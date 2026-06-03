@@ -1,12 +1,13 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState } from "react";
-import { useQuery, useMutation } from "@tanstack/react-query";
+import { useEffect, useState } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { listRecipes } from "@/lib/recipes.functions";
 import { generateRecipeFromIngredients, type GeneratedRecipe } from "@/lib/ai-extras.functions";
 import { BottomNav } from "@/components/bottom-nav";
 import { ArrowLeft, Clock, Flame, Search, Sparkles, Loader2, X, Star, Bookmark, TrendingUp } from "lucide-react";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/_authenticated/recipes")({
   component: RecipesPage,
@@ -25,11 +26,29 @@ type SortMode = "title" | "rating" | "popular" | "trending";
 function RecipesPage() {
   const fetchList = useServerFn(listRecipes);
   const genRecipe = useServerFn(generateRecipeFromIngredients);
+  const qc = useQueryClient();
   const { data: all = [] } = useQuery({ queryKey: ["recipes"], queryFn: () => fetchList() });
   const [cat, setCat] = useState<(typeof CATS)[number]["id"]>("all");
   const [q, setQ] = useState("");
   const [sort, setSort] = useState<SortMode>("title");
   const [trendingOnly, setTrendingOnly] = useState(false);
+
+  // Realtime re-sort while in trending mode
+  useEffect(() => {
+    if (sort !== "trending") return;
+    const ch = supabase
+      .channel("recipes-trending-bookmarks")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "recipe_bookmarks" },
+        () => qc.invalidateQueries({ queryKey: ["recipes"] }),
+      )
+      .subscribe();
+    return () => {
+      void supabase.removeChannel(ch);
+    };
+  }, [sort, qc]);
+
   const [aiOpen, setAiOpen] = useState(false);
   const [ingredients, setIngredients] = useState("");
   const [prefs, setPrefs] = useState("");
