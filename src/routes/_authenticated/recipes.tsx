@@ -216,6 +216,19 @@ function RecipesPage() {
             }`}
           >
             <TrendingUp className="size-3" /> Trending
+            {(() => {
+              const n = all.filter((r) => Number(r.weekly_growth ?? 0) > 0).length;
+              if (n === 0) return null;
+              return (
+                <span
+                  className={`ml-0.5 text-[9px] font-bold tabular-nums rounded-full px-1.5 py-px ${
+                    sort === "trending" ? "bg-white/25 text-white" : "bg-orange-100 text-orange-700"
+                  }`}
+                >
+                  {n}
+                </span>
+              );
+            })()}
             {pulseTrending && (
               <span className="absolute -top-0.5 -right-0.5 flex size-2">
                 <span className="absolute inline-flex size-full rounded-full bg-orange-400 opacity-75 animate-ping" />

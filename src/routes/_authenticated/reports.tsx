@@ -84,7 +84,12 @@ function ReportsPage() {
       .on(
         "postgres_changes",
         { event: "INSERT", schema: "public", table: "ai_reports" },
-        () => qc.invalidateQueries({ queryKey: ["ai-reports"] }),
+        () => {
+          // Local-only: clear last-seen so the new row gets the "Baru" badge
+          // immediately without waiting for the user to open it.
+          qc.setQueryData(["profile-last-seen-report"], null);
+          qc.invalidateQueries({ queryKey: ["ai-reports"] });
+        },
       )
       .subscribe();
     return () => {

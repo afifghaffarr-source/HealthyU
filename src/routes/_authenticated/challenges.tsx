@@ -30,6 +30,7 @@ import { groupChallengePendingMembers } from "@/lib/groupChallengePending.functi
 const challengesSearchSchema = z.object({
   group: fallback(z.string().uuid().optional(), undefined),
   challenge: fallback(z.string().uuid().optional(), undefined),
+  focus: fallback(z.enum(["streak"]).optional(), undefined),
 });
 
 export const Route = createFileRoute("/_authenticated/challenges")({
@@ -39,7 +40,7 @@ export const Route = createFileRoute("/_authenticated/challenges")({
 
 function ChallengesPage() {
   const qc = useQueryClient();
-  const { group: focusGroup, challenge: focusChallenge } = Route.useSearch();
+  const { group: focusGroup, challenge: focusChallenge, focus } = Route.useSearch();
   const fetchAll = useServerFn(listChallenges);
   const joinFn = useServerFn(joinChallenge);
   const logFn = useServerFn(logChallengeDay);
@@ -96,6 +97,20 @@ function ChallengesPage() {
     }, 250);
     return () => clearTimeout(t);
   }, [focusChallenge]);
+
+  // Streak deeplink: scroll to challenge where user has the longest streak
+  useEffect(() => {
+    if (focus !== "streak") return;
+    const parts = data?.participations ?? [];
+    if (parts.length === 0) return;
+    const top = parts.slice().sort((a, b) => (b.streak ?? 0) - (a.streak ?? 0))[0];
+    if (!top?.challenge_id) return;
+    setOpenLb(top.challenge_id);
+    const t = setTimeout(() => {
+      articleRefs.current[top.challenge_id]?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 250);
+    return () => clearTimeout(t);
+  }, [focus, data]);
 
   return (
     <div className="min-h-screen pb-32">
