@@ -3926,6 +3926,10 @@ export type Database = {
         Args: { p_challenge_id: string; p_group_id: string }
         Returns: Json
       }
+      is_co_challenge_participant: {
+        Args: { _challenge_id: string; _user_id: string }
+        Returns: boolean
+      }
       is_group_member: {
         Args: { _group_id: string; _user_id: string }
         Returns: boolean
