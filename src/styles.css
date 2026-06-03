@@ -152,6 +152,14 @@
 
   .no-scrollbar::-webkit-scrollbar { display: none; }
   .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+  /* Lucide icons: never collapse inside flex layouts and always
+     respect their declared size utility (size-3, size-4, size-5, …). */
+  svg.lucide {
+    flex-shrink: 0;
+    display: inline-block;
+    vertical-align: middle;
+  }
 }
 
 @layer utilities {
