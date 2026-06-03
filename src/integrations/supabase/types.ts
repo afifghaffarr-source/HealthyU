@@ -143,6 +143,42 @@ export type Database = {
         }
         Relationships: []
       }
+      app_versions: {
+        Row: {
+          build_number: number | null
+          created_at: string
+          id: string
+          is_active: boolean
+          is_force_update: boolean
+          min_supported_version: string | null
+          platform: string
+          release_notes: string | null
+          version: string
+        }
+        Insert: {
+          build_number?: number | null
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          is_force_update?: boolean
+          min_supported_version?: string | null
+          platform: string
+          release_notes?: string | null
+          version: string
+        }
+        Update: {
+          build_number?: number | null
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          is_force_update?: boolean
+          min_supported_version?: string | null
+          platform?: string
+          release_notes?: string | null
+          version?: string
+        }
+        Relationships: []
+      }
       article_bookmarks: {
         Row: {
           article_id: string
@@ -692,6 +728,98 @@ export type Database = {
           topic?: string | null
           updated_at?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      coin_redemptions: {
+        Row: {
+          coins_spent: number
+          created_at: string
+          delivered_at: string | null
+          delivery_data: Json | null
+          delivery_status: string
+          id: string
+          redeemed_at: string
+          reward_id: string
+          user_id: string
+        }
+        Insert: {
+          coins_spent: number
+          created_at?: string
+          delivered_at?: string | null
+          delivery_data?: Json | null
+          delivery_status?: string
+          id?: string
+          redeemed_at?: string
+          reward_id: string
+          user_id: string
+        }
+        Update: {
+          coins_spent?: number
+          created_at?: string
+          delivered_at?: string | null
+          delivery_data?: Json | null
+          delivery_status?: string
+          id?: string
+          redeemed_at?: string
+          reward_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "coin_redemptions_reward_id_fkey"
+            columns: ["reward_id"]
+            isOneToOne: false
+            referencedRelation: "coin_rewards"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      coin_rewards: {
+        Row: {
+          category: string | null
+          coin_cost: number
+          created_at: string
+          description: string | null
+          id: string
+          image_url: string | null
+          is_active: boolean
+          monetary_value_idr: number | null
+          name: string
+          partner_name: string | null
+          remaining_stock: number | null
+          total_stock: number | null
+          updated_at: string
+        }
+        Insert: {
+          category?: string | null
+          coin_cost: number
+          created_at?: string
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          is_active?: boolean
+          monetary_value_idr?: number | null
+          name: string
+          partner_name?: string | null
+          remaining_stock?: number | null
+          total_stock?: number | null
+          updated_at?: string
+        }
+        Update: {
+          category?: string | null
+          coin_cost?: number
+          created_at?: string
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          is_active?: boolean
+          monetary_value_idr?: number | null
+          name?: string
+          partner_name?: string | null
+          remaining_stock?: number | null
+          total_stock?: number | null
+          updated_at?: string
         }
         Relationships: []
       }
@@ -2166,6 +2294,44 @@ export type Database = {
         }
         Relationships: []
       }
+      pet_interactions: {
+        Row: {
+          created_at: string
+          energy_boost: number | null
+          happiness_boost: number | null
+          health_boost: number | null
+          id: string
+          interaction_type: string
+          pet_id: string
+        }
+        Insert: {
+          created_at?: string
+          energy_boost?: number | null
+          happiness_boost?: number | null
+          health_boost?: number | null
+          id?: string
+          interaction_type: string
+          pet_id: string
+        }
+        Update: {
+          created_at?: string
+          energy_boost?: number | null
+          happiness_boost?: number | null
+          health_boost?: number | null
+          id?: string
+          interaction_type?: string
+          pet_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pet_interactions_pet_id_fkey"
+            columns: ["pet_id"]
+            isOneToOne: false
+            referencedRelation: "virtual_pets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       prayer_times: {
         Row: {
           ashar: string | null
@@ -2600,6 +2766,111 @@ export type Database = {
         }
         Relationships: []
       }
+      referrals: {
+        Row: {
+          completed_at: string | null
+          created_at: string
+          id: string
+          referral_code: string
+          referred_id: string
+          referred_reward_coins: number
+          referrer_id: string
+          referrer_reward_coins: number
+          status: string
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string
+          id?: string
+          referral_code: string
+          referred_id: string
+          referred_reward_coins?: number
+          referrer_id: string
+          referrer_reward_coins?: number
+          status?: string
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string
+          id?: string
+          referral_code?: string
+          referred_id?: string
+          referred_reward_coins?: number
+          referrer_id?: string
+          referrer_reward_coins?: number
+          status?: string
+        }
+        Relationships: []
+      }
+      reward_transactions: {
+        Row: {
+          amount: number
+          balance_after: number | null
+          created_at: string
+          description: string | null
+          id: string
+          reference_id: string | null
+          transaction_type: string
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          balance_after?: number | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          reference_id?: string | null
+          transaction_type: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          balance_after?: number | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          reference_id?: string | null
+          transaction_type?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      search_history: {
+        Row: {
+          clicked_result_id: string | null
+          clicked_result_type: string | null
+          filters: Json | null
+          id: string
+          query: string
+          results_count: number | null
+          search_type: string | null
+          searched_at: string
+          user_id: string
+        }
+        Insert: {
+          clicked_result_id?: string | null
+          clicked_result_type?: string | null
+          filters?: Json | null
+          id?: string
+          query: string
+          results_count?: number | null
+          search_type?: string | null
+          searched_at?: string
+          user_id: string
+        }
+        Update: {
+          clicked_result_id?: string | null
+          clicked_result_type?: string | null
+          filters?: Json | null
+          id?: string
+          query?: string
+          results_count?: number | null
+          search_type?: string | null
+          searched_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       sleep_logs: {
         Row: {
           bed_time: string | null
@@ -2729,6 +3000,39 @@ export type Database = {
         }
         Relationships: []
       }
+      system_settings: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          is_public: boolean
+          key: string
+          updated_at: string
+          value: string | null
+          value_type: string | null
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_public?: boolean
+          key: string
+          updated_at?: string
+          value?: string | null
+          value_type?: string | null
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_public?: boolean
+          key?: string
+          updated_at?: string
+          value?: string | null
+          value_type?: string | null
+        }
+        Relationships: []
+      }
       user_achievements: {
         Row: {
           achievement_id: string
@@ -2757,6 +3061,42 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      user_activity_log: {
+        Row: {
+          activity_data: Json | null
+          activity_type: string
+          app_version: string | null
+          created_at: string
+          id: string
+          ip_address: string | null
+          platform: string | null
+          user_agent: string | null
+          user_id: string
+        }
+        Insert: {
+          activity_data?: Json | null
+          activity_type: string
+          app_version?: string | null
+          created_at?: string
+          id?: string
+          ip_address?: string | null
+          platform?: string | null
+          user_agent?: string | null
+          user_id: string
+        }
+        Update: {
+          activity_data?: Json | null
+          activity_type?: string
+          app_version?: string | null
+          created_at?: string
+          id?: string
+          ip_address?: string | null
+          platform?: string | null
+          user_agent?: string | null
+          user_id?: string
+        }
+        Relationships: []
       }
       user_allergies: {
         Row: {
@@ -2957,6 +3297,63 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      virtual_pets: {
+        Row: {
+          accessories: Json | null
+          created_at: string
+          energy_stat: number
+          evolution_points: number
+          evolution_stage: number
+          happiness_stat: number
+          health_stat: number
+          hunger_stat: number
+          id: string
+          last_fed_at: string | null
+          last_played_at: string | null
+          pet_avatar_url: string | null
+          pet_name: string
+          pet_type: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          accessories?: Json | null
+          created_at?: string
+          energy_stat?: number
+          evolution_points?: number
+          evolution_stage?: number
+          happiness_stat?: number
+          health_stat?: number
+          hunger_stat?: number
+          id?: string
+          last_fed_at?: string | null
+          last_played_at?: string | null
+          pet_avatar_url?: string | null
+          pet_name: string
+          pet_type?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          accessories?: Json | null
+          created_at?: string
+          energy_stat?: number
+          evolution_points?: number
+          evolution_stage?: number
+          happiness_stat?: number
+          health_stat?: number
+          hunger_stat?: number
+          id?: string
+          last_fed_at?: string | null
+          last_played_at?: string | null
+          pet_avatar_url?: string | null
+          pet_name?: string
+          pet_type?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       vitals_logs: {
         Row: {
