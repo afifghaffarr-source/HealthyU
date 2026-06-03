@@ -24,6 +24,7 @@ import {
 } from "@/lib/constants";
 import { useMiniFocusTrap } from "@/hooks/useMiniFocusTrap";
 import { useAnnounce } from "@/components/live-announcer";
+import { useReducedMotion } from "@/hooks/useReducedMotion";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   component: Dashboard,
@@ -33,6 +34,7 @@ function Dashboard() {
   const navigate = useNavigate();
   const qc = useQueryClient();
   const announce = useAnnounce();
+  const prefersReducedMotion = useReducedMotion();
   const fetchProfile = useServerFn(getProfile);
   const fetchMeals = useServerFn(todaysMeals);
   const fetchFast = useServerFn(currentFast);
@@ -502,7 +504,11 @@ function Dashboard() {
                       +{total} klaim baru
                       <span
                         aria-hidden
-                        className="absolute left-0 bottom-0 h-0.5 bg-amber-500/70 transition-[width] duration-1000 ease-linear"
+                        className={
+                          prefersReducedMotion
+                            ? "absolute left-0 bottom-0 h-0.5 bg-amber-500/70"
+                            : "absolute left-0 bottom-0 h-0.5 bg-amber-500/70 transition-[width] duration-1000 ease-linear"
+                        }
                         style={{ width: `${pct}%` }}
                       />
                     </button>
