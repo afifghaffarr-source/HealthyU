@@ -264,6 +264,14 @@ function FoodPage() {
                 <p className="text-[11px] text-muted-foreground">{Math.round(Number(f.calories))} kcal · {f.serving_size}{f.serving_unit}</p>
               </div>
               <button
+                onClick={() => setAltFor({ id: f.id, name: f.name })}
+                className="size-9 rounded-full bg-mint/60 text-emerald-700 grid place-items-center hover:bg-mint"
+                aria-label="Lihat pengganti sehat"
+                title="Saran pengganti sehat"
+              >
+                <Sparkles className="size-4" />
+              </button>
+              <button
                 onClick={() => addToBasket(f)}
                 className="size-9 rounded-full bg-primary/10 text-primary grid place-items-center hover:bg-primary/20"
                 aria-label="Tambah ke keranjang"
