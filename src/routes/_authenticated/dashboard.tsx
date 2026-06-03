@@ -101,8 +101,15 @@ function Dashboard() {
     const onDown = (e: MouseEvent) => {
       if (!breakdownRef.current?.contains(e.target as Node)) setBreakdownOpen(false);
     };
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setBreakdownOpen(false);
+    };
     document.addEventListener("mousedown", onDown);
-    return () => document.removeEventListener("mousedown", onDown);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("mousedown", onDown);
+      document.removeEventListener("keydown", onKey);
+    };
   }, [breakdownOpen]);
   useEffect(() => {
     if (Object.keys(newClaims).length === 0) return;

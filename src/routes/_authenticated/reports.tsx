@@ -275,6 +275,25 @@ function ReportsPage() {
       doc.setLineWidth(0.5);
       doc.line(555 - linkW, 42, 555, 42);
       doc.link(555 - linkW - 4, 30, linkW + 8, 16, { pageNumber: 1 });
+      // Tooltip hover via Text annotation overlay (jsPDF link option does
+      // not carry /Contents — we add a sibling annotation with the same bounds).
+      (
+        doc as unknown as {
+          createAnnotation: (a: {
+            type: string;
+            title?: string;
+            bounds: { x: number; y: number; w: number; h: number };
+            contents: string;
+            open?: boolean;
+          }) => void;
+        }
+      ).createAnnotation({
+        type: "text",
+        title: "Navigasi",
+        bounds: { x: 555 - linkW - 4, y: 30, w: linkW + 8, h: 16 },
+        contents: `Halaman ${currentPage} dari ${tocPages + filtered.length}`,
+        open: false,
+      });
       doc.setDrawColor(0);
       doc.setTextColor(0);
     });
