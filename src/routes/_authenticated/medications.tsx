@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -9,6 +9,7 @@ import {
   markMedicationTaken,
 } from "@/lib/medications.functions";
 import { BottomNav } from "@/components/bottom-nav";
+import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { Pill, Check, Trash2, Plus, X } from "lucide-react";
 import { toast } from "sonner";
 
@@ -68,21 +69,19 @@ function MedsPage() {
 
   return (
     <main className="min-h-screen bg-background pb-28">
-      <div className="max-w-md mx-auto px-5 pt-8 space-y-5">
-        <header className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <Link to="/profile" className="size-10 bg-card rounded-2xl outline-1 outline-black/10 grid place-items-center">
-              ←
-            </Link>
-            <h1 className="text-2xl font-bold">Obat & Vitamin</h1>
-          </div>
-          <button
-            onClick={() => setAdding(true)}
-            className="size-10 bg-primary text-primary-foreground rounded-2xl grid place-items-center"
-          >
-            <Plus className="size-5" />
-          </button>
-        </header>
+      <div className="max-w-md mx-auto px-5 pt-2 space-y-5">
+        <TopAppBar
+          title="Obat & Vitamin"
+          showBack
+          action={
+            <button
+              onClick={() => setAdding(true)}
+              className="size-10 bg-primary text-primary-foreground rounded-2xl grid place-items-center"
+            >
+              <Plus className="size-5" />
+            </button>
+          }
+        />
 
         {meds.length === 0 ? (
           <div className="bg-card p-6 rounded-3xl outline-1 outline-black/5 text-center animate-fade-up">
