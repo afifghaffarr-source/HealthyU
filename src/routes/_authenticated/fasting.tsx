@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { currentFast, startFast, stopFast, fastHistory } from "@/lib/fasting.functions";
+import { getAchievementToastPrefix } from "@/lib/achievement-icons";
 import { BottomNav } from "@/components/bottom-nav";
 import { ArrowLeft, Check, X } from "lucide-react";
 import { FASTING_PROTOCOLS, fastingStage, formatDuration } from "@/lib/health";
@@ -43,7 +44,7 @@ function FastingPage() {
       qc.invalidateQueries({ queryKey: ["game", "summary"] });
       toast.success(r.completed ? "Selamat! Puasa tercapai 🎉" : "Puasa dihentikan");
       (r?.game?.newlyUnlocked ?? []).forEach((a) =>
-        toast.success(`${a.icon} ${a.title} terbuka!`),
+        toast.success(`${getAchievementToastPrefix(a.icon)} ${a.title} terbuka!`),
       );
     },
   });
