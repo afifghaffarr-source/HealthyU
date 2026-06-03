@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -313,6 +313,7 @@ function Leaderboard({ challengeId, initialGroup }: { challengeId: string; initi
 
 function GroupInviter({ challengeId, initialOpen }: { challengeId: string; initialOpen?: boolean }) {
   const qc = useQueryClient();
+  const navigate = useNavigate();
   const fetchGroups = useServerFn(listMyGroupsForChallenge);
   const inviteFn = useServerFn(inviteGroupToChallenge);
   const [open, setOpen] = useState(!!initialOpen);
@@ -325,10 +326,21 @@ function GroupInviter({ challengeId, initialOpen }: { challengeId: string; initi
     enabled: open,
   });
   const inviteM = useMutation({
-    mutationFn: (group_id: string) =>
-      inviteFn({ data: { group_id, challenge_id: challengeId } }),
-    onSuccess: () => {
-      toast.success("Grup diundang ke challenge");
+    mutationFn: async (group_id: string) => {
+      await inviteFn({ data: { group_id, challenge_id: challengeId } });
+      return group_id;
+    },
+    onSuccess: (group_id) => {
+      toast.success("Grup diundang ke challenge", {
+        action: {
+          label: "Lihat",
+          onClick: () =>
+            navigate({
+              to: "/challenges",
+              search: { challenge: challengeId, group: group_id },
+            }),
+        },
+      });
       qc.invalidateQueries({ queryKey: ["my-groups-for-challenge", challengeId] });
       qc.invalidateQueries({ queryKey: ["challenge-groups", challengeId] });
     },
