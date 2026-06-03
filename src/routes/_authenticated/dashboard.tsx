@@ -238,6 +238,7 @@ function Dashboard() {
       qc.invalidateQueries({ queryKey: ["water", "today"] });
       qc.invalidateQueries({ queryKey: ["game", "summary"] });
       toast.success("+250ml dicatat");
+      announce("250 mililiter air tercatat");
       const newlyUnlocked = res?.game?.newlyUnlocked ?? [];
       newlyUnlocked.forEach((a) => toast.success(`${getAchievementToastPrefix(a.icon)} ${a.title} terbuka!`));
     },
@@ -245,9 +246,10 @@ function Dashboard() {
 
   const moodMutation = useMutation({
     mutationFn: (mood: number) => addMoodFn({ data: { mood } }),
-    onSuccess: () => {
+    onSuccess: (_r, mood) => {
       qc.invalidateQueries({ queryKey: ["mood"] });
       toast.success("Mood tercatat");
+      announce(`Mood ${mood} dari 5 tercatat`);
     },
   });
 

@@ -602,6 +602,13 @@ function GroupInviteRow({
 
 function BonusClaimer({ challengeId }: { challengeId: string }) {
   const qc = useQueryClient();
+  const [open, setOpen] = useState(true);
+  const triggerRef = useRef<HTMLButtonElement | null>(null);
+  // ESC menutup panel klaim bonus; fokus dikembalikan ke trigger.
+  useMiniFocusTrap(open, [triggerRef], () => {
+    setOpen(false);
+    triggerRef.current?.focus();
+  });
   const fetchGroups = useServerFn(listChallengeGroups);
   const fetchClaimed = useServerFn(listGroupBonusStatus);
   const claimFn = useServerFn(claimGroupChallengeBonus);
@@ -662,7 +669,16 @@ function BonusClaimer({ challengeId }: { challengeId: string }) {
   if (groups.length === 0) return null;
   return (
     <div className="mt-2 space-y-1.5">
-      {groups.map((g) => {
+      <button
+        ref={triggerRef}
+        onClick={() => setOpen((v) => !v)}
+        aria-expanded={open}
+        className="w-full text-[11px] font-semibold text-muted-foreground inline-flex items-center justify-center gap-1"
+      >
+        <Gift className="size-3" />
+        {open ? "Tutup klaim bonus" : "Klaim bonus grup"}
+      </button>
+      {open && groups.map((g) => {
         const done = claimedSet.has(g.id);
         return (
           <div key={g.id} className="space-y-1">

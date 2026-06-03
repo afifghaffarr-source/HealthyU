@@ -307,6 +307,21 @@ function ProfilePage() {
         >
           <LogOut className="size-4" /> Keluar
         </button>
+
+        <div className="flex items-center justify-between gap-3 px-1">
+          <label htmlFor="locale-switcher" className="text-xs font-semibold text-muted-foreground">
+            Bahasa / Language
+          </label>
+          <select
+            id="locale-switcher"
+            value={locale}
+            onChange={(e) => setLocale(e.target.value as Locale)}
+            className="text-xs bg-card outline-1 outline-black/10 rounded-lg px-2 py-1"
+          >
+            <option value="id">Bahasa Indonesia</option>
+            <option value="en">English</option>
+          </select>
+        </div>
       </div>
       <BottomNav />
     </main>
