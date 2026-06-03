@@ -81,6 +81,7 @@ import { Route as AuthenticatedProfileScanStatsRouteImport } from './routes/_aut
 import { Route as AuthenticatedProfilePrivacyRouteImport } from './routes/_authenticated/profile.privacy'
 import { Route as AuthenticatedPetShopRouteImport } from './routes/_authenticated/pet.shop'
 import { Route as AuthenticatedMealplanGroceryRouteImport } from './routes/_authenticated/mealplan.grocery'
+import { Route as AuthenticatedHabitsStackRouteImport } from './routes/_authenticated/habits.stack'
 import { Route as AuthenticatedCoachMealsRouteImport } from './routes/_authenticated/coach.meals'
 import { Route as AuthenticatedChallengesDailyRouteImport } from './routes/_authenticated/challenges.daily'
 import { Route as ApiWearableGoogleFitCallbackRouteImport } from './routes/api/wearable.google-fit.callback'
@@ -476,6 +477,12 @@ const AuthenticatedMealplanGroceryRoute =
     path: '/grocery',
     getParentRoute: () => AuthenticatedMealplanRoute,
   } as any)
+const AuthenticatedHabitsStackRoute =
+  AuthenticatedHabitsStackRouteImport.update({
+    id: '/habits/stack',
+    path: '/habits/stack',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedCoachMealsRoute = AuthenticatedCoachMealsRouteImport.update({
   id: '/meals',
   path: '/meals',
@@ -593,6 +600,7 @@ export interface FileRoutesByFullPath {
   '/workout': typeof AuthenticatedWorkoutRoute
   '/challenges/daily': typeof AuthenticatedChallengesDailyRoute
   '/coach/meals': typeof AuthenticatedCoachMealsRoute
+  '/habits/stack': typeof AuthenticatedHabitsStackRoute
   '/mealplan/grocery': typeof AuthenticatedMealplanGroceryRoute
   '/pet/shop': typeof AuthenticatedPetShopRoute
   '/profile/privacy': typeof AuthenticatedProfilePrivacyRoute
@@ -677,6 +685,7 @@ export interface FileRoutesByTo {
   '/workout': typeof AuthenticatedWorkoutRoute
   '/challenges/daily': typeof AuthenticatedChallengesDailyRoute
   '/coach/meals': typeof AuthenticatedCoachMealsRoute
+  '/habits/stack': typeof AuthenticatedHabitsStackRoute
   '/mealplan/grocery': typeof AuthenticatedMealplanGroceryRoute
   '/pet/shop': typeof AuthenticatedPetShopRoute
   '/profile/privacy': typeof AuthenticatedProfilePrivacyRoute
@@ -763,6 +772,7 @@ export interface FileRoutesById {
   '/_authenticated/workout': typeof AuthenticatedWorkoutRoute
   '/_authenticated/challenges/daily': typeof AuthenticatedChallengesDailyRoute
   '/_authenticated/coach/meals': typeof AuthenticatedCoachMealsRoute
+  '/_authenticated/habits/stack': typeof AuthenticatedHabitsStackRoute
   '/_authenticated/mealplan/grocery': typeof AuthenticatedMealplanGroceryRoute
   '/_authenticated/pet/shop': typeof AuthenticatedPetShopRoute
   '/_authenticated/profile/privacy': typeof AuthenticatedProfilePrivacyRoute
@@ -849,6 +859,7 @@ export interface FileRouteTypes {
     | '/workout'
     | '/challenges/daily'
     | '/coach/meals'
+    | '/habits/stack'
     | '/mealplan/grocery'
     | '/pet/shop'
     | '/profile/privacy'
@@ -933,6 +944,7 @@ export interface FileRouteTypes {
     | '/workout'
     | '/challenges/daily'
     | '/coach/meals'
+    | '/habits/stack'
     | '/mealplan/grocery'
     | '/pet/shop'
     | '/profile/privacy'
@@ -1018,6 +1030,7 @@ export interface FileRouteTypes {
     | '/_authenticated/workout'
     | '/_authenticated/challenges/daily'
     | '/_authenticated/coach/meals'
+    | '/_authenticated/habits/stack'
     | '/_authenticated/mealplan/grocery'
     | '/_authenticated/pet/shop'
     | '/_authenticated/profile/privacy'
@@ -1570,6 +1583,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedMealplanGroceryRouteImport
       parentRoute: typeof AuthenticatedMealplanRoute
     }
+    '/_authenticated/habits/stack': {
+      id: '/_authenticated/habits/stack'
+      path: '/habits/stack'
+      fullPath: '/habits/stack'
+      preLoaderRoute: typeof AuthenticatedHabitsStackRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/coach/meals': {
       id: '/_authenticated/coach/meals'
       path: '/meals'
@@ -1859,6 +1879,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedWearableRoute: typeof AuthenticatedWearableRoute
   AuthenticatedWeightRoute: typeof AuthenticatedWeightRoute
   AuthenticatedWorkoutRoute: typeof AuthenticatedWorkoutRoute
+  AuthenticatedHabitsStackRoute: typeof AuthenticatedHabitsStackRoute
   AuthenticatedQuizDailyRoute: typeof AuthenticatedQuizDailyRoute
 }
 
@@ -1909,6 +1930,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedWearableRoute: AuthenticatedWearableRoute,
   AuthenticatedWeightRoute: AuthenticatedWeightRoute,
   AuthenticatedWorkoutRoute: AuthenticatedWorkoutRoute,
+  AuthenticatedHabitsStackRoute: AuthenticatedHabitsStackRoute,
   AuthenticatedQuizDailyRoute: AuthenticatedQuizDailyRoute,
 }
 
