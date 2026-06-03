@@ -27,6 +27,7 @@ import { Route as AuthenticatedProgressRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
 import { Route as AuthenticatedPrayerRouteImport } from './routes/_authenticated/prayer'
 import { Route as AuthenticatedOnboardingRouteImport } from './routes/_authenticated/onboarding'
+import { Route as AuthenticatedOfflineQueueRouteImport } from './routes/_authenticated/offline-queue'
 import { Route as AuthenticatedMoodRouteImport } from './routes/_authenticated/mood'
 import { Route as AuthenticatedMedicationsRouteImport } from './routes/_authenticated/medications'
 import { Route as AuthenticatedMealplanRouteImport } from './routes/_authenticated/mealplan'
@@ -137,6 +138,12 @@ const AuthenticatedOnboardingRoute = AuthenticatedOnboardingRouteImport.update({
   path: '/onboarding',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedOfflineQueueRoute =
+  AuthenticatedOfflineQueueRouteImport.update({
+    id: '/offline-queue',
+    path: '/offline-queue',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedMoodRoute = AuthenticatedMoodRouteImport.update({
   id: '/mood',
   path: '/mood',
@@ -257,6 +264,7 @@ export interface FileRoutesByFullPath {
   '/mealplan': typeof AuthenticatedMealplanRoute
   '/medications': typeof AuthenticatedMedicationsRoute
   '/mood': typeof AuthenticatedMoodRoute
+  '/offline-queue': typeof AuthenticatedOfflineQueueRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/prayer': typeof AuthenticatedPrayerRoute
   '/profile': typeof AuthenticatedProfileRoute
@@ -295,6 +303,7 @@ export interface FileRoutesByTo {
   '/mealplan': typeof AuthenticatedMealplanRoute
   '/medications': typeof AuthenticatedMedicationsRoute
   '/mood': typeof AuthenticatedMoodRoute
+  '/offline-queue': typeof AuthenticatedOfflineQueueRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/prayer': typeof AuthenticatedPrayerRoute
   '/profile': typeof AuthenticatedProfileRoute
@@ -335,6 +344,7 @@ export interface FileRoutesById {
   '/_authenticated/mealplan': typeof AuthenticatedMealplanRoute
   '/_authenticated/medications': typeof AuthenticatedMedicationsRoute
   '/_authenticated/mood': typeof AuthenticatedMoodRoute
+  '/_authenticated/offline-queue': typeof AuthenticatedOfflineQueueRoute
   '/_authenticated/onboarding': typeof AuthenticatedOnboardingRoute
   '/_authenticated/prayer': typeof AuthenticatedPrayerRoute
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
@@ -375,6 +385,7 @@ export interface FileRouteTypes {
     | '/mealplan'
     | '/medications'
     | '/mood'
+    | '/offline-queue'
     | '/onboarding'
     | '/prayer'
     | '/profile'
@@ -413,6 +424,7 @@ export interface FileRouteTypes {
     | '/mealplan'
     | '/medications'
     | '/mood'
+    | '/offline-queue'
     | '/onboarding'
     | '/prayer'
     | '/profile'
@@ -452,6 +464,7 @@ export interface FileRouteTypes {
     | '/_authenticated/mealplan'
     | '/_authenticated/medications'
     | '/_authenticated/mood'
+    | '/_authenticated/offline-queue'
     | '/_authenticated/onboarding'
     | '/_authenticated/prayer'
     | '/_authenticated/profile'
@@ -608,6 +621,13 @@ declare module '@tanstack/react-router' {
       path: '/onboarding'
       fullPath: '/onboarding'
       preLoaderRoute: typeof AuthenticatedOnboardingRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/offline-queue': {
+      id: '/_authenticated/offline-queue'
+      path: '/offline-queue'
+      fullPath: '/offline-queue'
+      preLoaderRoute: typeof AuthenticatedOfflineQueueRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/mood': {
@@ -773,6 +793,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedMealplanRoute: typeof AuthenticatedMealplanRoute
   AuthenticatedMedicationsRoute: typeof AuthenticatedMedicationsRoute
   AuthenticatedMoodRoute: typeof AuthenticatedMoodRoute
+  AuthenticatedOfflineQueueRoute: typeof AuthenticatedOfflineQueueRoute
   AuthenticatedOnboardingRoute: typeof AuthenticatedOnboardingRoute
   AuthenticatedPrayerRoute: typeof AuthenticatedPrayerRoute
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
@@ -806,6 +827,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedMealplanRoute: AuthenticatedMealplanRoute,
   AuthenticatedMedicationsRoute: AuthenticatedMedicationsRoute,
   AuthenticatedMoodRoute: AuthenticatedMoodRoute,
+  AuthenticatedOfflineQueueRoute: AuthenticatedOfflineQueueRoute,
   AuthenticatedOnboardingRoute: AuthenticatedOnboardingRoute,
   AuthenticatedPrayerRoute: AuthenticatedPrayerRoute,
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,
