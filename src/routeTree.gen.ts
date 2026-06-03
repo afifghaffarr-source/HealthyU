@@ -58,6 +58,7 @@ import { Route as AuthenticatedCurrencyRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedCommunityRouteImport } from './routes/_authenticated/community'
 import { Route as AuthenticatedCoachRouteImport } from './routes/_authenticated/coach'
 import { Route as AuthenticatedChatRouteImport } from './routes/_authenticated/chat'
+import { Route as AuthenticatedCharityRouteImport } from './routes/_authenticated/charity'
 import { Route as AuthenticatedChallengesRouteImport } from './routes/_authenticated/challenges'
 import { Route as AuthenticatedBackupRouteImport } from './routes/_authenticated/backup'
 import { Route as AuthenticatedArticlesRouteImport } from './routes/_authenticated/articles'
@@ -367,6 +368,11 @@ const AuthenticatedCoachRoute = AuthenticatedCoachRouteImport.update({
 const AuthenticatedChatRoute = AuthenticatedChatRouteImport.update({
   id: '/chat',
   path: '/chat',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedCharityRoute = AuthenticatedCharityRouteImport.update({
+  id: '/charity',
+  path: '/charity',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedChallengesRoute = AuthenticatedChallengesRouteImport.update({
@@ -710,6 +716,7 @@ export interface FileRoutesByFullPath {
   '/articles': typeof AuthenticatedArticlesRoute
   '/backup': typeof AuthenticatedBackupRoute
   '/challenges': typeof AuthenticatedChallengesRouteWithChildren
+  '/charity': typeof AuthenticatedCharityRoute
   '/chat': typeof AuthenticatedChatRoute
   '/coach': typeof AuthenticatedCoachRouteWithChildren
   '/community': typeof AuthenticatedCommunityRoute
@@ -818,6 +825,7 @@ export interface FileRoutesByTo {
   '/articles': typeof AuthenticatedArticlesRoute
   '/backup': typeof AuthenticatedBackupRoute
   '/challenges': typeof AuthenticatedChallengesRouteWithChildren
+  '/charity': typeof AuthenticatedCharityRoute
   '/chat': typeof AuthenticatedChatRoute
   '/coach': typeof AuthenticatedCoachRouteWithChildren
   '/community': typeof AuthenticatedCommunityRoute
@@ -928,6 +936,7 @@ export interface FileRoutesById {
   '/_authenticated/articles': typeof AuthenticatedArticlesRoute
   '/_authenticated/backup': typeof AuthenticatedBackupRoute
   '/_authenticated/challenges': typeof AuthenticatedChallengesRouteWithChildren
+  '/_authenticated/charity': typeof AuthenticatedCharityRoute
   '/_authenticated/chat': typeof AuthenticatedChatRoute
   '/_authenticated/coach': typeof AuthenticatedCoachRouteWithChildren
   '/_authenticated/community': typeof AuthenticatedCommunityRoute
@@ -1038,6 +1047,7 @@ export interface FileRouteTypes {
     | '/articles'
     | '/backup'
     | '/challenges'
+    | '/charity'
     | '/chat'
     | '/coach'
     | '/community'
@@ -1146,6 +1156,7 @@ export interface FileRouteTypes {
     | '/articles'
     | '/backup'
     | '/challenges'
+    | '/charity'
     | '/chat'
     | '/coach'
     | '/community'
@@ -1255,6 +1266,7 @@ export interface FileRouteTypes {
     | '/_authenticated/articles'
     | '/_authenticated/backup'
     | '/_authenticated/challenges'
+    | '/_authenticated/charity'
     | '/_authenticated/chat'
     | '/_authenticated/coach'
     | '/_authenticated/community'
@@ -1711,6 +1723,13 @@ declare module '@tanstack/react-router' {
       path: '/chat'
       fullPath: '/chat'
       preLoaderRoute: typeof AuthenticatedChatRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/charity': {
+      id: '/_authenticated/charity'
+      path: '/charity'
+      fullPath: '/charity'
+      preLoaderRoute: typeof AuthenticatedCharityRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/challenges': {
@@ -2382,6 +2401,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedArticlesRoute: typeof AuthenticatedArticlesRoute
   AuthenticatedBackupRoute: typeof AuthenticatedBackupRoute
   AuthenticatedChallengesRoute: typeof AuthenticatedChallengesRouteWithChildren
+  AuthenticatedCharityRoute: typeof AuthenticatedCharityRoute
   AuthenticatedChatRoute: typeof AuthenticatedChatRoute
   AuthenticatedCoachRoute: typeof AuthenticatedCoachRouteWithChildren
   AuthenticatedCommunityRoute: typeof AuthenticatedCommunityRoute
@@ -2443,6 +2463,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedArticlesRoute: AuthenticatedArticlesRoute,
   AuthenticatedBackupRoute: AuthenticatedBackupRoute,
   AuthenticatedChallengesRoute: AuthenticatedChallengesRouteWithChildren,
+  AuthenticatedCharityRoute: AuthenticatedCharityRoute,
   AuthenticatedChatRoute: AuthenticatedChatRoute,
   AuthenticatedCoachRoute: AuthenticatedCoachRouteWithChildren,
   AuthenticatedCommunityRoute: AuthenticatedCommunityRoute,
