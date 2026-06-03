@@ -107,6 +107,152 @@ export type Database = {
         }
         Relationships: []
       }
+      article_bookmarks: {
+        Row: {
+          article_id: string
+          created_at: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          article_id: string
+          created_at?: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          article_id?: string
+          created_at?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "article_bookmarks_article_id_fkey"
+            columns: ["article_id"]
+            isOneToOne: false
+            referencedRelation: "articles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      articles: {
+        Row: {
+          audio_url: string | null
+          author_avatar_url: string | null
+          author_name: string | null
+          author_title: string | null
+          author_user_id: string | null
+          bookmark_count: number
+          category: string
+          content: string | null
+          content_html: string | null
+          created_at: string
+          deleted_at: string | null
+          excerpt: string | null
+          id: string
+          image_url: string | null
+          is_featured: boolean
+          is_original: boolean
+          is_published: boolean
+          keywords: Json | null
+          language: string | null
+          meta_description: string | null
+          meta_title: string | null
+          published_at: string | null
+          reading_time_minutes: number | null
+          share_count: number
+          slug: string
+          source_name: string | null
+          source_url: string | null
+          subcategory: string | null
+          tags: Json | null
+          target_conditions: Json | null
+          target_goals: Json | null
+          title: string
+          title_en: string | null
+          updated_at: string
+          video_url: string | null
+          view_count: number
+        }
+        Insert: {
+          audio_url?: string | null
+          author_avatar_url?: string | null
+          author_name?: string | null
+          author_title?: string | null
+          author_user_id?: string | null
+          bookmark_count?: number
+          category: string
+          content?: string | null
+          content_html?: string | null
+          created_at?: string
+          deleted_at?: string | null
+          excerpt?: string | null
+          id?: string
+          image_url?: string | null
+          is_featured?: boolean
+          is_original?: boolean
+          is_published?: boolean
+          keywords?: Json | null
+          language?: string | null
+          meta_description?: string | null
+          meta_title?: string | null
+          published_at?: string | null
+          reading_time_minutes?: number | null
+          share_count?: number
+          slug: string
+          source_name?: string | null
+          source_url?: string | null
+          subcategory?: string | null
+          tags?: Json | null
+          target_conditions?: Json | null
+          target_goals?: Json | null
+          title: string
+          title_en?: string | null
+          updated_at?: string
+          video_url?: string | null
+          view_count?: number
+        }
+        Update: {
+          audio_url?: string | null
+          author_avatar_url?: string | null
+          author_name?: string | null
+          author_title?: string | null
+          author_user_id?: string | null
+          bookmark_count?: number
+          category?: string
+          content?: string | null
+          content_html?: string | null
+          created_at?: string
+          deleted_at?: string | null
+          excerpt?: string | null
+          id?: string
+          image_url?: string | null
+          is_featured?: boolean
+          is_original?: boolean
+          is_published?: boolean
+          keywords?: Json | null
+          language?: string | null
+          meta_description?: string | null
+          meta_title?: string | null
+          published_at?: string | null
+          reading_time_minutes?: number | null
+          share_count?: number
+          slug?: string
+          source_name?: string | null
+          source_url?: string | null
+          subcategory?: string | null
+          tags?: Json | null
+          target_conditions?: Json | null
+          target_goals?: Json | null
+          title?: string
+          title_en?: string | null
+          updated_at?: string
+          video_url?: string | null
+          view_count?: number
+        }
+        Relationships: []
+      }
       body_metrics: {
         Row: {
           bicep_left_cm: number | null
@@ -333,23 +479,83 @@ export type Database = {
         Row: {
           content: string
           created_at: string
+          deleted_at: string | null
           id: string
+          is_flagged: boolean
+          likes_count: number
+          parent_comment_id: string | null
           post_id: string
+          updated_at: string
           user_id: string
         }
         Insert: {
           content: string
           created_at?: string
+          deleted_at?: string | null
           id?: string
+          is_flagged?: boolean
+          likes_count?: number
+          parent_comment_id?: string | null
           post_id: string
+          updated_at?: string
           user_id: string
         }
         Update: {
           content?: string
           created_at?: string
+          deleted_at?: string | null
           id?: string
+          is_flagged?: boolean
+          likes_count?: number
+          parent_comment_id?: string | null
           post_id?: string
+          updated_at?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      community_groups: {
+        Row: {
+          category: string | null
+          created_at: string
+          created_by: string | null
+          description: string | null
+          id: string
+          image_url: string | null
+          is_active: boolean
+          is_public: boolean
+          member_count: number
+          name: string
+          tags: Json | null
+          updated_at: string
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          is_active?: boolean
+          is_public?: boolean
+          member_count?: number
+          name: string
+          tags?: Json | null
+          updated_at?: string
+        }
+        Update: {
+          category?: string | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          is_active?: boolean
+          is_public?: boolean
+          member_count?: number
+          name?: string
+          tags?: Json | null
+          updated_at?: string
         }
         Relationships: []
       }
@@ -385,24 +591,66 @@ export type Database = {
       community_posts: {
         Row: {
           category: string
+          comments_count: number
           content: string
           created_at: string
+          deleted_at: string | null
           id: string
+          image_urls: Json | null
+          is_approved: boolean
+          is_featured: boolean
+          is_flagged: boolean
+          is_pinned: boolean
+          likes_count: number
+          post_type: string | null
+          shares_count: number
+          tags: Json | null
+          updated_at: string
           user_id: string
+          video_url: string | null
+          views_count: number
         }
         Insert: {
           category?: string
+          comments_count?: number
           content: string
           created_at?: string
+          deleted_at?: string | null
           id?: string
+          image_urls?: Json | null
+          is_approved?: boolean
+          is_featured?: boolean
+          is_flagged?: boolean
+          is_pinned?: boolean
+          likes_count?: number
+          post_type?: string | null
+          shares_count?: number
+          tags?: Json | null
+          updated_at?: string
           user_id: string
+          video_url?: string | null
+          views_count?: number
         }
         Update: {
           category?: string
+          comments_count?: number
           content?: string
           created_at?: string
+          deleted_at?: string | null
           id?: string
+          image_urls?: Json | null
+          is_approved?: boolean
+          is_featured?: boolean
+          is_flagged?: boolean
+          is_pinned?: boolean
+          likes_count?: number
+          post_type?: string | null
+          shares_count?: number
+          tags?: Json | null
+          updated_at?: string
           user_id?: string
+          video_url?: string | null
+          views_count?: number
         }
         Relationships: []
       }
@@ -1024,6 +1272,38 @@ export type Database = {
           owner_id?: string
         }
         Relationships: []
+      }
+      group_members: {
+        Row: {
+          group_id: string
+          id: string
+          joined_at: string
+          role: string
+          user_id: string
+        }
+        Insert: {
+          group_id: string
+          id?: string
+          joined_at?: string
+          role?: string
+          user_id: string
+        }
+        Update: {
+          group_id?: string
+          id?: string
+          joined_at?: string
+          role?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "group_members_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "community_groups"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       meal_log_items: {
         Row: {
