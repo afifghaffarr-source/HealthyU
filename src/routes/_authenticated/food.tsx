@@ -6,8 +6,10 @@ import { searchFoods, logMeal, todaysMeals, deleteMeal } from "@/lib/meals.funct
 import { parseMealFromVoice } from "@/lib/ai-extras.functions";
 import { getAchievementToastPrefix } from "@/lib/achievement-icons";
 import { BottomNav } from "@/components/bottom-nav";
-import { ArrowLeft, Search, Trash2, Mic, MicOff, Loader2 } from "lucide-react";
+import { ArrowLeft, Search, Trash2, Mic, MicOff, Loader2, WifiOff, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
+import { enqueue } from "@/lib/offline-queue";
+import { useOfflineQueue } from "@/hooks/use-offline-queue";
 
 export const Route = createFileRoute("/_authenticated/food")({
   component: FoodPage,
@@ -22,6 +24,7 @@ function FoodPage() {
   const fetchMeals = useServerFn(todaysMeals);
   const del = useServerFn(deleteMeal);
   const parseVoice = useServerFn(parseMealFromVoice);
+  const { online, pending, sync } = useOfflineQueue();
 
   const [q, setQ] = useState("");
   const [mealType, setMealType] = useState<MealType>(currentMealType());
@@ -42,12 +45,23 @@ function FoodPage() {
     fat_g: number;
   };
   const logMutation = useMutation({
-    mutationFn: (payload: LogPayload) => log({ data: payload }),
+    mutationFn: async (payload: LogPayload) => {
+      if (!navigator.onLine) {
+        await enqueue("meal", payload);
+        return { offline: true as const };
+      }
+      return log({ data: payload });
+    },
     onSuccess: (res) => {
       qc.invalidateQueries({ queryKey: ["meals"] });
       qc.invalidateQueries({ queryKey: ["game", "summary"] });
+      if (res && "offline" in res && res.offline) {
+        toast.success("Makanan disimpan offline. Akan sync otomatis.");
+        return;
+      }
       toast.success("Makanan dicatat");
-      (res?.game?.newlyUnlocked ?? []).forEach((a) =>
+      const game = "game" in res ? res.game : undefined;
+      (game?.newlyUnlocked ?? []).forEach((a: { icon: string; title: string }) =>
         toast.success(`${getAchievementToastPrefix(a.icon)} ${a.title} terbuka!`),
       );
     },
@@ -111,6 +125,15 @@ function FoodPage() {
             <ArrowLeft className="size-4" />
           </Link>
           <h1 className="text-2xl font-bold">Catat makanan</h1>
+          {(!online || pending > 0) && (
+            <button
+              onClick={() => sync()}
+              className={`ml-auto inline-flex items-center gap-1 text-[11px] font-semibold px-2.5 py-1.5 rounded-full ${online ? "bg-amber-100 text-amber-700" : "bg-muted text-muted-foreground"}`}
+            >
+              {online ? <RefreshCw className="size-3" /> : <WifiOff className="size-3" />}
+              {online ? `Sync ${pending}` : `Offline${pending ? ` · ${pending}` : ""}`}
+            </button>
+          )}
         </header>
 
         <div className="flex gap-2 overflow-x-auto no-scrollbar -mx-5 px-5">
