@@ -8,6 +8,7 @@ import {
   logWater,
   deleteWater,
 } from "@/lib/water.functions";
+import { getAchievementToastPrefix } from "@/lib/achievement-icons";
 import { BottomNav } from "@/components/bottom-nav";
 import { ArrowLeft, Droplet, Trash2, Plus } from "lucide-react";
 import { toast } from "sonner";
@@ -49,7 +50,7 @@ function WaterPage() {
       toast.success(`+${ml}ml dicatat`);
       const newly = res?.game?.newlyUnlocked ?? [];
       newly.forEach((a: { icon: string; title: string }) =>
-        toast.success(`${a.icon} ${a.title} terbuka!`),
+        toast.success(`${getAchievementToastPrefix(a.icon)} ${a.title} terbuka!`),
       );
     },
     onError: (e: Error) => toast.error(e.message),
