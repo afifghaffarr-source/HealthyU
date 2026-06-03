@@ -14,6 +14,7 @@ import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedWorkoutRouteImport } from './routes/_authenticated/workout'
 import { Route as AuthenticatedSleepRouteImport } from './routes/_authenticated/sleep'
+import { Route as AuthenticatedScanRouteImport } from './routes/_authenticated/scan'
 import { Route as AuthenticatedReportsRouteImport } from './routes/_authenticated/reports'
 import { Route as AuthenticatedRemindersRouteImport } from './routes/_authenticated/reminders'
 import { Route as AuthenticatedRecipesRouteImport } from './routes/_authenticated/recipes'
@@ -55,6 +56,11 @@ const AuthenticatedWorkoutRoute = AuthenticatedWorkoutRouteImport.update({
 const AuthenticatedSleepRoute = AuthenticatedSleepRouteImport.update({
   id: '/sleep',
   path: '/sleep',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedScanRoute = AuthenticatedScanRouteImport.update({
+  id: '/scan',
+  path: '/scan',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedReportsRoute = AuthenticatedReportsRouteImport.update({
@@ -171,6 +177,7 @@ export interface FileRoutesByFullPath {
   '/recipes': typeof AuthenticatedRecipesRouteWithChildren
   '/reminders': typeof AuthenticatedRemindersRoute
   '/reports': typeof AuthenticatedReportsRoute
+  '/scan': typeof AuthenticatedScanRoute
   '/sleep': typeof AuthenticatedSleepRoute
   '/workout': typeof AuthenticatedWorkoutRoute
   '/recipes/$id': typeof AuthenticatedRecipesIdRoute
@@ -195,6 +202,7 @@ export interface FileRoutesByTo {
   '/recipes': typeof AuthenticatedRecipesRouteWithChildren
   '/reminders': typeof AuthenticatedRemindersRoute
   '/reports': typeof AuthenticatedReportsRoute
+  '/scan': typeof AuthenticatedScanRoute
   '/sleep': typeof AuthenticatedSleepRoute
   '/workout': typeof AuthenticatedWorkoutRoute
   '/recipes/$id': typeof AuthenticatedRecipesIdRoute
@@ -221,6 +229,7 @@ export interface FileRoutesById {
   '/_authenticated/recipes': typeof AuthenticatedRecipesRouteWithChildren
   '/_authenticated/reminders': typeof AuthenticatedRemindersRoute
   '/_authenticated/reports': typeof AuthenticatedReportsRoute
+  '/_authenticated/scan': typeof AuthenticatedScanRoute
   '/_authenticated/sleep': typeof AuthenticatedSleepRoute
   '/_authenticated/workout': typeof AuthenticatedWorkoutRoute
   '/_authenticated/recipes/$id': typeof AuthenticatedRecipesIdRoute
@@ -247,6 +256,7 @@ export interface FileRouteTypes {
     | '/recipes'
     | '/reminders'
     | '/reports'
+    | '/scan'
     | '/sleep'
     | '/workout'
     | '/recipes/$id'
@@ -271,6 +281,7 @@ export interface FileRouteTypes {
     | '/recipes'
     | '/reminders'
     | '/reports'
+    | '/scan'
     | '/sleep'
     | '/workout'
     | '/recipes/$id'
@@ -296,6 +307,7 @@ export interface FileRouteTypes {
     | '/_authenticated/recipes'
     | '/_authenticated/reminders'
     | '/_authenticated/reports'
+    | '/_authenticated/scan'
     | '/_authenticated/sleep'
     | '/_authenticated/workout'
     | '/_authenticated/recipes/$id'
@@ -342,6 +354,13 @@ declare module '@tanstack/react-router' {
       path: '/sleep'
       fullPath: '/sleep'
       preLoaderRoute: typeof AuthenticatedSleepRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/scan': {
+      id: '/_authenticated/scan'
+      path: '/scan'
+      fullPath: '/scan'
+      preLoaderRoute: typeof AuthenticatedScanRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/reports': {
@@ -502,6 +521,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedRecipesRoute: typeof AuthenticatedRecipesRouteWithChildren
   AuthenticatedRemindersRoute: typeof AuthenticatedRemindersRoute
   AuthenticatedReportsRoute: typeof AuthenticatedReportsRoute
+  AuthenticatedScanRoute: typeof AuthenticatedScanRoute
   AuthenticatedSleepRoute: typeof AuthenticatedSleepRoute
   AuthenticatedWorkoutRoute: typeof AuthenticatedWorkoutRoute
 }
@@ -524,6 +544,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedRecipesRoute: AuthenticatedRecipesRouteWithChildren,
   AuthenticatedRemindersRoute: AuthenticatedRemindersRoute,
   AuthenticatedReportsRoute: AuthenticatedReportsRoute,
+  AuthenticatedScanRoute: AuthenticatedScanRoute,
   AuthenticatedSleepRoute: AuthenticatedSleepRoute,
   AuthenticatedWorkoutRoute: AuthenticatedWorkoutRoute,
 }
