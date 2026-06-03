@@ -363,9 +363,9 @@ export const getSleepMealCorrelation = createServerFn({ method: "POST" })
     const since = new Date(Date.now() - 14 * 86400000).toISOString().slice(0, 10);
     const { data: sleeps } = await supabase
       .from("sleep_logs")
-      .select("sleep_date, duration_hours")
+      .select("log_date, duration_hours")
       .eq("user_id", userId)
-      .gte("sleep_date", since);
+      .gte("log_date", since);
     const { data: meals } = await supabase
       .from("meal_logs")
       .select("log_date, calories")
@@ -373,12 +373,15 @@ export const getSleepMealCorrelation = createServerFn({ method: "POST" })
       .gte("log_date", since);
     const mealByDate = new Map<string, number>();
     for (const m of meals ?? []) {
+      if (!m.log_date) continue;
       mealByDate.set(m.log_date, (mealByDate.get(m.log_date) ?? 0) + Number(m.calories ?? 0));
     }
-    const points = (sleeps ?? []).map((s) => ({
-      date: s.sleep_date,
-      sleepHours: Number(s.duration_hours ?? 0),
-      calories: mealByDate.get(s.sleep_date) ?? 0,
-    }));
+    const points = (sleeps ?? [])
+      .filter((s) => s.log_date)
+      .map((s) => ({
+        date: s.log_date as string,
+        sleepHours: Number(s.duration_hours ?? 0),
+        calories: mealByDate.get(s.log_date as string) ?? 0,
+      }));
     return { points };
   });
