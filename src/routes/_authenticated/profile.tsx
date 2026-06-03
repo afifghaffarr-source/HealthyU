@@ -261,6 +261,13 @@ function ProfilePage() {
             <Sparkles className="size-5 text-primary" />
             <span className="text-sm font-semibold">AI Coach</span>
           </Link>
+          <Link
+            to="/health-import"
+            className="bg-card p-4 rounded-2xl outline-1 outline-black/10 flex flex-col items-start gap-2"
+          >
+            <Activity className="size-5 text-emerald-600" />
+            <span className="text-sm font-semibold">Import Apple/Samsung</span>
+          </Link>
         </section>
 
         <button
