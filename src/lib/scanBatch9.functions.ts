@@ -166,7 +166,9 @@ export const scanBarcode = createServerFn({ method: "POST" })
       raw: JSON.parse(JSON.stringify(p)) as never,
     };
     await supabase.from("barcode_cache").insert(product as never);
-    return { product: product as unknown as Record<string, unknown>, cached: false };
+    const { raw: _omit, ...safe } = product;
+    void _omit;
+    return { product: { ...safe, created_at: new Date().toISOString(), raw: null as never }, cached: false };
   });
 
 // ---------- Story photo upload metadata ----------
