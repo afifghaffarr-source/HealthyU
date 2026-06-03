@@ -211,84 +211,258 @@ export type Database = {
         }
         Relationships: []
       }
+      food_alternatives: {
+        Row: {
+          alternative_food_id: string
+          created_at: string
+          food_id: string
+          id: string
+          reason: string | null
+          similarity_score: number | null
+        }
+        Insert: {
+          alternative_food_id: string
+          created_at?: string
+          food_id: string
+          id?: string
+          reason?: string | null
+          similarity_score?: number | null
+        }
+        Update: {
+          alternative_food_id?: string
+          created_at?: string
+          food_id?: string
+          id?: string
+          reason?: string | null
+          similarity_score?: number | null
+        }
+        Relationships: []
+      }
       food_items: {
         Row: {
           allergens: string[] | null
+          barcode: string | null
+          bpom_number: string | null
+          brand: string | null
+          calcium_mg: number | null
           calories: number
           carbs_g: number | null
           category: string | null
+          cholesterol_mg: number | null
+          common_portions: Json | null
           created_at: string
+          cuisine: string | null
           data_confidence: number | null
           data_source: string | null
+          deleted_at: string | null
+          description: string | null
           fat_g: number | null
           fiber_g: number | null
           glycemic_index: number | null
+          glycemic_load: number | null
+          health_rating: number | null
           id: string
           image_url: string | null
+          ingredients: Json | null
+          iron_mg: number | null
+          is_active: boolean
+          is_diabetic_friendly: boolean | null
+          is_gluten_free: boolean | null
+          is_halal: boolean | null
           is_indonesian: boolean | null
+          is_keto_friendly: boolean | null
+          is_vegan: boolean | null
+          is_vegetarian: boolean | null
+          is_verified: boolean
+          ml_class_id: string | null
           name: string
           name_en: string | null
           popularity_score: number | null
+          potassium_mg: number | null
           protein_g: number | null
           region: string | null
+          sat_fat_g: number | null
           serving_size: number | null
           serving_unit: string | null
+          slug: string | null
           sodium_mg: number | null
           subcategory: string | null
           sugar_g: number | null
           tags: string[] | null
+          times_logged: number
+          trans_fat_g: number | null
+          updated_at: string
+          vitamin_a_mcg: number | null
+          vitamin_c_mg: number | null
+          vitamin_d_mcg: number | null
         }
         Insert: {
           allergens?: string[] | null
+          barcode?: string | null
+          bpom_number?: string | null
+          brand?: string | null
+          calcium_mg?: number | null
           calories: number
           carbs_g?: number | null
           category?: string | null
+          cholesterol_mg?: number | null
+          common_portions?: Json | null
           created_at?: string
+          cuisine?: string | null
           data_confidence?: number | null
           data_source?: string | null
+          deleted_at?: string | null
+          description?: string | null
           fat_g?: number | null
           fiber_g?: number | null
           glycemic_index?: number | null
+          glycemic_load?: number | null
+          health_rating?: number | null
           id?: string
           image_url?: string | null
+          ingredients?: Json | null
+          iron_mg?: number | null
+          is_active?: boolean
+          is_diabetic_friendly?: boolean | null
+          is_gluten_free?: boolean | null
+          is_halal?: boolean | null
           is_indonesian?: boolean | null
+          is_keto_friendly?: boolean | null
+          is_vegan?: boolean | null
+          is_vegetarian?: boolean | null
+          is_verified?: boolean
+          ml_class_id?: string | null
           name: string
           name_en?: string | null
           popularity_score?: number | null
+          potassium_mg?: number | null
           protein_g?: number | null
           region?: string | null
+          sat_fat_g?: number | null
           serving_size?: number | null
           serving_unit?: string | null
+          slug?: string | null
           sodium_mg?: number | null
           subcategory?: string | null
           sugar_g?: number | null
           tags?: string[] | null
+          times_logged?: number
+          trans_fat_g?: number | null
+          updated_at?: string
+          vitamin_a_mcg?: number | null
+          vitamin_c_mg?: number | null
+          vitamin_d_mcg?: number | null
         }
         Update: {
           allergens?: string[] | null
+          barcode?: string | null
+          bpom_number?: string | null
+          brand?: string | null
+          calcium_mg?: number | null
           calories?: number
           carbs_g?: number | null
           category?: string | null
+          cholesterol_mg?: number | null
+          common_portions?: Json | null
           created_at?: string
+          cuisine?: string | null
           data_confidence?: number | null
           data_source?: string | null
+          deleted_at?: string | null
+          description?: string | null
           fat_g?: number | null
           fiber_g?: number | null
           glycemic_index?: number | null
+          glycemic_load?: number | null
+          health_rating?: number | null
           id?: string
           image_url?: string | null
+          ingredients?: Json | null
+          iron_mg?: number | null
+          is_active?: boolean
+          is_diabetic_friendly?: boolean | null
+          is_gluten_free?: boolean | null
+          is_halal?: boolean | null
           is_indonesian?: boolean | null
+          is_keto_friendly?: boolean | null
+          is_vegan?: boolean | null
+          is_vegetarian?: boolean | null
+          is_verified?: boolean
+          ml_class_id?: string | null
           name?: string
           name_en?: string | null
           popularity_score?: number | null
+          potassium_mg?: number | null
           protein_g?: number | null
           region?: string | null
+          sat_fat_g?: number | null
           serving_size?: number | null
           serving_unit?: string | null
+          slug?: string | null
           sodium_mg?: number | null
           subcategory?: string | null
           sugar_g?: number | null
           tags?: string[] | null
+          times_logged?: number
+          trans_fat_g?: number | null
+          updated_at?: string
+          vitamin_a_mcg?: number | null
+          vitamin_c_mg?: number | null
+          vitamin_d_mcg?: number | null
+        }
+        Relationships: []
+      }
+      food_scans: {
+        Row: {
+          avg_confidence: number | null
+          created_at: string
+          detected_foods: Json | null
+          id: string
+          image_url: string | null
+          meal_log_id: string | null
+          model_version: string | null
+          processing_time_ms: number | null
+          total_calories: number | null
+          total_carbs: number | null
+          total_fat: number | null
+          total_protein: number | null
+          user_id: string
+          was_accurate: boolean | null
+          was_logged: boolean
+        }
+        Insert: {
+          avg_confidence?: number | null
+          created_at?: string
+          detected_foods?: Json | null
+          id?: string
+          image_url?: string | null
+          meal_log_id?: string | null
+          model_version?: string | null
+          processing_time_ms?: number | null
+          total_calories?: number | null
+          total_carbs?: number | null
+          total_fat?: number | null
+          total_protein?: number | null
+          user_id: string
+          was_accurate?: boolean | null
+          was_logged?: boolean
+        }
+        Update: {
+          avg_confidence?: number | null
+          created_at?: string
+          detected_foods?: Json | null
+          id?: string
+          image_url?: string | null
+          meal_log_id?: string | null
+          model_version?: string | null
+          processing_time_ms?: number | null
+          total_calories?: number | null
+          total_carbs?: number | null
+          total_fat?: number | null
+          total_protein?: number | null
+          user_id?: string
+          was_accurate?: boolean | null
+          was_logged?: boolean
         }
         Relationships: []
       }
@@ -380,19 +554,106 @@ export type Database = {
         }
         Relationships: []
       }
+      meal_log_items: {
+        Row: {
+          calories: number
+          carbs_g: number | null
+          created_at: string
+          fat_g: number | null
+          fiber_g: number | null
+          food_item_id: string | null
+          food_name: string
+          id: string
+          meal_log_id: string
+          notes: string | null
+          photo_url: string | null
+          protein_g: number | null
+          serving_qty: number
+          serving_size_g: number | null
+          serving_unit: string | null
+          sodium_mg: number | null
+          source: string | null
+          sugar_g: number | null
+          updated_at: string
+        }
+        Insert: {
+          calories?: number
+          carbs_g?: number | null
+          created_at?: string
+          fat_g?: number | null
+          fiber_g?: number | null
+          food_item_id?: string | null
+          food_name: string
+          id?: string
+          meal_log_id: string
+          notes?: string | null
+          photo_url?: string | null
+          protein_g?: number | null
+          serving_qty?: number
+          serving_size_g?: number | null
+          serving_unit?: string | null
+          sodium_mg?: number | null
+          source?: string | null
+          sugar_g?: number | null
+          updated_at?: string
+        }
+        Update: {
+          calories?: number
+          carbs_g?: number | null
+          created_at?: string
+          fat_g?: number | null
+          fiber_g?: number | null
+          food_item_id?: string | null
+          food_name?: string
+          id?: string
+          meal_log_id?: string
+          notes?: string | null
+          photo_url?: string | null
+          protein_g?: number | null
+          serving_qty?: number
+          serving_size_g?: number | null
+          serving_unit?: string | null
+          sodium_mg?: number | null
+          source?: string | null
+          sugar_g?: number | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "meal_log_items_meal_log_id_fkey"
+            columns: ["meal_log_id"]
+            isOneToOne: false
+            referencedRelation: "meal_logs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       meal_logs: {
         Row: {
           calories: number
           carbs_g: number | null
           created_at: string
           custom_name: string | null
+          deleted_at: string | null
           fat_g: number | null
+          fiber_g: number | null
           food_item_id: string | null
+          hunger_level_after: number | null
+          hunger_level_before: number | null
           id: string
+          location_name: string | null
+          log_date: string | null
           logged_at: string
           meal_type: string
+          mood_after: number | null
+          mood_before: number | null
+          notes: string | null
+          photo_url: string | null
           protein_g: number | null
           serving_qty: number
+          sodium_mg: number | null
+          source: string | null
+          sugar_g: number | null
           user_id: string
         }
         Insert: {
@@ -400,13 +661,26 @@ export type Database = {
           carbs_g?: number | null
           created_at?: string
           custom_name?: string | null
+          deleted_at?: string | null
           fat_g?: number | null
+          fiber_g?: number | null
           food_item_id?: string | null
+          hunger_level_after?: number | null
+          hunger_level_before?: number | null
           id?: string
+          location_name?: string | null
+          log_date?: string | null
           logged_at?: string
           meal_type: string
+          mood_after?: number | null
+          mood_before?: number | null
+          notes?: string | null
+          photo_url?: string | null
           protein_g?: number | null
           serving_qty?: number
+          sodium_mg?: number | null
+          source?: string | null
+          sugar_g?: number | null
           user_id: string
         }
         Update: {
@@ -414,13 +688,26 @@ export type Database = {
           carbs_g?: number | null
           created_at?: string
           custom_name?: string | null
+          deleted_at?: string | null
           fat_g?: number | null
+          fiber_g?: number | null
           food_item_id?: string | null
+          hunger_level_after?: number | null
+          hunger_level_before?: number | null
           id?: string
+          location_name?: string | null
+          log_date?: string | null
           logged_at?: string
           meal_type?: string
+          mood_after?: number | null
+          mood_before?: number | null
+          notes?: string | null
+          photo_url?: string | null
           protein_g?: number | null
           serving_qty?: number
+          sodium_mg?: number | null
+          source?: string | null
+          sugar_g?: number | null
           user_id?: string
         }
         Relationships: [
@@ -433,38 +720,172 @@ export type Database = {
           },
         ]
       }
+      meal_plan_items: {
+        Row: {
+          calories: number | null
+          carbs_g: number | null
+          created_at: string
+          estimated_cost_idr: number | null
+          fat_g: number | null
+          food_item_id: string | null
+          food_name: string | null
+          id: string
+          is_logged: boolean
+          logged_at: string | null
+          meal_plan_id: string
+          meal_type: string
+          plan_date: string
+          planned_time: string | null
+          protein_g: number | null
+          recipe_id: string | null
+          serving_qty: number | null
+          serving_unit: string | null
+          updated_at: string
+        }
+        Insert: {
+          calories?: number | null
+          carbs_g?: number | null
+          created_at?: string
+          estimated_cost_idr?: number | null
+          fat_g?: number | null
+          food_item_id?: string | null
+          food_name?: string | null
+          id?: string
+          is_logged?: boolean
+          logged_at?: string | null
+          meal_plan_id: string
+          meal_type: string
+          plan_date: string
+          planned_time?: string | null
+          protein_g?: number | null
+          recipe_id?: string | null
+          serving_qty?: number | null
+          serving_unit?: string | null
+          updated_at?: string
+        }
+        Update: {
+          calories?: number | null
+          carbs_g?: number | null
+          created_at?: string
+          estimated_cost_idr?: number | null
+          fat_g?: number | null
+          food_item_id?: string | null
+          food_name?: string | null
+          id?: string
+          is_logged?: boolean
+          logged_at?: string | null
+          meal_plan_id?: string
+          meal_type?: string
+          plan_date?: string
+          planned_time?: string | null
+          protein_g?: number | null
+          recipe_id?: string | null
+          serving_qty?: number | null
+          serving_unit?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "meal_plan_items_meal_plan_id_fkey"
+            columns: ["meal_plan_id"]
+            isOneToOne: false
+            referencedRelation: "meal_plans"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       meal_plans: {
         Row: {
           calories: number
           created_at: string
           custom_name: string | null
+          daily_budget_idr: number | null
+          deleted_at: string | null
+          diet_preference: string | null
+          eating_window_end: string | null
+          eating_window_start: string | null
+          end_date: string | null
+          exclude_allergens: Json | null
+          fasting_enabled: boolean | null
+          fasting_type: string | null
           food_item_id: string | null
+          generated_by: string | null
           id: string
+          is_active: boolean
+          meal_count_per_day: number | null
           meal_type: string
           plan_date: string
+          plan_name: string | null
+          plan_type: string | null
           planned_qty: number
+          start_date: string | null
+          target_calories: number | null
+          target_carbs: number | null
+          target_fat: number | null
+          target_protein: number | null
+          updated_at: string
           user_id: string
         }
         Insert: {
           calories?: number
           created_at?: string
           custom_name?: string | null
+          daily_budget_idr?: number | null
+          deleted_at?: string | null
+          diet_preference?: string | null
+          eating_window_end?: string | null
+          eating_window_start?: string | null
+          end_date?: string | null
+          exclude_allergens?: Json | null
+          fasting_enabled?: boolean | null
+          fasting_type?: string | null
           food_item_id?: string | null
+          generated_by?: string | null
           id?: string
+          is_active?: boolean
+          meal_count_per_day?: number | null
           meal_type: string
           plan_date: string
+          plan_name?: string | null
+          plan_type?: string | null
           planned_qty?: number
+          start_date?: string | null
+          target_calories?: number | null
+          target_carbs?: number | null
+          target_fat?: number | null
+          target_protein?: number | null
+          updated_at?: string
           user_id: string
         }
         Update: {
           calories?: number
           created_at?: string
           custom_name?: string | null
+          daily_budget_idr?: number | null
+          deleted_at?: string | null
+          diet_preference?: string | null
+          eating_window_end?: string | null
+          eating_window_start?: string | null
+          end_date?: string | null
+          exclude_allergens?: Json | null
+          fasting_enabled?: boolean | null
+          fasting_type?: string | null
           food_item_id?: string | null
+          generated_by?: string | null
           id?: string
+          is_active?: boolean
+          meal_count_per_day?: number | null
           meal_type?: string
           plan_date?: string
+          plan_name?: string | null
+          plan_type?: string | null
           planned_qty?: number
+          start_date?: string | null
+          target_calories?: number | null
+          target_carbs?: number | null
+          target_fat?: number | null
+          target_protein?: number | null
+          updated_at?: string
           user_id?: string
         }
         Relationships: []
@@ -789,54 +1210,158 @@ export type Database = {
         }
         Relationships: []
       }
+      recipe_ratings: {
+        Row: {
+          created_at: string
+          id: string
+          rating: number
+          recipe_id: string
+          review: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          rating: number
+          recipe_id: string
+          review?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          rating?: number
+          recipe_id?: string
+          review?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "recipe_ratings_recipe_id_fkey"
+            columns: ["recipe_id"]
+            isOneToOne: false
+            referencedRelation: "recipes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       recipes: {
         Row: {
+          avg_rating: number
           calories: number
           carbs_g: number
           category: string
+          cook_count: number
           created_at: string
+          cuisine: string | null
+          deleted_at: string | null
           description: string | null
+          difficulty: string | null
+          estimated_cost_idr: number | null
           fat_g: number
+          fiber_g: number | null
           id: string
+          image_url: string | null
           ingredients: string[]
           instructions: string[]
+          is_featured: boolean
+          is_halal: boolean | null
           is_indonesian: boolean
+          is_keto_friendly: boolean | null
+          is_published: boolean
+          is_vegan: boolean | null
+          is_vegetarian: boolean | null
           prep_min: number
           protein_g: number
+          rating_count: number
+          save_count: number
           servings: number
+          slug: string | null
+          tags: Json | null
           title: string
+          updated_at: string
+          user_id: string | null
+          video_url: string | null
+          view_count: number
         }
         Insert: {
+          avg_rating?: number
           calories?: number
           carbs_g?: number
           category?: string
+          cook_count?: number
           created_at?: string
+          cuisine?: string | null
+          deleted_at?: string | null
           description?: string | null
+          difficulty?: string | null
+          estimated_cost_idr?: number | null
           fat_g?: number
+          fiber_g?: number | null
           id?: string
+          image_url?: string | null
           ingredients?: string[]
           instructions?: string[]
+          is_featured?: boolean
+          is_halal?: boolean | null
           is_indonesian?: boolean
+          is_keto_friendly?: boolean | null
+          is_published?: boolean
+          is_vegan?: boolean | null
+          is_vegetarian?: boolean | null
           prep_min?: number
           protein_g?: number
+          rating_count?: number
+          save_count?: number
           servings?: number
+          slug?: string | null
+          tags?: Json | null
           title: string
+          updated_at?: string
+          user_id?: string | null
+          video_url?: string | null
+          view_count?: number
         }
         Update: {
+          avg_rating?: number
           calories?: number
           carbs_g?: number
           category?: string
+          cook_count?: number
           created_at?: string
+          cuisine?: string | null
+          deleted_at?: string | null
           description?: string | null
+          difficulty?: string | null
+          estimated_cost_idr?: number | null
           fat_g?: number
+          fiber_g?: number | null
           id?: string
+          image_url?: string | null
           ingredients?: string[]
           instructions?: string[]
+          is_featured?: boolean
+          is_halal?: boolean | null
           is_indonesian?: boolean
+          is_keto_friendly?: boolean | null
+          is_published?: boolean
+          is_vegan?: boolean | null
+          is_vegetarian?: boolean | null
           prep_min?: number
           protein_g?: number
+          rating_count?: number
+          save_count?: number
           servings?: number
+          slug?: string | null
+          tags?: Json | null
           title?: string
+          updated_at?: string
+          user_id?: string | null
+          video_url?: string | null
+          view_count?: number
         }
         Relationships: []
       }
