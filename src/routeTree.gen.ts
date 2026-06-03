@@ -64,6 +64,7 @@ import { Route as AuthenticatedRecipesRecommendationsRouteImport } from './route
 import { Route as AuthenticatedRecipesIdRouteImport } from './routes/_authenticated/recipes.$id'
 import { Route as AuthenticatedProfileScanStatsRouteImport } from './routes/_authenticated/profile.scan-stats'
 import { Route as AuthenticatedProfilePrivacyRouteImport } from './routes/_authenticated/profile.privacy'
+import { Route as AuthenticatedCoachMealsRouteImport } from './routes/_authenticated/coach.meals'
 import { Route as ApiWearableGoogleFitCallbackRouteImport } from './routes/api/wearable.google-fit.callback'
 import { Route as ApiPublicHooksWeeklyAiReportRouteImport } from './routes/api/public/hooks/weekly-ai-report'
 import { Route as ApiPublicHooksRecipesTrendingSnapshotRouteImport } from './routes/api/public/hooks/recipes-trending-snapshot'
@@ -360,6 +361,11 @@ const AuthenticatedProfilePrivacyRoute =
     path: '/privacy',
     getParentRoute: () => AuthenticatedProfileRoute,
   } as any)
+const AuthenticatedCoachMealsRoute = AuthenticatedCoachMealsRouteImport.update({
+  id: '/meals',
+  path: '/meals',
+  getParentRoute: () => AuthenticatedCoachRoute,
+} as any)
 const ApiWearableGoogleFitCallbackRoute =
   ApiWearableGoogleFitCallbackRouteImport.update({
     id: '/api/wearable/google-fit/callback',
@@ -399,7 +405,7 @@ export interface FileRoutesByFullPath {
   '/backup': typeof AuthenticatedBackupRoute
   '/challenges': typeof AuthenticatedChallengesRoute
   '/chat': typeof AuthenticatedChatRoute
-  '/coach': typeof AuthenticatedCoachRoute
+  '/coach': typeof AuthenticatedCoachRouteWithChildren
   '/community': typeof AuthenticatedCommunityRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/fasting': typeof AuthenticatedFastingRoute
@@ -433,6 +439,7 @@ export interface FileRoutesByFullPath {
   '/wearable': typeof AuthenticatedWearableRoute
   '/weight': typeof AuthenticatedWeightRoute
   '/workout': typeof AuthenticatedWorkoutRoute
+  '/coach/meals': typeof AuthenticatedCoachMealsRoute
   '/profile/privacy': typeof AuthenticatedProfilePrivacyRoute
   '/profile/scan-stats': typeof AuthenticatedProfileScanStatsRoute
   '/recipes/$id': typeof AuthenticatedRecipesIdRoute
@@ -460,7 +467,7 @@ export interface FileRoutesByTo {
   '/backup': typeof AuthenticatedBackupRoute
   '/challenges': typeof AuthenticatedChallengesRoute
   '/chat': typeof AuthenticatedChatRoute
-  '/coach': typeof AuthenticatedCoachRoute
+  '/coach': typeof AuthenticatedCoachRouteWithChildren
   '/community': typeof AuthenticatedCommunityRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/fasting': typeof AuthenticatedFastingRoute
@@ -494,6 +501,7 @@ export interface FileRoutesByTo {
   '/wearable': typeof AuthenticatedWearableRoute
   '/weight': typeof AuthenticatedWeightRoute
   '/workout': typeof AuthenticatedWorkoutRoute
+  '/coach/meals': typeof AuthenticatedCoachMealsRoute
   '/profile/privacy': typeof AuthenticatedProfilePrivacyRoute
   '/profile/scan-stats': typeof AuthenticatedProfileScanStatsRoute
   '/recipes/$id': typeof AuthenticatedRecipesIdRoute
@@ -523,7 +531,7 @@ export interface FileRoutesById {
   '/_authenticated/backup': typeof AuthenticatedBackupRoute
   '/_authenticated/challenges': typeof AuthenticatedChallengesRoute
   '/_authenticated/chat': typeof AuthenticatedChatRoute
-  '/_authenticated/coach': typeof AuthenticatedCoachRoute
+  '/_authenticated/coach': typeof AuthenticatedCoachRouteWithChildren
   '/_authenticated/community': typeof AuthenticatedCommunityRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/fasting': typeof AuthenticatedFastingRoute
@@ -557,6 +565,7 @@ export interface FileRoutesById {
   '/_authenticated/wearable': typeof AuthenticatedWearableRoute
   '/_authenticated/weight': typeof AuthenticatedWeightRoute
   '/_authenticated/workout': typeof AuthenticatedWorkoutRoute
+  '/_authenticated/coach/meals': typeof AuthenticatedCoachMealsRoute
   '/_authenticated/profile/privacy': typeof AuthenticatedProfilePrivacyRoute
   '/_authenticated/profile/scan-stats': typeof AuthenticatedProfileScanStatsRoute
   '/_authenticated/recipes/$id': typeof AuthenticatedRecipesIdRoute
@@ -620,6 +629,7 @@ export interface FileRouteTypes {
     | '/wearable'
     | '/weight'
     | '/workout'
+    | '/coach/meals'
     | '/profile/privacy'
     | '/profile/scan-stats'
     | '/recipes/$id'
@@ -681,6 +691,7 @@ export interface FileRouteTypes {
     | '/wearable'
     | '/weight'
     | '/workout'
+    | '/coach/meals'
     | '/profile/privacy'
     | '/profile/scan-stats'
     | '/recipes/$id'
@@ -743,6 +754,7 @@ export interface FileRouteTypes {
     | '/_authenticated/wearable'
     | '/_authenticated/weight'
     | '/_authenticated/workout'
+    | '/_authenticated/coach/meals'
     | '/_authenticated/profile/privacy'
     | '/_authenticated/profile/scan-stats'
     | '/_authenticated/recipes/$id'
@@ -1162,6 +1174,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedProfilePrivacyRouteImport
       parentRoute: typeof AuthenticatedProfileRoute
     }
+    '/_authenticated/coach/meals': {
+      id: '/_authenticated/coach/meals'
+      path: '/meals'
+      fullPath: '/coach/meals'
+      preLoaderRoute: typeof AuthenticatedCoachMealsRouteImport
+      parentRoute: typeof AuthenticatedCoachRoute
+    }
     '/api/wearable/google-fit/callback': {
       id: '/api/wearable/google-fit/callback'
       path: '/api/wearable/google-fit/callback'
@@ -1199,6 +1218,17 @@ declare module '@tanstack/react-router' {
     }
   }
 }
+
+interface AuthenticatedCoachRouteChildren {
+  AuthenticatedCoachMealsRoute: typeof AuthenticatedCoachMealsRoute
+}
+
+const AuthenticatedCoachRouteChildren: AuthenticatedCoachRouteChildren = {
+  AuthenticatedCoachMealsRoute: AuthenticatedCoachMealsRoute,
+}
+
+const AuthenticatedCoachRouteWithChildren =
+  AuthenticatedCoachRoute._addFileChildren(AuthenticatedCoachRouteChildren)
 
 interface AuthenticatedProfileRouteChildren {
   AuthenticatedProfilePrivacyRoute: typeof AuthenticatedProfilePrivacyRoute
@@ -1267,7 +1297,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedBackupRoute: typeof AuthenticatedBackupRoute
   AuthenticatedChallengesRoute: typeof AuthenticatedChallengesRoute
   AuthenticatedChatRoute: typeof AuthenticatedChatRoute
-  AuthenticatedCoachRoute: typeof AuthenticatedCoachRoute
+  AuthenticatedCoachRoute: typeof AuthenticatedCoachRouteWithChildren
   AuthenticatedCommunityRoute: typeof AuthenticatedCommunityRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedFastingRoute: typeof AuthenticatedFastingRoute
@@ -1309,7 +1339,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedBackupRoute: AuthenticatedBackupRoute,
   AuthenticatedChallengesRoute: AuthenticatedChallengesRoute,
   AuthenticatedChatRoute: AuthenticatedChatRoute,
-  AuthenticatedCoachRoute: AuthenticatedCoachRoute,
+  AuthenticatedCoachRoute: AuthenticatedCoachRouteWithChildren,
   AuthenticatedCommunityRoute: AuthenticatedCommunityRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedFastingRoute: AuthenticatedFastingRoute,
