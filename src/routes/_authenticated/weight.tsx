@@ -5,8 +5,10 @@ import { useServerFn } from "@tanstack/react-start";
 import { listWeight, addWeight, deleteWeight } from "@/lib/weight.functions";
 import { getProfile } from "@/lib/profile.functions";
 import { BottomNav } from "@/components/bottom-nav";
-import { ArrowLeft, Trash2, TrendingDown, TrendingUp, Minus } from "lucide-react";
+import { ArrowLeft, Trash2, TrendingDown, TrendingUp, Minus, WifiOff, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
+import { enqueue } from "@/lib/offline-queue";
+import { useOfflineQueue } from "@/hooks/use-offline-queue";
 
 export const Route = createFileRoute("/_authenticated/weight")({
   component: WeightPage,
@@ -18,6 +20,7 @@ function WeightPage() {
   const fetchProfile = useServerFn(getProfile);
   const add = useServerFn(addWeight);
   const del = useServerFn(deleteWeight);
+  const { online, pending, sync } = useOfflineQueue();
 
   const { data: logs = [] } = useQuery({ queryKey: ["weight"], queryFn: () => fetchList() });
   const { data: profile } = useQuery({ queryKey: ["profile"], queryFn: () => fetchProfile() });
@@ -26,13 +29,24 @@ function WeightPage() {
   const [note, setNote] = useState("");
 
   const addMut = useMutation({
-    mutationFn: () => add({ data: { weight_kg: Number(val), note: note.trim() || undefined } }),
-    onSuccess: () => {
+    mutationFn: async () => {
+      const payload = { weight_kg: Number(val), note: note.trim() || undefined };
+      if (!navigator.onLine) {
+        await enqueue("weight", payload);
+        return { offline: true as const };
+      }
+      return add({ data: payload });
+    },
+    onSuccess: (res) => {
       setVal("");
       setNote("");
       qc.invalidateQueries({ queryKey: ["weight"] });
       qc.invalidateQueries({ queryKey: ["profile"] });
-      toast.success("Berat tercatat");
+      if (res && "offline" in res && res.offline) {
+        toast.success("Berat disimpan offline. Akan sync otomatis.");
+      } else {
+        toast.success("Berat tercatat");
+      }
     },
     onError: (e: Error) => toast.error(e.message),
   });
@@ -57,6 +71,15 @@ function WeightPage() {
         <div className="max-w-md mx-auto px-4 py-3 flex items-center gap-3">
           <Link to="/profile" className="p-2 -ml-2"><ArrowLeft className="size-5" /></Link>
           <h1 className="font-bold text-lg">Berat Badan</h1>
+          {(!online || pending > 0) && (
+            <button
+              onClick={() => sync()}
+              className={`ml-auto inline-flex items-center gap-1 text-[11px] font-semibold px-2.5 py-1.5 rounded-full ${online ? "bg-amber-100 text-amber-700" : "bg-muted text-muted-foreground"}`}
+            >
+              {online ? <RefreshCw className="size-3" /> : <WifiOff className="size-3" />}
+              {online ? `Sync ${pending}` : `Offline${pending ? ` · ${pending}` : ""}`}
+            </button>
+          )}
         </div>
       </header>
 

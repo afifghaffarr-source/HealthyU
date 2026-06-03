@@ -6,8 +6,10 @@ import { searchFoods, logMeal, todaysMeals, deleteMeal } from "@/lib/meals.funct
 import { parseMealFromVoice } from "@/lib/ai-extras.functions";
 import { getAchievementToastPrefix } from "@/lib/achievement-icons";
 import { BottomNav } from "@/components/bottom-nav";
-import { ArrowLeft, Search, Trash2, Mic, MicOff, Loader2 } from "lucide-react";
+import { ArrowLeft, Search, Trash2, Mic, MicOff, Loader2, WifiOff, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
+import { enqueue } from "@/lib/offline-queue";
+import { useOfflineQueue } from "@/hooks/use-offline-queue";
 
 export const Route = createFileRoute("/_authenticated/food")({
   component: FoodPage,
@@ -22,6 +24,7 @@ function FoodPage() {
   const fetchMeals = useServerFn(todaysMeals);
   const del = useServerFn(deleteMeal);
   const parseVoice = useServerFn(parseMealFromVoice);
+  const { online, pending, sync } = useOfflineQueue();
 
   const [q, setQ] = useState("");
   const [mealType, setMealType] = useState<MealType>(currentMealType());
@@ -42,10 +45,20 @@ function FoodPage() {
     fat_g: number;
   };
   const logMutation = useMutation({
-    mutationFn: (payload: LogPayload) => log({ data: payload }),
+    mutationFn: async (payload: LogPayload) => {
+      if (!navigator.onLine) {
+        await enqueue("meal", payload);
+        return { offline: true as const };
+      }
+      return log({ data: payload });
+    },
     onSuccess: (res) => {
       qc.invalidateQueries({ queryKey: ["meals"] });
       qc.invalidateQueries({ queryKey: ["game", "summary"] });
+      if (res && "offline" in res && res.offline) {
+        toast.success("Makanan disimpan offline. Akan sync otomatis.");
+        return;
+      }
       toast.success("Makanan dicatat");
       (res?.game?.newlyUnlocked ?? []).forEach((a) =>
         toast.success(`${getAchievementToastPrefix(a.icon)} ${a.title} terbuka!`),
