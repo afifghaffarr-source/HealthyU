@@ -96,6 +96,7 @@ import { Route as AuthenticatedReportsHydrationRouteImport } from './routes/_aut
 import { Route as AuthenticatedReportsGalleryRouteImport } from './routes/_authenticated/reports.gallery'
 import { Route as AuthenticatedReportsExportRouteImport } from './routes/_authenticated/reports.export'
 import { Route as AuthenticatedReportsCompareRouteImport } from './routes/_authenticated/reports.compare'
+import { Route as AuthenticatedRecipesVideoRouteImport } from './routes/_authenticated/recipes.video'
 import { Route as AuthenticatedRecipesSavedRouteImport } from './routes/_authenticated/recipes.saved'
 import { Route as AuthenticatedRecipesRecommendationsRouteImport } from './routes/_authenticated/recipes.recommendations'
 import { Route as AuthenticatedRecipesImportRouteImport } from './routes/_authenticated/recipes.import'
@@ -603,6 +604,12 @@ const AuthenticatedReportsCompareRoute =
     path: '/compare',
     getParentRoute: () => AuthenticatedReportsRoute,
   } as any)
+const AuthenticatedRecipesVideoRoute =
+  AuthenticatedRecipesVideoRouteImport.update({
+    id: '/video',
+    path: '/video',
+    getParentRoute: () => AuthenticatedRecipesRoute,
+  } as any)
 const AuthenticatedRecipesSavedRoute =
   AuthenticatedRecipesSavedRouteImport.update({
     id: '/saved',
@@ -930,6 +937,7 @@ export interface FileRoutesByFullPath {
   '/recipes/import': typeof AuthenticatedRecipesImportRoute
   '/recipes/recommendations': typeof AuthenticatedRecipesRecommendationsRoute
   '/recipes/saved': typeof AuthenticatedRecipesSavedRoute
+  '/recipes/video': typeof AuthenticatedRecipesVideoRoute
   '/reports/compare': typeof AuthenticatedReportsCompareRoute
   '/reports/export': typeof AuthenticatedReportsExportRoute
   '/reports/gallery': typeof AuthenticatedReportsGalleryRoute
@@ -1059,6 +1067,7 @@ export interface FileRoutesByTo {
   '/recipes/import': typeof AuthenticatedRecipesImportRoute
   '/recipes/recommendations': typeof AuthenticatedRecipesRecommendationsRoute
   '/recipes/saved': typeof AuthenticatedRecipesSavedRoute
+  '/recipes/video': typeof AuthenticatedRecipesVideoRoute
   '/reports/compare': typeof AuthenticatedReportsCompareRoute
   '/reports/export': typeof AuthenticatedReportsExportRoute
   '/reports/gallery': typeof AuthenticatedReportsGalleryRoute
@@ -1190,6 +1199,7 @@ export interface FileRoutesById {
   '/_authenticated/recipes/import': typeof AuthenticatedRecipesImportRoute
   '/_authenticated/recipes/recommendations': typeof AuthenticatedRecipesRecommendationsRoute
   '/_authenticated/recipes/saved': typeof AuthenticatedRecipesSavedRoute
+  '/_authenticated/recipes/video': typeof AuthenticatedRecipesVideoRoute
   '/_authenticated/reports/compare': typeof AuthenticatedReportsCompareRoute
   '/_authenticated/reports/export': typeof AuthenticatedReportsExportRoute
   '/_authenticated/reports/gallery': typeof AuthenticatedReportsGalleryRoute
@@ -1321,6 +1331,7 @@ export interface FileRouteTypes {
     | '/recipes/import'
     | '/recipes/recommendations'
     | '/recipes/saved'
+    | '/recipes/video'
     | '/reports/compare'
     | '/reports/export'
     | '/reports/gallery'
@@ -1450,6 +1461,7 @@ export interface FileRouteTypes {
     | '/recipes/import'
     | '/recipes/recommendations'
     | '/recipes/saved'
+    | '/recipes/video'
     | '/reports/compare'
     | '/reports/export'
     | '/reports/gallery'
@@ -1580,6 +1592,7 @@ export interface FileRouteTypes {
     | '/_authenticated/recipes/import'
     | '/_authenticated/recipes/recommendations'
     | '/_authenticated/recipes/saved'
+    | '/_authenticated/recipes/video'
     | '/_authenticated/reports/compare'
     | '/_authenticated/reports/export'
     | '/_authenticated/reports/gallery'
@@ -2247,6 +2260,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedReportsCompareRouteImport
       parentRoute: typeof AuthenticatedReportsRoute
     }
+    '/_authenticated/recipes/video': {
+      id: '/_authenticated/recipes/video'
+      path: '/video'
+      fullPath: '/recipes/video'
+      preLoaderRoute: typeof AuthenticatedRecipesVideoRouteImport
+      parentRoute: typeof AuthenticatedRecipesRoute
+    }
     '/_authenticated/recipes/saved': {
       id: '/_authenticated/recipes/saved'
       path: '/saved'
@@ -2718,6 +2738,7 @@ interface AuthenticatedRecipesRouteChildren {
   AuthenticatedRecipesImportRoute: typeof AuthenticatedRecipesImportRoute
   AuthenticatedRecipesRecommendationsRoute: typeof AuthenticatedRecipesRecommendationsRoute
   AuthenticatedRecipesSavedRoute: typeof AuthenticatedRecipesSavedRoute
+  AuthenticatedRecipesVideoRoute: typeof AuthenticatedRecipesVideoRoute
 }
 
 const AuthenticatedRecipesRouteChildren: AuthenticatedRecipesRouteChildren = {
@@ -2726,6 +2747,7 @@ const AuthenticatedRecipesRouteChildren: AuthenticatedRecipesRouteChildren = {
   AuthenticatedRecipesRecommendationsRoute:
     AuthenticatedRecipesRecommendationsRoute,
   AuthenticatedRecipesSavedRoute: AuthenticatedRecipesSavedRoute,
+  AuthenticatedRecipesVideoRoute: AuthenticatedRecipesVideoRoute,
 }
 
 const AuthenticatedRecipesRouteWithChildren =
