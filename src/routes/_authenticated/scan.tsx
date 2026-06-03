@@ -8,6 +8,7 @@ import { toast } from "sonner";
 import { BottomNav } from "@/components/bottom-nav";
 import { recognizeFood, submitScanCorrection } from "@/lib/foodScan.functions";
 import { attachScanPhoto } from "@/lib/scanPhoto.functions";
+import { recordScanGameify, checkScanLimit, classifyMealTags } from "@/lib/scanMore.functions";
 import { logMeal } from "@/lib/meals.functions";
 
 export const Route = createFileRoute("/_authenticated/scan")({
@@ -51,6 +52,9 @@ function ScanPage() {
   const log = useServerFn(logMeal);
   const correct = useServerFn(submitScanCorrection);
   const upload = useServerFn(attachScanPhoto);
+  const gameify = useServerFn(recordScanGameify);
+  const limitFn = useServerFn(checkScanLimit);
+  const classify = useServerFn(classifyMealTags);
 
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [items, setItems] = useState<Item[]>([]);
@@ -68,6 +72,23 @@ function ScanPage() {
       setScanId(res.scan_id);
       if (res.scan_id && imageUrl) {
         upload({ data: { scan_id: res.scan_id, image_data_url: imageUrl } }).catch(() => {});
+      }
+      if (res.scan_id) {
+        gameify({})
+          .then((g) => {
+            if (g.coinsAwarded) toast.success(`+${g.coinsAwarded} 🪙 · Streak ${g.streak} hari`);
+            g.unlocked.forEach((id) => toast.success(`🏆 Achievement: ${id}`));
+          })
+          .catch(() => {});
+        // allergen/halal check on first item
+        if (res.items[0]) {
+          classify({ data: { name: res.items[0].name } })
+            .then((t) => {
+              if (t.allergy_warning) toast.warning(`⚠️ ${t.allergy_warning}`);
+              if (t.halal === false) toast.warning("⚠️ Mungkin tidak halal");
+            })
+            .catch(() => {});
+        }
       }
       if (res.items.length === 0) toast.error("Tidak ada makanan terdeteksi");
       else toast.success(`${res.items.length} makanan dikenali`);
@@ -119,6 +140,11 @@ function ScanPage() {
 
   async function handleFile(file: File) {
     try {
+      const lim = await limitFn().catch(() => null);
+      if (lim && lim.remaining <= 0 && !lim.isPro) {
+        toast.error(`Limit harian ${lim.limit} scan. Upgrade Pro untuk unlimited.`);
+        return;
+      }
       const url = await fileToDataUrl(file);
       setImageUrl(url);
       setItems([]);
