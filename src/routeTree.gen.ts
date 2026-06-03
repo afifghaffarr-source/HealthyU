@@ -53,6 +53,7 @@ import { Route as AuthenticatedAchievementsRouteImport } from './routes/_authent
 import { Route as ApiChatStreamRouteImport } from './routes/api/chat.stream'
 import { Route as AuthenticatedRecipesIdRouteImport } from './routes/_authenticated/recipes.$id'
 import { Route as ApiWearableGoogleFitCallbackRouteImport } from './routes/api/wearable.google-fit.callback'
+import { Route as ApiPublicHooksNotificationSchedulerRouteImport } from './routes/api/public/hooks/notification-scheduler'
 import { Route as ApiPublicHooksDailyCoachRouteImport } from './routes/api/public/hooks/daily-coach'
 
 const AuthRoute = AuthRouteImport.update({
@@ -283,6 +284,12 @@ const ApiWearableGoogleFitCallbackRoute =
     path: '/api/wearable/google-fit/callback',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicHooksNotificationSchedulerRoute =
+  ApiPublicHooksNotificationSchedulerRouteImport.update({
+    id: '/api/public/hooks/notification-scheduler',
+    path: '/api/public/hooks/notification-scheduler',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicHooksDailyCoachRoute =
   ApiPublicHooksDailyCoachRouteImport.update({
     id: '/api/public/hooks/daily-coach',
@@ -334,6 +341,7 @@ export interface FileRoutesByFullPath {
   '/recipes/$id': typeof AuthenticatedRecipesIdRoute
   '/api/chat/stream': typeof ApiChatStreamRoute
   '/api/public/hooks/daily-coach': typeof ApiPublicHooksDailyCoachRoute
+  '/api/public/hooks/notification-scheduler': typeof ApiPublicHooksNotificationSchedulerRoute
   '/api/wearable/google-fit/callback': typeof ApiWearableGoogleFitCallbackRoute
 }
 export interface FileRoutesByTo {
@@ -380,6 +388,7 @@ export interface FileRoutesByTo {
   '/recipes/$id': typeof AuthenticatedRecipesIdRoute
   '/api/chat/stream': typeof ApiChatStreamRoute
   '/api/public/hooks/daily-coach': typeof ApiPublicHooksDailyCoachRoute
+  '/api/public/hooks/notification-scheduler': typeof ApiPublicHooksNotificationSchedulerRoute
   '/api/wearable/google-fit/callback': typeof ApiWearableGoogleFitCallbackRoute
 }
 export interface FileRoutesById {
@@ -428,6 +437,7 @@ export interface FileRoutesById {
   '/_authenticated/recipes/$id': typeof AuthenticatedRecipesIdRoute
   '/api/chat/stream': typeof ApiChatStreamRoute
   '/api/public/hooks/daily-coach': typeof ApiPublicHooksDailyCoachRoute
+  '/api/public/hooks/notification-scheduler': typeof ApiPublicHooksNotificationSchedulerRoute
   '/api/wearable/google-fit/callback': typeof ApiWearableGoogleFitCallbackRoute
 }
 export interface FileRouteTypes {
@@ -476,6 +486,7 @@ export interface FileRouteTypes {
     | '/recipes/$id'
     | '/api/chat/stream'
     | '/api/public/hooks/daily-coach'
+    | '/api/public/hooks/notification-scheduler'
     | '/api/wearable/google-fit/callback'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -522,6 +533,7 @@ export interface FileRouteTypes {
     | '/recipes/$id'
     | '/api/chat/stream'
     | '/api/public/hooks/daily-coach'
+    | '/api/public/hooks/notification-scheduler'
     | '/api/wearable/google-fit/callback'
   id:
     | '__root__'
@@ -569,6 +581,7 @@ export interface FileRouteTypes {
     | '/_authenticated/recipes/$id'
     | '/api/chat/stream'
     | '/api/public/hooks/daily-coach'
+    | '/api/public/hooks/notification-scheduler'
     | '/api/wearable/google-fit/callback'
   fileRoutesById: FileRoutesById
 }
@@ -578,6 +591,7 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   ApiChatStreamRoute: typeof ApiChatStreamRoute
   ApiPublicHooksDailyCoachRoute: typeof ApiPublicHooksDailyCoachRoute
+  ApiPublicHooksNotificationSchedulerRoute: typeof ApiPublicHooksNotificationSchedulerRoute
   ApiWearableGoogleFitCallbackRoute: typeof ApiWearableGoogleFitCallbackRoute
 }
 
@@ -891,6 +905,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiWearableGoogleFitCallbackRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/hooks/notification-scheduler': {
+      id: '/api/public/hooks/notification-scheduler'
+      path: '/api/public/hooks/notification-scheduler'
+      fullPath: '/api/public/hooks/notification-scheduler'
+      preLoaderRoute: typeof ApiPublicHooksNotificationSchedulerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/hooks/daily-coach': {
       id: '/api/public/hooks/daily-coach'
       path: '/api/public/hooks/daily-coach'
@@ -1003,6 +1024,8 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   ApiChatStreamRoute: ApiChatStreamRoute,
   ApiPublicHooksDailyCoachRoute: ApiPublicHooksDailyCoachRoute,
+  ApiPublicHooksNotificationSchedulerRoute:
+    ApiPublicHooksNotificationSchedulerRoute,
   ApiWearableGoogleFitCallbackRoute: ApiWearableGoogleFitCallbackRoute,
 }
 export const routeTree = rootRouteImport
