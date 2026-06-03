@@ -65,6 +65,7 @@ import { Route as AuthenticatedAlarmsRouteImport } from './routes/_authenticated
 import { Route as AuthenticatedAchievementsRouteImport } from './routes/_authenticated/achievements'
 import { Route as ApiChatStreamRouteImport } from './routes/api/chat.stream'
 import { Route as AuthenticatedWeightGoalRouteImport } from './routes/_authenticated/weight.goal'
+import { Route as AuthenticatedStoriesUploadRouteImport } from './routes/_authenticated/stories.upload'
 import { Route as AuthenticatedStoriesIdRouteImport } from './routes/_authenticated/stories.$id'
 import { Route as AuthenticatedShoppingListRouteImport } from './routes/_authenticated/shopping.list'
 import { Route as AuthenticatedScanVoiceRouteImport } from './routes/_authenticated/scan.voice'
@@ -402,6 +403,12 @@ const AuthenticatedWeightGoalRoute = AuthenticatedWeightGoalRouteImport.update({
   path: '/goal',
   getParentRoute: () => AuthenticatedWeightRoute,
 } as any)
+const AuthenticatedStoriesUploadRoute =
+  AuthenticatedStoriesUploadRouteImport.update({
+    id: '/upload',
+    path: '/upload',
+    getParentRoute: () => AuthenticatedStoriesRoute,
+  } as any)
 const AuthenticatedStoriesIdRoute = AuthenticatedStoriesIdRouteImport.update({
   id: '/$id',
   path: '/$id',
@@ -773,6 +780,7 @@ export interface FileRoutesByFullPath {
   '/scan/voice': typeof AuthenticatedScanVoiceRoute
   '/shopping/list': typeof AuthenticatedShoppingListRoute
   '/stories/$id': typeof AuthenticatedStoriesIdRoute
+  '/stories/upload': typeof AuthenticatedStoriesUploadRoute
   '/weight/goal': typeof AuthenticatedWeightGoalRoute
   '/api/chat/stream': typeof ApiChatStreamRoute
   '/groups/$id/leaderboard': typeof AuthenticatedGroupsIdLeaderboardRoute
@@ -878,6 +886,7 @@ export interface FileRoutesByTo {
   '/scan/voice': typeof AuthenticatedScanVoiceRoute
   '/shopping/list': typeof AuthenticatedShoppingListRoute
   '/stories/$id': typeof AuthenticatedStoriesIdRoute
+  '/stories/upload': typeof AuthenticatedStoriesUploadRoute
   '/weight/goal': typeof AuthenticatedWeightGoalRoute
   '/api/chat/stream': typeof ApiChatStreamRoute
   '/groups/$id/leaderboard': typeof AuthenticatedGroupsIdLeaderboardRoute
@@ -985,6 +994,7 @@ export interface FileRoutesById {
   '/_authenticated/scan/voice': typeof AuthenticatedScanVoiceRoute
   '/_authenticated/shopping/list': typeof AuthenticatedShoppingListRoute
   '/_authenticated/stories/$id': typeof AuthenticatedStoriesIdRoute
+  '/_authenticated/stories/upload': typeof AuthenticatedStoriesUploadRoute
   '/_authenticated/weight/goal': typeof AuthenticatedWeightGoalRoute
   '/api/chat/stream': typeof ApiChatStreamRoute
   '/_authenticated/groups/$id/leaderboard': typeof AuthenticatedGroupsIdLeaderboardRoute
@@ -1092,6 +1102,7 @@ export interface FileRouteTypes {
     | '/scan/voice'
     | '/shopping/list'
     | '/stories/$id'
+    | '/stories/upload'
     | '/weight/goal'
     | '/api/chat/stream'
     | '/groups/$id/leaderboard'
@@ -1197,6 +1208,7 @@ export interface FileRouteTypes {
     | '/scan/voice'
     | '/shopping/list'
     | '/stories/$id'
+    | '/stories/upload'
     | '/weight/goal'
     | '/api/chat/stream'
     | '/groups/$id/leaderboard'
@@ -1303,6 +1315,7 @@ export interface FileRouteTypes {
     | '/_authenticated/scan/voice'
     | '/_authenticated/shopping/list'
     | '/_authenticated/stories/$id'
+    | '/_authenticated/stories/upload'
     | '/_authenticated/weight/goal'
     | '/api/chat/stream'
     | '/_authenticated/groups/$id/leaderboard'
@@ -1723,6 +1736,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/weight/goal'
       preLoaderRoute: typeof AuthenticatedWeightGoalRouteImport
       parentRoute: typeof AuthenticatedWeightRoute
+    }
+    '/_authenticated/stories/upload': {
+      id: '/_authenticated/stories/upload'
+      path: '/upload'
+      fullPath: '/stories/upload'
+      preLoaderRoute: typeof AuthenticatedStoriesUploadRouteImport
+      parentRoute: typeof AuthenticatedStoriesRoute
     }
     '/_authenticated/stories/$id': {
       id: '/_authenticated/stories/$id'
@@ -2273,10 +2293,12 @@ const AuthenticatedScanRouteWithChildren =
 
 interface AuthenticatedStoriesRouteChildren {
   AuthenticatedStoriesIdRoute: typeof AuthenticatedStoriesIdRoute
+  AuthenticatedStoriesUploadRoute: typeof AuthenticatedStoriesUploadRoute
 }
 
 const AuthenticatedStoriesRouteChildren: AuthenticatedStoriesRouteChildren = {
   AuthenticatedStoriesIdRoute: AuthenticatedStoriesIdRoute,
+  AuthenticatedStoriesUploadRoute: AuthenticatedStoriesUploadRoute,
 }
 
 const AuthenticatedStoriesRouteWithChildren =
