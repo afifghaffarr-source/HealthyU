@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { supabaseAdmin } from "@/integrations/supabase/client.server";
 
 export const listRecipes = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
@@ -14,7 +15,7 @@ export const listRecipes = createServerFn({ method: "GET" })
     const recipes = data ?? [];
     if (recipes.length === 0) return [];
     const ids = recipes.map((r) => r.id);
-    const { data: bms } = await supabase
+    const { data: bms } = await supabaseAdmin
       .from("recipe_bookmarks")
       .select("recipe_id")
       .in("recipe_id", ids);
