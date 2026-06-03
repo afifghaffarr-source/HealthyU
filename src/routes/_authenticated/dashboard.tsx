@@ -94,6 +94,7 @@ function Dashboard() {
   // Tick once per second while any claim badge is visible, so the TTL
   // countdown bar inside the badge animates down toward zero.
   const [nowTick, setNowTick] = useState(() => Date.now());
+  const [breakdownOpen, setBreakdownOpen] = useState(false);
   useEffect(() => {
     if (Object.keys(newClaims).length === 0) return;
     const id = window.setInterval(() => setNowTick(Date.now()), 1000);
