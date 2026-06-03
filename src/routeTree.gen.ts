@@ -74,6 +74,7 @@ import { Route as AuthenticatedSleepDiaryRouteImport } from './routes/_authentic
 import { Route as AuthenticatedShoppingListRouteImport } from './routes/_authenticated/shopping.list'
 import { Route as AuthenticatedScanVoiceRouteImport } from './routes/_authenticated/scan.voice'
 import { Route as AuthenticatedScanRecipeRouteImport } from './routes/_authenticated/scan.recipe'
+import { Route as AuthenticatedScanNutritionLabelRouteImport } from './routes/_authenticated/scan.nutrition-label'
 import { Route as AuthenticatedScanMenuRouteImport } from './routes/_authenticated/scan.menu'
 import { Route as AuthenticatedScanHistoryRouteImport } from './routes/_authenticated/scan.history'
 import { Route as AuthenticatedScanFridgeRouteImport } from './routes/_authenticated/scan.fridge'
@@ -461,6 +462,12 @@ const AuthenticatedScanRecipeRoute = AuthenticatedScanRecipeRouteImport.update({
   path: '/recipe',
   getParentRoute: () => AuthenticatedScanRoute,
 } as any)
+const AuthenticatedScanNutritionLabelRoute =
+  AuthenticatedScanNutritionLabelRouteImport.update({
+    id: '/nutrition-label',
+    path: '/nutrition-label',
+    getParentRoute: () => AuthenticatedScanRoute,
+  } as any)
 const AuthenticatedScanMenuRoute = AuthenticatedScanMenuRouteImport.update({
   id: '/menu',
   path: '/menu',
@@ -850,6 +857,7 @@ export interface FileRoutesByFullPath {
   '/scan/fridge': typeof AuthenticatedScanFridgeRoute
   '/scan/history': typeof AuthenticatedScanHistoryRoute
   '/scan/menu': typeof AuthenticatedScanMenuRoute
+  '/scan/nutrition-label': typeof AuthenticatedScanNutritionLabelRoute
   '/scan/recipe': typeof AuthenticatedScanRecipeRoute
   '/scan/voice': typeof AuthenticatedScanVoiceRoute
   '/shopping/list': typeof AuthenticatedShoppingListRoute
@@ -966,6 +974,7 @@ export interface FileRoutesByTo {
   '/scan/fridge': typeof AuthenticatedScanFridgeRoute
   '/scan/history': typeof AuthenticatedScanHistoryRoute
   '/scan/menu': typeof AuthenticatedScanMenuRoute
+  '/scan/nutrition-label': typeof AuthenticatedScanNutritionLabelRoute
   '/scan/recipe': typeof AuthenticatedScanRecipeRoute
   '/scan/voice': typeof AuthenticatedScanVoiceRoute
   '/shopping/list': typeof AuthenticatedShoppingListRoute
@@ -1084,6 +1093,7 @@ export interface FileRoutesById {
   '/_authenticated/scan/fridge': typeof AuthenticatedScanFridgeRoute
   '/_authenticated/scan/history': typeof AuthenticatedScanHistoryRoute
   '/_authenticated/scan/menu': typeof AuthenticatedScanMenuRoute
+  '/_authenticated/scan/nutrition-label': typeof AuthenticatedScanNutritionLabelRoute
   '/_authenticated/scan/recipe': typeof AuthenticatedScanRecipeRoute
   '/_authenticated/scan/voice': typeof AuthenticatedScanVoiceRoute
   '/_authenticated/shopping/list': typeof AuthenticatedShoppingListRoute
@@ -1202,6 +1212,7 @@ export interface FileRouteTypes {
     | '/scan/fridge'
     | '/scan/history'
     | '/scan/menu'
+    | '/scan/nutrition-label'
     | '/scan/recipe'
     | '/scan/voice'
     | '/shopping/list'
@@ -1318,6 +1329,7 @@ export interface FileRouteTypes {
     | '/scan/fridge'
     | '/scan/history'
     | '/scan/menu'
+    | '/scan/nutrition-label'
     | '/scan/recipe'
     | '/scan/voice'
     | '/shopping/list'
@@ -1435,6 +1447,7 @@ export interface FileRouteTypes {
     | '/_authenticated/scan/fridge'
     | '/_authenticated/scan/history'
     | '/_authenticated/scan/menu'
+    | '/_authenticated/scan/nutrition-label'
     | '/_authenticated/scan/recipe'
     | '/_authenticated/scan/voice'
     | '/_authenticated/shopping/list'
@@ -1924,6 +1937,13 @@ declare module '@tanstack/react-router' {
       path: '/recipe'
       fullPath: '/scan/recipe'
       preLoaderRoute: typeof AuthenticatedScanRecipeRouteImport
+      parentRoute: typeof AuthenticatedScanRoute
+    }
+    '/_authenticated/scan/nutrition-label': {
+      id: '/_authenticated/scan/nutrition-label'
+      path: '/nutrition-label'
+      fullPath: '/scan/nutrition-label'
+      preLoaderRoute: typeof AuthenticatedScanNutritionLabelRouteImport
       parentRoute: typeof AuthenticatedScanRoute
     }
     '/_authenticated/scan/menu': {
@@ -2490,6 +2510,7 @@ interface AuthenticatedScanRouteChildren {
   AuthenticatedScanFridgeRoute: typeof AuthenticatedScanFridgeRoute
   AuthenticatedScanHistoryRoute: typeof AuthenticatedScanHistoryRoute
   AuthenticatedScanMenuRoute: typeof AuthenticatedScanMenuRoute
+  AuthenticatedScanNutritionLabelRoute: typeof AuthenticatedScanNutritionLabelRoute
   AuthenticatedScanRecipeRoute: typeof AuthenticatedScanRecipeRoute
   AuthenticatedScanVoiceRoute: typeof AuthenticatedScanVoiceRoute
 }
@@ -2500,6 +2521,7 @@ const AuthenticatedScanRouteChildren: AuthenticatedScanRouteChildren = {
   AuthenticatedScanFridgeRoute: AuthenticatedScanFridgeRoute,
   AuthenticatedScanHistoryRoute: AuthenticatedScanHistoryRoute,
   AuthenticatedScanMenuRoute: AuthenticatedScanMenuRoute,
+  AuthenticatedScanNutritionLabelRoute: AuthenticatedScanNutritionLabelRoute,
   AuthenticatedScanRecipeRoute: AuthenticatedScanRecipeRoute,
   AuthenticatedScanVoiceRoute: AuthenticatedScanVoiceRoute,
 }
