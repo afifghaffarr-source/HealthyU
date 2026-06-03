@@ -279,7 +279,15 @@ function ChallengesPage() {
   );
 }
 
-function Leaderboard({ challengeId, initialGroup }: { challengeId: string; initialGroup?: string }) {
+function Leaderboard({
+  challengeId,
+  initialGroup,
+  autoSelectFirstGroup,
+}: {
+  challengeId: string;
+  initialGroup?: string;
+  autoSelectFirstGroup?: boolean;
+}) {
   const fetchLb = useServerFn(getChallengeLeaderboard);
   const fetchGroups = useServerFn(listChallengeGroups);
   const [mode, setMode] = useState<"all" | "friends" | string>(initialGroup ?? "all");
@@ -287,6 +295,12 @@ function Leaderboard({ challengeId, initialGroup }: { challengeId: string; initi
     queryKey: ["challenge-groups", challengeId],
     queryFn: () => fetchGroups({ data: { challenge_id: challengeId } }),
   });
+  useEffect(() => {
+    if (!autoSelectFirstGroup) return;
+    if (mode !== "all") return;
+    if (groups.length === 0) return;
+    setMode(groups[0].id);
+  }, [autoSelectFirstGroup, groups, mode]);
   const { data: rows = [], isLoading } = useQuery({
     queryKey: ["challenge-lb", challengeId, mode],
     queryFn: () =>
