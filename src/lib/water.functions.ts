@@ -2,6 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { todayRange } from "./health";
+import { recordActivityFor } from "./gamification.functions";
 
 export const todaysWater = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
@@ -29,5 +30,6 @@ export const logWater = createServerFn({ method: "POST" })
       .from("water_logs")
       .insert({ user_id: userId, amount_ml: data.amount_ml });
     if (error) throw new Error(error.message);
-    return { ok: true };
+    const game = await recordActivityFor(supabase, userId, "water_logged");
+    return { ok: true, game };
   });
