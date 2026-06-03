@@ -31,6 +31,7 @@ function CommunityPage() {
 
   const [content, setContent] = useState("");
   const [category, setCategory] = useState<(typeof CATS)[number]["id"]>("general");
+  const [filter, setFilter] = useState<"all" | (typeof CATS)[number]["id"]>("all");
 
   const createMut = useMutation({
     mutationFn: () => create({ data: { content: content.trim(), category } }),
@@ -51,6 +52,8 @@ function CommunityPage() {
   });
 
   const [openComments, setOpenComments] = useState<string | null>(null);
+
+  const visiblePosts = filter === "all" ? posts : posts.filter((p) => p.category === filter);
 
   return (
     <main className="min-h-screen bg-background pb-28">
@@ -96,10 +99,31 @@ function CommunityPage() {
         </section>
 
         <section className="space-y-3 animate-fade-up">
-          {posts.length === 0 ? (
+          <div className="flex gap-2 overflow-x-auto no-scrollbar -mx-1 px-1">
+            <button
+              onClick={() => setFilter("all")}
+              className={`px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap ${
+                filter === "all" ? "bg-primary text-primary-foreground" : "bg-card outline-1 outline-black/10"
+              }`}
+            >
+              Semua
+            </button>
+            {CATS.map((c) => (
+              <button
+                key={c.id}
+                onClick={() => setFilter(c.id)}
+                className={`px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap ${
+                  filter === c.id ? "bg-primary text-primary-foreground" : "bg-card outline-1 outline-black/10"
+                }`}
+              >
+                {c.label}
+              </button>
+            ))}
+          </div>
+          {visiblePosts.length === 0 ? (
             <p className="text-sm text-muted-foreground text-center py-8">Belum ada postingan. Jadilah yang pertama!</p>
           ) : (
-            posts.map((p) => (
+            visiblePosts.map((p) => (
               <article key={p.id} className="bg-card p-4 rounded-3xl outline-1 outline-black/5">
                 <div className="flex items-center gap-3 mb-2">
                   <div className="size-9 rounded-full bg-primary text-primary-foreground grid place-items-center text-sm font-bold">
