@@ -3,6 +3,9 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { BookOpen, Bookmark, BookmarkCheck, Clock } from "lucide-react";
 import { TopAppBar } from "@/components/healthyu/top-app-bar";
+import { EmptyState } from "@/components/healthyu/empty-state";
+import { ListSkeleton } from "@/components/healthyu/skeletons";
+import { LazyImage } from "@/components/healthyu/lazy-image";
 import { toast } from "sonner";
 import { BottomNav } from "@/components/bottom-nav";
 import { listArticles, toggleBookmark } from "@/lib/articles.functions";
@@ -39,16 +42,16 @@ function ArticlesPage() {
         <TopAppBar title="Artikel Kesehatan" showBack />
       </div>
       <main className="max-w-md mx-auto px-4 pt-4 space-y-3">
-        {isLoading && <p className="text-sm text-muted-foreground text-center py-10">Memuat…</p>}
+        {isLoading && <ListSkeleton count={3} />}
         {!isLoading && articles.length === 0 && (
-          <p className="text-sm text-muted-foreground text-center py-10">Belum ada artikel.</p>
+          <EmptyState icon={BookOpen} title="Belum ada artikel" description="Artikel kesehatan baru akan muncul di sini." />
         )}
         {articles.map((a) => {
           const marked = bookmarks.has(a.id);
           return (
             <article key={a.id} className="rounded-3xl bg-card outline-1 outline-black/5 overflow-hidden shadow-sm">
               {a.image_url && (
-                <img src={a.image_url} alt={a.title} className="w-full h-36 object-cover" loading="lazy" />
+                <LazyImage src={a.image_url} alt={a.title} className="w-full h-36 object-cover" />
               )}
               <div className="p-4">
                 <div className="flex items-start justify-between gap-2">
