@@ -237,6 +237,8 @@ function ReportsPage() {
       }
       doc.text(`${idx + 1}. ${periode}`, 40, tocY);
       doc.text(`hal. ${page}`, 510, tocY, { align: "right" });
+      // Make the whole TOC row clickable → jumps to that report's body page.
+      doc.link(40, tocY - 10, 515, 14, { pageNumber: page });
       tocY += 16;
     });
     filtered.forEach((r) => {
