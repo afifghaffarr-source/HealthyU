@@ -576,18 +576,49 @@ export type Database = {
           allergies: string[] | null
           avatar_url: string | null
           birth_date: string | null
+          blood_type: string | null
+          bmi: number | null
+          bmi_category: string | null
+          bmr: number | null
           city: string | null
           created_at: string
           daily_calorie_target: number | null
+          daily_carbs_target: number | null
+          daily_fat_target: number | null
+          daily_fiber_target: number | null
+          daily_protein_target: number | null
+          daily_steps_target: number | null
+          daily_water_target: number | null
+          deleted_at: string | null
           dietary_preference: string | null
+          fcm_token: string | null
           full_name: string | null
           gender: string | null
+          health_age: number | null
+          health_coins: number
           health_conditions: string[] | null
+          health_score: number | null
           height_cm: number | null
           id: string
+          ideal_weight_max: number | null
+          ideal_weight_min: number | null
           language: string | null
+          location_lat: number | null
+          location_lng: number | null
+          location_province: string | null
           onboarded: boolean
+          phone: string | null
+          platform: string | null
+          premium_expires_at: string | null
+          premium_status: string
+          referral_code: string | null
+          referred_by: string | null
+          streak_days: number
           target_weight_kg: number | null
+          tdee: number | null
+          theme: string | null
+          timezone: string | null
+          total_xp: number
           updated_at: string
           weight_kg: number | null
         }
@@ -596,18 +627,49 @@ export type Database = {
           allergies?: string[] | null
           avatar_url?: string | null
           birth_date?: string | null
+          blood_type?: string | null
+          bmi?: number | null
+          bmi_category?: string | null
+          bmr?: number | null
           city?: string | null
           created_at?: string
           daily_calorie_target?: number | null
+          daily_carbs_target?: number | null
+          daily_fat_target?: number | null
+          daily_fiber_target?: number | null
+          daily_protein_target?: number | null
+          daily_steps_target?: number | null
+          daily_water_target?: number | null
+          deleted_at?: string | null
           dietary_preference?: string | null
+          fcm_token?: string | null
           full_name?: string | null
           gender?: string | null
+          health_age?: number | null
+          health_coins?: number
           health_conditions?: string[] | null
+          health_score?: number | null
           height_cm?: number | null
           id: string
+          ideal_weight_max?: number | null
+          ideal_weight_min?: number | null
           language?: string | null
+          location_lat?: number | null
+          location_lng?: number | null
+          location_province?: string | null
           onboarded?: boolean
+          phone?: string | null
+          platform?: string | null
+          premium_expires_at?: string | null
+          premium_status?: string
+          referral_code?: string | null
+          referred_by?: string | null
+          streak_days?: number
           target_weight_kg?: number | null
+          tdee?: number | null
+          theme?: string | null
+          timezone?: string | null
+          total_xp?: number
           updated_at?: string
           weight_kg?: number | null
         }
@@ -616,18 +678,49 @@ export type Database = {
           allergies?: string[] | null
           avatar_url?: string | null
           birth_date?: string | null
+          blood_type?: string | null
+          bmi?: number | null
+          bmi_category?: string | null
+          bmr?: number | null
           city?: string | null
           created_at?: string
           daily_calorie_target?: number | null
+          daily_carbs_target?: number | null
+          daily_fat_target?: number | null
+          daily_fiber_target?: number | null
+          daily_protein_target?: number | null
+          daily_steps_target?: number | null
+          daily_water_target?: number | null
+          deleted_at?: string | null
           dietary_preference?: string | null
+          fcm_token?: string | null
           full_name?: string | null
           gender?: string | null
+          health_age?: number | null
+          health_coins?: number
           health_conditions?: string[] | null
+          health_score?: number | null
           height_cm?: number | null
           id?: string
+          ideal_weight_max?: number | null
+          ideal_weight_min?: number | null
           language?: string | null
+          location_lat?: number | null
+          location_lng?: number | null
+          location_province?: string | null
           onboarded?: boolean
+          phone?: string | null
+          platform?: string | null
+          premium_expires_at?: string | null
+          premium_status?: string
+          referral_code?: string | null
+          referred_by?: string | null
+          streak_days?: number
           target_weight_kg?: number | null
+          tdee?: number | null
+          theme?: string | null
+          timezone?: string | null
+          total_xp?: number
           updated_at?: string
           weight_kg?: number | null
         }
@@ -805,6 +898,117 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      user_allergies: {
+        Row: {
+          allergen: string
+          created_at: string
+          id: string
+          reaction: string | null
+          severity: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          allergen: string
+          created_at?: string
+          id?: string
+          reaction?: string | null
+          severity?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          allergen?: string
+          created_at?: string
+          id?: string
+          reaction?: string | null
+          severity?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_connected_accounts: {
+        Row: {
+          access_token: string | null
+          created_at: string
+          id: string
+          is_active: boolean
+          last_sync_at: string | null
+          metadata: Json | null
+          provider: string
+          provider_user_id: string | null
+          refresh_token: string | null
+          token_expires_at: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          access_token?: string | null
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          last_sync_at?: string | null
+          metadata?: Json | null
+          provider: string
+          provider_user_id?: string | null
+          refresh_token?: string | null
+          token_expires_at?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          access_token?: string | null
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          last_sync_at?: string | null
+          metadata?: Json | null
+          provider?: string
+          provider_user_id?: string | null
+          refresh_token?: string | null
+          token_expires_at?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_health_conditions: {
+        Row: {
+          condition_name: string
+          created_at: string
+          diagnosed_date: string | null
+          id: string
+          is_active: boolean
+          notes: string | null
+          severity: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          condition_name: string
+          created_at?: string
+          diagnosed_date?: string | null
+          id?: string
+          is_active?: boolean
+          notes?: string | null
+          severity?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          condition_name?: string
+          created_at?: string
+          diagnosed_date?: string | null
+          id?: string
+          is_active?: boolean
+          notes?: string | null
+          severity?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       user_stats: {
         Row: {
