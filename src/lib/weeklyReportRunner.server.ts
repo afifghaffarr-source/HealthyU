@@ -133,7 +133,7 @@ export async function sendWeeklyReportPush(
   const url = trendingRecipe
     ? "/recipes?sort=trending"
     : longestStreak && longestStreak > 0
-      ? "/challenges"
+      ? "/challenges?focus=streak"
       : "/reports?focus=latest";
   for (const s of subs ?? []) {
     try {
