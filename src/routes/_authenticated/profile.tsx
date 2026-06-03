@@ -32,6 +32,7 @@ import {
   AlertTriangle,
 } from "lucide-react";
 import { useTheme } from "@/components/theme-provider";
+import { useLocale, type Locale } from "@/lib/i18n";
 
 export const Route = createFileRoute("/_authenticated/profile")({
   component: ProfilePage,
@@ -40,6 +41,7 @@ export const Route = createFileRoute("/_authenticated/profile")({
 function ProfilePage() {
   const navigate = useNavigate();
   const { theme, toggle } = useTheme();
+  const { locale, setLocale } = useLocale();
   const fetchProfile = useServerFn(getProfile);
   const { data: p } = useQuery({ queryKey: ["profile"], queryFn: () => fetchProfile() });
 
