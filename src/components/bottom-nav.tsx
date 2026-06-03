@@ -1,5 +1,6 @@
 import { Link } from "@tanstack/react-router";
-import { Home, Camera, Database, Timer, Activity, User } from "lucide-react";
+import { Home, Camera, Database, Timer, Activity, User, WifiOff, RefreshCw } from "lucide-react";
+import { useOfflineQueue } from "@/hooks/use-offline-queue";
 
 const items = [
   { to: "/dashboard", label: "Beranda", icon: Home },
@@ -11,7 +12,19 @@ const items = [
 ] as const;
 
 export function BottomNav() {
+  const { online, pending, sync } = useOfflineQueue();
   return (
+    <>
+      {(!online || pending > 0) && (
+        <button
+          onClick={() => sync()}
+          className={`fixed bottom-24 left-1/2 -translate-x-1/2 z-40 inline-flex items-center gap-1.5 text-[11px] font-semibold px-3 py-1.5 rounded-full shadow-lg ${online ? "bg-amber-100 text-amber-700" : "bg-foreground text-background"}`}
+          aria-label={online ? "Sync sekarang" : "Offline"}
+        >
+          {online ? <RefreshCw className="size-3" /> : <WifiOff className="size-3" />}
+          {online ? `Sync ${pending}` : `Offline${pending ? ` · ${pending}` : ""}`}
+        </button>
+      )}
     <nav className="fixed bottom-4 left-4 right-4 z-40 h-16 bg-card/85 backdrop-blur-xl rounded-3xl outline-1 outline-black/5 shadow-lg shadow-black/5 flex items-center justify-around px-2 max-w-md mx-auto">
       {items.map(({ to, label, icon: Icon }) => (
         <Link
@@ -25,5 +38,6 @@ export function BottomNav() {
         </Link>
       ))}
     </nav>
+    </>
   );
 }
