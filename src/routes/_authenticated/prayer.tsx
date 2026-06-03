@@ -40,6 +40,7 @@ function PrayerPage() {
     : [];
 
   const nextIdx = findNext(prayers);
+  const countdown = useCountdown(nextIdx !== -1 ? prayers[nextIdx]?.time : undefined);
 
   return (
     <main className="min-h-screen bg-background pb-28">
@@ -65,6 +66,22 @@ function PrayerPage() {
                 <p className="text-xs uppercase tracking-widest opacity-80 font-bold mb-1">Sholat berikutnya</p>
                 <p className="text-3xl font-bold">{prayers[nextIdx].name}</p>
                 <p className="text-2xl tabular-nums mt-1">{prayers[nextIdx].time}</p>
+                {countdown && (
+                  <p className="text-sm mt-2 opacity-90">⏳ {countdown} lagi</p>
+                )}
+              </section>
+            )}
+
+            {times && (
+              <section className="grid grid-cols-2 gap-3 animate-fade-up">
+                <div className="bg-card p-4 rounded-2xl outline-1 outline-black/5">
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Imsak</p>
+                  <p className="text-lg font-bold tabular-nums">{shiftMinutes(times.Fajr, -10)}</p>
+                </div>
+                <div className="bg-card p-4 rounded-2xl outline-1 outline-black/5">
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Terbit</p>
+                  <p className="text-lg font-bold tabular-nums">{times.Sunrise}</p>
+                </div>
               </section>
             )}
 
@@ -96,4 +113,31 @@ function findNext(prayers: Array<{ name: string; time: string }>): number {
     if (h * 60 + m > cur) return i;
   }
   return 0; // tomorrow's Fajr
+}
+
+function shiftMinutes(time: string, delta: number): string {
+  const [h, m] = time.split(":").map(Number);
+  let total = h * 60 + m + delta;
+  total = ((total % 1440) + 1440) % 1440;
+  return `${String(Math.floor(total / 60)).padStart(2, "0")}:${String(total % 60).padStart(2, "0")}`;
+}
+
+function useCountdown(time?: string): string | null {
+  const [, force] = useState(0);
+  useEffect(() => {
+    if (!time) return;
+    const id = setInterval(() => force((x) => x + 1), 1000);
+    return () => clearInterval(id);
+  }, [time]);
+  if (!time) return null;
+  const now = new Date();
+  const [h, m] = time.split(":").map(Number);
+  const target = new Date(now);
+  target.setHours(h, m, 0, 0);
+  if (target.getTime() <= now.getTime()) target.setDate(target.getDate() + 1);
+  const diff = Math.max(0, target.getTime() - now.getTime());
+  const hh = Math.floor(diff / 3_600_000);
+  const mm = Math.floor((diff % 3_600_000) / 60_000);
+  const ss = Math.floor((diff % 60_000) / 1000);
+  return `${hh}j ${mm}m ${ss}d`;
 }
