@@ -60,6 +60,7 @@ import { Route as AuthenticatedChatRouteImport } from './routes/_authenticated/c
 import { Route as AuthenticatedChallengesRouteImport } from './routes/_authenticated/challenges'
 import { Route as AuthenticatedBackupRouteImport } from './routes/_authenticated/backup'
 import { Route as AuthenticatedArticlesRouteImport } from './routes/_authenticated/articles'
+import { Route as AuthenticatedAlarmsRouteImport } from './routes/_authenticated/alarms'
 import { Route as AuthenticatedAchievementsRouteImport } from './routes/_authenticated/achievements'
 import { Route as ApiChatStreamRouteImport } from './routes/api/chat.stream'
 import { Route as AuthenticatedWeightGoalRouteImport } from './routes/_authenticated/weight.goal'
@@ -371,6 +372,11 @@ const AuthenticatedArticlesRoute = AuthenticatedArticlesRouteImport.update({
   path: '/articles',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedAlarmsRoute = AuthenticatedAlarmsRouteImport.update({
+  id: '/alarms',
+  path: '/alarms',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedAchievementsRoute =
   AuthenticatedAchievementsRouteImport.update({
     id: '/achievements',
@@ -654,6 +660,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/achievements': typeof AuthenticatedAchievementsRoute
+  '/alarms': typeof AuthenticatedAlarmsRoute
   '/articles': typeof AuthenticatedArticlesRoute
   '/backup': typeof AuthenticatedBackupRoute
   '/challenges': typeof AuthenticatedChallengesRouteWithChildren
@@ -754,6 +761,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/achievements': typeof AuthenticatedAchievementsRoute
+  '/alarms': typeof AuthenticatedAlarmsRoute
   '/articles': typeof AuthenticatedArticlesRoute
   '/backup': typeof AuthenticatedBackupRoute
   '/challenges': typeof AuthenticatedChallengesRouteWithChildren
@@ -856,6 +864,7 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
   '/_authenticated/achievements': typeof AuthenticatedAchievementsRoute
+  '/_authenticated/alarms': typeof AuthenticatedAlarmsRoute
   '/_authenticated/articles': typeof AuthenticatedArticlesRoute
   '/_authenticated/backup': typeof AuthenticatedBackupRoute
   '/_authenticated/challenges': typeof AuthenticatedChallengesRouteWithChildren
@@ -958,6 +967,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/achievements'
+    | '/alarms'
     | '/articles'
     | '/backup'
     | '/challenges'
@@ -1058,6 +1068,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/achievements'
+    | '/alarms'
     | '/articles'
     | '/backup'
     | '/challenges'
@@ -1159,6 +1170,7 @@ export interface FileRouteTypes {
     | '/_authenticated'
     | '/auth'
     | '/_authenticated/achievements'
+    | '/_authenticated/alarms'
     | '/_authenticated/articles'
     | '/_authenticated/backup'
     | '/_authenticated/challenges'
@@ -1625,6 +1637,13 @@ declare module '@tanstack/react-router' {
       path: '/articles'
       fullPath: '/articles'
       preLoaderRoute: typeof AuthenticatedArticlesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/alarms': {
+      id: '/_authenticated/alarms'
+      path: '/alarms'
+      fullPath: '/alarms'
+      preLoaderRoute: typeof AuthenticatedAlarmsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/achievements': {
@@ -2187,6 +2206,7 @@ const AuthenticatedWeightRouteWithChildren =
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAchievementsRoute: typeof AuthenticatedAchievementsRoute
+  AuthenticatedAlarmsRoute: typeof AuthenticatedAlarmsRoute
   AuthenticatedArticlesRoute: typeof AuthenticatedArticlesRoute
   AuthenticatedBackupRoute: typeof AuthenticatedBackupRoute
   AuthenticatedChallengesRoute: typeof AuthenticatedChallengesRouteWithChildren
@@ -2244,6 +2264,7 @@ interface AuthenticatedRouteRouteChildren {
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAchievementsRoute: AuthenticatedAchievementsRoute,
+  AuthenticatedAlarmsRoute: AuthenticatedAlarmsRoute,
   AuthenticatedArticlesRoute: AuthenticatedArticlesRoute,
   AuthenticatedBackupRoute: AuthenticatedBackupRoute,
   AuthenticatedChallengesRoute: AuthenticatedChallengesRouteWithChildren,
