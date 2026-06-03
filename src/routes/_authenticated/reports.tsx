@@ -41,7 +41,13 @@ import {
   PDF_TOC_PAGE_BREAK_Y,
   PDF_TOC_CONTINUED_TOP_Y,
   PDF_FOOTER_DIVIDER_OFFSET,
+  PDF_LINK_BOUND_OFFSET,
+  PDF_LINK_BOUND_HEIGHT,
+  PDF_LINK_FONT_SIZE,
+  PDF_DIVIDER_LINE_WIDTH,
+  PDF_SECTION_DIVIDER_OFFSET,
 } from "@/lib/constants";
+import { useTranslation } from "@/lib/i18n";
 
 export const Route = createFileRoute("/_authenticated/reports")({
   validateSearch: zodValidator(
@@ -57,6 +63,7 @@ function dayKey(d: string | Date) {
 function ReportsPage() {
   const { focus } = Route.useSearch();
   const navigate = useNavigate();
+  const { t } = useTranslation();
   useEffect(() => {
     if (focus !== "latest") return;
     const t = setTimeout(() => {
