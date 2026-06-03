@@ -57,12 +57,16 @@ function Dashboard() {
     let flushTimer: ReturnType<typeof setTimeout> | null = null;
     const flush = () => {
       flushTimer = null;
-      for (const { groupName, names } of buffer.values()) {
+      for (const [groupId, { groupName, names }] of buffer.entries()) {
+        const action = {
+          label: "Lihat",
+          onClick: () => navigate({ to: "/challenges", search: { group: groupId } }),
+        };
         if (names.size === 1) {
           const [only] = Array.from(names);
-          toast.success(`🎉 ${only} klaim bonus di ${groupName}`);
+          toast.success(`🎉 ${only} klaim bonus di ${groupName}`, { action });
         } else if (names.size > 1) {
-          toast.success(`🎉 ${names.size} anggota klaim bonus di ${groupName}`);
+          toast.success(`🎉 ${names.size} anggota klaim bonus di ${groupName}`, { action });
         }
       }
       buffer.clear();
