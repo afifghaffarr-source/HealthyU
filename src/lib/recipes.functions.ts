@@ -11,7 +11,16 @@ export const listRecipes = createServerFn({ method: "GET" })
       .select("id, title, description, category, calories, protein_g, carbs_g, fat_g, prep_min, servings, avg_rating, rating_count, image_url")
       .order("title");
     if (error) throw new Error(error.message);
-    return data ?? [];
+    const recipes = data ?? [];
+    if (recipes.length === 0) return [];
+    const ids = recipes.map((r) => r.id);
+    const { data: bms } = await supabase
+      .from("recipe_bookmarks")
+      .select("recipe_id")
+      .in("recipe_id", ids);
+    const counts = new Map<string, number>();
+    (bms ?? []).forEach((b) => counts.set(b.recipe_id, (counts.get(b.recipe_id) ?? 0) + 1));
+    return recipes.map((r) => ({ ...r, bookmark_count: counts.get(r.id) ?? 0 }));
   });
 
 export const getRecipe = createServerFn({ method: "GET" })
