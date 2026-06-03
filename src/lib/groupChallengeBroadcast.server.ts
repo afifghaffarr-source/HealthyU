@@ -93,3 +93,67 @@ export async function broadcastGroupChallengeJoin(args: {
   );
   return { sent };
 }
+
+/**
+ * Notify other members of the group when someone successfully claims the
+ * group challenge bonus — positive FOMO.
+ */
+export async function broadcastGroupBonusClaim(args: {
+  userId: string;
+  groupId: string;
+  challengeId: string;
+  coins: number;
+}) {
+  const { userId, groupId, challengeId, coins } = args;
+
+  const { data: members } = await supabaseAdmin
+    .from("friend_group_members")
+    .select("user_id")
+    .eq("group_id", groupId);
+  const otherIds = (members ?? [])
+    .map((m) => m.user_id)
+    .filter((id) => id !== userId);
+  if (otherIds.length === 0) return { sent: 0 };
+
+  const { data: prefs } = await supabaseAdmin
+    .from("notification_preferences")
+    .select("user_id, challenge_enabled")
+    .in("user_id", otherIds);
+  const denied = new Set(
+    (prefs ?? []).filter((p) => p.challenge_enabled === false).map((p) => p.user_id),
+  );
+  const recipients = otherIds.filter((id) => !denied.has(id));
+  if (recipients.length === 0) return { sent: 0 };
+
+  const [{ data: meProf }, { data: ch }, { data: grp }] = await Promise.all([
+    supabaseAdmin.from("profiles").select("full_name").eq("id", userId).maybeSingle(),
+    supabaseAdmin.from("challenges").select("title").eq("id", challengeId).maybeSingle(),
+    supabaseAdmin.from("friend_groups").select("name").eq("id", groupId).maybeSingle(),
+  ]);
+  const name = meProf?.full_name ?? "Anggota grup";
+  const title = "Bonus grup diklaim 💰";
+  const body = `${name} dapat ${coins} koin dari "${ch?.title ?? "challenge"}" di grup ${grp?.name ?? ""}. Klaim punyamu!`;
+
+  const { data: subs } = await supabaseAdmin
+    .from("push_subscriptions")
+    .select("user_id, endpoint, p256dh, auth")
+    .in("user_id", recipients);
+
+  let sent = 0;
+  await Promise.all(
+    (subs ?? []).map(async (s) => {
+      try {
+        await sendWebPushTo(s as PushSub, {
+          title,
+          body,
+          url: "/challenges",
+          tag: `gc-bonus-${challengeId}`,
+        });
+        sent++;
+      } catch (e) {
+        console.error("push fail", (e as Error).message);
+      }
+    }),
+  );
+  return { sent };
+}
