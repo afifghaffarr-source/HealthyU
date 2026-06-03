@@ -430,6 +430,7 @@ function BonusClaimer({ challengeId }: { challengeId: string }) {
       if (r.ok) {
         toast.success(`+${r.coins_awarded} 🪙 bonus grup!`);
         qc.invalidateQueries({ queryKey: ["bonus-claimed", challengeId] });
+        qc.invalidateQueries({ queryKey: ["bonus-claimers"] });
       } else if (r.reason === "not_all_completed") {
         toast.error(`Belum semua selesai (${r.completed}/${r.total})`);
       } else if (r.reason === "already_claimed") {
