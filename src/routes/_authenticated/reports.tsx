@@ -3,7 +3,8 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { weeklyReport, weeklyAiAnalysis, listAiReports } from "@/lib/reports.functions";
 import { BottomNav } from "@/components/bottom-nav";
-import { ArrowLeft, Download, FileText, Sparkles, Loader2, Share2 } from "lucide-react";
+import { Download, FileText, Sparkles, Loader2, Share2 } from "lucide-react";
+import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import jsPDF from "jspdf";
@@ -580,19 +581,8 @@ function ReportsPage() {
 
   return (
     <main className="min-h-screen bg-background pb-28">
-      <div className="max-w-md mx-auto px-5 pt-8 space-y-5">
-        <header className="flex items-center gap-3">
-          <Link
-            to="/profile"
-            className="size-10 bg-card rounded-2xl outline-1 outline-black/10 grid place-items-center print:hidden"
-          >
-            <ArrowLeft className="size-4" />
-          </Link>
-          <div>
-            <h1 className="text-2xl font-bold">Laporan 7 Hari</h1>
-            <p className="text-xs text-muted-foreground">Ringkasan kesehatan mingguan</p>
-          </div>
-        </header>
+      <div className="max-w-md mx-auto px-5 pt-2 space-y-5">
+        <TopAppBar title="Laporan 7 Hari" subtitle="Ringkasan kesehatan mingguan" showBack className="print:hidden" />
 
         <section className="grid grid-cols-2 gap-3 animate-fade-up">
           <Stat
