@@ -4,12 +4,13 @@ import { useServerFn } from "@tanstack/react-start";
 import { weeklyReport, weeklyAiAnalysis, listAiReports } from "@/lib/reports.functions";
 import { BottomNav } from "@/components/bottom-nav";
 import { ArrowLeft, Download, FileText, Sparkles, Loader2, Share2 } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import { z } from "zod";
 import { fallback, zodValidator } from "@tanstack/zod-adapter";
+import { useNavigate } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/_authenticated/reports")({
   validateSearch: zodValidator(
@@ -24,6 +25,14 @@ function dayKey(d: string | Date) {
 
 function ReportsPage() {
   const { focus } = Route.useSearch();
+  const navigate = useNavigate();
+  useEffect(() => {
+    if (focus !== "latest") return;
+    const t = setTimeout(() => {
+      navigate({ to: "/reports", search: {}, replace: true });
+    }, 3000);
+    return () => clearTimeout(t);
+  }, [focus, navigate]);
   const fetchFn = useServerFn(weeklyReport);
   const aiFn = useServerFn(weeklyAiAnalysis);
   const listFn = useServerFn(listAiReports);
