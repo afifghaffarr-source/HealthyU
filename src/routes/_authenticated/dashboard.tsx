@@ -17,6 +17,7 @@ import { formatDuration, fastingStage } from "@/lib/health";
 import { Droplet, Plus, Sparkles, ArrowRight, Flame, Trophy, Camera, Smile } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { GROUP_BONUS_AGGREGATE_MS, GROUP_BONUS_BADGE_TTL_MS } from "@/lib/constants";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   component: Dashboard,
@@ -49,7 +50,23 @@ function Dashboard() {
     queryFn: () => fetchUnlinked(),
   });
   // Persistent per-group "+N klaim baru" counter, cleared when user clicks
-  const [newClaims, setNewClaims] = useState<Record<string, number>>({});
+  const [newClaims, setNewClaims] = useState<Record<string, number>>(() => {
+    if (typeof window === "undefined") return {};
+    try {
+      const raw = window.sessionStorage.getItem("dashboard:newClaims");
+      return raw ? (JSON.parse(raw) as Record<string, number>) : {};
+    } catch {
+      return {};
+    }
+  });
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (Object.keys(newClaims).length === 0) {
+      window.sessionStorage.removeItem("dashboard:newClaims");
+    } else {
+      window.sessionStorage.setItem("dashboard:newClaims", JSON.stringify(newClaims));
+    }
+  }, [newClaims]);
 
   // Realtime: refresh group challenge summary when bonuses/redemptions change
   useEffect(() => {
