@@ -1,3 +1,5 @@
+import { useReducedMotion } from "@/hooks/useReducedMotion";
+
 interface Props {
   consumed: number;
   target: number;
@@ -10,6 +12,7 @@ export function CalorieRing({ consumed, target, size = 128 }: Props) {
   const r = 50;
   const c = 2 * Math.PI * r;
   const dash = (pct / 100) * c;
+  const prefersReducedMotion = useReducedMotion();
 
   return (
     <div className="relative" style={{ width: size, height: size }}>
@@ -24,7 +27,8 @@ export function CalorieRing({ consumed, target, size = 128 }: Props) {
           strokeWidth="10"
           strokeLinecap="round"
           strokeDasharray={`${dash} ${c}`}
-          className="transition-all duration-700"
+          className="transition-all"
+          style={{ transitionDuration: prefersReducedMotion ? "0ms" : "700ms" }}
         />
       </svg>
       <div className="absolute inset-0 flex flex-col items-center justify-center">
