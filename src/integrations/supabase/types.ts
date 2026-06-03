@@ -2022,6 +2022,33 @@ export type Database = {
           },
         ]
       }
+      form_check_sessions: {
+        Row: {
+          ai_feedback: Json | null
+          created_at: string
+          exercise: string
+          id: string
+          user_id: string
+          video_path: string | null
+        }
+        Insert: {
+          ai_feedback?: Json | null
+          created_at?: string
+          exercise: string
+          id?: string
+          user_id: string
+          video_path?: string | null
+        }
+        Update: {
+          ai_feedback?: Json | null
+          created_at?: string
+          exercise?: string
+          id?: string
+          user_id?: string
+          video_path?: string | null
+        }
+        Relationships: []
+      }
       friend_group_members: {
         Row: {
           group_id: string
@@ -2125,6 +2152,33 @@ export type Database = {
           id?: string
           reward_coins?: number | null
           reward_label?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      grocery_lists: {
+        Row: {
+          created_at: string
+          id: string
+          items: Json
+          source: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          items?: Json
+          source?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          items?: Json
+          source?: string | null
+          updated_at?: string
           user_id?: string
         }
         Relationships: []
@@ -2301,6 +2355,39 @@ export type Database = {
           id?: string
           start_date?: string
           target_ml?: number
+        }
+        Relationships: []
+      }
+      imported_recipes: {
+        Row: {
+          created_at: string
+          id: string
+          ingredients: Json | null
+          raw_html: string | null
+          source_url: string
+          steps: Json | null
+          title: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          ingredients?: Json | null
+          raw_html?: string | null
+          source_url: string
+          steps?: Json | null
+          title?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          ingredients?: Json | null
+          raw_html?: string | null
+          source_url?: string
+          steps?: Json | null
+          title?: string | null
+          user_id?: string
         }
         Relationships: []
       }
@@ -4074,6 +4161,36 @@ export type Database = {
         }
         Relationships: []
       }
+      subscriptions: {
+        Row: {
+          created_at: string
+          current_period_end: string | null
+          id: string
+          status: string
+          tier: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          current_period_end?: string | null
+          id?: string
+          status?: string
+          tier?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          current_period_end?: string | null
+          id?: string
+          status?: string
+          tier?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       system_settings: {
         Row: {
           created_at: string
@@ -4641,6 +4758,63 @@ export type Database = {
           scope?: string | null
           updated_at?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      weekly_leaderboard: {
+        Row: {
+          created_at: string
+          id: string
+          rank: number | null
+          score: number
+          updated_at: string
+          user_id: string
+          week_start: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          rank?: number | null
+          score?: number
+          updated_at?: string
+          user_id: string
+          week_start: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          rank?: number | null
+          score?: number
+          updated_at?: string
+          user_id?: string
+          week_start?: string
+        }
+        Relationships: []
+      }
+      weekly_podcasts: {
+        Row: {
+          audio_url: string | null
+          created_at: string
+          id: string
+          script: string
+          user_id: string
+          week_start: string
+        }
+        Insert: {
+          audio_url?: string | null
+          created_at?: string
+          id?: string
+          script: string
+          user_id: string
+          week_start: string
+        }
+        Update: {
+          audio_url?: string | null
+          created_at?: string
+          id?: string
+          script?: string
+          user_id?: string
+          week_start?: string
         }
         Relationships: []
       }
