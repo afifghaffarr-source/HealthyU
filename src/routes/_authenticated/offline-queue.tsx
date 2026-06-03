@@ -1,7 +1,8 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
+import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { useEffect, useState, useCallback } from "react";
 import { BottomNav } from "@/components/bottom-nav";
-import { ArrowLeft, RefreshCw, Trash2, AlertTriangle } from "lucide-react";
+import { RefreshCw, Trash2, AlertTriangle } from "lucide-react";
 import { toast } from "sonner";
 import {
   listDead,
@@ -45,21 +46,8 @@ function OfflineQueuePage() {
 
   return (
     <main className="min-h-screen bg-background pb-28">
-      <div className="max-w-md mx-auto px-5 pt-8 space-y-5">
-        <header className="flex items-center gap-3">
-          <Link
-            to="/profile"
-            className="size-10 bg-card rounded-2xl outline-1 outline-black/10 grid place-items-center"
-          >
-            <ArrowLeft className="size-4" />
-          </Link>
-          <div>
-            <h1 className="text-2xl font-bold">Antrean Offline</h1>
-            <p className="text-xs text-muted-foreground">
-              {online ? "Online" : "Offline"} · {queued.length} menunggu · {dead.length} gagal
-            </p>
-          </div>
-        </header>
+      <div className="max-w-md mx-auto px-5 pt-2 space-y-5">
+        <TopAppBar title="Antrean Offline" subtitle="· menunggu · gagal" showBack />
 
         {pending > 0 && (
           <button

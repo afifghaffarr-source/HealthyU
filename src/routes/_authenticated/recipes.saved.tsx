@@ -1,9 +1,10 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { listRecipeBookmarks } from "@/lib/recipeBookmarks.functions";
 import { BottomNav } from "@/components/bottom-nav";
-import { ArrowLeft, Bookmark, Clock, Flame, Star } from "lucide-react";
+import { Bookmark, Clock, Flame, Star } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/recipes/saved")({
   component: SavedRecipesPage,
@@ -18,18 +19,8 @@ function SavedRecipesPage() {
 
   return (
     <main className="min-h-screen bg-background pb-28">
-      <div className="max-w-md mx-auto px-5 pt-8 space-y-5">
-        <header className="flex items-center gap-3">
-          <Link to="/recipes" className="size-10 bg-card rounded-2xl outline-1 outline-black/10 grid place-items-center">
-            <ArrowLeft className="size-4" />
-          </Link>
-          <div>
-            <h1 className="text-2xl font-bold flex items-center gap-2">
-              <Bookmark className="size-5 text-primary" /> Resep Tersimpan
-            </h1>
-            <p className="text-xs text-muted-foreground">{items.length} resep favorit</p>
-          </div>
-        </header>
+      <div className="max-w-md mx-auto px-5 pt-2 space-y-5">
+        <TopAppBar title="Resep Tersimpan" subtitle="resep favorit" showBack />
 
         {isLoading && <p className="text-sm text-muted-foreground text-center py-10">Memuat…</p>}
         {!isLoading && items.length === 0 && (
