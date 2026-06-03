@@ -108,7 +108,7 @@ function Dashboard() {
                 delete copy[gid];
                 return copy;
               });
-            }, 30000);
+            }, GROUP_BONUS_BADGE_TTL_MS);
             try {
               const [{ data: prof }, { data: grp }] = await Promise.all([
                 supabase.from("profiles").select("full_name").eq("id", row.user_id).maybeSingle(),
@@ -121,7 +121,7 @@ function Dashboard() {
               entry.groupName = groupName;
               buffer.set(gid, entry);
               if (flushTimer) clearTimeout(flushTimer);
-              flushTimer = setTimeout(flush, 5000);
+              flushTimer = setTimeout(flush, GROUP_BONUS_AGGREGATE_MS);
             } catch {
               /* ignore */
             }
