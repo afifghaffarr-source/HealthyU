@@ -410,8 +410,6 @@ function LeaderboardList({
 }
 
 function BonusClaimer({ challengeId }: { challengeId: string }) {
-
-}
   const qc = useQueryClient();
   const fetchGroups = useServerFn(listChallengeGroups);
   const fetchClaimed = useServerFn(listGroupBonusStatus);
