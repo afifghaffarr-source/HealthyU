@@ -159,8 +159,8 @@ function WearablePage() {
         )}
 
         <p className="text-xs text-muted-foreground leading-relaxed">
-          Data yang disinkron: jumlah langkah harian, rata-rata detak jantung harian
-          (tersimpan ke catatan vital). Pastikan aplikasi Google Fit di HP kamu aktif.
+          Data yang disinkron: jumlah langkah harian, rata-rata detak jantung harian (tersimpan
+          ke catatan vital). Pastikan aplikasi Google Fit di HP kamu aktif.
         </p>
       </div>
       <BottomNav />
