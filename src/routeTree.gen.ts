@@ -97,6 +97,7 @@ import { Route as AuthenticatedMealplanGroceryRouteImport } from './routes/_auth
 import { Route as AuthenticatedHabitsStackRouteImport } from './routes/_authenticated/habits.stack'
 import { Route as AuthenticatedFriendsInviteRouteImport } from './routes/_authenticated/friends.invite'
 import { Route as AuthenticatedFamilyInviteRouteImport } from './routes/_authenticated/family.invite'
+import { Route as AuthenticatedExercisesRecommendRouteImport } from './routes/_authenticated/exercises.recommend'
 import { Route as AuthenticatedExercisesLibraryRouteImport } from './routes/_authenticated/exercises.library'
 import { Route as AuthenticatedDoctorReferralRouteImport } from './routes/_authenticated/doctor.referral'
 import { Route as AuthenticatedCoachMealsRouteImport } from './routes/_authenticated/coach.meals'
@@ -585,6 +586,12 @@ const AuthenticatedFamilyInviteRoute =
     path: '/invite',
     getParentRoute: () => AuthenticatedFamilyRoute,
   } as any)
+const AuthenticatedExercisesRecommendRoute =
+  AuthenticatedExercisesRecommendRouteImport.update({
+    id: '/exercises/recommend',
+    path: '/exercises/recommend',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedExercisesLibraryRoute =
   AuthenticatedExercisesLibraryRouteImport.update({
     id: '/exercises/library',
@@ -733,6 +740,7 @@ export interface FileRoutesByFullPath {
   '/coach/meals': typeof AuthenticatedCoachMealsRoute
   '/doctor/referral': typeof AuthenticatedDoctorReferralRoute
   '/exercises/library': typeof AuthenticatedExercisesLibraryRoute
+  '/exercises/recommend': typeof AuthenticatedExercisesRecommendRoute
   '/family/invite': typeof AuthenticatedFamilyInviteRoute
   '/friends/invite': typeof AuthenticatedFriendsInviteRoute
   '/habits/stack': typeof AuthenticatedHabitsStackRoute
@@ -837,6 +845,7 @@ export interface FileRoutesByTo {
   '/coach/meals': typeof AuthenticatedCoachMealsRoute
   '/doctor/referral': typeof AuthenticatedDoctorReferralRoute
   '/exercises/library': typeof AuthenticatedExercisesLibraryRoute
+  '/exercises/recommend': typeof AuthenticatedExercisesRecommendRoute
   '/family/invite': typeof AuthenticatedFamilyInviteRoute
   '/friends/invite': typeof AuthenticatedFriendsInviteRoute
   '/habits/stack': typeof AuthenticatedHabitsStackRoute
@@ -943,6 +952,7 @@ export interface FileRoutesById {
   '/_authenticated/coach/meals': typeof AuthenticatedCoachMealsRoute
   '/_authenticated/doctor/referral': typeof AuthenticatedDoctorReferralRoute
   '/_authenticated/exercises/library': typeof AuthenticatedExercisesLibraryRoute
+  '/_authenticated/exercises/recommend': typeof AuthenticatedExercisesRecommendRoute
   '/_authenticated/family/invite': typeof AuthenticatedFamilyInviteRoute
   '/_authenticated/friends/invite': typeof AuthenticatedFriendsInviteRoute
   '/_authenticated/habits/stack': typeof AuthenticatedHabitsStackRoute
@@ -1049,6 +1059,7 @@ export interface FileRouteTypes {
     | '/coach/meals'
     | '/doctor/referral'
     | '/exercises/library'
+    | '/exercises/recommend'
     | '/family/invite'
     | '/friends/invite'
     | '/habits/stack'
@@ -1153,6 +1164,7 @@ export interface FileRouteTypes {
     | '/coach/meals'
     | '/doctor/referral'
     | '/exercises/library'
+    | '/exercises/recommend'
     | '/family/invite'
     | '/friends/invite'
     | '/habits/stack'
@@ -1258,6 +1270,7 @@ export interface FileRouteTypes {
     | '/_authenticated/coach/meals'
     | '/_authenticated/doctor/referral'
     | '/_authenticated/exercises/library'
+    | '/_authenticated/exercises/recommend'
     | '/_authenticated/family/invite'
     | '/_authenticated/friends/invite'
     | '/_authenticated/habits/stack'
@@ -1935,6 +1948,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedFamilyInviteRouteImport
       parentRoute: typeof AuthenticatedFamilyRoute
     }
+    '/_authenticated/exercises/recommend': {
+      id: '/_authenticated/exercises/recommend'
+      path: '/exercises/recommend'
+      fullPath: '/exercises/recommend'
+      preLoaderRoute: typeof AuthenticatedExercisesRecommendRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/exercises/library': {
       id: '/_authenticated/exercises/library'
       path: '/exercises/library'
@@ -2326,6 +2346,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedWeightRoute: typeof AuthenticatedWeightRouteWithChildren
   AuthenticatedWorkoutRoute: typeof AuthenticatedWorkoutRoute
   AuthenticatedExercisesLibraryRoute: typeof AuthenticatedExercisesLibraryRoute
+  AuthenticatedExercisesRecommendRoute: typeof AuthenticatedExercisesRecommendRoute
   AuthenticatedFriendsInviteRoute: typeof AuthenticatedFriendsInviteRoute
   AuthenticatedHabitsStackRoute: typeof AuthenticatedHabitsStackRoute
   AuthenticatedQuizDailyRoute: typeof AuthenticatedQuizDailyRoute
@@ -2386,6 +2407,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedWeightRoute: AuthenticatedWeightRouteWithChildren,
   AuthenticatedWorkoutRoute: AuthenticatedWorkoutRoute,
   AuthenticatedExercisesLibraryRoute: AuthenticatedExercisesLibraryRoute,
+  AuthenticatedExercisesRecommendRoute: AuthenticatedExercisesRecommendRoute,
   AuthenticatedFriendsInviteRoute: AuthenticatedFriendsInviteRoute,
   AuthenticatedHabitsStackRoute: AuthenticatedHabitsStackRoute,
   AuthenticatedQuizDailyRoute: AuthenticatedQuizDailyRoute,
