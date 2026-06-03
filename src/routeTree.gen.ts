@@ -31,6 +31,7 @@ import { Route as AuthenticatedMoodRouteImport } from './routes/_authenticated/m
 import { Route as AuthenticatedMedicationsRouteImport } from './routes/_authenticated/medications'
 import { Route as AuthenticatedMealplanRouteImport } from './routes/_authenticated/mealplan'
 import { Route as AuthenticatedLeaderboardRouteImport } from './routes/_authenticated/leaderboard'
+import { Route as AuthenticatedGroupsRouteImport } from './routes/_authenticated/groups'
 import { Route as AuthenticatedFoodsRouteImport } from './routes/_authenticated/foods'
 import { Route as AuthenticatedFoodRouteImport } from './routes/_authenticated/food'
 import { Route as AuthenticatedFastingRouteImport } from './routes/_authenticated/fasting'
@@ -155,6 +156,11 @@ const AuthenticatedLeaderboardRoute =
     path: '/leaderboard',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedGroupsRoute = AuthenticatedGroupsRouteImport.update({
+  id: '/groups',
+  path: '/groups',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedFoodsRoute = AuthenticatedFoodsRouteImport.update({
   id: '/foods',
   path: '/foods',
@@ -224,6 +230,7 @@ export interface FileRoutesByFullPath {
   '/fasting': typeof AuthenticatedFastingRoute
   '/food': typeof AuthenticatedFoodRoute
   '/foods': typeof AuthenticatedFoodsRoute
+  '/groups': typeof AuthenticatedGroupsRoute
   '/leaderboard': typeof AuthenticatedLeaderboardRoute
   '/mealplan': typeof AuthenticatedMealplanRoute
   '/medications': typeof AuthenticatedMedicationsRoute
@@ -258,6 +265,7 @@ export interface FileRoutesByTo {
   '/fasting': typeof AuthenticatedFastingRoute
   '/food': typeof AuthenticatedFoodRoute
   '/foods': typeof AuthenticatedFoodsRoute
+  '/groups': typeof AuthenticatedGroupsRoute
   '/leaderboard': typeof AuthenticatedLeaderboardRoute
   '/mealplan': typeof AuthenticatedMealplanRoute
   '/medications': typeof AuthenticatedMedicationsRoute
@@ -294,6 +302,7 @@ export interface FileRoutesById {
   '/_authenticated/fasting': typeof AuthenticatedFastingRoute
   '/_authenticated/food': typeof AuthenticatedFoodRoute
   '/_authenticated/foods': typeof AuthenticatedFoodsRoute
+  '/_authenticated/groups': typeof AuthenticatedGroupsRoute
   '/_authenticated/leaderboard': typeof AuthenticatedLeaderboardRoute
   '/_authenticated/mealplan': typeof AuthenticatedMealplanRoute
   '/_authenticated/medications': typeof AuthenticatedMedicationsRoute
@@ -330,6 +339,7 @@ export interface FileRouteTypes {
     | '/fasting'
     | '/food'
     | '/foods'
+    | '/groups'
     | '/leaderboard'
     | '/mealplan'
     | '/medications'
@@ -364,6 +374,7 @@ export interface FileRouteTypes {
     | '/fasting'
     | '/food'
     | '/foods'
+    | '/groups'
     | '/leaderboard'
     | '/mealplan'
     | '/medications'
@@ -399,6 +410,7 @@ export interface FileRouteTypes {
     | '/_authenticated/fasting'
     | '/_authenticated/food'
     | '/_authenticated/foods'
+    | '/_authenticated/groups'
     | '/_authenticated/leaderboard'
     | '/_authenticated/mealplan'
     | '/_authenticated/medications'
@@ -587,6 +599,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedLeaderboardRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/groups': {
+      id: '/_authenticated/groups'
+      path: '/groups'
+      fullPath: '/groups'
+      preLoaderRoute: typeof AuthenticatedGroupsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/foods': {
       id: '/_authenticated/foods'
       path: '/foods'
@@ -687,6 +706,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedFastingRoute: typeof AuthenticatedFastingRoute
   AuthenticatedFoodRoute: typeof AuthenticatedFoodRoute
   AuthenticatedFoodsRoute: typeof AuthenticatedFoodsRoute
+  AuthenticatedGroupsRoute: typeof AuthenticatedGroupsRoute
   AuthenticatedLeaderboardRoute: typeof AuthenticatedLeaderboardRoute
   AuthenticatedMealplanRoute: typeof AuthenticatedMealplanRoute
   AuthenticatedMedicationsRoute: typeof AuthenticatedMedicationsRoute
@@ -717,6 +737,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedFastingRoute: AuthenticatedFastingRoute,
   AuthenticatedFoodRoute: AuthenticatedFoodRoute,
   AuthenticatedFoodsRoute: AuthenticatedFoodsRoute,
+  AuthenticatedGroupsRoute: AuthenticatedGroupsRoute,
   AuthenticatedLeaderboardRoute: AuthenticatedLeaderboardRoute,
   AuthenticatedMealplanRoute: AuthenticatedMealplanRoute,
   AuthenticatedMedicationsRoute: AuthenticatedMedicationsRoute,
@@ -751,3 +772,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
