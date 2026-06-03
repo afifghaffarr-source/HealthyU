@@ -46,6 +46,12 @@
 // | PDF_LINK_FONT_SIZE             | Font size back-link "Daftar Isi" di TOC (pt).            |
 // | PDF_DIVIDER_LINE_WIDTH         | Ketebalan garis divider PDF (pt, setLineWidth).          |
 // | PDF_SECTION_DIVIDER_OFFSET     | Offset Y divider section header dari baseline (pt).      |
+// | PDF_LINK_BOUND_Y_OFFSET        | Offset Y atas bounding box klik link dari baseline (pt). |
+// | PDF_TOC_INDENT_X               | X indent kiri baris TOC PDF (pt).                        |
+// | PDF_TOC_PAGE_LABEL_X           | X kanan kolom "hal. N" baris TOC (pt).                   |
+// | PDF_TOC_ROW_BOUND_W            | Lebar bounding box klik baris TOC (pt).                  |
+// | PDF_TOC_ROW_BOUND_H            | Tinggi bounding box klik baris TOC (pt).                 |
+// | PDF_AUTOTABLE_START_Y          | Y mulai autoTable utama PDF mingguan (pt).               |
 //
 // CONVENTION: setiap konstanta tunable WAJIB ditambahkan ke tabel di atas
 // (nama + 1 baris efek). Reviewer boleh menolak PR yang menambah konstanta
@@ -227,3 +233,27 @@ export const PDF_DIVIDER_LINE_WIDTH = 0.5;
 /** Offset Y divider section header dari baseline (pt). */
 // eslint-disable-next-line no-restricted-syntax -- listed in header table
 export const PDF_SECTION_DIVIDER_OFFSET = 4;
+
+/** Offset Y atas bounding box klik link relatif ke baseline (pt). */
+// eslint-disable-next-line no-restricted-syntax -- listed in header table
+export const PDF_LINK_BOUND_Y_OFFSET = 10;
+
+/** X indent kiri baris TOC PDF (pt). */
+// eslint-disable-next-line no-restricted-syntax -- listed in header table
+export const PDF_TOC_INDENT_X = 40;
+
+/** X kanan kolom "hal. N" baris TOC (pt). */
+// eslint-disable-next-line no-restricted-syntax -- listed in header table
+export const PDF_TOC_PAGE_LABEL_X = 510;
+
+/** Lebar bounding box klik (doc.link) baris TOC (pt). */
+// eslint-disable-next-line no-restricted-syntax -- listed in header table
+export const PDF_TOC_ROW_BOUND_W = 515;
+
+/** Tinggi bounding box klik (doc.link) baris TOC (pt). */
+// eslint-disable-next-line no-restricted-syntax -- listed in header table
+export const PDF_TOC_ROW_BOUND_H = 14;
+
+/** Y mulai autoTable utama PDF mingguan (pt). */
+// eslint-disable-next-line no-restricted-syntax -- listed in header table
+export const PDF_AUTOTABLE_START_Y = 90;

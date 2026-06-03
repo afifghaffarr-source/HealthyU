@@ -34,6 +34,7 @@ import {
 } from "@/lib/constants";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
 import { useAnnounce } from "@/components/live-announcer";
+import { useMiniFocusTrap } from "@/hooks/useMiniFocusTrap";
 
 const challengesSearchSchema = z.object({
   group: fallback(z.string().uuid().optional(), undefined),
@@ -428,6 +429,12 @@ function GroupInviter({ challengeId, initialOpen }: { challengeId: string; initi
   const fetchGroups = useServerFn(listMyGroupsForChallenge);
   const inviteFn = useServerFn(inviteGroupToChallenge);
   const [open, setOpen] = useState(!!initialOpen);
+  const toggleRef = useRef<HTMLButtonElement | null>(null);
+  // ESC menutup panel undang-grup; tab cycling tidak ketat karena daftar dinamis.
+  useMiniFocusTrap(open, [toggleRef], () => {
+    setOpen(false);
+    toggleRef.current?.focus();
+  });
   useEffect(() => {
     if (initialOpen) setOpen(true);
   }, [initialOpen]);
@@ -460,6 +467,7 @@ function GroupInviter({ challengeId, initialOpen }: { challengeId: string; initi
   return (
     <div className="mt-2">
       <button
+        ref={toggleRef}
         onClick={() => setOpen((v) => !v)}
         className="w-full text-[11px] font-semibold text-muted-foreground inline-flex items-center justify-center gap-1"
       >
