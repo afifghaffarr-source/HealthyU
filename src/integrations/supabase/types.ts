@@ -68,6 +68,30 @@ export type Database = {
         }
         Relationships: []
       }
+      community_comments: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          post_id: string
+          user_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          post_id: string
+          user_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          post_id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       community_likes: {
         Row: {
           created_at: string
@@ -431,6 +455,87 @@ export type Database = {
           target_weight_kg?: number | null
           updated_at?: string
           weight_kg?: number | null
+        }
+        Relationships: []
+      }
+      progress_photos: {
+        Row: {
+          created_at: string
+          id: string
+          notes: string | null
+          photo_url: string
+          taken_at: string
+          user_id: string
+          weight_kg: number | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          notes?: string | null
+          photo_url: string
+          taken_at?: string
+          user_id: string
+          weight_kg?: number | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          notes?: string | null
+          photo_url?: string
+          taken_at?: string
+          user_id?: string
+          weight_kg?: number | null
+        }
+        Relationships: []
+      }
+      recipes: {
+        Row: {
+          calories: number
+          carbs_g: number
+          category: string
+          created_at: string
+          description: string | null
+          fat_g: number
+          id: string
+          ingredients: string[]
+          instructions: string[]
+          is_indonesian: boolean
+          prep_min: number
+          protein_g: number
+          servings: number
+          title: string
+        }
+        Insert: {
+          calories?: number
+          carbs_g?: number
+          category?: string
+          created_at?: string
+          description?: string | null
+          fat_g?: number
+          id?: string
+          ingredients?: string[]
+          instructions?: string[]
+          is_indonesian?: boolean
+          prep_min?: number
+          protein_g?: number
+          servings?: number
+          title: string
+        }
+        Update: {
+          calories?: number
+          carbs_g?: number
+          category?: string
+          created_at?: string
+          description?: string | null
+          fat_g?: number
+          id?: string
+          ingredients?: string[]
+          instructions?: string[]
+          is_indonesian?: boolean
+          prep_min?: number
+          protein_g?: number
+          servings?: number
+          title?: string
         }
         Relationships: []
       }
