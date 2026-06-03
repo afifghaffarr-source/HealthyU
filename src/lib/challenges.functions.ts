@@ -44,7 +44,6 @@ export const joinChallenge = createServerFn({ method: "POST" })
       .select("id")
       .single();
     if (error) throw new Error(error.message);
-    await supabase.rpc("noop").catch(() => {});
     return { id: inserted.id, already: false };
   });
 
