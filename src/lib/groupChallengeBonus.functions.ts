@@ -14,13 +14,27 @@ export const claimGroupChallengeBonus = createServerFn({ method: "POST" })
       p_challenge_id: data.challenge_id,
     });
     if (error) throw new Error(error.message);
-    return (res ?? { ok: false }) as {
+    const result = (res ?? { ok: false }) as {
       ok: boolean;
       coins_awarded?: number;
       reason?: string;
       completed?: number;
       total?: number;
     };
+    if (result.ok && result.coins_awarded) {
+      try {
+        const { broadcastGroupBonusClaim } = await import("./groupChallengeBroadcast.server");
+        await broadcastGroupBonusClaim({
+          userId: context.userId,
+          groupId: data.group_id,
+          challengeId: data.challenge_id,
+          coins: result.coins_awarded,
+        });
+      } catch (e) {
+        console.error("broadcastGroupBonusClaim failed", (e as Error).message);
+      }
+    }
+    return result;
   });
 
 export const listGroupBonusStatus = createServerFn({ method: "GET" })
