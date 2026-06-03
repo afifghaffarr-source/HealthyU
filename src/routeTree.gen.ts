@@ -58,6 +58,7 @@ import { Route as AuthenticatedScanHistoryRouteImport } from './routes/_authenti
 import { Route as AuthenticatedScanBarcodeRouteImport } from './routes/_authenticated/scan.barcode'
 import { Route as AuthenticatedReportsNutritionRouteImport } from './routes/_authenticated/reports.nutrition'
 import { Route as AuthenticatedRecipesSavedRouteImport } from './routes/_authenticated/recipes.saved'
+import { Route as AuthenticatedRecipesRecommendationsRouteImport } from './routes/_authenticated/recipes.recommendations'
 import { Route as AuthenticatedRecipesIdRouteImport } from './routes/_authenticated/recipes.$id'
 import { Route as AuthenticatedProfileScanStatsRouteImport } from './routes/_authenticated/profile.scan-stats'
 import { Route as ApiWearableGoogleFitCallbackRouteImport } from './routes/api/wearable.google-fit.callback'
@@ -322,6 +323,12 @@ const AuthenticatedRecipesSavedRoute =
     path: '/saved',
     getParentRoute: () => AuthenticatedRecipesRoute,
   } as any)
+const AuthenticatedRecipesRecommendationsRoute =
+  AuthenticatedRecipesRecommendationsRouteImport.update({
+    id: '/recommendations',
+    path: '/recommendations',
+    getParentRoute: () => AuthenticatedRecipesRoute,
+  } as any)
 const AuthenticatedRecipesIdRoute = AuthenticatedRecipesIdRouteImport.update({
   id: '/$id',
   path: '/$id',
@@ -408,6 +415,7 @@ export interface FileRoutesByFullPath {
   '/workout': typeof AuthenticatedWorkoutRoute
   '/profile/scan-stats': typeof AuthenticatedProfileScanStatsRoute
   '/recipes/$id': typeof AuthenticatedRecipesIdRoute
+  '/recipes/recommendations': typeof AuthenticatedRecipesRecommendationsRoute
   '/recipes/saved': typeof AuthenticatedRecipesSavedRoute
   '/reports/nutrition': typeof AuthenticatedReportsNutritionRoute
   '/scan/barcode': typeof AuthenticatedScanBarcodeRoute
@@ -465,6 +473,7 @@ export interface FileRoutesByTo {
   '/workout': typeof AuthenticatedWorkoutRoute
   '/profile/scan-stats': typeof AuthenticatedProfileScanStatsRoute
   '/recipes/$id': typeof AuthenticatedRecipesIdRoute
+  '/recipes/recommendations': typeof AuthenticatedRecipesRecommendationsRoute
   '/recipes/saved': typeof AuthenticatedRecipesSavedRoute
   '/reports/nutrition': typeof AuthenticatedReportsNutritionRoute
   '/scan/barcode': typeof AuthenticatedScanBarcodeRoute
@@ -524,6 +533,7 @@ export interface FileRoutesById {
   '/_authenticated/workout': typeof AuthenticatedWorkoutRoute
   '/_authenticated/profile/scan-stats': typeof AuthenticatedProfileScanStatsRoute
   '/_authenticated/recipes/$id': typeof AuthenticatedRecipesIdRoute
+  '/_authenticated/recipes/recommendations': typeof AuthenticatedRecipesRecommendationsRoute
   '/_authenticated/recipes/saved': typeof AuthenticatedRecipesSavedRoute
   '/_authenticated/reports/nutrition': typeof AuthenticatedReportsNutritionRoute
   '/_authenticated/scan/barcode': typeof AuthenticatedScanBarcodeRoute
@@ -583,6 +593,7 @@ export interface FileRouteTypes {
     | '/workout'
     | '/profile/scan-stats'
     | '/recipes/$id'
+    | '/recipes/recommendations'
     | '/recipes/saved'
     | '/reports/nutrition'
     | '/scan/barcode'
@@ -640,6 +651,7 @@ export interface FileRouteTypes {
     | '/workout'
     | '/profile/scan-stats'
     | '/recipes/$id'
+    | '/recipes/recommendations'
     | '/recipes/saved'
     | '/reports/nutrition'
     | '/scan/barcode'
@@ -698,6 +710,7 @@ export interface FileRouteTypes {
     | '/_authenticated/workout'
     | '/_authenticated/profile/scan-stats'
     | '/_authenticated/recipes/$id'
+    | '/_authenticated/recipes/recommendations'
     | '/_authenticated/recipes/saved'
     | '/_authenticated/reports/nutrition'
     | '/_authenticated/scan/barcode'
@@ -1069,6 +1082,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedRecipesSavedRouteImport
       parentRoute: typeof AuthenticatedRecipesRoute
     }
+    '/_authenticated/recipes/recommendations': {
+      id: '/_authenticated/recipes/recommendations'
+      path: '/recommendations'
+      fullPath: '/recipes/recommendations'
+      preLoaderRoute: typeof AuthenticatedRecipesRecommendationsRouteImport
+      parentRoute: typeof AuthenticatedRecipesRoute
+    }
     '/_authenticated/recipes/$id': {
       id: '/_authenticated/recipes/$id'
       path: '/$id'
@@ -1134,11 +1154,14 @@ const AuthenticatedProfileRouteWithChildren =
 
 interface AuthenticatedRecipesRouteChildren {
   AuthenticatedRecipesIdRoute: typeof AuthenticatedRecipesIdRoute
+  AuthenticatedRecipesRecommendationsRoute: typeof AuthenticatedRecipesRecommendationsRoute
   AuthenticatedRecipesSavedRoute: typeof AuthenticatedRecipesSavedRoute
 }
 
 const AuthenticatedRecipesRouteChildren: AuthenticatedRecipesRouteChildren = {
   AuthenticatedRecipesIdRoute: AuthenticatedRecipesIdRoute,
+  AuthenticatedRecipesRecommendationsRoute:
+    AuthenticatedRecipesRecommendationsRoute,
   AuthenticatedRecipesSavedRoute: AuthenticatedRecipesSavedRoute,
 }
 
