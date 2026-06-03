@@ -175,6 +175,21 @@ function Dashboard() {
           <ArrowRight className="size-5 text-muted-foreground" />
         </Link>
 
+        {/* AI Recommendations CTA */}
+        <Link
+          to="/recommendations"
+          className="block bg-card p-4 rounded-3xl outline-1 outline-primary/20 shadow-sm flex items-center gap-4 animate-fade-up"
+        >
+          <div className="size-12 rounded-2xl bg-primary/10 grid place-items-center">
+            <Sparkles className="size-6 text-primary" />
+          </div>
+          <div className="flex-1">
+            <p className="font-bold text-sm">Rekomendasi Meal Plan AI</p>
+            <p className="text-[11px] text-muted-foreground">Personal sesuai sisa kalori & profil</p>
+          </div>
+          <ArrowRight className="size-5 text-muted-foreground" />
+        </Link>
+
         {/* AI Chat CTA */}
         <Link
           to="/chat"
