@@ -147,8 +147,12 @@ export type Database = {
       }
       daily_steps: {
         Row: {
+          active_minutes: number | null
+          calories_burned: number | null
           created_at: string
           day: string
+          distance_km: number | null
+          floors_climbed: number | null
           id: string
           source: string
           steps: number
@@ -156,8 +160,12 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          active_minutes?: number | null
+          calories_burned?: number | null
           created_at?: string
           day: string
+          distance_km?: number | null
+          floors_climbed?: number | null
           id?: string
           source?: string
           steps?: number
@@ -165,13 +173,128 @@ export type Database = {
           user_id: string
         }
         Update: {
+          active_minutes?: number | null
+          calories_burned?: number | null
           created_at?: string
           day?: string
+          distance_km?: number | null
+          floors_climbed?: number | null
           id?: string
           source?: string
           steps?: number
           updated_at?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      exercises: {
+        Row: {
+          calories_10min: number | null
+          calories_15min: number | null
+          calories_30min: number | null
+          calories_5min: number | null
+          calories_burned_per_min: number | null
+          category: string
+          contraindications: Json | null
+          created_at: string
+          default_duration_sec: number | null
+          default_reps: number | null
+          default_rest_sec: number | null
+          default_sets: number | null
+          deleted_at: string | null
+          description: string | null
+          difficulty: string | null
+          duration_minutes: number | null
+          easier_variation_id: string | null
+          equipment: Json | null
+          harder_variation_id: string | null
+          id: string
+          image_url: string | null
+          instructions: Json | null
+          is_active: boolean
+          met_value: number | null
+          name: string
+          name_en: string | null
+          primary_muscles: Json | null
+          safety_tips: Json | null
+          secondary_muscles: Json | null
+          slug: string | null
+          subcategory: string | null
+          times_performed: number
+          updated_at: string
+          video_url: string | null
+        }
+        Insert: {
+          calories_10min?: number | null
+          calories_15min?: number | null
+          calories_30min?: number | null
+          calories_5min?: number | null
+          calories_burned_per_min?: number | null
+          category: string
+          contraindications?: Json | null
+          created_at?: string
+          default_duration_sec?: number | null
+          default_reps?: number | null
+          default_rest_sec?: number | null
+          default_sets?: number | null
+          deleted_at?: string | null
+          description?: string | null
+          difficulty?: string | null
+          duration_minutes?: number | null
+          easier_variation_id?: string | null
+          equipment?: Json | null
+          harder_variation_id?: string | null
+          id?: string
+          image_url?: string | null
+          instructions?: Json | null
+          is_active?: boolean
+          met_value?: number | null
+          name: string
+          name_en?: string | null
+          primary_muscles?: Json | null
+          safety_tips?: Json | null
+          secondary_muscles?: Json | null
+          slug?: string | null
+          subcategory?: string | null
+          times_performed?: number
+          updated_at?: string
+          video_url?: string | null
+        }
+        Update: {
+          calories_10min?: number | null
+          calories_15min?: number | null
+          calories_30min?: number | null
+          calories_5min?: number | null
+          calories_burned_per_min?: number | null
+          category?: string
+          contraindications?: Json | null
+          created_at?: string
+          default_duration_sec?: number | null
+          default_reps?: number | null
+          default_rest_sec?: number | null
+          default_sets?: number | null
+          deleted_at?: string | null
+          description?: string | null
+          difficulty?: string | null
+          duration_minutes?: number | null
+          easier_variation_id?: string | null
+          equipment?: Json | null
+          harder_variation_id?: string | null
+          id?: string
+          image_url?: string | null
+          instructions?: Json | null
+          is_active?: boolean
+          met_value?: number | null
+          name?: string
+          name_en?: string | null
+          primary_muscles?: Json | null
+          safety_tips?: Json | null
+          secondary_muscles?: Json | null
+          slug?: string | null
+          subcategory?: string | null
+          times_performed?: number
+          updated_at?: string
+          video_url?: string | null
         }
         Relationships: []
       }
@@ -1694,42 +1817,295 @@ export type Database = {
         }
         Relationships: []
       }
+      workout_log_items: {
+        Row: {
+          calories_burned: number | null
+          created_at: string
+          distance_km: number | null
+          duration_sec: number | null
+          exercise_id: string | null
+          exercise_name: string
+          exercise_order: number
+          heart_rate_avg: number | null
+          heart_rate_max: number | null
+          id: string
+          notes: string | null
+          reps_per_set: Json | null
+          sets_completed: number | null
+          updated_at: string
+          weight_kg: number | null
+          workout_log_id: string
+        }
+        Insert: {
+          calories_burned?: number | null
+          created_at?: string
+          distance_km?: number | null
+          duration_sec?: number | null
+          exercise_id?: string | null
+          exercise_name: string
+          exercise_order?: number
+          heart_rate_avg?: number | null
+          heart_rate_max?: number | null
+          id?: string
+          notes?: string | null
+          reps_per_set?: Json | null
+          sets_completed?: number | null
+          updated_at?: string
+          weight_kg?: number | null
+          workout_log_id: string
+        }
+        Update: {
+          calories_burned?: number | null
+          created_at?: string
+          distance_km?: number | null
+          duration_sec?: number | null
+          exercise_id?: string | null
+          exercise_name?: string
+          exercise_order?: number
+          heart_rate_avg?: number | null
+          heart_rate_max?: number | null
+          id?: string
+          notes?: string | null
+          reps_per_set?: Json | null
+          sets_completed?: number | null
+          updated_at?: string
+          weight_kg?: number | null
+          workout_log_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workout_log_items_workout_log_id_fkey"
+            columns: ["workout_log_id"]
+            isOneToOne: false
+            referencedRelation: "workout_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      workout_plan_items: {
+        Row: {
+          completed_at: string | null
+          created_at: string
+          day_of_week: number | null
+          duration_sec: number | null
+          exercise_id: string | null
+          exercise_name: string
+          exercise_order: number
+          exercise_type: string | null
+          id: string
+          is_completed: boolean
+          plan_date: string | null
+          reps: number | null
+          rest_after_sec: number | null
+          rest_between_sets_sec: number | null
+          sets: number | null
+          updated_at: string
+          weight_kg: number | null
+          workout_plan_id: string
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string
+          day_of_week?: number | null
+          duration_sec?: number | null
+          exercise_id?: string | null
+          exercise_name: string
+          exercise_order?: number
+          exercise_type?: string | null
+          id?: string
+          is_completed?: boolean
+          plan_date?: string | null
+          reps?: number | null
+          rest_after_sec?: number | null
+          rest_between_sets_sec?: number | null
+          sets?: number | null
+          updated_at?: string
+          weight_kg?: number | null
+          workout_plan_id: string
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string
+          day_of_week?: number | null
+          duration_sec?: number | null
+          exercise_id?: string | null
+          exercise_name?: string
+          exercise_order?: number
+          exercise_type?: string | null
+          id?: string
+          is_completed?: boolean
+          plan_date?: string | null
+          reps?: number | null
+          rest_after_sec?: number | null
+          rest_between_sets_sec?: number | null
+          sets?: number | null
+          updated_at?: string
+          weight_kg?: number | null
+          workout_plan_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workout_plan_items_workout_plan_id_fkey"
+            columns: ["workout_plan_id"]
+            isOneToOne: false
+            referencedRelation: "workout_plans"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      workout_plans: {
+        Row: {
+          available_equipment: Json | null
+          created_at: string
+          deleted_at: string | null
+          difficulty: string | null
+          end_date: string | null
+          focus_areas: Json | null
+          generated_by: string | null
+          id: string
+          injuries: Json | null
+          is_active: boolean
+          plan_name: string
+          plan_type: string | null
+          start_date: string | null
+          target_calories: number | null
+          target_days_per_week: number | null
+          target_duration_min: number | null
+          updated_at: string
+          user_id: string
+          workout_types: Json | null
+        }
+        Insert: {
+          available_equipment?: Json | null
+          created_at?: string
+          deleted_at?: string | null
+          difficulty?: string | null
+          end_date?: string | null
+          focus_areas?: Json | null
+          generated_by?: string | null
+          id?: string
+          injuries?: Json | null
+          is_active?: boolean
+          plan_name: string
+          plan_type?: string | null
+          start_date?: string | null
+          target_calories?: number | null
+          target_days_per_week?: number | null
+          target_duration_min?: number | null
+          updated_at?: string
+          user_id: string
+          workout_types?: Json | null
+        }
+        Update: {
+          available_equipment?: Json | null
+          created_at?: string
+          deleted_at?: string | null
+          difficulty?: string | null
+          end_date?: string | null
+          focus_areas?: Json | null
+          generated_by?: string | null
+          id?: string
+          injuries?: Json | null
+          is_active?: boolean
+          plan_name?: string
+          plan_type?: string | null
+          start_date?: string | null
+          target_calories?: number | null
+          target_days_per_week?: number | null
+          target_duration_min?: number | null
+          updated_at?: string
+          user_id?: string
+          workout_types?: Json | null
+        }
+        Relationships: []
+      }
       workout_sessions: {
         Row: {
           calories_burned: number
+          completed_at: string | null
           created_at: string
+          deleted_at: string | null
+          difficulty_rating: number | null
           duration_min: number
+          exercises_completed: number | null
+          heart_rate_avg: number | null
+          heart_rate_max: number | null
+          heart_rate_min: number | null
           id: string
           intensity: string
+          log_date: string | null
+          mood_after: number | null
+          mood_before: number | null
           name: string
           notes: string | null
+          perceived_exertion: number | null
           performed_at: string
+          source: string | null
+          started_at: string | null
+          total_reps: number | null
+          total_sets: number | null
           type: string
+          updated_at: string
           user_id: string
+          workout_plan_id: string | null
         }
         Insert: {
           calories_burned?: number
+          completed_at?: string | null
           created_at?: string
+          deleted_at?: string | null
+          difficulty_rating?: number | null
           duration_min: number
+          exercises_completed?: number | null
+          heart_rate_avg?: number | null
+          heart_rate_max?: number | null
+          heart_rate_min?: number | null
           id?: string
           intensity?: string
+          log_date?: string | null
+          mood_after?: number | null
+          mood_before?: number | null
           name: string
           notes?: string | null
+          perceived_exertion?: number | null
           performed_at?: string
+          source?: string | null
+          started_at?: string | null
+          total_reps?: number | null
+          total_sets?: number | null
           type: string
+          updated_at?: string
           user_id: string
+          workout_plan_id?: string | null
         }
         Update: {
           calories_burned?: number
+          completed_at?: string | null
           created_at?: string
+          deleted_at?: string | null
+          difficulty_rating?: number | null
           duration_min?: number
+          exercises_completed?: number | null
+          heart_rate_avg?: number | null
+          heart_rate_max?: number | null
+          heart_rate_min?: number | null
           id?: string
           intensity?: string
+          log_date?: string | null
+          mood_after?: number | null
+          mood_before?: number | null
           name?: string
           notes?: string | null
+          perceived_exertion?: number | null
           performed_at?: string
+          source?: string | null
+          started_at?: string | null
+          total_reps?: number | null
+          total_sets?: number | null
           type?: string
+          updated_at?: string
           user_id?: string
+          workout_plan_id?: string | null
         }
         Relationships: []
       }
