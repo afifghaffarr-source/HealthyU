@@ -116,6 +116,33 @@ function ProfilePage() {
           <Trophy className="size-4" /> Pencapaian & badge
         </Link>
 
+        <div className="grid grid-cols-2 gap-2">
+          <Link to="/profile/scan-stats" className="text-center text-xs bg-card outline-1 outline-black/10 py-3 rounded-2xl">
+            📊 Statistik Scan AI
+          </Link>
+          <Link to="/profile/privacy" className="text-center text-xs bg-card outline-1 outline-black/10 py-3 rounded-2xl">
+            🔒 Privasi
+          </Link>
+          <Link to="/insights" className="text-center text-xs bg-card outline-1 outline-black/10 py-3 rounded-2xl">
+            ✨ Insight AI
+          </Link>
+          <Link to="/recipes/recommendations" className="text-center text-xs bg-card outline-1 outline-black/10 py-3 rounded-2xl">
+            🍽️ Rekomendasi Resep
+          </Link>
+          <Link to="/reports/nutrition" className="text-center text-xs bg-card outline-1 outline-black/10 py-3 rounded-2xl">
+            📈 Tren Nutrisi
+          </Link>
+          <Link to="/scan/barcode" className="text-center text-xs bg-card outline-1 outline-black/10 py-3 rounded-2xl">
+            🏷️ Scan Barcode
+          </Link>
+          <Link to="/scan/menu" className="text-center text-xs bg-card outline-1 outline-black/10 py-3 rounded-2xl">
+            📋 Scan Menu
+          </Link>
+          <Link to="/scan/recipe" className="text-center text-xs bg-card outline-1 outline-black/10 py-3 rounded-2xl">
+            📖 Scan Resep
+          </Link>
+        </div>
+
         <section className="grid grid-cols-2 gap-3">
           <Link
             to="/community"

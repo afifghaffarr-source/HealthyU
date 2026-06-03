@@ -2528,6 +2528,7 @@ export type Database = {
           premium_status: string
           referral_code: string | null
           referred_by: string | null
+          scan_audit_opt_in: boolean
           streak_days: number
           target_weight_kg: number | null
           tdee: number | null
@@ -2580,6 +2581,7 @@ export type Database = {
           premium_status?: string
           referral_code?: string | null
           referred_by?: string | null
+          scan_audit_opt_in?: boolean
           streak_days?: number
           target_weight_kg?: number | null
           tdee?: number | null
@@ -2632,6 +2634,7 @@ export type Database = {
           premium_status?: string
           referral_code?: string | null
           referred_by?: string | null
+          scan_audit_opt_in?: boolean
           streak_days?: number
           target_weight_kg?: number | null
           tdee?: number | null

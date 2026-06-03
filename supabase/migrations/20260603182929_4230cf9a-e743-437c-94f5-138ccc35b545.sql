@@ -1,0 +1,1 @@
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS scan_audit_opt_in BOOLEAN NOT NULL DEFAULT true;

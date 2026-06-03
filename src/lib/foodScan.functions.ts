@@ -180,6 +180,14 @@ export const submitScanCorrection = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) => CorrectionInput.parse(input))
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
+    const { data: prof } = await supabase
+      .from("profiles")
+      .select("scan_audit_opt_in")
+      .eq("id", userId)
+      .maybeSingle();
+    if (prof && prof.scan_audit_opt_in === false) {
+      return { ok: true, skipped: true };
+    }
     const { error } = await supabase.from("food_scan_corrections").insert({
       user_id: userId,
       scan_id: data.scan_id,

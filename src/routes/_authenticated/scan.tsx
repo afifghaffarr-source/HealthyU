@@ -300,6 +300,27 @@ function ScanPage() {
                       </div>
                       {editing && (
                         <div className="grid grid-cols-2 gap-2 pt-1">
+                          <div className="col-span-2 flex gap-1">
+                            {[0.5, 1, 1.5, 2].map((mult) => (
+                              <button
+                                key={mult}
+                                onClick={() => {
+                                  const o = originals[i];
+                                  if (!o) return;
+                                  updateItem(i, {
+                                    portion_g: Math.round((o.portion_g ?? 0) * mult),
+                                    calories: Math.round(o.calories * mult),
+                                    protein_g: Number((o.protein_g * mult).toFixed(1)),
+                                    carbs_g: Number((o.carbs_g * mult).toFixed(1)),
+                                    fat_g: Number((o.fat_g * mult).toFixed(1)),
+                                  });
+                                }}
+                                className="flex-1 text-xs py-1 rounded-lg bg-muted hover:bg-primary/10"
+                              >
+                                {mult}×
+                              </button>
+                            ))}
+                          </div>
                           <EditField
                             label="Porsi (g)"
                             value={it.portion_g ?? 0}
