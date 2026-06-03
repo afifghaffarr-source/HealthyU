@@ -37,4 +37,22 @@ export default tseslint.config(
     },
   },
   eslintPluginPrettier,
+  {
+    // Tunable constants live in src/lib/constants.ts. Every new export MUST
+    // be added to the "What it controls" table in the file header. ESLint
+    // can't introspect leading comments via selectors, so this rule fires
+    // a warning on EVERY new `export const` to force the author to look at
+    // the doc table before merging.
+    files: ["src/lib/constants.ts"],
+    rules: {
+      "no-restricted-syntax": [
+        "warn",
+        {
+          selector: "ExportNamedDeclaration > VariableDeclaration",
+          message:
+            "constants.ts: pastikan konstanta ini sudah ditambahkan ke tabel doc di header file (lalu // eslint-disable-next-line no-restricted-syntax pada baris ini).",
+        },
+      ],
+    },
+  },
 );
