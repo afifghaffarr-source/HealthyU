@@ -18,6 +18,7 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { ReminderScheduler } from "@/components/reminder-scheduler";
 import { InstallPrompt } from "@/components/install-prompt";
 import { LiveAnnouncerProvider } from "@/components/live-announcer";
+import { I18nProvider, defaultBundle } from "@/lib/i18n";
 
 function NotFoundComponent() {
   return (
@@ -137,14 +138,16 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeProvider>
-        <LiveAnnouncerProvider>
+        <I18nProvider value={defaultBundle}>
+          <LiveAnnouncerProvider>
           <ManifestLinkManager />
           <AuthListener />
           <ReminderScheduler />
           <Outlet />
           <InstallPrompt />
           <Toaster position="top-center" />
-        </LiveAnnouncerProvider>
+          </LiveAnnouncerProvider>
+        </I18nProvider>
       </ThemeProvider>
     </QueryClientProvider>
   );

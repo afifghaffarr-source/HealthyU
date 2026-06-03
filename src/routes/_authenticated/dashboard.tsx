@@ -131,6 +131,7 @@ function Dashboard() {
       setRestoredFromBreakdown(true);
       badgeBtnRef.current?.focus();
     },
+    { autoFocusFirst: true },
   );
   useEffect(() => {
     if (!restoredFromBreakdown) return;
@@ -534,7 +535,6 @@ function Dashboard() {
                         <div className="flex gap-1.5 mt-2 pt-2 border-t border-border/60">
                           <button
                             ref={trapFirstRef}
-                            autoFocus
                             onClick={() => {
                               setNewClaims({});
                               setBreakdownOpen(false);

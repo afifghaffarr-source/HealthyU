@@ -33,6 +33,7 @@ import {
   CHALLENGE_HIGHLIGHT_TRANSITION_MS,
 } from "@/lib/constants";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
+import { useAnnounce } from "@/components/live-announcer";
 
 const challengesSearchSchema = z.object({
   group: fallback(z.string().uuid().optional(), undefined),
@@ -48,6 +49,7 @@ export const Route = createFileRoute("/_authenticated/challenges")({
 function ChallengesPage() {
   const qc = useQueryClient();
   const navigate = useNavigate();
+  const announce = useAnnounce();
   const { group: focusGroup, challenge: focusChallenge, focus } = Route.useSearch();
   // prefers-reduced-motion → override transisi spring jadi 0ms.
   const prefersReducedMotion = useReducedMotion();
@@ -103,6 +105,8 @@ function ChallengesPage() {
   const flashHighlight = (id: string) => {
     setHighlightId(id);
     setHighlightFading(false);
+    const ch = (data?.challenges ?? []).find((c) => c.id === id);
+    if (ch?.title) announce(`Kartu challenge ${ch.title} disorot`);
     // Start fade-out 500ms before the end so the ring smoothly disappears.
     window.setTimeout(
       () => setHighlightFading(true),

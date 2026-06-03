@@ -202,3 +202,23 @@ export const PDF_TOC_CONTINUED_TOP_Y = 80;
 /** Offset Y divider tipis di atas footer (pt). */
 // eslint-disable-next-line no-restricted-syntax -- listed in header table
 export const PDF_FOOTER_DIVIDER_OFFSET = 8;
+
+/** Padding kiri+kanan tambahan untuk bounding box klik link PDF (pt). */
+// eslint-disable-next-line no-restricted-syntax -- listed in header table
+export const PDF_LINK_BOUND_OFFSET = 4;
+
+/** Tinggi bounding box klik link PDF (pt). */
+// eslint-disable-next-line no-restricted-syntax -- listed in header table
+export const PDF_LINK_BOUND_HEIGHT = 16;
+
+/** Font size back-link "← Daftar Isi" di TOC (pt). */
+// eslint-disable-next-line no-restricted-syntax -- listed in header table
+export const PDF_LINK_FONT_SIZE = 9;
+
+/** Ketebalan garis divider PDF (pt) — dipakai setLineWidth(). */
+// eslint-disable-next-line no-restricted-syntax -- listed in header table
+export const PDF_DIVIDER_LINE_WIDTH = 0.5;
+
+/** Offset Y divider section header dari baseline (pt). */
+// eslint-disable-next-line no-restricted-syntax -- listed in header table
+export const PDF_SECTION_DIVIDER_OFFSET = 4;
