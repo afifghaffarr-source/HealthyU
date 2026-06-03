@@ -385,6 +385,45 @@ export type Database = {
         }
         Relationships: []
       }
+      barcode_cache: {
+        Row: {
+          allergens: string[] | null
+          barcode: string
+          brand: string | null
+          calories_per_100g: number | null
+          carbs_g: number | null
+          created_at: string
+          fat_g: number | null
+          product_name: string | null
+          protein_g: number | null
+          raw: Json | null
+        }
+        Insert: {
+          allergens?: string[] | null
+          barcode: string
+          brand?: string | null
+          calories_per_100g?: number | null
+          carbs_g?: number | null
+          created_at?: string
+          fat_g?: number | null
+          product_name?: string | null
+          protein_g?: number | null
+          raw?: Json | null
+        }
+        Update: {
+          allergens?: string[] | null
+          barcode?: string
+          brand?: string | null
+          calories_per_100g?: number | null
+          carbs_g?: number | null
+          created_at?: string
+          fat_g?: number | null
+          product_name?: string | null
+          protein_g?: number | null
+          raw?: Json | null
+        }
+        Relationships: []
+      }
       body_metrics: {
         Row: {
           bicep_left_cm: number | null
@@ -1086,6 +1125,33 @@ export type Database = {
         }
         Relationships: []
       }
+      daily_login_bonuses: {
+        Row: {
+          bonus_date: string
+          coins: number
+          created_at: string
+          id: string
+          streak: number
+          user_id: string
+        }
+        Insert: {
+          bonus_date: string
+          coins?: number
+          created_at?: string
+          id?: string
+          streak?: number
+          user_id: string
+        }
+        Update: {
+          bonus_date?: string
+          coins?: number
+          created_at?: string
+          id?: string
+          streak?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
       daily_quotes: {
         Row: {
           category: string | null
@@ -1179,6 +1245,39 @@ export type Database = {
           recommended_specialist?: string | null
           urgency?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      exercise_library: {
+        Row: {
+          category: string | null
+          created_at: string
+          description: string | null
+          difficulty: string | null
+          id: string
+          muscle_group: string | null
+          name: string
+          video_url: string | null
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string
+          description?: string | null
+          difficulty?: string | null
+          id?: string
+          muscle_group?: string | null
+          name: string
+          video_url?: string | null
+        }
+        Update: {
+          category?: string | null
+          created_at?: string
+          description?: string | null
+          difficulty?: string | null
+          id?: string
+          muscle_group?: string | null
+          name?: string
+          video_url?: string | null
         }
         Relationships: []
       }
@@ -2047,6 +2146,65 @@ export type Database = {
           steps?: Json
           updated_at?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      hydration_challenge_members: {
+        Row: {
+          challenge_id: string
+          id: string
+          total_ml: number
+          user_id: string
+        }
+        Insert: {
+          challenge_id: string
+          id?: string
+          total_ml?: number
+          user_id: string
+        }
+        Update: {
+          challenge_id?: string
+          id?: string
+          total_ml?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "hydration_challenge_members_challenge_id_fkey"
+            columns: ["challenge_id"]
+            isOneToOne: false
+            referencedRelation: "hydration_challenges"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      hydration_challenges: {
+        Row: {
+          created_at: string
+          creator_id: string
+          end_date: string
+          group_id: string
+          id: string
+          start_date: string
+          target_ml: number
+        }
+        Insert: {
+          created_at?: string
+          creator_id: string
+          end_date: string
+          group_id: string
+          id?: string
+          start_date: string
+          target_ml: number
+        }
+        Update: {
+          created_at?: string
+          creator_id?: string
+          end_date?: string
+          group_id?: string
+          id?: string
+          start_date?: string
+          target_ml?: number
         }
         Relationships: []
       }
@@ -3261,6 +3419,33 @@ export type Database = {
           },
         ]
       }
+      recipe_reviews: {
+        Row: {
+          created_at: string
+          id: string
+          rating: number
+          recipe_id: string
+          review: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          rating: number
+          recipe_id: string
+          review?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          rating?: number
+          recipe_id?: string
+          review?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       recipes: {
         Row: {
           avg_rating: number
@@ -3591,6 +3776,33 @@ export type Database = {
         }
         Relationships: []
       }
+      smart_alarms: {
+        Row: {
+          created_at: string
+          enabled: boolean
+          id: string
+          user_id: string
+          wake_time: string
+          window_min: number
+        }
+        Insert: {
+          created_at?: string
+          enabled?: boolean
+          id?: string
+          user_id: string
+          wake_time: string
+          window_min?: number
+        }
+        Update: {
+          created_at?: string
+          enabled?: boolean
+          id?: string
+          user_id?: string
+          wake_time?: string
+          window_min?: number
+        }
+        Relationships: []
+      }
       story_comments: {
         Row: {
           body: string
@@ -3648,6 +3860,33 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      story_photos: {
+        Row: {
+          caption: string | null
+          created_at: string
+          id: string
+          storage_path: string
+          story_id: string | null
+          user_id: string
+        }
+        Insert: {
+          caption?: string | null
+          created_at?: string
+          id?: string
+          storage_path: string
+          story_id?: string | null
+          user_id: string
+        }
+        Update: {
+          caption?: string | null
+          created_at?: string
+          id?: string
+          storage_path?: string
+          story_id?: string | null
+          user_id?: string
+        }
+        Relationships: []
       }
       subscription_plans: {
         Row: {
@@ -4242,6 +4481,36 @@ export type Database = {
           id?: string
           report_id?: string | null
           run_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      weight_goals: {
+        Row: {
+          created_at: string
+          id: string
+          start_weight_kg: number
+          target_date: string
+          target_weight_kg: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          start_weight_kg: number
+          target_date: string
+          target_weight_kg: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          start_weight_kg?: number
+          target_date?: string
+          target_weight_kg?: number
+          updated_at?: string
           user_id?: string
         }
         Relationships: []
