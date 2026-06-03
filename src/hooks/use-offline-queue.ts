@@ -71,10 +71,15 @@ export function useOfflineQueue() {
     window.addEventListener("offline", off);
     window.addEventListener("offline-queue:changed", ch);
     if (navigator.onLine) sync();
+    // periodic retry for items with backoff
+    const t = setInterval(() => {
+      if (navigator.onLine) sync();
+    }, 5_000);
     return () => {
       window.removeEventListener("online", on);
       window.removeEventListener("offline", off);
       window.removeEventListener("offline-queue:changed", ch);
+      clearInterval(t);
     };
   }, [refresh, sync]);
 
