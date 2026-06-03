@@ -47,6 +47,7 @@ import { Route as AuthenticatedHeatmapRouteImport } from './routes/_authenticate
 import { Route as AuthenticatedHealthImportRouteImport } from './routes/_authenticated/health-import'
 import { Route as AuthenticatedGroupsRouteImport } from './routes/_authenticated/groups'
 import { Route as AuthenticatedGachaRouteImport } from './routes/_authenticated/gacha'
+import { Route as AuthenticatedFormCheckRouteImport } from './routes/_authenticated/form-check'
 import { Route as AuthenticatedFoodsRouteImport } from './routes/_authenticated/foods'
 import { Route as AuthenticatedFoodRouteImport } from './routes/_authenticated/food'
 import { Route as AuthenticatedFastingRouteImport } from './routes/_authenticated/fasting'
@@ -319,6 +320,11 @@ const AuthenticatedGroupsRoute = AuthenticatedGroupsRouteImport.update({
 const AuthenticatedGachaRoute = AuthenticatedGachaRouteImport.update({
   id: '/gacha',
   path: '/gacha',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedFormCheckRoute = AuthenticatedFormCheckRouteImport.update({
+  id: '/form-check',
+  path: '/form-check',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedFoodsRoute = AuthenticatedFoodsRouteImport.update({
@@ -769,6 +775,7 @@ export interface FileRoutesByFullPath {
   '/fasting': typeof AuthenticatedFastingRoute
   '/food': typeof AuthenticatedFoodRoute
   '/foods': typeof AuthenticatedFoodsRoute
+  '/form-check': typeof AuthenticatedFormCheckRoute
   '/gacha': typeof AuthenticatedGachaRoute
   '/groups': typeof AuthenticatedGroupsRouteWithChildren
   '/health-import': typeof AuthenticatedHealthImportRoute
@@ -884,6 +891,7 @@ export interface FileRoutesByTo {
   '/fasting': typeof AuthenticatedFastingRoute
   '/food': typeof AuthenticatedFoodRoute
   '/foods': typeof AuthenticatedFoodsRoute
+  '/form-check': typeof AuthenticatedFormCheckRoute
   '/gacha': typeof AuthenticatedGachaRoute
   '/groups': typeof AuthenticatedGroupsRouteWithChildren
   '/health-import': typeof AuthenticatedHealthImportRoute
@@ -1001,6 +1009,7 @@ export interface FileRoutesById {
   '/_authenticated/fasting': typeof AuthenticatedFastingRoute
   '/_authenticated/food': typeof AuthenticatedFoodRoute
   '/_authenticated/foods': typeof AuthenticatedFoodsRoute
+  '/_authenticated/form-check': typeof AuthenticatedFormCheckRoute
   '/_authenticated/gacha': typeof AuthenticatedGachaRoute
   '/_authenticated/groups': typeof AuthenticatedGroupsRouteWithChildren
   '/_authenticated/health-import': typeof AuthenticatedHealthImportRoute
@@ -1118,6 +1127,7 @@ export interface FileRouteTypes {
     | '/fasting'
     | '/food'
     | '/foods'
+    | '/form-check'
     | '/gacha'
     | '/groups'
     | '/health-import'
@@ -1233,6 +1243,7 @@ export interface FileRouteTypes {
     | '/fasting'
     | '/food'
     | '/foods'
+    | '/form-check'
     | '/gacha'
     | '/groups'
     | '/health-import'
@@ -1349,6 +1360,7 @@ export interface FileRouteTypes {
     | '/_authenticated/fasting'
     | '/_authenticated/food'
     | '/_authenticated/foods'
+    | '/_authenticated/form-check'
     | '/_authenticated/gacha'
     | '/_authenticated/groups'
     | '/_authenticated/health-import'
@@ -1723,6 +1735,13 @@ declare module '@tanstack/react-router' {
       path: '/gacha'
       fullPath: '/gacha'
       preLoaderRoute: typeof AuthenticatedGachaRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/form-check': {
+      id: '/_authenticated/form-check'
+      path: '/form-check'
+      fullPath: '/form-check'
+      preLoaderRoute: typeof AuthenticatedFormCheckRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/foods': {
@@ -2552,6 +2571,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedFastingRoute: typeof AuthenticatedFastingRoute
   AuthenticatedFoodRoute: typeof AuthenticatedFoodRoute
   AuthenticatedFoodsRoute: typeof AuthenticatedFoodsRoute
+  AuthenticatedFormCheckRoute: typeof AuthenticatedFormCheckRoute
   AuthenticatedGachaRoute: typeof AuthenticatedGachaRoute
   AuthenticatedGroupsRoute: typeof AuthenticatedGroupsRouteWithChildren
   AuthenticatedHealthImportRoute: typeof AuthenticatedHealthImportRoute
@@ -2616,6 +2636,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedFastingRoute: AuthenticatedFastingRoute,
   AuthenticatedFoodRoute: AuthenticatedFoodRoute,
   AuthenticatedFoodsRoute: AuthenticatedFoodsRoute,
+  AuthenticatedFormCheckRoute: AuthenticatedFormCheckRoute,
   AuthenticatedGachaRoute: AuthenticatedGachaRoute,
   AuthenticatedGroupsRoute: AuthenticatedGroupsRouteWithChildren,
   AuthenticatedHealthImportRoute: AuthenticatedHealthImportRoute,
