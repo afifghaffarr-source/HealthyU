@@ -249,10 +249,10 @@ function ChallengesPage() {
   );
 }
 
-function Leaderboard({ challengeId }: { challengeId: string }) {
+function Leaderboard({ challengeId, initialGroup }: { challengeId: string; initialGroup?: string }) {
   const fetchLb = useServerFn(getChallengeLeaderboard);
   const fetchGroups = useServerFn(listChallengeGroups);
-  const [mode, setMode] = useState<"all" | "friends" | string>("all");
+  const [mode, setMode] = useState<"all" | "friends" | string>(initialGroup ?? "all");
   const { data: groups = [] } = useQuery({
     queryKey: ["challenge-groups", challengeId],
     queryFn: () => fetchGroups({ data: { challenge_id: challengeId } }),
