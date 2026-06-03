@@ -36,6 +36,7 @@ export const listComments = createServerFn({ method: "GET" })
   .inputValidator((i: unknown) => z.object({ post_id: z.string().uuid() }).parse(i))
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: comments, error } = await supabase
       .from("community_comments")
       .select("id, user_id, content, created_at")
@@ -44,7 +45,7 @@ export const listComments = createServerFn({ method: "GET" })
     if (error) throw new Error(error.message);
     const ids = Array.from(new Set((comments ?? []).map((c) => c.user_id)));
     const { data: profiles } = ids.length
-      ? await supabase.from("profiles").select("id, full_name").in("id", ids)
+      ? await supabaseAdmin.from("profiles").select("id, full_name").in("id", ids)
       : { data: [] as { id: string; full_name: string | null }[] };
     const nameMap = new Map((profiles ?? []).map((p) => [p.id, p.full_name]));
     return (comments ?? []).map((c) => ({
