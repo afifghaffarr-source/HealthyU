@@ -26,7 +26,11 @@ import {
   listGroupBonusClaimers,
 } from "@/lib/groupChallengeBonus.functions";
 import { groupChallengePendingMembers } from "@/lib/groupChallengePending.functions";
-import { CHALLENGE_HIGHLIGHT_MS, CHALLENGE_HIGHLIGHT_FADE_MS } from "@/lib/constants";
+import {
+  CHALLENGE_HIGHLIGHT_MS,
+  CHALLENGE_HIGHLIGHT_FADE_MS,
+  CHALLENGE_HIGHLIGHT_FADE_OPACITY,
+} from "@/lib/constants";
 
 const challengesSearchSchema = z.object({
   group: fallback(z.string().uuid().optional(), undefined),
@@ -198,9 +202,14 @@ function ChallengesPage() {
               className={
                 highlightId === c.id
                   ? `rounded-3xl bg-card outline-1 outline-black/5 p-4 shadow-sm ring-4 ring-primary/40 transition-[opacity,box-shadow] duration-500 ease-out ${
-                      highlightFading ? "opacity-90 ring-primary/0" : "animate-pulse"
+                      highlightFading ? "ring-primary/0" : "animate-pulse"
                     }`
                   : "rounded-3xl bg-card outline-1 outline-black/5 p-4 shadow-sm"
+              }
+              style={
+                highlightId === c.id && highlightFading
+                  ? { opacity: CHALLENGE_HIGHLIGHT_FADE_OPACITY }
+                  : undefined
               }
             >
               <div className="flex items-start justify-between gap-3">
