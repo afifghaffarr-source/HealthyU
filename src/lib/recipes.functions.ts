@@ -8,7 +8,7 @@ export const listRecipes = createServerFn({ method: "GET" })
     const { supabase } = context;
     const { data, error } = await supabase
       .from("recipes")
-      .select("id, title, description, category, calories, protein_g, carbs_g, fat_g, prep_min, servings")
+      .select("id, title, description, category, calories, protein_g, carbs_g, fat_g, prep_min, servings, avg_rating, rating_count, image_url")
       .order("title");
     if (error) throw new Error(error.message);
     return data ?? [];
