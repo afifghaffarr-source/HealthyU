@@ -4,12 +4,26 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 type QueryableClient = {
   from: (table: string) => {
-    select: (...args: unknown[]) => unknown;
-    update: (...args: unknown[]) => unknown;
-    insert: (...args: unknown[]) => unknown;
-    upsert: (...args: unknown[]) => unknown;
-    delete: (...args: unknown[]) => unknown;
-    eq: (...args: unknown[]) => unknown;
+    select: (...args: unknown[]) => {
+      eq: (...args: unknown[]) => {
+        maybeSingle: () => Promise<{
+          data: {
+            access_token?: string;
+            refresh_token?: string;
+            expires_at?: string;
+          } | null;
+          error: { message: string } | null;
+        }>;
+      };
+    };
+    update: (...args: unknown[]) => {
+      eq: (...args: unknown[]) => Promise<unknown>;
+    };
+    insert: (...args: unknown[]) => Promise<unknown>;
+    upsert: (...args: unknown[]) => Promise<unknown>;
+    delete: (...args: unknown[]) => {
+      eq: (...args: unknown[]) => Promise<unknown>;
+    };
     maybeSingle: () => Promise<{ data: unknown; error: { message: string } | null }>;
   };
 };
