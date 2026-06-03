@@ -138,6 +138,7 @@ function RootComponent() {
       <ThemeProvider>
         <AuthListener />
         <ReminderScheduler />
+        <SWRegister />
         <Outlet />
         <Toaster position="top-center" />
       </ThemeProvider>
