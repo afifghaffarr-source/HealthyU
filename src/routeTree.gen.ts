@@ -30,6 +30,7 @@ import { Route as AuthenticatedDashboardRouteImport } from './routes/_authentica
 import { Route as AuthenticatedCommunityRouteImport } from './routes/_authenticated/community'
 import { Route as AuthenticatedChatRouteImport } from './routes/_authenticated/chat'
 import { Route as AuthenticatedAchievementsRouteImport } from './routes/_authenticated/achievements'
+import { Route as AuthenticatedRecipesIdRouteImport } from './routes/_authenticated/recipes.$id'
 
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
@@ -138,6 +139,11 @@ const AuthenticatedAchievementsRoute =
     path: '/achievements',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedRecipesIdRoute = AuthenticatedRecipesIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => AuthenticatedRecipesRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -155,11 +161,12 @@ export interface FileRoutesByFullPath {
   '/prayer': typeof AuthenticatedPrayerRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/progress': typeof AuthenticatedProgressRoute
-  '/recipes': typeof AuthenticatedRecipesRoute
+  '/recipes': typeof AuthenticatedRecipesRouteWithChildren
   '/reminders': typeof AuthenticatedRemindersRoute
   '/reports': typeof AuthenticatedReportsRoute
   '/sleep': typeof AuthenticatedSleepRoute
   '/workout': typeof AuthenticatedWorkoutRoute
+  '/recipes/$id': typeof AuthenticatedRecipesIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -177,11 +184,12 @@ export interface FileRoutesByTo {
   '/prayer': typeof AuthenticatedPrayerRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/progress': typeof AuthenticatedProgressRoute
-  '/recipes': typeof AuthenticatedRecipesRoute
+  '/recipes': typeof AuthenticatedRecipesRouteWithChildren
   '/reminders': typeof AuthenticatedRemindersRoute
   '/reports': typeof AuthenticatedReportsRoute
   '/sleep': typeof AuthenticatedSleepRoute
   '/workout': typeof AuthenticatedWorkoutRoute
+  '/recipes/$id': typeof AuthenticatedRecipesIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -201,11 +209,12 @@ export interface FileRoutesById {
   '/_authenticated/prayer': typeof AuthenticatedPrayerRoute
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/_authenticated/progress': typeof AuthenticatedProgressRoute
-  '/_authenticated/recipes': typeof AuthenticatedRecipesRoute
+  '/_authenticated/recipes': typeof AuthenticatedRecipesRouteWithChildren
   '/_authenticated/reminders': typeof AuthenticatedRemindersRoute
   '/_authenticated/reports': typeof AuthenticatedReportsRoute
   '/_authenticated/sleep': typeof AuthenticatedSleepRoute
   '/_authenticated/workout': typeof AuthenticatedWorkoutRoute
+  '/_authenticated/recipes/$id': typeof AuthenticatedRecipesIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -230,6 +239,7 @@ export interface FileRouteTypes {
     | '/reports'
     | '/sleep'
     | '/workout'
+    | '/recipes/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -252,6 +262,7 @@ export interface FileRouteTypes {
     | '/reports'
     | '/sleep'
     | '/workout'
+    | '/recipes/$id'
   id:
     | '__root__'
     | '/'
@@ -275,6 +286,7 @@ export interface FileRouteTypes {
     | '/_authenticated/reports'
     | '/_authenticated/sleep'
     | '/_authenticated/workout'
+    | '/_authenticated/recipes/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -432,8 +444,26 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAchievementsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/recipes/$id': {
+      id: '/_authenticated/recipes/$id'
+      path: '/$id'
+      fullPath: '/recipes/$id'
+      preLoaderRoute: typeof AuthenticatedRecipesIdRouteImport
+      parentRoute: typeof AuthenticatedRecipesRoute
+    }
   }
 }
+
+interface AuthenticatedRecipesRouteChildren {
+  AuthenticatedRecipesIdRoute: typeof AuthenticatedRecipesIdRoute
+}
+
+const AuthenticatedRecipesRouteChildren: AuthenticatedRecipesRouteChildren = {
+  AuthenticatedRecipesIdRoute: AuthenticatedRecipesIdRoute,
+}
+
+const AuthenticatedRecipesRouteWithChildren =
+  AuthenticatedRecipesRoute._addFileChildren(AuthenticatedRecipesRouteChildren)
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAchievementsRoute: typeof AuthenticatedAchievementsRoute
@@ -449,7 +479,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedPrayerRoute: typeof AuthenticatedPrayerRoute
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
   AuthenticatedProgressRoute: typeof AuthenticatedProgressRoute
-  AuthenticatedRecipesRoute: typeof AuthenticatedRecipesRoute
+  AuthenticatedRecipesRoute: typeof AuthenticatedRecipesRouteWithChildren
   AuthenticatedRemindersRoute: typeof AuthenticatedRemindersRoute
   AuthenticatedReportsRoute: typeof AuthenticatedReportsRoute
   AuthenticatedSleepRoute: typeof AuthenticatedSleepRoute
@@ -470,7 +500,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedPrayerRoute: AuthenticatedPrayerRoute,
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,
   AuthenticatedProgressRoute: AuthenticatedProgressRoute,
-  AuthenticatedRecipesRoute: AuthenticatedRecipesRoute,
+  AuthenticatedRecipesRoute: AuthenticatedRecipesRouteWithChildren,
   AuthenticatedRemindersRoute: AuthenticatedRemindersRoute,
   AuthenticatedReportsRoute: AuthenticatedReportsRoute,
   AuthenticatedSleepRoute: AuthenticatedSleepRoute,
