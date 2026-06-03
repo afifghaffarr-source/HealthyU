@@ -10,6 +10,7 @@ export const getChallengeLeaderboard = createServerFn({ method: "GET" })
       challenge_id: z.string().uuid(),
       limit: z.number().int().min(1).max(50).optional(),
       friends_only: z.boolean().optional(),
+      group_id: z.string().uuid().optional(),
     }).parse(i),
   )
   .handler(async ({ data, context }) => {
@@ -17,7 +18,24 @@ export const getChallengeLeaderboard = createServerFn({ method: "GET" })
     const limit = data.limit ?? 20;
 
     let friendIds: string[] | null = null;
-    if (data.friends_only) {
+    if (data.group_id) {
+      // verify membership then list members
+      const { data: me } = await supabase
+        .from("friend_group_members")
+        .select("group_id")
+        .eq("user_id", userId)
+        .eq("group_id", data.group_id)
+        .maybeSingle();
+      if (!me) {
+        friendIds = [userId];
+      } else {
+        const { data: members } = await supabaseAdmin
+          .from("friend_group_members")
+          .select("user_id")
+          .eq("group_id", data.group_id);
+        friendIds = (members ?? []).map((m) => m.user_id);
+      }
+    } else if (data.friends_only) {
       // groups I'm in
       const { data: myGroups } = await supabase
         .from("friend_group_members")
