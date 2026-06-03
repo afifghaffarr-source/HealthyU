@@ -5,8 +5,9 @@ import { useServerFn } from "@tanstack/react-start";
 import { listProgress, addProgress, deleteProgress } from "@/lib/progress.functions";
 import { supabase } from "@/integrations/supabase/client";
 import { BottomNav } from "@/components/bottom-nav";
-import { ArrowLeft, Camera, Trash2, Loader2 } from "lucide-react";
+import { ArrowLeft, Camera, Trash2, Loader2, Film } from "lucide-react";
 import { toast } from "sonner";
+import { generateTimelapse } from "@/lib/timelapse";
 
 export const Route = createFileRoute("/_authenticated/progress")({
   component: ProgressPage,
@@ -113,6 +114,14 @@ function ProgressPage() {
             {uploading ? "Mengunggah..." : "Ambil / Pilih Foto"}
           </button>
         </section>
+
+        {photos.length >= 2 && (
+          <TimelapseButton
+            photos={photos
+              .filter((p): p is typeof p & { signed_url: string } => Boolean(p.signed_url))
+              .map((p) => ({ url: p.signed_url!, taken_at: p.taken_at }))}
+          />
+        )}
 
         <section className="grid grid-cols-2 gap-3">
           {photos.map((p) => (
