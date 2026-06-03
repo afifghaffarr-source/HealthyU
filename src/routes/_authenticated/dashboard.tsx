@@ -327,7 +327,14 @@ function Dashboard() {
                   search={{ challenge: c.id }}
                   className="flex items-center justify-between gap-2 bg-muted/40 hover:bg-muted/70 rounded-xl px-3 py-2 text-xs"
                 >
-                  <span className="font-semibold truncate">{c.title}</span>
+                  <div className="min-w-0 flex-1">
+                    <p className="font-semibold truncate">{c.title}</p>
+                    {("pending_members" in c) && (c.pending_members ?? 0) > 0 && (
+                      <p className="text-[10px] text-muted-foreground">
+                        {c.pending_members} anggota grup belum gabung
+                      </p>
+                    )}
+                  </div>
                   <span className="text-[10px] text-primary font-semibold inline-flex items-center gap-1 shrink-0">
                     Undang <ArrowRight className="size-3" />
                   </span>
