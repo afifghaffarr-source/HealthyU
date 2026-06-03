@@ -297,6 +297,12 @@ function Dashboard() {
           </Link>
         </header>
 
+        <Coachmark
+          flagKey="dashboard-v1"
+          title="Selamat datang di Healthy U"
+          description="Geser ke bawah untuk refresh, ketuk kartu untuk catat aktivitas, dan kunjungi Profil untuk personalisasi."
+        />
+
         {/* Top row: Calorie + Fasting */}
         <div className="grid grid-cols-2 gap-3 animate-fade-up">
           <div className="bg-card p-4 rounded-3xl outline-1 outline-black/5 shadow-sm flex flex-col items-center justify-center">
