@@ -17,6 +17,7 @@ import { Route as AuthenticatedWeightRouteImport } from './routes/_authenticated
 import { Route as AuthenticatedWearableRouteImport } from './routes/_authenticated/wearable'
 import { Route as AuthenticatedWaterRouteImport } from './routes/_authenticated/water'
 import { Route as AuthenticatedVitalsRouteImport } from './routes/_authenticated/vitals'
+import { Route as AuthenticatedSubscriptionRouteImport } from './routes/_authenticated/subscription'
 import { Route as AuthenticatedSleepRouteImport } from './routes/_authenticated/sleep'
 import { Route as AuthenticatedScanRouteImport } from './routes/_authenticated/scan'
 import { Route as AuthenticatedReportsRouteImport } from './routes/_authenticated/reports'
@@ -90,6 +91,12 @@ const AuthenticatedVitalsRoute = AuthenticatedVitalsRouteImport.update({
   path: '/vitals',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedSubscriptionRoute =
+  AuthenticatedSubscriptionRouteImport.update({
+    id: '/subscription',
+    path: '/subscription',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedSleepRoute = AuthenticatedSleepRouteImport.update({
   id: '/sleep',
   path: '/sleep',
@@ -296,6 +303,7 @@ export interface FileRoutesByFullPath {
   '/reports': typeof AuthenticatedReportsRoute
   '/scan': typeof AuthenticatedScanRoute
   '/sleep': typeof AuthenticatedSleepRoute
+  '/subscription': typeof AuthenticatedSubscriptionRoute
   '/vitals': typeof AuthenticatedVitalsRoute
   '/water': typeof AuthenticatedWaterRoute
   '/wearable': typeof AuthenticatedWearableRoute
@@ -338,6 +346,7 @@ export interface FileRoutesByTo {
   '/reports': typeof AuthenticatedReportsRoute
   '/scan': typeof AuthenticatedScanRoute
   '/sleep': typeof AuthenticatedSleepRoute
+  '/subscription': typeof AuthenticatedSubscriptionRoute
   '/vitals': typeof AuthenticatedVitalsRoute
   '/water': typeof AuthenticatedWaterRoute
   '/wearable': typeof AuthenticatedWearableRoute
@@ -382,6 +391,7 @@ export interface FileRoutesById {
   '/_authenticated/reports': typeof AuthenticatedReportsRoute
   '/_authenticated/scan': typeof AuthenticatedScanRoute
   '/_authenticated/sleep': typeof AuthenticatedSleepRoute
+  '/_authenticated/subscription': typeof AuthenticatedSubscriptionRoute
   '/_authenticated/vitals': typeof AuthenticatedVitalsRoute
   '/_authenticated/water': typeof AuthenticatedWaterRoute
   '/_authenticated/wearable': typeof AuthenticatedWearableRoute
@@ -426,6 +436,7 @@ export interface FileRouteTypes {
     | '/reports'
     | '/scan'
     | '/sleep'
+    | '/subscription'
     | '/vitals'
     | '/water'
     | '/wearable'
@@ -468,6 +479,7 @@ export interface FileRouteTypes {
     | '/reports'
     | '/scan'
     | '/sleep'
+    | '/subscription'
     | '/vitals'
     | '/water'
     | '/wearable'
@@ -511,6 +523,7 @@ export interface FileRouteTypes {
     | '/_authenticated/reports'
     | '/_authenticated/scan'
     | '/_authenticated/sleep'
+    | '/_authenticated/subscription'
     | '/_authenticated/vitals'
     | '/_authenticated/water'
     | '/_authenticated/wearable'
@@ -587,6 +600,13 @@ declare module '@tanstack/react-router' {
       path: '/vitals'
       fullPath: '/vitals'
       preLoaderRoute: typeof AuthenticatedVitalsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/subscription': {
+      id: '/_authenticated/subscription'
+      path: '/subscription'
+      fullPath: '/subscription'
+      preLoaderRoute: typeof AuthenticatedSubscriptionRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/sleep': {
@@ -864,6 +884,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedReportsRoute: typeof AuthenticatedReportsRoute
   AuthenticatedScanRoute: typeof AuthenticatedScanRoute
   AuthenticatedSleepRoute: typeof AuthenticatedSleepRoute
+  AuthenticatedSubscriptionRoute: typeof AuthenticatedSubscriptionRoute
   AuthenticatedVitalsRoute: typeof AuthenticatedVitalsRoute
   AuthenticatedWaterRoute: typeof AuthenticatedWaterRoute
   AuthenticatedWearableRoute: typeof AuthenticatedWearableRoute
@@ -901,6 +922,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedReportsRoute: AuthenticatedReportsRoute,
   AuthenticatedScanRoute: AuthenticatedScanRoute,
   AuthenticatedSleepRoute: AuthenticatedSleepRoute,
+  AuthenticatedSubscriptionRoute: AuthenticatedSubscriptionRoute,
   AuthenticatedVitalsRoute: AuthenticatedVitalsRoute,
   AuthenticatedWaterRoute: AuthenticatedWaterRoute,
   AuthenticatedWearableRoute: AuthenticatedWearableRoute,
