@@ -176,6 +176,23 @@ function Dashboard() {
           </div>
         </Link>
 
+        {/* Gamification */}
+        <Link
+          to="/achievements"
+          className="bg-card p-4 rounded-3xl outline-1 outline-black/5 shadow-sm flex items-center gap-3 animate-fade-up"
+        >
+          <div className="size-12 rounded-2xl bg-orange-100 grid place-items-center">
+            <Flame className="size-5 text-coral" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-[10px] font-bold uppercase text-muted-foreground tracking-wider">Level {game?.stats?.level ?? 1} · {game?.stats?.xp ?? 0} XP</p>
+            <p className="font-semibold text-sm">
+              Streak {game?.stats?.current_streak ?? 0} hari
+            </p>
+          </div>
+          <Trophy className="size-5 text-primary" />
+        </Link>
+
         {/* Today's meals */}
         <section className="animate-fade-up">
           <div className="flex justify-between items-center mb-3">
