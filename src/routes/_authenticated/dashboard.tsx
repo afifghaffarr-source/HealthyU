@@ -1,0 +1,205 @@
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
+import { getProfile } from "@/lib/profile.functions";
+import { todaysMeals } from "@/lib/meals.functions";
+import { currentFast } from "@/lib/fasting.functions";
+import { todaysWater, logWater } from "@/lib/water.functions";
+import { BottomNav } from "@/components/bottom-nav";
+import { CalorieRing } from "@/components/calorie-ring";
+import { formatDuration, fastingStage } from "@/lib/health";
+import { Droplet, Plus, Sparkles, ArrowRight } from "lucide-react";
+import { toast } from "sonner";
+
+export const Route = createFileRoute("/_authenticated/dashboard")({
+  component: Dashboard,
+});
+
+function Dashboard() {
+  const navigate = useNavigate();
+  const qc = useQueryClient();
+  const fetchProfile = useServerFn(getProfile);
+  const fetchMeals = useServerFn(todaysMeals);
+  const fetchFast = useServerFn(currentFast);
+  const fetchWater = useServerFn(todaysWater);
+  const logWaterFn = useServerFn(logWater);
+
+  const { data: profile, isLoading: pLoad } = useQuery({ queryKey: ["profile"], queryFn: () => fetchProfile() });
+  const { data: meals = [] } = useQuery({ queryKey: ["meals", "today"], queryFn: () => fetchMeals() });
+  const { data: fast } = useQuery({ queryKey: ["fast", "current"], queryFn: () => fetchFast(), refetchInterval: 30000 });
+  const { data: waterMl = 0 } = useQuery({ queryKey: ["water", "today"], queryFn: () => fetchWater() });
+
+  useEffect(() => {
+    if (!pLoad && profile && !profile.onboarded) {
+      navigate({ to: "/onboarding" });
+    }
+  }, [profile, pLoad, navigate]);
+
+  const waterMutation = useMutation({
+    mutationFn: (ml: number) => logWaterFn({ data: { amount_ml: ml } }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["water", "today"] });
+      toast.success("+250ml dicatat");
+    },
+  });
+
+  const totals = meals.reduce(
+    (acc, m) => ({
+      cal: acc.cal + Number(m.calories || 0),
+      p: acc.p + Number(m.protein_g || 0),
+      c: acc.c + Number(m.carbs_g || 0),
+      f: acc.f + Number(m.fat_g || 0),
+    }),
+    { cal: 0, p: 0, c: 0, f: 0 },
+  );
+
+  const calTarget = profile?.daily_calorie_target ?? 2000;
+  const waterTarget = 2500;
+
+  const [now, setNow] = useState(Date.now());
+  useEffect(() => {
+    if (!fast) return;
+    const id = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(id);
+  }, [fast]);
+  const fastMs = fast ? now - new Date(fast.start_time).getTime() : 0;
+  const fastHrs = fastMs / 3600000;
+  const fastPct = fast ? Math.min(100, (fastHrs / Number(fast.target_hours)) * 100) : 0;
+
+  const greeting = (() => {
+    const h = new Date().getHours();
+    if (h < 11) return "Selamat pagi";
+    if (h < 15) return "Selamat siang";
+    if (h < 18) return "Selamat sore";
+    return "Selamat malam";
+  })();
+
+  return (
+    <main className="min-h-screen bg-background pb-28">
+      <div className="max-w-md mx-auto px-5 pt-8 space-y-5">
+        <header className="flex justify-between items-start animate-fade-up">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-wider text-primary/70 mb-1">{greeting}</p>
+            <h1 className="text-2xl font-bold">Halo, {profile?.full_name?.split(" ")[0] ?? "Sahabat"}!</h1>
+          </div>
+          <Link to="/profile" className="size-11 rounded-full bg-card outline-1 outline-black/10 grid place-items-center font-bold text-primary">
+            {(profile?.full_name ?? "U").slice(0, 1).toUpperCase()}
+          </Link>
+        </header>
+
+        {/* Top row: Calorie + Fasting */}
+        <div className="grid grid-cols-2 gap-3 animate-fade-up">
+          <div className="bg-card p-4 rounded-3xl outline-1 outline-black/5 shadow-sm flex flex-col items-center justify-center">
+            <CalorieRing consumed={totals.cal} target={calTarget} size={112} />
+            <p className="text-xs font-semibold mt-2">Nutrisi hari ini</p>
+            <p className="text-[10px] text-muted-foreground">{Math.round(totals.cal)} / {calTarget} kcal</p>
+          </div>
+          <Link to="/fasting" className="bg-card p-4 rounded-3xl outline-1 outline-black/5 shadow-sm flex flex-col justify-between">
+            <p className="text-[10px] font-bold uppercase text-muted-foreground tracking-wider">Puasa</p>
+            {fast ? (
+              <>
+                <p className="text-2xl font-bold tabular-nums">{formatDuration(fastMs)}</p>
+                <div className="h-1.5 w-full bg-mint rounded-full overflow-hidden mt-2">
+                  <div className="h-full bg-coral transition-all" style={{ width: `${fastPct}%` }} />
+                </div>
+                <p className="text-[10px] text-muted-foreground mt-1.5 truncate">{fastingStage(fastHrs)}</p>
+              </>
+            ) : (
+              <>
+                <p className="text-base font-semibold">Mulai puasa</p>
+                <p className="text-[11px] text-muted-foreground mt-1">16:8, OMAD, Ramadhan & lainnya</p>
+                <p className="text-xs font-semibold text-primary mt-2 inline-flex items-center gap-1">
+                  Pilih protokol <ArrowRight className="size-3" />
+                </p>
+              </>
+            )}
+          </Link>
+        </div>
+
+        {/* Macro breakdown */}
+        <div className="bg-card p-4 rounded-3xl outline-1 outline-black/5 shadow-sm grid grid-cols-3 gap-2 animate-fade-up">
+          {[
+            { label: "Protein", value: totals.p, color: "bg-primary" },
+            { label: "Karbo", value: totals.c, color: "bg-accent" },
+            { label: "Lemak", value: totals.f, color: "bg-charcoal" },
+          ].map((m) => (
+            <div key={m.label}>
+              <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wide">{m.label}</p>
+              <p className="text-lg font-bold tabular-nums">{Math.round(m.value)}<span className="text-xs font-medium text-muted-foreground">g</span></p>
+              <div className={`h-1 w-8 rounded-full mt-1 ${m.color}`} />
+            </div>
+          ))}
+        </div>
+
+        {/* Water */}
+        <div className="bg-card p-4 rounded-3xl outline-1 outline-black/5 shadow-sm flex items-center gap-4 animate-fade-up">
+          <div className="size-12 rounded-2xl bg-sky-100 grid place-items-center">
+            <Droplet className="size-5 text-sky-600" />
+          </div>
+          <div className="flex-1">
+            <p className="text-xs font-bold uppercase text-muted-foreground tracking-wider">Air</p>
+            <p className="text-lg font-bold tabular-nums">
+              {(waterMl / 1000).toFixed(1)}L <span className="text-xs text-muted-foreground font-medium">/ {waterTarget / 1000}L</span>
+            </p>
+          </div>
+          <button
+            onClick={() => waterMutation.mutate(250)}
+            disabled={waterMutation.isPending}
+            className="bg-primary text-primary-foreground text-xs font-semibold px-3 py-2 rounded-xl inline-flex items-center gap-1"
+          >
+            <Plus className="size-3.5" /> 250ml
+          </button>
+        </div>
+
+        {/* AI Chat CTA */}
+        <Link
+          to="/chat"
+          className="block bg-gradient-to-br from-sage to-sage-deep p-5 rounded-3xl text-primary-foreground relative overflow-hidden animate-fade-up"
+        >
+          <div className="absolute -right-6 -bottom-6 size-32 bg-white/10 rounded-full blur-2xl" />
+          <div className="relative z-10 flex items-center gap-4">
+            <div className="size-12 rounded-2xl bg-white/15 backdrop-blur grid place-items-center">
+              <Sparkles className="size-6" />
+            </div>
+            <div className="flex-1">
+              <p className="font-bold text-lg">Tanya Dr. Healthy</p>
+              <p className="text-xs text-white/80">"Berapa kalori 1 porsi rendang?"</p>
+            </div>
+            <ArrowRight className="size-5" />
+          </div>
+        </Link>
+
+        {/* Today's meals */}
+        <section className="animate-fade-up">
+          <div className="flex justify-between items-center mb-3">
+            <h2 className="font-bold">Makan hari ini</h2>
+            <Link to="/food" className="text-xs font-semibold text-primary">+ Tambah</Link>
+          </div>
+          {meals.length === 0 ? (
+            <div className="bg-card p-6 rounded-3xl outline-1 outline-black/5 text-center">
+              <p className="text-sm text-muted-foreground mb-3">Belum ada catatan hari ini</p>
+              <Link to="/food" className="inline-block bg-primary text-primary-foreground text-sm font-semibold px-4 py-2 rounded-xl">
+                Catat makanan
+              </Link>
+            </div>
+          ) : (
+            <div className="space-y-2">
+              {meals.map((m) => (
+                <div key={m.id} className="bg-card p-3 rounded-2xl outline-1 outline-black/5 flex items-center gap-3">
+                  <div className="size-12 rounded-xl bg-mint grid place-items-center text-lg">🍽️</div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-[10px] font-bold uppercase text-coral tracking-wider">{m.meal_type}</p>
+                    <p className="font-semibold text-sm truncate">{(m.food_item as { name?: string } | null)?.name ?? m.custom_name ?? "Makanan"}</p>
+                  </div>
+                  <p className="text-sm font-bold tabular-nums">{Math.round(Number(m.calories))}<span className="text-[10px] text-muted-foreground"> kcal</span></p>
+                </div>
+              ))}
+            </div>
+          )}
+        </section>
+      </div>
+      <BottomNav />
+    </main>
+  );
+}
