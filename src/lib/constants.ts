@@ -52,6 +52,7 @@
 // | PDF_TOC_ROW_BOUND_W            | Lebar bounding box klik baris TOC (pt).                  |
 // | PDF_TOC_ROW_BOUND_H            | Tinggi bounding box klik baris TOC (pt).                 |
 // | PDF_AUTOTABLE_START_Y          | Y mulai autoTable utama PDF mingguan (pt).               |
+// | PDF_BODY_TEXT_OFFSET_Y         | Y baseline body text di bawah section header (pt).       |
 //
 // CONVENTION: setiap konstanta tunable WAJIB ditambahkan ke tabel di atas
 // (nama + 1 baris efek). Reviewer boleh menolak PR yang menambah konstanta
@@ -257,3 +258,7 @@ export const PDF_TOC_ROW_BOUND_H = 14;
 /** Y mulai autoTable utama PDF mingguan (pt). */
 // eslint-disable-next-line no-restricted-syntax -- listed in header table
 export const PDF_AUTOTABLE_START_Y = 90;
+
+/** Y baseline body text di bawah section header (PDF_BODY_TOP_Y + PDF_LINE_HEIGHT, pt). */
+// eslint-disable-next-line no-restricted-syntax -- listed in header table
+export const PDF_BODY_TEXT_OFFSET_Y = PDF_BODY_TOP_Y + PDF_LINE_HEIGHT;

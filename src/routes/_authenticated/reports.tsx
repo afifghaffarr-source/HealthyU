@@ -50,6 +50,7 @@ import {
   PDF_TOC_ROW_BOUND_W,
   PDF_TOC_ROW_BOUND_H,
   PDF_AUTOTABLE_START_Y,
+  PDF_BODY_TEXT_OFFSET_Y,
 } from "@/lib/constants";
 import { useTranslation } from "@/lib/i18n";
 import { useAnnounce } from "@/components/live-announcer";
@@ -286,7 +287,11 @@ function ReportsPage() {
         tocPageIdx += 1;
         doc.setFont("helvetica", "bold");
         doc.setFontSize(PDF_SUBTITLE_FONT_SIZE);
-        doc.text(`Daftar Isi (lanjutan ${tocPageIdx + 1}/${tocPages})`, PDF_MARGIN_X, PDF_HEADER_BASELINE_Y);
+        doc.text(
+          t("pdf.toc.continued", { n: tocPageIdx + 1, m: tocPages }),
+          PDF_MARGIN_X,
+          PDF_HEADER_BASELINE_Y,
+        );
         doc.setFont("helvetica", "normal");
         doc.setFontSize(PDF_BODY_FONT_SIZE);
         tocY = PDF_TOC_CONTINUED_TOP_Y;
@@ -333,7 +338,7 @@ function ReportsPage() {
       doc.setFont("helvetica", "normal");
       doc.setFontSize(PDF_BODY_FONT_SIZE);
       const lines = doc.splitTextToSize(text || "(kosong)", PDF_PAGE_CONTENT_W);
-      doc.text(lines, PDF_MARGIN_X, PDF_BODY_TOP_Y + PDF_LINE_HEIGHT);
+      doc.text(lines, PDF_MARGIN_X, PDF_BODY_TEXT_OFFSET_Y);
       // Back-link to TOC (page 1) in the top-right corner.
       doc.setTextColor(PDF_LINK_RGB[0], PDF_LINK_RGB[1], PDF_LINK_RGB[2]);
       doc.setFontSize(PDF_LINK_FONT_SIZE);
@@ -367,7 +372,7 @@ function ReportsPage() {
         }
       ).createAnnotation({
         type: "text",
-        title: "Navigasi",
+        title: t("pdf.tooltip.navigation"),
         bounds: {
           x: PDF_LINK_RIGHT_X - linkW - PDF_LINK_BOUND_OFFSET,
           y: PDF_LINK_BASELINE_Y - PDF_LINK_BOUND_Y_OFFSET,
@@ -554,7 +559,7 @@ function ReportsPage() {
     doc.setFont("helvetica", "normal");
     doc.setFontSize(PDF_BODY_FONT_SIZE);
     const lines = doc.splitTextToSize(text || "(kosong)", PDF_PAGE_CONTENT_W);
-    doc.text(lines, PDF_MARGIN_X, PDF_BODY_TOP_Y + PDF_LINE_HEIGHT);
+    doc.text(lines, PDF_MARGIN_X, PDF_BODY_TEXT_OFFSET_Y);
     doc.save(`laporan-healthyu-${(r.report_period_end ?? r.created_at).slice(0, 10)}.pdf`);
   };
 

@@ -21,4 +21,10 @@ jobs:
       - uses: actions/checkout@v4
       - uses: oven-sh/setup-bun@v2
       - run: bun install --frozen-lockfile
-      - run: bunx vitest run --coverage
+      - run: bunx vitest run --coverage --coverage.reporter=text --coverage.reporter=html
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: coverage-html
+          path: coverage/
+          retention-days: 14

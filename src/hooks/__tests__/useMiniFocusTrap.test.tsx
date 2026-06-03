@@ -48,4 +48,37 @@ describe("useMiniFocusTrap", () => {
     fireEvent.keyDown(document, { key: "Escape" });
     expect(escaped).toBe(1);
   });
+
+  it("autoFocusFirst:false tidak memindahkan fokus saat aktif", () => {
+    function NoAutoFocus() {
+      const first = useRef<HTMLButtonElement | null>(null);
+      const last = useRef<HTMLButtonElement | null>(null);
+      useMiniFocusTrap(true, [first, last], undefined, { autoFocusFirst: false });
+      return (
+        <div>
+          <button>Outside</button>
+          <button ref={first}>First</button>
+          <button ref={last}>Last</button>
+        </div>
+      );
+    }
+    render(<NoAutoFocus />);
+    expect(document.activeElement).toBe(document.body);
+  });
+
+  it("autoFocusFirst:true memindahkan fokus ke first ref", () => {
+    function AutoFocus() {
+      const first = useRef<HTMLButtonElement | null>(null);
+      const last = useRef<HTMLButtonElement | null>(null);
+      useMiniFocusTrap(true, [first, last], undefined, { autoFocusFirst: true });
+      return (
+        <div>
+          <button ref={first}>First</button>
+          <button ref={last}>Last</button>
+        </div>
+      );
+    }
+    render(<AutoFocus />);
+    expect(document.activeElement).toBe(screen.getByText("First"));
+  });
 });
