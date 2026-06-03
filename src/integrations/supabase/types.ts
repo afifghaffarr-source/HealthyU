@@ -205,6 +205,119 @@ export type Database = {
           },
         ]
       }
+      meal_plans: {
+        Row: {
+          calories: number
+          created_at: string
+          custom_name: string | null
+          food_item_id: string | null
+          id: string
+          meal_type: string
+          plan_date: string
+          planned_qty: number
+          user_id: string
+        }
+        Insert: {
+          calories?: number
+          created_at?: string
+          custom_name?: string | null
+          food_item_id?: string | null
+          id?: string
+          meal_type: string
+          plan_date: string
+          planned_qty?: number
+          user_id: string
+        }
+        Update: {
+          calories?: number
+          created_at?: string
+          custom_name?: string | null
+          food_item_id?: string | null
+          id?: string
+          meal_type?: string
+          plan_date?: string
+          planned_qty?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
+      medication_logs: {
+        Row: {
+          id: string
+          medication_id: string
+          scheduled_date: string
+          scheduled_time: string
+          taken_at: string
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          medication_id: string
+          scheduled_date?: string
+          scheduled_time: string
+          taken_at?: string
+          user_id: string
+        }
+        Update: {
+          id?: string
+          medication_id?: string
+          scheduled_date?: string
+          scheduled_time?: string
+          taken_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "medication_logs_medication_id_fkey"
+            columns: ["medication_id"]
+            isOneToOne: false
+            referencedRelation: "medications"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      medications: {
+        Row: {
+          active: boolean
+          created_at: string
+          dose: string | null
+          end_date: string | null
+          frequency: string
+          id: string
+          name: string
+          notes: string | null
+          start_date: string
+          times: string[]
+          user_id: string
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          dose?: string | null
+          end_date?: string | null
+          frequency?: string
+          id?: string
+          name: string
+          notes?: string | null
+          start_date?: string
+          times?: string[]
+          user_id: string
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          dose?: string | null
+          end_date?: string | null
+          frequency?: string
+          id?: string
+          name?: string
+          notes?: string | null
+          start_date?: string
+          times?: string[]
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           activity_level: string | null
@@ -265,6 +378,36 @@ export type Database = {
           target_weight_kg?: number | null
           updated_at?: string
           weight_kg?: number | null
+        }
+        Relationships: []
+      }
+      sleep_logs: {
+        Row: {
+          created_at: string
+          id: string
+          notes: string | null
+          quality: number
+          sleep_end: string
+          sleep_start: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          notes?: string | null
+          quality?: number
+          sleep_end: string
+          sleep_start: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          notes?: string | null
+          quality?: number
+          sleep_end?: string
+          sleep_start?: string
+          user_id?: string
         }
         Relationships: []
       }
@@ -347,6 +490,45 @@ export type Database = {
           amount_ml?: number
           id?: string
           logged_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      workout_sessions: {
+        Row: {
+          calories_burned: number
+          created_at: string
+          duration_min: number
+          id: string
+          intensity: string
+          name: string
+          notes: string | null
+          performed_at: string
+          type: string
+          user_id: string
+        }
+        Insert: {
+          calories_burned?: number
+          created_at?: string
+          duration_min: number
+          id?: string
+          intensity?: string
+          name: string
+          notes?: string | null
+          performed_at?: string
+          type: string
+          user_id: string
+        }
+        Update: {
+          calories_burned?: number
+          created_at?: string
+          duration_min?: number
+          id?: string
+          intensity?: string
+          name?: string
+          notes?: string | null
+          performed_at?: string
+          type?: string
           user_id?: string
         }
         Relationships: []
