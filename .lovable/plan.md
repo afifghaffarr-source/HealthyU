@@ -1,94 +1,77 @@
-# Plan Migrasi Bertahap HealthyU Schema
+# HealthyU Full Redesign — 6 Fase
 
-Existing schema HealthyU sudah punya 25+ tabel (`profiles`, `meal_logs`, `workout_sessions`, `fasting_sessions`, `water_logs`, `mood_logs`, `vitals_logs`, `weight_logs`, `sleep_logs`, `recipes`, `community_posts`, `achievements`, `user_stats`, dll). Target 58-tabel akan dicapai dengan **extend** kolom yang kurang + **add** tabel yang belum ada, tanpa drop apapun.
+Spec sangat luas (20 layar + design system penuh + 5 fitur baru). Eksekusi bertahap; setiap fase 1 chat turn agar bisa direview & tidak break preview.
 
-## Mapping existing → target
+## Phase 1 — Design Tokens & Foundation *(turn ini)*
+- Rewrite `src/styles.css`: palet Green/Orange/Blue (oklch konversi #4CAF50/#FF9800/#2196F3), semantic success/warning/error/info, chart colors (protein/carbs/fat/fiber), spacing scale 4/8/12/16/20/24/32/40/48/64, radius scale 8/12/16/24/full, shadow levels 1–4, dark mode variants.
+- Tambah Google Fonts via `<link>` di `__root.tsx`: Plus Jakarta Sans 700, Inter 400/500/600, JetBrains Mono 700.
+- Update `@theme` dengan `--font-display`, `--font-body`, `--font-mono`.
+- Hasil: semua komponen existing otomatis ikut palet baru (sage→green, dst).
 
-| Target (prompt) | Existing | Aksi |
-|---|---|---|
-| `users` | `profiles` (PK = auth.users.id) | EXTEND — tetap pakai `profiles`, tambah kolom |
-| `meal_logs` + `meal_log_items` | `meal_logs` (flat) | EXTEND `meal_logs`, tambah `meal_log_items` opsional nanti |
-| `workout_logs` + `workout_log_items` | `workout_sessions` | EXTEND, alias view nanti |
-| `body_metrics` | `weight_logs` + `vitals_logs` | TAMBAH `body_metrics` baru (komposit) |
-| `fasting_logs` | `fasting_sessions` | EXTEND |
-| `step_logs` | `daily_steps` | EXTEND |
-| `chat_messages` | sudah ada | EXTEND + tambah `chat_sessions`, `ai_reports` |
-| `community_posts` | sudah ada | EXTEND + `post_likes` (sudah ada `community_likes`), `post_comments` (ada `community_comments`) |
-| `community_groups` / `group_members` | `friend_groups` / `friend_group_members` | EXTEND |
+## Phase 2 — Komponen Library (atomic)
+- `src/components/healthyu/`: Button (primary/secondary/text/FAB/icon), Card variants (standard/food/stat/progress), Input/SearchBar/Chip, Modal/BottomSheet, Badge (achievement/status/calorie), CalorieRing 180px, MacroBar stacked, NutritionPieChart, BottomNav 5-item, TopAppBar, TabBar, ListItem, Divider, Toast.
 
-## Modul (urutan migration, tiap modul = 1 migration file)
+## Phase 3 — Layar Existing Redesign (Dashboard, Food, Exercise, Fasting, Profile, Reports)
+- Apply komponen Phase 2 ke 6 route yang sudah ada sesuai wireframe (health score card, daily progress ring, quick actions row, AI insight card, upcoming, recent activity, dll).
 
-### Migration 1 — CORE & Profile extend
-- Extend `profiles`: `bmi`, `bmi_category`, `bmr`, `tdee`, `ideal_weight_min/max`, `health_score`, `health_age`, `daily_protein/carbs/fat/fiber/water_target`, `daily_steps_target`, `total_xp` (mirror), `health_coins`, `streak_days` (mirror), `timezone`, `theme`, `location_province`, `location_lat`, `location_lng`, `premium_status`, `premium_expires_at`, `referral_code`, `referred_by`, `fcm_token`, `platform`, `phone`, `blood_type`
-- Tabel baru: `user_health_conditions`, `user_allergies` (struktur), `user_connected_accounts` (wearable + auth providers)
+## Phase 4 — Layar Baru
+- Routes baru: `/onboarding` (5-step swipeable), `/body` (Berat/Ukuran/Foto/Vitals tabs), `/articles` (hub + reader), `/community` (Feed/Challenges/Groups), `/achievements` (grid + level bar), `/notifications`, `/prayer-times`, `/shopping-list`, `/workout-player`, `/meal-detail`.
 
-### Migration 2 — NUTRITION extend
-- Extend `food_items`: `slug`, `cuisine`, `brand`, `barcode`, `glycemic_load`, `is_halal`, `is_vegetarian`, `is_vegan`, `is_gluten_free`, `is_keto_friendly`, `is_diabetic_friendly`, `health_rating`, `common_portions JSONB`, `bpom_number`, `is_verified`, `times_logged`, `is_active`, `deleted_at`, vitamin/mineral cols
-- Extend `meal_logs`: `total_fiber_g`, `total_sugar_g`, `total_sodium_mg`, `mood_before/after`, `hunger_level_before/after`, `location_name`, `source`, `notes`, `photo_url`, `log_date`, `deleted_at`
-- Tabel baru: `meal_log_items`, `food_alternatives`, `food_scans`, `recipe_ratings`
-- Extend `recipes`: `slug`, `video_url`, `cuisine`, `tags JSONB`, `estimated_cost_idr`, `is_halal`, `is_vegetarian`, `is_vegan`, `is_keto_friendly`, `view/save/cook_count`, `avg_rating`, `rating_count`, `is_published`, `is_featured`, `user_id`, `deleted_at`
-- Extend `meal_plans`: `plan_name`, `plan_type`, `start_date`, `end_date`, `target_protein/carbs/fat`, `daily_budget_idr`, `diet_preference`, `exclude_allergens`, `meal_count_per_day`, `fasting_enabled`, `is_active`, `deleted_at`; tabel baru `meal_plan_items`
+## Phase 5 — Fitur Khusus
+- **Virtual Pet** (`/pet`): avatar SVG, stats (health/happy/energy/hunger), evolution 1-5, feed/play/exercise/sleep actions, derived dari user health metrics.
+- **AI Chatbot** (`/chat`): AI SDK + Lovable AI Gateway `google/gemini-3-flash-preview`, persistent threads di Supabase, AI Elements primitives, tool calling untuk inline nutrition/exercise cards.
+- **Prayer Times** (`/prayer-times`): API Aladhan, countdown, daftar 6 waktu, Qibla compass.
+- **Shopping List** (`/shopping-list`): derive dari meal plan, kategori protein/sayur/karbo, total Rp, checklist persist.
 
-### Migration 3 — EXERCISE
-- Tabel baru: `exercises`, `workout_plans`, `workout_plan_items`, `workout_log_items`
-- Extend `workout_sessions` (alias `workout_logs`): `started_at`, `completed_at`, `log_date`, `total_sets/reps`, `exercises_completed`, `heart_rate_avg/max/min`, `difficulty_rating`, `perceived_exertion`, `mood_before/after`, `source`, `deleted_at`, `workout_plan_id`
-- Extend `daily_steps`: `distance_km`, `active_minutes`, `floors_climbed`, `calories_burned`
+## Phase 6 — Polish & A11y
+- Micro-interactions (button press scale, heart pop, confetti, ring fill glow).
+- `prefers-reduced-motion` gate semua animasi.
+- WCAG AA contrast audit (semua kombinasi text/bg).
+- Tablet/desktop breakpoint (md: 2-col, lg: sidebar nav).
+- Empty/error/loading states global.
+- Skeleton shimmer.
 
-### Migration 4 — FASTING & BODY
-- Extend `fasting_sessions`: `planned_duration_hours`, `planned_end_at`, `status` (enum-ish), `actual_duration_hours`, `imsak_time`, `iftar_time`, `sahur_logged`, `iftar_logged`, `water_intake_ml`, `energy_level_start/end`, `hunger_level_avg`, `mood_during`, `break_reason`
-- Tabel baru: `fasting_schedules`, `body_metrics`
+## Technical Details
 
-### Migration 5 — WELLNESS & AI
-- Extend `water_logs`: `water_type`, `log_date`, `source`
-- Extend `mood_logs`: `energy_level`, `stress_level`, `anxiety_level`, `mood_label`, `triggers JSONB`, `log_date`
-- Extend `sleep_logs`: `bed_time`, `wake_time`, `log_date`, `duration_hours`, `quality_score`, `time_to_sleep_min`, `interruptions`, `deep/light/rem_hours`, `pre_sleep_activities`, `source`
-- Tabel baru: `chat_sessions` (group `chat_messages`), `ai_reports`
-- Extend `chat_messages`: `session_id`, `content_type`, `image_url`, `audio_url`, `model_used`, `tokens_used`, `suggestions JSONB`, `user_rating`, `is_helpful`, `was_flagged`
+### Phase 1 token mapping (oklch konversi)
+```
+--primary: oklch(0.66 0.17 142)       /* #4CAF50 green-500 */
+--primary-dark: oklch(0.55 0.17 142)  /* #388E3C */
+--secondary: oklch(0.72 0.17 60)      /* #FF9800 orange */
+--accent: oklch(0.62 0.18 250)        /* #2196F3 blue */
+--success: oklch(0.71 0.16 142)
+--warning: oklch(0.78 0.15 75)
+--error: oklch(0.65 0.21 25)
+--chart-protein: oklch(0.69 0.18 18)
+--chart-carbs: oklch(0.74 0.13 185)
+--chart-fat: oklch(0.88 0.13 95)
+--chart-fiber: oklch(0.85 0.09 168)
+--bg: oklch(0.97 0.005 240)           /* #F5F7FA */
+--surface: oklch(1 0 0)
+--text-primary: oklch(0.18 0.02 270)  /* #1A1A2E */
+--text-secondary: oklch(0.50 0.01 250)/* #6B7280 */
+```
 
-### Migration 6 — CONTENT & COMMUNITY
-- Tabel baru: `articles`, `article_bookmarks`
-- Extend `community_posts`: `post_type`, `image_urls JSONB`, `video_url`, `tags JSONB`, `likes/comments/shares/views_count`, `is_flagged`, `is_approved`, `is_pinned`, `is_featured`, `deleted_at`
-- Tabel baru: `community_groups`, `group_members` (atau alias ke `friend_groups`); `post_likes` (alias `community_likes`), `post_comments` parent_comment_id
+### Phase 1 dark mode
+- `--bg: oklch(0.15 0 0)` (#121212)
+- `--surface: oklch(0.20 0 0)` (#1E1E1E)
+- `--text-primary: oklch(1 0 0)`
+- `--text-secondary: oklch(0.70 0 0)`
 
-### Migration 7 — GAMIFICATION
-- Extend `achievements`: `name_en`, `badge_url`, `rarity`, `coin_reward`, `condition_type`, `condition_value`, `condition_metadata`, `is_hidden`, `times_unlocked`
-- Tabel baru: `xp_logs`, `challenges`, `challenge_participants`, `challenge_daily_logs`
+### Phase 1 fonts
+```tsx
+// __root.tsx head().links
+{ rel: "preconnect", href: "https://fonts.googleapis.com" },
+{ rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
+{ rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@700&display=swap" }
+```
 
-### Migration 8 — NOTIFICATIONS & PRAYER
-- Tabel baru: `notifications`, `notification_preferences`, `prayer_times`
+### Phase 5 secrets (akan diminta saat fase berjalan)
+- `LOVABLE_API_KEY` (auto-provisioned untuk AI Chatbot).
+- Aladhan API public, no key needed untuk Prayer Times.
 
-### Migration 9 — SUBSCRIPTION & PAYMENT
-- Tabel baru: `subscription_plans`, `user_subscriptions`, `payment_history`
-
-### Migration 10 — REFERRAL, REWARDS, PET, ANALYTICS, CONFIG
-- Tabel baru: `referrals`, `reward_transactions`, `coin_rewards`, `coin_redemptions`, `virtual_pets`, `pet_interactions`, `search_history`, `user_activity_log`, `system_settings`, `app_versions`
-
-## Aturan eksekusi tiap migration
-
-1. Setiap `CREATE TABLE public.X` diikuti `GRANT SELECT,INSERT,UPDATE,DELETE TO authenticated`, `GRANT ALL TO service_role`, `ENABLE RLS`, dan policy `auth.uid() = user_id` (atau public read untuk content).
-2. Triggers global: pakai `public.update_updated_at_column()` yang sudah perlu dibuat di Migration 1.
-3. Index pada FK + (`user_id`, `log_date`/`logged_at`).
-4. **Tidak ada DROP** apa pun. Kolom baru semua nullable atau ber-default.
-5. **Tidak ada perubahan `auth/storage/realtime/vault/supabase_functions` schemas.**
-
-## Yang TIDAK termasuk
-
-- Timescaledb / pg_trgm extension (Supabase managed — pg_trgm OK, timescaledb tidak tersedia, akan di-skip).
-- Materialized views (`mv_*`) — akan ditambah di migration terpisah setelah skema stabil, butuh refresh strategy.
-- ENUM types Postgres native — pakai `TEXT` + CHECK constraint (lebih fleksibel + tidak rusak saat enum value bertambah).
-- Update kode TS/React — hanya migration SQL. Wiring kode menyusul saat fitur dipakai.
-
-## Execution order
-
-Saya akan submit **Migration 1 dulu** (CORE + profile extend + helper function `update_updated_at_column`). Setelah Anda approve & run, saya lanjut Migration 2, dst. Pendekatan ini aman karena tiap migration kecil & isolated.
-
-## Saran lanjutan setelah semua 10 migration jalan
-
-- Wire kolom baru `profiles.bmi/bmr/tdee` ke onboarding form & auto-compute trigger
-- Hidupkan `meal_log_items` granular (split meal jadi item) di halaman `/food`
-- Build halaman `/challenges` pakai tabel baru
-- Build halaman `/articles` + bookmark
-- Build `/pet` virtual pet
-- Build `/subscription` paywall
-
-Mau saya mulai submit Migration 1?
+## Out of Scope
+- Lottie files (perlu `.json` asset upload; bisa dirender placeholder SVG dulu).
+- Google Fit / Calendar / Drive integration (butuh OAuth scope user).
+- Wearable device sync (butuh native bridge — tidak mungkin di web).
+- Bahasa toggle ID/EN sudah ada (Phase 1 tidak ubah, lanjut pakai).
