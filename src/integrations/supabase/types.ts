@@ -44,6 +44,108 @@ export type Database = {
         }
         Relationships: []
       }
+      body_metrics: {
+        Row: {
+          bicep_left_cm: number | null
+          bicep_right_cm: number | null
+          blood_oxygen_pct: number | null
+          blood_pressure_dia: number | null
+          blood_pressure_sys: number | null
+          blood_sugar_mg_dl: number | null
+          bmi: number | null
+          bmi_category: string | null
+          body_fat_pct: number | null
+          body_temperature_c: number | null
+          bone_mass_kg: number | null
+          calf_cm: number | null
+          chest_cm: number | null
+          created_at: string
+          heart_rate_bpm: number | null
+          hip_cm: number | null
+          id: string
+          measure_date: string | null
+          measured_at: string
+          muscle_mass_kg: number | null
+          neck_cm: number | null
+          notes: string | null
+          source: string | null
+          thigh_left_cm: number | null
+          thigh_right_cm: number | null
+          updated_at: string
+          user_id: string
+          visceral_fat: number | null
+          waist_cm: number | null
+          water_pct: number | null
+          weight_kg: number | null
+        }
+        Insert: {
+          bicep_left_cm?: number | null
+          bicep_right_cm?: number | null
+          blood_oxygen_pct?: number | null
+          blood_pressure_dia?: number | null
+          blood_pressure_sys?: number | null
+          blood_sugar_mg_dl?: number | null
+          bmi?: number | null
+          bmi_category?: string | null
+          body_fat_pct?: number | null
+          body_temperature_c?: number | null
+          bone_mass_kg?: number | null
+          calf_cm?: number | null
+          chest_cm?: number | null
+          created_at?: string
+          heart_rate_bpm?: number | null
+          hip_cm?: number | null
+          id?: string
+          measure_date?: string | null
+          measured_at?: string
+          muscle_mass_kg?: number | null
+          neck_cm?: number | null
+          notes?: string | null
+          source?: string | null
+          thigh_left_cm?: number | null
+          thigh_right_cm?: number | null
+          updated_at?: string
+          user_id: string
+          visceral_fat?: number | null
+          waist_cm?: number | null
+          water_pct?: number | null
+          weight_kg?: number | null
+        }
+        Update: {
+          bicep_left_cm?: number | null
+          bicep_right_cm?: number | null
+          blood_oxygen_pct?: number | null
+          blood_pressure_dia?: number | null
+          blood_pressure_sys?: number | null
+          blood_sugar_mg_dl?: number | null
+          bmi?: number | null
+          bmi_category?: string | null
+          body_fat_pct?: number | null
+          body_temperature_c?: number | null
+          bone_mass_kg?: number | null
+          calf_cm?: number | null
+          chest_cm?: number | null
+          created_at?: string
+          heart_rate_bpm?: number | null
+          hip_cm?: number | null
+          id?: string
+          measure_date?: string | null
+          measured_at?: string
+          muscle_mass_kg?: number | null
+          neck_cm?: number | null
+          notes?: string | null
+          source?: string | null
+          thigh_left_cm?: number | null
+          thigh_right_cm?: number | null
+          updated_at?: string
+          user_id?: string
+          visceral_fat?: number | null
+          waist_cm?: number | null
+          water_pct?: number | null
+          weight_kg?: number | null
+        }
+        Relationships: []
+      }
       chat_messages: {
         Row: {
           content: string
@@ -298,39 +400,126 @@ export type Database = {
         }
         Relationships: []
       }
-      fasting_sessions: {
+      fasting_schedules: {
         Row: {
-          completed: boolean | null
           created_at: string
-          end_time: string | null
+          eating_window_end: string | null
+          eating_window_start: string | null
+          enabled_days: Json | null
+          fasting_type: string
           id: string
-          notes: string | null
-          protocol: string
-          start_time: string
-          target_hours: number
+          is_active: boolean
+          is_ramadhan_mode: boolean
+          target_duration_hours: number | null
+          updated_at: string
           user_id: string
         }
         Insert: {
-          completed?: boolean | null
           created_at?: string
-          end_time?: string | null
+          eating_window_end?: string | null
+          eating_window_start?: string | null
+          enabled_days?: Json | null
+          fasting_type: string
           id?: string
-          notes?: string | null
-          protocol?: string
-          start_time?: string
-          target_hours?: number
+          is_active?: boolean
+          is_ramadhan_mode?: boolean
+          target_duration_hours?: number | null
+          updated_at?: string
           user_id: string
         }
         Update: {
+          created_at?: string
+          eating_window_end?: string | null
+          eating_window_start?: string | null
+          enabled_days?: Json | null
+          fasting_type?: string
+          id?: string
+          is_active?: boolean
+          is_ramadhan_mode?: boolean
+          target_duration_hours?: number | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      fasting_sessions: {
+        Row: {
+          actual_duration_hours: number | null
+          break_reason: string | null
+          completed: boolean | null
+          created_at: string
+          end_time: string | null
+          energy_level_end: number | null
+          energy_level_start: number | null
+          hunger_level_avg: number | null
+          id: string
+          iftar_logged: boolean | null
+          iftar_time: string | null
+          imsak_time: string | null
+          mood_during: number | null
+          notes: string | null
+          planned_duration_hours: number | null
+          planned_end_at: string | null
+          protocol: string
+          sahur_logged: boolean | null
+          start_time: string
+          status: string | null
+          target_hours: number
+          updated_at: string
+          user_id: string
+          water_intake_ml: number | null
+        }
+        Insert: {
+          actual_duration_hours?: number | null
+          break_reason?: string | null
           completed?: boolean | null
           created_at?: string
           end_time?: string | null
+          energy_level_end?: number | null
+          energy_level_start?: number | null
+          hunger_level_avg?: number | null
           id?: string
+          iftar_logged?: boolean | null
+          iftar_time?: string | null
+          imsak_time?: string | null
+          mood_during?: number | null
           notes?: string | null
+          planned_duration_hours?: number | null
+          planned_end_at?: string | null
           protocol?: string
+          sahur_logged?: boolean | null
           start_time?: string
+          status?: string | null
           target_hours?: number
+          updated_at?: string
+          user_id: string
+          water_intake_ml?: number | null
+        }
+        Update: {
+          actual_duration_hours?: number | null
+          break_reason?: string | null
+          completed?: boolean | null
+          created_at?: string
+          end_time?: string | null
+          energy_level_end?: number | null
+          energy_level_start?: number | null
+          hunger_level_avg?: number | null
+          id?: string
+          iftar_logged?: boolean | null
+          iftar_time?: string | null
+          imsak_time?: string | null
+          mood_during?: number | null
+          notes?: string | null
+          planned_duration_hours?: number | null
+          planned_end_at?: string | null
+          protocol?: string
+          sahur_logged?: boolean | null
+          start_time?: string
+          status?: string | null
+          target_hours?: number
+          updated_at?: string
           user_id?: string
+          water_intake_ml?: number | null
         }
         Relationships: []
       }
