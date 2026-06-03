@@ -458,8 +458,8 @@ function ReportsPage() {
                         e.preventDefault();
                         shareWhatsapp({
                           text,
-                          periodStart: r.report_period_start,
-                          periodEnd: r.report_period_end,
+                          periodStart: r.report_period_start ?? undefined,
+                          periodEnd: r.report_period_end ?? undefined,
                         });
                       }}
                       className="mt-3 inline-flex items-center gap-1.5 bg-[#25D366] text-white text-xs font-semibold px-3 py-1.5 rounded-full"
