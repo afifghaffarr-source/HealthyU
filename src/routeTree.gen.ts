@@ -24,6 +24,7 @@ import { Route as AuthenticatedProgressRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
 import { Route as AuthenticatedPrayerRouteImport } from './routes/_authenticated/prayer'
 import { Route as AuthenticatedOnboardingRouteImport } from './routes/_authenticated/onboarding'
+import { Route as AuthenticatedMoodRouteImport } from './routes/_authenticated/mood'
 import { Route as AuthenticatedMedicationsRouteImport } from './routes/_authenticated/medications'
 import { Route as AuthenticatedMealplanRouteImport } from './routes/_authenticated/mealplan'
 import { Route as AuthenticatedLeaderboardRouteImport } from './routes/_authenticated/leaderboard'
@@ -111,6 +112,11 @@ const AuthenticatedOnboardingRoute = AuthenticatedOnboardingRouteImport.update({
   path: '/onboarding',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedMoodRoute = AuthenticatedMoodRouteImport.update({
+  id: '/mood',
+  path: '/mood',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedMedicationsRoute =
   AuthenticatedMedicationsRouteImport.update({
     id: '/medications',
@@ -183,6 +189,7 @@ export interface FileRoutesByFullPath {
   '/leaderboard': typeof AuthenticatedLeaderboardRoute
   '/mealplan': typeof AuthenticatedMealplanRoute
   '/medications': typeof AuthenticatedMedicationsRoute
+  '/mood': typeof AuthenticatedMoodRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/prayer': typeof AuthenticatedPrayerRoute
   '/profile': typeof AuthenticatedProfileRoute
@@ -210,6 +217,7 @@ export interface FileRoutesByTo {
   '/leaderboard': typeof AuthenticatedLeaderboardRoute
   '/mealplan': typeof AuthenticatedMealplanRoute
   '/medications': typeof AuthenticatedMedicationsRoute
+  '/mood': typeof AuthenticatedMoodRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/prayer': typeof AuthenticatedPrayerRoute
   '/profile': typeof AuthenticatedProfileRoute
@@ -239,6 +247,7 @@ export interface FileRoutesById {
   '/_authenticated/leaderboard': typeof AuthenticatedLeaderboardRoute
   '/_authenticated/mealplan': typeof AuthenticatedMealplanRoute
   '/_authenticated/medications': typeof AuthenticatedMedicationsRoute
+  '/_authenticated/mood': typeof AuthenticatedMoodRoute
   '/_authenticated/onboarding': typeof AuthenticatedOnboardingRoute
   '/_authenticated/prayer': typeof AuthenticatedPrayerRoute
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
@@ -268,6 +277,7 @@ export interface FileRouteTypes {
     | '/leaderboard'
     | '/mealplan'
     | '/medications'
+    | '/mood'
     | '/onboarding'
     | '/prayer'
     | '/profile'
@@ -295,6 +305,7 @@ export interface FileRouteTypes {
     | '/leaderboard'
     | '/mealplan'
     | '/medications'
+    | '/mood'
     | '/onboarding'
     | '/prayer'
     | '/profile'
@@ -323,6 +334,7 @@ export interface FileRouteTypes {
     | '/_authenticated/leaderboard'
     | '/_authenticated/mealplan'
     | '/_authenticated/medications'
+    | '/_authenticated/mood'
     | '/_authenticated/onboarding'
     | '/_authenticated/prayer'
     | '/_authenticated/profile'
@@ -451,6 +463,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedOnboardingRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/mood': {
+      id: '/_authenticated/mood'
+      path: '/mood'
+      fullPath: '/mood'
+      preLoaderRoute: typeof AuthenticatedMoodRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/medications': {
       id: '/_authenticated/medications'
       path: '/medications'
@@ -553,6 +572,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedLeaderboardRoute: typeof AuthenticatedLeaderboardRoute
   AuthenticatedMealplanRoute: typeof AuthenticatedMealplanRoute
   AuthenticatedMedicationsRoute: typeof AuthenticatedMedicationsRoute
+  AuthenticatedMoodRoute: typeof AuthenticatedMoodRoute
   AuthenticatedOnboardingRoute: typeof AuthenticatedOnboardingRoute
   AuthenticatedPrayerRoute: typeof AuthenticatedPrayerRoute
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
@@ -578,6 +598,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedLeaderboardRoute: AuthenticatedLeaderboardRoute,
   AuthenticatedMealplanRoute: AuthenticatedMealplanRoute,
   AuthenticatedMedicationsRoute: AuthenticatedMedicationsRoute,
+  AuthenticatedMoodRoute: AuthenticatedMoodRoute,
   AuthenticatedOnboardingRoute: AuthenticatedOnboardingRoute,
   AuthenticatedPrayerRoute: AuthenticatedPrayerRoute,
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,
@@ -603,3 +624,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
