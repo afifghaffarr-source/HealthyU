@@ -301,6 +301,16 @@ function ReportsPage() {
       doc.setDrawColor(0);
       doc.setTextColor(0);
     });
+    // Footer "hal X / N" di setiap halaman (TOC + body).
+    const totalPages = doc.getNumberOfPages();
+    for (let p = 1; p <= totalPages; p++) {
+      doc.setPage(p);
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(8);
+      doc.setTextColor(120);
+      doc.text(`hal ${p} / ${totalPages}`, 555, 820, { align: "right" });
+      doc.setTextColor(0);
+    }
     doc.save(`laporan-healthyu-arsip-${new Date().toISOString().slice(0, 10)}.pdf`);
   };
 

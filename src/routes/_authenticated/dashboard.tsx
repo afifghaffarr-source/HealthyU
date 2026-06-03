@@ -17,7 +17,11 @@ import { formatDuration, fastingStage } from "@/lib/health";
 import { Droplet, Plus, Sparkles, ArrowRight, Flame, Trophy, Camera, Smile } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import { GROUP_BONUS_AGGREGATE_MS, GROUP_BONUS_BADGE_TTL_MS } from "@/lib/constants";
+import {
+  GROUP_BONUS_AGGREGATE_MS,
+  GROUP_BONUS_BADGE_TTL_MS,
+  GROUP_BONUS_BADGE_TICK_MS,
+} from "@/lib/constants";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   component: Dashboard,
@@ -120,7 +124,7 @@ function Dashboard() {
   }, [breakdownOpen]);
   useEffect(() => {
     if (Object.keys(newClaims).length === 0) return;
-    const id = window.setInterval(() => setNowTick(Date.now()), 1000);
+    const id = window.setInterval(() => setNowTick(Date.now()), GROUP_BONUS_BADGE_TICK_MS);
     return () => window.clearInterval(id);
   }, [newClaims]);
 
@@ -470,6 +474,11 @@ function Dashboard() {
                       onClick={() => setBreakdownOpen((o) => !o)}
                       className="relative text-[9px] font-bold uppercase bg-amber-100 text-amber-800 rounded-full pl-2 pr-2 pt-0.5 pb-1 overflow-hidden"
                       title={breakdown || "Breakdown klaim baru"}
+                      aria-haspopup="dialog"
+                      aria-expanded={breakdownOpen}
+                      aria-live="polite"
+                      aria-atomic="true"
+                      aria-label={`+${total} klaim baru. ${breakdown || ""}`.trim()}
                     >
                       +{total} klaim baru
                       <span
