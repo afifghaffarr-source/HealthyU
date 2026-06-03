@@ -1,9 +1,11 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { ArrowLeft, Trophy, Flame, Users, Calendar, Check, Medal, UserPlus, Gift } from "lucide-react";
 import { toast } from "sonner";
+import { z } from "zod";
+import { fallback, zodValidator } from "@tanstack/zod-adapter";
 import { BottomNav } from "@/components/bottom-nav";
 import {
   listChallenges,
@@ -20,14 +22,22 @@ import {
 import {
   claimGroupChallengeBonus,
   listGroupBonusStatus,
+  listGroupBonusClaimers,
 } from "@/lib/groupChallengeBonus.functions";
 
+const challengesSearchSchema = z.object({
+  group: fallback(z.string().uuid().optional(), undefined),
+  challenge: fallback(z.string().uuid().optional(), undefined),
+});
+
 export const Route = createFileRoute("/_authenticated/challenges")({
+  validateSearch: zodValidator(challengesSearchSchema),
   component: ChallengesPage,
 });
 
 function ChallengesPage() {
   const qc = useQueryClient();
+  const { group: focusGroup, challenge: focusChallenge } = Route.useSearch();
   const fetchAll = useServerFn(listChallenges);
   const joinFn = useServerFn(joinChallenge);
   const logFn = useServerFn(logChallengeDay);
@@ -73,6 +83,17 @@ function ChallengesPage() {
     (data?.participations ?? []).map((p) => [p.challenge_id, p] as const),
   );
   const [openLb, setOpenLb] = useState<string | null>(null);
+  const articleRefs = useRef<Record<string, HTMLElement | null>>({});
+
+  useEffect(() => {
+    if (!focusChallenge) return;
+    setOpenLb(focusChallenge);
+    const t = setTimeout(() => {
+      const el = articleRefs.current[focusChallenge];
+      el?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 250);
+    return () => clearTimeout(t);
+  }, [focusChallenge]);
 
   return (
     <div className="min-h-screen pb-32">
