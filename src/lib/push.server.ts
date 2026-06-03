@@ -22,6 +22,9 @@ function bufToB64url(buf: ArrayBuffer | Uint8Array): string {
   return btoa(s).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
 }
 
+// Cast helper to satisfy strict BufferSource typing under TS 5.7.
+const bs = (u: Uint8Array): BufferSource => u as unknown as BufferSource;
+
 function concat(...arrs: Uint8Array[]): Uint8Array {
   const len = arrs.reduce((s, a) => s + a.length, 0);
   const out = new Uint8Array(len);
@@ -62,16 +65,16 @@ async function signJwt(privKey: CryptoKey, header: object, payload: object): Pro
   const sig = await crypto.subtle.sign(
     { name: "ECDSA", hash: "SHA-256" },
     privKey,
-    enc.encode(input),
+    bs(enc.encode(input)),
   );
   return `${input}.${bufToB64url(sig)}`;
 }
 
 async function hkdf(salt: Uint8Array, ikm: Uint8Array, info: Uint8Array, length: number) {
-  const key = await crypto.subtle.importKey("raw", ikm, { name: "HKDF" }, false, ["deriveBits"]);
+  const key = await crypto.subtle.importKey("raw", bs(ikm), { name: "HKDF" }, false, ["deriveBits"]);
   return new Uint8Array(
     await crypto.subtle.deriveBits(
-      { name: "HKDF", hash: "SHA-256", salt, info },
+      { name: "HKDF", hash: "SHA-256", salt: bs(salt), info: bs(info) },
       key,
       length * 8,
     ),
@@ -79,9 +82,9 @@ async function hkdf(salt: Uint8Array, ikm: Uint8Array, info: Uint8Array, length:
 }
 
 async function encryptAes128Gcm(key: Uint8Array, nonce: Uint8Array, data: Uint8Array) {
-  const k = await crypto.subtle.importKey("raw", key, { name: "AES-GCM" }, false, ["encrypt"]);
+  const k = await crypto.subtle.importKey("raw", bs(key), { name: "AES-GCM" }, false, ["encrypt"]);
   return new Uint8Array(
-    await crypto.subtle.encrypt({ name: "AES-GCM", iv: nonce, tagLength: 128 }, k, data),
+    await crypto.subtle.encrypt({ name: "AES-GCM", iv: bs(nonce), tagLength: 128 }, k, bs(data)),
   );
 }
 
@@ -107,7 +110,7 @@ async function encryptPayload(
   // 2. Import subscriber pubkey
   const subPub = await crypto.subtle.importKey(
     "raw",
-    subPubRaw,
+    bs(subPubRaw),
     { name: "ECDH", namedCurve: "P-256" },
     false,
     [],
@@ -179,7 +182,7 @@ export async function sendWebPushTo(
       "Content-Type": "application/octet-stream",
       TTL: "86400",
     },
-    body,
+    body: body as unknown as BodyInit,
   });
 
   if (!res.ok && res.status !== 201) {
