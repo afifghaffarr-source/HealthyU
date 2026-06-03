@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { z } from "zod";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import {
@@ -16,6 +17,7 @@ import {
   Plus,
   LogIn,
   Copy,
+  Share2,
   Trophy,
   Flame,
   LogOut,
@@ -24,11 +26,14 @@ import {
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/groups")({
+  validateSearch: (s: Record<string, unknown>) =>
+    z.object({ invite: z.string().optional() }).parse(s),
   component: GroupsPage,
 });
 
 function GroupsPage() {
   const qc = useQueryClient();
+  const { invite } = Route.useSearch();
   const listFn = useServerFn(listMyGroups);
   const createFn = useServerFn(createGroup);
   const joinFn = useServerFn(joinGroup);
@@ -53,7 +58,7 @@ function GroupsPage() {
   });
 
   const joinMut = useMutation({
-    mutationFn: () => joinFn({ data: { invite_code: code.trim().toUpperCase() } }),
+    mutationFn: (c: string) => joinFn({ data: { invite_code: c.trim().toUpperCase() } }),
     onSuccess: (r) => {
       toast.success(`Bergabung ke ${r.name}`);
       setCode("");
@@ -61,6 +66,14 @@ function GroupsPage() {
     },
     onError: (e) => toast.error(e instanceof Error ? e.message : "Gagal bergabung"),
   });
+
+  const autoJoined = useRef(false);
+  useEffect(() => {
+    if (invite && !autoJoined.current) {
+      autoJoined.current = true;
+      joinMut.mutate(invite);
+    }
+  }, [invite, joinMut]);
 
   return (
     <main className="min-h-screen bg-background pb-28">
