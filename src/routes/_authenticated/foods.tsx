@@ -2,7 +2,8 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { ArrowLeft, Search, X, Info } from "lucide-react";
+import { Search, X, Info } from "lucide-react";
+import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { BottomNav } from "@/components/bottom-nav";
 import { browseFoods, getFoodDetail, getFoodFacets } from "@/lib/foodDb.functions";
 
@@ -58,14 +59,11 @@ function FoodsPage() {
 
   return (
     <div className="min-h-dvh bg-background pb-28">
-      <header className="sticky top-0 z-30 bg-background/85 backdrop-blur-xl border-b border-border/50">
-        <div className="max-w-md mx-auto px-4 py-3 flex items-center gap-3">
-          <Link to="/dashboard" className="p-2 -ml-2 rounded-full hover:bg-muted">
-            <ArrowLeft className="size-5" />
-          </Link>
-          <h1 className="font-semibold text-lg">Database Makanan</h1>
-        </div>
-        <div className="max-w-md mx-auto px-4 pb-3">
+      <div className="max-w-md mx-auto px-4">
+        <TopAppBar title="Database Makanan" showBack />
+      </div>
+      <div className="sticky top-[57px] z-20 bg-background/85 backdrop-blur-xl border-b border-border/50">
+        <div className="max-w-md mx-auto px-4 py-3">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
             <input
@@ -76,7 +74,7 @@ function FoodsPage() {
             />
           </div>
         </div>
-      </header>
+      </div>
 
       <main className="max-w-md mx-auto px-4 pt-4 space-y-4">
         <section className="space-y-3">

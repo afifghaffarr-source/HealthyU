@@ -10,7 +10,8 @@ import {
 } from "@/lib/water.functions";
 import { getAchievementToastPrefix } from "@/lib/achievement-icons";
 import { BottomNav } from "@/components/bottom-nav";
-import { ArrowLeft, Droplet, Trash2, WifiOff, RefreshCw } from "lucide-react";
+import { Droplet, Trash2, WifiOff, RefreshCw } from "lucide-react";
+import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { toast } from "sonner";
 import { enqueue } from "@/lib/offline-queue";
 import { useOfflineQueue } from "@/hooks/use-offline-queue";
@@ -82,29 +83,22 @@ function WaterPage() {
 
   return (
     <div className="min-h-screen bg-background pb-28">
-      <header className="sticky top-0 z-30 bg-background/90 backdrop-blur-xl">
-        <div className="max-w-md mx-auto px-4 py-4 flex items-center gap-3">
-          <Link
-            to="/dashboard"
-            className="size-10 rounded-2xl bg-card flex items-center justify-center"
-          >
-            <ArrowLeft className="size-5" />
-          </Link>
-          <div>
-            <h1 className="text-xl font-bold">Hidrasi</h1>
-            <p className="text-xs text-muted-foreground">Target {GOAL_ML} ml / hari</p>
-          </div>
-          {(!online || pending > 0) && (
+      <div className="max-w-md mx-auto px-4">
+        <TopAppBar
+          title="Hidrasi"
+          subtitle={`Target ${GOAL_ML} ml / hari`}
+          showBack
+          action={(!online || pending > 0) ? (
             <button
               onClick={() => sync()}
-              className={`ml-auto inline-flex items-center gap-1 text-[11px] font-semibold px-2.5 py-1.5 rounded-full ${online ? "bg-amber-100 text-amber-700" : "bg-muted text-muted-foreground"}`}
+              className={`inline-flex items-center gap-1 text-[11px] font-semibold px-2.5 py-1.5 rounded-full ${online ? "bg-amber-100 text-amber-700" : "bg-muted text-muted-foreground"}`}
             >
               {online ? <RefreshCw className="size-3" /> : <WifiOff className="size-3" />}
               {online ? `Sync ${pending}` : `Offline${pending ? ` · ${pending}` : ""}`}
             </button>
-          )}
-        </div>
-      </header>
+          ) : undefined}
+        />
+      </div>
 
       <main className="max-w-md mx-auto px-4 space-y-6">
         <section className="rounded-3xl bg-card p-6 outline-1 outline-black/5">

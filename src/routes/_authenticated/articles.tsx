@@ -1,7 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { ArrowLeft, BookOpen, Bookmark, BookmarkCheck, Clock } from "lucide-react";
+import { BookOpen, Bookmark, BookmarkCheck, Clock } from "lucide-react";
+import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { toast } from "sonner";
 import { BottomNav } from "@/components/bottom-nav";
 import { listArticles, toggleBookmark } from "@/lib/articles.functions";
@@ -34,17 +35,9 @@ function ArticlesPage() {
 
   return (
     <div className="min-h-screen pb-32">
-      <header className="sticky top-0 z-30 bg-background/85 backdrop-blur-xl border-b border-border/60">
-        <div className="max-w-md mx-auto px-4 h-14 flex items-center gap-3">
-          <Link to="/dashboard" className="size-9 inline-flex items-center justify-center rounded-full bg-muted" aria-label="Kembali">
-            <ArrowLeft className="size-4" />
-          </Link>
-          <h1 className="text-base font-bold flex items-center gap-2">
-            <BookOpen className="size-4 text-primary" />
-            Artikel Kesehatan
-          </h1>
-        </div>
-      </header>
+      <div className="max-w-md mx-auto px-4">
+        <TopAppBar title="Artikel Kesehatan" showBack />
+      </div>
       <main className="max-w-md mx-auto px-4 pt-4 space-y-3">
         {isLoading && <p className="text-sm text-muted-foreground text-center py-10">Memuat…</p>}
         {!isLoading && articles.length === 0 && (

@@ -5,7 +5,8 @@ import { useServerFn } from "@tanstack/react-start";
 import { getChatHistory, clearChatHistory, weeklyHealthReport } from "@/lib/chat.functions";
 import { supabase } from "@/integrations/supabase/client";
 import { BottomNav } from "@/components/bottom-nav";
-import { ArrowLeft, Send, Sparkles, ImagePlus, X, Mic, MicOff, Volume2, VolumeX, Utensils, Timer, Flame, ChefHat, Trash2, BarChart3 } from "lucide-react";
+import { Send, Sparkles, ImagePlus, X, Mic, MicOff, Volume2, VolumeX, Utensils, Timer, Flame, ChefHat, Trash2, BarChart3 } from "lucide-react";
+import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { toast } from "sonner";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
@@ -229,35 +230,34 @@ function ChatPage() {
 
   return (
     <main className="min-h-screen bg-background flex flex-col">
-      <header className="max-w-md w-full mx-auto px-5 pt-8 pb-4 flex items-center gap-3">
-        <Link to="/dashboard" className="size-10 bg-card rounded-2xl outline-1 outline-black/10 grid place-items-center">
-          <ArrowLeft className="size-4" />
-        </Link>
-        <div>
-          <div className="flex items-center gap-1.5">
-            <Sparkles className="size-3.5 text-primary" />
-            <h1 className="text-lg font-bold">Dr. Healthy</h1>
-          </div>
-          <p className="text-[11px] text-muted-foreground">AI nutrition coach</p>
-        </div>
-        <button
-          onClick={toggleTts}
-          className={`ml-auto size-10 rounded-2xl grid place-items-center outline-1 outline-black/10 transition ${
-            ttsOn ? "bg-primary text-primary-foreground" : "bg-card text-muted-foreground"
-          }`}
-          aria-label="Toggle suara balasan"
-        >
-          {ttsOn ? <Volume2 className="size-4" /> : <VolumeX className="size-4" />}
-        </button>
-        <button
-          onClick={handleClear}
-          disabled={!messages.length || clearMut.isPending}
-          className="size-10 rounded-2xl grid place-items-center bg-card outline-1 outline-black/10 text-muted-foreground hover:text-destructive disabled:opacity-40"
-          aria-label="Hapus percakapan"
-        >
-          <Trash2 className="size-4" />
-        </button>
-      </header>
+      <div className="max-w-md w-full mx-auto px-5 pt-0">
+        <TopAppBar
+          title="Dr. Healthy"
+          subtitle="AI nutrition coach"
+          showBack
+          action={
+            <div className="flex items-center gap-1.5">
+              <button
+                onClick={toggleTts}
+                className={`size-9 rounded-full grid place-items-center transition ${
+                  ttsOn ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"
+                }`}
+                aria-label="Toggle suara balasan"
+              >
+                {ttsOn ? <Volume2 className="size-4" /> : <VolumeX className="size-4" />}
+              </button>
+              <button
+                onClick={handleClear}
+                disabled={!messages.length || clearMut.isPending}
+                className="size-9 rounded-full grid place-items-center bg-muted text-muted-foreground hover:text-destructive disabled:opacity-40"
+                aria-label="Hapus percakapan"
+              >
+                <Trash2 className="size-4" />
+              </button>
+            </div>
+          }
+        />
+      </div>
 
       <div ref={scrollRef} className="flex-1 overflow-y-auto max-w-md w-full mx-auto px-5 pb-40">
         <div className="flex gap-2 overflow-x-auto pt-2 -mx-1 px-1 pb-1 no-scrollbar">

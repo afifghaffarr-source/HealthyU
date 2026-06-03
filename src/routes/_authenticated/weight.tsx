@@ -1,11 +1,12 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { listWeight, addWeight, deleteWeight } from "@/lib/weight.functions";
 import { getProfile } from "@/lib/profile.functions";
 import { BottomNav } from "@/components/bottom-nav";
-import { ArrowLeft, Trash2, TrendingDown, TrendingUp, Minus, WifiOff, RefreshCw } from "lucide-react";
+import { Trash2, TrendingDown, TrendingUp, Minus, WifiOff, RefreshCw } from "lucide-react";
+import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { toast } from "sonner";
 import { enqueue } from "@/lib/offline-queue";
 import { useOfflineQueue } from "@/hooks/use-offline-queue";
@@ -67,21 +68,21 @@ function WeightPage() {
 
   return (
     <div className="min-h-screen bg-background pb-24">
-      <header className="sticky top-0 z-10 bg-background/80 backdrop-blur border-b">
-        <div className="max-w-md mx-auto px-4 py-3 flex items-center gap-3">
-          <Link to="/profile" className="p-2 -ml-2"><ArrowLeft className="size-5" /></Link>
-          <h1 className="font-bold text-lg">Berat Badan</h1>
-          {(!online || pending > 0) && (
+      <div className="max-w-md mx-auto px-4">
+        <TopAppBar
+          title="Berat Badan"
+          showBack
+          action={(!online || pending > 0) ? (
             <button
               onClick={() => sync()}
-              className={`ml-auto inline-flex items-center gap-1 text-[11px] font-semibold px-2.5 py-1.5 rounded-full ${online ? "bg-amber-100 text-amber-700" : "bg-muted text-muted-foreground"}`}
+              className={`inline-flex items-center gap-1 text-[11px] font-semibold px-2.5 py-1.5 rounded-full ${online ? "bg-amber-100 text-amber-700" : "bg-muted text-muted-foreground"}`}
             >
               {online ? <RefreshCw className="size-3" /> : <WifiOff className="size-3" />}
               {online ? `Sync ${pending}` : `Offline${pending ? ` · ${pending}` : ""}`}
             </button>
-          )}
-        </div>
-      </header>
+          ) : undefined}
+        />
+      </div>
 
       <main className="max-w-md mx-auto px-4 py-5 space-y-5">
         <section className="bg-card rounded-3xl p-5 shadow-sm outline-1 outline-black/5">
