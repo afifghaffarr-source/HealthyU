@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { getProfile } from "@/lib/profile.functions";
@@ -50,22 +50,45 @@ function Dashboard() {
     queryFn: () => fetchUnlinked(),
   });
   // Persistent per-group "+N klaim baru" counter, cleared when user clicks
+  // or when the entry exceeds GROUP_BONUS_BADGE_TTL_MS at reload time.
+  const claimsTsRef = useRef<Record<string, number>>({});
   const [newClaims, setNewClaims] = useState<Record<string, number>>(() => {
     if (typeof window === "undefined") return {};
     try {
       const raw = window.sessionStorage.getItem("dashboard:newClaims");
-      return raw ? (JSON.parse(raw) as Record<string, number>) : {};
+      if (!raw) return {};
+      const parsed = JSON.parse(raw) as Record<string, { count: number; ts: number }>;
+      const now = Date.now();
+      const out: Record<string, number> = {};
+      for (const [gid, entry] of Object.entries(parsed)) {
+        if (
+          entry &&
+          typeof entry.count === "number" &&
+          typeof entry.ts === "number" &&
+          now - entry.ts < GROUP_BONUS_BADGE_TTL_MS
+        ) {
+          out[gid] = entry.count;
+          claimsTsRef.current[gid] = entry.ts;
+        }
+      }
+      return out;
     } catch {
       return {};
     }
   });
   useEffect(() => {
     if (typeof window === "undefined") return;
-    if (Object.keys(newClaims).length === 0) {
+    const keys = Object.keys(newClaims);
+    if (keys.length === 0) {
       window.sessionStorage.removeItem("dashboard:newClaims");
-    } else {
-      window.sessionStorage.setItem("dashboard:newClaims", JSON.stringify(newClaims));
+      claimsTsRef.current = {};
+      return;
     }
+    const payload: Record<string, { count: number; ts: number }> = {};
+    for (const k of keys) {
+      payload[k] = { count: newClaims[k], ts: claimsTsRef.current[k] ?? Date.now() };
+    }
+    window.sessionStorage.setItem("dashboard:newClaims", JSON.stringify(payload));
   }, [newClaims]);
 
   // Realtime: refresh group challenge summary when bonuses/redemptions change
@@ -99,6 +122,7 @@ function Dashboard() {
           const row = payload.new as { user_id?: string; group_id?: string } | null;
           if (row?.user_id && row?.group_id) {
             const gid = row.group_id;
+            claimsTsRef.current[gid] = Date.now();
             setNewClaims((cur) => ({ ...cur, [gid]: (cur[gid] ?? 0) + 1 }));
             // Auto-clear this group's badge after 30s if user ignores it
             setTimeout(() => {

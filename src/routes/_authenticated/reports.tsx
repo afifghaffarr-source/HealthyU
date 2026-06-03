@@ -200,8 +200,33 @@ function ReportsPage() {
     });
     if (filtered.length === 0) return;
     const doc = new jsPDF({ unit: "pt", format: "a4" });
+    // Index page (TOC)
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(18);
+    doc.text("Arsip Laporan HealthyU", 40, 50);
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(10);
+    doc.setTextColor(120);
+    doc.text(`Total: ${filtered.length} laporan`, 40, 68);
+    doc.setTextColor(0);
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(12);
+    doc.text("Daftar Isi", 40, 100);
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(10);
     filtered.forEach((r, idx) => {
-      if (idx > 0) doc.addPage();
+      const periode =
+        r.report_period_start && r.report_period_end
+          ? `${r.report_period_start} → ${r.report_period_end}`
+          : new Date(r.created_at).toLocaleDateString("id-ID");
+      const page = idx + 2; // page 1 = TOC
+      const y = 120 + idx * 16;
+      if (y > 780) return; // skip overflow (rare for normal histories)
+      doc.text(`${idx + 1}. ${periode}`, 40, y);
+      doc.text(`hal. ${page}`, 510, y, { align: "right" });
+    });
+    filtered.forEach((r) => {
+      doc.addPage();
       const text = Array.isArray(r.recommendations) ? String(r.recommendations[0] ?? "") : "";
       doc.setFont("helvetica", "bold");
       doc.setFontSize(18);
