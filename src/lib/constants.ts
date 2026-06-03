@@ -12,6 +12,8 @@
 // | CHALLENGE_HIGHLIGHT_FADE_OPACITY | Opacity kartu di akhir fade ring highlight (0..1).      |
 // | CHALLENGE_HIGHLIGHT_TRANSITION_MS | Durasi transisi spring opacity+ring highlight (ms).    |
 // | GROUP_BONUS_BADGE_TICK_MS      | Interval re-render countdown badge "+N klaim baru" (ms).  |
+// | PDF_PAGE_FOOTER_Y              | Y koordinat baris footer halaman A4 (pt).                |
+// | PDF_MARGIN_X                   | Margin kiri (juga basis kanan = 595 - margin) PDF (pt).  |
 //
 // CONVENTION: setiap konstanta tunable WAJIB ditambahkan ke tabel di atas
 // (nama + 1 baris efek). Reviewer boleh menolak PR yang menambah konstanta
@@ -57,3 +59,11 @@ export const CHALLENGE_HIGHLIGHT_TRANSITION_MS = 700;
 /** Interval tick re-render countdown badge bonus klaim (ms). */
 // eslint-disable-next-line no-restricted-syntax -- listed in header table
 export const GROUP_BONUS_BADGE_TICK_MS = 1000;
+
+/** Y koordinat baris footer ("hal X / N", brand) pada halaman A4 (pt, jsPDF). */
+// eslint-disable-next-line no-restricted-syntax -- listed in header table
+export const PDF_PAGE_FOOTER_Y = 820;
+
+/** Margin horizontal kiri PDF (pt). Kanan dihitung 595 - PDF_MARGIN_X. */
+// eslint-disable-next-line no-restricted-syntax -- listed in header table
+export const PDF_MARGIN_X = 40;

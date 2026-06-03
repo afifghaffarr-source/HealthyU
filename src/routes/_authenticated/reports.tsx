@@ -12,6 +12,7 @@ import { z } from "zod";
 import { fallback, zodValidator } from "@tanstack/zod-adapter";
 import { useNavigate } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
+import { PDF_PAGE_FOOTER_Y, PDF_MARGIN_X } from "@/lib/constants";
 
 export const Route = createFileRoute("/_authenticated/reports")({
   validateSearch: zodValidator(
@@ -301,14 +302,27 @@ function ReportsPage() {
       doc.setDrawColor(0);
       doc.setTextColor(0);
     });
-    // Footer "hal X / N" di setiap halaman (TOC + body).
+    // Footer brand kiri + "hal X / N" kanan di setiap halaman (TOC + body).
     const totalPages = doc.getNumberOfPages();
+    const exportedAt = new Date().toLocaleDateString("id-ID", {
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+    });
+    const pageRightX = 595 - PDF_MARGIN_X;
     for (let p = 1; p <= totalPages; p++) {
       doc.setPage(p);
       doc.setFont("helvetica", "normal");
       doc.setFontSize(8);
       doc.setTextColor(120);
-      doc.text(`hal ${p} / ${totalPages}`, 555, 820, { align: "right" });
+      doc.text(
+        `HealthyU \u00B7 diekspor ${exportedAt}`,
+        PDF_MARGIN_X,
+        PDF_PAGE_FOOTER_Y,
+      );
+      doc.text(`hal ${p} / ${totalPages}`, pageRightX, PDF_PAGE_FOOTER_Y, {
+        align: "right",
+      });
       doc.setTextColor(0);
     }
     doc.save(`laporan-healthyu-arsip-${new Date().toISOString().slice(0, 10)}.pdf`);
