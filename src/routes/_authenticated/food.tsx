@@ -60,7 +60,8 @@ function FoodPage() {
         return;
       }
       toast.success("Makanan dicatat");
-      (res?.game?.newlyUnlocked ?? []).forEach((a) =>
+      const game = "game" in res ? res.game : undefined;
+      (game?.newlyUnlocked ?? []).forEach((a: { icon: string; title: string }) =>
         toast.success(`${getAchievementToastPrefix(a.icon)} ${a.title} terbuka!`),
       );
     },
