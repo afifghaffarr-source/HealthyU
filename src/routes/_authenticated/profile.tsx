@@ -105,6 +105,10 @@ function ProfilePage() {
             <Bell className="size-5 text-coral" />
             <span className="text-sm font-semibold">Pengingat</span>
           </Link>
+          <Link to="/wearable" className="bg-card p-4 rounded-2xl outline-1 outline-black/10 flex flex-col items-start gap-2">
+            <Activity className="size-5 text-primary" />
+            <span className="text-sm font-semibold">Wearable</span>
+          </Link>
           <Link to="/sleep" className="bg-card p-4 rounded-2xl outline-1 outline-black/10 flex flex-col items-start gap-2">
             <MoonStar className="size-5 text-indigo-600" />
             <span className="text-sm font-semibold">Tidur</span>
