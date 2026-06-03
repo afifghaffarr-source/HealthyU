@@ -1,11 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
-type ExportPayload = {
-  exported_at: string;
-  user_id: string;
-  tables: Record<string, unknown[]>;
-};
 
 const USER_TABLES = [
   "meal_logs",
@@ -30,7 +25,7 @@ const USER_TABLES = [
 
 export const exportAllData = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
-  .handler(async ({ context }): Promise<ExportPayload> => {
+  .handler(async ({ context }) => {
     const { supabase, userId } = context;
     const tables: Record<string, unknown[]> = {};
 
@@ -53,6 +48,6 @@ export const exportAllData = createServerFn({ method: "GET" })
     return {
       exported_at: new Date().toISOString(),
       user_id: userId,
-      tables,
+      json: JSON.stringify(tables),
     };
   });
