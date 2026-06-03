@@ -4,6 +4,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { Heart, Zap, Drumstick, Smile, Sparkles } from "lucide-react";
 import { TopAppBar } from "@/components/healthyu/top-app-bar";
+import { ListSkeleton } from "@/components/healthyu/skeletons";
 import { toast } from "sonner";
 import { BottomNav } from "@/components/bottom-nav";
 import { getPet, adoptPet, interactPet } from "@/lib/pet.functions";
@@ -66,7 +67,7 @@ function PetPage() {
         <TopAppBar title="Virtual Pet" showBack />
       </div>
       <main className="max-w-md mx-auto px-4 pt-4 space-y-4">
-        {isLoading && <p className="text-sm text-muted-foreground text-center py-10">Memuat…</p>}
+        {isLoading && <ListSkeleton count={2} />}
         {!isLoading && !pet && (
           <div className="rounded-3xl bg-card outline-1 outline-black/5 p-5 space-y-4">
             <h2 className="font-semibold">Adopsi pet kamu</h2>
