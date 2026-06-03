@@ -16,6 +16,10 @@ import {
   PDF_PAGE_FOOTER_Y,
   PDF_MARGIN_X,
   PDF_PAGE_W,
+  PDF_DIVIDER_GRAY,
+  PDF_HEADER_BASELINE_Y,
+  PDF_HEADER_SUBTITLE_Y,
+  PDF_BODY_TOP_Y,
 } from "@/lib/constants";
 
 export const Route = createFileRoute("/_authenticated/reports")({
@@ -208,15 +212,15 @@ function ReportsPage() {
     // Index page (TOC)
     doc.setFont("helvetica", "bold");
     doc.setFontSize(18);
-    doc.text("Arsip Laporan HealthyU", 40, 50);
+    doc.text("Arsip Laporan HealthyU", PDF_MARGIN_X, PDF_HEADER_BASELINE_Y);
     doc.setFont("helvetica", "normal");
     doc.setFontSize(10);
     doc.setTextColor(120);
-    doc.text(`Total: ${filtered.length} laporan`, 40, 68);
+    doc.text(`Total: ${filtered.length} laporan`, PDF_MARGIN_X, PDF_HEADER_SUBTITLE_Y);
     doc.setTextColor(0);
     doc.setFont("helvetica", "bold");
     doc.setFontSize(12);
-    doc.text("Daftar Isi", 40, 100);
+    doc.text("Daftar Isi", PDF_MARGIN_X, PDF_BODY_TOP_Y);
     doc.setFont("helvetica", "normal");
     doc.setFontSize(10);
     // Compute how many TOC pages we need so body page numbers stay correct.
@@ -235,7 +239,7 @@ function ReportsPage() {
         tocPageIdx += 1;
         doc.setFont("helvetica", "bold");
         doc.setFontSize(12);
-        doc.text(`Daftar Isi (lanjutan ${tocPageIdx + 1}/${tocPages})`, 40, 50);
+        doc.text(`Daftar Isi (lanjutan ${tocPageIdx + 1}/${tocPages})`, PDF_MARGIN_X, PDF_HEADER_BASELINE_Y);
         doc.setFont("helvetica", "normal");
         doc.setFontSize(10);
         tocY = 80;
@@ -252,7 +256,7 @@ function ReportsPage() {
       const text = Array.isArray(r.recommendations) ? String(r.recommendations[0] ?? "") : "";
       doc.setFont("helvetica", "bold");
       doc.setFontSize(18);
-      doc.text("Laporan HealthyU", 40, 50);
+      doc.text("Laporan HealthyU", PDF_MARGIN_X, PDF_HEADER_BASELINE_Y);
       doc.setFont("helvetica", "normal");
       doc.setFontSize(10);
       doc.setTextColor(120);
@@ -260,11 +264,11 @@ function ReportsPage() {
         r.report_period_start && r.report_period_end
           ? `Periode: ${r.report_period_start} → ${r.report_period_end}`
           : `Dibuat: ${new Date(r.created_at).toLocaleDateString("id-ID")}`;
-      doc.text(periode, 40, 68);
+      doc.text(periode, PDF_MARGIN_X, PDF_HEADER_SUBTITLE_Y);
       doc.setTextColor(0);
       doc.setFont("helvetica", "bold");
       doc.setFontSize(12);
-      doc.text("Analisis AI", 40, 100);
+      doc.text("Analisis AI", PDF_MARGIN_X, PDF_BODY_TOP_Y);
       doc.setFont("helvetica", "normal");
       doc.setFontSize(10);
       const lines = doc.splitTextToSize(text || "(kosong)", 515);
@@ -320,7 +324,7 @@ function ReportsPage() {
       doc.setFontSize(8);
       doc.setTextColor(120);
       // Divider tipis di atas baris footer.
-      doc.setDrawColor(220);
+      doc.setDrawColor(PDF_DIVIDER_GRAY);
       doc.setLineWidth(0.5);
       doc.line(
         PDF_MARGIN_X,
@@ -351,11 +355,11 @@ function ReportsPage() {
     });
     doc.setFont("helvetica", "bold");
     doc.setFontSize(18);
-    doc.text("Laporan HealthyU - 7 Hari", 40, 50);
+    doc.text("Laporan HealthyU - 7 Hari", PDF_MARGIN_X, PDF_HEADER_BASELINE_Y);
     doc.setFont("helvetica", "normal");
     doc.setFontSize(10);
     doc.setTextColor(120);
-    doc.text(`Dicetak: ${today}`, 40, 68);
+    doc.text(`Dicetak: ${today}`, PDF_MARGIN_X, PDF_HEADER_SUBTITLE_Y);
     doc.setTextColor(0);
 
     autoTable(doc, {
@@ -454,7 +458,7 @@ function ReportsPage() {
     const doc = new jsPDF({ unit: "pt", format: "a4" });
     doc.setFont("helvetica", "bold");
     doc.setFontSize(18);
-    doc.text("Laporan HealthyU", 40, 50);
+    doc.text("Laporan HealthyU", PDF_MARGIN_X, PDF_HEADER_BASELINE_Y);
     doc.setFont("helvetica", "normal");
     doc.setFontSize(10);
     doc.setTextColor(120);
@@ -462,11 +466,11 @@ function ReportsPage() {
       r.report_period_start && r.report_period_end
         ? `Periode: ${r.report_period_start} → ${r.report_period_end}`
         : `Dicetak: ${new Date(r.created_at).toLocaleDateString("id-ID")}`;
-    doc.text(periode, 40, 68);
+    doc.text(periode, PDF_MARGIN_X, PDF_HEADER_SUBTITLE_Y);
     doc.setTextColor(0);
     doc.setFont("helvetica", "bold");
     doc.setFontSize(12);
-    doc.text("Analisis AI", 40, 100);
+    doc.text("Analisis AI", PDF_MARGIN_X, PDF_BODY_TOP_Y);
     doc.setFont("helvetica", "normal");
     doc.setFontSize(10);
     const lines = doc.splitTextToSize(text || "(kosong)", 515);
