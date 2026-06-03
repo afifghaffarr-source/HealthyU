@@ -44,6 +44,69 @@ export type Database = {
         }
         Relationships: []
       }
+      ai_reports: {
+        Row: {
+          ai_model: string | null
+          chart_data: Json | null
+          concerns: Json | null
+          correlation_insights: Json | null
+          created_at: string
+          health_score: number | null
+          health_score_change: number | null
+          highlights: Json | null
+          id: string
+          is_read: boolean
+          prediction: string | null
+          recommendations: Json | null
+          report_period_end: string | null
+          report_period_start: string | null
+          report_type: string
+          shared_with_doctor: boolean
+          summary: Json | null
+          user_id: string
+        }
+        Insert: {
+          ai_model?: string | null
+          chart_data?: Json | null
+          concerns?: Json | null
+          correlation_insights?: Json | null
+          created_at?: string
+          health_score?: number | null
+          health_score_change?: number | null
+          highlights?: Json | null
+          id?: string
+          is_read?: boolean
+          prediction?: string | null
+          recommendations?: Json | null
+          report_period_end?: string | null
+          report_period_start?: string | null
+          report_type: string
+          shared_with_doctor?: boolean
+          summary?: Json | null
+          user_id: string
+        }
+        Update: {
+          ai_model?: string | null
+          chart_data?: Json | null
+          concerns?: Json | null
+          correlation_insights?: Json | null
+          created_at?: string
+          health_score?: number | null
+          health_score_change?: number | null
+          highlights?: Json | null
+          id?: string
+          is_read?: boolean
+          prediction?: string | null
+          recommendations?: Json | null
+          report_period_end?: string | null
+          report_period_start?: string | null
+          report_type?: string
+          shared_with_doctor?: boolean
+          summary?: Json | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       body_metrics: {
         Row: {
           bicep_left_cm: number | null
@@ -148,24 +211,120 @@ export type Database = {
       }
       chat_messages: {
         Row: {
+          audio_url: string | null
+          contains_disclaimer: boolean | null
           content: string
+          content_type: string | null
+          context_used: Json | null
+          created_at: string
+          flag_reason: string | null
+          id: string
+          image_url: string | null
+          is_accurate: boolean | null
+          is_helpful: boolean | null
+          model_used: string | null
+          processing_time_ms: number | null
+          rag_sources: Json | null
+          role: string
+          safety_score: number | null
+          session_id: string | null
+          suggestions: Json | null
+          tokens_used: number | null
+          transcription: string | null
+          user_feedback: string | null
+          user_id: string
+          user_rating: number | null
+          was_flagged: boolean
+        }
+        Insert: {
+          audio_url?: string | null
+          contains_disclaimer?: boolean | null
+          content: string
+          content_type?: string | null
+          context_used?: Json | null
+          created_at?: string
+          flag_reason?: string | null
+          id?: string
+          image_url?: string | null
+          is_accurate?: boolean | null
+          is_helpful?: boolean | null
+          model_used?: string | null
+          processing_time_ms?: number | null
+          rag_sources?: Json | null
+          role: string
+          safety_score?: number | null
+          session_id?: string | null
+          suggestions?: Json | null
+          tokens_used?: number | null
+          transcription?: string | null
+          user_feedback?: string | null
+          user_id: string
+          user_rating?: number | null
+          was_flagged?: boolean
+        }
+        Update: {
+          audio_url?: string | null
+          contains_disclaimer?: boolean | null
+          content?: string
+          content_type?: string | null
+          context_used?: Json | null
+          created_at?: string
+          flag_reason?: string | null
+          id?: string
+          image_url?: string | null
+          is_accurate?: boolean | null
+          is_helpful?: boolean | null
+          model_used?: string | null
+          processing_time_ms?: number | null
+          rag_sources?: Json | null
+          role?: string
+          safety_score?: number | null
+          session_id?: string | null
+          suggestions?: Json | null
+          tokens_used?: number | null
+          transcription?: string | null
+          user_feedback?: string | null
+          user_id?: string
+          user_rating?: number | null
+          was_flagged?: boolean
+        }
+        Relationships: []
+      }
+      chat_sessions: {
+        Row: {
+          context_data: Json | null
           created_at: string
           id: string
-          role: string
+          is_active: boolean
+          last_message_at: string | null
+          message_count: number
+          title: string | null
+          topic: string | null
+          updated_at: string
           user_id: string
         }
         Insert: {
-          content: string
+          context_data?: Json | null
           created_at?: string
           id?: string
-          role: string
+          is_active?: boolean
+          last_message_at?: string | null
+          message_count?: number
+          title?: string | null
+          topic?: string | null
+          updated_at?: string
           user_id: string
         }
         Update: {
-          content?: string
+          context_data?: Json | null
           created_at?: string
           id?: string
-          role?: string
+          is_active?: boolean
+          last_message_at?: string | null
+          message_count?: number
+          title?: string | null
+          topic?: string | null
+          updated_at?: string
           user_id?: string
         }
         Relationships: []
@@ -1281,24 +1440,42 @@ export type Database = {
       }
       mood_logs: {
         Row: {
+          anxiety_level: number | null
+          energy_level: number | null
           id: string
+          log_date: string | null
           logged_at: string
           mood: number
+          mood_label: string | null
           note: string | null
+          stress_level: number | null
+          triggers: Json | null
           user_id: string
         }
         Insert: {
+          anxiety_level?: number | null
+          energy_level?: number | null
           id?: string
+          log_date?: string | null
           logged_at?: string
           mood: number
+          mood_label?: string | null
           note?: string | null
+          stress_level?: number | null
+          triggers?: Json | null
           user_id: string
         }
         Update: {
+          anxiety_level?: number | null
+          energy_level?: number | null
           id?: string
+          log_date?: string | null
           logged_at?: string
           mood?: number
+          mood_label?: string | null
           note?: string | null
+          stress_level?: number | null
+          triggers?: Json | null
           user_id?: string
         }
         Relationships: []
@@ -1679,31 +1856,73 @@ export type Database = {
       }
       sleep_logs: {
         Row: {
+          bed_time: string | null
           created_at: string
+          deep_hours: number | null
+          duration_hours: number | null
           id: string
+          interruptions: number | null
+          light_hours: number | null
+          log_date: string | null
           notes: string | null
+          pre_sleep_activities: Json | null
           quality: number
+          quality_label: string | null
+          quality_score: number | null
+          rem_hours: number | null
           sleep_end: string
           sleep_start: string
+          source: string | null
+          time_to_sleep_min: number | null
+          updated_at: string
           user_id: string
+          wake_time: string | null
         }
         Insert: {
+          bed_time?: string | null
           created_at?: string
+          deep_hours?: number | null
+          duration_hours?: number | null
           id?: string
+          interruptions?: number | null
+          light_hours?: number | null
+          log_date?: string | null
           notes?: string | null
+          pre_sleep_activities?: Json | null
           quality?: number
+          quality_label?: string | null
+          quality_score?: number | null
+          rem_hours?: number | null
           sleep_end: string
           sleep_start: string
+          source?: string | null
+          time_to_sleep_min?: number | null
+          updated_at?: string
           user_id: string
+          wake_time?: string | null
         }
         Update: {
+          bed_time?: string | null
           created_at?: string
+          deep_hours?: number | null
+          duration_hours?: number | null
           id?: string
+          interruptions?: number | null
+          light_hours?: number | null
+          log_date?: string | null
           notes?: string | null
+          pre_sleep_activities?: Json | null
           quality?: number
+          quality_label?: string | null
+          quality_score?: number | null
+          rem_hours?: number | null
           sleep_end?: string
           sleep_start?: string
+          source?: string | null
+          time_to_sleep_min?: number | null
+          updated_at?: string
           user_id?: string
+          wake_time?: string | null
         }
         Relationships: []
       }
@@ -1923,20 +2142,29 @@ export type Database = {
         Row: {
           amount_ml: number
           id: string
+          log_date: string | null
           logged_at: string
+          source: string | null
           user_id: string
+          water_type: string | null
         }
         Insert: {
           amount_ml: number
           id?: string
+          log_date?: string | null
           logged_at?: string
+          source?: string | null
           user_id: string
+          water_type?: string | null
         }
         Update: {
           amount_ml?: number
           id?: string
+          log_date?: string | null
           logged_at?: string
+          source?: string | null
           user_id?: string
+          water_type?: string | null
         }
         Relationships: []
       }
