@@ -5,8 +5,9 @@ import { useServerFn } from "@tanstack/react-start";
 import { listVitals, addVitals, deleteVitals } from "@/lib/vitals.functions";
 import { listBodyMetrics, addBodyMetrics, deleteBodyMetrics } from "@/lib/bodyMetrics.functions";
 import { BottomNav } from "@/components/bottom-nav";
-import { Heart, Activity, Droplet, Trash2, WifiOff, RefreshCw, Ruler, ChevronDown } from "lucide-react";
+import { Heart, Activity, Droplet, Trash2, Ruler, ChevronDown } from "lucide-react";
 import { TopAppBar } from "@/components/healthyu/top-app-bar";
+import { SyncPill } from "@/components/healthyu/sync-pill";
 import { toast } from "sonner";
 import { enqueue } from "@/lib/offline-queue";
 import { useOfflineQueue } from "@/hooks/use-offline-queue";
@@ -144,15 +145,7 @@ function VitalsPage() {
         <TopAppBar
           title="Vital Signs"
           showBack
-          action={(!online || pending > 0) ? (
-            <button
-              onClick={() => sync()}
-              className={`inline-flex items-center gap-1 text-[11px] font-semibold px-2.5 py-1.5 rounded-full ${online ? "bg-amber-100 text-amber-700" : "bg-muted text-muted-foreground"}`}
-            >
-              {online ? <RefreshCw className="size-3" /> : <WifiOff className="size-3" />}
-              {online ? `Sync ${pending}` : `Offline${pending ? ` · ${pending}` : ""}`}
-            </button>
-          ) : undefined}
+          action={<SyncPill online={online} pending={pending} onSync={() => sync()} />}
         />
 
         {latest && (

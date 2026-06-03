@@ -13,6 +13,7 @@ import { addMood } from "@/lib/mood.functions";
 import { getAchievementToastPrefix } from "@/lib/achievement-icons";
 import { BottomNav } from "@/components/bottom-nav";
 import { CalorieRing } from "@/components/calorie-ring";
+import { Coachmark } from "@/components/healthyu/coachmark";
 import { formatDuration, fastingStage } from "@/lib/health";
 import { Droplet, Plus, Sparkles, ArrowRight, Flame, Trophy, Camera, Smile } from "lucide-react";
 import { toast } from "sonner";
@@ -296,6 +297,12 @@ function Dashboard() {
             {(profile?.full_name ?? "U").slice(0, 1).toUpperCase()}
           </Link>
         </header>
+
+        <Coachmark
+          flagKey="dashboard-v1"
+          title="Selamat datang di Healthy U"
+          description="Geser ke bawah untuk refresh, ketuk kartu untuk catat aktivitas, dan kunjungi Profil untuk personalisasi."
+        />
 
         {/* Top row: Calorie + Fasting */}
         <div className="grid grid-cols-2 gap-3 animate-fade-up">

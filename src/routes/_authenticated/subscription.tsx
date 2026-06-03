@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { Crown, Check } from "lucide-react";
 import { TopAppBar } from "@/components/healthyu/top-app-bar";
+import { ListSkeleton } from "@/components/healthyu/skeletons";
 import { toast } from "sonner";
 import { BottomNav } from "@/components/bottom-nav";
 import { listPlans, subscribe, cancelSubscription } from "@/lib/subscription.functions";
@@ -45,7 +46,7 @@ function SubscriptionPage() {
         <TopAppBar title="Langganan" showBack />
       </div>
       <main className="max-w-md mx-auto px-4 pt-4 space-y-3">
-        {isLoading && <p className="text-sm text-muted-foreground text-center py-10">Memuat…</p>}
+        {isLoading && <ListSkeleton count={3} />}
         {current && (
           <div className="rounded-3xl bg-primary/10 outline-1 outline-primary/30 p-4">
             <p className="text-xs text-muted-foreground">Paket aktif</p>
