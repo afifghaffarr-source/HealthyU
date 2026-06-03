@@ -70,3 +70,18 @@ export const stopFast = createServerFn({ method: "POST" })
     const game = completed ? await recordActivityFor(supabase, userId, "fast_completed") : null;
     return { ok: true, completed, game };
   });
+
+export const fastHistory = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { supabase, userId } = context;
+    const { data, error } = await supabase
+      .from("fasting_sessions")
+      .select("id, protocol, target_hours, start_time, end_time, completed")
+      .eq("user_id", userId)
+      .not("end_time", "is", null)
+      .order("start_time", { ascending: false })
+      .limit(20);
+    if (error) throw new Error(error.message);
+    return data ?? [];
+  });
