@@ -2,6 +2,46 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
+type QueryableClient = {
+  from: (table: string) => {
+    select: (...args: unknown[]) => {
+      eq: (...args: unknown[]) => {
+        maybeSingle: () => Promise<{
+          data: {
+            access_token?: string;
+            refresh_token?: string;
+            expires_at?: string;
+          } | null;
+          error: { message: string } | null;
+        }>;
+      };
+    };
+    update: (...args: unknown[]) => {
+      eq: (...args: unknown[]) => Promise<unknown>;
+    };
+    insert: (...args: unknown[]) => Promise<unknown>;
+    upsert: (...args: unknown[]) => Promise<unknown>;
+    delete: (...args: unknown[]) => {
+      eq: (...args: unknown[]) => Promise<unknown>;
+    };
+    maybeSingle: () => Promise<{ data: unknown; error: { message: string } | null }>;
+  };
+};
+
+type GoogleAggregateResponse = {
+  bucket: Array<{
+    startTimeMillis: string;
+    dataset: Array<{
+      point: Array<{
+        value: Array<{
+          intVal?: number;
+          fpVal?: number;
+        }>;
+      }>;
+    }>;
+  }>;
+};
+
 const SCOPES = [
   "https://www.googleapis.com/auth/fitness.activity.read",
   "https://www.googleapis.com/auth/fitness.heart_rate.read",
@@ -55,11 +95,7 @@ export const disconnectGoogleFit = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
-type AnyClient = {
-  from: (t: string) => any;
-};
-
-async function refreshIfNeeded(supabase: AnyClient, userId: string): Promise<string> {
+async function refreshIfNeeded(supabase: QueryableClient, userId: string): Promise<string> {
   const { data: row, error } = await supabase
     .from("wearable_tokens")
     .select("access_token, refresh_token, expires_at")
@@ -86,7 +122,11 @@ async function refreshIfNeeded(supabase: AnyClient, userId: string): Promise<str
   const newExpires = new Date(Date.now() + json.expires_in * 1000).toISOString();
   await supabase
     .from("wearable_tokens")
-    .update({ access_token: json.access_token, expires_at: newExpires, updated_at: new Date().toISOString() })
+    .update({
+      access_token: json.access_token,
+      expires_at: newExpires,
+      updated_at: new Date().toISOString(),
+    })
     .eq("user_id", userId);
   return json.access_token;
 }
@@ -106,35 +146,41 @@ async function aggregate(token: string, dataTypeName: string, days: number) {
   });
   if (!res.ok) {
     const body = await res.text().catch(() => "");
-    throw new Error(
-      `Google Fit ${dataTypeName} ${res.status}: ${body.slice(0, 200)}`,
-    );
+    throw new Error(`Google Fit ${dataTypeName} ${res.status}: ${body.slice(0, 200)}`);
   }
-  return (await res.json()) as { bucket: Array<{ startTimeMillis: string; dataset: Array<{ point: Array<{ value: Array<{ intVal?: number; fpVal?: number }> }> }> }> };
+  return (await res.json()) as GoogleAggregateResponse;
 }
 
 export const syncGoogleFit = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
-    const { supabase, userId } = context as unknown as { supabase: AnyClient; userId: string };
+    const { supabase, userId } = context as unknown as {
+      supabase: QueryableClient;
+      userId: string;
+    };
     const token = await refreshIfNeeded(supabase, userId);
 
     let stepsCount = 0;
     let hrCount = 0;
+    const syncErrors: string[] = [];
 
     // Steps - 7 days
     try {
       const stepsRes = await aggregate(token, "com.google.step_count.delta", 7);
-      const rows = stepsRes.bucket.map((b) => {
-        const day = new Date(Number(b.startTimeMillis)).toISOString().slice(0, 10);
-        const steps = b.dataset[0]?.point.reduce((s, p) => s + (p.value[0]?.intVal ?? 0), 0) ?? 0;
-        return { user_id: userId, day, steps, source: "google_fit" };
-      }).filter((r) => r.steps > 0);
+      const rows = stepsRes.bucket
+        .map((b) => {
+          const day = new Date(Number(b.startTimeMillis)).toISOString().slice(0, 10);
+          const steps = b.dataset[0]?.point.reduce((s, p) => s + (p.value[0]?.intVal ?? 0), 0) ?? 0;
+          return { user_id: userId, day, steps, source: "google_fit" };
+        })
+        .filter((r) => r.steps > 0);
       if (rows.length) {
         await supabase.from("daily_steps").upsert(rows, { onConflict: "user_id,day" });
         stepsCount = rows.length;
       }
-    } catch { /* ignore */ }
+    } catch (error) {
+      syncErrors.push(error instanceof Error ? error.message : "Gagal sinkron langkah");
+    }
 
     // Heart rate average - last 7 days
     try {
@@ -153,7 +199,13 @@ export const syncGoogleFit = createServerFn({ method: "POST" })
           hrCount++;
         }
       }
-    } catch { /* ignore */ }
+    } catch (error) {
+      syncErrors.push(error instanceof Error ? error.message : "Gagal sinkron detak jantung");
+    }
+
+    if (syncErrors.length > 0 && stepsCount === 0 && hrCount === 0) {
+      throw new Error(syncErrors[0]);
+    }
 
     await supabase
       .from("wearable_tokens")

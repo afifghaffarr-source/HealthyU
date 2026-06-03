@@ -37,19 +37,40 @@ function ReportsPage() {
       return d.toISOString().slice(0, 10);
     });
     const byDay = days.map((day) => {
-      const cals = data.meals.filter((m) => dayKey(m.logged_at) === day).reduce((s, m) => s + Number(m.calories || 0), 0);
-      const ml = data.water.filter((w) => dayKey(w.logged_at) === day).reduce((s, w) => s + (w.amount_ml || 0), 0);
-      const burn = data.workouts.filter((w) => dayKey(w.performed_at) === day).reduce((s, w) => s + (w.calories_burned || 0), 0);
+      const cals = data.meals
+        .filter((m) => dayKey(m.logged_at) === day)
+        .reduce((s, m) => s + Number(m.calories || 0), 0);
+      const ml = data.water
+        .filter((w) => dayKey(w.logged_at) === day)
+        .reduce((s, w) => s + (w.amount_ml || 0), 0);
+      const burn = data.workouts
+        .filter((w) => dayKey(w.performed_at) === day)
+        .reduce((s, w) => s + (w.calories_burned || 0), 0);
       const slept = data.sleep.filter((s) => dayKey(s.sleep_end) === day);
-      const hours = slept.reduce((s, x) => s + (new Date(x.sleep_end).getTime() - new Date(x.sleep_start).getTime()) / 3600000, 0);
+      const hours = slept.reduce(
+        (s, x) =>
+          s + (new Date(x.sleep_end).getTime() - new Date(x.sleep_start).getTime()) / 3600000,
+        0,
+      );
       return { day, cals, ml, burn, hours };
     });
     const totals = byDay.reduce(
-      (a, b) => ({ cals: a.cals + b.cals, ml: a.ml + b.ml, burn: a.burn + b.burn, hours: a.hours + b.hours }),
+      (a, b) => ({
+        cals: a.cals + b.cals,
+        ml: a.ml + b.ml,
+        burn: a.burn + b.burn,
+        hours: a.hours + b.hours,
+      }),
       { cals: 0, ml: 0, burn: 0, hours: 0 },
     );
     const fastingDone = data.fasting.filter((f) => f.completed).length;
-    return { byDay, totals, fastingDone, workoutCount: data.workouts.length, sleepCount: data.sleep.length };
+    return {
+      byDay,
+      totals,
+      fastingDone,
+      workoutCount: data.workouts.length,
+      sleepCount: data.sleep.length,
+    };
   }, [data]);
 
   const exportCsv = () => {
@@ -57,9 +78,19 @@ function ReportsPage() {
     const lines: string[] = ["type,date,detail,value"];
     data.meals.forEach((m) => lines.push(`meal,${m.logged_at},${m.meal_type},${m.calories}`));
     data.water.forEach((w) => lines.push(`water,${w.logged_at},,${w.amount_ml}`));
-    data.workouts.forEach((w) => lines.push(`workout,${w.performed_at},"${w.name}",${w.calories_burned}`));
-    data.sleep.forEach((s) => lines.push(`sleep,${s.sleep_end},quality_${s.quality},${((new Date(s.sleep_end).getTime() - new Date(s.sleep_start).getTime()) / 3600000).toFixed(2)}`));
-    data.fasting.forEach((f) => lines.push(`fasting,${f.start_time},${f.protocol},${f.completed ? "completed" : "incomplete"}`));
+    data.workouts.forEach((w) =>
+      lines.push(`workout,${w.performed_at},"${w.name}",${w.calories_burned}`),
+    );
+    data.sleep.forEach((s) =>
+      lines.push(
+        `sleep,${s.sleep_end},quality_${s.quality},${((new Date(s.sleep_end).getTime() - new Date(s.sleep_start).getTime()) / 3600000).toFixed(2)}`,
+      ),
+    );
+    data.fasting.forEach((f) =>
+      lines.push(
+        `fasting,${f.start_time},${f.protocol},${f.completed ? "completed" : "incomplete"}`,
+      ),
+    );
     const blob = new Blob([lines.join("\n")], { type: "text/csv" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
@@ -72,7 +103,11 @@ function ReportsPage() {
   const exportPdf = () => {
     if (!data || !summary) return;
     const doc = new jsPDF({ unit: "pt", format: "a4" });
-    const today = new Date().toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" });
+    const today = new Date().toLocaleDateString("id-ID", {
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+    });
     doc.setFont("helvetica", "bold");
     doc.setFontSize(18);
     doc.text("Laporan HealthyU - 7 Hari", 40, 50);
@@ -100,7 +135,11 @@ function ReportsPage() {
     autoTable(doc, {
       head: [["Tanggal", "Kalori (kcal)", "Air (ml)", "Bakar (kcal)", "Tidur (jam)"]],
       body: summary.byDay.map((d) => [
-        new Date(d.day).toLocaleDateString("id-ID", { weekday: "short", day: "numeric", month: "short" }),
+        new Date(d.day).toLocaleDateString("id-ID", {
+          weekday: "short",
+          day: "numeric",
+          month: "short",
+        }),
         Math.round(d.cals).toString(),
         d.ml.toString(),
         d.burn.toString(),
@@ -111,7 +150,8 @@ function ReportsPage() {
     });
 
     if (aiMut.data?.report) {
-      const lastY = (doc as unknown as { lastAutoTable?: { finalY: number } }).lastAutoTable?.finalY ?? 200;
+      const lastY =
+        (doc as unknown as { lastAutoTable?: { finalY: number } }).lastAutoTable?.finalY ?? 200;
       doc.setFont("helvetica", "bold");
       doc.setFontSize(12);
       doc.text("Analisis AI", 40, lastY + 30);
@@ -136,9 +176,13 @@ function ReportsPage() {
       `🏃 Latihan: ${summary.workoutCount} sesi`,
       `⏱️ Puasa selesai: ${summary.fastingDone} sesi`,
       "",
-      aiMut.data?.report ? `_${aiMut.data.report.slice(0, 400)}${aiMut.data.report.length > 400 ? "…" : ""}_` : "",
+      aiMut.data?.report
+        ? `_${aiMut.data.report.slice(0, 400)}${aiMut.data.report.length > 400 ? "…" : ""}_`
+        : "",
       "— dikirim dari HealthyU",
-    ].filter(Boolean).join("\n");
+    ]
+      .filter(Boolean)
+      .join("\n");
     const url = `https://wa.me/?text=${encodeURIComponent(lines)}`;
     window.open(url, "_blank", "noopener,noreferrer");
   };
@@ -149,7 +193,10 @@ function ReportsPage() {
     <main className="min-h-screen bg-background pb-28">
       <div className="max-w-md mx-auto px-5 pt-8 space-y-5">
         <header className="flex items-center gap-3">
-          <Link to="/profile" className="size-10 bg-card rounded-2xl outline-1 outline-black/10 grid place-items-center print:hidden">
+          <Link
+            to="/profile"
+            className="size-10 bg-card rounded-2xl outline-1 outline-black/10 grid place-items-center print:hidden"
+          >
             <ArrowLeft className="size-4" />
           </Link>
           <div>
@@ -159,23 +206,40 @@ function ReportsPage() {
         </header>
 
         <section className="grid grid-cols-2 gap-3 animate-fade-up">
-          <Stat label="Total kalori masuk" value={`${Math.round(summary?.totals.cals ?? 0)}`} sub="kcal" />
+          <Stat
+            label="Total kalori masuk"
+            value={`${Math.round(summary?.totals.cals ?? 0)}`}
+            sub="kcal"
+          />
           <Stat label="Kalori terbakar" value={`${summary?.totals.burn ?? 0}`} sub="kcal" />
-          <Stat label="Total air" value={`${((summary?.totals.ml ?? 0) / 1000).toFixed(1)}`} sub="liter" />
-          <Stat label="Total tidur" value={`${(summary?.totals.hours ?? 0).toFixed(1)}`} sub="jam" />
+          <Stat
+            label="Total air"
+            value={`${((summary?.totals.ml ?? 0) / 1000).toFixed(1)}`}
+            sub="liter"
+          />
+          <Stat
+            label="Total tidur"
+            value={`${(summary?.totals.hours ?? 0).toFixed(1)}`}
+            sub="jam"
+          />
           <Stat label="Latihan" value={`${summary?.workoutCount ?? 0}`} sub="sesi" />
           <Stat label="Puasa selesai" value={`${summary?.fastingDone ?? 0}`} sub="sesi" />
         </section>
 
         <section className="bg-card p-4 rounded-3xl outline-1 outline-black/5 animate-fade-up">
-          <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-3">Kalori harian</p>
+          <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-3">
+            Kalori harian
+          </p>
           <div className="flex items-end gap-2 h-32">
             {summary?.byDay.map((d) => (
               <div key={d.day} className="flex-1 flex flex-col items-center gap-1">
                 <div className="flex-1 w-full flex items-end">
                   <div
                     className="w-full bg-primary rounded-t-md transition-all"
-                    style={{ height: `${(d.cals / maxCal) * 100}%`, minHeight: d.cals > 0 ? "4px" : 0 }}
+                    style={{
+                      height: `${(d.cals / maxCal) * 100}%`,
+                      minHeight: d.cals > 0 ? "4px" : 0,
+                    }}
                   />
                 </div>
                 <span className="text-[9px] text-muted-foreground tabular-nums">
@@ -187,13 +251,22 @@ function ReportsPage() {
         </section>
 
         <section className="grid grid-cols-3 gap-2 print:hidden">
-          <button onClick={exportCsv} className="flex items-center justify-center gap-2 bg-primary text-primary-foreground font-semibold py-3 rounded-2xl">
+          <button
+            onClick={exportCsv}
+            className="flex items-center justify-center gap-2 bg-primary text-primary-foreground font-semibold py-3 rounded-2xl"
+          >
             <Download className="size-4" /> <span className="text-sm">CSV</span>
           </button>
-          <button onClick={exportPdf} className="flex items-center justify-center gap-2 bg-card outline-1 outline-black/10 font-semibold py-3 rounded-2xl">
+          <button
+            onClick={exportPdf}
+            className="flex items-center justify-center gap-2 bg-card outline-1 outline-black/10 font-semibold py-3 rounded-2xl"
+          >
             <FileText className="size-4" /> <span className="text-sm">PDF</span>
           </button>
-          <button onClick={shareWhatsapp} className="flex items-center justify-center gap-2 bg-[#25D366] text-white font-semibold py-3 rounded-2xl">
+          <button
+            onClick={shareWhatsapp}
+            className="flex items-center justify-center gap-2 bg-[#25D366] text-white font-semibold py-3 rounded-2xl"
+          >
             <Share2 className="size-4" /> <span className="text-sm">WA</span>
           </button>
         </section>
@@ -204,7 +277,11 @@ function ReportsPage() {
             disabled={aiMut.isPending}
             className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-primary to-primary/80 text-primary-foreground font-semibold py-3 rounded-2xl shadow-lg disabled:opacity-60"
           >
-            {aiMut.isPending ? <Loader2 className="size-4 animate-spin" /> : <Sparkles className="size-4" />}
+            {aiMut.isPending ? (
+              <Loader2 className="size-4 animate-spin" />
+            ) : (
+              <Sparkles className="size-4" />
+            )}
             {aiMut.isPending ? "Menganalisis..." : "Analisis AI Mingguan"}
           </button>
           {aiMut.data && (
@@ -222,8 +299,13 @@ function ReportsPage() {
 function Stat({ label, value, sub }: { label: string; value: string; sub?: string }) {
   return (
     <div className="bg-card p-4 rounded-2xl outline-1 outline-black/5">
-      <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">{label}</p>
-      <p className="text-2xl font-bold tabular-nums mt-1">{value}<span className="text-xs font-medium text-muted-foreground ml-1">{sub}</span></p>
+      <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+        {label}
+      </p>
+      <p className="text-2xl font-bold tabular-nums mt-1">
+        {value}
+        <span className="text-xs font-medium text-muted-foreground ml-1">{sub}</span>
+      </p>
     </div>
   );
 }
