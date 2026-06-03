@@ -3,8 +3,9 @@ import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { listPosts, createPost, deletePost, toggleLike } from "@/lib/community.functions";
+import { listComments, createComment, deleteComment } from "@/lib/social.functions";
 import { BottomNav } from "@/components/bottom-nav";
-import { ArrowLeft, Heart, Trash2, Send } from "lucide-react";
+import { ArrowLeft, Heart, Trash2, Send, MessageCircle } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/community")({
@@ -48,6 +49,8 @@ function CommunityPage() {
     mutationFn: (id: string) => like({ data: { post_id: id } }),
     onSuccess: () => qc.invalidateQueries({ queryKey: ["community"] }),
   });
+
+  const [openComments, setOpenComments] = useState<string | null>(null);
 
   return (
     <main className="min-h-screen bg-background pb-28">
@@ -126,6 +129,24 @@ function CommunityPage() {
                   <Heart className={`size-4 ${p.liked_by_me ? "fill-coral" : ""}`} />
                   {p.like_count}
                 </button>
+                <div className="flex gap-4 mt-3 items-center">
+                  <button
+                    onClick={() => likeMut.mutate(p.id)}
+                    className={`flex items-center gap-1.5 text-xs font-semibold ${
+                      p.liked_by_me ? "text-coral" : "text-muted-foreground"
+                    }`}
+                  >
+                    <Heart className={`size-4 ${p.liked_by_me ? "fill-coral" : ""}`} />
+                    {p.like_count}
+                  </button>
+                  <button
+                    onClick={() => setOpenComments(openComments === p.id ? null : p.id)}
+                    className="flex items-center gap-1.5 text-xs font-semibold text-muted-foreground"
+                  >
+                    <MessageCircle className="size-4" /> Komentar
+                  </button>
+                </div>
+                {openComments === p.id && <Comments postId={p.id} />}
               </article>
             ))
           )}
@@ -133,5 +154,64 @@ function CommunityPage() {
       </div>
       <BottomNav />
     </main>
+  );
+}
+
+function Comments({ postId }: { postId: string }) {
+  const qc = useQueryClient();
+  const list = useServerFn(listComments);
+  const create = useServerFn(createComment);
+  const del = useServerFn(deleteComment);
+  const { data: comments = [] } = useQuery({
+    queryKey: ["comments", postId],
+    queryFn: () => list({ data: { post_id: postId } }),
+  });
+  const [text, setText] = useState("");
+  const createMut = useMutation({
+    mutationFn: () => create({ data: { post_id: postId, content: text.trim() } }),
+    onSuccess: () => {
+      setText("");
+      qc.invalidateQueries({ queryKey: ["comments", postId] });
+    },
+    onError: (e) => toast.error(e instanceof Error ? e.message : "Gagal"),
+  });
+  const delMut = useMutation({
+    mutationFn: (id: string) => del({ data: { id } }),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["comments", postId] }),
+  });
+  return (
+    <div className="mt-3 pt-3 border-t border-border space-y-2">
+      {comments.map((c) => (
+        <div key={c.id} className="flex items-start gap-2 text-xs">
+          <div className="size-7 rounded-full bg-mint text-sage-deep grid place-items-center text-[10px] font-bold shrink-0">
+            {c.author.slice(0, 1).toUpperCase()}
+          </div>
+          <div className="flex-1 bg-background rounded-2xl px-3 py-2">
+            <p className="font-semibold">{c.author}</p>
+            <p className="whitespace-pre-wrap leading-relaxed">{c.content}</p>
+          </div>
+          {c.is_mine && (
+            <button onClick={() => delMut.mutate(c.id)} className="p-1 text-muted-foreground">
+              <Trash2 className="size-3.5" />
+            </button>
+          )}
+        </div>
+      ))}
+      <div className="flex gap-2">
+        <input
+          value={text}
+          onChange={(e) => setText(e.target.value.slice(0, 500))}
+          placeholder="Tulis komentar..."
+          className="flex-1 bg-background outline-1 outline-black/10 rounded-2xl px-3 py-2 text-xs"
+        />
+        <button
+          onClick={() => createMut.mutate()}
+          disabled={!text.trim() || createMut.isPending}
+          className="px-3 bg-primary text-primary-foreground rounded-2xl text-xs font-semibold disabled:opacity-50"
+        >
+          Kirim
+        </button>
+      </div>
+    </div>
   );
 }
