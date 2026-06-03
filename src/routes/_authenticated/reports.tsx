@@ -452,6 +452,21 @@ function ReportsPage() {
                     </span>
                   </summary>
                   <p className="mt-3 text-sm whitespace-pre-wrap leading-relaxed">{text}</p>
+                  {isManualFlash && text && (
+                    <button
+                      onClick={(e) => {
+                        e.preventDefault();
+                        shareWhatsapp({
+                          text,
+                          periodStart: r.report_period_start,
+                          periodEnd: r.report_period_end,
+                        });
+                      }}
+                      className="mt-3 inline-flex items-center gap-1.5 bg-[#25D366] text-white text-xs font-semibold px-3 py-1.5 rounded-full"
+                    >
+                      <Share2 className="size-3" /> Share
+                    </button>
+                  )}
                 </details>
               );
             })}
