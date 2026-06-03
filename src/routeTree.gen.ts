@@ -59,6 +59,7 @@ import { Route as AuthenticatedScanHistoryRouteImport } from './routes/_authenti
 import { Route as AuthenticatedScanBarcodeRouteImport } from './routes/_authenticated/scan.barcode'
 import { Route as AuthenticatedReportsNutritionRouteImport } from './routes/_authenticated/reports.nutrition'
 import { Route as AuthenticatedReportsGalleryRouteImport } from './routes/_authenticated/reports.gallery'
+import { Route as AuthenticatedReportsExportRouteImport } from './routes/_authenticated/reports.export'
 import { Route as AuthenticatedReportsCompareRouteImport } from './routes/_authenticated/reports.compare'
 import { Route as AuthenticatedRecipesSavedRouteImport } from './routes/_authenticated/recipes.saved'
 import { Route as AuthenticatedRecipesRecommendationsRouteImport } from './routes/_authenticated/recipes.recommendations'
@@ -333,6 +334,12 @@ const AuthenticatedReportsGalleryRoute =
     path: '/gallery',
     getParentRoute: () => AuthenticatedReportsRoute,
   } as any)
+const AuthenticatedReportsExportRoute =
+  AuthenticatedReportsExportRouteImport.update({
+    id: '/export',
+    path: '/export',
+    getParentRoute: () => AuthenticatedReportsRoute,
+  } as any)
 const AuthenticatedReportsCompareRoute =
   AuthenticatedReportsCompareRouteImport.update({
     id: '/compare',
@@ -453,6 +460,7 @@ export interface FileRoutesByFullPath {
   '/recipes/recommendations': typeof AuthenticatedRecipesRecommendationsRoute
   '/recipes/saved': typeof AuthenticatedRecipesSavedRoute
   '/reports/compare': typeof AuthenticatedReportsCompareRoute
+  '/reports/export': typeof AuthenticatedReportsExportRoute
   '/reports/gallery': typeof AuthenticatedReportsGalleryRoute
   '/reports/nutrition': typeof AuthenticatedReportsNutritionRoute
   '/scan/barcode': typeof AuthenticatedScanBarcodeRoute
@@ -516,6 +524,7 @@ export interface FileRoutesByTo {
   '/recipes/recommendations': typeof AuthenticatedRecipesRecommendationsRoute
   '/recipes/saved': typeof AuthenticatedRecipesSavedRoute
   '/reports/compare': typeof AuthenticatedReportsCompareRoute
+  '/reports/export': typeof AuthenticatedReportsExportRoute
   '/reports/gallery': typeof AuthenticatedReportsGalleryRoute
   '/reports/nutrition': typeof AuthenticatedReportsNutritionRoute
   '/scan/barcode': typeof AuthenticatedScanBarcodeRoute
@@ -581,6 +590,7 @@ export interface FileRoutesById {
   '/_authenticated/recipes/recommendations': typeof AuthenticatedRecipesRecommendationsRoute
   '/_authenticated/recipes/saved': typeof AuthenticatedRecipesSavedRoute
   '/_authenticated/reports/compare': typeof AuthenticatedReportsCompareRoute
+  '/_authenticated/reports/export': typeof AuthenticatedReportsExportRoute
   '/_authenticated/reports/gallery': typeof AuthenticatedReportsGalleryRoute
   '/_authenticated/reports/nutrition': typeof AuthenticatedReportsNutritionRoute
   '/_authenticated/scan/barcode': typeof AuthenticatedScanBarcodeRoute
@@ -646,6 +656,7 @@ export interface FileRouteTypes {
     | '/recipes/recommendations'
     | '/recipes/saved'
     | '/reports/compare'
+    | '/reports/export'
     | '/reports/gallery'
     | '/reports/nutrition'
     | '/scan/barcode'
@@ -709,6 +720,7 @@ export interface FileRouteTypes {
     | '/recipes/recommendations'
     | '/recipes/saved'
     | '/reports/compare'
+    | '/reports/export'
     | '/reports/gallery'
     | '/reports/nutrition'
     | '/scan/barcode'
@@ -773,6 +785,7 @@ export interface FileRouteTypes {
     | '/_authenticated/recipes/recommendations'
     | '/_authenticated/recipes/saved'
     | '/_authenticated/reports/compare'
+    | '/_authenticated/reports/export'
     | '/_authenticated/reports/gallery'
     | '/_authenticated/reports/nutrition'
     | '/_authenticated/scan/barcode'
@@ -1152,6 +1165,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedReportsGalleryRouteImport
       parentRoute: typeof AuthenticatedReportsRoute
     }
+    '/_authenticated/reports/export': {
+      id: '/_authenticated/reports/export'
+      path: '/export'
+      fullPath: '/reports/export'
+      preLoaderRoute: typeof AuthenticatedReportsExportRouteImport
+      parentRoute: typeof AuthenticatedReportsRoute
+    }
     '/_authenticated/reports/compare': {
       id: '/_authenticated/reports/compare'
       path: '/compare'
@@ -1281,12 +1301,14 @@ const AuthenticatedRecipesRouteWithChildren =
 
 interface AuthenticatedReportsRouteChildren {
   AuthenticatedReportsCompareRoute: typeof AuthenticatedReportsCompareRoute
+  AuthenticatedReportsExportRoute: typeof AuthenticatedReportsExportRoute
   AuthenticatedReportsGalleryRoute: typeof AuthenticatedReportsGalleryRoute
   AuthenticatedReportsNutritionRoute: typeof AuthenticatedReportsNutritionRoute
 }
 
 const AuthenticatedReportsRouteChildren: AuthenticatedReportsRouteChildren = {
   AuthenticatedReportsCompareRoute: AuthenticatedReportsCompareRoute,
+  AuthenticatedReportsExportRoute: AuthenticatedReportsExportRoute,
   AuthenticatedReportsGalleryRoute: AuthenticatedReportsGalleryRoute,
   AuthenticatedReportsNutritionRoute: AuthenticatedReportsNutritionRoute,
 }
