@@ -100,6 +100,7 @@ import { Route as AuthenticatedNotificationsFeedRouteImport } from './routes/_au
 import { Route as AuthenticatedMoodVoiceRouteImport } from './routes/_authenticated/mood.voice'
 import { Route as AuthenticatedMealplanGroceryRouteImport } from './routes/_authenticated/mealplan.grocery'
 import { Route as AuthenticatedMealplanBudgetRouteImport } from './routes/_authenticated/mealplan.budget'
+import { Route as AuthenticatedLeaderboardWeeklyRouteImport } from './routes/_authenticated/leaderboard.weekly'
 import { Route as AuthenticatedHabitsStackRouteImport } from './routes/_authenticated/habits.stack'
 import { Route as AuthenticatedFriendsInviteRouteImport } from './routes/_authenticated/friends.invite'
 import { Route as AuthenticatedFamilyInviteRouteImport } from './routes/_authenticated/family.invite'
@@ -607,6 +608,12 @@ const AuthenticatedMealplanBudgetRoute =
     path: '/budget',
     getParentRoute: () => AuthenticatedMealplanRoute,
   } as any)
+const AuthenticatedLeaderboardWeeklyRoute =
+  AuthenticatedLeaderboardWeeklyRouteImport.update({
+    id: '/weekly',
+    path: '/weekly',
+    getParentRoute: () => AuthenticatedLeaderboardRoute,
+  } as any)
 const AuthenticatedHabitsStackRoute =
   AuthenticatedHabitsStackRouteImport.update({
     id: '/habits/stack',
@@ -746,7 +753,7 @@ export interface FileRoutesByFullPath {
   '/health-import': typeof AuthenticatedHealthImportRoute
   '/heatmap': typeof AuthenticatedHeatmapRoute
   '/insights': typeof AuthenticatedInsightsRoute
-  '/leaderboard': typeof AuthenticatedLeaderboardRoute
+  '/leaderboard': typeof AuthenticatedLeaderboardRouteWithChildren
   '/login-bonus': typeof AuthenticatedLoginBonusRoute
   '/mealplan': typeof AuthenticatedMealplanRouteWithChildren
   '/medications': typeof AuthenticatedMedicationsRoute
@@ -784,6 +791,7 @@ export interface FileRoutesByFullPath {
   '/family/invite': typeof AuthenticatedFamilyInviteRoute
   '/friends/invite': typeof AuthenticatedFriendsInviteRoute
   '/habits/stack': typeof AuthenticatedHabitsStackRoute
+  '/leaderboard/weekly': typeof AuthenticatedLeaderboardWeeklyRoute
   '/mealplan/budget': typeof AuthenticatedMealplanBudgetRoute
   '/mealplan/grocery': typeof AuthenticatedMealplanGroceryRoute
   '/mood/voice': typeof AuthenticatedMoodVoiceRoute
@@ -857,7 +865,7 @@ export interface FileRoutesByTo {
   '/health-import': typeof AuthenticatedHealthImportRoute
   '/heatmap': typeof AuthenticatedHeatmapRoute
   '/insights': typeof AuthenticatedInsightsRoute
-  '/leaderboard': typeof AuthenticatedLeaderboardRoute
+  '/leaderboard': typeof AuthenticatedLeaderboardRouteWithChildren
   '/login-bonus': typeof AuthenticatedLoginBonusRoute
   '/mealplan': typeof AuthenticatedMealplanRouteWithChildren
   '/medications': typeof AuthenticatedMedicationsRoute
@@ -895,6 +903,7 @@ export interface FileRoutesByTo {
   '/family/invite': typeof AuthenticatedFamilyInviteRoute
   '/friends/invite': typeof AuthenticatedFriendsInviteRoute
   '/habits/stack': typeof AuthenticatedHabitsStackRoute
+  '/leaderboard/weekly': typeof AuthenticatedLeaderboardWeeklyRoute
   '/mealplan/budget': typeof AuthenticatedMealplanBudgetRoute
   '/mealplan/grocery': typeof AuthenticatedMealplanGroceryRoute
   '/mood/voice': typeof AuthenticatedMoodVoiceRoute
@@ -970,7 +979,7 @@ export interface FileRoutesById {
   '/_authenticated/health-import': typeof AuthenticatedHealthImportRoute
   '/_authenticated/heatmap': typeof AuthenticatedHeatmapRoute
   '/_authenticated/insights': typeof AuthenticatedInsightsRoute
-  '/_authenticated/leaderboard': typeof AuthenticatedLeaderboardRoute
+  '/_authenticated/leaderboard': typeof AuthenticatedLeaderboardRouteWithChildren
   '/_authenticated/login-bonus': typeof AuthenticatedLoginBonusRoute
   '/_authenticated/mealplan': typeof AuthenticatedMealplanRouteWithChildren
   '/_authenticated/medications': typeof AuthenticatedMedicationsRoute
@@ -1008,6 +1017,7 @@ export interface FileRoutesById {
   '/_authenticated/family/invite': typeof AuthenticatedFamilyInviteRoute
   '/_authenticated/friends/invite': typeof AuthenticatedFriendsInviteRoute
   '/_authenticated/habits/stack': typeof AuthenticatedHabitsStackRoute
+  '/_authenticated/leaderboard/weekly': typeof AuthenticatedLeaderboardWeeklyRoute
   '/_authenticated/mealplan/budget': typeof AuthenticatedMealplanBudgetRoute
   '/_authenticated/mealplan/grocery': typeof AuthenticatedMealplanGroceryRoute
   '/_authenticated/mood/voice': typeof AuthenticatedMoodVoiceRoute
@@ -1121,6 +1131,7 @@ export interface FileRouteTypes {
     | '/family/invite'
     | '/friends/invite'
     | '/habits/stack'
+    | '/leaderboard/weekly'
     | '/mealplan/budget'
     | '/mealplan/grocery'
     | '/mood/voice'
@@ -1232,6 +1243,7 @@ export interface FileRouteTypes {
     | '/family/invite'
     | '/friends/invite'
     | '/habits/stack'
+    | '/leaderboard/weekly'
     | '/mealplan/budget'
     | '/mealplan/grocery'
     | '/mood/voice'
@@ -1344,6 +1356,7 @@ export interface FileRouteTypes {
     | '/_authenticated/family/invite'
     | '/_authenticated/friends/invite'
     | '/_authenticated/habits/stack'
+    | '/_authenticated/leaderboard/weekly'
     | '/_authenticated/mealplan/budget'
     | '/_authenticated/mealplan/grocery'
     | '/_authenticated/mood/voice'
@@ -2044,6 +2057,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedMealplanBudgetRouteImport
       parentRoute: typeof AuthenticatedMealplanRoute
     }
+    '/_authenticated/leaderboard/weekly': {
+      id: '/_authenticated/leaderboard/weekly'
+      path: '/weekly'
+      fullPath: '/leaderboard/weekly'
+      preLoaderRoute: typeof AuthenticatedLeaderboardWeeklyRouteImport
+      parentRoute: typeof AuthenticatedLeaderboardRoute
+    }
     '/_authenticated/habits/stack': {
       id: '/_authenticated/habits/stack'
       path: '/habits/stack'
@@ -2239,6 +2259,20 @@ const AuthenticatedGroupsRouteChildren: AuthenticatedGroupsRouteChildren = {
 
 const AuthenticatedGroupsRouteWithChildren =
   AuthenticatedGroupsRoute._addFileChildren(AuthenticatedGroupsRouteChildren)
+
+interface AuthenticatedLeaderboardRouteChildren {
+  AuthenticatedLeaderboardWeeklyRoute: typeof AuthenticatedLeaderboardWeeklyRoute
+}
+
+const AuthenticatedLeaderboardRouteChildren: AuthenticatedLeaderboardRouteChildren =
+  {
+    AuthenticatedLeaderboardWeeklyRoute: AuthenticatedLeaderboardWeeklyRoute,
+  }
+
+const AuthenticatedLeaderboardRouteWithChildren =
+  AuthenticatedLeaderboardRoute._addFileChildren(
+    AuthenticatedLeaderboardRouteChildren,
+  )
 
 interface AuthenticatedMealplanRouteChildren {
   AuthenticatedMealplanBudgetRoute: typeof AuthenticatedMealplanBudgetRoute
@@ -2461,7 +2495,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedHealthImportRoute: typeof AuthenticatedHealthImportRoute
   AuthenticatedHeatmapRoute: typeof AuthenticatedHeatmapRoute
   AuthenticatedInsightsRoute: typeof AuthenticatedInsightsRoute
-  AuthenticatedLeaderboardRoute: typeof AuthenticatedLeaderboardRoute
+  AuthenticatedLeaderboardRoute: typeof AuthenticatedLeaderboardRouteWithChildren
   AuthenticatedLoginBonusRoute: typeof AuthenticatedLoginBonusRoute
   AuthenticatedMealplanRoute: typeof AuthenticatedMealplanRouteWithChildren
   AuthenticatedMedicationsRoute: typeof AuthenticatedMedicationsRoute
@@ -2523,7 +2557,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedHealthImportRoute: AuthenticatedHealthImportRoute,
   AuthenticatedHeatmapRoute: AuthenticatedHeatmapRoute,
   AuthenticatedInsightsRoute: AuthenticatedInsightsRoute,
-  AuthenticatedLeaderboardRoute: AuthenticatedLeaderboardRoute,
+  AuthenticatedLeaderboardRoute: AuthenticatedLeaderboardRouteWithChildren,
   AuthenticatedLoginBonusRoute: AuthenticatedLoginBonusRoute,
   AuthenticatedMealplanRoute: AuthenticatedMealplanRouteWithChildren,
   AuthenticatedMedicationsRoute: AuthenticatedMedicationsRoute,
