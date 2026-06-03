@@ -16,30 +16,66 @@ export type Database = {
     Tables: {
       achievements: {
         Row: {
+          badge_url: string | null
           category: string
+          coin_reward: number
+          condition_metadata: Json | null
+          condition_type: string | null
+          condition_value: number | null
           created_at: string
           description: string
           icon: string
           id: string
+          is_active: boolean
+          is_hidden: boolean
+          name: string | null
+          name_en: string | null
+          rarity: string | null
+          times_unlocked: number
           title: string
+          updated_at: string
           xp_reward: number
         }
         Insert: {
+          badge_url?: string | null
           category?: string
+          coin_reward?: number
+          condition_metadata?: Json | null
+          condition_type?: string | null
+          condition_value?: number | null
           created_at?: string
           description: string
           icon: string
           id: string
+          is_active?: boolean
+          is_hidden?: boolean
+          name?: string | null
+          name_en?: string | null
+          rarity?: string | null
+          times_unlocked?: number
           title: string
+          updated_at?: string
           xp_reward?: number
         }
         Update: {
+          badge_url?: string | null
           category?: string
+          coin_reward?: number
+          condition_metadata?: Json | null
+          condition_type?: string | null
+          condition_value?: number | null
           created_at?: string
           description?: string
           icon?: string
           id?: string
+          is_active?: boolean
+          is_hidden?: boolean
+          name?: string | null
+          name_en?: string | null
+          rarity?: string | null
+          times_unlocked?: number
           title?: string
+          updated_at?: string
           xp_reward?: number
         }
         Relationships: []
@@ -352,6 +388,190 @@ export type Database = {
           waist_cm?: number | null
           water_pct?: number | null
           weight_kg?: number | null
+        }
+        Relationships: []
+      }
+      challenge_daily_logs: {
+        Row: {
+          challenge_participant_id: string
+          completed: boolean
+          created_at: string
+          day_number: number
+          id: string
+          log_date: string
+          notes: string | null
+          proof_url: string | null
+          target_logged: number | null
+          value_logged: number | null
+        }
+        Insert: {
+          challenge_participant_id: string
+          completed?: boolean
+          created_at?: string
+          day_number: number
+          id?: string
+          log_date: string
+          notes?: string | null
+          proof_url?: string | null
+          target_logged?: number | null
+          value_logged?: number | null
+        }
+        Update: {
+          challenge_participant_id?: string
+          completed?: boolean
+          created_at?: string
+          day_number?: number
+          id?: string
+          log_date?: string
+          notes?: string | null
+          proof_url?: string | null
+          target_logged?: number | null
+          value_logged?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "challenge_daily_logs_challenge_participant_id_fkey"
+            columns: ["challenge_participant_id"]
+            isOneToOne: false
+            referencedRelation: "challenge_participants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      challenge_participants: {
+        Row: {
+          challenge_id: string
+          coins_earned: number
+          completed_at: string | null
+          created_at: string
+          current_day: number
+          final_rank: number | null
+          id: string
+          joined_at: string
+          progress_data: Json | null
+          rewards_claimed: boolean
+          status: string
+          streak: number
+          updated_at: string
+          user_id: string
+          xp_earned: number
+        }
+        Insert: {
+          challenge_id: string
+          coins_earned?: number
+          completed_at?: string | null
+          created_at?: string
+          current_day?: number
+          final_rank?: number | null
+          id?: string
+          joined_at?: string
+          progress_data?: Json | null
+          rewards_claimed?: boolean
+          status?: string
+          streak?: number
+          updated_at?: string
+          user_id: string
+          xp_earned?: number
+        }
+        Update: {
+          challenge_id?: string
+          coins_earned?: number
+          completed_at?: string | null
+          created_at?: string
+          current_day?: number
+          final_rank?: number | null
+          id?: string
+          joined_at?: string
+          progress_data?: Json | null
+          rewards_claimed?: boolean
+          status?: string
+          streak?: number
+          updated_at?: string
+          user_id?: string
+          xp_earned?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "challenge_participants_challenge_id_fkey"
+            columns: ["challenge_id"]
+            isOneToOne: false
+            referencedRelation: "challenges"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      challenges: {
+        Row: {
+          badge_url: string | null
+          category: string | null
+          challenge_type: string
+          coin_reward: number
+          created_at: string
+          created_by: string | null
+          current_participants: number
+          description: string | null
+          difficulty: string | null
+          duration_days: number | null
+          end_date: string | null
+          id: string
+          image_url: string | null
+          is_featured: boolean
+          max_participants: number | null
+          rules: Json | null
+          start_date: string | null
+          status: string
+          title: string
+          title_en: string | null
+          updated_at: string
+          xp_reward: number
+        }
+        Insert: {
+          badge_url?: string | null
+          category?: string | null
+          challenge_type: string
+          coin_reward?: number
+          created_at?: string
+          created_by?: string | null
+          current_participants?: number
+          description?: string | null
+          difficulty?: string | null
+          duration_days?: number | null
+          end_date?: string | null
+          id?: string
+          image_url?: string | null
+          is_featured?: boolean
+          max_participants?: number | null
+          rules?: Json | null
+          start_date?: string | null
+          status?: string
+          title: string
+          title_en?: string | null
+          updated_at?: string
+          xp_reward?: number
+        }
+        Update: {
+          badge_url?: string | null
+          category?: string | null
+          challenge_type?: string
+          coin_reward?: number
+          created_at?: string
+          created_by?: string | null
+          current_participants?: number
+          description?: string | null
+          difficulty?: string | null
+          duration_days?: number | null
+          end_date?: string | null
+          id?: string
+          image_url?: string | null
+          is_featured?: boolean
+          max_participants?: number | null
+          rules?: Json | null
+          start_date?: string | null
+          status?: string
+          title?: string
+          title_en?: string | null
+          updated_at?: string
+          xp_reward?: number
         }
         Relationships: []
       }
@@ -2803,6 +3023,36 @@ export type Database = {
           updated_at?: string
           user_id?: string
           workout_plan_id?: string | null
+        }
+        Relationships: []
+      }
+      xp_logs: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          source: string
+          source_id: string | null
+          user_id: string
+          xp_amount: number
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          source: string
+          source_id?: string | null
+          user_id: string
+          xp_amount: number
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          source?: string
+          source_id?: string | null
+          user_id?: string
+          xp_amount?: number
         }
         Relationships: []
       }
