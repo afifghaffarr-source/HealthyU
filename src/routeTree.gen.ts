@@ -64,6 +64,7 @@ import { Route as AuthenticatedArticlesRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedAlarmsRouteImport } from './routes/_authenticated/alarms'
 import { Route as AuthenticatedAchievementsRouteImport } from './routes/_authenticated/achievements'
 import { Route as ApiChatStreamRouteImport } from './routes/api/chat.stream'
+import { Route as AuthenticatedWorkoutTimerRouteImport } from './routes/_authenticated/workout.timer'
 import { Route as AuthenticatedWeightGoalRouteImport } from './routes/_authenticated/weight.goal'
 import { Route as AuthenticatedStoriesUploadRouteImport } from './routes/_authenticated/stories.upload'
 import { Route as AuthenticatedStoriesIdRouteImport } from './routes/_authenticated/stories.$id'
@@ -399,6 +400,12 @@ const ApiChatStreamRoute = ApiChatStreamRouteImport.update({
   path: '/api/chat/stream',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedWorkoutTimerRoute =
+  AuthenticatedWorkoutTimerRouteImport.update({
+    id: '/timer',
+    path: '/timer',
+    getParentRoute: () => AuthenticatedWorkoutRoute,
+  } as any)
 const AuthenticatedWeightGoalRoute = AuthenticatedWeightGoalRouteImport.update({
   id: '/goal',
   path: '/goal',
@@ -748,7 +755,7 @@ export interface FileRoutesByFullPath {
   '/water': typeof AuthenticatedWaterRoute
   '/wearable': typeof AuthenticatedWearableRoute
   '/weight': typeof AuthenticatedWeightRouteWithChildren
-  '/workout': typeof AuthenticatedWorkoutRoute
+  '/workout': typeof AuthenticatedWorkoutRouteWithChildren
   '/challenges/daily': typeof AuthenticatedChallengesDailyRoute
   '/coach/meals': typeof AuthenticatedCoachMealsRoute
   '/doctor/referral': typeof AuthenticatedDoctorReferralRoute
@@ -789,6 +796,7 @@ export interface FileRoutesByFullPath {
   '/stories/$id': typeof AuthenticatedStoriesIdRoute
   '/stories/upload': typeof AuthenticatedStoriesUploadRoute
   '/weight/goal': typeof AuthenticatedWeightGoalRoute
+  '/workout/timer': typeof AuthenticatedWorkoutTimerRoute
   '/api/chat/stream': typeof ApiChatStreamRoute
   '/groups/$id/leaderboard': typeof AuthenticatedGroupsIdLeaderboardRoute
   '/groups/$id/meals': typeof AuthenticatedGroupsIdMealsRoute
@@ -855,7 +863,7 @@ export interface FileRoutesByTo {
   '/water': typeof AuthenticatedWaterRoute
   '/wearable': typeof AuthenticatedWearableRoute
   '/weight': typeof AuthenticatedWeightRouteWithChildren
-  '/workout': typeof AuthenticatedWorkoutRoute
+  '/workout': typeof AuthenticatedWorkoutRouteWithChildren
   '/challenges/daily': typeof AuthenticatedChallengesDailyRoute
   '/coach/meals': typeof AuthenticatedCoachMealsRoute
   '/doctor/referral': typeof AuthenticatedDoctorReferralRoute
@@ -896,6 +904,7 @@ export interface FileRoutesByTo {
   '/stories/$id': typeof AuthenticatedStoriesIdRoute
   '/stories/upload': typeof AuthenticatedStoriesUploadRoute
   '/weight/goal': typeof AuthenticatedWeightGoalRoute
+  '/workout/timer': typeof AuthenticatedWorkoutTimerRoute
   '/api/chat/stream': typeof ApiChatStreamRoute
   '/groups/$id/leaderboard': typeof AuthenticatedGroupsIdLeaderboardRoute
   '/groups/$id/meals': typeof AuthenticatedGroupsIdMealsRoute
@@ -964,7 +973,7 @@ export interface FileRoutesById {
   '/_authenticated/water': typeof AuthenticatedWaterRoute
   '/_authenticated/wearable': typeof AuthenticatedWearableRoute
   '/_authenticated/weight': typeof AuthenticatedWeightRouteWithChildren
-  '/_authenticated/workout': typeof AuthenticatedWorkoutRoute
+  '/_authenticated/workout': typeof AuthenticatedWorkoutRouteWithChildren
   '/_authenticated/challenges/daily': typeof AuthenticatedChallengesDailyRoute
   '/_authenticated/coach/meals': typeof AuthenticatedCoachMealsRoute
   '/_authenticated/doctor/referral': typeof AuthenticatedDoctorReferralRoute
@@ -1005,6 +1014,7 @@ export interface FileRoutesById {
   '/_authenticated/stories/$id': typeof AuthenticatedStoriesIdRoute
   '/_authenticated/stories/upload': typeof AuthenticatedStoriesUploadRoute
   '/_authenticated/weight/goal': typeof AuthenticatedWeightGoalRoute
+  '/_authenticated/workout/timer': typeof AuthenticatedWorkoutTimerRoute
   '/api/chat/stream': typeof ApiChatStreamRoute
   '/_authenticated/groups/$id/leaderboard': typeof AuthenticatedGroupsIdLeaderboardRoute
   '/_authenticated/groups/$id/meals': typeof AuthenticatedGroupsIdMealsRoute
@@ -1114,6 +1124,7 @@ export interface FileRouteTypes {
     | '/stories/$id'
     | '/stories/upload'
     | '/weight/goal'
+    | '/workout/timer'
     | '/api/chat/stream'
     | '/groups/$id/leaderboard'
     | '/groups/$id/meals'
@@ -1221,6 +1232,7 @@ export interface FileRouteTypes {
     | '/stories/$id'
     | '/stories/upload'
     | '/weight/goal'
+    | '/workout/timer'
     | '/api/chat/stream'
     | '/groups/$id/leaderboard'
     | '/groups/$id/meals'
@@ -1329,6 +1341,7 @@ export interface FileRouteTypes {
     | '/_authenticated/stories/$id'
     | '/_authenticated/stories/upload'
     | '/_authenticated/weight/goal'
+    | '/_authenticated/workout/timer'
     | '/api/chat/stream'
     | '/_authenticated/groups/$id/leaderboard'
     | '/_authenticated/groups/$id/meals'
@@ -1741,6 +1754,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/api/chat/stream'
       preLoaderRoute: typeof ApiChatStreamRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/workout/timer': {
+      id: '/_authenticated/workout/timer'
+      path: '/timer'
+      fullPath: '/workout/timer'
+      preLoaderRoute: typeof AuthenticatedWorkoutTimerRouteImport
+      parentRoute: typeof AuthenticatedWorkoutRoute
     }
     '/_authenticated/weight/goal': {
       id: '/_authenticated/weight/goal'
@@ -2345,6 +2365,17 @@ const AuthenticatedWeightRouteChildren: AuthenticatedWeightRouteChildren = {
 const AuthenticatedWeightRouteWithChildren =
   AuthenticatedWeightRoute._addFileChildren(AuthenticatedWeightRouteChildren)
 
+interface AuthenticatedWorkoutRouteChildren {
+  AuthenticatedWorkoutTimerRoute: typeof AuthenticatedWorkoutTimerRoute
+}
+
+const AuthenticatedWorkoutRouteChildren: AuthenticatedWorkoutRouteChildren = {
+  AuthenticatedWorkoutTimerRoute: AuthenticatedWorkoutTimerRoute,
+}
+
+const AuthenticatedWorkoutRouteWithChildren =
+  AuthenticatedWorkoutRoute._addFileChildren(AuthenticatedWorkoutRouteChildren)
+
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAchievementsRoute: typeof AuthenticatedAchievementsRoute
   AuthenticatedAlarmsRoute: typeof AuthenticatedAlarmsRoute
@@ -2396,7 +2427,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedWaterRoute: typeof AuthenticatedWaterRoute
   AuthenticatedWearableRoute: typeof AuthenticatedWearableRoute
   AuthenticatedWeightRoute: typeof AuthenticatedWeightRouteWithChildren
-  AuthenticatedWorkoutRoute: typeof AuthenticatedWorkoutRoute
+  AuthenticatedWorkoutRoute: typeof AuthenticatedWorkoutRouteWithChildren
   AuthenticatedExercisesLibraryRoute: typeof AuthenticatedExercisesLibraryRoute
   AuthenticatedExercisesRecommendRoute: typeof AuthenticatedExercisesRecommendRoute
   AuthenticatedFriendsInviteRoute: typeof AuthenticatedFriendsInviteRoute
@@ -2457,7 +2488,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedWaterRoute: AuthenticatedWaterRoute,
   AuthenticatedWearableRoute: AuthenticatedWearableRoute,
   AuthenticatedWeightRoute: AuthenticatedWeightRouteWithChildren,
-  AuthenticatedWorkoutRoute: AuthenticatedWorkoutRoute,
+  AuthenticatedWorkoutRoute: AuthenticatedWorkoutRouteWithChildren,
   AuthenticatedExercisesLibraryRoute: AuthenticatedExercisesLibraryRoute,
   AuthenticatedExercisesRecommendRoute: AuthenticatedExercisesRecommendRoute,
   AuthenticatedFriendsInviteRoute: AuthenticatedFriendsInviteRoute,
