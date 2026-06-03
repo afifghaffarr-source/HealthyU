@@ -1,10 +1,11 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { listMood, addMood, deleteMood } from "@/lib/mood.functions";
 import { BottomNav } from "@/components/bottom-nav";
-import { ArrowLeft, Trash2, Loader2, WifiOff, RefreshCw } from "lucide-react";
+import { Trash2, Loader2, WifiOff, RefreshCw } from "lucide-react";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { toast } from "sonner";
 import { enqueue } from "@/lib/offline-queue";
 import { useOfflineQueue } from "@/hooks/use-offline-queue";
@@ -70,31 +71,22 @@ function MoodPage() {
 
   return (
     <div className="min-h-screen bg-background pb-28">
-      <header className="sticky top-0 z-30 bg-background/90 backdrop-blur-xl">
-        <div className="max-w-md mx-auto px-4 py-4 flex items-center gap-3">
-          <Link
-            to="/dashboard"
-            className="size-10 rounded-2xl bg-card flex items-center justify-center"
-          >
-            <ArrowLeft className="size-5" />
-          </Link>
-          <div>
-            <h1 className="text-xl font-bold">Mood & Jurnal</h1>
-            <p className="text-xs text-muted-foreground">
-              {avg ? `Rata-rata 30 hari: ${avg.toFixed(1)} / 5` : "Catat perasaanmu hari ini"}
-            </p>
-          </div>
-          {(!online || pending > 0) && (
+      <div className="max-w-md mx-auto px-4">
+        <TopAppBar
+          title="Mood & Jurnal"
+          subtitle={avg ? `Rata-rata 30 hari: ${avg.toFixed(1)} / 5` : "Catat perasaanmu hari ini"}
+          showBack
+          action={(!online || pending > 0) ? (
             <button
               onClick={() => sync()}
-              className={`ml-auto inline-flex items-center gap-1 text-[11px] font-semibold px-2.5 py-1.5 rounded-full ${online ? "bg-amber-100 text-amber-700" : "bg-muted text-muted-foreground"}`}
+              className={`inline-flex items-center gap-1 text-[11px] font-semibold px-2.5 py-1.5 rounded-full ${online ? "bg-amber-100 text-amber-700" : "bg-muted text-muted-foreground"}`}
             >
               {online ? <RefreshCw className="size-3" /> : <WifiOff className="size-3" />}
               {online ? `Sync ${pending}` : `Offline${pending ? ` · ${pending}` : ""}`}
             </button>
-          )}
-        </div>
-      </header>
+          ) : undefined}
+        />
+      </div>
 
       <main className="max-w-md mx-auto px-4 space-y-6">
         <section className="rounded-3xl bg-card p-5 outline-1 outline-black/5">
