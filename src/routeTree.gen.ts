@@ -37,6 +37,7 @@ import { Route as AuthenticatedDashboardRouteImport } from './routes/_authentica
 import { Route as AuthenticatedCommunityRouteImport } from './routes/_authenticated/community'
 import { Route as AuthenticatedChatRouteImport } from './routes/_authenticated/chat'
 import { Route as AuthenticatedAchievementsRouteImport } from './routes/_authenticated/achievements'
+import { Route as ApiChatStreamRouteImport } from './routes/api/chat.stream'
 import { Route as AuthenticatedRecipesIdRouteImport } from './routes/_authenticated/recipes.$id'
 
 const AuthRoute = AuthRouteImport.update({
@@ -182,6 +183,11 @@ const AuthenticatedAchievementsRoute =
     path: '/achievements',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const ApiChatStreamRoute = ApiChatStreamRouteImport.update({
+  id: '/api/chat/stream',
+  path: '/api/chat/stream',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedRecipesIdRoute = AuthenticatedRecipesIdRouteImport.update({
   id: '/$id',
   path: '/$id',
@@ -217,6 +223,7 @@ export interface FileRoutesByFullPath {
   '/weight': typeof AuthenticatedWeightRoute
   '/workout': typeof AuthenticatedWorkoutRoute
   '/recipes/$id': typeof AuthenticatedRecipesIdRoute
+  '/api/chat/stream': typeof ApiChatStreamRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -247,6 +254,7 @@ export interface FileRoutesByTo {
   '/weight': typeof AuthenticatedWeightRoute
   '/workout': typeof AuthenticatedWorkoutRoute
   '/recipes/$id': typeof AuthenticatedRecipesIdRoute
+  '/api/chat/stream': typeof ApiChatStreamRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -279,6 +287,7 @@ export interface FileRoutesById {
   '/_authenticated/weight': typeof AuthenticatedWeightRoute
   '/_authenticated/workout': typeof AuthenticatedWorkoutRoute
   '/_authenticated/recipes/$id': typeof AuthenticatedRecipesIdRoute
+  '/api/chat/stream': typeof ApiChatStreamRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -311,6 +320,7 @@ export interface FileRouteTypes {
     | '/weight'
     | '/workout'
     | '/recipes/$id'
+    | '/api/chat/stream'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -341,6 +351,7 @@ export interface FileRouteTypes {
     | '/weight'
     | '/workout'
     | '/recipes/$id'
+    | '/api/chat/stream'
   id:
     | '__root__'
     | '/'
@@ -372,12 +383,14 @@ export interface FileRouteTypes {
     | '/_authenticated/weight'
     | '/_authenticated/workout'
     | '/_authenticated/recipes/$id'
+    | '/api/chat/stream'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
+  ApiChatStreamRoute: typeof ApiChatStreamRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -578,6 +591,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAchievementsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/api/chat/stream': {
+      id: '/api/chat/stream'
+      path: '/api/chat/stream'
+      fullPath: '/api/chat/stream'
+      preLoaderRoute: typeof ApiChatStreamRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/recipes/$id': {
       id: '/_authenticated/recipes/$id'
       path: '/$id'
@@ -662,6 +682,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
+  ApiChatStreamRoute: ApiChatStreamRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
