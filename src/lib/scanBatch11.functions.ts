@@ -84,11 +84,10 @@ export const generateBudgetMealPlan = createServerFn({ method: "POST" })
     const json = (await res.json()) as { choices?: { message?: { content?: string } }[] };
     const text = json.choices?.[0]?.message?.content ?? "{}";
     const m = text.match(/\{[\s\S]*\}/);
-    let plan: Record<string, unknown> = {};
-    try { plan = JSON.parse(m ? m[0] : "{}"); } catch { plan = {}; }
-    const { data: row } = await context.supabase.from("budget_meal_plans")
-      .insert({ user_id: context.userId, budget_idr: data.budgetIdr, days: data.days, plan: plan as never }).select().single();
-    return { plan, record: row };
+    const planStr = m ? m[0] : "{}";
+    await context.supabase.from("budget_meal_plans")
+      .insert({ user_id: context.userId, budget_idr: data.budgetIdr, days: data.days, plan: JSON.parse(planStr) as never });
+    return { planJson: planStr };
   });
 
 // Recipe from fridge photo (AI)
