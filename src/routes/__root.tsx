@@ -101,7 +101,6 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         rel: "stylesheet",
         href: appCss,
       },
-      { rel: "manifest", href: "/manifest.json", crossOrigin: "use-credentials" },
       { rel: "apple-touch-icon", href: "/icon-192.svg" },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
@@ -137,6 +136,7 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeProvider>
+        <ManifestLinkManager />
         <AuthListener />
         <ReminderScheduler />
         <Outlet />
@@ -157,5 +157,25 @@ function AuthListener() {
     });
     return () => subscription.unsubscribe();
   }, [router, queryClient]);
+  return null;
+}
+
+function ManifestLinkManager() {
+  useEffect(() => {
+    const url = new URL(window.location.href);
+    const previewToken = url.searchParams.get("__lovable_token");
+    const manifestHref = previewToken
+      ? `/manifest.json?__lovable_token=${encodeURIComponent(previewToken)}`
+      : "/manifest.json";
+
+    let link = document.querySelector('link[rel="manifest"]') as HTMLLinkElement | null;
+    if (!link) {
+      link = document.createElement("link");
+      link.rel = "manifest";
+      document.head.appendChild(link);
+    }
+    link.href = manifestHref;
+  }, []);
+
   return null;
 }
