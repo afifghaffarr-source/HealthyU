@@ -18,6 +18,7 @@ import { Route as AuthenticatedWearableRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedWaterRouteImport } from './routes/_authenticated/water'
 import { Route as AuthenticatedVitalsRouteImport } from './routes/_authenticated/vitals'
 import { Route as AuthenticatedSubscriptionRouteImport } from './routes/_authenticated/subscription'
+import { Route as AuthenticatedStoriesRouteImport } from './routes/_authenticated/stories'
 import { Route as AuthenticatedSleepRouteImport } from './routes/_authenticated/sleep'
 import { Route as AuthenticatedScanRouteImport } from './routes/_authenticated/scan'
 import { Route as AuthenticatedRewardsRouteImport } from './routes/_authenticated/rewards'
@@ -44,6 +45,7 @@ import { Route as AuthenticatedGroupsRouteImport } from './routes/_authenticated
 import { Route as AuthenticatedFoodsRouteImport } from './routes/_authenticated/foods'
 import { Route as AuthenticatedFoodRouteImport } from './routes/_authenticated/food'
 import { Route as AuthenticatedFastingRouteImport } from './routes/_authenticated/fasting'
+import { Route as AuthenticatedDoctorRouteImport } from './routes/_authenticated/doctor'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedCommunityRouteImport } from './routes/_authenticated/community'
 import { Route as AuthenticatedCoachRouteImport } from './routes/_authenticated/coach'
@@ -120,6 +122,11 @@ const AuthenticatedSubscriptionRoute =
     path: '/subscription',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedStoriesRoute = AuthenticatedStoriesRouteImport.update({
+  id: '/stories',
+  path: '/stories',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedSleepRoute = AuthenticatedSleepRouteImport.update({
   id: '/sleep',
   path: '/sleep',
@@ -255,6 +262,11 @@ const AuthenticatedFoodRoute = AuthenticatedFoodRouteImport.update({
 const AuthenticatedFastingRoute = AuthenticatedFastingRouteImport.update({
   id: '/fasting',
   path: '/fasting',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedDoctorRoute = AuthenticatedDoctorRouteImport.update({
+  id: '/doctor',
+  path: '/doctor',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
@@ -436,6 +448,7 @@ export interface FileRoutesByFullPath {
   '/coach': typeof AuthenticatedCoachRouteWithChildren
   '/community': typeof AuthenticatedCommunityRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/doctor': typeof AuthenticatedDoctorRoute
   '/fasting': typeof AuthenticatedFastingRoute
   '/food': typeof AuthenticatedFoodRoute
   '/foods': typeof AuthenticatedFoodsRoute
@@ -462,6 +475,7 @@ export interface FileRoutesByFullPath {
   '/rewards': typeof AuthenticatedRewardsRoute
   '/scan': typeof AuthenticatedScanRouteWithChildren
   '/sleep': typeof AuthenticatedSleepRoute
+  '/stories': typeof AuthenticatedStoriesRoute
   '/subscription': typeof AuthenticatedSubscriptionRoute
   '/vitals': typeof AuthenticatedVitalsRoute
   '/water': typeof AuthenticatedWaterRoute
@@ -502,6 +516,7 @@ export interface FileRoutesByTo {
   '/coach': typeof AuthenticatedCoachRouteWithChildren
   '/community': typeof AuthenticatedCommunityRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/doctor': typeof AuthenticatedDoctorRoute
   '/fasting': typeof AuthenticatedFastingRoute
   '/food': typeof AuthenticatedFoodRoute
   '/foods': typeof AuthenticatedFoodsRoute
@@ -528,6 +543,7 @@ export interface FileRoutesByTo {
   '/rewards': typeof AuthenticatedRewardsRoute
   '/scan': typeof AuthenticatedScanRouteWithChildren
   '/sleep': typeof AuthenticatedSleepRoute
+  '/stories': typeof AuthenticatedStoriesRoute
   '/subscription': typeof AuthenticatedSubscriptionRoute
   '/vitals': typeof AuthenticatedVitalsRoute
   '/water': typeof AuthenticatedWaterRoute
@@ -570,6 +586,7 @@ export interface FileRoutesById {
   '/_authenticated/coach': typeof AuthenticatedCoachRouteWithChildren
   '/_authenticated/community': typeof AuthenticatedCommunityRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/_authenticated/doctor': typeof AuthenticatedDoctorRoute
   '/_authenticated/fasting': typeof AuthenticatedFastingRoute
   '/_authenticated/food': typeof AuthenticatedFoodRoute
   '/_authenticated/foods': typeof AuthenticatedFoodsRoute
@@ -596,6 +613,7 @@ export interface FileRoutesById {
   '/_authenticated/rewards': typeof AuthenticatedRewardsRoute
   '/_authenticated/scan': typeof AuthenticatedScanRouteWithChildren
   '/_authenticated/sleep': typeof AuthenticatedSleepRoute
+  '/_authenticated/stories': typeof AuthenticatedStoriesRoute
   '/_authenticated/subscription': typeof AuthenticatedSubscriptionRoute
   '/_authenticated/vitals': typeof AuthenticatedVitalsRoute
   '/_authenticated/water': typeof AuthenticatedWaterRoute
@@ -638,6 +656,7 @@ export interface FileRouteTypes {
     | '/coach'
     | '/community'
     | '/dashboard'
+    | '/doctor'
     | '/fasting'
     | '/food'
     | '/foods'
@@ -664,6 +683,7 @@ export interface FileRouteTypes {
     | '/rewards'
     | '/scan'
     | '/sleep'
+    | '/stories'
     | '/subscription'
     | '/vitals'
     | '/water'
@@ -704,6 +724,7 @@ export interface FileRouteTypes {
     | '/coach'
     | '/community'
     | '/dashboard'
+    | '/doctor'
     | '/fasting'
     | '/food'
     | '/foods'
@@ -730,6 +751,7 @@ export interface FileRouteTypes {
     | '/rewards'
     | '/scan'
     | '/sleep'
+    | '/stories'
     | '/subscription'
     | '/vitals'
     | '/water'
@@ -771,6 +793,7 @@ export interface FileRouteTypes {
     | '/_authenticated/coach'
     | '/_authenticated/community'
     | '/_authenticated/dashboard'
+    | '/_authenticated/doctor'
     | '/_authenticated/fasting'
     | '/_authenticated/food'
     | '/_authenticated/foods'
@@ -797,6 +820,7 @@ export interface FileRouteTypes {
     | '/_authenticated/rewards'
     | '/_authenticated/scan'
     | '/_authenticated/sleep'
+    | '/_authenticated/stories'
     | '/_authenticated/subscription'
     | '/_authenticated/vitals'
     | '/_authenticated/water'
@@ -902,6 +926,13 @@ declare module '@tanstack/react-router' {
       path: '/subscription'
       fullPath: '/subscription'
       preLoaderRoute: typeof AuthenticatedSubscriptionRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/stories': {
+      id: '/_authenticated/stories'
+      path: '/stories'
+      fullPath: '/stories'
+      preLoaderRoute: typeof AuthenticatedStoriesRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/sleep': {
@@ -1084,6 +1115,13 @@ declare module '@tanstack/react-router' {
       path: '/fasting'
       fullPath: '/fasting'
       preLoaderRoute: typeof AuthenticatedFastingRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/doctor': {
+      id: '/_authenticated/doctor'
+      path: '/doctor'
+      fullPath: '/doctor'
+      preLoaderRoute: typeof AuthenticatedDoctorRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/dashboard': {
@@ -1395,6 +1433,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedCoachRoute: typeof AuthenticatedCoachRouteWithChildren
   AuthenticatedCommunityRoute: typeof AuthenticatedCommunityRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+  AuthenticatedDoctorRoute: typeof AuthenticatedDoctorRoute
   AuthenticatedFastingRoute: typeof AuthenticatedFastingRoute
   AuthenticatedFoodRoute: typeof AuthenticatedFoodRoute
   AuthenticatedFoodsRoute: typeof AuthenticatedFoodsRoute
@@ -1421,6 +1460,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedRewardsRoute: typeof AuthenticatedRewardsRoute
   AuthenticatedScanRoute: typeof AuthenticatedScanRouteWithChildren
   AuthenticatedSleepRoute: typeof AuthenticatedSleepRoute
+  AuthenticatedStoriesRoute: typeof AuthenticatedStoriesRoute
   AuthenticatedSubscriptionRoute: typeof AuthenticatedSubscriptionRoute
   AuthenticatedVitalsRoute: typeof AuthenticatedVitalsRoute
   AuthenticatedWaterRoute: typeof AuthenticatedWaterRoute
@@ -1438,6 +1478,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedCoachRoute: AuthenticatedCoachRouteWithChildren,
   AuthenticatedCommunityRoute: AuthenticatedCommunityRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+  AuthenticatedDoctorRoute: AuthenticatedDoctorRoute,
   AuthenticatedFastingRoute: AuthenticatedFastingRoute,
   AuthenticatedFoodRoute: AuthenticatedFoodRoute,
   AuthenticatedFoodsRoute: AuthenticatedFoodsRoute,
@@ -1464,6 +1505,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedRewardsRoute: AuthenticatedRewardsRoute,
   AuthenticatedScanRoute: AuthenticatedScanRouteWithChildren,
   AuthenticatedSleepRoute: AuthenticatedSleepRoute,
+  AuthenticatedStoriesRoute: AuthenticatedStoriesRoute,
   AuthenticatedSubscriptionRoute: AuthenticatedSubscriptionRoute,
   AuthenticatedVitalsRoute: AuthenticatedVitalsRoute,
   AuthenticatedWaterRoute: AuthenticatedWaterRoute,
@@ -1491,3 +1533,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
