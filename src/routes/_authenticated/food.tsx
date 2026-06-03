@@ -26,8 +26,18 @@ function FoodPage() {
   const { data: foods = [] } = useQuery({ queryKey: ["foods", q], queryFn: () => search({ data: { q } }) });
   const { data: meals = [] } = useQuery({ queryKey: ["meals", "today"], queryFn: () => fetchMeals() });
 
+  type LogPayload = {
+    food_item_id: string | null;
+    custom_name: string | null;
+    meal_type: MealType;
+    serving_qty: number;
+    calories: number;
+    protein_g: number;
+    carbs_g: number;
+    fat_g: number;
+  };
   const logMutation = useMutation({
-    mutationFn: (payload: Parameters<typeof log>[0]["data"]) => log({ data: payload }),
+    mutationFn: (payload: LogPayload) => log({ data: payload }),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["meals"] });
       toast.success("Makanan dicatat");

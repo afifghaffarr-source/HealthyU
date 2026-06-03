@@ -23,7 +23,7 @@ function ProfilePage() {
 
   const bmi = p?.height_cm && p?.weight_kg ? calcBMI(Number(p.weight_kg), Number(p.height_cm)) : null;
   const cat = bmi ? bmiCategory(bmi) : null;
-  const bmr = p?.height_cm && p?.weight_kg && p?.gender
+  const bmr = p?.height_cm && p?.weight_kg && (p?.gender === "male" || p?.gender === "female")
     ? calcBMR({ weightKg: Number(p.weight_kg), heightCm: Number(p.height_cm), age: calcAge(p.birth_date), gender: p.gender })
     : null;
   const tdee = bmr && p?.activity_level ? calcTDEE(bmr, p.activity_level as ActivityLevel) : null;
