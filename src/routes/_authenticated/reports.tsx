@@ -170,7 +170,11 @@ function ReportsPage() {
         window.setTimeout(() => setManualFlashId((cur) => (cur === latest ? null : cur)), 3000);
       }
     },
-    onError: (e) => toast.error(e instanceof Error ? e.message : "Gagal generate"),
+    onError: (e) => {
+      const msg = e instanceof Error ? e.message : "Gagal generate";
+      toast.error(msg);
+      announce(`Gagal generate laporan: ${msg}`, "assertive");
+    },
   });
 
   const summary = useMemo(() => {
