@@ -16,22 +16,29 @@
 // trending / dashboard) lalu tambahkan dengan urutan deklarasi di bawah.
 
 /** Hari sebelum localStorage `recipes:trendingCount` dianggap basi & di-invalidate. */
+// eslint-disable-next-line no-restricted-syntax -- listed in header table
 export const TRENDING_TTL_DAYS = 7;
 
 /** Window agregasi toast bonus klaim grup (ms). */
+// eslint-disable-next-line no-restricted-syntax -- listed in header table
 export const GROUP_BONUS_AGGREGATE_MS = 5000;
 
 /** Durasi badge "+N klaim baru" sebelum auto-clear (ms). */
+// eslint-disable-next-line no-restricted-syntax -- listed in header table
 export const GROUP_BONUS_BADGE_TTL_MS = 30000;
 
 /** Durasi pulse chip counter Trending saat angka bertambah (ms). */
+// eslint-disable-next-line no-restricted-syntax -- listed in header table
 export const TRENDING_COUNTER_PULSE_MS = 1500;
 
 /** Durasi flash "+N" pada badge growth resep (ms). */
+// eslint-disable-next-line no-restricted-syntax -- listed in header table
 export const TRENDING_GROWTH_FLASH_MS = 2500;
 
 /** Durasi ring highlight kartu challenge setelah scroll otomatis (ms). */
+// eslint-disable-next-line no-restricted-syntax -- listed in header table
 export const CHALLENGE_HIGHLIGHT_MS = 2000;
 
 /** Lama fade-out ring di akhir CHALLENGE_HIGHLIGHT_MS (ms). */
+// eslint-disable-next-line no-restricted-syntax -- listed in header table
 export const CHALLENGE_HIGHLIGHT_FADE_MS = 500;

@@ -94,6 +94,7 @@ function Dashboard() {
   // Tick once per second while any claim badge is visible, so the TTL
   // countdown bar inside the badge animates down toward zero.
   const [nowTick, setNowTick] = useState(() => Date.now());
+  const [breakdownOpen, setBreakdownOpen] = useState(false);
   useEffect(() => {
     if (Object.keys(newClaims).length === 0) return;
     const id = window.setInterval(() => setNowTick(Date.now()), 1000);
@@ -438,22 +439,60 @@ function Dashboard() {
                     return `${g?.group ?? "Grup"}: +${n}`;
                   })
                   .join(" · ");
+                const entries = Object.entries(newClaims);
                 return (
-                  <button
-                    onClick={() => {
-                      setNewClaims({});
-                      navigate({ to: "/challenges" });
-                    }}
-                    className="ml-auto relative text-[9px] font-bold uppercase bg-amber-100 text-amber-800 rounded-full pl-2 pr-2 pt-0.5 pb-1 overflow-hidden"
-                    title={breakdown ? `${breakdown} — klik untuk lihat semua` : "Lihat semua leaderboard"}
-                  >
-                    +{total} klaim baru
-                    <span
-                      aria-hidden
-                      className="absolute left-0 bottom-0 h-0.5 bg-amber-500/70 transition-[width] duration-1000 ease-linear"
-                      style={{ width: `${pct}%` }}
-                    />
-                  </button>
+                  <div className="ml-auto relative">
+                    <button
+                      onClick={() => setBreakdownOpen((o) => !o)}
+                      className="relative text-[9px] font-bold uppercase bg-amber-100 text-amber-800 rounded-full pl-2 pr-2 pt-0.5 pb-1 overflow-hidden"
+                      title={breakdown || "Breakdown klaim baru"}
+                    >
+                      +{total} klaim baru
+                      <span
+                        aria-hidden
+                        className="absolute left-0 bottom-0 h-0.5 bg-amber-500/70 transition-[width] duration-1000 ease-linear"
+                        style={{ width: `${pct}%` }}
+                      />
+                    </button>
+                    {breakdownOpen && (
+                      <div className="absolute right-0 top-full mt-1 z-20 w-48 bg-card outline-1 outline-black/10 rounded-xl shadow-lg p-2 text-[11px] animate-fade-up">
+                        <p className="font-semibold mb-1 text-foreground">Breakdown</p>
+                        <ul className="space-y-0.5 max-h-40 overflow-y-auto">
+                          {entries.map(([gid, n]) => {
+                            const g = groupSummary.find((x) => x.group_id === gid);
+                            return (
+                              <li key={gid} className="flex justify-between gap-2">
+                                <span className="truncate text-muted-foreground">
+                                  {g?.group ?? "Grup"}
+                                </span>
+                                <span className="font-bold tabular-nums">+{n}</span>
+                              </li>
+                            );
+                          })}
+                        </ul>
+                        <div className="flex gap-1.5 mt-2 pt-2 border-t border-border/60">
+                          <button
+                            onClick={() => {
+                              setNewClaims({});
+                              setBreakdownOpen(false);
+                            }}
+                            className="flex-1 text-[10px] font-semibold bg-muted hover:bg-muted/70 rounded-lg px-2 py-1"
+                          >
+                            Reset
+                          </button>
+                          <button
+                            onClick={() => {
+                              setBreakdownOpen(false);
+                              navigate({ to: "/challenges" });
+                            }}
+                            className="flex-1 text-[10px] font-semibold bg-primary text-primary-foreground rounded-lg px-2 py-1"
+                          >
+                            Lihat
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
                 );
               })()}
             </div>
