@@ -87,10 +87,10 @@ export const generateGroceryList = createServerFn({ method: "POST" })
     });
     const j = await ai.json();
     const txt = j.choices?.[0]?.message?.content ?? "[]";
-    let items: unknown[] = [];
+    let items: Array<{ name: string; qty?: string; unit?: string }> = [];
     try { items = JSON.parse(txt.replace(/^```json|```$/g, "").trim()); } catch { items = []; }
     const { data: row } = await context.supabase.from("grocery_lists").insert({
-      user_id: context.userId, source: "mealplan", items,
+      user_id: context.userId, source: "mealplan", items: items as never,
     }).select().single();
     return { list: row };
   });
@@ -160,10 +160,10 @@ export const analyzeFormCheck = createServerFn({ method: "POST" })
     });
     const j = await ai.json();
     const txt = j.choices?.[0]?.message?.content ?? "{}";
-    let feedback: unknown = {};
+    let feedback: { score?: number; mistakes?: string[]; tips?: string[]; raw?: string } = {};
     try { feedback = JSON.parse(txt.replace(/^```json|```$/g, "").trim()); } catch { feedback = { raw: txt }; }
     const { data: row } = await context.supabase.from("form_check_sessions").insert({
-      user_id: context.userId, exercise: data.exercise, ai_feedback: feedback,
+      user_id: context.userId, exercise: data.exercise, ai_feedback: feedback as never,
     }).select().single();
     return { session: row, feedback };
   });
@@ -187,7 +187,7 @@ export const ocrNutritionLabel = createServerFn({ method: "POST" })
     });
     const j = await ai.json();
     const txt = j.choices?.[0]?.message?.content ?? "{}";
-    let nutrition: unknown = {};
+    let nutrition: Record<string, string | number> = {};
     try { nutrition = JSON.parse(txt.replace(/^```json|```$/g, "").trim()); } catch { nutrition = { raw: txt }; }
     return { nutrition };
   });
@@ -197,12 +197,12 @@ export const getMoodHeatmap = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     const yearAgo = new Date(Date.now() - 365 * 24 * 3600 * 1000).toISOString();
-    const { data } = await context.supabase.from("mood_logs").select("mood_score, logged_at").eq("user_id", context.userId).gte("logged_at", yearAgo);
+    const { data } = await context.supabase.from("mood_logs").select("mood, logged_at").eq("user_id", context.userId).gte("logged_at", yearAgo);
     const map: Record<string, { sum: number; count: number }> = {};
-    (data ?? []).forEach((r: { mood_score: number | null; logged_at: string }) => {
+    (data ?? []).forEach((r: { mood: number | null; logged_at: string }) => {
       const day = r.logged_at.slice(0, 10);
       if (!map[day]) map[day] = { sum: 0, count: 0 };
-      map[day].sum += r.mood_score ?? 0;
+      map[day].sum += r.mood ?? 0;
       map[day].count += 1;
     });
     return { days: Object.entries(map).map(([d, v]) => ({ date: d, avg: v.sum / v.count })) };
