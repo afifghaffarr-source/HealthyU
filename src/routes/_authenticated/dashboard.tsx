@@ -279,6 +279,32 @@ function Dashboard() {
           <Trophy className="size-5 text-primary" />
         </Link>
 
+        {groupSummary.length > 0 && (
+          <Link
+            to="/challenges"
+            className="block bg-card p-4 rounded-3xl outline-1 outline-black/5 shadow-sm animate-fade-up"
+          >
+            <div className="flex items-center gap-2 mb-2">
+              <Trophy className="size-4 text-primary" />
+              <p className="text-xs font-bold uppercase tracking-wider">Challenge Grup</p>
+            </div>
+            <div className="space-y-2">
+              {groupSummary.slice(0, 3).map((g, i) => (
+                <div key={i} className="flex items-center justify-between text-xs">
+                  <div className="min-w-0 flex-1">
+                    <p className="font-semibold truncate">{g.challenge}</p>
+                    <p className="text-[10px] text-muted-foreground truncate">{g.group}</p>
+                  </div>
+                  <div className="text-right shrink-0 ml-2">
+                    <p className="font-bold">#{g.rank || "-"}<span className="text-muted-foreground font-normal">/{g.total_participants}</span></p>
+                    <p className="text-[10px] text-muted-foreground">Hari {g.my_day}{g.duration_days ? `/${g.duration_days}` : ""}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </Link>
+        )}
+
         {/* Today's meals */}
         <section className="animate-fade-up">
           <div className="flex justify-between items-center mb-3">
