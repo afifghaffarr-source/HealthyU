@@ -35,6 +35,12 @@
 // | PDF_TOC_ROWS_PER_PAGE          | Jumlah baris TOC per halaman sebelum addPage().          |
 // | PDF_TOC_ROW_HEIGHT             | Tinggi baris TOC (pt) — tocY increment.                  |
 // | PDF_FOOTER_BRAND_LABEL         | Label brand kiri footer PDF (siap i18n).                 |
+// | PDF_LINK_BASELINE_Y            | Y baseline back-link "Daftar Isi" di TOC (pt).           |
+// | PDF_LINK_UNDERLINE_OFFSET      | Offset Y underline back-link (pt, relatif ke baseline).  |
+// | PDF_LINK_RIGHT_X               | X kanan back-link TOC (pt).                              |
+// | PDF_TOC_PAGE_BREAK_Y           | Y treshold tocY sebelum addPage() di TOC (pt).           |
+// | PDF_TOC_CONTINUED_TOP_Y        | Y start tocY di halaman TOC lanjutan (pt).               |
+// | PDF_FOOTER_DIVIDER_OFFSET      | Offset Y divider tipis di atas footer (pt).              |
 //
 // CONVENTION: setiap konstanta tunable WAJIB ditambahkan ke tabel di atas
 // (nama + 1 baris efek). Reviewer boleh menolak PR yang menambah konstanta
@@ -172,3 +178,27 @@ export const PDF_TOC_ROW_HEIGHT = 16;
 /** Label brand kiri footer PDF (siap i18n). */
 // eslint-disable-next-line no-restricted-syntax -- listed in header table
 export const PDF_FOOTER_BRAND_LABEL = "HealthyU \u00B7 diekspor";
+
+/** Y baseline back-link "← Daftar Isi" di TOC (pt). */
+// eslint-disable-next-line no-restricted-syntax -- listed in header table
+export const PDF_LINK_BASELINE_Y = 40;
+
+/** Offset Y underline back-link relatif ke baseline (pt). */
+// eslint-disable-next-line no-restricted-syntax -- listed in header table
+export const PDF_LINK_UNDERLINE_OFFSET = 2;
+
+/** X kanan back-link TOC (pt). */
+// eslint-disable-next-line no-restricted-syntax -- listed in header table
+export const PDF_LINK_RIGHT_X = 555;
+
+/** Y treshold tocY sebelum addPage() di TOC (pt). */
+// eslint-disable-next-line no-restricted-syntax -- listed in header table
+export const PDF_TOC_PAGE_BREAK_Y = 780;
+
+/** Y start tocY di halaman TOC lanjutan (pt). */
+// eslint-disable-next-line no-restricted-syntax -- listed in header table
+export const PDF_TOC_CONTINUED_TOP_Y = 80;
+
+/** Offset Y divider tipis di atas footer (pt). */
+// eslint-disable-next-line no-restricted-syntax -- listed in header table
+export const PDF_FOOTER_DIVIDER_OFFSET = 8;
