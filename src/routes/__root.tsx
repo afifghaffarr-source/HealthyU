@@ -17,6 +17,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { ThemeProvider } from "@/components/theme-provider";
 import { ReminderScheduler } from "@/components/reminder-scheduler";
 import { SWRegister } from "@/components/sw-register";
+import { InstallPrompt } from "@/components/install-prompt";
 
 function NotFoundComponent() {
   return (
@@ -141,6 +142,7 @@ function RootComponent() {
         <ReminderScheduler />
         <SWRegister />
         <Outlet />
+        <InstallPrompt />
         <Toaster position="top-center" />
       </ThemeProvider>
     </QueryClientProvider>
