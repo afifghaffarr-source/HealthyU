@@ -25,6 +25,7 @@ import {
   listGroupBonusStatus,
   listGroupBonusClaimers,
 } from "@/lib/groupChallengeBonus.functions";
+import { groupChallengePendingMembers } from "@/lib/groupChallengePending.functions";
 
 const challengesSearchSchema = z.object({
   group: fallback(z.string().uuid().optional(), undefined),
@@ -351,23 +352,13 @@ function GroupInviter({ challengeId, initialOpen }: { challengeId: string; initi
             </p>
           )}
           {groups.map((g) => (
-            <div
+            <GroupInviteRow
               key={g.id}
-              className="flex items-center justify-between gap-2 px-2.5 py-1.5 rounded-xl bg-muted/40 text-xs"
-            >
-              <span className="truncate font-semibold">{g.name}</span>
-              {g.joined ? (
-                <span className="text-[10px] text-primary font-semibold">Aktif</span>
-              ) : (
-                <button
-                  onClick={() => inviteM.mutate(g.id)}
-                  disabled={inviteM.isPending}
-                  className="text-[10px] font-semibold text-primary disabled:opacity-50"
-                >
-                  Undang
-                </button>
-              )}
-            </div>
+              group={g}
+              challengeId={challengeId}
+              onInvite={() => inviteM.mutate(g.id)}
+              inviting={inviteM.isPending}
+            />
           ))}
         </div>
       )}
@@ -415,6 +406,66 @@ function LeaderboardList({
         </li>
       ))}
     </ol>
+  );
+}
+
+function GroupInviteRow({
+  group,
+  challengeId,
+  onInvite,
+  inviting,
+}: {
+  group: { id: string; name: string; joined: boolean };
+  challengeId: string;
+  onInvite: () => void;
+  inviting: boolean;
+}) {
+  const fetchPending = useServerFn(groupChallengePendingMembers);
+  const { data: pending } = useQuery({
+    queryKey: ["group-pending-members", group.id, challengeId],
+    queryFn: () => fetchPending({ data: { group_id: group.id, challenge_id: challengeId } }),
+  });
+  return (
+    <div className="flex items-center justify-between gap-2 px-2.5 py-1.5 rounded-xl bg-muted/40 text-xs">
+      <div className="min-w-0 flex-1">
+        <p className="truncate font-semibold">{group.name}</p>
+        {(pending?.preview.length ?? 0) > 0 && (
+          <div className="flex items-center mt-1">
+            <div className="flex -space-x-1.5">
+              {pending!.preview.map((m) => (
+                <span
+                  key={m.id}
+                  title={m.name}
+                  className="size-5 rounded-full bg-primary/15 outline-2 outline-card grid place-items-center text-[9px] font-bold text-primary overflow-hidden"
+                >
+                  {m.avatar_url ? (
+                    <img src={m.avatar_url} alt={m.name} className="size-full object-cover" />
+                  ) : (
+                    (m.name ?? "?").slice(0, 1).toUpperCase()
+                  )}
+                </span>
+              ))}
+            </div>
+            {pending!.pending > pending!.preview.length && (
+              <span className="text-[9px] text-muted-foreground ml-1.5">
+                +{pending!.pending - pending!.preview.length}
+              </span>
+            )}
+          </div>
+        )}
+      </div>
+      {group.joined ? (
+        <span className="text-[10px] text-primary font-semibold">Aktif</span>
+      ) : (
+        <button
+          onClick={onInvite}
+          disabled={inviting}
+          className="text-[10px] font-semibold text-primary disabled:opacity-50"
+        >
+          Undang
+        </button>
+      )}
+    </div>
   );
 }
 

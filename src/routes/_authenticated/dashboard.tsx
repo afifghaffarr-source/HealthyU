@@ -56,7 +56,23 @@ function Dashboard() {
       .on(
         "postgres_changes",
         { event: "*", schema: "public", table: "group_challenge_bonuses" },
-        () => qc.invalidateQueries({ queryKey: ["group-challenge-summary"] }),
+        async (payload) => {
+          const row = payload.new as { user_id?: string; group_id?: string } | null;
+          if (row?.user_id && row?.group_id) {
+            try {
+              const [{ data: prof }, { data: grp }] = await Promise.all([
+                supabase.from("profiles").select("full_name").eq("id", row.user_id).maybeSingle(),
+                supabase.from("friend_groups").select("name").eq("id", row.group_id).maybeSingle(),
+              ]);
+              const name = prof?.full_name ?? "Seseorang";
+              const groupName = grp?.name ?? "grup";
+              toast.success(`🎉 ${name} klaim bonus di ${groupName}`);
+            } catch {
+              /* ignore */
+            }
+          }
+          qc.invalidateQueries({ queryKey: ["group-challenge-summary"] });
+        },
       )
       .on(
         "postgres_changes",
