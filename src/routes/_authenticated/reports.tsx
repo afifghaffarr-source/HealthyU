@@ -89,6 +89,7 @@ function ReportsPage() {
           // immediately without waiting for the user to open it.
           qc.setQueryData(["profile-last-seen-report"], null);
           qc.invalidateQueries({ queryKey: ["ai-reports"] });
+          toast.success("📄 Laporan minggu baru tersedia");
         },
       )
       .subscribe();
