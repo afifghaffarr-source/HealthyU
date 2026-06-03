@@ -44,6 +44,19 @@ export const joinChallenge = createServerFn({ method: "POST" })
       .select("id")
       .single();
     if (error) throw new Error(error.message);
+
+    // Auto-broadcast to other members of any groups this user shares which already
+    // linked this challenge. Fire-and-forget; failures don't block joining.
+    try {
+      const { broadcastGroupChallengeJoin } = await import("./groupChallengeBroadcast.server");
+      await broadcastGroupChallengeJoin({
+        userId,
+        challengeId: data.challenge_id,
+      });
+    } catch (e) {
+      console.error("group broadcast failed:", e);
+    }
+
     return { id: inserted.id, already: false };
   });
 
