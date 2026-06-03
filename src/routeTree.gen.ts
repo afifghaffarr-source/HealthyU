@@ -92,6 +92,7 @@ import { Route as AuthenticatedProfileScanStatsRouteImport } from './routes/_aut
 import { Route as AuthenticatedProfilePrivacyRouteImport } from './routes/_authenticated/profile.privacy'
 import { Route as AuthenticatedPetShopRouteImport } from './routes/_authenticated/pet.shop'
 import { Route as AuthenticatedNotificationsFeedRouteImport } from './routes/_authenticated/notifications.feed'
+import { Route as AuthenticatedMoodVoiceRouteImport } from './routes/_authenticated/mood.voice'
 import { Route as AuthenticatedMealplanGroceryRouteImport } from './routes/_authenticated/mealplan.grocery'
 import { Route as AuthenticatedHabitsStackRouteImport } from './routes/_authenticated/habits.stack'
 import { Route as AuthenticatedFriendsInviteRouteImport } from './routes/_authenticated/friends.invite'
@@ -555,6 +556,11 @@ const AuthenticatedNotificationsFeedRoute =
     path: '/feed',
     getParentRoute: () => AuthenticatedNotificationsRoute,
   } as any)
+const AuthenticatedMoodVoiceRoute = AuthenticatedMoodVoiceRouteImport.update({
+  id: '/voice',
+  path: '/voice',
+  getParentRoute: () => AuthenticatedMoodRoute,
+} as any)
 const AuthenticatedMealplanGroceryRoute =
   AuthenticatedMealplanGroceryRouteImport.update({
     id: '/grocery',
@@ -698,7 +704,7 @@ export interface FileRoutesByFullPath {
   '/mealplan': typeof AuthenticatedMealplanRouteWithChildren
   '/medications': typeof AuthenticatedMedicationsRoute
   '/meditation': typeof AuthenticatedMeditationRoute
-  '/mood': typeof AuthenticatedMoodRoute
+  '/mood': typeof AuthenticatedMoodRouteWithChildren
   '/notifications': typeof AuthenticatedNotificationsRouteWithChildren
   '/offline-queue': typeof AuthenticatedOfflineQueueRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
@@ -731,6 +737,7 @@ export interface FileRoutesByFullPath {
   '/friends/invite': typeof AuthenticatedFriendsInviteRoute
   '/habits/stack': typeof AuthenticatedHabitsStackRoute
   '/mealplan/grocery': typeof AuthenticatedMealplanGroceryRoute
+  '/mood/voice': typeof AuthenticatedMoodVoiceRoute
   '/notifications/feed': typeof AuthenticatedNotificationsFeedRoute
   '/pet/shop': typeof AuthenticatedPetShopRoute
   '/profile/privacy': typeof AuthenticatedProfilePrivacyRoute
@@ -801,7 +808,7 @@ export interface FileRoutesByTo {
   '/mealplan': typeof AuthenticatedMealplanRouteWithChildren
   '/medications': typeof AuthenticatedMedicationsRoute
   '/meditation': typeof AuthenticatedMeditationRoute
-  '/mood': typeof AuthenticatedMoodRoute
+  '/mood': typeof AuthenticatedMoodRouteWithChildren
   '/notifications': typeof AuthenticatedNotificationsRouteWithChildren
   '/offline-queue': typeof AuthenticatedOfflineQueueRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
@@ -834,6 +841,7 @@ export interface FileRoutesByTo {
   '/friends/invite': typeof AuthenticatedFriendsInviteRoute
   '/habits/stack': typeof AuthenticatedHabitsStackRoute
   '/mealplan/grocery': typeof AuthenticatedMealplanGroceryRoute
+  '/mood/voice': typeof AuthenticatedMoodVoiceRoute
   '/notifications/feed': typeof AuthenticatedNotificationsFeedRoute
   '/pet/shop': typeof AuthenticatedPetShopRoute
   '/profile/privacy': typeof AuthenticatedProfilePrivacyRoute
@@ -906,7 +914,7 @@ export interface FileRoutesById {
   '/_authenticated/mealplan': typeof AuthenticatedMealplanRouteWithChildren
   '/_authenticated/medications': typeof AuthenticatedMedicationsRoute
   '/_authenticated/meditation': typeof AuthenticatedMeditationRoute
-  '/_authenticated/mood': typeof AuthenticatedMoodRoute
+  '/_authenticated/mood': typeof AuthenticatedMoodRouteWithChildren
   '/_authenticated/notifications': typeof AuthenticatedNotificationsRouteWithChildren
   '/_authenticated/offline-queue': typeof AuthenticatedOfflineQueueRoute
   '/_authenticated/onboarding': typeof AuthenticatedOnboardingRoute
@@ -939,6 +947,7 @@ export interface FileRoutesById {
   '/_authenticated/friends/invite': typeof AuthenticatedFriendsInviteRoute
   '/_authenticated/habits/stack': typeof AuthenticatedHabitsStackRoute
   '/_authenticated/mealplan/grocery': typeof AuthenticatedMealplanGroceryRoute
+  '/_authenticated/mood/voice': typeof AuthenticatedMoodVoiceRoute
   '/_authenticated/notifications/feed': typeof AuthenticatedNotificationsFeedRoute
   '/_authenticated/pet/shop': typeof AuthenticatedPetShopRoute
   '/_authenticated/profile/privacy': typeof AuthenticatedProfilePrivacyRoute
@@ -1044,6 +1053,7 @@ export interface FileRouteTypes {
     | '/friends/invite'
     | '/habits/stack'
     | '/mealplan/grocery'
+    | '/mood/voice'
     | '/notifications/feed'
     | '/pet/shop'
     | '/profile/privacy'
@@ -1147,6 +1157,7 @@ export interface FileRouteTypes {
     | '/friends/invite'
     | '/habits/stack'
     | '/mealplan/grocery'
+    | '/mood/voice'
     | '/notifications/feed'
     | '/pet/shop'
     | '/profile/privacy'
@@ -1251,6 +1262,7 @@ export interface FileRouteTypes {
     | '/_authenticated/friends/invite'
     | '/_authenticated/habits/stack'
     | '/_authenticated/mealplan/grocery'
+    | '/_authenticated/mood/voice'
     | '/_authenticated/notifications/feed'
     | '/_authenticated/pet/shop'
     | '/_authenticated/profile/privacy'
@@ -1888,6 +1900,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedNotificationsFeedRouteImport
       parentRoute: typeof AuthenticatedNotificationsRoute
     }
+    '/_authenticated/mood/voice': {
+      id: '/_authenticated/mood/voice'
+      path: '/voice'
+      fullPath: '/mood/voice'
+      preLoaderRoute: typeof AuthenticatedMoodVoiceRouteImport
+      parentRoute: typeof AuthenticatedMoodRoute
+    }
     '/_authenticated/mealplan/grocery': {
       id: '/_authenticated/mealplan/grocery'
       path: '/grocery'
@@ -2097,6 +2116,17 @@ const AuthenticatedMealplanRouteWithChildren =
     AuthenticatedMealplanRouteChildren,
   )
 
+interface AuthenticatedMoodRouteChildren {
+  AuthenticatedMoodVoiceRoute: typeof AuthenticatedMoodVoiceRoute
+}
+
+const AuthenticatedMoodRouteChildren: AuthenticatedMoodRouteChildren = {
+  AuthenticatedMoodVoiceRoute: AuthenticatedMoodVoiceRoute,
+}
+
+const AuthenticatedMoodRouteWithChildren =
+  AuthenticatedMoodRoute._addFileChildren(AuthenticatedMoodRouteChildren)
+
 interface AuthenticatedNotificationsRouteChildren {
   AuthenticatedNotificationsFeedRoute: typeof AuthenticatedNotificationsFeedRoute
 }
@@ -2270,7 +2300,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedMealplanRoute: typeof AuthenticatedMealplanRouteWithChildren
   AuthenticatedMedicationsRoute: typeof AuthenticatedMedicationsRoute
   AuthenticatedMeditationRoute: typeof AuthenticatedMeditationRoute
-  AuthenticatedMoodRoute: typeof AuthenticatedMoodRoute
+  AuthenticatedMoodRoute: typeof AuthenticatedMoodRouteWithChildren
   AuthenticatedNotificationsRoute: typeof AuthenticatedNotificationsRouteWithChildren
   AuthenticatedOfflineQueueRoute: typeof AuthenticatedOfflineQueueRoute
   AuthenticatedOnboardingRoute: typeof AuthenticatedOnboardingRoute
@@ -2330,7 +2360,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedMealplanRoute: AuthenticatedMealplanRouteWithChildren,
   AuthenticatedMedicationsRoute: AuthenticatedMedicationsRoute,
   AuthenticatedMeditationRoute: AuthenticatedMeditationRoute,
-  AuthenticatedMoodRoute: AuthenticatedMoodRoute,
+  AuthenticatedMoodRoute: AuthenticatedMoodRouteWithChildren,
   AuthenticatedNotificationsRoute: AuthenticatedNotificationsRouteWithChildren,
   AuthenticatedOfflineQueueRoute: AuthenticatedOfflineQueueRoute,
   AuthenticatedOnboardingRoute: AuthenticatedOnboardingRoute,
