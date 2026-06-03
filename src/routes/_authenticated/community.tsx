@@ -123,7 +123,7 @@ function CommunityPage() {
           {visiblePosts.length === 0 ? (
             <p className="text-sm text-muted-foreground text-center py-8">Belum ada postingan. Jadilah yang pertama!</p>
           ) : (
-            posts.map((p) => (
+            visiblePosts.map((p) => (
               <article key={p.id} className="bg-card p-4 rounded-3xl outline-1 outline-black/5">
                 <div className="flex items-center gap-3 mb-2">
                   <div className="size-9 rounded-full bg-primary text-primary-foreground grid place-items-center text-sm font-bold">
