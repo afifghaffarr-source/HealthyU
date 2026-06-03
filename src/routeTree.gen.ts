@@ -54,6 +54,7 @@ import { Route as ApiChatStreamRouteImport } from './routes/api/chat.stream'
 import { Route as AuthenticatedRecipesSavedRouteImport } from './routes/_authenticated/recipes.saved'
 import { Route as AuthenticatedRecipesIdRouteImport } from './routes/_authenticated/recipes.$id'
 import { Route as ApiWearableGoogleFitCallbackRouteImport } from './routes/api/wearable.google-fit.callback'
+import { Route as ApiPublicHooksWeeklyAiReportRouteImport } from './routes/api/public/hooks/weekly-ai-report'
 import { Route as ApiPublicHooksRecipesTrendingSnapshotRouteImport } from './routes/api/public/hooks/recipes-trending-snapshot'
 import { Route as ApiPublicHooksNotificationSchedulerRouteImport } from './routes/api/public/hooks/notification-scheduler'
 import { Route as ApiPublicHooksDailyCoachRouteImport } from './routes/api/public/hooks/daily-coach'
@@ -292,6 +293,12 @@ const ApiWearableGoogleFitCallbackRoute =
     path: '/api/wearable/google-fit/callback',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicHooksWeeklyAiReportRoute =
+  ApiPublicHooksWeeklyAiReportRouteImport.update({
+    id: '/api/public/hooks/weekly-ai-report',
+    path: '/api/public/hooks/weekly-ai-report',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicHooksRecipesTrendingSnapshotRoute =
   ApiPublicHooksRecipesTrendingSnapshotRouteImport.update({
     id: '/api/public/hooks/recipes-trending-snapshot',
@@ -358,6 +365,7 @@ export interface FileRoutesByFullPath {
   '/api/public/hooks/daily-coach': typeof ApiPublicHooksDailyCoachRoute
   '/api/public/hooks/notification-scheduler': typeof ApiPublicHooksNotificationSchedulerRoute
   '/api/public/hooks/recipes-trending-snapshot': typeof ApiPublicHooksRecipesTrendingSnapshotRoute
+  '/api/public/hooks/weekly-ai-report': typeof ApiPublicHooksWeeklyAiReportRoute
   '/api/wearable/google-fit/callback': typeof ApiWearableGoogleFitCallbackRoute
 }
 export interface FileRoutesByTo {
@@ -407,6 +415,7 @@ export interface FileRoutesByTo {
   '/api/public/hooks/daily-coach': typeof ApiPublicHooksDailyCoachRoute
   '/api/public/hooks/notification-scheduler': typeof ApiPublicHooksNotificationSchedulerRoute
   '/api/public/hooks/recipes-trending-snapshot': typeof ApiPublicHooksRecipesTrendingSnapshotRoute
+  '/api/public/hooks/weekly-ai-report': typeof ApiPublicHooksWeeklyAiReportRoute
   '/api/wearable/google-fit/callback': typeof ApiWearableGoogleFitCallbackRoute
 }
 export interface FileRoutesById {
@@ -458,6 +467,7 @@ export interface FileRoutesById {
   '/api/public/hooks/daily-coach': typeof ApiPublicHooksDailyCoachRoute
   '/api/public/hooks/notification-scheduler': typeof ApiPublicHooksNotificationSchedulerRoute
   '/api/public/hooks/recipes-trending-snapshot': typeof ApiPublicHooksRecipesTrendingSnapshotRoute
+  '/api/public/hooks/weekly-ai-report': typeof ApiPublicHooksWeeklyAiReportRoute
   '/api/wearable/google-fit/callback': typeof ApiWearableGoogleFitCallbackRoute
 }
 export interface FileRouteTypes {
@@ -509,6 +519,7 @@ export interface FileRouteTypes {
     | '/api/public/hooks/daily-coach'
     | '/api/public/hooks/notification-scheduler'
     | '/api/public/hooks/recipes-trending-snapshot'
+    | '/api/public/hooks/weekly-ai-report'
     | '/api/wearable/google-fit/callback'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -558,6 +569,7 @@ export interface FileRouteTypes {
     | '/api/public/hooks/daily-coach'
     | '/api/public/hooks/notification-scheduler'
     | '/api/public/hooks/recipes-trending-snapshot'
+    | '/api/public/hooks/weekly-ai-report'
     | '/api/wearable/google-fit/callback'
   id:
     | '__root__'
@@ -608,6 +620,7 @@ export interface FileRouteTypes {
     | '/api/public/hooks/daily-coach'
     | '/api/public/hooks/notification-scheduler'
     | '/api/public/hooks/recipes-trending-snapshot'
+    | '/api/public/hooks/weekly-ai-report'
     | '/api/wearable/google-fit/callback'
   fileRoutesById: FileRoutesById
 }
@@ -619,6 +632,7 @@ export interface RootRouteChildren {
   ApiPublicHooksDailyCoachRoute: typeof ApiPublicHooksDailyCoachRoute
   ApiPublicHooksNotificationSchedulerRoute: typeof ApiPublicHooksNotificationSchedulerRoute
   ApiPublicHooksRecipesTrendingSnapshotRoute: typeof ApiPublicHooksRecipesTrendingSnapshotRoute
+  ApiPublicHooksWeeklyAiReportRoute: typeof ApiPublicHooksWeeklyAiReportRoute
   ApiWearableGoogleFitCallbackRoute: typeof ApiWearableGoogleFitCallbackRoute
 }
 
@@ -939,6 +953,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiWearableGoogleFitCallbackRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/hooks/weekly-ai-report': {
+      id: '/api/public/hooks/weekly-ai-report'
+      path: '/api/public/hooks/weekly-ai-report'
+      fullPath: '/api/public/hooks/weekly-ai-report'
+      preLoaderRoute: typeof ApiPublicHooksWeeklyAiReportRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/hooks/recipes-trending-snapshot': {
       id: '/api/public/hooks/recipes-trending-snapshot'
       path: '/api/public/hooks/recipes-trending-snapshot'
@@ -1071,8 +1092,19 @@ const rootRouteChildren: RootRouteChildren = {
     ApiPublicHooksNotificationSchedulerRoute,
   ApiPublicHooksRecipesTrendingSnapshotRoute:
     ApiPublicHooksRecipesTrendingSnapshotRoute,
+  ApiPublicHooksWeeklyAiReportRoute: ApiPublicHooksWeeklyAiReportRoute,
   ApiWearableGoogleFitCallbackRoute: ApiWearableGoogleFitCallbackRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
