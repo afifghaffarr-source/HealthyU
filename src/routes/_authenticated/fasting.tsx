@@ -2,9 +2,9 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { currentFast, startFast, stopFast } from "@/lib/fasting.functions";
+import { currentFast, startFast, stopFast, fastHistory } from "@/lib/fasting.functions";
 import { BottomNav } from "@/components/bottom-nav";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Check, X } from "lucide-react";
 import { FASTING_PROTOCOLS, fastingStage, formatDuration } from "@/lib/health";
 import { toast } from "sonner";
 
@@ -19,6 +19,8 @@ function FastingPage() {
   const stopFn = useServerFn(stopFast);
 
   const { data: fast } = useQuery({ queryKey: ["fast", "current"], queryFn: () => fetchFast() });
+  const fetchHistory = useServerFn(fastHistory);
+  const { data: history = [] } = useQuery({ queryKey: ["fast", "history"], queryFn: () => fetchHistory() });
 
   const [now, setNow] = useState(Date.now());
   useEffect(() => {
@@ -97,6 +99,31 @@ function FastingPage() {
                 <span className="text-primary font-bold text-sm">Mulai →</span>
               </button>
             ))}
+          </section>
+        )}
+
+        {history.length > 0 && (
+          <section className="space-y-2 animate-fade-up">
+            <h2 className="text-sm font-bold uppercase tracking-wider text-muted-foreground">Riwayat</h2>
+            {history.map((h) => {
+              const dur = h.end_time
+                ? (new Date(h.end_time).getTime() - new Date(h.start_time).getTime()) / 3600000
+                : 0;
+              const date = new Date(h.start_time).toLocaleDateString("id-ID", { day: "2-digit", month: "short" });
+              return (
+                <div key={h.id} className="bg-card p-4 rounded-2xl outline-1 outline-black/5 flex items-center gap-3">
+                  <div className={`size-9 rounded-xl grid place-items-center ${h.completed ? "bg-mint text-sage-deep" : "bg-muted text-muted-foreground"}`}>
+                    {h.completed ? <Check className="size-4" /> : <X className="size-4" />}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="font-semibold text-sm">{h.protocol} · {date}</p>
+                    <p className="text-xs text-muted-foreground tabular-nums">
+                      {dur.toFixed(1)}j / {Number(h.target_hours)}j
+                    </p>
+                  </div>
+                </div>
+              );
+            })}
           </section>
         )}
       </div>
