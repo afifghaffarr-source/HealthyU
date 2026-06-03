@@ -120,6 +120,7 @@ import { Route as AuthenticatedDoctorReferralRouteImport } from './routes/_authe
 import { Route as AuthenticatedCoachMealsRouteImport } from './routes/_authenticated/coach.meals'
 import { Route as AuthenticatedChallengesDailyRouteImport } from './routes/_authenticated/challenges.daily'
 import { Route as AuthenticatedCalendarGoogleRouteImport } from './routes/_authenticated/calendar.google'
+import { Route as AuthenticatedBonusAutoClaimRouteImport } from './routes/_authenticated/bonus.auto-claim'
 import { Route as ApiWearableGoogleFitCallbackRouteImport } from './routes/api/wearable.google-fit.callback'
 import { Route as ApiPublicHooksWeeklyAiReportRouteImport } from './routes/api/public/hooks/weekly-ai-report'
 import { Route as ApiPublicHooksRecipesTrendingSnapshotRouteImport } from './routes/api/public/hooks/recipes-trending-snapshot'
@@ -737,6 +738,12 @@ const AuthenticatedCalendarGoogleRoute =
     path: '/calendar/google',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedBonusAutoClaimRoute =
+  AuthenticatedBonusAutoClaimRouteImport.update({
+    id: '/bonus/auto-claim',
+    path: '/bonus/auto-claim',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const ApiWearableGoogleFitCallbackRoute =
   ApiWearableGoogleFitCallbackRouteImport.update({
     id: '/api/wearable/google-fit/callback',
@@ -860,6 +867,7 @@ export interface FileRoutesByFullPath {
   '/wearable': typeof AuthenticatedWearableRoute
   '/weight': typeof AuthenticatedWeightRouteWithChildren
   '/workout': typeof AuthenticatedWorkoutRouteWithChildren
+  '/bonus/auto-claim': typeof AuthenticatedBonusAutoClaimRoute
   '/calendar/google': typeof AuthenticatedCalendarGoogleRoute
   '/challenges/daily': typeof AuthenticatedChallengesDailyRoute
   '/coach/meals': typeof AuthenticatedCoachMealsRoute
@@ -983,6 +991,7 @@ export interface FileRoutesByTo {
   '/wearable': typeof AuthenticatedWearableRoute
   '/weight': typeof AuthenticatedWeightRouteWithChildren
   '/workout': typeof AuthenticatedWorkoutRouteWithChildren
+  '/bonus/auto-claim': typeof AuthenticatedBonusAutoClaimRoute
   '/calendar/google': typeof AuthenticatedCalendarGoogleRoute
   '/challenges/daily': typeof AuthenticatedChallengesDailyRoute
   '/coach/meals': typeof AuthenticatedCoachMealsRoute
@@ -1108,6 +1117,7 @@ export interface FileRoutesById {
   '/_authenticated/wearable': typeof AuthenticatedWearableRoute
   '/_authenticated/weight': typeof AuthenticatedWeightRouteWithChildren
   '/_authenticated/workout': typeof AuthenticatedWorkoutRouteWithChildren
+  '/_authenticated/bonus/auto-claim': typeof AuthenticatedBonusAutoClaimRoute
   '/_authenticated/calendar/google': typeof AuthenticatedCalendarGoogleRoute
   '/_authenticated/challenges/daily': typeof AuthenticatedChallengesDailyRoute
   '/_authenticated/coach/meals': typeof AuthenticatedCoachMealsRoute
@@ -1233,6 +1243,7 @@ export interface FileRouteTypes {
     | '/wearable'
     | '/weight'
     | '/workout'
+    | '/bonus/auto-claim'
     | '/calendar/google'
     | '/challenges/daily'
     | '/coach/meals'
@@ -1356,6 +1367,7 @@ export interface FileRouteTypes {
     | '/wearable'
     | '/weight'
     | '/workout'
+    | '/bonus/auto-claim'
     | '/calendar/google'
     | '/challenges/daily'
     | '/coach/meals'
@@ -1480,6 +1492,7 @@ export interface FileRouteTypes {
     | '/_authenticated/wearable'
     | '/_authenticated/weight'
     | '/_authenticated/workout'
+    | '/_authenticated/bonus/auto-claim'
     | '/_authenticated/calendar/google'
     | '/_authenticated/challenges/daily'
     | '/_authenticated/coach/meals'
@@ -2339,6 +2352,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedCalendarGoogleRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/bonus/auto-claim': {
+      id: '/_authenticated/bonus/auto-claim'
+      path: '/bonus/auto-claim'
+      fullPath: '/bonus/auto-claim'
+      preLoaderRoute: typeof AuthenticatedBonusAutoClaimRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/api/wearable/google-fit/callback': {
       id: '/api/wearable/google-fit/callback'
       path: '/api/wearable/google-fit/callback'
@@ -2767,6 +2787,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedWearableRoute: typeof AuthenticatedWearableRoute
   AuthenticatedWeightRoute: typeof AuthenticatedWeightRouteWithChildren
   AuthenticatedWorkoutRoute: typeof AuthenticatedWorkoutRouteWithChildren
+  AuthenticatedBonusAutoClaimRoute: typeof AuthenticatedBonusAutoClaimRoute
   AuthenticatedCalendarGoogleRoute: typeof AuthenticatedCalendarGoogleRoute
   AuthenticatedExercisesLibraryRoute: typeof AuthenticatedExercisesLibraryRoute
   AuthenticatedExercisesRecommendRoute: typeof AuthenticatedExercisesRecommendRoute
@@ -2835,6 +2856,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedWearableRoute: AuthenticatedWearableRoute,
   AuthenticatedWeightRoute: AuthenticatedWeightRouteWithChildren,
   AuthenticatedWorkoutRoute: AuthenticatedWorkoutRouteWithChildren,
+  AuthenticatedBonusAutoClaimRoute: AuthenticatedBonusAutoClaimRoute,
   AuthenticatedCalendarGoogleRoute: AuthenticatedCalendarGoogleRoute,
   AuthenticatedExercisesLibraryRoute: AuthenticatedExercisesLibraryRoute,
   AuthenticatedExercisesRecommendRoute: AuthenticatedExercisesRecommendRoute,
