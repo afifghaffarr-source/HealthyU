@@ -46,6 +46,8 @@ export async function computeGroupChallengeSummary(userId: string) {
   }
 
   const out: Array<{
+    group_id: string;
+    challenge_id: string;
     group: string;
     challenge: string;
     duration_days: number | null;
@@ -69,6 +71,8 @@ export async function computeGroupChallengeSummary(userId: string) {
     const me = myIdx >= 0 ? groupParts[myIdx] : null;
     const ch = chMap.get(link.challenge_id);
     out.push({
+      group_id: link.group_id,
+      challenge_id: link.challenge_id,
       group: groupName.get(link.group_id) ?? "Grup",
       challenge: ch?.title ?? "Challenge",
       duration_days: ch?.duration_days ?? null,
