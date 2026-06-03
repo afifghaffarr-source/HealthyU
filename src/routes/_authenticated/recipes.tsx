@@ -3,7 +3,11 @@ import { useEffect, useRef, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { listRecipes } from "@/lib/recipes.functions";
-import { TRENDING_TTL_DAYS } from "@/lib/constants";
+import {
+  TRENDING_TTL_DAYS,
+  TRENDING_COUNTER_PULSE_MS,
+  TRENDING_GROWTH_FLASH_MS,
+} from "@/lib/constants";
 import { generateRecipeFromIngredients, type GeneratedRecipe } from "@/lib/ai-extras.functions";
 import { BottomNav } from "@/components/bottom-nav";
 import { ArrowLeft, Clock, Flame, Search, Sparkles, Loader2, X, Star, Bookmark, TrendingUp } from "lucide-react";
@@ -89,7 +93,7 @@ function RecipesPage() {
     if (prev === null) return;
     if (trendingCount > prev) {
       setPulseCounter(true);
-      const t = window.setTimeout(() => setPulseCounter(false), 1500);
+      const t = window.setTimeout(() => setPulseCounter(false), TRENDING_COUNTER_PULSE_MS);
       return () => window.clearTimeout(t);
     }
   }, [trendingCount]);
@@ -134,7 +138,7 @@ function RecipesPage() {
         for (const id of ids) delete copy[id];
         return copy;
       });
-    }, 2500);
+    }, TRENDING_GROWTH_FLASH_MS);
     return () => window.clearTimeout(t);
   }, [all]);
 
