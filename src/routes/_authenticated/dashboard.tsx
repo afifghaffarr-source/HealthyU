@@ -487,6 +487,9 @@ function Dashboard() {
                 const entries = Object.entries(newClaims);
                 return (
                   <div className="ml-auto relative" ref={breakdownRef}>
+                    <span role="status" aria-live="polite" className="sr-only">
+                      {restoredFromBreakdown ? "Popover ditutup, fokus dikembalikan ke badge klaim baru" : ""}
+                    </span>
                     <button
                       ref={badgeBtnRef}
                       onClick={() => setBreakdownOpen((o) => !o)}
