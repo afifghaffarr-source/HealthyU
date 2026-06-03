@@ -2,9 +2,9 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { getChatHistory, sendChatMessage } from "@/lib/chat.functions";
+import { getChatHistory, sendChatMessage, clearChatHistory } from "@/lib/chat.functions";
 import { BottomNav } from "@/components/bottom-nav";
-import { ArrowLeft, Send, Sparkles, ImagePlus, X, Mic, MicOff, Volume2, VolumeX, Utensils, Timer, Flame, ChefHat } from "lucide-react";
+import { ArrowLeft, Send, Sparkles, ImagePlus, X, Mic, MicOff, Volume2, VolumeX, Utensils, Timer, Flame, ChefHat, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/chat")({
@@ -29,6 +29,7 @@ function ChatPage() {
   const qc = useQueryClient();
   const fetchHist = useServerFn(getChatHistory);
   const send = useServerFn(sendChatMessage);
+  const clearFn = useServerFn(clearChatHistory);
   const { data: messages = [] } = useQuery({ queryKey: ["chat"], queryFn: () => fetchHist() });
 
   const [input, setInput] = useState("");
@@ -51,6 +52,22 @@ function ChatPage() {
     },
     onError: (e) => toast.error(e instanceof Error ? e.message : "Gagal kirim"),
   });
+
+  const clearMut = useMutation({
+    mutationFn: () => clearFn(),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["chat"] });
+      try { window.speechSynthesis?.cancel(); } catch {}
+      lastSpokenRef.current = null;
+      toast.success("Riwayat dihapus");
+    },
+  });
+
+  const handleClear = () => {
+    if (!messages.length || clearMut.isPending) return;
+    if (typeof window !== "undefined" && !window.confirm("Hapus seluruh percakapan?")) return;
+    clearMut.mutate();
+  };
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
@@ -178,6 +195,14 @@ function ChatPage() {
           aria-label="Toggle suara balasan"
         >
           {ttsOn ? <Volume2 className="size-4" /> : <VolumeX className="size-4" />}
+        </button>
+        <button
+          onClick={handleClear}
+          disabled={!messages.length || clearMut.isPending}
+          className="size-10 rounded-2xl grid place-items-center bg-card outline-1 outline-black/10 text-muted-foreground hover:text-destructive disabled:opacity-40"
+          aria-label="Hapus percakapan"
+        >
+          <Trash2 className="size-4" />
         </button>
       </header>
 
