@@ -173,7 +173,8 @@ export const PDF_PAGE_CONTENT_W = PDF_PAGE_W - 2 * PDF_MARGIN_X;
 
 /** Warna fill brand untuk header autoTable PDF. */
 // eslint-disable-next-line no-restricted-syntax -- listed in header table
-export const PDF_HEADER_FILL_RGB: [number, number, number] = [107, 142, 90];
+// HealthyU Green 500 (#4CAF50)
+export const PDF_HEADER_FILL_RGB: [number, number, number] = [76, 175, 80];
 
 /** Warna teks & garis hyperlink di PDF (back-link TOC). */
 // eslint-disable-next-line no-restricted-syntax -- listed in header table
