@@ -4,7 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { listRecipes } from "@/lib/recipes.functions";
 import { BottomNav } from "@/components/bottom-nav";
-import { ArrowLeft, Clock, Flame } from "lucide-react";
+import { ArrowLeft, Clock, Flame, Search } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/recipes")({
   component: RecipesPage,
@@ -22,7 +22,14 @@ function RecipesPage() {
   const fetchList = useServerFn(listRecipes);
   const { data: all = [] } = useQuery({ queryKey: ["recipes"], queryFn: () => fetchList() });
   const [cat, setCat] = useState<(typeof CATS)[number]["id"]>("all");
-  const items = cat === "all" ? all : all.filter((r) => r.category === cat);
+  const [q, setQ] = useState("");
+  const items = all
+    .filter((r) => cat === "all" || r.category === cat)
+    .filter((r) => {
+      if (!q.trim()) return true;
+      const s = q.toLowerCase();
+      return r.title.toLowerCase().includes(s) || (r.description ?? "").toLowerCase().includes(s);
+    });
 
   return (
     <main className="min-h-screen bg-background pb-28">
@@ -36,6 +43,16 @@ function RecipesPage() {
             <p className="text-xs text-muted-foreground">Pilihan menu Indonesia</p>
           </div>
         </header>
+
+        <div className="relative">
+          <Search className="size-4 absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground" />
+          <input
+            value={q}
+            onChange={(e) => setQ(e.target.value)}
+            placeholder="Cari resep (gado-gado, ayam bakar...)"
+            className="w-full bg-card rounded-2xl outline-1 outline-black/10 py-3 pl-11 pr-4 text-sm"
+          />
+        </div>
 
         <div className="flex gap-2 overflow-x-auto -mx-5 px-5 pb-1">
           {CATS.map((c) => (
