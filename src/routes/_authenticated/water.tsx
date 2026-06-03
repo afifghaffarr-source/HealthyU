@@ -10,8 +10,10 @@ import {
 } from "@/lib/water.functions";
 import { getAchievementToastPrefix } from "@/lib/achievement-icons";
 import { BottomNav } from "@/components/bottom-nav";
-import { ArrowLeft, Droplet, Trash2, Plus } from "lucide-react";
+import { ArrowLeft, Droplet, Trash2, WifiOff, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
+import { enqueue } from "@/lib/offline-queue";
+import { useOfflineQueue } from "@/hooks/use-offline-queue";
 
 export const Route = createFileRoute("/_authenticated/water")({
   component: WaterPage,
@@ -27,6 +29,7 @@ function WaterPage() {
   const fetchWeek = useServerFn(weekWaterHistory);
   const logFn = useServerFn(logWater);
   const delFn = useServerFn(deleteWater);
+  const { online, pending, sync } = useOfflineQueue();
 
   const { data: total = 0 } = useQuery({ queryKey: ["water", "today"], queryFn: () => fetchToday() });
   const { data: entries = [] } = useQuery({
@@ -44,11 +47,21 @@ function WaterPage() {
   };
 
   const logMut = useMutation({
-    mutationFn: (ml: number) => logFn({ data: { amount_ml: ml } }),
+    mutationFn: async (ml: number) => {
+      if (!navigator.onLine) {
+        await enqueue("water", { amount_ml: ml });
+        return { offline: true, ml };
+      }
+      return logFn({ data: { amount_ml: ml } });
+    },
     onSuccess: (res, ml) => {
       invalidate();
+      if (res && (res as { offline?: boolean }).offline) {
+        toast.success(`+${ml}ml disimpan offline. Akan sync otomatis.`);
+        return;
+      }
       toast.success(`+${ml}ml dicatat`);
-      const newly = res?.game?.newlyUnlocked ?? [];
+      const newly = ("game" in res ? res.game?.newlyUnlocked : undefined) ?? [];
       newly.forEach((a: { icon: string; title: string }) =>
         toast.success(`${getAchievementToastPrefix(a.icon)} ${a.title} terbuka!`),
       );
@@ -81,6 +94,15 @@ function WaterPage() {
             <h1 className="text-xl font-bold">Hidrasi</h1>
             <p className="text-xs text-muted-foreground">Target {GOAL_ML} ml / hari</p>
           </div>
+          {(!online || pending > 0) && (
+            <button
+              onClick={() => sync()}
+              className={`ml-auto inline-flex items-center gap-1 text-[11px] font-semibold px-2.5 py-1.5 rounded-full ${online ? "bg-amber-100 text-amber-700" : "bg-muted text-muted-foreground"}`}
+            >
+              {online ? <RefreshCw className="size-3" /> : <WifiOff className="size-3" />}
+              {online ? `Sync ${pending}` : `Offline${pending ? ` · ${pending}` : ""}`}
+            </button>
+          )}
         </div>
       </header>
 

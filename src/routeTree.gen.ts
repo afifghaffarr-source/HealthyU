@@ -31,6 +31,7 @@ import { Route as AuthenticatedMoodRouteImport } from './routes/_authenticated/m
 import { Route as AuthenticatedMedicationsRouteImport } from './routes/_authenticated/medications'
 import { Route as AuthenticatedMealplanRouteImport } from './routes/_authenticated/mealplan'
 import { Route as AuthenticatedLeaderboardRouteImport } from './routes/_authenticated/leaderboard'
+import { Route as AuthenticatedHealthImportRouteImport } from './routes/_authenticated/health-import'
 import { Route as AuthenticatedGroupsRouteImport } from './routes/_authenticated/groups'
 import { Route as AuthenticatedFoodsRouteImport } from './routes/_authenticated/foods'
 import { Route as AuthenticatedFoodRouteImport } from './routes/_authenticated/food'
@@ -44,6 +45,7 @@ import { Route as AuthenticatedAchievementsRouteImport } from './routes/_authent
 import { Route as ApiChatStreamRouteImport } from './routes/api/chat.stream'
 import { Route as AuthenticatedRecipesIdRouteImport } from './routes/_authenticated/recipes.$id'
 import { Route as ApiWearableGoogleFitCallbackRouteImport } from './routes/api/wearable.google-fit.callback'
+import { Route as ApiPublicHooksDailyCoachRouteImport } from './routes/api/public/hooks/daily-coach'
 
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
@@ -157,6 +159,12 @@ const AuthenticatedLeaderboardRoute =
     path: '/leaderboard',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedHealthImportRoute =
+  AuthenticatedHealthImportRouteImport.update({
+    id: '/health-import',
+    path: '/health-import',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedGroupsRoute = AuthenticatedGroupsRouteImport.update({
   id: '/groups',
   path: '/groups',
@@ -224,6 +232,12 @@ const ApiWearableGoogleFitCallbackRoute =
     path: '/api/wearable/google-fit/callback',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicHooksDailyCoachRoute =
+  ApiPublicHooksDailyCoachRouteImport.update({
+    id: '/api/public/hooks/daily-coach',
+    path: '/api/public/hooks/daily-coach',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -238,6 +252,7 @@ export interface FileRoutesByFullPath {
   '/food': typeof AuthenticatedFoodRoute
   '/foods': typeof AuthenticatedFoodsRoute
   '/groups': typeof AuthenticatedGroupsRoute
+  '/health-import': typeof AuthenticatedHealthImportRoute
   '/leaderboard': typeof AuthenticatedLeaderboardRoute
   '/mealplan': typeof AuthenticatedMealplanRoute
   '/medications': typeof AuthenticatedMedicationsRoute
@@ -259,6 +274,7 @@ export interface FileRoutesByFullPath {
   '/workout': typeof AuthenticatedWorkoutRoute
   '/recipes/$id': typeof AuthenticatedRecipesIdRoute
   '/api/chat/stream': typeof ApiChatStreamRoute
+  '/api/public/hooks/daily-coach': typeof ApiPublicHooksDailyCoachRoute
   '/api/wearable/google-fit/callback': typeof ApiWearableGoogleFitCallbackRoute
 }
 export interface FileRoutesByTo {
@@ -274,6 +290,7 @@ export interface FileRoutesByTo {
   '/food': typeof AuthenticatedFoodRoute
   '/foods': typeof AuthenticatedFoodsRoute
   '/groups': typeof AuthenticatedGroupsRoute
+  '/health-import': typeof AuthenticatedHealthImportRoute
   '/leaderboard': typeof AuthenticatedLeaderboardRoute
   '/mealplan': typeof AuthenticatedMealplanRoute
   '/medications': typeof AuthenticatedMedicationsRoute
@@ -295,6 +312,7 @@ export interface FileRoutesByTo {
   '/workout': typeof AuthenticatedWorkoutRoute
   '/recipes/$id': typeof AuthenticatedRecipesIdRoute
   '/api/chat/stream': typeof ApiChatStreamRoute
+  '/api/public/hooks/daily-coach': typeof ApiPublicHooksDailyCoachRoute
   '/api/wearable/google-fit/callback': typeof ApiWearableGoogleFitCallbackRoute
 }
 export interface FileRoutesById {
@@ -312,6 +330,7 @@ export interface FileRoutesById {
   '/_authenticated/food': typeof AuthenticatedFoodRoute
   '/_authenticated/foods': typeof AuthenticatedFoodsRoute
   '/_authenticated/groups': typeof AuthenticatedGroupsRoute
+  '/_authenticated/health-import': typeof AuthenticatedHealthImportRoute
   '/_authenticated/leaderboard': typeof AuthenticatedLeaderboardRoute
   '/_authenticated/mealplan': typeof AuthenticatedMealplanRoute
   '/_authenticated/medications': typeof AuthenticatedMedicationsRoute
@@ -333,6 +352,7 @@ export interface FileRoutesById {
   '/_authenticated/workout': typeof AuthenticatedWorkoutRoute
   '/_authenticated/recipes/$id': typeof AuthenticatedRecipesIdRoute
   '/api/chat/stream': typeof ApiChatStreamRoute
+  '/api/public/hooks/daily-coach': typeof ApiPublicHooksDailyCoachRoute
   '/api/wearable/google-fit/callback': typeof ApiWearableGoogleFitCallbackRoute
 }
 export interface FileRouteTypes {
@@ -350,6 +370,7 @@ export interface FileRouteTypes {
     | '/food'
     | '/foods'
     | '/groups'
+    | '/health-import'
     | '/leaderboard'
     | '/mealplan'
     | '/medications'
@@ -371,6 +392,7 @@ export interface FileRouteTypes {
     | '/workout'
     | '/recipes/$id'
     | '/api/chat/stream'
+    | '/api/public/hooks/daily-coach'
     | '/api/wearable/google-fit/callback'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -386,6 +408,7 @@ export interface FileRouteTypes {
     | '/food'
     | '/foods'
     | '/groups'
+    | '/health-import'
     | '/leaderboard'
     | '/mealplan'
     | '/medications'
@@ -407,6 +430,7 @@ export interface FileRouteTypes {
     | '/workout'
     | '/recipes/$id'
     | '/api/chat/stream'
+    | '/api/public/hooks/daily-coach'
     | '/api/wearable/google-fit/callback'
   id:
     | '__root__'
@@ -423,6 +447,7 @@ export interface FileRouteTypes {
     | '/_authenticated/food'
     | '/_authenticated/foods'
     | '/_authenticated/groups'
+    | '/_authenticated/health-import'
     | '/_authenticated/leaderboard'
     | '/_authenticated/mealplan'
     | '/_authenticated/medications'
@@ -444,6 +469,7 @@ export interface FileRouteTypes {
     | '/_authenticated/workout'
     | '/_authenticated/recipes/$id'
     | '/api/chat/stream'
+    | '/api/public/hooks/daily-coach'
     | '/api/wearable/google-fit/callback'
   fileRoutesById: FileRoutesById
 }
@@ -452,6 +478,7 @@ export interface RootRouteChildren {
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
   ApiChatStreamRoute: typeof ApiChatStreamRoute
+  ApiPublicHooksDailyCoachRoute: typeof ApiPublicHooksDailyCoachRoute
   ApiWearableGoogleFitCallbackRoute: typeof ApiWearableGoogleFitCallbackRoute
 }
 
@@ -611,6 +638,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedLeaderboardRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/health-import': {
+      id: '/_authenticated/health-import'
+      path: '/health-import'
+      fullPath: '/health-import'
+      preLoaderRoute: typeof AuthenticatedHealthImportRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/groups': {
       id: '/_authenticated/groups'
       path: '/groups'
@@ -702,6 +736,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiWearableGoogleFitCallbackRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/hooks/daily-coach': {
+      id: '/api/public/hooks/daily-coach'
+      path: '/api/public/hooks/daily-coach'
+      fullPath: '/api/public/hooks/daily-coach'
+      preLoaderRoute: typeof ApiPublicHooksDailyCoachRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -727,6 +768,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedFoodRoute: typeof AuthenticatedFoodRoute
   AuthenticatedFoodsRoute: typeof AuthenticatedFoodsRoute
   AuthenticatedGroupsRoute: typeof AuthenticatedGroupsRoute
+  AuthenticatedHealthImportRoute: typeof AuthenticatedHealthImportRoute
   AuthenticatedLeaderboardRoute: typeof AuthenticatedLeaderboardRoute
   AuthenticatedMealplanRoute: typeof AuthenticatedMealplanRoute
   AuthenticatedMedicationsRoute: typeof AuthenticatedMedicationsRoute
@@ -759,6 +801,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedFoodRoute: AuthenticatedFoodRoute,
   AuthenticatedFoodsRoute: AuthenticatedFoodsRoute,
   AuthenticatedGroupsRoute: AuthenticatedGroupsRoute,
+  AuthenticatedHealthImportRoute: AuthenticatedHealthImportRoute,
   AuthenticatedLeaderboardRoute: AuthenticatedLeaderboardRoute,
   AuthenticatedMealplanRoute: AuthenticatedMealplanRoute,
   AuthenticatedMedicationsRoute: AuthenticatedMedicationsRoute,
@@ -788,6 +831,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
   ApiChatStreamRoute: ApiChatStreamRoute,
+  ApiPublicHooksDailyCoachRoute: ApiPublicHooksDailyCoachRoute,
   ApiWearableGoogleFitCallbackRoute: ApiWearableGoogleFitCallbackRoute,
 }
 export const routeTree = rootRouteImport
