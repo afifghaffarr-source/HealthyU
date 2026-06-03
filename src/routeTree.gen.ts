@@ -96,6 +96,7 @@ import { Route as AuthenticatedRecipesIdRouteImport } from './routes/_authentica
 import { Route as AuthenticatedQuizDailyRouteImport } from './routes/_authenticated/quiz.daily'
 import { Route as AuthenticatedProfileScanStatsRouteImport } from './routes/_authenticated/profile.scan-stats'
 import { Route as AuthenticatedProfilePrivacyRouteImport } from './routes/_authenticated/profile.privacy'
+import { Route as AuthenticatedPodcastWeeklyRouteImport } from './routes/_authenticated/podcast.weekly'
 import { Route as AuthenticatedPetShopRouteImport } from './routes/_authenticated/pet.shop'
 import { Route as AuthenticatedNotificationsFeedRouteImport } from './routes/_authenticated/notifications.feed'
 import { Route as AuthenticatedMoodVoiceRouteImport } from './routes/_authenticated/mood.voice'
@@ -588,6 +589,12 @@ const AuthenticatedProfilePrivacyRoute =
     path: '/privacy',
     getParentRoute: () => AuthenticatedProfileRoute,
   } as any)
+const AuthenticatedPodcastWeeklyRoute =
+  AuthenticatedPodcastWeeklyRouteImport.update({
+    id: '/podcast/weekly',
+    path: '/podcast/weekly',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedPetShopRoute = AuthenticatedPetShopRouteImport.update({
   id: '/shop',
   path: '/shop',
@@ -812,6 +819,7 @@ export interface FileRoutesByFullPath {
   '/mood/voice': typeof AuthenticatedMoodVoiceRoute
   '/notifications/feed': typeof AuthenticatedNotificationsFeedRoute
   '/pet/shop': typeof AuthenticatedPetShopRoute
+  '/podcast/weekly': typeof AuthenticatedPodcastWeeklyRoute
   '/profile/privacy': typeof AuthenticatedProfilePrivacyRoute
   '/profile/scan-stats': typeof AuthenticatedProfileScanStatsRoute
   '/quiz/daily': typeof AuthenticatedQuizDailyRoute
@@ -926,6 +934,7 @@ export interface FileRoutesByTo {
   '/mood/voice': typeof AuthenticatedMoodVoiceRoute
   '/notifications/feed': typeof AuthenticatedNotificationsFeedRoute
   '/pet/shop': typeof AuthenticatedPetShopRoute
+  '/podcast/weekly': typeof AuthenticatedPodcastWeeklyRoute
   '/profile/privacy': typeof AuthenticatedProfilePrivacyRoute
   '/profile/scan-stats': typeof AuthenticatedProfileScanStatsRoute
   '/quiz/daily': typeof AuthenticatedQuizDailyRoute
@@ -1042,6 +1051,7 @@ export interface FileRoutesById {
   '/_authenticated/mood/voice': typeof AuthenticatedMoodVoiceRoute
   '/_authenticated/notifications/feed': typeof AuthenticatedNotificationsFeedRoute
   '/_authenticated/pet/shop': typeof AuthenticatedPetShopRoute
+  '/_authenticated/podcast/weekly': typeof AuthenticatedPodcastWeeklyRoute
   '/_authenticated/profile/privacy': typeof AuthenticatedProfilePrivacyRoute
   '/_authenticated/profile/scan-stats': typeof AuthenticatedProfileScanStatsRoute
   '/_authenticated/quiz/daily': typeof AuthenticatedQuizDailyRoute
@@ -1158,6 +1168,7 @@ export interface FileRouteTypes {
     | '/mood/voice'
     | '/notifications/feed'
     | '/pet/shop'
+    | '/podcast/weekly'
     | '/profile/privacy'
     | '/profile/scan-stats'
     | '/quiz/daily'
@@ -1272,6 +1283,7 @@ export interface FileRouteTypes {
     | '/mood/voice'
     | '/notifications/feed'
     | '/pet/shop'
+    | '/podcast/weekly'
     | '/profile/privacy'
     | '/profile/scan-stats'
     | '/quiz/daily'
@@ -1387,6 +1399,7 @@ export interface FileRouteTypes {
     | '/_authenticated/mood/voice'
     | '/_authenticated/notifications/feed'
     | '/_authenticated/pet/shop'
+    | '/_authenticated/podcast/weekly'
     | '/_authenticated/profile/privacy'
     | '/_authenticated/profile/scan-stats'
     | '/_authenticated/quiz/daily'
@@ -2055,6 +2068,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedProfilePrivacyRouteImport
       parentRoute: typeof AuthenticatedProfileRoute
     }
+    '/_authenticated/podcast/weekly': {
+      id: '/_authenticated/podcast/weekly'
+      path: '/podcast/weekly'
+      fullPath: '/podcast/weekly'
+      preLoaderRoute: typeof AuthenticatedPodcastWeeklyRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/pet/shop': {
       id: '/_authenticated/pet/shop'
       path: '/shop'
@@ -2572,6 +2592,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedFriendsInviteRoute: typeof AuthenticatedFriendsInviteRoute
   AuthenticatedGrocerySmartRoute: typeof AuthenticatedGrocerySmartRoute
   AuthenticatedHabitsStackRoute: typeof AuthenticatedHabitsStackRoute
+  AuthenticatedPodcastWeeklyRoute: typeof AuthenticatedPodcastWeeklyRoute
   AuthenticatedQuizDailyRoute: typeof AuthenticatedQuizDailyRoute
   AuthenticatedRestaurantsNearbyRoute: typeof AuthenticatedRestaurantsNearbyRoute
   AuthenticatedShoppingListRoute: typeof AuthenticatedShoppingListRoute
@@ -2635,6 +2656,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedFriendsInviteRoute: AuthenticatedFriendsInviteRoute,
   AuthenticatedGrocerySmartRoute: AuthenticatedGrocerySmartRoute,
   AuthenticatedHabitsStackRoute: AuthenticatedHabitsStackRoute,
+  AuthenticatedPodcastWeeklyRoute: AuthenticatedPodcastWeeklyRoute,
   AuthenticatedQuizDailyRoute: AuthenticatedQuizDailyRoute,
   AuthenticatedRestaurantsNearbyRoute: AuthenticatedRestaurantsNearbyRoute,
   AuthenticatedShoppingListRoute: AuthenticatedShoppingListRoute,
