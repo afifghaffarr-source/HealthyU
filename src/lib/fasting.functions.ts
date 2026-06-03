@@ -85,3 +85,49 @@ export const fastHistory = createServerFn({ method: "GET" })
     if (error) throw new Error(error.message);
     return data ?? [];
   });
+
+export const getFastingSchedule = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { supabase, userId } = context;
+    const { data, error } = await supabase
+      .from("fasting_schedules")
+      .select("*")
+      .eq("user_id", userId)
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    if (error) throw new Error(error.message);
+    return data;
+  });
+
+const ScheduleSchema = z.object({
+  fasting_type: z.string().min(1).max(20),
+  is_ramadhan_mode: z.boolean().default(false),
+  is_active: z.boolean().default(true),
+  target_duration_hours: z.number().min(1).max(24).nullable().optional(),
+  eating_window_start: z.string().regex(/^\d{2}:\d{2}(:\d{2})?$/).nullable().optional(),
+  eating_window_end: z.string().regex(/^\d{2}:\d{2}(:\d{2})?$/).nullable().optional(),
+  enabled_days: z.array(z.number().min(0).max(6)).max(7).default([]),
+});
+
+export const saveFastingSchedule = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((i: unknown) => ScheduleSchema.parse(i))
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    // deactivate existing
+    await supabase.from("fasting_schedules").update({ is_active: false }).eq("user_id", userId);
+    const { error } = await supabase.from("fasting_schedules").insert({
+      user_id: userId,
+      fasting_type: data.fasting_type,
+      is_ramadhan_mode: data.is_ramadhan_mode,
+      is_active: data.is_active,
+      target_duration_hours: data.target_duration_hours ?? null,
+      eating_window_start: data.eating_window_start ?? null,
+      eating_window_end: data.eating_window_end ?? null,
+      enabled_days: data.enabled_days as never,
+    });
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
