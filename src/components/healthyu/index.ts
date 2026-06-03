@@ -11,3 +11,4 @@ export { LazyImage } from "./lazy-image";
 export { PullIndicator } from "./pull-indicator";
 export { Coachmark } from "./coachmark";
 export { CardSkeleton, ListSkeleton, StatSkeleton } from "./skeletons";
+export { SearchChips } from "./search-chips";

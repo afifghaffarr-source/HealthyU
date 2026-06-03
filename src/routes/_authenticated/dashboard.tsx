@@ -14,6 +14,8 @@ import { getAchievementToastPrefix } from "@/lib/achievement-icons";
 import { BottomNav } from "@/components/bottom-nav";
 import { CalorieRing } from "@/components/calorie-ring";
 import { Coachmark } from "@/components/healthyu/coachmark";
+import { PullIndicator } from "@/components/healthyu/pull-indicator";
+import { usePullToRefresh } from "@/hooks/use-pull-to-refresh";
 import { formatDuration, fastingStage } from "@/lib/health";
 import { Droplet, Plus, Sparkles, ArrowRight, Flame, Trophy, Camera, Smile } from "lucide-react";
 import { toast } from "sonner";
@@ -34,6 +36,9 @@ export const Route = createFileRoute("/_authenticated/dashboard")({
 function Dashboard() {
   const navigate = useNavigate();
   const qc = useQueryClient();
+  const { pulling, refreshing } = usePullToRefresh(async () => {
+    await qc.invalidateQueries();
+  });
   const announce = useAnnounce();
   const prefersReducedMotion = useReducedMotion();
   const fetchProfile = useServerFn(getProfile);
@@ -287,6 +292,7 @@ function Dashboard() {
 
   return (
     <main className="min-h-screen bg-background pb-28">
+      <PullIndicator pulling={pulling} refreshing={refreshing} />
       <div className="max-w-md mx-auto px-5 pt-8 space-y-5">
         <header className="flex justify-between items-start animate-fade-up">
           <div>
