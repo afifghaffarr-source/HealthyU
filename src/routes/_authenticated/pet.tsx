@@ -2,7 +2,8 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { ArrowLeft, Heart, Zap, Drumstick, Smile, Sparkles } from "lucide-react";
+import { Heart, Zap, Drumstick, Smile, Sparkles } from "lucide-react";
+import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { toast } from "sonner";
 import { BottomNav } from "@/components/bottom-nav";
 import { getPet, adoptPet, interactPet } from "@/lib/pet.functions";
@@ -61,17 +62,9 @@ function PetPage() {
 
   return (
     <div className="min-h-screen pb-32">
-      <header className="sticky top-0 z-30 bg-background/85 backdrop-blur-xl border-b border-border/60">
-        <div className="max-w-md mx-auto px-4 h-14 flex items-center gap-3">
-          <Link to="/dashboard" className="size-9 inline-flex items-center justify-center rounded-full bg-muted">
-            <ArrowLeft className="size-4" />
-          </Link>
-          <h1 className="text-base font-bold flex items-center gap-2">
-            <Sparkles className="size-4 text-primary" />
-            Virtual Pet
-          </h1>
-        </div>
-      </header>
+      <div className="max-w-md mx-auto px-4">
+        <TopAppBar title="Virtual Pet" showBack />
+      </div>
       <main className="max-w-md mx-auto px-4 pt-4 space-y-4">
         {isLoading && <p className="text-sm text-muted-foreground text-center py-10">Memuat…</p>}
         {!isLoading && !pet && (
