@@ -27,6 +27,7 @@ import {
   HeartPulse,
   Activity,
   Download,
+  UsersRound,
 } from "lucide-react";
 import { useTheme } from "@/components/theme-provider";
 
@@ -244,6 +245,13 @@ function ProfilePage() {
           >
             <Download className="size-5 text-primary" />
             <span className="text-sm font-semibold">Backup Data</span>
+          </Link>
+          <Link
+            to="/groups"
+            className="bg-card p-4 rounded-2xl outline-1 outline-black/10 flex flex-col items-start gap-2"
+          >
+            <UsersRound className="size-5 text-primary" />
+            <span className="text-sm font-semibold">Grup Teman</span>
           </Link>
         </section>
 
