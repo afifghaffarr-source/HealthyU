@@ -6,7 +6,8 @@ import { searchFoods, logMeal, todaysMeals, deleteMeal, logMealWithItems } from 
 import { parseMealFromVoice } from "@/lib/ai-extras.functions";
 import { getAchievementToastPrefix } from "@/lib/achievement-icons";
 import { BottomNav } from "@/components/bottom-nav";
-import { ArrowLeft, Search, Trash2, Mic, MicOff, Loader2, WifiOff, RefreshCw, Plus, Minus, ShoppingBasket } from "lucide-react";
+import { ArrowLeft, Search, Trash2, Mic, MicOff, Loader2, WifiOff, RefreshCw, Plus, Minus, ShoppingBasket, Sparkles, X } from "lucide-react";
+import { getFoodAlternatives } from "@/lib/foodAlternatives.functions";
 import { toast } from "sonner";
 import { enqueue } from "@/lib/offline-queue";
 import { useOfflineQueue } from "@/hooks/use-offline-queue";
@@ -44,6 +45,13 @@ function FoodPage() {
     fat_g: number;
   };
   const [basket, setBasket] = useState<BasketItem[]>([]);
+  const [altFor, setAltFor] = useState<{ id: string; name: string } | null>(null);
+  const altFn = useServerFn(getFoodAlternatives);
+  const { data: alts = [], isLoading: altLoading } = useQuery({
+    queryKey: ["food-alternatives", altFor?.id],
+    queryFn: () => altFn({ data: { food_id: altFor!.id } }),
+    enabled: !!altFor,
+  });
 
   const addToBasket = (f: {
     id: string;
