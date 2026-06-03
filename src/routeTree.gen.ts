@@ -74,6 +74,7 @@ import { Route as AuthenticatedReportsCompareRouteImport } from './routes/_authe
 import { Route as AuthenticatedRecipesSavedRouteImport } from './routes/_authenticated/recipes.saved'
 import { Route as AuthenticatedRecipesRecommendationsRouteImport } from './routes/_authenticated/recipes.recommendations'
 import { Route as AuthenticatedRecipesIdRouteImport } from './routes/_authenticated/recipes.$id'
+import { Route as AuthenticatedQuizDailyRouteImport } from './routes/_authenticated/quiz.daily'
 import { Route as AuthenticatedProfileScanStatsRouteImport } from './routes/_authenticated/profile.scan-stats'
 import { Route as AuthenticatedProfilePrivacyRouteImport } from './routes/_authenticated/profile.privacy'
 import { Route as AuthenticatedMealplanGroceryRouteImport } from './routes/_authenticated/mealplan.grocery'
@@ -434,6 +435,11 @@ const AuthenticatedRecipesIdRoute = AuthenticatedRecipesIdRouteImport.update({
   path: '/$id',
   getParentRoute: () => AuthenticatedRecipesRoute,
 } as any)
+const AuthenticatedQuizDailyRoute = AuthenticatedQuizDailyRouteImport.update({
+  id: '/quiz/daily',
+  path: '/quiz/daily',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedProfileScanStatsRoute =
   AuthenticatedProfileScanStatsRouteImport.update({
     id: '/scan-stats',
@@ -570,6 +576,7 @@ export interface FileRoutesByFullPath {
   '/mealplan/grocery': typeof AuthenticatedMealplanGroceryRoute
   '/profile/privacy': typeof AuthenticatedProfilePrivacyRoute
   '/profile/scan-stats': typeof AuthenticatedProfileScanStatsRoute
+  '/quiz/daily': typeof AuthenticatedQuizDailyRoute
   '/recipes/$id': typeof AuthenticatedRecipesIdRouteWithChildren
   '/recipes/recommendations': typeof AuthenticatedRecipesRecommendationsRoute
   '/recipes/saved': typeof AuthenticatedRecipesSavedRoute
@@ -650,6 +657,7 @@ export interface FileRoutesByTo {
   '/mealplan/grocery': typeof AuthenticatedMealplanGroceryRoute
   '/profile/privacy': typeof AuthenticatedProfilePrivacyRoute
   '/profile/scan-stats': typeof AuthenticatedProfileScanStatsRoute
+  '/quiz/daily': typeof AuthenticatedQuizDailyRoute
   '/recipes/$id': typeof AuthenticatedRecipesIdRouteWithChildren
   '/recipes/recommendations': typeof AuthenticatedRecipesRecommendationsRoute
   '/recipes/saved': typeof AuthenticatedRecipesSavedRoute
@@ -732,6 +740,7 @@ export interface FileRoutesById {
   '/_authenticated/mealplan/grocery': typeof AuthenticatedMealplanGroceryRoute
   '/_authenticated/profile/privacy': typeof AuthenticatedProfilePrivacyRoute
   '/_authenticated/profile/scan-stats': typeof AuthenticatedProfileScanStatsRoute
+  '/_authenticated/quiz/daily': typeof AuthenticatedQuizDailyRoute
   '/_authenticated/recipes/$id': typeof AuthenticatedRecipesIdRouteWithChildren
   '/_authenticated/recipes/recommendations': typeof AuthenticatedRecipesRecommendationsRoute
   '/_authenticated/recipes/saved': typeof AuthenticatedRecipesSavedRoute
@@ -814,6 +823,7 @@ export interface FileRouteTypes {
     | '/mealplan/grocery'
     | '/profile/privacy'
     | '/profile/scan-stats'
+    | '/quiz/daily'
     | '/recipes/$id'
     | '/recipes/recommendations'
     | '/recipes/saved'
@@ -894,6 +904,7 @@ export interface FileRouteTypes {
     | '/mealplan/grocery'
     | '/profile/privacy'
     | '/profile/scan-stats'
+    | '/quiz/daily'
     | '/recipes/$id'
     | '/recipes/recommendations'
     | '/recipes/saved'
@@ -975,6 +986,7 @@ export interface FileRouteTypes {
     | '/_authenticated/mealplan/grocery'
     | '/_authenticated/profile/privacy'
     | '/_authenticated/profile/scan-stats'
+    | '/_authenticated/quiz/daily'
     | '/_authenticated/recipes/$id'
     | '/_authenticated/recipes/recommendations'
     | '/_authenticated/recipes/saved'
@@ -1473,6 +1485,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedRecipesIdRouteImport
       parentRoute: typeof AuthenticatedRecipesRoute
     }
+    '/_authenticated/quiz/daily': {
+      id: '/_authenticated/quiz/daily'
+      path: '/quiz/daily'
+      fullPath: '/quiz/daily'
+      preLoaderRoute: typeof AuthenticatedQuizDailyRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/profile/scan-stats': {
       id: '/_authenticated/profile/scan-stats'
       path: '/scan-stats'
@@ -1770,6 +1789,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedWearableRoute: typeof AuthenticatedWearableRoute
   AuthenticatedWeightRoute: typeof AuthenticatedWeightRoute
   AuthenticatedWorkoutRoute: typeof AuthenticatedWorkoutRoute
+  AuthenticatedQuizDailyRoute: typeof AuthenticatedQuizDailyRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
@@ -1817,6 +1837,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedWearableRoute: AuthenticatedWearableRoute,
   AuthenticatedWeightRoute: AuthenticatedWeightRoute,
   AuthenticatedWorkoutRoute: AuthenticatedWorkoutRoute,
+  AuthenticatedQuizDailyRoute: AuthenticatedQuizDailyRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =

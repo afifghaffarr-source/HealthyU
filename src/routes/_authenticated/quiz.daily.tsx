@@ -17,7 +17,7 @@ function Page() {
   const { data, isLoading } = useQuery({ queryKey: ["daily-quiz"], queryFn: () => quizFn({ data: undefined as any }) });
   const { data: quote } = useQuery({ queryKey: ["daily-quote"], queryFn: () => quoteFn({ data: undefined as any }) });
   const mut = useMutation({
-    mutationFn: (i: number) => ansFn({ data: { quizId: data!.quiz.id, answer: i } }),
+    mutationFn: (i: number) => ansFn({ data: { quizId: (data?.quiz as any).id, answer: i } }),
     onSuccess: (r) => {
       toast.success(r.correct ? `Benar! +${r.coins} coin` : "Salah, coba lagi besok");
       qc.invalidateQueries({ queryKey: ["daily-quiz"] });
