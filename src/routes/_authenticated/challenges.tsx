@@ -431,6 +431,32 @@ function BonusClaimer({ challengeId }: { challengeId: string }) {
     queryKey: ["bonus-claimed", challengeId],
     queryFn: () => fetchClaimed({ data: { challenge_id: challengeId } }),
   });
+  useEffect(() => {
+    if (groups.length === 0) return;
+    const groupIds = groups.map((g) => g.id);
+    const ch = supabase
+      .channel(`bonus-claimer-${challengeId}`)
+      .on(
+        "postgres_changes",
+        {
+          event: "INSERT",
+          schema: "public",
+          table: "group_challenge_bonuses",
+          filter: `challenge_id=eq.${challengeId}`,
+        },
+        (payload) => {
+          const row = payload.new as { group_id?: string };
+          if (row.group_id && groupIds.includes(row.group_id)) {
+            qc.invalidateQueries({ queryKey: ["bonus-claimed", challengeId] });
+            qc.invalidateQueries({ queryKey: ["bonus-claimers", row.group_id, challengeId] });
+          }
+        },
+      )
+      .subscribe();
+    return () => {
+      void supabase.removeChannel(ch);
+    };
+  }, [challengeId, groups, qc]);
   const claimedSet = new Set(claimedIds);
   const claimM = useMutation({
     mutationFn: (group_id: string) =>
