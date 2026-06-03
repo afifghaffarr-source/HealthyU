@@ -26,6 +26,7 @@ import { Route as AuthenticatedRecipesRouteImport } from './routes/_authenticate
 import { Route as AuthenticatedProgressRouteImport } from './routes/_authenticated/progress'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
 import { Route as AuthenticatedPrayerRouteImport } from './routes/_authenticated/prayer'
+import { Route as AuthenticatedPetRouteImport } from './routes/_authenticated/pet'
 import { Route as AuthenticatedOnboardingRouteImport } from './routes/_authenticated/onboarding'
 import { Route as AuthenticatedOfflineQueueRouteImport } from './routes/_authenticated/offline-queue'
 import { Route as AuthenticatedMoodRouteImport } from './routes/_authenticated/mood'
@@ -133,6 +134,11 @@ const AuthenticatedProfileRoute = AuthenticatedProfileRouteImport.update({
 const AuthenticatedPrayerRoute = AuthenticatedPrayerRouteImport.update({
   id: '/prayer',
   path: '/prayer',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedPetRoute = AuthenticatedPetRouteImport.update({
+  id: '/pet',
+  path: '/pet',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedOnboardingRoute = AuthenticatedOnboardingRouteImport.update({
@@ -280,6 +286,7 @@ export interface FileRoutesByFullPath {
   '/mood': typeof AuthenticatedMoodRoute
   '/offline-queue': typeof AuthenticatedOfflineQueueRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
+  '/pet': typeof AuthenticatedPetRoute
   '/prayer': typeof AuthenticatedPrayerRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/progress': typeof AuthenticatedProgressRoute
@@ -321,6 +328,7 @@ export interface FileRoutesByTo {
   '/mood': typeof AuthenticatedMoodRoute
   '/offline-queue': typeof AuthenticatedOfflineQueueRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
+  '/pet': typeof AuthenticatedPetRoute
   '/prayer': typeof AuthenticatedPrayerRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/progress': typeof AuthenticatedProgressRoute
@@ -364,6 +372,7 @@ export interface FileRoutesById {
   '/_authenticated/mood': typeof AuthenticatedMoodRoute
   '/_authenticated/offline-queue': typeof AuthenticatedOfflineQueueRoute
   '/_authenticated/onboarding': typeof AuthenticatedOnboardingRoute
+  '/_authenticated/pet': typeof AuthenticatedPetRoute
   '/_authenticated/prayer': typeof AuthenticatedPrayerRoute
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/_authenticated/progress': typeof AuthenticatedProgressRoute
@@ -407,6 +416,7 @@ export interface FileRouteTypes {
     | '/mood'
     | '/offline-queue'
     | '/onboarding'
+    | '/pet'
     | '/prayer'
     | '/profile'
     | '/progress'
@@ -448,6 +458,7 @@ export interface FileRouteTypes {
     | '/mood'
     | '/offline-queue'
     | '/onboarding'
+    | '/pet'
     | '/prayer'
     | '/profile'
     | '/progress'
@@ -490,6 +501,7 @@ export interface FileRouteTypes {
     | '/_authenticated/mood'
     | '/_authenticated/offline-queue'
     | '/_authenticated/onboarding'
+    | '/_authenticated/pet'
     | '/_authenticated/prayer'
     | '/_authenticated/profile'
     | '/_authenticated/progress'
@@ -638,6 +650,13 @@ declare module '@tanstack/react-router' {
       path: '/prayer'
       fullPath: '/prayer'
       preLoaderRoute: typeof AuthenticatedPrayerRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/pet': {
+      id: '/_authenticated/pet'
+      path: '/pet'
+      fullPath: '/pet'
+      preLoaderRoute: typeof AuthenticatedPetRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/onboarding': {
@@ -835,6 +854,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedMoodRoute: typeof AuthenticatedMoodRoute
   AuthenticatedOfflineQueueRoute: typeof AuthenticatedOfflineQueueRoute
   AuthenticatedOnboardingRoute: typeof AuthenticatedOnboardingRoute
+  AuthenticatedPetRoute: typeof AuthenticatedPetRoute
   AuthenticatedPrayerRoute: typeof AuthenticatedPrayerRoute
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
   AuthenticatedProgressRoute: typeof AuthenticatedProgressRoute
@@ -871,6 +891,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedMoodRoute: AuthenticatedMoodRoute,
   AuthenticatedOfflineQueueRoute: AuthenticatedOfflineQueueRoute,
   AuthenticatedOnboardingRoute: AuthenticatedOnboardingRoute,
+  AuthenticatedPetRoute: AuthenticatedPetRoute,
   AuthenticatedPrayerRoute: AuthenticatedPrayerRoute,
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,
   AuthenticatedProgressRoute: AuthenticatedProgressRoute,
