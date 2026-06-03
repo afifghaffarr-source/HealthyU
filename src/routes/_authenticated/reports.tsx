@@ -214,16 +214,30 @@ function ReportsPage() {
     doc.text("Daftar Isi", 40, 100);
     doc.setFont("helvetica", "normal");
     doc.setFontSize(10);
+    // Compute how many TOC pages we need so body page numbers stay correct.
+    const ROWS_PER_TOC_PAGE = 40;
+    const tocPages = Math.max(1, Math.ceil(filtered.length / ROWS_PER_TOC_PAGE));
+    let tocY = 120;
+    let tocPageIdx = 0;
     filtered.forEach((r, idx) => {
       const periode =
         r.report_period_start && r.report_period_end
           ? `${r.report_period_start} → ${r.report_period_end}`
           : new Date(r.created_at).toLocaleDateString("id-ID");
-      const page = idx + 2; // page 1 = TOC
-      const y = 120 + idx * 16;
-      if (y > 780) return; // skip overflow (rare for normal histories)
-      doc.text(`${idx + 1}. ${periode}`, 40, y);
-      doc.text(`hal. ${page}`, 510, y, { align: "right" });
+      const page = tocPages + idx + 1; // body pages start after all TOC pages
+      if (tocY > 780) {
+        doc.addPage();
+        tocPageIdx += 1;
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(12);
+        doc.text(`Daftar Isi (lanjutan ${tocPageIdx + 1}/${tocPages})`, 40, 50);
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(10);
+        tocY = 80;
+      }
+      doc.text(`${idx + 1}. ${periode}`, 40, tocY);
+      doc.text(`hal. ${page}`, 510, tocY, { align: "right" });
+      tocY += 16;
     });
     filtered.forEach((r) => {
       doc.addPage();
