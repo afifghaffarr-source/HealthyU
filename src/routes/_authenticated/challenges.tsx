@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { ArrowLeft, Trophy, Flame, Users, Calendar, Check, Medal } from "lucide-react";
+import { ArrowLeft, Trophy, Flame, Users, Calendar, Check, Medal, UserPlus } from "lucide-react";
 import { toast } from "sonner";
 import { BottomNav } from "@/components/bottom-nav";
 import {
@@ -12,6 +12,11 @@ import {
   leaveChallenge,
 } from "@/lib/challenges.functions";
 import { getChallengeLeaderboard } from "@/lib/challengeLeaderboard.functions";
+import {
+  listMyGroupsForChallenge,
+  inviteGroupToChallenge,
+  listChallengeGroups,
+} from "@/lib/groupChallenges.functions";
 
 export const Route = createFileRoute("/_authenticated/challenges")({
   component: ChallengesPage,
@@ -206,6 +211,7 @@ function ChallengesPage() {
                 {openLb === c.id ? "Sembunyikan leaderboard" : "Lihat leaderboard"}
               </button>
               {openLb === c.id && <Leaderboard challengeId={c.id} />}
+              {joined && <GroupInviter challengeId={c.id} />}
             </article>
           );
         })}
@@ -218,32 +224,117 @@ function ChallengesPage() {
 
 function Leaderboard({ challengeId }: { challengeId: string }) {
   const fetchLb = useServerFn(getChallengeLeaderboard);
-  const [friendsOnly, setFriendsOnly] = useState(false);
+  const fetchGroups = useServerFn(listChallengeGroups);
+  const [mode, setMode] = useState<"all" | "friends" | string>("all");
+  const { data: groups = [] } = useQuery({
+    queryKey: ["challenge-groups", challengeId],
+    queryFn: () => fetchGroups({ data: { challenge_id: challengeId } }),
+  });
   const { data: rows = [], isLoading } = useQuery({
-    queryKey: ["challenge-lb", challengeId, friendsOnly],
-    queryFn: () => fetchLb({ data: { challenge_id: challengeId, friends_only: friendsOnly } }),
+    queryKey: ["challenge-lb", challengeId, mode],
+    queryFn: () =>
+      fetchLb({
+        data: {
+          challenge_id: challengeId,
+          friends_only: mode === "friends",
+          group_id: mode !== "all" && mode !== "friends" ? mode : undefined,
+        },
+      }),
   });
   return (
     <div className="mt-3 space-y-2">
-      <div className="flex gap-1.5 bg-muted/50 rounded-full p-1">
+      <div className="flex gap-1.5 bg-muted/50 rounded-full p-1 flex-wrap">
         <button
-          onClick={() => setFriendsOnly(false)}
-          className={`flex-1 text-[11px] font-semibold py-1 rounded-full transition ${
-            !friendsOnly ? "bg-card shadow-sm" : "text-muted-foreground"
+          onClick={() => setMode("all")}
+          className={`flex-1 min-w-[60px] text-[11px] font-semibold py-1 rounded-full transition ${
+            mode === "all" ? "bg-card shadow-sm" : "text-muted-foreground"
           }`}
         >
           Semua
         </button>
         <button
-          onClick={() => setFriendsOnly(true)}
-          className={`flex-1 text-[11px] font-semibold py-1 rounded-full transition ${
-            friendsOnly ? "bg-card shadow-sm" : "text-muted-foreground"
+          onClick={() => setMode("friends")}
+          className={`flex-1 min-w-[60px] text-[11px] font-semibold py-1 rounded-full transition ${
+            mode === "friends" ? "bg-card shadow-sm" : "text-muted-foreground"
           }`}
         >
           Teman
         </button>
+        {groups.map((g) => (
+          <button
+            key={g.id}
+            onClick={() => setMode(g.id)}
+            className={`flex-1 min-w-[60px] text-[11px] font-semibold py-1 px-2 rounded-full transition truncate ${
+              mode === g.id ? "bg-card shadow-sm" : "text-muted-foreground"
+            }`}
+          >
+            {g.name}
+          </button>
+        ))}
       </div>
       <LeaderboardList rows={rows} isLoading={isLoading} />
+    </div>
+  );
+}
+
+function GroupInviter({ challengeId }: { challengeId: string }) {
+  const qc = useQueryClient();
+  const fetchGroups = useServerFn(listMyGroupsForChallenge);
+  const inviteFn = useServerFn(inviteGroupToChallenge);
+  const [open, setOpen] = useState(false);
+  const { data: groups = [], isLoading } = useQuery({
+    queryKey: ["my-groups-for-challenge", challengeId],
+    queryFn: () => fetchGroups({ data: { challenge_id: challengeId } }),
+    enabled: open,
+  });
+  const inviteM = useMutation({
+    mutationFn: (group_id: string) =>
+      inviteFn({ data: { group_id, challenge_id: challengeId } }),
+    onSuccess: () => {
+      toast.success("Grup diundang ke challenge");
+      qc.invalidateQueries({ queryKey: ["my-groups-for-challenge", challengeId] });
+      qc.invalidateQueries({ queryKey: ["challenge-groups", challengeId] });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+  return (
+    <div className="mt-2">
+      <button
+        onClick={() => setOpen((v) => !v)}
+        className="w-full text-[11px] font-semibold text-muted-foreground inline-flex items-center justify-center gap-1"
+      >
+        <UserPlus className="size-3" />
+        {open ? "Tutup" : "Bareng grup"}
+      </button>
+      {open && (
+        <div className="mt-2 space-y-1.5">
+          {isLoading && <p className="text-[11px] text-muted-foreground text-center">Memuat…</p>}
+          {!isLoading && groups.length === 0 && (
+            <p className="text-[11px] text-muted-foreground text-center">
+              Belum ada grup. Buat di halaman Groups.
+            </p>
+          )}
+          {groups.map((g) => (
+            <div
+              key={g.id}
+              className="flex items-center justify-between gap-2 px-2.5 py-1.5 rounded-xl bg-muted/40 text-xs"
+            >
+              <span className="truncate font-semibold">{g.name}</span>
+              {g.joined ? (
+                <span className="text-[10px] text-primary font-semibold">Aktif</span>
+              ) : (
+                <button
+                  onClick={() => inviteM.mutate(g.id)}
+                  disabled={inviteM.isPending}
+                  className="text-[10px] font-semibold text-primary disabled:opacity-50"
+                >
+                  Undang
+                </button>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
