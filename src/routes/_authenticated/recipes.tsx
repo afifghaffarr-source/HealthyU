@@ -58,10 +58,10 @@ function RecipesPage() {
           if (!raw) return null;
           try {
             const parsed = JSON.parse(raw) as { count: number; ts: number };
-            if (
+          if (
               typeof parsed?.count !== "number" ||
               typeof parsed?.ts !== "number" ||
-              Date.now() - parsed.ts > 7 * 86400000
+            Date.now() - parsed.ts > TRENDING_TTL_DAYS * 86400000
             ) {
               window.localStorage.removeItem("recipes:trendingCount");
               return null;
