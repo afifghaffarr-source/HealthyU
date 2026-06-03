@@ -77,6 +77,7 @@ import { Route as ApiPublicHooksWeeklyAiReportRouteImport } from './routes/api/p
 import { Route as ApiPublicHooksRecipesTrendingSnapshotRouteImport } from './routes/api/public/hooks/recipes-trending-snapshot'
 import { Route as ApiPublicHooksNotificationSchedulerRouteImport } from './routes/api/public/hooks/notification-scheduler'
 import { Route as ApiPublicHooksDailyCoachRouteImport } from './routes/api/public/hooks/daily-coach'
+import { Route as AuthenticatedProfilePublicIdRouteImport } from './routes/_authenticated/profile.public.$id'
 import { Route as AuthenticatedGroupsIdMealsRouteImport } from './routes/_authenticated/groups.$id.meals'
 import { Route as AuthenticatedGroupsIdLeaderboardRouteImport } from './routes/_authenticated/groups.$id.leaderboard'
 
@@ -445,6 +446,12 @@ const ApiPublicHooksDailyCoachRoute =
     path: '/api/public/hooks/daily-coach',
     getParentRoute: () => rootRouteImport,
   } as any)
+const AuthenticatedProfilePublicIdRoute =
+  AuthenticatedProfilePublicIdRouteImport.update({
+    id: '/public/$id',
+    path: '/public/$id',
+    getParentRoute: () => AuthenticatedProfileRoute,
+  } as any)
 const AuthenticatedGroupsIdMealsRoute =
   AuthenticatedGroupsIdMealsRouteImport.update({
     id: '/$id/meals',
@@ -523,6 +530,7 @@ export interface FileRoutesByFullPath {
   '/api/chat/stream': typeof ApiChatStreamRoute
   '/groups/$id/leaderboard': typeof AuthenticatedGroupsIdLeaderboardRoute
   '/groups/$id/meals': typeof AuthenticatedGroupsIdMealsRoute
+  '/profile/public/$id': typeof AuthenticatedProfilePublicIdRoute
   '/api/public/hooks/daily-coach': typeof ApiPublicHooksDailyCoachRoute
   '/api/public/hooks/notification-scheduler': typeof ApiPublicHooksNotificationSchedulerRoute
   '/api/public/hooks/recipes-trending-snapshot': typeof ApiPublicHooksRecipesTrendingSnapshotRoute
@@ -594,6 +602,7 @@ export interface FileRoutesByTo {
   '/api/chat/stream': typeof ApiChatStreamRoute
   '/groups/$id/leaderboard': typeof AuthenticatedGroupsIdLeaderboardRoute
   '/groups/$id/meals': typeof AuthenticatedGroupsIdMealsRoute
+  '/profile/public/$id': typeof AuthenticatedProfilePublicIdRoute
   '/api/public/hooks/daily-coach': typeof ApiPublicHooksDailyCoachRoute
   '/api/public/hooks/notification-scheduler': typeof ApiPublicHooksNotificationSchedulerRoute
   '/api/public/hooks/recipes-trending-snapshot': typeof ApiPublicHooksRecipesTrendingSnapshotRoute
@@ -667,6 +676,7 @@ export interface FileRoutesById {
   '/api/chat/stream': typeof ApiChatStreamRoute
   '/_authenticated/groups/$id/leaderboard': typeof AuthenticatedGroupsIdLeaderboardRoute
   '/_authenticated/groups/$id/meals': typeof AuthenticatedGroupsIdMealsRoute
+  '/_authenticated/profile/public/$id': typeof AuthenticatedProfilePublicIdRoute
   '/api/public/hooks/daily-coach': typeof ApiPublicHooksDailyCoachRoute
   '/api/public/hooks/notification-scheduler': typeof ApiPublicHooksNotificationSchedulerRoute
   '/api/public/hooks/recipes-trending-snapshot': typeof ApiPublicHooksRecipesTrendingSnapshotRoute
@@ -740,6 +750,7 @@ export interface FileRouteTypes {
     | '/api/chat/stream'
     | '/groups/$id/leaderboard'
     | '/groups/$id/meals'
+    | '/profile/public/$id'
     | '/api/public/hooks/daily-coach'
     | '/api/public/hooks/notification-scheduler'
     | '/api/public/hooks/recipes-trending-snapshot'
@@ -811,6 +822,7 @@ export interface FileRouteTypes {
     | '/api/chat/stream'
     | '/groups/$id/leaderboard'
     | '/groups/$id/meals'
+    | '/profile/public/$id'
     | '/api/public/hooks/daily-coach'
     | '/api/public/hooks/notification-scheduler'
     | '/api/public/hooks/recipes-trending-snapshot'
@@ -883,6 +895,7 @@ export interface FileRouteTypes {
     | '/api/chat/stream'
     | '/_authenticated/groups/$id/leaderboard'
     | '/_authenticated/groups/$id/meals'
+    | '/_authenticated/profile/public/$id'
     | '/api/public/hooks/daily-coach'
     | '/api/public/hooks/notification-scheduler'
     | '/api/public/hooks/recipes-trending-snapshot'
@@ -1380,6 +1393,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicHooksDailyCoachRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/profile/public/$id': {
+      id: '/_authenticated/profile/public/$id'
+      path: '/public/$id'
+      fullPath: '/profile/public/$id'
+      preLoaderRoute: typeof AuthenticatedProfilePublicIdRouteImport
+      parentRoute: typeof AuthenticatedProfileRoute
+    }
     '/_authenticated/groups/$id/meals': {
       id: '/_authenticated/groups/$id/meals'
       path: '/$id/meals'
@@ -1451,11 +1471,13 @@ const AuthenticatedMealplanRouteWithChildren =
 interface AuthenticatedProfileRouteChildren {
   AuthenticatedProfilePrivacyRoute: typeof AuthenticatedProfilePrivacyRoute
   AuthenticatedProfileScanStatsRoute: typeof AuthenticatedProfileScanStatsRoute
+  AuthenticatedProfilePublicIdRoute: typeof AuthenticatedProfilePublicIdRoute
 }
 
 const AuthenticatedProfileRouteChildren: AuthenticatedProfileRouteChildren = {
   AuthenticatedProfilePrivacyRoute: AuthenticatedProfilePrivacyRoute,
   AuthenticatedProfileScanStatsRoute: AuthenticatedProfileScanStatsRoute,
+  AuthenticatedProfilePublicIdRoute: AuthenticatedProfilePublicIdRoute,
 }
 
 const AuthenticatedProfileRouteWithChildren =
