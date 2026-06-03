@@ -1,4 +1,13 @@
 // App-wide tunable constants.
+//
+// | Constant                       | What it controls                                          |
+// | ------------------------------ | --------------------------------------------------------- |
+// | TRENDING_TTL_DAYS              | Umur cache `recipes:trendingCount` sebelum di-invalidate. |
+// | GROUP_BONUS_AGGREGATE_MS       | Window agregasi toast bonus klaim grup (debounce flush).  |
+// | GROUP_BONUS_BADGE_TTL_MS       | Umur badge "+N klaim baru" sebelum auto-clear.            |
+// | TRENDING_COUNTER_PULSE_MS      | Durasi pulse chip counter Trending saat angka bertambah.  |
+// | TRENDING_GROWTH_FLASH_MS       | Durasi flash "+N" pada badge growth resep.                |
+// | CHALLENGE_HIGHLIGHT_MS         | Durasi ring highlight kartu challenge (auto-scroll).      |
 
 /** Hari sebelum localStorage `recipes:trendingCount` dianggap basi & di-invalidate. */
 export const TRENDING_TTL_DAYS = 7;
