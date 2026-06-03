@@ -103,6 +103,7 @@ import { Route as AuthenticatedMealplanGroceryRouteImport } from './routes/_auth
 import { Route as AuthenticatedMealplanBudgetRouteImport } from './routes/_authenticated/mealplan.budget'
 import { Route as AuthenticatedLeaderboardWeeklyRouteImport } from './routes/_authenticated/leaderboard.weekly'
 import { Route as AuthenticatedHabitsStackRouteImport } from './routes/_authenticated/habits.stack'
+import { Route as AuthenticatedGrocerySmartRouteImport } from './routes/_authenticated/grocery.smart'
 import { Route as AuthenticatedFriendsInviteRouteImport } from './routes/_authenticated/friends.invite'
 import { Route as AuthenticatedFamilyInviteRouteImport } from './routes/_authenticated/family.invite'
 import { Route as AuthenticatedExercisesRecommendRouteImport } from './routes/_authenticated/exercises.recommend'
@@ -627,6 +628,12 @@ const AuthenticatedHabitsStackRoute =
     path: '/habits/stack',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedGrocerySmartRoute =
+  AuthenticatedGrocerySmartRouteImport.update({
+    id: '/grocery/smart',
+    path: '/grocery/smart',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedFriendsInviteRoute =
   AuthenticatedFriendsInviteRouteImport.update({
     id: '/friends/invite',
@@ -797,6 +804,7 @@ export interface FileRoutesByFullPath {
   '/exercises/recommend': typeof AuthenticatedExercisesRecommendRoute
   '/family/invite': typeof AuthenticatedFamilyInviteRoute
   '/friends/invite': typeof AuthenticatedFriendsInviteRoute
+  '/grocery/smart': typeof AuthenticatedGrocerySmartRoute
   '/habits/stack': typeof AuthenticatedHabitsStackRoute
   '/leaderboard/weekly': typeof AuthenticatedLeaderboardWeeklyRoute
   '/mealplan/budget': typeof AuthenticatedMealplanBudgetRoute
@@ -910,6 +918,7 @@ export interface FileRoutesByTo {
   '/exercises/recommend': typeof AuthenticatedExercisesRecommendRoute
   '/family/invite': typeof AuthenticatedFamilyInviteRoute
   '/friends/invite': typeof AuthenticatedFriendsInviteRoute
+  '/grocery/smart': typeof AuthenticatedGrocerySmartRoute
   '/habits/stack': typeof AuthenticatedHabitsStackRoute
   '/leaderboard/weekly': typeof AuthenticatedLeaderboardWeeklyRoute
   '/mealplan/budget': typeof AuthenticatedMealplanBudgetRoute
@@ -1025,6 +1034,7 @@ export interface FileRoutesById {
   '/_authenticated/exercises/recommend': typeof AuthenticatedExercisesRecommendRoute
   '/_authenticated/family/invite': typeof AuthenticatedFamilyInviteRoute
   '/_authenticated/friends/invite': typeof AuthenticatedFriendsInviteRoute
+  '/_authenticated/grocery/smart': typeof AuthenticatedGrocerySmartRoute
   '/_authenticated/habits/stack': typeof AuthenticatedHabitsStackRoute
   '/_authenticated/leaderboard/weekly': typeof AuthenticatedLeaderboardWeeklyRoute
   '/_authenticated/mealplan/budget': typeof AuthenticatedMealplanBudgetRoute
@@ -1140,6 +1150,7 @@ export interface FileRouteTypes {
     | '/exercises/recommend'
     | '/family/invite'
     | '/friends/invite'
+    | '/grocery/smart'
     | '/habits/stack'
     | '/leaderboard/weekly'
     | '/mealplan/budget'
@@ -1253,6 +1264,7 @@ export interface FileRouteTypes {
     | '/exercises/recommend'
     | '/family/invite'
     | '/friends/invite'
+    | '/grocery/smart'
     | '/habits/stack'
     | '/leaderboard/weekly'
     | '/mealplan/budget'
@@ -1367,6 +1379,7 @@ export interface FileRouteTypes {
     | '/_authenticated/exercises/recommend'
     | '/_authenticated/family/invite'
     | '/_authenticated/friends/invite'
+    | '/_authenticated/grocery/smart'
     | '/_authenticated/habits/stack'
     | '/_authenticated/leaderboard/weekly'
     | '/_authenticated/mealplan/budget'
@@ -2091,6 +2104,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedHabitsStackRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/grocery/smart': {
+      id: '/_authenticated/grocery/smart'
+      path: '/grocery/smart'
+      fullPath: '/grocery/smart'
+      preLoaderRoute: typeof AuthenticatedGrocerySmartRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/friends/invite': {
       id: '/_authenticated/friends/invite'
       path: '/friends/invite'
@@ -2550,6 +2570,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedExercisesLibraryRoute: typeof AuthenticatedExercisesLibraryRoute
   AuthenticatedExercisesRecommendRoute: typeof AuthenticatedExercisesRecommendRoute
   AuthenticatedFriendsInviteRoute: typeof AuthenticatedFriendsInviteRoute
+  AuthenticatedGrocerySmartRoute: typeof AuthenticatedGrocerySmartRoute
   AuthenticatedHabitsStackRoute: typeof AuthenticatedHabitsStackRoute
   AuthenticatedQuizDailyRoute: typeof AuthenticatedQuizDailyRoute
   AuthenticatedRestaurantsNearbyRoute: typeof AuthenticatedRestaurantsNearbyRoute
@@ -2612,6 +2633,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedExercisesLibraryRoute: AuthenticatedExercisesLibraryRoute,
   AuthenticatedExercisesRecommendRoute: AuthenticatedExercisesRecommendRoute,
   AuthenticatedFriendsInviteRoute: AuthenticatedFriendsInviteRoute,
+  AuthenticatedGrocerySmartRoute: AuthenticatedGrocerySmartRoute,
   AuthenticatedHabitsStackRoute: AuthenticatedHabitsStackRoute,
   AuthenticatedQuizDailyRoute: AuthenticatedQuizDailyRoute,
   AuthenticatedRestaurantsNearbyRoute: AuthenticatedRestaurantsNearbyRoute,
