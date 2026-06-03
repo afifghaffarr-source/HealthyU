@@ -68,8 +68,10 @@ function ChallengesPage() {
 
   const joinM = useMutation({
     mutationFn: (challenge_id: string) => joinFn({ data: { challenge_id } }),
-    onSuccess: (r) => {
+    onSuccess: (r, challenge_id) => {
       toast.success(r.already ? "Sudah bergabung" : "Bergabung challenge!");
+      const ch = (data?.challenges ?? []).find((c) => c.id === challenge_id);
+      announce(r.already ? `Sudah bergabung challenge ${ch?.title ?? ""}` : `Bergabung challenge ${ch?.title ?? ""}`);
       invalidate();
     },
     onError: (e: Error) => toast.error(e.message),
@@ -80,6 +82,7 @@ function ChallengesPage() {
       logFn({ data: p }),
     onSuccess: (r) => {
       toast.success(`Hari ${r.day} tercatat · streak ${r.streak}`);
+      announce(`Hari ${r.day} tercatat, streak ${r.streak}`);
       invalidate();
     },
     onError: (e: Error) => toast.error(e.message),
@@ -89,6 +92,7 @@ function ChallengesPage() {
     mutationFn: (participant_id: string) => leaveFn({ data: { participant_id } }),
     onSuccess: () => {
       toast.success("Keluar dari challenge");
+      announce("Keluar dari challenge");
       invalidate();
     },
     onError: (e: Error) => toast.error(e.message),
@@ -343,7 +347,7 @@ function ChallengesPage() {
                   initialOpen={focusChallenge === c.id}
                 />
               )}
-              {joined && <BonusClaimer challengeId={c.id} />}
+              {joined && <BonusClaimer challengeId={c.id} initialOpen={focusChallenge === c.id} />}
             </article>
           );
         })}
@@ -600,9 +604,9 @@ function GroupInviteRow({
   );
 }
 
-function BonusClaimer({ challengeId }: { challengeId: string }) {
+function BonusClaimer({ challengeId, initialOpen }: { challengeId: string; initialOpen?: boolean }) {
   const qc = useQueryClient();
-  const [open, setOpen] = useState(true);
+  const [open, setOpen] = useState(initialOpen ?? true);
   const triggerRef = useRef<HTMLButtonElement | null>(null);
   // ESC menutup panel klaim bonus; fokus dikembalikan ke trigger.
   useMiniFocusTrap(open, [triggerRef], () => {
