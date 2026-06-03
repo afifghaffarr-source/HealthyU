@@ -94,5 +94,36 @@ export const weeklyAiAnalysis = createServerFn({ method: "POST" })
     if (!res.ok) throw new Error(`AI error: ${res.status}`);
     const json = await res.json();
     const report: string = json?.choices?.[0]?.message?.content ?? "Tidak ada analisis.";
-    return { report, summary };
+
+    const end = new Date();
+    const start = new Date(end.getTime() - d * 86400000);
+    const { data: saved } = await supabase
+      .from("ai_reports")
+      .insert({
+        user_id: userId,
+        report_type: "weekly",
+        report_period_start: start.toISOString().slice(0, 10),
+        report_period_end: end.toISOString().slice(0, 10),
+        summary: summary as never,
+        recommendations: [report] as never,
+        ai_model: "google/gemini-2.5-flash",
+      })
+      .select("id")
+      .maybeSingle();
+
+    return { report, summary, id: saved?.id ?? null };
+  });
+
+export const listAiReports = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { supabase, userId } = context;
+    const { data, error } = await supabase
+      .from("ai_reports")
+      .select("id, report_type, report_period_start, report_period_end, summary, recommendations, created_at, is_read")
+      .eq("user_id", userId)
+      .order("created_at", { ascending: false })
+      .limit(10);
+    if (error) throw new Error(error.message);
+    return data ?? [];
   });
