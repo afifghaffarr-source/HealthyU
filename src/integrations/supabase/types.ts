@@ -723,6 +723,45 @@ export type Database = {
         }
         Relationships: []
       }
+      vitals_logs: {
+        Row: {
+          created_at: string
+          diastolic: number | null
+          glucose_mgdl: number | null
+          glucose_state: string | null
+          heart_rate: number | null
+          id: string
+          logged_at: string
+          note: string | null
+          systolic: number | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          diastolic?: number | null
+          glucose_mgdl?: number | null
+          glucose_state?: string | null
+          heart_rate?: number | null
+          id?: string
+          logged_at?: string
+          note?: string | null
+          systolic?: number | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          diastolic?: number | null
+          glucose_mgdl?: number | null
+          glucose_state?: string | null
+          heart_rate?: number | null
+          id?: string
+          logged_at?: string
+          note?: string | null
+          systolic?: number | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       water_logs: {
         Row: {
           amount_ml: number

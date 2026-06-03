@@ -15,6 +15,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedWorkoutRouteImport } from './routes/_authenticated/workout'
 import { Route as AuthenticatedWeightRouteImport } from './routes/_authenticated/weight'
 import { Route as AuthenticatedWaterRouteImport } from './routes/_authenticated/water'
+import { Route as AuthenticatedVitalsRouteImport } from './routes/_authenticated/vitals'
 import { Route as AuthenticatedSleepRouteImport } from './routes/_authenticated/sleep'
 import { Route as AuthenticatedScanRouteImport } from './routes/_authenticated/scan'
 import { Route as AuthenticatedReportsRouteImport } from './routes/_authenticated/reports'
@@ -65,6 +66,11 @@ const AuthenticatedWeightRoute = AuthenticatedWeightRouteImport.update({
 const AuthenticatedWaterRoute = AuthenticatedWaterRouteImport.update({
   id: '/water',
   path: '/water',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedVitalsRoute = AuthenticatedVitalsRouteImport.update({
+  id: '/vitals',
+  path: '/vitals',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedSleepRoute = AuthenticatedSleepRouteImport.update({
@@ -206,6 +212,7 @@ export interface FileRoutesByFullPath {
   '/reports': typeof AuthenticatedReportsRoute
   '/scan': typeof AuthenticatedScanRoute
   '/sleep': typeof AuthenticatedSleepRoute
+  '/vitals': typeof AuthenticatedVitalsRoute
   '/water': typeof AuthenticatedWaterRoute
   '/weight': typeof AuthenticatedWeightRoute
   '/workout': typeof AuthenticatedWorkoutRoute
@@ -235,6 +242,7 @@ export interface FileRoutesByTo {
   '/reports': typeof AuthenticatedReportsRoute
   '/scan': typeof AuthenticatedScanRoute
   '/sleep': typeof AuthenticatedSleepRoute
+  '/vitals': typeof AuthenticatedVitalsRoute
   '/water': typeof AuthenticatedWaterRoute
   '/weight': typeof AuthenticatedWeightRoute
   '/workout': typeof AuthenticatedWorkoutRoute
@@ -266,6 +274,7 @@ export interface FileRoutesById {
   '/_authenticated/reports': typeof AuthenticatedReportsRoute
   '/_authenticated/scan': typeof AuthenticatedScanRoute
   '/_authenticated/sleep': typeof AuthenticatedSleepRoute
+  '/_authenticated/vitals': typeof AuthenticatedVitalsRoute
   '/_authenticated/water': typeof AuthenticatedWaterRoute
   '/_authenticated/weight': typeof AuthenticatedWeightRoute
   '/_authenticated/workout': typeof AuthenticatedWorkoutRoute
@@ -297,6 +306,7 @@ export interface FileRouteTypes {
     | '/reports'
     | '/scan'
     | '/sleep'
+    | '/vitals'
     | '/water'
     | '/weight'
     | '/workout'
@@ -326,6 +336,7 @@ export interface FileRouteTypes {
     | '/reports'
     | '/scan'
     | '/sleep'
+    | '/vitals'
     | '/water'
     | '/weight'
     | '/workout'
@@ -356,6 +367,7 @@ export interface FileRouteTypes {
     | '/_authenticated/reports'
     | '/_authenticated/scan'
     | '/_authenticated/sleep'
+    | '/_authenticated/vitals'
     | '/_authenticated/water'
     | '/_authenticated/weight'
     | '/_authenticated/workout'
@@ -410,6 +422,13 @@ declare module '@tanstack/react-router' {
       path: '/water'
       fullPath: '/water'
       preLoaderRoute: typeof AuthenticatedWaterRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/vitals': {
+      id: '/_authenticated/vitals'
+      path: '/vitals'
+      fullPath: '/vitals'
+      preLoaderRoute: typeof AuthenticatedVitalsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/sleep': {
@@ -602,6 +621,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedReportsRoute: typeof AuthenticatedReportsRoute
   AuthenticatedScanRoute: typeof AuthenticatedScanRoute
   AuthenticatedSleepRoute: typeof AuthenticatedSleepRoute
+  AuthenticatedVitalsRoute: typeof AuthenticatedVitalsRoute
   AuthenticatedWaterRoute: typeof AuthenticatedWaterRoute
   AuthenticatedWeightRoute: typeof AuthenticatedWeightRoute
   AuthenticatedWorkoutRoute: typeof AuthenticatedWorkoutRoute
@@ -629,6 +649,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedReportsRoute: AuthenticatedReportsRoute,
   AuthenticatedScanRoute: AuthenticatedScanRoute,
   AuthenticatedSleepRoute: AuthenticatedSleepRoute,
+  AuthenticatedVitalsRoute: AuthenticatedVitalsRoute,
   AuthenticatedWaterRoute: AuthenticatedWaterRoute,
   AuthenticatedWeightRoute: AuthenticatedWeightRoute,
   AuthenticatedWorkoutRoute: AuthenticatedWorkoutRoute,
