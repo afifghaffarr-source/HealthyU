@@ -26,6 +26,7 @@ import {
   Scale,
   HeartPulse,
   Activity,
+  Download,
 } from "lucide-react";
 import { useTheme } from "@/components/theme-provider";
 
@@ -236,6 +237,13 @@ function ProfilePage() {
           >
             <HeartPulse className="size-5 text-red-600" />
             <span className="text-sm font-semibold">Vital Signs</span>
+          </Link>
+          <Link
+            to="/backup"
+            className="bg-card p-4 rounded-2xl outline-1 outline-black/10 flex flex-col items-start gap-2"
+          >
+            <Download className="size-5 text-primary" />
+            <span className="text-sm font-semibold">Backup Data</span>
           </Link>
         </section>
 
