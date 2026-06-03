@@ -90,6 +90,15 @@ function FoodsPage() {
       </div>
 
       <main className="max-w-md mx-auto px-4 pt-4 space-y-4">
+        {!q && recent.items.length > 0 && (
+          <SearchChips
+            label="Pencarian terakhir"
+            items={recent.items}
+            onPick={(t) => setQ(t)}
+            onRemove={recent.remove}
+            onClear={recent.clear}
+          />
+        )}
         <section className="space-y-3">
           <FacetSelect label="Daerah" value={region} setValue={setRegion} options={facetData?.regions ?? []} />
           <FacetSelect label="Kategori" value={category} setValue={setCategory} options={facetData?.categories ?? []} />
