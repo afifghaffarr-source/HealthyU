@@ -65,28 +65,35 @@ export const interactPet = createServerFn({ method: "POST" })
       dE = 0,
       dHun = 0;
     const now = new Date().toISOString();
-    const patch: Record<string, unknown> = { updated_at: now };
+    let lastFedAt: string | undefined;
+    let lastPlayedAt: string | undefined;
     if (data.action === "feed") {
       dH = 5;
       dHun = -25;
       dE = 5;
-      patch.last_fed_at = now;
+      lastFedAt = now;
     } else if (data.action === "play") {
       dHap = 15;
       dE = -15;
       dHun = 10;
-      patch.last_played_at = now;
+      lastPlayedAt = now;
     } else {
       dE = 25;
       dHap = -2;
     }
-    patch.health_stat = clamp((pet.health_stat ?? 80) + dH);
-    patch.happiness_stat = clamp((pet.happiness_stat ?? 80) + dHap);
-    patch.energy_stat = clamp((pet.energy_stat ?? 80) + dE);
-    patch.hunger_stat = clamp((pet.hunger_stat ?? 50) + dHun);
-    patch.evolution_points = (pet.evolution_points ?? 0) + 5;
-
-    await supabase.from("virtual_pets").update(patch).eq("id", pet.id);
+    await supabase
+      .from("virtual_pets")
+      .update({
+        updated_at: now,
+        last_fed_at: lastFedAt,
+        last_played_at: lastPlayedAt,
+        health_stat: clamp((pet.health_stat ?? 80) + dH),
+        happiness_stat: clamp((pet.happiness_stat ?? 80) + dHap),
+        energy_stat: clamp((pet.energy_stat ?? 80) + dE),
+        hunger_stat: clamp((pet.hunger_stat ?? 50) + dHun),
+        evolution_points: (pet.evolution_points ?? 0) + 5,
+      })
+      .eq("id", pet.id);
     await supabase.from("pet_interactions").insert({
       pet_id: pet.id,
       interaction_type: data.action,
