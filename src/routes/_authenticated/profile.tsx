@@ -32,7 +32,7 @@ import {
   AlertTriangle,
 } from "lucide-react";
 import { useTheme } from "@/components/theme-provider";
-import { useLocale, type Locale } from "@/lib/i18n";
+import { LocaleSwitcher } from "@/components/locale-switcher";
 
 export const Route = createFileRoute("/_authenticated/profile")({
   component: ProfilePage,
@@ -41,7 +41,6 @@ export const Route = createFileRoute("/_authenticated/profile")({
 function ProfilePage() {
   const navigate = useNavigate();
   const { theme, toggle } = useTheme();
-  const { locale, setLocale } = useLocale();
   const fetchProfile = useServerFn(getProfile);
   const { data: p } = useQuery({ queryKey: ["profile"], queryFn: () => fetchProfile() });
 
@@ -308,20 +307,7 @@ function ProfilePage() {
           <LogOut className="size-4" /> Keluar
         </button>
 
-        <div className="flex items-center justify-between gap-3 px-1">
-          <label htmlFor="locale-switcher" className="text-xs font-semibold text-muted-foreground">
-            Bahasa / Language
-          </label>
-          <select
-            id="locale-switcher"
-            value={locale}
-            onChange={(e) => setLocale(e.target.value as Locale)}
-            className="text-xs bg-card outline-1 outline-black/10 rounded-lg px-2 py-1"
-          >
-            <option value="id">Bahasa Indonesia</option>
-            <option value="en">English</option>
-          </select>
-        </div>
+        <LocaleSwitcher />
       </div>
       <BottomNav />
     </main>
