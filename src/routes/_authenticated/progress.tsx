@@ -155,3 +155,54 @@ function ProgressPage() {
     </main>
   );
 }
+
+function TimelapseButton({ photos }: { photos: { url: string; taken_at: string }[] }) {
+  const [busy, setBusy] = useState(false);
+  const [video, setVideo] = useState<{ url: string; ext: string } | null>(null);
+
+  const run = async () => {
+    setBusy(true);
+    setVideo(null);
+    try {
+      const r = await generateTimelapse(photos, { frameMs: 600 });
+      setVideo({ url: r.url, ext: r.ext });
+      toast.success("Time-lapse siap!");
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Gagal membuat time-lapse");
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  return (
+    <section className="bg-card p-5 rounded-3xl outline-1 outline-black/5 space-y-3">
+      <div className="flex items-center gap-2">
+        <Film className="size-4 text-coral" />
+        <h2 className="font-semibold text-sm">Time-lapse Transformasi</h2>
+      </div>
+      <p className="text-xs text-muted-foreground">
+        Gabungkan {photos.length} foto progres jadi video pendek.
+      </p>
+      <button
+        onClick={run}
+        disabled={busy}
+        className="w-full bg-coral text-white font-semibold py-3 rounded-2xl flex items-center justify-center gap-2 disabled:opacity-50"
+      >
+        {busy ? <Loader2 className="size-4 animate-spin" /> : <Film className="size-4" />}
+        {busy ? "Merender..." : "Buat Time-lapse"}
+      </button>
+      {video && (
+        <div className="space-y-2">
+          <video src={video.url} controls autoPlay loop className="w-full rounded-2xl" />
+          <a
+            href={video.url}
+            download={`timelapse-${Date.now()}.${video.ext}`}
+            className="block w-full text-center bg-card outline-1 outline-black/10 font-semibold py-3 rounded-2xl text-sm"
+          >
+            Unduh video
+          </a>
+        </div>
+      )}
+    </section>
+  );
+}
