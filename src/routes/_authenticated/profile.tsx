@@ -283,6 +283,20 @@ function ProfilePage() {
             <Bell className="size-5 text-primary" />
             <span className="text-sm font-semibold">Notifikasi</span>
           </Link>
+          <Link
+            to="/referrals"
+            className="bg-card p-4 rounded-2xl outline-1 outline-black/10 flex flex-col items-start gap-2"
+          >
+            <UsersRound className="size-5 text-primary" />
+            <span className="text-sm font-semibold">Ajak Teman</span>
+          </Link>
+          <Link
+            to="/rewards"
+            className="bg-card p-4 rounded-2xl outline-1 outline-black/10 flex flex-col items-start gap-2"
+          >
+            <Medal className="size-5 text-amber-600" />
+            <span className="text-sm font-semibold">Tukar Koin</span>
+          </Link>
         </section>
 
         <button
