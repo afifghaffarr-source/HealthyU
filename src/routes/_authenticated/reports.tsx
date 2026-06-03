@@ -3,7 +3,7 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { weeklyReport, weeklyAiAnalysis } from "@/lib/reports.functions";
 import { BottomNav } from "@/components/bottom-nav";
-import { ArrowLeft, Download, Printer, Sparkles, Loader2 } from "lucide-react";
+import { ArrowLeft, Download, Printer, Sparkles, Loader2, Share2 } from "lucide-react";
 import { useMemo } from "react";
 import { toast } from "sonner";
 
@@ -67,6 +67,25 @@ function ReportsPage() {
     URL.revokeObjectURL(url);
   };
 
+  const shareWhatsapp = () => {
+    if (!summary) return;
+    const lines = [
+      "📊 *Laporan HealthyU 7 Hari*",
+      "",
+      `🍽️ Total kalori masuk: ${Math.round(summary.totals.cals)} kcal`,
+      `🔥 Kalori terbakar: ${summary.totals.burn} kcal`,
+      `💧 Total air: ${(summary.totals.ml / 1000).toFixed(1)} L`,
+      `😴 Total tidur: ${summary.totals.hours.toFixed(1)} jam`,
+      `🏃 Latihan: ${summary.workoutCount} sesi`,
+      `⏱️ Puasa selesai: ${summary.fastingDone} sesi`,
+      "",
+      aiMut.data?.report ? `_${aiMut.data.report.slice(0, 400)}${aiMut.data.report.length > 400 ? "…" : ""}_` : "",
+      "— dikirim dari HealthyU",
+    ].filter(Boolean).join("\n");
+    const url = `https://wa.me/?text=${encodeURIComponent(lines)}`;
+    window.open(url, "_blank", "noopener,noreferrer");
+  };
+
   const maxCal = Math.max(1, ...(summary?.byDay.map((d) => d.cals) ?? [1]));
 
   return (
@@ -110,12 +129,15 @@ function ReportsPage() {
           </div>
         </section>
 
-        <section className="grid grid-cols-2 gap-3 print:hidden">
+        <section className="grid grid-cols-3 gap-2 print:hidden">
           <button onClick={exportCsv} className="flex items-center justify-center gap-2 bg-primary text-primary-foreground font-semibold py-3 rounded-2xl">
-            <Download className="size-4" /> CSV
+            <Download className="size-4" /> <span className="text-sm">CSV</span>
           </button>
           <button onClick={() => window.print()} className="flex items-center justify-center gap-2 bg-card outline-1 outline-black/10 font-semibold py-3 rounded-2xl">
-            <Printer className="size-4" /> Cetak PDF
+            <Printer className="size-4" /> <span className="text-sm">PDF</span>
+          </button>
+          <button onClick={shareWhatsapp} className="flex items-center justify-center gap-2 bg-[#25D366] text-white font-semibold py-3 rounded-2xl">
+            <Share2 className="size-4" /> <span className="text-sm">WA</span>
           </button>
         </section>
 
