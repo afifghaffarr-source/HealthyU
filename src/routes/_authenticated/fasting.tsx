@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { currentFast, startFast, stopFast, fastHistory } from "@/lib/fasting.functions";
+import { getFastingSchedule, saveFastingSchedule } from "@/lib/fasting.functions";
 import { getAchievementToastPrefix } from "@/lib/achievement-icons";
 import { BottomNav } from "@/components/bottom-nav";
 import { ArrowLeft, Check, X } from "lucide-react";
@@ -22,6 +23,36 @@ function FastingPage() {
   const { data: fast } = useQuery({ queryKey: ["fast", "current"], queryFn: () => fetchFast() });
   const fetchHistory = useServerFn(fastHistory);
   const { data: history = [] } = useQuery({ queryKey: ["fast", "history"], queryFn: () => fetchHistory() });
+  const fetchSchedule = useServerFn(getFastingSchedule);
+  const saveScheduleFn = useServerFn(saveFastingSchedule);
+  const { data: schedule } = useQuery({ queryKey: ["fast", "schedule"], queryFn: () => fetchSchedule() });
+  const [ramadhan, setRamadhan] = useState(false);
+  const [imsak, setImsak] = useState("04:30");
+  const [iftar, setIftar] = useState("18:00");
+  useEffect(() => {
+    if (!schedule) return;
+    setRamadhan(Boolean(schedule.is_ramadhan_mode));
+    if (schedule.eating_window_end) setImsak(String(schedule.eating_window_end).slice(0, 5));
+    if (schedule.eating_window_start) setIftar(String(schedule.eating_window_start).slice(0, 5));
+  }, [schedule]);
+  const saveSchedule = useMutation({
+    mutationFn: (v: { ramadhan: boolean; imsak: string; iftar: string }) =>
+      saveScheduleFn({
+        data: {
+          fasting_type: v.ramadhan ? "ramadhan" : "recurring",
+          is_ramadhan_mode: v.ramadhan,
+          is_active: true,
+          eating_window_end: v.imsak,
+          eating_window_start: v.iftar,
+          enabled_days: [0, 1, 2, 3, 4, 5, 6],
+        },
+      }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["fast", "schedule"] });
+      toast.success("Jadwal tersimpan");
+    },
+    onError: (e) => toast.error(e instanceof Error ? e.message : "Gagal"),
+  });
 
   const [now, setNow] = useState(Date.now());
   useEffect(() => {
@@ -102,6 +133,48 @@ function FastingPage() {
             ))}
           </section>
         )}
+
+        <section className="space-y-3 bg-card p-5 rounded-3xl outline-1 outline-black/5 animate-fade-up">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="font-bold">Mode Ramadhan</p>
+              <p className="text-xs text-muted-foreground">Jadwal puasa berulang harian</p>
+            </div>
+            <input
+              type="checkbox"
+              className="size-5"
+              checked={ramadhan}
+              onChange={(e) => setRamadhan(e.target.checked)}
+            />
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <label className="text-xs space-y-1">
+              <span className="text-muted-foreground">Imsak</span>
+              <input
+                type="time"
+                value={imsak}
+                onChange={(e) => setImsak(e.target.value)}
+                className="w-full bg-secondary/40 rounded-lg px-2 py-2 text-sm"
+              />
+            </label>
+            <label className="text-xs space-y-1">
+              <span className="text-muted-foreground">Berbuka</span>
+              <input
+                type="time"
+                value={iftar}
+                onChange={(e) => setIftar(e.target.value)}
+                className="w-full bg-secondary/40 rounded-lg px-2 py-2 text-sm"
+              />
+            </label>
+          </div>
+          <button
+            onClick={() => saveSchedule.mutate({ ramadhan, imsak, iftar })}
+            disabled={saveSchedule.isPending}
+            className="w-full bg-primary text-primary-foreground font-semibold py-3 rounded-2xl disabled:opacity-60"
+          >
+            Simpan jadwal
+          </button>
+        </section>
 
         {history.length > 0 && (
           <section className="space-y-2 animate-fade-up">

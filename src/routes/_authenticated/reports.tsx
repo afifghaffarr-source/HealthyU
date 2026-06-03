@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useQuery, useMutation } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { weeklyReport, weeklyAiAnalysis } from "@/lib/reports.functions";
+import { weeklyReport, weeklyAiAnalysis, listAiReports } from "@/lib/reports.functions";
 import { BottomNav } from "@/components/bottom-nav";
 import { ArrowLeft, Download, FileText, Sparkles, Loader2, Share2 } from "lucide-react";
 import { useMemo } from "react";
@@ -20,12 +20,19 @@ function dayKey(d: string | Date) {
 function ReportsPage() {
   const fetchFn = useServerFn(weeklyReport);
   const aiFn = useServerFn(weeklyAiAnalysis);
+  const listFn = useServerFn(listAiReports);
+  const qc = useQueryClient();
   const { data } = useQuery({
     queryKey: ["report", 7],
     queryFn: () => fetchFn({ data: { days: 7 } }),
   });
+  const { data: history = [] } = useQuery({
+    queryKey: ["ai-reports"],
+    queryFn: () => listFn(),
+  });
   const aiMut = useMutation({
     mutationFn: () => aiFn({ data: { days: 7 } }),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["ai-reports"] }),
     onError: (e) => toast.error(e instanceof Error ? e.message : "Gagal generate"),
   });
 
@@ -290,6 +297,30 @@ function ReportsPage() {
             </article>
           )}
         </section>
+
+        {history.length > 0 && (
+          <section className="space-y-2 animate-fade-up">
+            <h2 className="text-xs font-bold uppercase tracking-wider text-muted-foreground px-1">
+              Riwayat Laporan AI
+            </h2>
+            {history.map((r) => {
+              const text = Array.isArray(r.recommendations) ? String(r.recommendations[0] ?? "") : "";
+              return (
+                <details key={r.id} className="bg-card rounded-2xl outline-1 outline-black/5 p-4">
+                  <summary className="cursor-pointer text-sm font-semibold flex items-center justify-between">
+                    <span>
+                      {r.report_period_start} → {r.report_period_end}
+                    </span>
+                    <span className="text-xs text-muted-foreground">
+                      {new Date(r.created_at).toLocaleDateString("id-ID")}
+                    </span>
+                  </summary>
+                  <p className="mt-3 text-sm whitespace-pre-wrap leading-relaxed">{text}</p>
+                </details>
+              );
+            })}
+          </section>
+        )}
       </div>
       <BottomNav />
     </main>

@@ -30,6 +30,7 @@ import { Route as AuthenticatedPrayerRouteImport } from './routes/_authenticated
 import { Route as AuthenticatedPetRouteImport } from './routes/_authenticated/pet'
 import { Route as AuthenticatedOnboardingRouteImport } from './routes/_authenticated/onboarding'
 import { Route as AuthenticatedOfflineQueueRouteImport } from './routes/_authenticated/offline-queue'
+import { Route as AuthenticatedNotificationsRouteImport } from './routes/_authenticated/notifications'
 import { Route as AuthenticatedMoodRouteImport } from './routes/_authenticated/mood'
 import { Route as AuthenticatedMedicationsRouteImport } from './routes/_authenticated/medications'
 import { Route as AuthenticatedMealplanRouteImport } from './routes/_authenticated/mealplan'
@@ -157,6 +158,12 @@ const AuthenticatedOfflineQueueRoute =
   AuthenticatedOfflineQueueRouteImport.update({
     id: '/offline-queue',
     path: '/offline-queue',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedNotificationsRoute =
+  AuthenticatedNotificationsRouteImport.update({
+    id: '/notifications',
+    path: '/notifications',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedMoodRoute = AuthenticatedMoodRouteImport.update({
@@ -291,6 +298,7 @@ export interface FileRoutesByFullPath {
   '/mealplan': typeof AuthenticatedMealplanRoute
   '/medications': typeof AuthenticatedMedicationsRoute
   '/mood': typeof AuthenticatedMoodRoute
+  '/notifications': typeof AuthenticatedNotificationsRoute
   '/offline-queue': typeof AuthenticatedOfflineQueueRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/pet': typeof AuthenticatedPetRoute
@@ -334,6 +342,7 @@ export interface FileRoutesByTo {
   '/mealplan': typeof AuthenticatedMealplanRoute
   '/medications': typeof AuthenticatedMedicationsRoute
   '/mood': typeof AuthenticatedMoodRoute
+  '/notifications': typeof AuthenticatedNotificationsRoute
   '/offline-queue': typeof AuthenticatedOfflineQueueRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/pet': typeof AuthenticatedPetRoute
@@ -379,6 +388,7 @@ export interface FileRoutesById {
   '/_authenticated/mealplan': typeof AuthenticatedMealplanRoute
   '/_authenticated/medications': typeof AuthenticatedMedicationsRoute
   '/_authenticated/mood': typeof AuthenticatedMoodRoute
+  '/_authenticated/notifications': typeof AuthenticatedNotificationsRoute
   '/_authenticated/offline-queue': typeof AuthenticatedOfflineQueueRoute
   '/_authenticated/onboarding': typeof AuthenticatedOnboardingRoute
   '/_authenticated/pet': typeof AuthenticatedPetRoute
@@ -424,6 +434,7 @@ export interface FileRouteTypes {
     | '/mealplan'
     | '/medications'
     | '/mood'
+    | '/notifications'
     | '/offline-queue'
     | '/onboarding'
     | '/pet'
@@ -467,6 +478,7 @@ export interface FileRouteTypes {
     | '/mealplan'
     | '/medications'
     | '/mood'
+    | '/notifications'
     | '/offline-queue'
     | '/onboarding'
     | '/pet'
@@ -511,6 +523,7 @@ export interface FileRouteTypes {
     | '/_authenticated/mealplan'
     | '/_authenticated/medications'
     | '/_authenticated/mood'
+    | '/_authenticated/notifications'
     | '/_authenticated/offline-queue'
     | '/_authenticated/onboarding'
     | '/_authenticated/pet'
@@ -693,6 +706,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedOfflineQueueRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/notifications': {
+      id: '/_authenticated/notifications'
+      path: '/notifications'
+      fullPath: '/notifications'
+      preLoaderRoute: typeof AuthenticatedNotificationsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/mood': {
       id: '/_authenticated/mood'
       path: '/mood'
@@ -872,6 +892,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedMealplanRoute: typeof AuthenticatedMealplanRoute
   AuthenticatedMedicationsRoute: typeof AuthenticatedMedicationsRoute
   AuthenticatedMoodRoute: typeof AuthenticatedMoodRoute
+  AuthenticatedNotificationsRoute: typeof AuthenticatedNotificationsRoute
   AuthenticatedOfflineQueueRoute: typeof AuthenticatedOfflineQueueRoute
   AuthenticatedOnboardingRoute: typeof AuthenticatedOnboardingRoute
   AuthenticatedPetRoute: typeof AuthenticatedPetRoute
@@ -910,6 +931,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedMealplanRoute: AuthenticatedMealplanRoute,
   AuthenticatedMedicationsRoute: AuthenticatedMedicationsRoute,
   AuthenticatedMoodRoute: AuthenticatedMoodRoute,
+  AuthenticatedNotificationsRoute: AuthenticatedNotificationsRoute,
   AuthenticatedOfflineQueueRoute: AuthenticatedOfflineQueueRoute,
   AuthenticatedOnboardingRoute: AuthenticatedOnboardingRoute,
   AuthenticatedPetRoute: AuthenticatedPetRoute,
