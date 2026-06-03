@@ -3,9 +3,10 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { listMood, addMood, deleteMood } from "@/lib/mood.functions";
 import { BottomNav } from "@/components/bottom-nav";
-import { Trash2, Loader2, WifiOff, RefreshCw } from "lucide-react";
+import { Trash2, Loader2 } from "lucide-react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { TopAppBar } from "@/components/healthyu/top-app-bar";
+import { SyncPill } from "@/components/healthyu/sync-pill";
 import { toast } from "sonner";
 import { enqueue } from "@/lib/offline-queue";
 import { useOfflineQueue } from "@/hooks/use-offline-queue";
@@ -76,15 +77,7 @@ function MoodPage() {
           title="Mood & Jurnal"
           subtitle={avg ? `Rata-rata 30 hari: ${avg.toFixed(1)} / 5` : "Catat perasaanmu hari ini"}
           showBack
-          action={(!online || pending > 0) ? (
-            <button
-              onClick={() => sync()}
-              className={`inline-flex items-center gap-1 text-[11px] font-semibold px-2.5 py-1.5 rounded-full ${online ? "bg-amber-100 text-amber-700" : "bg-muted text-muted-foreground"}`}
-            >
-              {online ? <RefreshCw className="size-3" /> : <WifiOff className="size-3" />}
-              {online ? `Sync ${pending}` : `Offline${pending ? ` · ${pending}` : ""}`}
-            </button>
-          ) : undefined}
+          action={<SyncPill online={online} pending={pending} onSync={() => sync()} />}
         />
       </div>
 
