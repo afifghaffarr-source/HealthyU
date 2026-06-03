@@ -15,6 +15,7 @@ import { Toaster } from "@/components/ui/sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
 import { ThemeProvider } from "@/components/theme-provider";
+import { ReminderScheduler } from "@/components/reminder-scheduler";
 
 function NotFoundComponent() {
   return (
@@ -136,6 +137,7 @@ function RootComponent() {
     <QueryClientProvider client={queryClient}>
       <ThemeProvider>
         <AuthListener />
+        <ReminderScheduler />
         <Outlet />
         <Toaster position="top-center" />
       </ThemeProvider>
