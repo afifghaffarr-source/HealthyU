@@ -67,6 +67,7 @@ import { Route as ApiChatStreamRouteImport } from './routes/api/chat.stream'
 import { Route as AuthenticatedWeightGoalRouteImport } from './routes/_authenticated/weight.goal'
 import { Route as AuthenticatedStoriesUploadRouteImport } from './routes/_authenticated/stories.upload'
 import { Route as AuthenticatedStoriesIdRouteImport } from './routes/_authenticated/stories.$id'
+import { Route as AuthenticatedSleepDiaryRouteImport } from './routes/_authenticated/sleep.diary'
 import { Route as AuthenticatedShoppingListRouteImport } from './routes/_authenticated/shopping.list'
 import { Route as AuthenticatedScanVoiceRouteImport } from './routes/_authenticated/scan.voice'
 import { Route as AuthenticatedScanRecipeRouteImport } from './routes/_authenticated/scan.recipe'
@@ -414,6 +415,11 @@ const AuthenticatedStoriesIdRoute = AuthenticatedStoriesIdRouteImport.update({
   path: '/$id',
   getParentRoute: () => AuthenticatedStoriesRoute,
 } as any)
+const AuthenticatedSleepDiaryRoute = AuthenticatedSleepDiaryRouteImport.update({
+  id: '/diary',
+  path: '/diary',
+  getParentRoute: () => AuthenticatedSleepRoute,
+} as any)
 const AuthenticatedShoppingListRoute =
   AuthenticatedShoppingListRouteImport.update({
     id: '/shopping/list',
@@ -734,7 +740,7 @@ export interface FileRoutesByFullPath {
   '/reverse-calorie': typeof AuthenticatedReverseCalorieRoute
   '/rewards': typeof AuthenticatedRewardsRoute
   '/scan': typeof AuthenticatedScanRouteWithChildren
-  '/sleep': typeof AuthenticatedSleepRoute
+  '/sleep': typeof AuthenticatedSleepRouteWithChildren
   '/stories': typeof AuthenticatedStoriesRouteWithChildren
   '/subscription': typeof AuthenticatedSubscriptionRoute
   '/theme': typeof AuthenticatedThemeRoute
@@ -779,6 +785,7 @@ export interface FileRoutesByFullPath {
   '/scan/recipe': typeof AuthenticatedScanRecipeRoute
   '/scan/voice': typeof AuthenticatedScanVoiceRoute
   '/shopping/list': typeof AuthenticatedShoppingListRoute
+  '/sleep/diary': typeof AuthenticatedSleepDiaryRoute
   '/stories/$id': typeof AuthenticatedStoriesIdRoute
   '/stories/upload': typeof AuthenticatedStoriesUploadRoute
   '/weight/goal': typeof AuthenticatedWeightGoalRoute
@@ -840,7 +847,7 @@ export interface FileRoutesByTo {
   '/reverse-calorie': typeof AuthenticatedReverseCalorieRoute
   '/rewards': typeof AuthenticatedRewardsRoute
   '/scan': typeof AuthenticatedScanRouteWithChildren
-  '/sleep': typeof AuthenticatedSleepRoute
+  '/sleep': typeof AuthenticatedSleepRouteWithChildren
   '/stories': typeof AuthenticatedStoriesRouteWithChildren
   '/subscription': typeof AuthenticatedSubscriptionRoute
   '/theme': typeof AuthenticatedThemeRoute
@@ -885,6 +892,7 @@ export interface FileRoutesByTo {
   '/scan/recipe': typeof AuthenticatedScanRecipeRoute
   '/scan/voice': typeof AuthenticatedScanVoiceRoute
   '/shopping/list': typeof AuthenticatedShoppingListRoute
+  '/sleep/diary': typeof AuthenticatedSleepDiaryRoute
   '/stories/$id': typeof AuthenticatedStoriesIdRoute
   '/stories/upload': typeof AuthenticatedStoriesUploadRoute
   '/weight/goal': typeof AuthenticatedWeightGoalRoute
@@ -948,7 +956,7 @@ export interface FileRoutesById {
   '/_authenticated/reverse-calorie': typeof AuthenticatedReverseCalorieRoute
   '/_authenticated/rewards': typeof AuthenticatedRewardsRoute
   '/_authenticated/scan': typeof AuthenticatedScanRouteWithChildren
-  '/_authenticated/sleep': typeof AuthenticatedSleepRoute
+  '/_authenticated/sleep': typeof AuthenticatedSleepRouteWithChildren
   '/_authenticated/stories': typeof AuthenticatedStoriesRouteWithChildren
   '/_authenticated/subscription': typeof AuthenticatedSubscriptionRoute
   '/_authenticated/theme': typeof AuthenticatedThemeRoute
@@ -993,6 +1001,7 @@ export interface FileRoutesById {
   '/_authenticated/scan/recipe': typeof AuthenticatedScanRecipeRoute
   '/_authenticated/scan/voice': typeof AuthenticatedScanVoiceRoute
   '/_authenticated/shopping/list': typeof AuthenticatedShoppingListRoute
+  '/_authenticated/sleep/diary': typeof AuthenticatedSleepDiaryRoute
   '/_authenticated/stories/$id': typeof AuthenticatedStoriesIdRoute
   '/_authenticated/stories/upload': typeof AuthenticatedStoriesUploadRoute
   '/_authenticated/weight/goal': typeof AuthenticatedWeightGoalRoute
@@ -1101,6 +1110,7 @@ export interface FileRouteTypes {
     | '/scan/recipe'
     | '/scan/voice'
     | '/shopping/list'
+    | '/sleep/diary'
     | '/stories/$id'
     | '/stories/upload'
     | '/weight/goal'
@@ -1207,6 +1217,7 @@ export interface FileRouteTypes {
     | '/scan/recipe'
     | '/scan/voice'
     | '/shopping/list'
+    | '/sleep/diary'
     | '/stories/$id'
     | '/stories/upload'
     | '/weight/goal'
@@ -1314,6 +1325,7 @@ export interface FileRouteTypes {
     | '/_authenticated/scan/recipe'
     | '/_authenticated/scan/voice'
     | '/_authenticated/shopping/list'
+    | '/_authenticated/sleep/diary'
     | '/_authenticated/stories/$id'
     | '/_authenticated/stories/upload'
     | '/_authenticated/weight/goal'
@@ -1750,6 +1762,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/stories/$id'
       preLoaderRoute: typeof AuthenticatedStoriesIdRouteImport
       parentRoute: typeof AuthenticatedStoriesRoute
+    }
+    '/_authenticated/sleep/diary': {
+      id: '/_authenticated/sleep/diary'
+      path: '/diary'
+      fullPath: '/sleep/diary'
+      preLoaderRoute: typeof AuthenticatedSleepDiaryRouteImport
+      parentRoute: typeof AuthenticatedSleepRoute
     }
     '/_authenticated/shopping/list': {
       id: '/_authenticated/shopping/list'
@@ -2291,6 +2310,17 @@ const AuthenticatedScanRouteChildren: AuthenticatedScanRouteChildren = {
 const AuthenticatedScanRouteWithChildren =
   AuthenticatedScanRoute._addFileChildren(AuthenticatedScanRouteChildren)
 
+interface AuthenticatedSleepRouteChildren {
+  AuthenticatedSleepDiaryRoute: typeof AuthenticatedSleepDiaryRoute
+}
+
+const AuthenticatedSleepRouteChildren: AuthenticatedSleepRouteChildren = {
+  AuthenticatedSleepDiaryRoute: AuthenticatedSleepDiaryRoute,
+}
+
+const AuthenticatedSleepRouteWithChildren =
+  AuthenticatedSleepRoute._addFileChildren(AuthenticatedSleepRouteChildren)
+
 interface AuthenticatedStoriesRouteChildren {
   AuthenticatedStoriesIdRoute: typeof AuthenticatedStoriesIdRoute
   AuthenticatedStoriesUploadRoute: typeof AuthenticatedStoriesUploadRoute
@@ -2358,7 +2388,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedReverseCalorieRoute: typeof AuthenticatedReverseCalorieRoute
   AuthenticatedRewardsRoute: typeof AuthenticatedRewardsRoute
   AuthenticatedScanRoute: typeof AuthenticatedScanRouteWithChildren
-  AuthenticatedSleepRoute: typeof AuthenticatedSleepRoute
+  AuthenticatedSleepRoute: typeof AuthenticatedSleepRouteWithChildren
   AuthenticatedStoriesRoute: typeof AuthenticatedStoriesRouteWithChildren
   AuthenticatedSubscriptionRoute: typeof AuthenticatedSubscriptionRoute
   AuthenticatedThemeRoute: typeof AuthenticatedThemeRoute
@@ -2419,7 +2449,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedReverseCalorieRoute: AuthenticatedReverseCalorieRoute,
   AuthenticatedRewardsRoute: AuthenticatedRewardsRoute,
   AuthenticatedScanRoute: AuthenticatedScanRouteWithChildren,
-  AuthenticatedSleepRoute: AuthenticatedSleepRoute,
+  AuthenticatedSleepRoute: AuthenticatedSleepRouteWithChildren,
   AuthenticatedStoriesRoute: AuthenticatedStoriesRouteWithChildren,
   AuthenticatedSubscriptionRoute: AuthenticatedSubscriptionRoute,
   AuthenticatedThemeRoute: AuthenticatedThemeRoute,
