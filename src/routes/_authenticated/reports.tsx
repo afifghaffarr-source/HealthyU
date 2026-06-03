@@ -35,6 +35,12 @@ import {
   PDF_TOC_ROW_HEIGHT,
   PDF_FOOTER_BRAND_LABEL,
   PDF_DIVIDER_GRAY_STRONG,
+  PDF_LINK_BASELINE_Y,
+  PDF_LINK_UNDERLINE_OFFSET,
+  PDF_LINK_RIGHT_X,
+  PDF_TOC_PAGE_BREAK_Y,
+  PDF_TOC_CONTINUED_TOP_Y,
+  PDF_FOOTER_DIVIDER_OFFSET,
 } from "@/lib/constants";
 
 export const Route = createFileRoute("/_authenticated/reports")({
@@ -252,7 +258,7 @@ function ReportsPage() {
           ? `${r.report_period_start} → ${r.report_period_end}`
           : new Date(r.created_at).toLocaleDateString("id-ID");
       const page = tocPages + idx + 1; // body pages start after all TOC pages
-      if (tocY > 780) {
+      if (tocY > PDF_TOC_PAGE_BREAK_Y) {
         doc.addPage();
         tocPageIdx += 1;
         doc.setFont("helvetica", "bold");
@@ -260,7 +266,7 @@ function ReportsPage() {
         doc.text(`Daftar Isi (lanjutan ${tocPageIdx + 1}/${tocPages})`, PDF_MARGIN_X, PDF_HEADER_BASELINE_Y);
         doc.setFont("helvetica", "normal");
         doc.setFontSize(PDF_BODY_FONT_SIZE);
-        tocY = 80;
+        tocY = PDF_TOC_CONTINUED_TOP_Y;
       }
       doc.text(`${idx + 1}. ${periode}`, 40, tocY);
       doc.text(`hal. ${page}`, 510, tocY, { align: "right" });
@@ -298,13 +304,13 @@ function ReportsPage() {
       doc.setTextColor(PDF_LINK_RGB[0], PDF_LINK_RGB[1], PDF_LINK_RGB[2]);
       doc.setFontSize(9);
       const linkLabel = `hal. ${currentPage} \u2190 Daftar Isi`;
-      doc.text(linkLabel, 555, 40, { align: "right" });
+      doc.text(linkLabel, PDF_LINK_RIGHT_X, PDF_LINK_BASELINE_Y, { align: "right" });
       // Underline manually (jsPDF text has no built-in underline style).
       const linkW = doc.getTextWidth(linkLabel);
       doc.setDrawColor(PDF_LINK_RGB[0], PDF_LINK_RGB[1], PDF_LINK_RGB[2]);
       doc.setLineWidth(0.5);
-      doc.line(555 - linkW, 42, 555, 42);
-      doc.link(555 - linkW - 4, 30, linkW + 8, 16, { pageNumber: 1 });
+      doc.line(PDF_LINK_RIGHT_X - linkW, PDF_LINK_BASELINE_Y + PDF_LINK_UNDERLINE_OFFSET, PDF_LINK_RIGHT_X, PDF_LINK_BASELINE_Y + PDF_LINK_UNDERLINE_OFFSET);
+      doc.link(PDF_LINK_RIGHT_X - linkW - 4, PDF_LINK_BASELINE_Y - 10, linkW + 8, 16, { pageNumber: 1 });
       // Tooltip hover via Text annotation overlay (jsPDF link option does
       // not carry /Contents — we add a sibling annotation with the same bounds).
       (
@@ -322,7 +328,7 @@ function ReportsPage() {
       ).createAnnotation({
         type: "text",
         title: "Navigasi",
-        bounds: { x: 555 - linkW - 4, y: 30, w: linkW + 8, h: 16 },
+        bounds: { x: PDF_LINK_RIGHT_X - linkW - 4, y: PDF_LINK_BASELINE_Y - 10, w: linkW + 8, h: 16 },
         contents: `Halaman ${currentPage} dari ${tocPages + filtered.length}`,
         open: false,
         // Sembunyikan ikon sticky-note default; hanya tooltip hover yang aktif.
@@ -349,9 +355,9 @@ function ReportsPage() {
       doc.setLineWidth(0.5);
       doc.line(
         PDF_MARGIN_X,
-        PDF_PAGE_FOOTER_Y - 8,
+        PDF_PAGE_FOOTER_Y - PDF_FOOTER_DIVIDER_OFFSET,
         pageRightX,
-        PDF_PAGE_FOOTER_Y - 8,
+        PDF_PAGE_FOOTER_Y - PDF_FOOTER_DIVIDER_OFFSET,
       );
       doc.text(
         `${PDF_FOOTER_BRAND_LABEL} ${exportedAt}`,

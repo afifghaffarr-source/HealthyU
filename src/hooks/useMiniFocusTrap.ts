@@ -11,11 +11,13 @@ export function useMiniFocusTrap(
   active: boolean,
   refs: ReadonlyArray<RefObject<HTMLElement | null>>,
   onEscape?: () => void,
+  options?: { autoFocusFirst?: boolean },
 ) {
   useEffect(() => {
     if (!active || refs.length === 0) return;
     const first = refs[0];
     const last = refs[refs.length - 1];
+    if (options?.autoFocusFirst) first.current?.focus();
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
         onEscape?.();
@@ -33,5 +35,5 @@ export function useMiniFocusTrap(
     };
     document.addEventListener("keydown", onKey);
     return () => document.removeEventListener("keydown", onKey);
-  }, [active, refs, onEscape]);
+  }, [active, refs, onEscape, options?.autoFocusFirst]);
 }
