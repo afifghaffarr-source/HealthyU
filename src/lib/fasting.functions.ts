@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { recordActivityFor } from "./gamification.functions";
 
 export const currentFast = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
@@ -66,5 +67,6 @@ export const stopFast = createServerFn({ method: "POST" })
       .eq("id", data.id)
       .eq("user_id", userId);
     if (error) throw new Error(error.message);
-    return { ok: true, completed };
+    const game = completed ? await recordActivityFor(supabase, userId, "fast_completed") : null;
+    return { ok: true, completed, game };
   });
