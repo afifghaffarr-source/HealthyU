@@ -64,6 +64,15 @@ function RecipesPage() {
     return Math.max(1, counts[idx]);
   })();
 
+  // Trending: top 5 by weekly_growth, only when sort==title and cat==all and no search
+  const showTrending = sort === "title" && cat === "all" && !q.trim();
+  const trending = showTrending
+    ? all
+        .filter((r) => Number(r.weekly_growth ?? 0) > 0)
+        .sort((a, b) => Number(b.weekly_growth ?? 0) - Number(a.weekly_growth ?? 0))
+        .slice(0, 5)
+    : [];
+
   return (
     <main className="min-h-screen bg-background pb-28">
       <div className="max-w-md mx-auto px-5 pt-8 space-y-5">
