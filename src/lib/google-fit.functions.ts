@@ -104,7 +104,12 @@ async function aggregate(token: string, dataTypeName: string, days: number) {
       endTimeMillis: endMs,
     }),
   });
-  if (!res.ok) throw new Error(`Google Fit ${dataTypeName} ${res.status}`);
+  if (!res.ok) {
+    const body = await res.text().catch(() => "");
+    throw new Error(
+      `Google Fit ${dataTypeName} ${res.status}: ${body.slice(0, 200)}`,
+    );
+  }
   return (await res.json()) as { bucket: Array<{ startTimeMillis: string; dataset: Array<{ point: Array<{ value: Array<{ intVal?: number; fpVal?: number }> }> }> }> };
 }
 
