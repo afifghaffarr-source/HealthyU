@@ -14,6 +14,7 @@ import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedWorkoutRouteImport } from './routes/_authenticated/workout'
 import { Route as AuthenticatedSleepRouteImport } from './routes/_authenticated/sleep'
+import { Route as AuthenticatedReportsRouteImport } from './routes/_authenticated/reports'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
 import { Route as AuthenticatedPrayerRouteImport } from './routes/_authenticated/prayer'
 import { Route as AuthenticatedOnboardingRouteImport } from './routes/_authenticated/onboarding'
@@ -47,6 +48,11 @@ const AuthenticatedWorkoutRoute = AuthenticatedWorkoutRouteImport.update({
 const AuthenticatedSleepRoute = AuthenticatedSleepRouteImport.update({
   id: '/sleep',
   path: '/sleep',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedReportsRoute = AuthenticatedReportsRouteImport.update({
+  id: '/reports',
+  path: '/reports',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedProfileRoute = AuthenticatedProfileRouteImport.update({
@@ -115,6 +121,7 @@ export interface FileRoutesByFullPath {
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/prayer': typeof AuthenticatedPrayerRoute
   '/profile': typeof AuthenticatedProfileRoute
+  '/reports': typeof AuthenticatedReportsRoute
   '/sleep': typeof AuthenticatedSleepRoute
   '/workout': typeof AuthenticatedWorkoutRoute
 }
@@ -131,6 +138,7 @@ export interface FileRoutesByTo {
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/prayer': typeof AuthenticatedPrayerRoute
   '/profile': typeof AuthenticatedProfileRoute
+  '/reports': typeof AuthenticatedReportsRoute
   '/sleep': typeof AuthenticatedSleepRoute
   '/workout': typeof AuthenticatedWorkoutRoute
 }
@@ -149,6 +157,7 @@ export interface FileRoutesById {
   '/_authenticated/onboarding': typeof AuthenticatedOnboardingRoute
   '/_authenticated/prayer': typeof AuthenticatedPrayerRoute
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
+  '/_authenticated/reports': typeof AuthenticatedReportsRoute
   '/_authenticated/sleep': typeof AuthenticatedSleepRoute
   '/_authenticated/workout': typeof AuthenticatedWorkoutRoute
 }
@@ -167,6 +176,7 @@ export interface FileRouteTypes {
     | '/onboarding'
     | '/prayer'
     | '/profile'
+    | '/reports'
     | '/sleep'
     | '/workout'
   fileRoutesByTo: FileRoutesByTo
@@ -183,6 +193,7 @@ export interface FileRouteTypes {
     | '/onboarding'
     | '/prayer'
     | '/profile'
+    | '/reports'
     | '/sleep'
     | '/workout'
   id:
@@ -200,6 +211,7 @@ export interface FileRouteTypes {
     | '/_authenticated/onboarding'
     | '/_authenticated/prayer'
     | '/_authenticated/profile'
+    | '/_authenticated/reports'
     | '/_authenticated/sleep'
     | '/_authenticated/workout'
   fileRoutesById: FileRoutesById
@@ -245,6 +257,13 @@ declare module '@tanstack/react-router' {
       path: '/sleep'
       fullPath: '/sleep'
       preLoaderRoute: typeof AuthenticatedSleepRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/reports': {
+      id: '/_authenticated/reports'
+      path: '/reports'
+      fullPath: '/reports'
+      preLoaderRoute: typeof AuthenticatedReportsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/profile': {
@@ -331,6 +350,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedOnboardingRoute: typeof AuthenticatedOnboardingRoute
   AuthenticatedPrayerRoute: typeof AuthenticatedPrayerRoute
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
+  AuthenticatedReportsRoute: typeof AuthenticatedReportsRoute
   AuthenticatedSleepRoute: typeof AuthenticatedSleepRoute
   AuthenticatedWorkoutRoute: typeof AuthenticatedWorkoutRoute
 }
@@ -346,6 +366,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedOnboardingRoute: AuthenticatedOnboardingRoute,
   AuthenticatedPrayerRoute: AuthenticatedPrayerRoute,
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,
+  AuthenticatedReportsRoute: AuthenticatedReportsRoute,
   AuthenticatedSleepRoute: AuthenticatedSleepRoute,
   AuthenticatedWorkoutRoute: AuthenticatedWorkoutRoute,
 }
