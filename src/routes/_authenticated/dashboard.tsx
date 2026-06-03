@@ -72,12 +72,16 @@ function Dashboard() {
             }
           }
           qc.invalidateQueries({ queryKey: ["group-challenge-summary"] });
+          qc.invalidateQueries({ queryKey: ["unlinked-joined-challenges"] });
         },
       )
       .on(
         "postgres_changes",
         { event: "*", schema: "public", table: "coin_redemptions" },
-        () => qc.invalidateQueries({ queryKey: ["group-challenge-summary"] }),
+        () => {
+          qc.invalidateQueries({ queryKey: ["group-challenge-summary"] });
+          qc.invalidateQueries({ queryKey: ["unlinked-joined-challenges"] });
+        },
       )
       .subscribe();
     return () => {

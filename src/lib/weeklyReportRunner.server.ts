@@ -8,21 +8,22 @@ type PushSub = { endpoint: string; p256dh: string; auth: string };
  * Run the weekly AI analysis for a single user (server-side, admin client).
  * Inserts an ai_reports row and returns the report id.
  */
-export type WeeklyRunResult = { reportId: string | null; highlight: string };
-export type WeeklyPushPayload = { highlight: string; trendingRecipe: string | null };
+export type WeeklyRunResult = { reportId: string | null; highlight: string; longestStreak: number };
+export type WeeklyPushPayload = { highlight: string; trendingRecipe: string | null; longestStreak: number };
 
 export async function runWeeklyReportForUser(userId: string, days = 7): Promise<WeeklyRunResult> {
   const apiKey = process.env.LOVABLE_API_KEY;
   if (!apiKey) throw new Error("LOVABLE_API_KEY missing");
   const since = new Date(Date.now() - days * 86400000).toISOString();
 
-  const [profileRes, meals, water, workouts, sleep, fasting] = await Promise.all([
+  const [profileRes, meals, water, workouts, sleep, fasting, statsRes] = await Promise.all([
     supabaseAdmin.from("profiles").select("full_name, daily_calorie_target, health_conditions, allergies").eq("id", userId).maybeSingle(),
     supabaseAdmin.from("meal_logs").select("calories, protein_g, carbs_g, fat_g").eq("user_id", userId).gte("logged_at", since),
     supabaseAdmin.from("water_logs").select("amount_ml").eq("user_id", userId).gte("logged_at", since),
     supabaseAdmin.from("workout_sessions").select("duration_min, calories_burned").eq("user_id", userId).gte("performed_at", since),
     supabaseAdmin.from("sleep_logs").select("sleep_start, sleep_end").eq("user_id", userId).gte("sleep_end", since),
     supabaseAdmin.from("fasting_sessions").select("completed").eq("user_id", userId).gte("start_time", since),
+    supabaseAdmin.from("user_stats").select("longest_streak, current_streak").eq("user_id", userId).maybeSingle(),
   ]);
 
   const groupChallenges = await computeGroupChallengeSummary(userId);
@@ -35,6 +36,7 @@ export async function runWeeklyReportForUser(userId: string, days = 7): Promise<
     0,
   );
   const fastingDone = (fasting.data ?? []).filter((f) => f.completed).length;
+  const longestStreak = Number(statsRes.data?.longest_streak ?? 0);
 
   const summary = {
     days,
@@ -53,6 +55,7 @@ export async function runWeeklyReportForUser(userId: string, days = 7): Promise<
   const highlightParts: string[] = [];
   if (summary.avg_sleep_hours > 0) highlightParts.push(`Tidur ${summary.avg_sleep_hours}j`);
   if (summary.workout_sessions > 0) highlightParts.push(`${summary.workout_sessions}x olahraga`);
+  if (longestStreak > 0) highlightParts.push(`streak ${longestStreak}h`);
   const topGroup = groupChallenges.find((g) => g.rank > 0);
   if (topGroup) highlightParts.push(`rank #${topGroup.rank} di ${topGroup.group}`);
   const highlight = highlightParts.slice(0, 3).join(" · ") || "Lihat insight lengkap minggu ini";
@@ -91,7 +94,7 @@ export async function runWeeklyReportForUser(userId: string, days = 7): Promise<
     .select("id")
     .maybeSingle();
 
-  return { reportId: saved?.id ?? null, highlight };
+  return { reportId: saved?.id ?? null, highlight, longestStreak };
 }
 
 export async function getTopTrendingRecipe(): Promise<{ title: string } | null> {
@@ -114,6 +117,7 @@ export async function sendWeeklyReportPush(
   userId: string,
   highlight?: string,
   trendingRecipe?: string | null,
+  longestStreak?: number,
 ) {
   const { data: subs } = await supabaseAdmin
     .from("push_subscriptions")
@@ -122,10 +126,15 @@ export async function sendWeeklyReportPush(
   const body = [
     highlight ?? "Buka untuk lihat insight AI minggu ini",
     trendingRecipe ? `🔥 Trending: ${trendingRecipe}` : null,
+    longestStreak && longestStreak > 0 ? `🔥 Streak ${longestStreak} hari` : null,
   ]
     .filter(Boolean)
     .join(" — ");
-  const url = trendingRecipe ? "/recipes?sort=trending" : "/reports?focus=latest";
+  const url = trendingRecipe
+    ? "/recipes?sort=trending"
+    : longestStreak && longestStreak > 0
+      ? "/challenges"
+      : "/reports?focus=latest";
   for (const s of subs ?? []) {
     try {
       await sendWebPushTo(s as PushSub, {
