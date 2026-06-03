@@ -423,16 +423,30 @@ function Dashboard() {
               {(() => {
                 const total = Object.values(newClaims).reduce((a, b) => a + b, 0);
                 if (total === 0) return null;
+                const tsValues = Object.keys(newClaims)
+                  .map((gid) => claimsTsRef.current[gid])
+                  .filter((v): v is number => typeof v === "number");
+                const latestTs = tsValues.length > 0 ? Math.max(...tsValues) : nowTick;
+                const remaining = Math.max(
+                  0,
+                  GROUP_BONUS_BADGE_TTL_MS - (nowTick - latestTs),
+                );
+                const pct = Math.round((remaining / GROUP_BONUS_BADGE_TTL_MS) * 100);
                 return (
                   <button
                     onClick={() => {
                       setNewClaims({});
                       navigate({ to: "/challenges" });
                     }}
-                    className="ml-auto text-[9px] font-bold uppercase bg-amber-100 text-amber-800 rounded-full px-2 py-0.5 animate-pulse"
+                    className="ml-auto relative text-[9px] font-bold uppercase bg-amber-100 text-amber-800 rounded-full pl-2 pr-2 pt-0.5 pb-1 overflow-hidden"
                     title="Lihat semua leaderboard"
                   >
                     +{total} klaim baru
+                    <span
+                      aria-hidden
+                      className="absolute left-0 bottom-0 h-0.5 bg-amber-500/70 transition-[width] duration-1000 ease-linear"
+                      style={{ width: `${pct}%` }}
+                    />
                   </button>
                 );
               })()}
