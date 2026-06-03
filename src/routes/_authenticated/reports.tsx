@@ -28,6 +28,13 @@ import {
   PDF_PAGE_CONTENT_W,
   PDF_LINE_HEIGHT,
   PDF_SECTION_GAP,
+  PDF_HEADER_FILL_RGB,
+  PDF_LINK_RGB,
+  PDF_MUTED_GRAY,
+  PDF_TOC_ROWS_PER_PAGE,
+  PDF_TOC_ROW_HEIGHT,
+  PDF_FOOTER_BRAND_LABEL,
+  PDF_DIVIDER_GRAY_STRONG,
 } from "@/lib/constants";
 
 export const Route = createFileRoute("/_authenticated/reports")({
@@ -223,16 +230,19 @@ function ReportsPage() {
     doc.text("Arsip Laporan HealthyU", PDF_MARGIN_X, PDF_HEADER_BASELINE_Y);
     doc.setFont("helvetica", "normal");
     doc.setFontSize(PDF_BODY_FONT_SIZE);
-    doc.setTextColor(120);
+    doc.setTextColor(PDF_MUTED_GRAY);
     doc.text(`Total: ${filtered.length} laporan`, PDF_MARGIN_X, PDF_HEADER_SUBTITLE_Y);
     doc.setTextColor(0);
     doc.setFont("helvetica", "bold");
     doc.setFontSize(PDF_SUBTITLE_FONT_SIZE);
     doc.text("Daftar Isi", PDF_MARGIN_X, PDF_BODY_TOP_Y);
+    doc.setDrawColor(PDF_DIVIDER_GRAY_STRONG);
+    doc.setLineWidth(0.5);
+    doc.line(PDF_MARGIN_X, PDF_BODY_TOP_Y + 4, PDF_PAGE_W - PDF_MARGIN_X, PDF_BODY_TOP_Y + 4);
     doc.setFont("helvetica", "normal");
     doc.setFontSize(PDF_BODY_FONT_SIZE);
     // Compute how many TOC pages we need so body page numbers stay correct.
-    const ROWS_PER_TOC_PAGE = 40;
+    const ROWS_PER_TOC_PAGE = PDF_TOC_ROWS_PER_PAGE;
     const tocPages = Math.max(1, Math.ceil(filtered.length / ROWS_PER_TOC_PAGE));
     let tocY = 120;
     let tocPageIdx = 0;
@@ -256,7 +266,7 @@ function ReportsPage() {
       doc.text(`hal. ${page}`, 510, tocY, { align: "right" });
       // Make the whole TOC row clickable → jumps to that report's body page.
       doc.link(40, tocY - 10, 515, 14, { pageNumber: page });
-      tocY += 16;
+      tocY += PDF_TOC_ROW_HEIGHT;
     });
     filtered.forEach((r, bodyIdx) => {
       doc.addPage();
@@ -267,7 +277,7 @@ function ReportsPage() {
       doc.text("Laporan HealthyU", PDF_MARGIN_X, PDF_HEADER_BASELINE_Y);
       doc.setFont("helvetica", "normal");
       doc.setFontSize(PDF_BODY_FONT_SIZE);
-      doc.setTextColor(120);
+      doc.setTextColor(PDF_MUTED_GRAY);
       const periode =
         r.report_period_start && r.report_period_end
           ? `Periode: ${r.report_period_start} → ${r.report_period_end}`
@@ -277,18 +287,21 @@ function ReportsPage() {
       doc.setFont("helvetica", "bold");
       doc.setFontSize(PDF_SUBTITLE_FONT_SIZE);
       doc.text("Analisis AI", PDF_MARGIN_X, PDF_BODY_TOP_Y);
+      doc.setDrawColor(PDF_DIVIDER_GRAY_STRONG);
+      doc.setLineWidth(0.5);
+      doc.line(PDF_MARGIN_X, PDF_BODY_TOP_Y + 4, PDF_PAGE_W - PDF_MARGIN_X, PDF_BODY_TOP_Y + 4);
       doc.setFont("helvetica", "normal");
       doc.setFontSize(PDF_BODY_FONT_SIZE);
       const lines = doc.splitTextToSize(text || "(kosong)", PDF_PAGE_CONTENT_W);
       doc.text(lines, PDF_MARGIN_X, PDF_BODY_TOP_Y + PDF_LINE_HEIGHT);
       // Back-link to TOC (page 1) in the top-right corner.
-      doc.setTextColor(80, 80, 200);
+      doc.setTextColor(PDF_LINK_RGB[0], PDF_LINK_RGB[1], PDF_LINK_RGB[2]);
       doc.setFontSize(9);
       const linkLabel = `hal. ${currentPage} \u2190 Daftar Isi`;
       doc.text(linkLabel, 555, 40, { align: "right" });
       // Underline manually (jsPDF text has no built-in underline style).
       const linkW = doc.getTextWidth(linkLabel);
-      doc.setDrawColor(80, 80, 200);
+      doc.setDrawColor(PDF_LINK_RGB[0], PDF_LINK_RGB[1], PDF_LINK_RGB[2]);
       doc.setLineWidth(0.5);
       doc.line(555 - linkW, 42, 555, 42);
       doc.link(555 - linkW - 4, 30, linkW + 8, 16, { pageNumber: 1 });
@@ -330,7 +343,7 @@ function ReportsPage() {
       doc.setPage(p);
       doc.setFont("helvetica", "normal");
       doc.setFontSize(PDF_FOOTER_FONT_SIZE);
-      doc.setTextColor(120);
+      doc.setTextColor(PDF_MUTED_GRAY);
       // Divider tipis di atas baris footer.
       doc.setDrawColor(PDF_DIVIDER_GRAY);
       doc.setLineWidth(0.5);
@@ -341,7 +354,7 @@ function ReportsPage() {
         PDF_PAGE_FOOTER_Y - 8,
       );
       doc.text(
-        `HealthyU \u00B7 diekspor ${exportedAt}`,
+        `${PDF_FOOTER_BRAND_LABEL} ${exportedAt}`,
         PDF_MARGIN_X,
         PDF_PAGE_FOOTER_Y,
       );
@@ -366,7 +379,7 @@ function ReportsPage() {
     doc.text("Laporan HealthyU - 7 Hari", PDF_MARGIN_X, PDF_HEADER_BASELINE_Y);
     doc.setFont("helvetica", "normal");
     doc.setFontSize(PDF_BODY_FONT_SIZE);
-    doc.setTextColor(120);
+    doc.setTextColor(PDF_MUTED_GRAY);
     doc.text(`Dicetak: ${today}`, PDF_MARGIN_X, PDF_HEADER_SUBTITLE_Y);
     doc.setTextColor(0);
 
@@ -382,7 +395,7 @@ function ReportsPage() {
         ["Puasa selesai", `${summary.fastingDone} sesi`],
       ],
       styles: { font: "helvetica", fontSize: 10 },
-      headStyles: { fillColor: [107, 142, 90] },
+      headStyles: { fillColor: PDF_HEADER_FILL_RGB },
     });
 
     autoTable(doc, {
@@ -399,7 +412,7 @@ function ReportsPage() {
         d.hours.toFixed(1),
       ]),
       styles: { font: "helvetica", fontSize: 9 },
-      headStyles: { fillColor: [107, 142, 90] },
+      headStyles: { fillColor: PDF_HEADER_FILL_RGB },
     });
 
     if (aiMut.data?.report) {
@@ -469,7 +482,7 @@ function ReportsPage() {
     doc.text("Laporan HealthyU", PDF_MARGIN_X, PDF_HEADER_BASELINE_Y);
     doc.setFont("helvetica", "normal");
     doc.setFontSize(PDF_BODY_FONT_SIZE);
-    doc.setTextColor(120);
+    doc.setTextColor(PDF_MUTED_GRAY);
     const periode =
       r.report_period_start && r.report_period_end
         ? `Periode: ${r.report_period_start} → ${r.report_period_end}`
@@ -479,6 +492,9 @@ function ReportsPage() {
     doc.setFont("helvetica", "bold");
     doc.setFontSize(PDF_SUBTITLE_FONT_SIZE);
     doc.text("Analisis AI", PDF_MARGIN_X, PDF_BODY_TOP_Y);
+      doc.setDrawColor(PDF_DIVIDER_GRAY_STRONG);
+      doc.setLineWidth(0.5);
+      doc.line(PDF_MARGIN_X, PDF_BODY_TOP_Y + 4, PDF_PAGE_W - PDF_MARGIN_X, PDF_BODY_TOP_Y + 4);
     doc.setFont("helvetica", "normal");
     doc.setFontSize(PDF_BODY_FONT_SIZE);
     const lines = doc.splitTextToSize(text || "(kosong)", PDF_PAGE_CONTENT_W);

@@ -17,6 +17,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { ThemeProvider } from "@/components/theme-provider";
 import { ReminderScheduler } from "@/components/reminder-scheduler";
 import { InstallPrompt } from "@/components/install-prompt";
+import { LiveAnnouncerProvider } from "@/components/live-announcer";
 
 function NotFoundComponent() {
   return (
@@ -136,12 +137,14 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeProvider>
-        <ManifestLinkManager />
-        <AuthListener />
-        <ReminderScheduler />
-        <Outlet />
-        <InstallPrompt />
-        <Toaster position="top-center" />
+        <LiveAnnouncerProvider>
+          <ManifestLinkManager />
+          <AuthListener />
+          <ReminderScheduler />
+          <Outlet />
+          <InstallPrompt />
+          <Toaster position="top-center" />
+        </LiveAnnouncerProvider>
       </ThemeProvider>
     </QueryClientProvider>
   );

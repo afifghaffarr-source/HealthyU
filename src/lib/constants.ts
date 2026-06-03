@@ -29,6 +29,12 @@
 // | PDF_FOOTER_FONT_SIZE           | Font size baris footer PDF (pt).                         |
 // | PDF_FOOTER_PAGE_LABEL          | Label kata halaman footer ("hal"), siap i18n.            |
 // | PDF_PAGE_CONTENT_W             | Lebar konten PDF (PDF_PAGE_W - 2*PDF_MARGIN_X, pt).      |
+// | PDF_HEADER_FILL_RGB            | Warna fill brand untuk header autoTable PDF ([r,g,b]).   |
+// | PDF_LINK_RGB                   | Warna teks+garis hyperlink di PDF ([r,g,b]).             |
+// | PDF_MUTED_GRAY                 | Grayscale 0-255 untuk teks muted (subjudul) PDF.         |
+// | PDF_TOC_ROWS_PER_PAGE          | Jumlah baris TOC per halaman sebelum addPage().          |
+// | PDF_TOC_ROW_HEIGHT             | Tinggi baris TOC (pt) — tocY increment.                  |
+// | PDF_FOOTER_BRAND_LABEL         | Label brand kiri footer PDF (siap i18n).                 |
 //
 // CONVENTION: setiap konstanta tunable WAJIB ditambahkan ke tabel di atas
 // (nama + 1 baris efek). Reviewer boleh menolak PR yang menambah konstanta
@@ -142,3 +148,27 @@ export const PDF_FOOTER_PAGE_LABEL = "hal";
 /** Lebar konten PDF (PDF_PAGE_W - 2*PDF_MARGIN_X) untuk splitTextToSize dkk. */
 // eslint-disable-next-line no-restricted-syntax -- listed in header table
 export const PDF_PAGE_CONTENT_W = PDF_PAGE_W - 2 * PDF_MARGIN_X;
+
+/** Warna fill brand untuk header autoTable PDF. */
+// eslint-disable-next-line no-restricted-syntax -- listed in header table
+export const PDF_HEADER_FILL_RGB: [number, number, number] = [107, 142, 90];
+
+/** Warna teks & garis hyperlink di PDF (back-link TOC). */
+// eslint-disable-next-line no-restricted-syntax -- listed in header table
+export const PDF_LINK_RGB: [number, number, number] = [80, 80, 200];
+
+/** Grayscale 0-255 untuk teks muted (subjudul/footer) PDF. */
+// eslint-disable-next-line no-restricted-syntax -- listed in header table
+export const PDF_MUTED_GRAY = 120;
+
+/** Jumlah baris TOC per halaman sebelum addPage(). */
+// eslint-disable-next-line no-restricted-syntax -- listed in header table
+export const PDF_TOC_ROWS_PER_PAGE = 40;
+
+/** Tinggi baris TOC (pt) — increment tocY tiap row. */
+// eslint-disable-next-line no-restricted-syntax -- listed in header table
+export const PDF_TOC_ROW_HEIGHT = 16;
+
+/** Label brand kiri footer PDF (siap i18n). */
+// eslint-disable-next-line no-restricted-syntax -- listed in header table
+export const PDF_FOOTER_BRAND_LABEL = "HealthyU \u00B7 diekspor";

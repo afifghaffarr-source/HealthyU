@@ -32,6 +32,7 @@ import {
   CHALLENGE_HIGHLIGHT_FADE_OPACITY,
   CHALLENGE_HIGHLIGHT_TRANSITION_MS,
 } from "@/lib/constants";
+import { useReducedMotion } from "@/hooks/useReducedMotion";
 
 const challengesSearchSchema = z.object({
   group: fallback(z.string().uuid().optional(), undefined),
@@ -48,17 +49,8 @@ function ChallengesPage() {
   const qc = useQueryClient();
   const navigate = useNavigate();
   const { group: focusGroup, challenge: focusChallenge, focus } = Route.useSearch();
-  // prefers-reduced-motion → override transisi spring jadi 0ms supaya
-  // tidak ada delay sama sekali bagi user yang sensitif animasi.
-  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
-  useEffect(() => {
-    if (typeof window === "undefined" || !window.matchMedia) return;
-    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
-    setPrefersReducedMotion(mq.matches);
-    const onChange = (e: MediaQueryListEvent) => setPrefersReducedMotion(e.matches);
-    mq.addEventListener("change", onChange);
-    return () => mq.removeEventListener("change", onChange);
-  }, []);
+  // prefers-reduced-motion → override transisi spring jadi 0ms.
+  const prefersReducedMotion = useReducedMotion();
   const fetchAll = useServerFn(listChallenges);
   const joinFn = useServerFn(joinChallenge);
   const logFn = useServerFn(logChallengeDay);
