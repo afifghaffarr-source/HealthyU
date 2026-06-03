@@ -17,7 +17,11 @@ import { formatDuration, fastingStage } from "@/lib/health";
 import { Droplet, Plus, Sparkles, ArrowRight, Flame, Trophy, Camera, Smile } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import { GROUP_BONUS_AGGREGATE_MS, GROUP_BONUS_BADGE_TTL_MS } from "@/lib/constants";
+import {
+  GROUP_BONUS_AGGREGATE_MS,
+  GROUP_BONUS_BADGE_TTL_MS,
+  GROUP_BONUS_BADGE_TICK_MS,
+} from "@/lib/constants";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   component: Dashboard,
@@ -120,7 +124,7 @@ function Dashboard() {
   }, [breakdownOpen]);
   useEffect(() => {
     if (Object.keys(newClaims).length === 0) return;
-    const id = window.setInterval(() => setNowTick(Date.now()), 1000);
+    const id = window.setInterval(() => setNowTick(Date.now()), GROUP_BONUS_BADGE_TICK_MS);
     return () => window.clearInterval(id);
   }, [newClaims]);
 
