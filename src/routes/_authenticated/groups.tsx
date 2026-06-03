@@ -126,7 +126,7 @@ function GroupsPage() {
           />
           <button
             disabled={code.trim().length < 4 || joinMut.isPending}
-            onClick={() => joinMut.mutate()}
+            onClick={() => joinMut.mutate(code)}
             className="w-full bg-card outline-1 outline-black/10 font-semibold py-3 rounded-2xl disabled:opacity-60"
           >
             {joinMut.isPending ? "Bergabung..." : "Gabung"}
