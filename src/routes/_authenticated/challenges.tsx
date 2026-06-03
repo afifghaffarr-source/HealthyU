@@ -1,0 +1,205 @@
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
+import { ArrowLeft, Trophy, Flame, Users, Calendar, Check } from "lucide-react";
+import { toast } from "sonner";
+import { BottomNav } from "@/components/bottom-nav";
+import {
+  listChallenges,
+  joinChallenge,
+  logChallengeDay,
+  leaveChallenge,
+} from "@/lib/challenges.functions";
+
+export const Route = createFileRoute("/_authenticated/challenges")({
+  component: ChallengesPage,
+});
+
+function ChallengesPage() {
+  const qc = useQueryClient();
+  const fetchAll = useServerFn(listChallenges);
+  const joinFn = useServerFn(joinChallenge);
+  const logFn = useServerFn(logChallengeDay);
+  const leaveFn = useServerFn(leaveChallenge);
+
+  const { data, isLoading } = useQuery({
+    queryKey: ["challenges"],
+    queryFn: () => fetchAll(),
+  });
+
+  const invalidate = () => qc.invalidateQueries({ queryKey: ["challenges"] });
+
+  const joinM = useMutation({
+    mutationFn: (challenge_id: string) => joinFn({ data: { challenge_id } }),
+    onSuccess: (r) => {
+      toast.success(r.already ? "Sudah bergabung" : "Bergabung challenge!");
+      invalidate();
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  const logM = useMutation({
+    mutationFn: (p: { participant_id: string; day_number: number }) =>
+      logFn({ data: p }),
+    onSuccess: (r) => {
+      toast.success(`Hari ${r.day} tercatat · streak ${r.streak}`);
+      invalidate();
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  const leaveM = useMutation({
+    mutationFn: (participant_id: string) => leaveFn({ data: { participant_id } }),
+    onSuccess: () => {
+      toast.success("Keluar dari challenge");
+      invalidate();
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  const challenges = data?.challenges ?? [];
+  const partsByCh = new Map(
+    (data?.participations ?? []).map((p) => [p.challenge_id, p] as const),
+  );
+
+  return (
+    <div className="min-h-screen pb-32">
+      <header className="sticky top-0 z-30 bg-background/85 backdrop-blur-xl border-b border-border/60">
+        <div className="max-w-md mx-auto px-4 h-14 flex items-center gap-3">
+          <Link
+            to="/dashboard"
+            className="size-9 inline-flex items-center justify-center rounded-full bg-muted"
+            aria-label="Kembali"
+          >
+            <ArrowLeft className="size-4" />
+          </Link>
+          <h1 className="text-base font-bold flex items-center gap-2">
+            <Trophy className="size-4 text-primary" />
+            Challenges
+          </h1>
+        </div>
+      </header>
+
+      <main className="max-w-md mx-auto px-4 pt-4 space-y-3">
+        {isLoading && (
+          <p className="text-sm text-muted-foreground text-center py-10">
+            Memuat…
+          </p>
+        )}
+        {!isLoading && challenges.length === 0 && (
+          <p className="text-sm text-muted-foreground text-center py-10">
+            Belum ada challenge tersedia.
+          </p>
+        )}
+        {challenges.map((c) => {
+          const part = partsByCh.get(c.id);
+          const joined = !!part;
+          const nextDay = (part?.current_day ?? 0) + 1;
+          return (
+            <article
+              key={c.id}
+              className="rounded-3xl bg-card outline-1 outline-black/5 p-4 shadow-sm"
+            >
+              <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0">
+                  <h2 className="font-semibold leading-tight truncate">
+                    {c.title}
+                  </h2>
+                  {c.description && (
+                    <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
+                      {c.description}
+                    </p>
+                  )}
+                </div>
+                {c.is_featured && (
+                  <span className="text-[10px] font-semibold uppercase tracking-wide bg-primary/10 text-primary px-2 py-0.5 rounded-full shrink-0">
+                    Featured
+                  </span>
+                )}
+              </div>
+
+              <div className="flex flex-wrap gap-3 text-[11px] text-muted-foreground mt-3">
+                {c.duration_days && (
+                  <span className="inline-flex items-center gap-1">
+                    <Calendar className="size-3" />
+                    {c.duration_days} hari
+                  </span>
+                )}
+                <span className="inline-flex items-center gap-1">
+                  <Users className="size-3" />
+                  {c.current_participants ?? 0}
+                </span>
+                {c.difficulty && (
+                  <span className="capitalize">{c.difficulty}</span>
+                )}
+                {(c.xp_reward ?? 0) > 0 && (
+                  <span className="text-primary font-semibold">
+                    +{c.xp_reward} XP
+                  </span>
+                )}
+                {(c.coin_reward ?? 0) > 0 && (
+                  <span className="text-amber-600 font-semibold">
+                    +{c.coin_reward} 🪙
+                  </span>
+                )}
+              </div>
+
+              {joined && (
+                <div className="mt-3 flex items-center gap-3 text-xs">
+                  <span className="inline-flex items-center gap-1 font-semibold">
+                    <Flame className="size-3 text-orange-500" />
+                    Streak {part!.streak ?? 0}
+                  </span>
+                  <span className="text-muted-foreground">
+                    Hari {part!.current_day ?? 0}
+                    {c.duration_days ? ` / ${c.duration_days}` : ""}
+                  </span>
+                </div>
+              )}
+
+              <div className="mt-3 flex gap-2">
+                {!joined ? (
+                  <button
+                    onClick={() => joinM.mutate(c.id)}
+                    disabled={joinM.isPending}
+                    className="flex-1 h-10 rounded-2xl bg-primary text-primary-foreground text-sm font-semibold disabled:opacity-50"
+                  >
+                    Gabung
+                  </button>
+                ) : (
+                  <>
+                    <button
+                      onClick={() =>
+                        logM.mutate({
+                          participant_id: part!.id,
+                          day_number: nextDay,
+                        })
+                      }
+                      disabled={logM.isPending}
+                      className="flex-1 h-10 rounded-2xl bg-primary text-primary-foreground text-sm font-semibold inline-flex items-center justify-center gap-1 disabled:opacity-50"
+                    >
+                      <Check className="size-4" />
+                      Catat hari {nextDay}
+                    </button>
+                    <button
+                      onClick={() => {
+                        if (confirm("Keluar dari challenge ini?")) {
+                          leaveM.mutate(part!.id);
+                        }
+                      }}
+                      className="h-10 px-3 rounded-2xl bg-muted text-foreground text-sm"
+                    >
+                      Keluar
+                    </button>
+                  </>
+                )}
+              </div>
+            </article>
+          );
+        })}
+      </main>
+
+      <BottomNav />
+    </div>
+  );
+}
