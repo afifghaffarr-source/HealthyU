@@ -11,6 +11,7 @@ import autoTable from "jspdf-autotable";
 import { z } from "zod";
 import { fallback, zodValidator } from "@tanstack/zod-adapter";
 import { useNavigate } from "@tanstack/react-router";
+import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/_authenticated/reports")({
   validateSearch: zodValidator(
@@ -46,6 +47,35 @@ function ReportsPage() {
     queryKey: ["ai-reports"],
     queryFn: () => listFn(),
   });
+  const { data: lastSeenId = null } = useQuery({
+    queryKey: ["profile-last-seen-report"],
+    queryFn: async (): Promise<string | null> => {
+      const { data: auth } = await supabase.auth.getUser();
+      const uid = auth.user?.id;
+      if (!uid) return null;
+      const { data: prof } = await supabase
+        .from("profiles")
+        .select("last_seen_report_id")
+        .eq("id", uid)
+        .maybeSingle();
+      return ((prof as { last_seen_report_id?: string | null } | null)?.last_seen_report_id) ?? null;
+    },
+  });
+  const latestId = history[0]?.id ?? null;
+  useEffect(() => {
+    if (!latestId || lastSeenId === latestId) return;
+    if (focus !== "latest") return;
+    void (async () => {
+      const { data: auth } = await supabase.auth.getUser();
+      const uid = auth.user?.id;
+      if (!uid) return;
+      await supabase
+        .from("profiles")
+        .update({ last_seen_report_id: latestId } as never)
+        .eq("id", uid);
+      qc.invalidateQueries({ queryKey: ["profile-last-seen-report"] });
+    })();
+  }, [focus, latestId, lastSeenId, qc]);
   const aiMut = useMutation({
     mutationFn: () => aiFn({ data: { days: 7 } }),
     onSuccess: () => qc.invalidateQueries({ queryKey: ["ai-reports"] }),
@@ -339,19 +369,20 @@ function ReportsPage() {
               })
               .map((r, idx) => {
               const text = Array.isArray(r.recommendations) ? String(r.recommendations[0] ?? "") : "";
+              const isNew = idx === 0 && latestId === r.id && lastSeenId !== r.id;
               return (
                 <details
                   key={r.id}
-                  open={focus === "latest" && idx === 0}
+                  open={(focus === "latest" && idx === 0) || isNew}
                   className={
-                    focus === "latest" && idx === 0
+                    isNew
                       ? "bg-card rounded-2xl outline-2 outline-primary p-4 ring-2 ring-primary/20 shadow-md animate-fade-up"
                       : "bg-card rounded-2xl outline-1 outline-black/5 p-4"
                   }
                 >
                   <summary className="cursor-pointer text-sm font-semibold flex items-center justify-between">
                     <span className="inline-flex items-center gap-2">
-                      {focus === "latest" && idx === 0 && (
+                      {isNew && (
                         <span className="text-[9px] font-bold uppercase tracking-wider bg-primary text-primary-foreground rounded-full px-2 py-0.5">
                           Baru
                         </span>
