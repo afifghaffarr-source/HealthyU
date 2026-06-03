@@ -96,13 +96,20 @@ function Dashboard() {
   const [nowTick, setNowTick] = useState(() => Date.now());
   const [breakdownOpen, setBreakdownOpen] = useState(false);
   const breakdownRef = useRef<HTMLDivElement | null>(null);
+  const badgeBtnRef = useRef<HTMLButtonElement | null>(null);
   useEffect(() => {
     if (!breakdownOpen) return;
     const onDown = (e: MouseEvent) => {
-      if (!breakdownRef.current?.contains(e.target as Node)) setBreakdownOpen(false);
+      if (!breakdownRef.current?.contains(e.target as Node)) {
+        setBreakdownOpen(false);
+        badgeBtnRef.current?.focus();
+      }
     };
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setBreakdownOpen(false);
+      if (e.key === "Escape") {
+        setBreakdownOpen(false);
+        badgeBtnRef.current?.focus();
+      }
     };
     document.addEventListener("mousedown", onDown);
     document.addEventListener("keydown", onKey);
@@ -459,6 +466,7 @@ function Dashboard() {
                 return (
                   <div className="ml-auto relative" ref={breakdownRef}>
                     <button
+                      ref={badgeBtnRef}
                       onClick={() => setBreakdownOpen((o) => !o)}
                       className="relative text-[9px] font-bold uppercase bg-amber-100 text-amber-800 rounded-full pl-2 pr-2 pt-0.5 pb-1 overflow-hidden"
                       title={breakdown || "Breakdown klaim baru"}
