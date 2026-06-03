@@ -7,7 +7,7 @@ import { parseMealFromVoice } from "@/lib/ai-extras.functions";
 import { getAchievementToastPrefix } from "@/lib/achievement-icons";
 import { BottomNav } from "@/components/bottom-nav";
 import { ArrowLeft, Search, Trash2, Mic, MicOff, Loader2, WifiOff, RefreshCw, Plus, Minus, ShoppingBasket, Sparkles, X } from "lucide-react";
-import { getFoodAlternatives } from "@/lib/foodAlternatives.functions";
+import { getFoodAlternatives, regenerateAlternativeReasons } from "@/lib/foodAlternatives.functions";
 import { toast } from "sonner";
 import { enqueue } from "@/lib/offline-queue";
 import { useOfflineQueue } from "@/hooks/use-offline-queue";
@@ -47,10 +47,19 @@ function FoodPage() {
   const [basket, setBasket] = useState<BasketItem[]>([]);
   const [altFor, setAltFor] = useState<{ id: string; name: string } | null>(null);
   const altFn = useServerFn(getFoodAlternatives);
+  const regenFn = useServerFn(regenerateAlternativeReasons);
   const { data: alts = [], isLoading: altLoading } = useQuery({
     queryKey: ["food-alternatives", altFor?.id],
     queryFn: () => altFn({ data: { food_id: altFor!.id } }),
     enabled: !!altFor,
+  });
+  const regenM = useMutation({
+    mutationFn: () => regenFn({ data: { food_id: altFor!.id } }),
+    onSuccess: (r) => {
+      toast.success(`AI memperbarui ${r.updated} penjelasan`);
+      qc.invalidateQueries({ queryKey: ["food-alternatives", altFor?.id] });
+    },
+    onError: (e: Error) => toast.error(e.message),
   });
 
   const addToBasket = (f: {
@@ -367,6 +376,14 @@ function FoodPage() {
               </button>
             </div>
             <p className="text-xs text-muted-foreground mb-3">Alternatif untuk <span className="font-semibold">{altFor.name}</span></p>
+            <button
+              onClick={() => regenM.mutate()}
+              disabled={regenM.isPending || alts.length === 0}
+              className="w-full mb-3 inline-flex items-center justify-center gap-2 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white text-xs font-semibold py-2 rounded-xl disabled:opacity-50"
+            >
+              {regenM.isPending ? <Loader2 className="size-3 animate-spin" /> : <Sparkles className="size-3" />}
+              {regenM.isPending ? "AI menulis penjelasan…" : "Perbaiki penjelasan dengan AI"}
+            </button>
             {altLoading && <p className="text-sm text-muted-foreground text-center py-6">Memuat…</p>}
             {!altLoading && alts.length === 0 && (
               <p className="text-sm text-muted-foreground text-center py-6">Belum ada saran pengganti untuk makanan ini.</p>

@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { z } from "zod";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import {
@@ -16,6 +17,7 @@ import {
   Plus,
   LogIn,
   Copy,
+  Share2,
   Trophy,
   Flame,
   LogOut,
@@ -24,11 +26,14 @@ import {
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/groups")({
+  validateSearch: (s: Record<string, unknown>) =>
+    z.object({ invite: z.string().optional() }).parse(s),
   component: GroupsPage,
 });
 
 function GroupsPage() {
   const qc = useQueryClient();
+  const { invite } = Route.useSearch();
   const listFn = useServerFn(listMyGroups);
   const createFn = useServerFn(createGroup);
   const joinFn = useServerFn(joinGroup);
@@ -53,7 +58,7 @@ function GroupsPage() {
   });
 
   const joinMut = useMutation({
-    mutationFn: () => joinFn({ data: { invite_code: code.trim().toUpperCase() } }),
+    mutationFn: (c: string) => joinFn({ data: { invite_code: c.trim().toUpperCase() } }),
     onSuccess: (r) => {
       toast.success(`Bergabung ke ${r.name}`);
       setCode("");
@@ -61,6 +66,14 @@ function GroupsPage() {
     },
     onError: (e) => toast.error(e instanceof Error ? e.message : "Gagal bergabung"),
   });
+
+  const autoJoined = useRef(false);
+  useEffect(() => {
+    if (invite && !autoJoined.current) {
+      autoJoined.current = true;
+      joinMut.mutate(invite);
+    }
+  }, [invite, joinMut]);
 
   return (
     <main className="min-h-screen bg-background pb-28">
@@ -113,7 +126,7 @@ function GroupsPage() {
           />
           <button
             disabled={code.trim().length < 4 || joinMut.isPending}
-            onClick={() => joinMut.mutate()}
+            onClick={() => joinMut.mutate(code)}
             className="w-full bg-card outline-1 outline-black/10 font-semibold py-3 rounded-2xl disabled:opacity-60"
           >
             {joinMut.isPending ? "Bergabung..." : "Gabung"}
@@ -205,6 +218,25 @@ function GroupCard({
               className="size-9 rounded-xl bg-card outline-1 outline-black/10 grid place-items-center"
             >
               <Copy className="size-4" />
+            </button>
+            <button
+              onClick={async () => {
+                const url = `${window.location.origin}/groups?invite=${group.invite_code}`;
+                const text = `Gabung grup "${group.name}" di SehatKu! Kode: ${group.invite_code}`;
+                const nav = navigator as Navigator & { share?: (d: { title?: string; text?: string; url?: string }) => Promise<void> };
+                if (nav.share) {
+                  try {
+                    await nav.share({ title: group.name, text, url });
+                    return;
+                  } catch { /* user cancelled */ }
+                }
+                navigator.clipboard.writeText(url);
+                toast.success("Link undangan disalin");
+              }}
+              className="size-9 rounded-xl bg-primary text-primary-foreground grid place-items-center"
+              aria-label="Bagikan link"
+            >
+              <Share2 className="size-4" />
             </button>
           </div>
 
