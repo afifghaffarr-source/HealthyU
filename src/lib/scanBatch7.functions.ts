@@ -114,9 +114,9 @@ export const discoverUsers = createServerFn({ method: "POST" })
     const { supabase } = context;
     const { data } = await supabase
       .from("profiles")
-      .select("id, full_name, avatar_url, scan_streak_current, total_points")
+      .select("id, full_name, avatar_url, scan_streak_current, health_coins")
       .eq("public_profile", true)
-      .order("total_points", { ascending: false })
+      .order("health_coins", { ascending: false })
       .limit(30);
     return { users: data ?? [] };
   });
@@ -141,15 +141,15 @@ export const getMealHeatmap = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     const { supabase, userId } = context;
-    const since = new Date(Date.now() - 365 * 86400000).toISOString();
+    const sinceDate = new Date(Date.now() - 365 * 86400000).toISOString().slice(0, 10);
     const { data } = await supabase
       .from("meal_logs")
-      .select("logged_date")
+      .select("log_date")
       .eq("user_id", userId)
-      .gte("logged_date", since.slice(0, 10));
+      .gte("log_date", sinceDate);
     const counts: Record<string, number> = {};
     (data ?? []).forEach((r: any) => {
-      const d = r.logged_date;
+      const d = r.log_date;
       counts[d] = (counts[d] ?? 0) + 1;
     });
     return { counts };
@@ -384,13 +384,23 @@ export const listFollowers = createServerFn({ method: "POST" })
   .inputValidator((d: { userId: string }) => z.object({ userId: z.string().uuid() }).parse(d))
   .handler(async ({ context, data }) => {
     const { supabase } = context;
-    const { data: followers } = await supabase
+    const { data: followerRows } = await supabase
       .from("user_follows")
-      .select("follower_id, profiles!user_follows_follower_id_fkey(id, full_name, avatar_url)")
+      .select("follower_id")
       .eq("following_id", data.userId);
-    const { data: following } = await supabase
+    const { data: followingRows } = await supabase
       .from("user_follows")
-      .select("following_id, profiles!user_follows_following_id_fkey(id, full_name, avatar_url)")
+      .select("following_id")
       .eq("follower_id", data.userId);
-    return { followers: followers ?? [], following: following ?? [] };
+    const followerIds = (followerRows ?? []).map((r: any) => r.follower_id);
+    const followingIds = (followingRows ?? []).map((r: any) => r.following_id);
+    const allIds = Array.from(new Set([...followerIds, ...followingIds]));
+    const { data: profs } = allIds.length
+      ? await supabase.from("profiles").select("id, full_name, avatar_url").in("id", allIds)
+      : { data: [] as any[] };
+    const map = new Map((profs ?? []).map((p: any) => [p.id, p]));
+    return {
+      followers: followerIds.map((id) => map.get(id)).filter(Boolean),
+      following: followingIds.map((id) => map.get(id)).filter(Boolean),
+    };
   });
