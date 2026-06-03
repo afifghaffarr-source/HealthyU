@@ -51,6 +51,9 @@ import {
   PDF_TOC_ROW_BOUND_H,
   PDF_AUTOTABLE_START_Y,
   PDF_BODY_TEXT_OFFSET_Y,
+  PDF_TABLE_FONT_SIZE,
+  PDF_TABLE_FONT_SIZE_SM,
+  PDF_TABLE_CELL_PADDING,
 } from "@/lib/constants";
 import { useTranslation } from "@/lib/i18n";
 import { useAnnounce } from "@/components/live-announcer";
@@ -252,7 +255,7 @@ function ReportsPage() {
     // Index page (TOC)
     doc.setFont("helvetica", "bold");
     doc.setFontSize(PDF_TITLE_FONT_SIZE);
-    doc.text("Arsip Laporan HealthyU", PDF_MARGIN_X, PDF_HEADER_BASELINE_Y);
+    doc.text(t("pdf.title.archive"), PDF_MARGIN_X, PDF_HEADER_BASELINE_Y);
     doc.setFont("helvetica", "normal");
     doc.setFontSize(PDF_BODY_FONT_SIZE);
     doc.setTextColor(PDF_MUTED_GRAY);
@@ -297,7 +300,7 @@ function ReportsPage() {
         tocY = PDF_TOC_CONTINUED_TOP_Y;
       }
       doc.text(`${idx + 1}. ${periode}`, PDF_TOC_INDENT_X, tocY);
-      doc.text(`hal. ${page}`, PDF_TOC_PAGE_LABEL_X, tocY, { align: "right" });
+      doc.text(t("pdf.pageShort", { page }), PDF_TOC_PAGE_LABEL_X, tocY, { align: "right" });
       // Make the whole TOC row clickable → jumps to that report's body page.
       doc.link(
         PDF_TOC_INDENT_X,
@@ -432,7 +435,7 @@ function ReportsPage() {
     });
     doc.setFont("helvetica", "bold");
     doc.setFontSize(PDF_TITLE_FONT_SIZE);
-    doc.text("Laporan HealthyU - 7 Hari", PDF_MARGIN_X, PDF_HEADER_BASELINE_Y);
+    doc.text(t("pdf.title.weekly7"), PDF_MARGIN_X, PDF_HEADER_BASELINE_Y);
     doc.setFont("helvetica", "normal");
     doc.setFontSize(PDF_BODY_FONT_SIZE);
     doc.setTextColor(PDF_MUTED_GRAY);
@@ -441,7 +444,7 @@ function ReportsPage() {
 
     autoTable(doc, {
       startY: PDF_AUTOTABLE_START_Y,
-      head: [["Metrik", "Nilai"]],
+      head: [[t("pdf.headers.metric"), t("pdf.headers.value")]],
       body: [
         ["Total kalori masuk", `${Math.round(summary.totals.cals)} kcal`],
         ["Kalori terbakar", `${summary.totals.burn} kcal`],
@@ -450,12 +453,18 @@ function ReportsPage() {
         ["Latihan", `${summary.workoutCount} sesi`],
         ["Puasa selesai", `${summary.fastingDone} sesi`],
       ],
-      styles: { font: "helvetica", fontSize: 10 },
+      styles: { font: "helvetica", fontSize: PDF_TABLE_FONT_SIZE, cellPadding: PDF_TABLE_CELL_PADDING },
       headStyles: { fillColor: PDF_HEADER_FILL_RGB },
     });
 
     autoTable(doc, {
-      head: [["Tanggal", "Kalori (kcal)", "Air (ml)", "Bakar (kcal)", "Tidur (jam)"]],
+      head: [[
+        t("pdf.headers.date"),
+        t("pdf.headers.calIn"),
+        t("pdf.headers.water"),
+        t("pdf.headers.burn"),
+        t("pdf.headers.sleep"),
+      ]],
       body: summary.byDay.map((d) => [
         new Date(d.day).toLocaleDateString("id-ID", {
           weekday: "short",
@@ -467,7 +476,7 @@ function ReportsPage() {
         d.burn.toString(),
         d.hours.toFixed(1),
       ]),
-      styles: { font: "helvetica", fontSize: 9 },
+      styles: { font: "helvetica", fontSize: PDF_TABLE_FONT_SIZE_SM, cellPadding: PDF_TABLE_CELL_PADDING },
       headStyles: { fillColor: PDF_HEADER_FILL_RGB },
     });
 
