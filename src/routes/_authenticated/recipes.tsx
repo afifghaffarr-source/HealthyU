@@ -5,7 +5,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { listRecipes } from "@/lib/recipes.functions";
 import { generateRecipeFromIngredients, type GeneratedRecipe } from "@/lib/ai-extras.functions";
 import { BottomNav } from "@/components/bottom-nav";
-import { ArrowLeft, Clock, Flame, Search, Sparkles, Loader2, X } from "lucide-react";
+import { ArrowLeft, Clock, Flame, Search, Sparkles, Loader2, X, Star } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/recipes")({
@@ -26,6 +26,7 @@ function RecipesPage() {
   const { data: all = [] } = useQuery({ queryKey: ["recipes"], queryFn: () => fetchList() });
   const [cat, setCat] = useState<(typeof CATS)[number]["id"]>("all");
   const [q, setQ] = useState("");
+  const [sortByRating, setSortByRating] = useState(false);
   const [aiOpen, setAiOpen] = useState(false);
   const [ingredients, setIngredients] = useState("");
   const [prefs, setPrefs] = useState("");
@@ -42,7 +43,13 @@ function RecipesPage() {
       if (!q.trim()) return true;
       const s = q.toLowerCase();
       return r.title.toLowerCase().includes(s) || (r.description ?? "").toLowerCase().includes(s);
-    });
+    })
+    .slice()
+    .sort((a, b) =>
+      sortByRating
+        ? Number(b.avg_rating ?? 0) - Number(a.avg_rating ?? 0)
+        : a.title.localeCompare(b.title),
+    );
 
   return (
     <main className="min-h-screen bg-background pb-28">
@@ -90,6 +97,14 @@ function RecipesPage() {
               {c.label}
             </button>
           ))}
+          <button
+            onClick={() => setSortByRating((v) => !v)}
+            className={`px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap inline-flex items-center gap-1 ${
+              sortByRating ? "bg-amber-400 text-amber-950" : "bg-card outline-1 outline-black/10"
+            }`}
+          >
+            <Star className="size-3" /> Top rating
+          </button>
         </div>
 
         <section className="space-y-3">
@@ -106,6 +121,13 @@ function RecipesPage() {
                 <span className="inline-flex items-center gap-1"><Flame className="size-3" />{r.calories} kcal</span>
                 <span className="inline-flex items-center gap-1"><Clock className="size-3" />{r.prep_min} min</span>
                 <span>P{Math.round(Number(r.protein_g))} K{Math.round(Number(r.carbs_g))} L{Math.round(Number(r.fat_g))}</span>
+                {Number(r.rating_count ?? 0) > 0 && (
+                  <span className="inline-flex items-center gap-1 text-amber-600 font-semibold">
+                    <Star className="size-3 fill-amber-500 text-amber-500" />
+                    {Number(r.avg_rating ?? 0).toFixed(1)}
+                    <span className="text-muted-foreground font-normal">({r.rating_count})</span>
+                  </span>
+                )}
               </div>
             </Link>
           ))}
