@@ -20,13 +20,15 @@ const CATS = [
   { id: "snack", label: "Snack" },
 ] as const;
 
+type SortMode = "title" | "rating" | "popular";
+
 function RecipesPage() {
   const fetchList = useServerFn(listRecipes);
   const genRecipe = useServerFn(generateRecipeFromIngredients);
   const { data: all = [] } = useQuery({ queryKey: ["recipes"], queryFn: () => fetchList() });
   const [cat, setCat] = useState<(typeof CATS)[number]["id"]>("all");
   const [q, setQ] = useState("");
-  const [sortByRating, setSortByRating] = useState(false);
+  const [sort, setSort] = useState<SortMode>("title");
   const [aiOpen, setAiOpen] = useState(false);
   const [ingredients, setIngredients] = useState("");
   const [prefs, setPrefs] = useState("");
@@ -45,11 +47,11 @@ function RecipesPage() {
       return r.title.toLowerCase().includes(s) || (r.description ?? "").toLowerCase().includes(s);
     })
     .slice()
-    .sort((a, b) =>
-      sortByRating
-        ? Number(b.avg_rating ?? 0) - Number(a.avg_rating ?? 0)
-        : a.title.localeCompare(b.title),
-    );
+    .sort((a, b) => {
+      if (sort === "rating") return Number(b.avg_rating ?? 0) - Number(a.avg_rating ?? 0);
+      if (sort === "popular") return Number(b.bookmark_count ?? 0) - Number(a.bookmark_count ?? 0);
+      return a.title.localeCompare(b.title);
+    });
 
   return (
     <main className="min-h-screen bg-background pb-28">
@@ -105,12 +107,20 @@ function RecipesPage() {
             </button>
           ))}
           <button
-            onClick={() => setSortByRating((v) => !v)}
+            onClick={() => setSort(sort === "rating" ? "title" : "rating")}
             className={`px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap inline-flex items-center gap-1 ${
-              sortByRating ? "bg-amber-400 text-amber-950" : "bg-card outline-1 outline-black/10"
+              sort === "rating" ? "bg-amber-400 text-amber-950" : "bg-card outline-1 outline-black/10"
             }`}
           >
             <Star className="size-3" /> Top rating
+          </button>
+          <button
+            onClick={() => setSort(sort === "popular" ? "title" : "popular")}
+            className={`px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap inline-flex items-center gap-1 ${
+              sort === "popular" ? "bg-primary text-primary-foreground" : "bg-card outline-1 outline-black/10"
+            }`}
+          >
+            <Bookmark className="size-3" /> Terpopuler
           </button>
         </div>
 
@@ -133,6 +143,12 @@ function RecipesPage() {
                     <Star className="size-3 fill-amber-500 text-amber-500" />
                     {Number(r.avg_rating ?? 0).toFixed(1)}
                     <span className="text-muted-foreground font-normal">({r.rating_count})</span>
+                  </span>
+                )}
+                {Number(r.bookmark_count ?? 0) > 0 && (
+                  <span className="inline-flex items-center gap-1 text-primary font-semibold">
+                    <Bookmark className="size-3 fill-primary" />
+                    {r.bookmark_count}
                   </span>
                 )}
               </div>
