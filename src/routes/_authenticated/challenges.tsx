@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { ArrowLeft, Trophy, Flame, Users, Calendar, Check, Medal, UserPlus } from "lucide-react";
+import { ArrowLeft, Trophy, Flame, Users, Calendar, Check, Medal, UserPlus, Gift } from "lucide-react";
 import { toast } from "sonner";
 import { BottomNav } from "@/components/bottom-nav";
 import {
@@ -17,6 +17,10 @@ import {
   inviteGroupToChallenge,
   listChallengeGroups,
 } from "@/lib/groupChallenges.functions";
+import {
+  claimGroupChallengeBonus,
+  listGroupBonusStatus,
+} from "@/lib/groupChallengeBonus.functions";
 
 export const Route = createFileRoute("/_authenticated/challenges")({
   component: ChallengesPage,
@@ -212,6 +216,7 @@ function ChallengesPage() {
               </button>
               {openLb === c.id && <Leaderboard challengeId={c.id} />}
               {joined && <GroupInviter challengeId={c.id} />}
+              {joined && <BonusClaimer challengeId={c.id} />}
             </article>
           );
         })}
