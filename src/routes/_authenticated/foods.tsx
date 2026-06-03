@@ -1,9 +1,11 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { Search, X, Info } from "lucide-react";
 import { TopAppBar } from "@/components/healthyu/top-app-bar";
+import { SearchChips } from "@/components/healthyu/search-chips";
+import { useRecentSearch } from "@/hooks/use-recent-search";
 import { BottomNav } from "@/components/bottom-nav";
 import { browseFoods, getFoodDetail, getFoodFacets } from "@/lib/foodDb.functions";
 
@@ -17,6 +19,17 @@ function FoodsPage() {
   const detail = useServerFn(getFoodDetail);
 
   const [q, setQ] = useState("");
+  const recent = useRecentSearch("foods");
+  const pushTimer = useRef<number | null>(null);
+  useEffect(() => {
+    if (pushTimer.current) window.clearTimeout(pushTimer.current);
+    if (q.trim().length >= 2) {
+      pushTimer.current = window.setTimeout(() => recent.push(q), 900);
+    }
+    return () => {
+      if (pushTimer.current) window.clearTimeout(pushTimer.current);
+    };
+  }, [q, recent]);
   const [region, setRegion] = useState<string>("");
   const [category, setCategory] = useState<string>("");
   const [tag, setTag] = useState<string>("");
