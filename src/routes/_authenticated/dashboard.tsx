@@ -329,7 +329,7 @@ function Dashboard() {
                 >
                   <div className="min-w-0 flex-1">
                     <p className="font-semibold truncate">{c.title}</p>
-                    {("pending_members" in c) && (c.pending_members ?? 0) > 0 && (
+                    {(c.pending_members ?? 0) > 0 && (
                       <p className="text-[10px] text-muted-foreground">
                         {c.pending_members} anggota grup belum gabung
                       </p>
