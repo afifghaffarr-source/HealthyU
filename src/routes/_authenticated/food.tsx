@@ -6,7 +6,8 @@ import { searchFoods, logMeal, todaysMeals, deleteMeal, logMealWithItems } from 
 import { parseMealFromVoice } from "@/lib/ai-extras.functions";
 import { getAchievementToastPrefix } from "@/lib/achievement-icons";
 import { BottomNav } from "@/components/bottom-nav";
-import { ArrowLeft, Search, Trash2, Mic, MicOff, Loader2, WifiOff, RefreshCw, Plus, Minus, ShoppingBasket, Sparkles, X } from "lucide-react";
+import { Search, Trash2, Mic, MicOff, Loader2, WifiOff, RefreshCw, Plus, Minus, ShoppingBasket, Sparkles, X } from "lucide-react";
+import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { getFoodAlternatives, regenerateAlternativeReasons } from "@/lib/foodAlternatives.functions";
 import { toast } from "sonner";
 import { enqueue } from "@/lib/offline-queue";
@@ -211,22 +212,21 @@ function FoodPage() {
 
   return (
     <main className="min-h-screen bg-background pb-28">
-      <div className="max-w-md mx-auto px-5 pt-8 space-y-5">
-        <header className="flex items-center gap-3">
-          <Link to="/dashboard" className="size-10 bg-card rounded-2xl outline-1 outline-black/10 grid place-items-center">
-            <ArrowLeft className="size-4" />
-          </Link>
-          <h1 className="text-2xl font-bold">Catat makanan</h1>
-          {(!online || pending > 0) && (
+      <div className="max-w-md mx-auto px-5 pt-2 space-y-5">
+        <TopAppBar
+          title="Catat makanan"
+          subtitle="Cari, scan, atau bicarakan"
+          showBack
+          action={(!online || pending > 0) ? (
             <button
               onClick={() => sync()}
-              className={`ml-auto inline-flex items-center gap-1 text-[11px] font-semibold px-2.5 py-1.5 rounded-full ${online ? "bg-amber-100 text-amber-700" : "bg-muted text-muted-foreground"}`}
+              className={`inline-flex items-center gap-1 text-[11px] font-semibold px-2.5 py-1.5 rounded-full ${online ? "bg-amber-100 text-amber-700" : "bg-muted text-muted-foreground"}`}
             >
               {online ? <RefreshCw className="size-3" /> : <WifiOff className="size-3" />}
               {online ? `Sync ${pending}` : `Offline${pending ? ` · ${pending}` : ""}`}
             </button>
-          )}
-        </header>
+          ) : undefined}
+        />
 
         <div className="flex gap-2 overflow-x-auto no-scrollbar -mx-5 px-5">
           {(["breakfast", "lunch", "dinner", "snack"] as const).map((t) => (
