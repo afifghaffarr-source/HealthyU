@@ -258,7 +258,10 @@ function RecipesPage() {
               // Mark current count as "seen" so the pulse stops immediately
               prevTrendingCount.current = trendingCount;
               if (typeof window !== "undefined") {
-                window.localStorage.setItem("recipes:trendingCount", String(trendingCount));
+                window.localStorage.setItem(
+                  "recipes:trendingCount",
+                  JSON.stringify({ count: trendingCount, ts: Date.now() }),
+                );
               }
               setPulseCounter(false);
             }}
