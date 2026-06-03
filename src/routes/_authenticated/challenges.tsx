@@ -90,13 +90,21 @@ function ChallengesPage() {
   const [openLb, setOpenLb] = useState<string | null>(null);
   const [streakAutoChallenge, setStreakAutoChallenge] = useState<string | null>(null);
   const [highlightId, setHighlightId] = useState<string | null>(null);
+  const [highlightFading, setHighlightFading] = useState(false);
   const articleRefs = useRef<Record<string, HTMLElement | null>>({});
   const flashHighlight = (id: string) => {
     setHighlightId(id);
+    setHighlightFading(false);
+    // Start fade-out 500ms before the end so the ring smoothly disappears.
+    const FADE = 500;
     window.setTimeout(
-      () => setHighlightId((cur) => (cur === id ? null : cur)),
-      CHALLENGE_HIGHLIGHT_MS,
+      () => setHighlightFading(true),
+      Math.max(0, CHALLENGE_HIGHLIGHT_MS - FADE),
     );
+    window.setTimeout(() => {
+      setHighlightId((cur) => (cur === id ? null : cur));
+      setHighlightFading(false);
+    }, CHALLENGE_HIGHLIGHT_MS);
   };
 
   useEffect(() => {
@@ -190,7 +198,9 @@ function ChallengesPage() {
               ref={(el) => { articleRefs.current[c.id] = el; }}
               className={
                 highlightId === c.id
-                  ? "rounded-3xl bg-card outline-1 outline-black/5 p-4 shadow-sm ring-4 ring-primary/40 transition-shadow"
+                  ? `rounded-3xl bg-card outline-1 outline-black/5 p-4 shadow-sm ring-4 ring-primary/40 transition-opacity duration-500 ${
+                      highlightFading ? "opacity-90 ring-primary/0" : "animate-pulse"
+                    }`
                   : "rounded-3xl bg-card outline-1 outline-black/5 p-4 shadow-sm"
               }
             >
