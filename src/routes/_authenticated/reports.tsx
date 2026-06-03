@@ -12,7 +12,11 @@ import { z } from "zod";
 import { fallback, zodValidator } from "@tanstack/zod-adapter";
 import { useNavigate } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
-import { PDF_PAGE_FOOTER_Y, PDF_MARGIN_X } from "@/lib/constants";
+import {
+  PDF_PAGE_FOOTER_Y,
+  PDF_MARGIN_X,
+  PDF_PAGE_W,
+} from "@/lib/constants";
 
 export const Route = createFileRoute("/_authenticated/reports")({
   validateSearch: zodValidator(
@@ -309,12 +313,21 @@ function ReportsPage() {
       month: "long",
       year: "numeric",
     });
-    const pageRightX = 595 - PDF_MARGIN_X;
+    const pageRightX = PDF_PAGE_W - PDF_MARGIN_X;
     for (let p = 1; p <= totalPages; p++) {
       doc.setPage(p);
       doc.setFont("helvetica", "normal");
       doc.setFontSize(8);
       doc.setTextColor(120);
+      // Divider tipis di atas baris footer.
+      doc.setDrawColor(220);
+      doc.setLineWidth(0.5);
+      doc.line(
+        PDF_MARGIN_X,
+        PDF_PAGE_FOOTER_Y - 8,
+        pageRightX,
+        PDF_PAGE_FOOTER_Y - 8,
+      );
       doc.text(
         `HealthyU \u00B7 diekspor ${exportedAt}`,
         PDF_MARGIN_X,
