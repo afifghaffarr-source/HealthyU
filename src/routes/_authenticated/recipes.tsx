@@ -54,8 +54,24 @@ function RecipesPage() {
     typeof window === "undefined"
       ? null
       : (() => {
-          const v = window.localStorage.getItem("recipes:trendingCount");
-          return v === null ? null : Number(v);
+          const raw = window.localStorage.getItem("recipes:trendingCount");
+          if (!raw) return null;
+          try {
+            const parsed = JSON.parse(raw) as { count: number; ts: number };
+            if (
+              typeof parsed?.count !== "number" ||
+              typeof parsed?.ts !== "number" ||
+              Date.now() - parsed.ts > 7 * 86400000
+            ) {
+              window.localStorage.removeItem("recipes:trendingCount");
+              return null;
+            }
+            return parsed.count;
+          } catch {
+            // legacy plain-number format → invalidate
+            window.localStorage.removeItem("recipes:trendingCount");
+            return null;
+          }
         })(),
   );
 
@@ -64,7 +80,10 @@ function RecipesPage() {
     const prev = prevTrendingCount.current;
     prevTrendingCount.current = trendingCount;
     if (typeof window !== "undefined") {
-      window.localStorage.setItem("recipes:trendingCount", String(trendingCount));
+      window.localStorage.setItem(
+        "recipes:trendingCount",
+        JSON.stringify({ count: trendingCount, ts: Date.now() }),
+      );
     }
     if (prev === null) return;
     if (trendingCount > prev) {
@@ -239,7 +258,10 @@ function RecipesPage() {
               // Mark current count as "seen" so the pulse stops immediately
               prevTrendingCount.current = trendingCount;
               if (typeof window !== "undefined") {
-                window.localStorage.setItem("recipes:trendingCount", String(trendingCount));
+                window.localStorage.setItem(
+                  "recipes:trendingCount",
+                  JSON.stringify({ count: trendingCount, ts: Date.now() }),
+                );
               }
               setPulseCounter(false);
             }}

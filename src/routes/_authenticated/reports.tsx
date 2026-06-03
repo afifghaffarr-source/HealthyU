@@ -256,17 +256,33 @@ function ReportsPage() {
     doc.save(`laporan-healthyu-${new Date().toISOString().slice(0, 10)}.pdf`);
   };
 
-  const shareWhatsapp = () => {
-    if (!summary) return;
+  const shareWhatsapp = (overrideReport?: { text: string; periodStart?: string; periodEnd?: string }) => {
+    if (!summary && !overrideReport) return;
+    const header = overrideReport
+      ? `📊 *Laporan HealthyU* ${overrideReport.periodStart ?? ""} → ${overrideReport.periodEnd ?? ""}`.trim()
+      : "📊 *Laporan HealthyU 7 Hari*";
+    const body = overrideReport?.text ?? aiMut.data?.report;
+    if (overrideReport) {
+      const text = [
+        header,
+        "",
+        body ? `_${body.slice(0, 600)}${body.length > 600 ? "…" : ""}_` : "",
+        "— dikirim dari HealthyU",
+      ]
+        .filter(Boolean)
+        .join("\n");
+      window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, "_blank", "noopener,noreferrer");
+      return;
+    }
     const lines = [
       "📊 *Laporan HealthyU 7 Hari*",
       "",
-      `🍽️ Total kalori masuk: ${Math.round(summary.totals.cals)} kcal`,
-      `🔥 Kalori terbakar: ${summary.totals.burn} kcal`,
-      `💧 Total air: ${(summary.totals.ml / 1000).toFixed(1)} L`,
-      `😴 Total tidur: ${summary.totals.hours.toFixed(1)} jam`,
-      `🏃 Latihan: ${summary.workoutCount} sesi`,
-      `⏱️ Puasa selesai: ${summary.fastingDone} sesi`,
+      `🍽️ Total kalori masuk: ${Math.round(summary!.totals.cals)} kcal`,
+      `🔥 Kalori terbakar: ${summary!.totals.burn} kcal`,
+      `💧 Total air: ${(summary!.totals.ml / 1000).toFixed(1)} L`,
+      `😴 Total tidur: ${summary!.totals.hours.toFixed(1)} jam`,
+      `🏃 Latihan: ${summary!.workoutCount} sesi`,
+      `⏱️ Puasa selesai: ${summary!.fastingDone} sesi`,
       "",
       aiMut.data?.report
         ? `_${aiMut.data.report.slice(0, 400)}${aiMut.data.report.length > 400 ? "…" : ""}_`
@@ -356,7 +372,7 @@ function ReportsPage() {
             <FileText className="size-4" /> <span className="text-sm">PDF</span>
           </button>
           <button
-            onClick={shareWhatsapp}
+            onClick={() => shareWhatsapp()}
             className="flex items-center justify-center gap-2 bg-[#25D366] text-white font-semibold py-3 rounded-2xl"
           >
             <Share2 className="size-4" /> <span className="text-sm">WA</span>
@@ -436,6 +452,21 @@ function ReportsPage() {
                     </span>
                   </summary>
                   <p className="mt-3 text-sm whitespace-pre-wrap leading-relaxed">{text}</p>
+                  {isManualFlash && text && (
+                    <button
+                      onClick={(e) => {
+                        e.preventDefault();
+                        shareWhatsapp({
+                          text,
+                          periodStart: r.report_period_start ?? undefined,
+                          periodEnd: r.report_period_end ?? undefined,
+                        });
+                      }}
+                      className="mt-3 inline-flex items-center gap-1.5 bg-[#25D366] text-white text-xs font-semibold px-3 py-1.5 rounded-full"
+                    >
+                      <Share2 className="size-3" /> Share
+                    </button>
+                  )}
                 </details>
               );
             })}

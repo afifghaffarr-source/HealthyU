@@ -110,7 +110,12 @@ function ChallengesPage() {
       navigate({ to: "/challenges", search: {}, replace: true });
       return;
     }
-    const top = parts.slice().sort((a, b) => (b.streak ?? 0) - (a.streak ?? 0))[0];
+    const active = parts.filter((p) => {
+      const s = (p as { status?: string }).status;
+      return !s || s === "active";
+    });
+    const pool = active.length > 0 ? active : parts;
+    const top = pool.slice().sort((a, b) => (b.streak ?? 0) - (a.streak ?? 0))[0];
     if (!top?.challenge_id) return;
     setOpenLb(top.challenge_id);
     setStreakAutoChallenge(top.challenge_id);

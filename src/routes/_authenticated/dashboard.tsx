@@ -370,6 +370,19 @@ function Dashboard() {
             <div className="flex items-center gap-2 mb-2">
               <Trophy className="size-4 text-primary" />
               <p className="text-xs font-bold uppercase tracking-wider">Challenge Grup</p>
+              {(() => {
+                const total = Object.values(newClaims).reduce((a, b) => a + b, 0);
+                if (total === 0) return null;
+                return (
+                  <button
+                    onClick={() => setNewClaims({})}
+                    className="ml-auto text-[9px] font-bold uppercase bg-amber-100 text-amber-800 rounded-full px-2 py-0.5 animate-pulse"
+                    title="Klik untuk reset"
+                  >
+                    +{total} klaim baru
+                  </button>
+                );
+              })()}
             </div>
             <div className="space-y-2">
               {groupSummary.slice(0, 3).map((g, i) => (
