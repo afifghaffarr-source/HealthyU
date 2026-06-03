@@ -256,12 +256,28 @@ function ReportsPage() {
     doc.save(`laporan-healthyu-${new Date().toISOString().slice(0, 10)}.pdf`);
   };
 
-  const shareWhatsapp = () => {
-    if (!summary) return;
+  const shareWhatsapp = (overrideReport?: { text: string; periodStart?: string; periodEnd?: string }) => {
+    if (!summary && !overrideReport) return;
+    const header = overrideReport
+      ? `📊 *Laporan HealthyU* ${overrideReport.periodStart ?? ""} → ${overrideReport.periodEnd ?? ""}`.trim()
+      : "📊 *Laporan HealthyU 7 Hari*";
+    const body = overrideReport?.text ?? aiMut.data?.report;
+    if (overrideReport) {
+      const text = [
+        header,
+        "",
+        body ? `_${body.slice(0, 600)}${body.length > 600 ? "…" : ""}_` : "",
+        "— dikirim dari HealthyU",
+      ]
+        .filter(Boolean)
+        .join("\n");
+      window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, "_blank", "noopener,noreferrer");
+      return;
+    }
     const lines = [
       "📊 *Laporan HealthyU 7 Hari*",
       "",
-      `🍽️ Total kalori masuk: ${Math.round(summary.totals.cals)} kcal`,
+      `🍽️ Total kalori masuk: ${Math.round(summary!.totals.cals)} kcal`,
       `🔥 Kalori terbakar: ${summary.totals.burn} kcal`,
       `💧 Total air: ${(summary.totals.ml / 1000).toFixed(1)} L`,
       `😴 Total tidur: ${summary.totals.hours.toFixed(1)} jam`,
