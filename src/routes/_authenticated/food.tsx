@@ -7,7 +7,7 @@ import { parseMealFromVoice } from "@/lib/ai-extras.functions";
 import { getAchievementToastPrefix } from "@/lib/achievement-icons";
 import { BottomNav } from "@/components/bottom-nav";
 import { ArrowLeft, Search, Trash2, Mic, MicOff, Loader2, WifiOff, RefreshCw, Plus, Minus, ShoppingBasket, Sparkles, X } from "lucide-react";
-import { getFoodAlternatives } from "@/lib/foodAlternatives.functions";
+import { getFoodAlternatives, regenerateAlternativeReasons } from "@/lib/foodAlternatives.functions";
 import { toast } from "sonner";
 import { enqueue } from "@/lib/offline-queue";
 import { useOfflineQueue } from "@/hooks/use-offline-queue";
@@ -47,10 +47,19 @@ function FoodPage() {
   const [basket, setBasket] = useState<BasketItem[]>([]);
   const [altFor, setAltFor] = useState<{ id: string; name: string } | null>(null);
   const altFn = useServerFn(getFoodAlternatives);
+  const regenFn = useServerFn(regenerateAlternativeReasons);
   const { data: alts = [], isLoading: altLoading } = useQuery({
     queryKey: ["food-alternatives", altFor?.id],
     queryFn: () => altFn({ data: { food_id: altFor!.id } }),
     enabled: !!altFor,
+  });
+  const regenM = useMutation({
+    mutationFn: () => regenFn({ data: { food_id: altFor!.id } }),
+    onSuccess: (r) => {
+      toast.success(`AI memperbarui ${r.updated} penjelasan`);
+      qc.invalidateQueries({ queryKey: ["food-alternatives", altFor?.id] });
+    },
+    onError: (e: Error) => toast.error(e.message),
   });
 
   const addToBasket = (f: {
