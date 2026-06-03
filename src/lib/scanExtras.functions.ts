@@ -100,7 +100,7 @@ export const recommendRecipes = createServerFn({ method: "GET" })
     const min = Math.max(0, Math.round(remaining - 200));
     const { data: recipes, error } = await supabase
       .from("recipes")
-      .select("id, name, calories, image_url, prep_time_minutes")
+      .select("id, title, calories, image_url, prep_min")
       .gte("calories", min)
       .lte("calories", max)
       .limit(10);
