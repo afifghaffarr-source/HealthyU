@@ -79,6 +79,7 @@ import { Route as AuthenticatedRecipesIdRouteImport } from './routes/_authentica
 import { Route as AuthenticatedQuizDailyRouteImport } from './routes/_authenticated/quiz.daily'
 import { Route as AuthenticatedProfileScanStatsRouteImport } from './routes/_authenticated/profile.scan-stats'
 import { Route as AuthenticatedProfilePrivacyRouteImport } from './routes/_authenticated/profile.privacy'
+import { Route as AuthenticatedPetShopRouteImport } from './routes/_authenticated/pet.shop'
 import { Route as AuthenticatedMealplanGroceryRouteImport } from './routes/_authenticated/mealplan.grocery'
 import { Route as AuthenticatedCoachMealsRouteImport } from './routes/_authenticated/coach.meals'
 import { Route as AuthenticatedChallengesDailyRouteImport } from './routes/_authenticated/challenges.daily'
@@ -464,6 +465,11 @@ const AuthenticatedProfilePrivacyRoute =
     path: '/privacy',
     getParentRoute: () => AuthenticatedProfileRoute,
   } as any)
+const AuthenticatedPetShopRoute = AuthenticatedPetShopRouteImport.update({
+  id: '/shop',
+  path: '/shop',
+  getParentRoute: () => AuthenticatedPetRoute,
+} as any)
 const AuthenticatedMealplanGroceryRoute =
   AuthenticatedMealplanGroceryRouteImport.update({
     id: '/grocery',
@@ -565,7 +571,7 @@ export interface FileRoutesByFullPath {
   '/notifications': typeof AuthenticatedNotificationsRoute
   '/offline-queue': typeof AuthenticatedOfflineQueueRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
-  '/pet': typeof AuthenticatedPetRoute
+  '/pet': typeof AuthenticatedPetRouteWithChildren
   '/prayer': typeof AuthenticatedPrayerRoute
   '/profile': typeof AuthenticatedProfileRouteWithChildren
   '/progress': typeof AuthenticatedProgressRoute
@@ -588,6 +594,7 @@ export interface FileRoutesByFullPath {
   '/challenges/daily': typeof AuthenticatedChallengesDailyRoute
   '/coach/meals': typeof AuthenticatedCoachMealsRoute
   '/mealplan/grocery': typeof AuthenticatedMealplanGroceryRoute
+  '/pet/shop': typeof AuthenticatedPetShopRoute
   '/profile/privacy': typeof AuthenticatedProfilePrivacyRoute
   '/profile/scan-stats': typeof AuthenticatedProfileScanStatsRoute
   '/quiz/daily': typeof AuthenticatedQuizDailyRoute
@@ -648,7 +655,7 @@ export interface FileRoutesByTo {
   '/notifications': typeof AuthenticatedNotificationsRoute
   '/offline-queue': typeof AuthenticatedOfflineQueueRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
-  '/pet': typeof AuthenticatedPetRoute
+  '/pet': typeof AuthenticatedPetRouteWithChildren
   '/prayer': typeof AuthenticatedPrayerRoute
   '/profile': typeof AuthenticatedProfileRouteWithChildren
   '/progress': typeof AuthenticatedProgressRoute
@@ -671,6 +678,7 @@ export interface FileRoutesByTo {
   '/challenges/daily': typeof AuthenticatedChallengesDailyRoute
   '/coach/meals': typeof AuthenticatedCoachMealsRoute
   '/mealplan/grocery': typeof AuthenticatedMealplanGroceryRoute
+  '/pet/shop': typeof AuthenticatedPetShopRoute
   '/profile/privacy': typeof AuthenticatedProfilePrivacyRoute
   '/profile/scan-stats': typeof AuthenticatedProfileScanStatsRoute
   '/quiz/daily': typeof AuthenticatedQuizDailyRoute
@@ -733,7 +741,7 @@ export interface FileRoutesById {
   '/_authenticated/notifications': typeof AuthenticatedNotificationsRoute
   '/_authenticated/offline-queue': typeof AuthenticatedOfflineQueueRoute
   '/_authenticated/onboarding': typeof AuthenticatedOnboardingRoute
-  '/_authenticated/pet': typeof AuthenticatedPetRoute
+  '/_authenticated/pet': typeof AuthenticatedPetRouteWithChildren
   '/_authenticated/prayer': typeof AuthenticatedPrayerRoute
   '/_authenticated/profile': typeof AuthenticatedProfileRouteWithChildren
   '/_authenticated/progress': typeof AuthenticatedProgressRoute
@@ -756,6 +764,7 @@ export interface FileRoutesById {
   '/_authenticated/challenges/daily': typeof AuthenticatedChallengesDailyRoute
   '/_authenticated/coach/meals': typeof AuthenticatedCoachMealsRoute
   '/_authenticated/mealplan/grocery': typeof AuthenticatedMealplanGroceryRoute
+  '/_authenticated/pet/shop': typeof AuthenticatedPetShopRoute
   '/_authenticated/profile/privacy': typeof AuthenticatedProfilePrivacyRoute
   '/_authenticated/profile/scan-stats': typeof AuthenticatedProfileScanStatsRoute
   '/_authenticated/quiz/daily': typeof AuthenticatedQuizDailyRoute
@@ -841,6 +850,7 @@ export interface FileRouteTypes {
     | '/challenges/daily'
     | '/coach/meals'
     | '/mealplan/grocery'
+    | '/pet/shop'
     | '/profile/privacy'
     | '/profile/scan-stats'
     | '/quiz/daily'
@@ -924,6 +934,7 @@ export interface FileRouteTypes {
     | '/challenges/daily'
     | '/coach/meals'
     | '/mealplan/grocery'
+    | '/pet/shop'
     | '/profile/privacy'
     | '/profile/scan-stats'
     | '/quiz/daily'
@@ -1008,6 +1019,7 @@ export interface FileRouteTypes {
     | '/_authenticated/challenges/daily'
     | '/_authenticated/coach/meals'
     | '/_authenticated/mealplan/grocery'
+    | '/_authenticated/pet/shop'
     | '/_authenticated/profile/privacy'
     | '/_authenticated/profile/scan-stats'
     | '/_authenticated/quiz/daily'
@@ -1544,6 +1556,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedProfilePrivacyRouteImport
       parentRoute: typeof AuthenticatedProfileRoute
     }
+    '/_authenticated/pet/shop': {
+      id: '/_authenticated/pet/shop'
+      path: '/shop'
+      fullPath: '/pet/shop'
+      preLoaderRoute: typeof AuthenticatedPetShopRouteImport
+      parentRoute: typeof AuthenticatedPetRoute
+    }
     '/_authenticated/mealplan/grocery': {
       id: '/_authenticated/mealplan/grocery'
       path: '/grocery'
@@ -1682,6 +1701,17 @@ const AuthenticatedMealplanRouteWithChildren =
     AuthenticatedMealplanRouteChildren,
   )
 
+interface AuthenticatedPetRouteChildren {
+  AuthenticatedPetShopRoute: typeof AuthenticatedPetShopRoute
+}
+
+const AuthenticatedPetRouteChildren: AuthenticatedPetRouteChildren = {
+  AuthenticatedPetShopRoute: AuthenticatedPetShopRoute,
+}
+
+const AuthenticatedPetRouteWithChildren =
+  AuthenticatedPetRoute._addFileChildren(AuthenticatedPetRouteChildren)
+
 interface AuthenticatedProfileRouteChildren {
   AuthenticatedProfilePrivacyRoute: typeof AuthenticatedProfilePrivacyRoute
   AuthenticatedProfileScanStatsRoute: typeof AuthenticatedProfileScanStatsRoute
@@ -1809,7 +1839,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedNotificationsRoute: typeof AuthenticatedNotificationsRoute
   AuthenticatedOfflineQueueRoute: typeof AuthenticatedOfflineQueueRoute
   AuthenticatedOnboardingRoute: typeof AuthenticatedOnboardingRoute
-  AuthenticatedPetRoute: typeof AuthenticatedPetRoute
+  AuthenticatedPetRoute: typeof AuthenticatedPetRouteWithChildren
   AuthenticatedPrayerRoute: typeof AuthenticatedPrayerRoute
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRouteWithChildren
   AuthenticatedProgressRoute: typeof AuthenticatedProgressRoute
@@ -1859,7 +1889,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedNotificationsRoute: AuthenticatedNotificationsRoute,
   AuthenticatedOfflineQueueRoute: AuthenticatedOfflineQueueRoute,
   AuthenticatedOnboardingRoute: AuthenticatedOnboardingRoute,
-  AuthenticatedPetRoute: AuthenticatedPetRoute,
+  AuthenticatedPetRoute: AuthenticatedPetRouteWithChildren,
   AuthenticatedPrayerRoute: AuthenticatedPrayerRoute,
   AuthenticatedProfileRoute: AuthenticatedProfileRouteWithChildren,
   AuthenticatedProgressRoute: AuthenticatedProgressRoute,
