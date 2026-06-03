@@ -11,7 +11,7 @@ export default defineConfig({
       provider: "v8",
       reporter: ["text", "json-summary"],
       include: ["src/hooks/**", "src/lib/**", "src/components/live-announcer.tsx"],
-      thresholds: { lines: 70, functions: 70 },
+      thresholds: { lines: 70, functions: 70, statements: 70, branches: 60 },
     },
   },
 });
