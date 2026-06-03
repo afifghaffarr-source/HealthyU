@@ -83,6 +83,15 @@ function Dashboard() {
           if (row?.user_id && row?.group_id) {
             const gid = row.group_id;
             setNewClaims((cur) => ({ ...cur, [gid]: (cur[gid] ?? 0) + 1 }));
+            // Auto-clear this group's badge after 30s if user ignores it
+            setTimeout(() => {
+              setNewClaims((cur) => {
+                if (!cur[gid]) return cur;
+                const copy = { ...cur };
+                delete copy[gid];
+                return copy;
+              });
+            }, 30000);
             try {
               const [{ data: prof }, { data: grp }] = await Promise.all([
                 supabase.from("profiles").select("full_name").eq("id", row.user_id).maybeSingle(),

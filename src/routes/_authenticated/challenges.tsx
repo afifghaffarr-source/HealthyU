@@ -40,6 +40,7 @@ export const Route = createFileRoute("/_authenticated/challenges")({
 
 function ChallengesPage() {
   const qc = useQueryClient();
+  const navigate = useNavigate();
   const { group: focusGroup, challenge: focusChallenge, focus } = Route.useSearch();
   const fetchAll = useServerFn(listChallenges);
   const joinFn = useServerFn(joinChallenge);
@@ -103,7 +104,12 @@ function ChallengesPage() {
   useEffect(() => {
     if (focus !== "streak") return;
     const parts = data?.participations ?? [];
-    if (parts.length === 0) return;
+    if (!data) return; // wait for data
+    if (parts.length === 0) {
+      toast.info("Belum ada streak — gabung challenge dulu");
+      navigate({ to: "/challenges", search: {}, replace: true });
+      return;
+    }
     const top = parts.slice().sort((a, b) => (b.streak ?? 0) - (a.streak ?? 0))[0];
     if (!top?.challenge_id) return;
     setOpenLb(top.challenge_id);
@@ -112,7 +118,7 @@ function ChallengesPage() {
       articleRefs.current[top.challenge_id]?.scrollIntoView({ behavior: "smooth", block: "start" });
     }, 250);
     return () => clearTimeout(t);
-  }, [focus, data]);
+  }, [focus, data, navigate]);
 
   return (
     <div className="min-h-screen pb-32">
