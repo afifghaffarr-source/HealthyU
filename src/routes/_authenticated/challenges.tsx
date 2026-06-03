@@ -26,7 +26,7 @@ import {
   listGroupBonusClaimers,
 } from "@/lib/groupChallengeBonus.functions";
 import { groupChallengePendingMembers } from "@/lib/groupChallengePending.functions";
-import { CHALLENGE_HIGHLIGHT_MS } from "@/lib/constants";
+import { CHALLENGE_HIGHLIGHT_MS, CHALLENGE_HIGHLIGHT_FADE_MS } from "@/lib/constants";
 
 const challengesSearchSchema = z.object({
   group: fallback(z.string().uuid().optional(), undefined),
@@ -96,10 +96,9 @@ function ChallengesPage() {
     setHighlightId(id);
     setHighlightFading(false);
     // Start fade-out 500ms before the end so the ring smoothly disappears.
-    const FADE = 500;
     window.setTimeout(
       () => setHighlightFading(true),
-      Math.max(0, CHALLENGE_HIGHLIGHT_MS - FADE),
+      Math.max(0, CHALLENGE_HIGHLIGHT_MS - CHALLENGE_HIGHLIGHT_FADE_MS),
     );
     window.setTimeout(() => {
       setHighlightId((cur) => (cur === id ? null : cur));
