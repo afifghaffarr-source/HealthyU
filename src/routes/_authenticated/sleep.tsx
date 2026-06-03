@@ -1,9 +1,10 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { logSleep, recentSleep, deleteSleep } from "@/lib/sleep.functions";
 import { BottomNav } from "@/components/bottom-nav";
+import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { Moon, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -73,13 +74,8 @@ function SleepPage() {
 
   return (
     <main className="min-h-screen bg-background pb-28">
-      <div className="max-w-md mx-auto px-5 pt-8 space-y-5">
-        <header className="flex items-center gap-3">
-          <Link to="/profile" className="size-10 bg-card rounded-2xl outline-1 outline-black/10 grid place-items-center">
-            ←
-          </Link>
-          <h1 className="text-2xl font-bold">Tidur</h1>
-        </header>
+      <div className="max-w-md mx-auto px-5 pt-2 space-y-5">
+        <TopAppBar title="Tidur" showBack />
 
         <section className="grid grid-cols-2 gap-3 animate-fade-up">
           <div className="bg-card p-4 rounded-3xl outline-1 outline-black/5">
