@@ -1038,6 +1038,30 @@ export type Database = {
         }
         Relationships: []
       }
+      daily_quotes: {
+        Row: {
+          category: string | null
+          created_at: string
+          date: string
+          id: string
+          quote: string
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string
+          date: string
+          id?: string
+          quote: string
+        }
+        Update: {
+          category?: string | null
+          created_at?: string
+          date?: string
+          id?: string
+          quote?: string
+        }
+        Relationships: []
+      }
       daily_steps: {
         Row: {
           active_minutes: number | null
@@ -1188,6 +1212,33 @@ export type Database = {
           times_performed?: number
           updated_at?: string
           video_url?: string | null
+        }
+        Relationships: []
+      }
+      family_meal_votes: {
+        Row: {
+          created_at: string
+          id: string
+          meal_name: string
+          plan_id: string
+          user_id: string
+          vote_date: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          meal_name: string
+          plan_id: string
+          user_id: string
+          vote_date: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          meal_name?: string
+          plan_id?: string
+          user_id?: string
+          vote_date?: string
         }
         Relationships: []
       }
@@ -1745,6 +1796,33 @@ export type Database = {
         }
         Relationships: []
       }
+      gacha_pulls: {
+        Row: {
+          cost_coins: number
+          created_at: string
+          id: string
+          reward_coins: number | null
+          reward_label: string
+          user_id: string
+        }
+        Insert: {
+          cost_coins: number
+          created_at?: string
+          id?: string
+          reward_coins?: number | null
+          reward_label: string
+          user_id: string
+        }
+        Update: {
+          cost_coins?: number
+          created_at?: string
+          id?: string
+          reward_coins?: number | null
+          reward_label?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       group_challenge_bonuses: {
         Row: {
           challenge_id: string
@@ -1830,6 +1908,36 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      habit_stacks: {
+        Row: {
+          active: boolean
+          created_at: string
+          id: string
+          name: string
+          steps: Json
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          id?: string
+          name: string
+          steps?: Json
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          id?: string
+          name?: string
+          steps?: Json
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       meal_log_items: {
         Row: {
@@ -2468,6 +2576,45 @@ export type Database = {
         }
         Relationships: []
       }
+      nutrition_quizzes: {
+        Row: {
+          coins_awarded: number | null
+          correct_index: number
+          created_at: string
+          date: string
+          id: string
+          is_correct: boolean | null
+          options: Json
+          question: string
+          user_answer: number | null
+          user_id: string
+        }
+        Insert: {
+          coins_awarded?: number | null
+          correct_index: number
+          created_at?: string
+          date: string
+          id?: string
+          is_correct?: boolean | null
+          options: Json
+          question: string
+          user_answer?: number | null
+          user_id: string
+        }
+        Update: {
+          coins_awarded?: number | null
+          correct_index?: number
+          created_at?: string
+          date?: string
+          id?: string
+          is_correct?: boolean | null
+          options?: Json
+          question?: string
+          user_answer?: number | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       payment_history: {
         Row: {
           amount_idr: number
@@ -2513,6 +2660,33 @@ export type Database = {
           subscription_id?: string | null
           updated_at?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      pet_accessories: {
+        Row: {
+          cost_coins: number
+          created_at: string
+          emoji: string | null
+          id: string
+          name: string
+          slot: string
+        }
+        Insert: {
+          cost_coins?: number
+          created_at?: string
+          emoji?: string | null
+          id?: string
+          name: string
+          slot: string
+        }
+        Update: {
+          cost_coins?: number
+          created_at?: string
+          emoji?: string | null
+          id?: string
+          name?: string
+          slot?: string
         }
         Relationships: []
       }
@@ -3563,6 +3737,38 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      user_pet_accessories: {
+        Row: {
+          accessory_id: string
+          equipped: boolean
+          id: string
+          purchased_at: string
+          user_id: string
+        }
+        Insert: {
+          accessory_id: string
+          equipped?: boolean
+          id?: string
+          purchased_at?: string
+          user_id: string
+        }
+        Update: {
+          accessory_id?: string
+          equipped?: boolean
+          id?: string
+          purchased_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_pet_accessories_accessory_id_fkey"
+            columns: ["accessory_id"]
+            isOneToOne: false
+            referencedRelation: "pet_accessories"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_stats: {
         Row: {
