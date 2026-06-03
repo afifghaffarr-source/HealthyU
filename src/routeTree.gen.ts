@@ -14,6 +14,7 @@ import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedWorkoutRouteImport } from './routes/_authenticated/workout'
 import { Route as AuthenticatedWeightRouteImport } from './routes/_authenticated/weight'
+import { Route as AuthenticatedWearableRouteImport } from './routes/_authenticated/wearable'
 import { Route as AuthenticatedWaterRouteImport } from './routes/_authenticated/water'
 import { Route as AuthenticatedVitalsRouteImport } from './routes/_authenticated/vitals'
 import { Route as AuthenticatedSleepRouteImport } from './routes/_authenticated/sleep'
@@ -39,6 +40,7 @@ import { Route as AuthenticatedChatRouteImport } from './routes/_authenticated/c
 import { Route as AuthenticatedAchievementsRouteImport } from './routes/_authenticated/achievements'
 import { Route as ApiChatStreamRouteImport } from './routes/api/chat.stream'
 import { Route as AuthenticatedRecipesIdRouteImport } from './routes/_authenticated/recipes.$id'
+import { Route as ApiWearableGoogleFitCallbackRouteImport } from './routes/api/wearable.google-fit.callback'
 
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
@@ -62,6 +64,11 @@ const AuthenticatedWorkoutRoute = AuthenticatedWorkoutRouteImport.update({
 const AuthenticatedWeightRoute = AuthenticatedWeightRouteImport.update({
   id: '/weight',
   path: '/weight',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedWearableRoute = AuthenticatedWearableRouteImport.update({
+  id: '/wearable',
+  path: '/wearable',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedWaterRoute = AuthenticatedWaterRouteImport.update({
@@ -193,6 +200,12 @@ const AuthenticatedRecipesIdRoute = AuthenticatedRecipesIdRouteImport.update({
   path: '/$id',
   getParentRoute: () => AuthenticatedRecipesRoute,
 } as any)
+const ApiWearableGoogleFitCallbackRoute =
+  ApiWearableGoogleFitCallbackRouteImport.update({
+    id: '/api/wearable/google-fit/callback',
+    path: '/api/wearable/google-fit/callback',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -220,10 +233,12 @@ export interface FileRoutesByFullPath {
   '/sleep': typeof AuthenticatedSleepRoute
   '/vitals': typeof AuthenticatedVitalsRoute
   '/water': typeof AuthenticatedWaterRoute
+  '/wearable': typeof AuthenticatedWearableRoute
   '/weight': typeof AuthenticatedWeightRoute
   '/workout': typeof AuthenticatedWorkoutRoute
   '/recipes/$id': typeof AuthenticatedRecipesIdRoute
   '/api/chat/stream': typeof ApiChatStreamRoute
+  '/api/wearable/google-fit/callback': typeof ApiWearableGoogleFitCallbackRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -251,10 +266,12 @@ export interface FileRoutesByTo {
   '/sleep': typeof AuthenticatedSleepRoute
   '/vitals': typeof AuthenticatedVitalsRoute
   '/water': typeof AuthenticatedWaterRoute
+  '/wearable': typeof AuthenticatedWearableRoute
   '/weight': typeof AuthenticatedWeightRoute
   '/workout': typeof AuthenticatedWorkoutRoute
   '/recipes/$id': typeof AuthenticatedRecipesIdRoute
   '/api/chat/stream': typeof ApiChatStreamRoute
+  '/api/wearable/google-fit/callback': typeof ApiWearableGoogleFitCallbackRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -284,10 +301,12 @@ export interface FileRoutesById {
   '/_authenticated/sleep': typeof AuthenticatedSleepRoute
   '/_authenticated/vitals': typeof AuthenticatedVitalsRoute
   '/_authenticated/water': typeof AuthenticatedWaterRoute
+  '/_authenticated/wearable': typeof AuthenticatedWearableRoute
   '/_authenticated/weight': typeof AuthenticatedWeightRoute
   '/_authenticated/workout': typeof AuthenticatedWorkoutRoute
   '/_authenticated/recipes/$id': typeof AuthenticatedRecipesIdRoute
   '/api/chat/stream': typeof ApiChatStreamRoute
+  '/api/wearable/google-fit/callback': typeof ApiWearableGoogleFitCallbackRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -317,10 +336,12 @@ export interface FileRouteTypes {
     | '/sleep'
     | '/vitals'
     | '/water'
+    | '/wearable'
     | '/weight'
     | '/workout'
     | '/recipes/$id'
     | '/api/chat/stream'
+    | '/api/wearable/google-fit/callback'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -348,10 +369,12 @@ export interface FileRouteTypes {
     | '/sleep'
     | '/vitals'
     | '/water'
+    | '/wearable'
     | '/weight'
     | '/workout'
     | '/recipes/$id'
     | '/api/chat/stream'
+    | '/api/wearable/google-fit/callback'
   id:
     | '__root__'
     | '/'
@@ -380,10 +403,12 @@ export interface FileRouteTypes {
     | '/_authenticated/sleep'
     | '/_authenticated/vitals'
     | '/_authenticated/water'
+    | '/_authenticated/wearable'
     | '/_authenticated/weight'
     | '/_authenticated/workout'
     | '/_authenticated/recipes/$id'
     | '/api/chat/stream'
+    | '/api/wearable/google-fit/callback'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -391,6 +416,7 @@ export interface RootRouteChildren {
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
   ApiChatStreamRoute: typeof ApiChatStreamRoute
+  ApiWearableGoogleFitCallbackRoute: typeof ApiWearableGoogleFitCallbackRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -428,6 +454,13 @@ declare module '@tanstack/react-router' {
       path: '/weight'
       fullPath: '/weight'
       preLoaderRoute: typeof AuthenticatedWeightRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/wearable': {
+      id: '/_authenticated/wearable'
+      path: '/wearable'
+      fullPath: '/wearable'
+      preLoaderRoute: typeof AuthenticatedWearableRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/water': {
@@ -605,6 +638,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedRecipesIdRouteImport
       parentRoute: typeof AuthenticatedRecipesRoute
     }
+    '/api/wearable/google-fit/callback': {
+      id: '/api/wearable/google-fit/callback'
+      path: '/api/wearable/google-fit/callback'
+      fullPath: '/api/wearable/google-fit/callback'
+      preLoaderRoute: typeof ApiWearableGoogleFitCallbackRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -643,6 +683,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedSleepRoute: typeof AuthenticatedSleepRoute
   AuthenticatedVitalsRoute: typeof AuthenticatedVitalsRoute
   AuthenticatedWaterRoute: typeof AuthenticatedWaterRoute
+  AuthenticatedWearableRoute: typeof AuthenticatedWearableRoute
   AuthenticatedWeightRoute: typeof AuthenticatedWeightRoute
   AuthenticatedWorkoutRoute: typeof AuthenticatedWorkoutRoute
 }
@@ -671,6 +712,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedSleepRoute: AuthenticatedSleepRoute,
   AuthenticatedVitalsRoute: AuthenticatedVitalsRoute,
   AuthenticatedWaterRoute: AuthenticatedWaterRoute,
+  AuthenticatedWearableRoute: AuthenticatedWearableRoute,
   AuthenticatedWeightRoute: AuthenticatedWeightRoute,
   AuthenticatedWorkoutRoute: AuthenticatedWorkoutRoute,
 }
@@ -683,6 +725,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
   ApiChatStreamRoute: ApiChatStreamRoute,
+  ApiWearableGoogleFitCallbackRoute: ApiWearableGoogleFitCallbackRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
