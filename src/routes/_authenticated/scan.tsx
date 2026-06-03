@@ -74,7 +74,7 @@ function ScanPage() {
         upload({ data: { scan_id: res.scan_id, image_data_url: imageUrl } }).catch(() => {});
       }
       if (res.scan_id) {
-        gameify({})
+        gameify()
           .then((g) => {
             if (g.coinsAwarded) toast.success(`+${g.coinsAwarded} 🪙 · Streak ${g.streak} hari`);
             g.unlocked.forEach((id) => toast.success(`🏆 Achievement: ${id}`));
