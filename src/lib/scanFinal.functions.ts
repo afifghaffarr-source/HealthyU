@@ -108,7 +108,7 @@ export const moodMealCorrelation = createServerFn({ method: "POST" })
     const { supabase, userId } = context;
     const since = new Date(Date.now() - 30 * 86400000).toISOString().slice(0, 10);
     const { data: moods } = await supabase
-      .from("mood_logs").select("log_date, mood_score").eq("user_id", userId).gte("log_date", since);
+      .from("mood_logs").select("log_date, mood").eq("user_id", userId).gte("log_date", since);
     const { data: meals } = await supabase
       .from("meal_logs").select("log_date, calories, sugar_g").eq("user_id", userId).gte("log_date", since);
     const byDate = new Map<string, { kcal: number; sugar: number }>();
@@ -119,12 +119,14 @@ export const moodMealCorrelation = createServerFn({ method: "POST" })
       cur.sugar += Number(m.sugar_g ?? 0);
       byDate.set(m.log_date, cur);
     }
-    const points = (moods ?? []).map((m) => ({
-      date: m.log_date,
-      mood: m.mood_score,
-      kcal: byDate.get(m.log_date)?.kcal ?? 0,
-      sugar: byDate.get(m.log_date)?.sugar ?? 0,
-    }));
+    const points = (moods ?? [])
+      .filter((m) => m.log_date)
+      .map((m) => ({
+        date: m.log_date as string,
+        mood: m.mood,
+        kcal: byDate.get(m.log_date as string)?.kcal ?? 0,
+        sugar: byDate.get(m.log_date as string)?.sugar ?? 0,
+      }));
     return { points };
   });
 
