@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { listRecipes } from "@/lib/recipes.functions";
@@ -32,6 +32,9 @@ function RecipesPage() {
   const [q, setQ] = useState("");
   const [sort, setSort] = useState<SortMode>("title");
   const [trendingOnly, setTrendingOnly] = useState(false);
+  const [pulseTrending, setPulseTrending] = useState(false);
+  const [flashIds, setFlashIds] = useState<Record<string, number>>({});
+  const prevGrowth = useRef<Record<string, number>>({});
 
   // Realtime re-sort while in trending mode
   useEffect(() => {
@@ -41,13 +44,41 @@ function RecipesPage() {
       .on(
         "postgres_changes",
         { event: "*", schema: "public", table: "recipe_bookmarks" },
-        () => qc.invalidateQueries({ queryKey: ["recipes"] }),
+        () => {
+          qc.invalidateQueries({ queryKey: ["recipes"] });
+          setPulseTrending(true);
+          window.setTimeout(() => setPulseTrending(false), 3000);
+        },
       )
       .subscribe();
     return () => {
       void supabase.removeChannel(ch);
     };
   }, [sort, qc]);
+
+  // Detect weekly_growth bumps to flash a +N badge
+  useEffect(() => {
+    const next: Record<string, number> = {};
+    const bumps: Record<string, number> = {};
+    for (const r of all) {
+      const g = Number(r.weekly_growth ?? 0);
+      next[r.id] = g;
+      const prev = prevGrowth.current[r.id];
+      if (prev !== undefined && g > prev) bumps[r.id] = g - prev;
+    }
+    prevGrowth.current = next;
+    if (Object.keys(bumps).length === 0) return;
+    setFlashIds((cur) => ({ ...cur, ...bumps }));
+    const ids = Object.keys(bumps);
+    const t = window.setTimeout(() => {
+      setFlashIds((cur) => {
+        const copy = { ...cur };
+        for (const id of ids) delete copy[id];
+        return copy;
+      });
+    }, 2500);
+    return () => window.clearTimeout(t);
+  }, [all]);
 
   const [aiOpen, setAiOpen] = useState(false);
   const [ingredients, setIngredients] = useState("");
@@ -166,11 +197,17 @@ function RecipesPage() {
           </button>
           <button
             onClick={() => setSort(sort === "trending" ? "title" : "trending")}
-            className={`px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap inline-flex items-center gap-1 ${
+            className={`relative px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap inline-flex items-center gap-1 ${
               sort === "trending" ? "bg-orange-500 text-white" : "bg-card outline-1 outline-black/10"
             }`}
           >
             <TrendingUp className="size-3" /> Trending
+            {pulseTrending && (
+              <span className="absolute -top-0.5 -right-0.5 flex size-2">
+                <span className="absolute inline-flex size-full rounded-full bg-orange-400 opacity-75 animate-ping" />
+                <span className="relative inline-flex size-2 rounded-full bg-orange-500" />
+              </span>
+            )}
           </button>
           {sort === "trending" && (
             <button
@@ -226,6 +263,11 @@ function RecipesPage() {
                 {Number(r.weekly_growth ?? 0) > 0 && (
                   <span className="inline-flex items-center gap-0.5 text-[10px] font-semibold bg-orange-50 text-orange-600 px-1.5 py-0.5 rounded-full">
                     <TrendingUp className="size-2.5" />+{r.weekly_growth}/7h
+                    {flashIds[r.id] && (
+                      <span className="ml-1 text-orange-700 bg-orange-200 rounded-full px-1 animate-fade-in">
+                        +{flashIds[r.id]}
+                      </span>
+                    )}
                   </span>
                 )}
               </div>
