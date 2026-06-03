@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { count, flush } from "@/lib/offline-queue";
 import { logWater } from "@/lib/water.functions";
-import { logWeight } from "@/lib/weight.functions";
+import { addWeight } from "@/lib/weight.functions";
 import { logMeal } from "@/lib/meals.functions";
 import { useServerFn } from "@tanstack/react-start";
 import { useQueryClient } from "@tanstack/react-query";
@@ -9,7 +9,7 @@ import { useQueryClient } from "@tanstack/react-query";
 export function useOfflineQueue() {
   const qc = useQueryClient();
   const water = useServerFn(logWater);
-  const weight = useServerFn(logWeight);
+  const weight = useServerFn(addWeight);
   const meal = useServerFn(logMeal);
   const [online, setOnline] = useState(typeof navigator !== "undefined" ? navigator.onLine : true);
   const [pending, setPending] = useState(0);
@@ -28,10 +28,11 @@ export function useOfflineQueue() {
         await water({ data: it.payload as { amount_ml: number } });
       },
       weight: async (it) => {
-        await weight({ data: it.payload as { weight_kg: number; note?: string | null } });
+        await weight({ data: it.payload as { weight_kg: number; note?: string } });
       },
       meal: async (it) => {
-        await meal({ data: it.payload as Parameters<typeof meal>[0]["data"] });
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        await meal({ data: it.payload as any });
       },
     });
     if (res.synced > 0) {
