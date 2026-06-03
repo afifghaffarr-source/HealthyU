@@ -16,6 +16,10 @@
 // | PDF_MARGIN_X                   | Margin kiri (juga basis kanan = 595 - margin) PDF (pt).  |
 // | PDF_PAGE_W                     | Lebar halaman A4 PDF (pt, jsPDF).                        |
 // | PDF_PAGE_H                     | Tinggi halaman A4 PDF (pt, jsPDF).                       |
+// | PDF_DIVIDER_GRAY               | Nilai abu-abu (0-255) untuk garis divider PDF.           |
+// | PDF_HEADER_BASELINE_Y          | Y baseline judul halaman PDF (pt).                       |
+// | PDF_HEADER_SUBTITLE_Y          | Y baseline subjudul halaman PDF (pt).                    |
+// | PDF_BODY_TOP_Y                 | Y start section header body PDF (pt).                    |
 //
 // CONVENTION: setiap konstanta tunable WAJIB ditambahkan ke tabel di atas
 // (nama + 1 baris efek). Reviewer boleh menolak PR yang menambah konstanta
@@ -77,3 +81,19 @@ export const PDF_PAGE_W = 595;
 /** Tinggi halaman A4 PDF (pt, jsPDF). */
 // eslint-disable-next-line no-restricted-syntax -- listed in header table
 export const PDF_PAGE_H = 842;
+
+/** Nilai grayscale 0-255 untuk garis divider PDF (setDrawColor). */
+// eslint-disable-next-line no-restricted-syntax -- listed in header table
+export const PDF_DIVIDER_GRAY = 220;
+
+/** Y baseline judul utama halaman PDF (pt). */
+// eslint-disable-next-line no-restricted-syntax -- listed in header table
+export const PDF_HEADER_BASELINE_Y = 50;
+
+/** Y baseline subjudul halaman PDF (pt). */
+// eslint-disable-next-line no-restricted-syntax -- listed in header table
+export const PDF_HEADER_SUBTITLE_Y = 68;
+
+/** Y start section header pertama dalam body PDF (pt). */
+// eslint-disable-next-line no-restricted-syntax -- listed in header table
+export const PDF_BODY_TOP_Y = 100;
