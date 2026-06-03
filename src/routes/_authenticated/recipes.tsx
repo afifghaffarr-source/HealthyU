@@ -186,11 +186,18 @@ function RecipesPage() {
               className="block bg-card p-4 rounded-2xl outline-1 outline-black/5"
             >
               <h3 className="font-bold">{r.title}</h3>
-              {Number(r.bookmark_count ?? 0) >= popularThreshold && (
-                <span className="inline-block mt-1 text-[10px] font-bold uppercase tracking-wide bg-orange-100 text-orange-700 px-2 py-0.5 rounded-full">
-                  🔥 Populer
-                </span>
-              )}
+              <div className="flex flex-wrap gap-1 mt-1">
+                {Number(r.bookmark_count ?? 0) >= popularThreshold && (
+                  <span className="text-[10px] font-bold uppercase tracking-wide bg-orange-100 text-orange-700 px-2 py-0.5 rounded-full">
+                    🔥 Populer
+                  </span>
+                )}
+                {Number(r.weekly_growth ?? 0) > 0 && (
+                  <span className="inline-flex items-center gap-0.5 text-[10px] font-semibold bg-orange-50 text-orange-600 px-1.5 py-0.5 rounded-full">
+                    <TrendingUp className="size-2.5" />+{r.weekly_growth}/7h
+                  </span>
+                )}
+              </div>
               {r.description && <p className="text-xs text-muted-foreground mt-1 line-clamp-2">{r.description}</p>}
               <div className="flex gap-4 mt-3 text-xs text-muted-foreground">
                 <span className="inline-flex items-center gap-1"><Flame className="size-3" />{r.calories} kcal</span>
