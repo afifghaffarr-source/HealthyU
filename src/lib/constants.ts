@@ -20,6 +20,15 @@
 // | PDF_HEADER_BASELINE_Y          | Y baseline judul halaman PDF (pt).                       |
 // | PDF_HEADER_SUBTITLE_Y          | Y baseline subjudul halaman PDF (pt).                    |
 // | PDF_BODY_TOP_Y                 | Y start section header body PDF (pt).                    |
+// | PDF_DIVIDER_GRAY_STRONG        | Grayscale 0-255 untuk divider gelap (section header).    |
+// | PDF_LINE_HEIGHT                | Tinggi baris standar body PDF (pt).                      |
+// | PDF_SECTION_GAP                | Jarak vertikal antar section header dalam body PDF (pt). |
+// | PDF_TITLE_FONT_SIZE            | Font size judul utama halaman PDF (pt).                  |
+// | PDF_SUBTITLE_FONT_SIZE         | Font size subjudul/section header PDF (pt).              |
+// | PDF_BODY_FONT_SIZE             | Font size body teks PDF (pt).                            |
+// | PDF_FOOTER_FONT_SIZE           | Font size baris footer PDF (pt).                         |
+// | PDF_FOOTER_PAGE_LABEL          | Label kata halaman footer ("hal"), siap i18n.            |
+// | PDF_PAGE_CONTENT_W             | Lebar konten PDF (PDF_PAGE_W - 2*PDF_MARGIN_X, pt).      |
 //
 // CONVENTION: setiap konstanta tunable WAJIB ditambahkan ke tabel di atas
 // (nama + 1 baris efek). Reviewer boleh menolak PR yang menambah konstanta
@@ -97,3 +106,39 @@ export const PDF_HEADER_SUBTITLE_Y = 68;
 /** Y start section header pertama dalam body PDF (pt). */
 // eslint-disable-next-line no-restricted-syntax -- listed in header table
 export const PDF_BODY_TOP_Y = 100;
+
+/** Grayscale 0-255 untuk divider gelap (section header) — lebih tegas dari PDF_DIVIDER_GRAY. */
+// eslint-disable-next-line no-restricted-syntax -- listed in header table
+export const PDF_DIVIDER_GRAY_STRONG = 160;
+
+/** Tinggi baris standar body PDF (pt). */
+// eslint-disable-next-line no-restricted-syntax -- listed in header table
+export const PDF_LINE_HEIGHT = 18;
+
+/** Jarak vertikal antar section header dalam body PDF (pt). */
+// eslint-disable-next-line no-restricted-syntax -- listed in header table
+export const PDF_SECTION_GAP = 30;
+
+/** Font size judul utama halaman PDF (pt). */
+// eslint-disable-next-line no-restricted-syntax -- listed in header table
+export const PDF_TITLE_FONT_SIZE = 18;
+
+/** Font size subjudul / section header PDF (pt). */
+// eslint-disable-next-line no-restricted-syntax -- listed in header table
+export const PDF_SUBTITLE_FONT_SIZE = 12;
+
+/** Font size body teks PDF (pt). */
+// eslint-disable-next-line no-restricted-syntax -- listed in header table
+export const PDF_BODY_FONT_SIZE = 10;
+
+/** Font size baris footer PDF (pt). */
+// eslint-disable-next-line no-restricted-syntax -- listed in header table
+export const PDF_FOOTER_FONT_SIZE = 8;
+
+/** Label kata halaman footer ("hal"), siap diganti saat i18n. */
+// eslint-disable-next-line no-restricted-syntax -- listed in header table
+export const PDF_FOOTER_PAGE_LABEL = "hal";
+
+/** Lebar konten PDF (PDF_PAGE_W - 2*PDF_MARGIN_X) untuk splitTextToSize dkk. */
+// eslint-disable-next-line no-restricted-syntax -- listed in header table
+export const PDF_PAGE_CONTENT_W = PDF_PAGE_W - 2 * PDF_MARGIN_X;

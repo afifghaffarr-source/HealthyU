@@ -22,6 +22,7 @@ import {
   GROUP_BONUS_BADGE_TTL_MS,
   GROUP_BONUS_BADGE_TICK_MS,
 } from "@/lib/constants";
+import { useMiniFocusTrap } from "@/hooks/useMiniFocusTrap";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   component: Dashboard,
@@ -101,6 +102,8 @@ function Dashboard() {
   const [breakdownOpen, setBreakdownOpen] = useState(false);
   const breakdownRef = useRef<HTMLDivElement | null>(null);
   const badgeBtnRef = useRef<HTMLButtonElement | null>(null);
+  const trapFirstRef = useRef<HTMLButtonElement | null>(null);
+  const trapLastRef = useRef<HTMLButtonElement | null>(null);
   const [restoredFromBreakdown, setRestoredFromBreakdown] = useState(false);
   useEffect(() => {
     if (!breakdownOpen) return;
@@ -111,22 +114,29 @@ function Dashboard() {
         badgeBtnRef.current?.focus();
       }
     };
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
-        setBreakdownOpen(false);
-        setRestoredFromBreakdown(true);
-        badgeBtnRef.current?.focus();
-      }
-    };
     document.addEventListener("mousedown", onDown);
-    document.addEventListener("keydown", onKey);
     return () => {
       document.removeEventListener("mousedown", onDown);
-      document.removeEventListener("keydown", onKey);
     };
   }, [breakdownOpen]);
+  // Mini focus-trap: Tab/Shift+Tab cycles antara Reset (first) & Lihat (last);
+  // ESC menutup popover dan mengembalikan fokus ke tombol badge.
+  useMiniFocusTrap(
+    breakdownOpen,
+    [trapFirstRef, trapLastRef],
+    () => {
+      setBreakdownOpen(false);
+      setRestoredFromBreakdown(true);
+      badgeBtnRef.current?.focus();
+    },
+  );
   useEffect(() => {
     if (!restoredFromBreakdown) return;
+    // Announce via CustomEvent untuk aria-live region (lebih reliable
+    // dari title attribute yang muncul hanya saat hover mouse).
+    badgeBtnRef.current?.dispatchEvent(
+      new CustomEvent("focus-restored", { bubbles: true }),
+    );
     const t = window.setTimeout(() => setRestoredFromBreakdown(false), 1500);
     return () => window.clearTimeout(t);
   }, [restoredFromBreakdown]);
@@ -477,6 +487,9 @@ function Dashboard() {
                 const entries = Object.entries(newClaims);
                 return (
                   <div className="ml-auto relative" ref={breakdownRef}>
+                    <span role="status" aria-live="polite" className="sr-only">
+                      {restoredFromBreakdown ? "Popover ditutup, fokus dikembalikan ke badge klaim baru" : ""}
+                    </span>
                     <button
                       ref={badgeBtnRef}
                       onClick={() => setBreakdownOpen((o) => !o)}
@@ -524,16 +537,8 @@ function Dashboard() {
                         </ul>
                         <div className="flex gap-1.5 mt-2 pt-2 border-t border-border/60">
                           <button
+                            ref={trapFirstRef}
                             autoFocus
-                            onKeyDown={(e) => {
-                              if (e.key === "Tab" && e.shiftKey) {
-                                e.preventDefault();
-                                (
-                                  e.currentTarget
-                                    .nextElementSibling as HTMLButtonElement | null
-                                )?.focus();
-                              }
-                            }}
                             onClick={() => {
                               setNewClaims({});
                               setBreakdownOpen(false);
@@ -543,15 +548,7 @@ function Dashboard() {
                             Reset
                           </button>
                           <button
-                            onKeyDown={(e) => {
-                              if (e.key === "Tab" && !e.shiftKey) {
-                                e.preventDefault();
-                                (
-                                  e.currentTarget
-                                    .previousElementSibling as HTMLButtonElement | null
-                                )?.focus();
-                              }
-                            }}
+                            ref={trapLastRef}
                             onClick={() => {
                               setBreakdownOpen(false);
                               navigate({ to: "/challenges" });
