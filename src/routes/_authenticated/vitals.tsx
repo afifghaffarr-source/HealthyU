@@ -3,8 +3,9 @@ import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { listVitals, addVitals, deleteVitals } from "@/lib/vitals.functions";
+import { listBodyMetrics, addBodyMetrics, deleteBodyMetrics } from "@/lib/bodyMetrics.functions";
 import { BottomNav } from "@/components/bottom-nav";
-import { ArrowLeft, Heart, Activity, Droplet, Trash2, WifiOff, RefreshCw } from "lucide-react";
+import { ArrowLeft, Heart, Activity, Droplet, Trash2, WifiOff, RefreshCw, Ruler, ChevronDown } from "lucide-react";
 import { toast } from "sonner";
 import { enqueue } from "@/lib/offline-queue";
 import { useOfflineQueue } from "@/hooks/use-offline-queue";
@@ -43,9 +44,13 @@ function VitalsPage() {
   const fetchList = useServerFn(listVitals);
   const add = useServerFn(addVitals);
   const del = useServerFn(deleteVitals);
+  const fetchBody = useServerFn(listBodyMetrics);
+  const addBody = useServerFn(addBodyMetrics);
+  const delBody = useServerFn(deleteBodyMetrics);
   const { online, pending, sync } = useOfflineQueue();
 
   const { data: logs = [] } = useQuery({ queryKey: ["vitals"], queryFn: () => fetchList() });
+  const { data: bodyLogs = [] } = useQuery({ queryKey: ["body_metrics"], queryFn: () => fetchBody() });
 
   const [sys, setSys] = useState("");
   const [dia, setDia] = useState("");
@@ -53,6 +58,47 @@ function VitalsPage() {
   const [glu, setGlu] = useState("");
   const [state, setState] = useState<"fasting" | "post_meal" | "random">("fasting");
   const [note, setNote] = useState("");
+
+  const [bodyOpen, setBodyOpen] = useState(false);
+  type BodyField =
+    | "weight_kg" | "body_fat_pct" | "muscle_mass_kg" | "water_pct" | "visceral_fat"
+    | "waist_cm" | "hip_cm" | "chest_cm" | "neck_cm" | "calf_cm"
+    | "bicep_left_cm" | "bicep_right_cm" | "thigh_left_cm" | "thigh_right_cm";
+  const [body, setBody] = useState<Record<BodyField, string>>({
+    weight_kg: "", body_fat_pct: "", muscle_mass_kg: "", water_pct: "", visceral_fat: "",
+    waist_cm: "", hip_cm: "", chest_cm: "", neck_cm: "", calf_cm: "",
+    bicep_left_cm: "", bicep_right_cm: "", thigh_left_cm: "", thigh_right_cm: "",
+  });
+  const setBodyVal = (k: BodyField, v: string) => setBody((p) => ({ ...p, [k]: v }));
+
+  const addBodyMut = useMutation({
+    mutationFn: () => {
+      const payload: Record<string, number> = {};
+      (Object.keys(body) as BodyField[]).forEach((k) => {
+        if (body[k] !== "") payload[k] = Number(body[k]);
+      });
+      return addBody({ data: payload });
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["body_metrics"] });
+      setBody({
+        weight_kg: "", body_fat_pct: "", muscle_mass_kg: "", water_pct: "", visceral_fat: "",
+        waist_cm: "", hip_cm: "", chest_cm: "", neck_cm: "", calf_cm: "",
+        bicep_left_cm: "", bicep_right_cm: "", thigh_left_cm: "", thigh_right_cm: "",
+      });
+      toast.success("Komposisi tubuh tercatat");
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  const delBodyMut = useMutation({
+    mutationFn: (id: string) => delBody({ data: { id } }),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["body_metrics"] }),
+  });
+
+  const whrLatest = bodyLogs[0]?.waist_cm && bodyLogs[0]?.hip_cm
+    ? Number(bodyLogs[0].waist_cm) / Number(bodyLogs[0].hip_cm)
+    : null;
 
   const addMut = useMutation({
     mutationFn: async () => {
@@ -196,6 +242,87 @@ function VitalsPage() {
                 </button>
               </div>
             ))
+          )}
+        </section>
+
+        <section className="bg-card rounded-3xl outline-1 outline-black/5 animate-fade-up">
+          <button
+            onClick={() => setBodyOpen((o) => !o)}
+            className="w-full px-4 py-3 flex items-center gap-2"
+          >
+            <Ruler className="size-4 text-primary" />
+            <h2 className="font-bold text-sm flex-1 text-left">Komposisi Tubuh & Lingkar</h2>
+            {whrLatest && (
+              <span className="text-[10px] text-muted-foreground">
+                W/H {whrLatest.toFixed(2)}
+              </span>
+            )}
+            <ChevronDown className={`size-4 text-muted-foreground transition ${bodyOpen ? "rotate-180" : ""}`} />
+          </button>
+          {bodyOpen && (
+            <div className="px-4 pb-4 space-y-3">
+              <p className="text-[11px] text-muted-foreground">Isi yang tersedia, kosongkan jika tidak diukur.</p>
+              <div>
+                <p className="text-[10px] font-bold uppercase text-muted-foreground mb-2">Komposisi</p>
+                <div className="grid grid-cols-2 gap-2">
+                  <Input label="Berat" value={body.weight_kg} onChange={(v) => setBodyVal("weight_kg", v)} suffix="kg" />
+                  <Input label="Lemak" value={body.body_fat_pct} onChange={(v) => setBodyVal("body_fat_pct", v)} suffix="%" />
+                  <Input label="Otot" value={body.muscle_mass_kg} onChange={(v) => setBodyVal("muscle_mass_kg", v)} suffix="kg" />
+                  <Input label="Air" value={body.water_pct} onChange={(v) => setBodyVal("water_pct", v)} suffix="%" />
+                  <Input label="Visceral fat" value={body.visceral_fat} onChange={(v) => setBodyVal("visceral_fat", v)} suffix="" />
+                </div>
+              </div>
+              <div>
+                <p className="text-[10px] font-bold uppercase text-muted-foreground mb-2">Lingkar tubuh</p>
+                <div className="grid grid-cols-2 gap-2">
+                  <Input label="Pinggang" value={body.waist_cm} onChange={(v) => setBodyVal("waist_cm", v)} suffix="cm" />
+                  <Input label="Pinggul" value={body.hip_cm} onChange={(v) => setBodyVal("hip_cm", v)} suffix="cm" />
+                  <Input label="Dada" value={body.chest_cm} onChange={(v) => setBodyVal("chest_cm", v)} suffix="cm" />
+                  <Input label="Leher" value={body.neck_cm} onChange={(v) => setBodyVal("neck_cm", v)} suffix="cm" />
+                  <Input label="Betis" value={body.calf_cm} onChange={(v) => setBodyVal("calf_cm", v)} suffix="cm" />
+                </div>
+              </div>
+              <div>
+                <p className="text-[10px] font-bold uppercase text-muted-foreground mb-2">Lengan & paha</p>
+                <div className="grid grid-cols-2 gap-2">
+                  <Input label="Bisep kiri" value={body.bicep_left_cm} onChange={(v) => setBodyVal("bicep_left_cm", v)} suffix="cm" />
+                  <Input label="Bisep kanan" value={body.bicep_right_cm} onChange={(v) => setBodyVal("bicep_right_cm", v)} suffix="cm" />
+                  <Input label="Paha kiri" value={body.thigh_left_cm} onChange={(v) => setBodyVal("thigh_left_cm", v)} suffix="cm" />
+                  <Input label="Paha kanan" value={body.thigh_right_cm} onChange={(v) => setBodyVal("thigh_right_cm", v)} suffix="cm" />
+                </div>
+              </div>
+              <button
+                onClick={() => addBodyMut.mutate()}
+                disabled={addBodyMut.isPending || Object.values(body).every((v) => v === "")}
+                className="w-full bg-primary text-primary-foreground font-semibold py-3 rounded-2xl disabled:opacity-50"
+              >
+                Simpan komposisi
+              </button>
+
+              {bodyLogs.length > 0 && (
+                <div className="pt-2 space-y-2">
+                  <p className="text-[10px] font-bold uppercase text-muted-foreground">Riwayat (30 terakhir)</p>
+                  {bodyLogs.slice(0, 10).map((b) => (
+                    <div key={b.id} className="bg-muted/40 rounded-xl px-3 py-2 flex items-start gap-2 text-xs">
+                      <div className="flex-1 min-w-0">
+                        <p className="text-[10px] text-muted-foreground">
+                          {new Date(b.measured_at).toLocaleDateString("id-ID", { dateStyle: "medium" })}
+                        </p>
+                        <p className="font-semibold tabular-nums">
+                          {b.weight_kg ? `${b.weight_kg}kg` : ""}
+                          {b.body_fat_pct ? ` · lemak ${b.body_fat_pct}%` : ""}
+                          {b.waist_cm ? ` · pinggang ${b.waist_cm}cm` : ""}
+                          {b.hip_cm ? ` · pinggul ${b.hip_cm}cm` : ""}
+                        </p>
+                      </div>
+                      <button onClick={() => delBodyMut.mutate(b.id)} className="text-muted-foreground hover:text-red-600">
+                        <Trash2 className="size-3.5" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
           )}
         </section>
       </div>

@@ -1,9 +1,12 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
+import { useState, useEffect } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { getRecipe } from "@/lib/recipes.functions";
+import { getRecipeRating, rateRecipe } from "@/lib/recipeRatings.functions";
 import { BottomNav } from "@/components/bottom-nav";
-import { ArrowLeft, Clock, Flame, Users } from "lucide-react";
+import { ArrowLeft, Clock, Flame, Users, Star } from "lucide-react";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/recipes/$id")({
   component: RecipeDetail,
@@ -11,8 +14,31 @@ export const Route = createFileRoute("/_authenticated/recipes/$id")({
 
 function RecipeDetail() {
   const { id } = Route.useParams();
+  const qc = useQueryClient();
   const fetch = useServerFn(getRecipe);
+  const fetchRating = useServerFn(getRecipeRating);
+  const rateFn = useServerFn(rateRecipe);
   const { data: r, isLoading } = useQuery({ queryKey: ["recipe", id], queryFn: () => fetch({ data: { id } }) });
+  const { data: rating } = useQuery({
+    queryKey: ["recipe", id, "rating"],
+    queryFn: () => fetchRating({ data: { recipe_id: id } }),
+  });
+
+  const [stars, setStars] = useState(0);
+  const [review, setReview] = useState("");
+  useEffect(() => {
+    if (rating?.myRating) setStars(rating.myRating);
+    if (rating?.myReview) setReview(rating.myReview);
+  }, [rating?.myRating, rating?.myReview]);
+
+  const rateM = useMutation({
+    mutationFn: () => rateFn({ data: { recipe_id: id, rating: stars, review: review.trim() || undefined } }),
+    onSuccess: () => {
+      toast.success("Rating tersimpan");
+      qc.invalidateQueries({ queryKey: ["recipe", id, "rating"] });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
 
   return (
     <main className="min-h-screen bg-background pb-28">
@@ -63,6 +89,46 @@ function RecipeDetail() {
                   </li>
                 ))}
               </ol>
+            </section>
+
+            <section className="bg-card p-5 rounded-3xl outline-1 outline-black/5 space-y-3">
+              <div className="flex items-center justify-between">
+                <h2 className="font-bold">Rating</h2>
+                {rating && rating.count > 0 && (
+                  <p className="text-xs text-muted-foreground">
+                    ⭐ {rating.avg.toFixed(1)} · {rating.count} ulasan
+                  </p>
+                )}
+              </div>
+              <div className="flex gap-1.5">
+                {[1, 2, 3, 4, 5].map((n) => (
+                  <button
+                    key={n}
+                    onClick={() => setStars(n)}
+                    className="p-1"
+                    aria-label={`${n} bintang`}
+                  >
+                    <Star
+                      className={`size-7 transition ${n <= stars ? "fill-amber-400 text-amber-400" : "text-muted-foreground"}`}
+                    />
+                  </button>
+                ))}
+              </div>
+              <textarea
+                value={review}
+                onChange={(e) => setReview(e.target.value)}
+                placeholder="Tulis ulasan (opsional)"
+                rows={3}
+                maxLength={500}
+                className="w-full text-sm bg-muted rounded-xl px-3 py-2 outline-none resize-none"
+              />
+              <button
+                onClick={() => rateM.mutate()}
+                disabled={stars === 0 || rateM.isPending}
+                className="w-full bg-primary text-primary-foreground font-semibold py-3 rounded-2xl disabled:opacity-50"
+              >
+                {rating?.myRating ? "Perbarui rating" : "Kirim rating"}
+              </button>
             </section>
           </>
         )}

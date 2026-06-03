@@ -2,11 +2,11 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { searchFoods, logMeal, todaysMeals, deleteMeal } from "@/lib/meals.functions";
+import { searchFoods, logMeal, todaysMeals, deleteMeal, logMealWithItems } from "@/lib/meals.functions";
 import { parseMealFromVoice } from "@/lib/ai-extras.functions";
 import { getAchievementToastPrefix } from "@/lib/achievement-icons";
 import { BottomNav } from "@/components/bottom-nav";
-import { ArrowLeft, Search, Trash2, Mic, MicOff, Loader2, WifiOff, RefreshCw } from "lucide-react";
+import { ArrowLeft, Search, Trash2, Mic, MicOff, Loader2, WifiOff, RefreshCw, Plus, Minus, ShoppingBasket } from "lucide-react";
 import { toast } from "sonner";
 import { enqueue } from "@/lib/offline-queue";
 import { useOfflineQueue } from "@/hooks/use-offline-queue";
@@ -21,6 +21,7 @@ function FoodPage() {
   const qc = useQueryClient();
   const search = useServerFn(searchFoods);
   const log = useServerFn(logMeal);
+  const logMulti = useServerFn(logMealWithItems);
   const fetchMeals = useServerFn(todaysMeals);
   const del = useServerFn(deleteMeal);
   const parseVoice = useServerFn(parseMealFromVoice);
@@ -30,6 +31,80 @@ function FoodPage() {
   const [mealType, setMealType] = useState<MealType>(currentMealType());
   const [listening, setListening] = useState(false);
   const [parsing, setParsing] = useState(false);
+
+  type BasketItem = {
+    key: string;
+    food_item_id: string | null;
+    food_name: string;
+    serving_qty: number;
+    serving_unit: string | null;
+    calories: number;
+    protein_g: number;
+    carbs_g: number;
+    fat_g: number;
+  };
+  const [basket, setBasket] = useState<BasketItem[]>([]);
+
+  const addToBasket = (f: {
+    id: string;
+    name: string;
+    serving_unit?: string | null;
+    calories: number | string;
+    protein_g?: number | string | null;
+    carbs_g?: number | string | null;
+    fat_g?: number | string | null;
+  }) => {
+    setBasket((prev) => [
+      ...prev,
+      {
+        key: `${f.id}-${Date.now()}`,
+        food_item_id: f.id,
+        food_name: f.name,
+        serving_qty: 1,
+        serving_unit: f.serving_unit ?? null,
+        calories: Number(f.calories),
+        protein_g: Number(f.protein_g ?? 0),
+        carbs_g: Number(f.carbs_g ?? 0),
+        fat_g: Number(f.fat_g ?? 0),
+      },
+    ]);
+  };
+  const updateQty = (k: string, delta: number) =>
+    setBasket((prev) =>
+      prev
+        .map((b) => (b.key === k ? { ...b, serving_qty: Math.max(0.1, Math.round((b.serving_qty + delta) * 10) / 10) } : b))
+    );
+  const removeFromBasket = (k: string) => setBasket((prev) => prev.filter((b) => b.key !== k));
+
+  const basketTotals = basket.reduce(
+    (a, b) => ({
+      calories: a.calories + b.calories * b.serving_qty,
+      protein_g: a.protein_g + b.protein_g * b.serving_qty,
+      carbs_g: a.carbs_g + b.carbs_g * b.serving_qty,
+      fat_g: a.fat_g + b.fat_g * b.serving_qty,
+    }),
+    { calories: 0, protein_g: 0, carbs_g: 0, fat_g: 0 },
+  );
+
+  const logBasketM = useMutation({
+    mutationFn: () =>
+      logMulti({
+        data: {
+          meal_type: mealType,
+          items: basket.map(({ key: _k, ...rest }) => rest),
+        },
+      }),
+    onSuccess: (res) => {
+      qc.invalidateQueries({ queryKey: ["meals"] });
+      qc.invalidateQueries({ queryKey: ["game", "summary"] });
+      toast.success(`Tercatat ${basket.length} item · ${Math.round(basketTotals.calories)} kcal`);
+      setBasket([]);
+      (res?.game?.newlyUnlocked ?? []).forEach((a: { icon: string; title: string }) =>
+        toast.success(`${getAchievementToastPrefix(a.icon)} ${a.title} terbuka!`),
+      );
+    },
+    onError: (e) => toast.error(e instanceof Error ? e.message : "Gagal"),
+  });
 
   const { data: foods = [] } = useQuery({ queryKey: ["foods", q], queryFn: () => search({ data: { q } }) });
   const { data: meals = [] } = useQuery({ queryKey: ["meals", "today"], queryFn: () => fetchMeals() });
@@ -174,31 +249,74 @@ function FoodPage() {
 
         <section className="space-y-2">
           {foods.map((f) => (
-            <button
-              key={f.id}
-              onClick={() =>
-                logMutation.mutate({
-                  food_item_id: f.id,
-                  custom_name: null,
-                  meal_type: mealType,
-                  serving_qty: 1,
-                  calories: Number(f.calories),
-                  protein_g: Number(f.protein_g ?? 0),
-                  carbs_g: Number(f.carbs_g ?? 0),
-                  fat_g: Number(f.fat_g ?? 0),
-                })
-              }
-              className="w-full text-left bg-card p-3 rounded-2xl outline-1 outline-black/5 flex items-center gap-3 hover:bg-secondary/40 transition"
-            >
+            <div key={f.id} className="w-full text-left bg-card p-3 rounded-2xl outline-1 outline-black/5 flex items-center gap-3">
               <div className="size-12 rounded-xl bg-mint grid place-items-center text-lg">🍽️</div>
               <div className="flex-1 min-w-0">
                 <p className="font-semibold text-sm truncate">{f.name}</p>
                 <p className="text-[11px] text-muted-foreground">{Math.round(Number(f.calories))} kcal · {f.serving_size}{f.serving_unit}</p>
               </div>
-              <span className="text-primary text-xs font-bold">+ Tambah</span>
-            </button>
+              <button
+                onClick={() => addToBasket(f)}
+                className="size-9 rounded-full bg-primary/10 text-primary grid place-items-center hover:bg-primary/20"
+                aria-label="Tambah ke keranjang"
+              >
+                <Plus className="size-4" />
+              </button>
+              <button
+                onClick={() =>
+                  logMutation.mutate({
+                    food_item_id: f.id,
+                    custom_name: null,
+                    meal_type: mealType,
+                    serving_qty: 1,
+                    calories: Number(f.calories),
+                    protein_g: Number(f.protein_g ?? 0),
+                    carbs_g: Number(f.carbs_g ?? 0),
+                    fat_g: Number(f.fat_g ?? 0),
+                  })
+                }
+                className="text-primary text-xs font-bold"
+              >
+                Catat
+              </button>
+            </div>
           ))}
         </section>
+
+        {basket.length > 0 && (
+          <section className="bg-card p-4 rounded-3xl outline-1 outline-black/5 space-y-3 animate-fade-up">
+            <div className="flex items-center gap-2">
+              <ShoppingBasket className="size-4 text-primary" />
+              <h2 className="font-bold text-sm">Keranjang ({basket.length})</h2>
+              <span className="ml-auto text-sm font-bold tabular-nums">{Math.round(basketTotals.calories)} kcal</span>
+            </div>
+            <div className="space-y-2">
+              {basket.map((b) => (
+                <div key={b.key} className="flex items-center gap-2 bg-muted/40 rounded-xl px-3 py-2">
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-semibold truncate">{b.food_name}</p>
+                    <p className="text-[11px] text-muted-foreground tabular-nums">
+                      {Math.round(b.calories * b.serving_qty)} kcal · P{(b.protein_g * b.serving_qty).toFixed(0)} K{(b.carbs_g * b.serving_qty).toFixed(0)} L{(b.fat_g * b.serving_qty).toFixed(0)}
+                    </p>
+                  </div>
+                  <button onClick={() => updateQty(b.key, -0.5)} className="size-7 rounded-full bg-background grid place-items-center"><Minus className="size-3" /></button>
+                  <span className="w-8 text-center text-xs font-bold tabular-nums">{b.serving_qty}x</span>
+                  <button onClick={() => updateQty(b.key, 0.5)} className="size-7 rounded-full bg-background grid place-items-center"><Plus className="size-3" /></button>
+                  <button onClick={() => removeFromBasket(b.key)} className="text-muted-foreground hover:text-destructive">
+                    <Trash2 className="size-3.5" />
+                  </button>
+                </div>
+              ))}
+            </div>
+            <button
+              onClick={() => logBasketM.mutate()}
+              disabled={logBasketM.isPending}
+              className="w-full bg-primary text-primary-foreground font-semibold py-3 rounded-2xl disabled:opacity-50"
+            >
+              Catat semua sebagai {labelMeal(mealType).toLowerCase()}
+            </button>
+          </section>
+        )}
 
         {meals.length > 0 && (
           <section className="pt-2">
