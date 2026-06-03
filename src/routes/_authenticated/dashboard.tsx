@@ -8,6 +8,7 @@ import { currentFast } from "@/lib/fasting.functions";
 import { todaysWater, logWater } from "@/lib/water.functions";
 import { getGameSummary } from "@/lib/gamification.functions";
 import { addMood } from "@/lib/mood.functions";
+import { getAchievementToastPrefix } from "@/lib/achievement-icons";
 import { BottomNav } from "@/components/bottom-nav";
 import { CalorieRing } from "@/components/calorie-ring";
 import { formatDuration, fastingStage } from "@/lib/health";
@@ -48,7 +49,7 @@ function Dashboard() {
       qc.invalidateQueries({ queryKey: ["game", "summary"] });
       toast.success("+250ml dicatat");
       const newlyUnlocked = res?.game?.newlyUnlocked ?? [];
-      newlyUnlocked.forEach((a) => toast.success(`${a.icon} ${a.title} terbuka!`));
+      newlyUnlocked.forEach((a) => toast.success(`${getAchievementToastPrefix(a.icon)} ${a.title} terbuka!`));
     },
   });
 
