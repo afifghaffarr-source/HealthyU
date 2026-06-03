@@ -65,6 +65,7 @@ import { Route as AuthenticatedScanRecipeRouteImport } from './routes/_authentic
 import { Route as AuthenticatedScanMenuRouteImport } from './routes/_authenticated/scan.menu'
 import { Route as AuthenticatedScanHistoryRouteImport } from './routes/_authenticated/scan.history'
 import { Route as AuthenticatedScanBarcodeRouteImport } from './routes/_authenticated/scan.barcode'
+import { Route as AuthenticatedRestaurantsNearbyRouteImport } from './routes/_authenticated/restaurants.nearby'
 import { Route as AuthenticatedReportsWorkoutMatchRouteImport } from './routes/_authenticated/reports.workout-match'
 import { Route as AuthenticatedReportsWeeklyRouteImport } from './routes/_authenticated/reports.weekly'
 import { Route as AuthenticatedReportsSleepMealRouteImport } from './routes/_authenticated/reports.sleep-meal'
@@ -387,6 +388,12 @@ const AuthenticatedScanBarcodeRoute =
     path: '/barcode',
     getParentRoute: () => AuthenticatedScanRoute,
   } as any)
+const AuthenticatedRestaurantsNearbyRoute =
+  AuthenticatedRestaurantsNearbyRouteImport.update({
+    id: '/restaurants/nearby',
+    path: '/restaurants/nearby',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedReportsWorkoutMatchRoute =
   AuthenticatedReportsWorkoutMatchRouteImport.update({
     id: '/workout-match',
@@ -640,6 +647,7 @@ export interface FileRoutesByFullPath {
   '/reports/sleep-meal': typeof AuthenticatedReportsSleepMealRoute
   '/reports/weekly': typeof AuthenticatedReportsWeeklyRoute
   '/reports/workout-match': typeof AuthenticatedReportsWorkoutMatchRoute
+  '/restaurants/nearby': typeof AuthenticatedRestaurantsNearbyRoute
   '/scan/barcode': typeof AuthenticatedScanBarcodeRoute
   '/scan/history': typeof AuthenticatedScanHistoryRoute
   '/scan/menu': typeof AuthenticatedScanMenuRoute
@@ -728,6 +736,7 @@ export interface FileRoutesByTo {
   '/reports/sleep-meal': typeof AuthenticatedReportsSleepMealRoute
   '/reports/weekly': typeof AuthenticatedReportsWeeklyRoute
   '/reports/workout-match': typeof AuthenticatedReportsWorkoutMatchRoute
+  '/restaurants/nearby': typeof AuthenticatedRestaurantsNearbyRoute
   '/scan/barcode': typeof AuthenticatedScanBarcodeRoute
   '/scan/history': typeof AuthenticatedScanHistoryRoute
   '/scan/menu': typeof AuthenticatedScanMenuRoute
@@ -818,6 +827,7 @@ export interface FileRoutesById {
   '/_authenticated/reports/sleep-meal': typeof AuthenticatedReportsSleepMealRoute
   '/_authenticated/reports/weekly': typeof AuthenticatedReportsWeeklyRoute
   '/_authenticated/reports/workout-match': typeof AuthenticatedReportsWorkoutMatchRoute
+  '/_authenticated/restaurants/nearby': typeof AuthenticatedRestaurantsNearbyRoute
   '/_authenticated/scan/barcode': typeof AuthenticatedScanBarcodeRoute
   '/_authenticated/scan/history': typeof AuthenticatedScanHistoryRoute
   '/_authenticated/scan/menu': typeof AuthenticatedScanMenuRoute
@@ -908,6 +918,7 @@ export interface FileRouteTypes {
     | '/reports/sleep-meal'
     | '/reports/weekly'
     | '/reports/workout-match'
+    | '/restaurants/nearby'
     | '/scan/barcode'
     | '/scan/history'
     | '/scan/menu'
@@ -996,6 +1007,7 @@ export interface FileRouteTypes {
     | '/reports/sleep-meal'
     | '/reports/weekly'
     | '/reports/workout-match'
+    | '/restaurants/nearby'
     | '/scan/barcode'
     | '/scan/history'
     | '/scan/menu'
@@ -1085,6 +1097,7 @@ export interface FileRouteTypes {
     | '/_authenticated/reports/sleep-meal'
     | '/_authenticated/reports/weekly'
     | '/_authenticated/reports/workout-match'
+    | '/_authenticated/restaurants/nearby'
     | '/_authenticated/scan/barcode'
     | '/_authenticated/scan/history'
     | '/_authenticated/scan/menu'
@@ -1509,6 +1522,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/scan/barcode'
       preLoaderRoute: typeof AuthenticatedScanBarcodeRouteImport
       parentRoute: typeof AuthenticatedScanRoute
+    }
+    '/_authenticated/restaurants/nearby': {
+      id: '/_authenticated/restaurants/nearby'
+      path: '/restaurants/nearby'
+      fullPath: '/restaurants/nearby'
+      preLoaderRoute: typeof AuthenticatedRestaurantsNearbyRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/reports/workout-match': {
       id: '/_authenticated/reports/workout-match'
@@ -1959,6 +1979,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedWorkoutRoute: typeof AuthenticatedWorkoutRoute
   AuthenticatedHabitsStackRoute: typeof AuthenticatedHabitsStackRoute
   AuthenticatedQuizDailyRoute: typeof AuthenticatedQuizDailyRoute
+  AuthenticatedRestaurantsNearbyRoute: typeof AuthenticatedRestaurantsNearbyRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
@@ -2010,6 +2031,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedWorkoutRoute: AuthenticatedWorkoutRoute,
   AuthenticatedHabitsStackRoute: AuthenticatedHabitsStackRoute,
   AuthenticatedQuizDailyRoute: AuthenticatedQuizDailyRoute,
+  AuthenticatedRestaurantsNearbyRoute: AuthenticatedRestaurantsNearbyRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
