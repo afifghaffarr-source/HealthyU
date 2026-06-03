@@ -6,6 +6,7 @@ export const listPosts = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     const { supabase, userId } = context;
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: posts, error } = await supabase
       .from("community_posts")
       .select("id, user_id, content, category, created_at")
@@ -19,7 +20,7 @@ export const listPosts = createServerFn({ method: "GET" })
       : { data: [] as { post_id: string; user_id: string }[] };
     const userIds = Array.from(new Set((posts ?? []).map((p) => p.user_id)));
     const { data: profiles } = userIds.length
-      ? await supabase.from("profiles").select("id, full_name").in("id", userIds)
+      ? await supabaseAdmin.from("profiles").select("id, full_name").in("id", userIds)
       : { data: [] as { id: string; full_name: string | null }[] };
     const nameMap = new Map((profiles ?? []).map((p) => [p.id, p.full_name]));
 
