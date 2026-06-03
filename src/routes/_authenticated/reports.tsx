@@ -250,8 +250,13 @@ function ReportsPage() {
     doc.setFontSize(PDF_SUBTITLE_FONT_SIZE);
     doc.text("Daftar Isi", PDF_MARGIN_X, PDF_BODY_TOP_Y);
     doc.setDrawColor(PDF_DIVIDER_GRAY_STRONG);
-    doc.setLineWidth(0.5);
-    doc.line(PDF_MARGIN_X, PDF_BODY_TOP_Y + 4, PDF_PAGE_W - PDF_MARGIN_X, PDF_BODY_TOP_Y + 4);
+    doc.setLineWidth(PDF_DIVIDER_LINE_WIDTH);
+    doc.line(
+      PDF_MARGIN_X,
+      PDF_BODY_TOP_Y + PDF_SECTION_DIVIDER_OFFSET,
+      PDF_PAGE_W - PDF_MARGIN_X,
+      PDF_BODY_TOP_Y + PDF_SECTION_DIVIDER_OFFSET,
+    );
     doc.setFont("helvetica", "normal");
     doc.setFontSize(PDF_BODY_FONT_SIZE);
     // Compute how many TOC pages we need so body page numbers stay correct.
@@ -301,23 +306,34 @@ function ReportsPage() {
       doc.setFontSize(PDF_SUBTITLE_FONT_SIZE);
       doc.text("Analisis AI", PDF_MARGIN_X, PDF_BODY_TOP_Y);
       doc.setDrawColor(PDF_DIVIDER_GRAY_STRONG);
-      doc.setLineWidth(0.5);
-      doc.line(PDF_MARGIN_X, PDF_BODY_TOP_Y + 4, PDF_PAGE_W - PDF_MARGIN_X, PDF_BODY_TOP_Y + 4);
+      doc.setLineWidth(PDF_DIVIDER_LINE_WIDTH);
+      doc.line(
+        PDF_MARGIN_X,
+        PDF_BODY_TOP_Y + PDF_SECTION_DIVIDER_OFFSET,
+        PDF_PAGE_W - PDF_MARGIN_X,
+        PDF_BODY_TOP_Y + PDF_SECTION_DIVIDER_OFFSET,
+      );
       doc.setFont("helvetica", "normal");
       doc.setFontSize(PDF_BODY_FONT_SIZE);
       const lines = doc.splitTextToSize(text || "(kosong)", PDF_PAGE_CONTENT_W);
       doc.text(lines, PDF_MARGIN_X, PDF_BODY_TOP_Y + PDF_LINE_HEIGHT);
       // Back-link to TOC (page 1) in the top-right corner.
       doc.setTextColor(PDF_LINK_RGB[0], PDF_LINK_RGB[1], PDF_LINK_RGB[2]);
-      doc.setFontSize(9);
+      doc.setFontSize(PDF_LINK_FONT_SIZE);
       const linkLabel = `hal. ${currentPage} \u2190 Daftar Isi`;
       doc.text(linkLabel, PDF_LINK_RIGHT_X, PDF_LINK_BASELINE_Y, { align: "right" });
       // Underline manually (jsPDF text has no built-in underline style).
       const linkW = doc.getTextWidth(linkLabel);
       doc.setDrawColor(PDF_LINK_RGB[0], PDF_LINK_RGB[1], PDF_LINK_RGB[2]);
-      doc.setLineWidth(0.5);
+      doc.setLineWidth(PDF_DIVIDER_LINE_WIDTH);
       doc.line(PDF_LINK_RIGHT_X - linkW, PDF_LINK_BASELINE_Y + PDF_LINK_UNDERLINE_OFFSET, PDF_LINK_RIGHT_X, PDF_LINK_BASELINE_Y + PDF_LINK_UNDERLINE_OFFSET);
-      doc.link(PDF_LINK_RIGHT_X - linkW - 4, PDF_LINK_BASELINE_Y - 10, linkW + 8, 16, { pageNumber: 1 });
+      doc.link(
+        PDF_LINK_RIGHT_X - linkW - PDF_LINK_BOUND_OFFSET,
+        PDF_LINK_BASELINE_Y - 10,
+        linkW + PDF_LINK_BOUND_OFFSET * 2,
+        PDF_LINK_BOUND_HEIGHT,
+        { pageNumber: 1 },
+      );
       // Tooltip hover via Text annotation overlay (jsPDF link option does
       // not carry /Contents — we add a sibling annotation with the same bounds).
       (
@@ -335,7 +351,12 @@ function ReportsPage() {
       ).createAnnotation({
         type: "text",
         title: "Navigasi",
-        bounds: { x: PDF_LINK_RIGHT_X - linkW - 4, y: PDF_LINK_BASELINE_Y - 10, w: linkW + 8, h: 16 },
+        bounds: {
+          x: PDF_LINK_RIGHT_X - linkW - PDF_LINK_BOUND_OFFSET,
+          y: PDF_LINK_BASELINE_Y - 10,
+          w: linkW + PDF_LINK_BOUND_OFFSET * 2,
+          h: PDF_LINK_BOUND_HEIGHT,
+        },
         contents: `Halaman ${currentPage} dari ${tocPages + filtered.length}`,
         open: false,
         // Sembunyikan ikon sticky-note default; hanya tooltip hover yang aktif.
@@ -359,7 +380,7 @@ function ReportsPage() {
       doc.setTextColor(PDF_MUTED_GRAY);
       // Divider tipis di atas baris footer.
       doc.setDrawColor(PDF_DIVIDER_GRAY);
-      doc.setLineWidth(0.5);
+      doc.setLineWidth(PDF_DIVIDER_LINE_WIDTH);
       doc.line(
         PDF_MARGIN_X,
         PDF_PAGE_FOOTER_Y - PDF_FOOTER_DIVIDER_OFFSET,
@@ -367,11 +388,11 @@ function ReportsPage() {
         PDF_PAGE_FOOTER_Y - PDF_FOOTER_DIVIDER_OFFSET,
       );
       doc.text(
-        `${PDF_FOOTER_BRAND_LABEL} ${exportedAt}`,
+        `${t("pdf.footer.brandLabel")} ${exportedAt}`,
         PDF_MARGIN_X,
         PDF_PAGE_FOOTER_Y,
       );
-      doc.text(`${PDF_FOOTER_PAGE_LABEL} ${p} / ${totalPages}`, pageRightX, PDF_PAGE_FOOTER_Y, {
+      doc.text(`${t("pdf.footer.pageLabel")} ${p} / ${totalPages}`, pageRightX, PDF_PAGE_FOOTER_Y, {
         align: "right",
       });
       doc.setTextColor(0);
@@ -506,8 +527,13 @@ function ReportsPage() {
     doc.setFontSize(PDF_SUBTITLE_FONT_SIZE);
     doc.text("Analisis AI", PDF_MARGIN_X, PDF_BODY_TOP_Y);
       doc.setDrawColor(PDF_DIVIDER_GRAY_STRONG);
-      doc.setLineWidth(0.5);
-      doc.line(PDF_MARGIN_X, PDF_BODY_TOP_Y + 4, PDF_PAGE_W - PDF_MARGIN_X, PDF_BODY_TOP_Y + 4);
+      doc.setLineWidth(PDF_DIVIDER_LINE_WIDTH);
+      doc.line(
+        PDF_MARGIN_X,
+        PDF_BODY_TOP_Y + PDF_SECTION_DIVIDER_OFFSET,
+        PDF_PAGE_W - PDF_MARGIN_X,
+        PDF_BODY_TOP_Y + PDF_SECTION_DIVIDER_OFFSET,
+      );
     doc.setFont("helvetica", "normal");
     doc.setFontSize(PDF_BODY_FONT_SIZE);
     const lines = doc.splitTextToSize(text || "(kosong)", PDF_PAGE_CONTENT_W);
