@@ -11,6 +11,7 @@
     "lint": "eslint .",
     "lint:constants": "eslint src/lib/constants.ts",
     "precommit": "bun run lint:constants && bun run lint",
+    "test": "vitest run",
     "format": "prettier --write ."
   },
   "dependencies": {
