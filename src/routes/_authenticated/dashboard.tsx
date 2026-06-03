@@ -368,10 +368,25 @@ function Dashboard() {
                   key={i}
                   to="/challenges"
                   search={{ group: g.group_id, challenge: g.challenge_id }}
+                  onClick={() =>
+                    setNewClaims((cur) => {
+                      if (!cur[g.group_id]) return cur;
+                      const copy = { ...cur };
+                      delete copy[g.group_id];
+                      return copy;
+                    })
+                  }
                   className="flex items-center justify-between text-xs hover:bg-muted/50 rounded-xl p-1 -m-1"
                 >
                   <div className="min-w-0 flex-1">
-                    <p className="font-semibold truncate">{g.challenge}</p>
+                    <p className="font-semibold truncate inline-flex items-center gap-1.5">
+                      <span className="truncate">{g.challenge}</span>
+                      {(newClaims[g.group_id] ?? 0) > 0 && (
+                        <span className="shrink-0 text-[9px] font-bold uppercase bg-amber-100 text-amber-800 rounded-full px-1.5 py-0.5">
+                          +{newClaims[g.group_id]} klaim baru
+                        </span>
+                      )}
+                    </p>
                     <p className="text-[10px] text-muted-foreground truncate">{g.group}</p>
                   </div>
                   <div className="text-right shrink-0 ml-2">
