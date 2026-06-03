@@ -1,0 +1,5 @@
+
+CREATE SCHEMA IF NOT EXISTS extensions;
+ALTER EXTENSION pg_trgm SET SCHEMA extensions;
+ALTER EXTENSION unaccent SET SCHEMA extensions;
+GRANT USAGE ON SCHEMA extensions TO anon, authenticated, service_role;

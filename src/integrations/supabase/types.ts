@@ -183,51 +183,119 @@ export type Database = {
       }
       food_items: {
         Row: {
+          allergens: string[] | null
           calories: number
           carbs_g: number | null
           category: string | null
           created_at: string
+          data_confidence: number | null
+          data_source: string | null
           fat_g: number | null
           fiber_g: number | null
+          glycemic_index: number | null
           id: string
+          image_url: string | null
           is_indonesian: boolean | null
           name: string
           name_en: string | null
+          popularity_score: number | null
           protein_g: number | null
+          region: string | null
           serving_size: number | null
           serving_unit: string | null
+          sodium_mg: number | null
+          subcategory: string | null
+          sugar_g: number | null
+          tags: string[] | null
         }
         Insert: {
+          allergens?: string[] | null
           calories: number
           carbs_g?: number | null
           category?: string | null
           created_at?: string
+          data_confidence?: number | null
+          data_source?: string | null
           fat_g?: number | null
           fiber_g?: number | null
+          glycemic_index?: number | null
           id?: string
+          image_url?: string | null
           is_indonesian?: boolean | null
           name: string
           name_en?: string | null
+          popularity_score?: number | null
           protein_g?: number | null
+          region?: string | null
           serving_size?: number | null
           serving_unit?: string | null
+          sodium_mg?: number | null
+          subcategory?: string | null
+          sugar_g?: number | null
+          tags?: string[] | null
         }
         Update: {
+          allergens?: string[] | null
           calories?: number
           carbs_g?: number | null
           category?: string | null
           created_at?: string
+          data_confidence?: number | null
+          data_source?: string | null
           fat_g?: number | null
           fiber_g?: number | null
+          glycemic_index?: number | null
           id?: string
+          image_url?: string | null
           is_indonesian?: boolean | null
           name?: string
           name_en?: string | null
+          popularity_score?: number | null
           protein_g?: number | null
+          region?: string | null
           serving_size?: number | null
           serving_unit?: string | null
+          sodium_mg?: number | null
+          subcategory?: string | null
+          sugar_g?: number | null
+          tags?: string[] | null
         }
         Relationships: []
+      }
+      food_serving_sizes: {
+        Row: {
+          created_at: string
+          food_item_id: string
+          grams: number
+          id: string
+          is_default: boolean
+          label: string
+        }
+        Insert: {
+          created_at?: string
+          food_item_id: string
+          grams: number
+          id?: string
+          is_default?: boolean
+          label: string
+        }
+        Update: {
+          created_at?: string
+          food_item_id?: string
+          grams?: number
+          id?: string
+          is_default?: boolean
+          label?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "food_serving_sizes_food_item_id_fkey"
+            columns: ["food_item_id"]
+            isOneToOne: false
+            referencedRelation: "food_items"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       meal_logs: {
         Row: {
