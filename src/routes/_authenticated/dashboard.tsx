@@ -48,6 +48,8 @@ function Dashboard() {
     queryKey: ["unlinked-joined-challenges"],
     queryFn: () => fetchUnlinked(),
   });
+  // Persistent per-group "+N klaim baru" counter, cleared when user clicks
+  const [newClaims, setNewClaims] = useState<Record<string, number>>({});
 
   // Realtime: refresh group challenge summary when bonuses/redemptions change
   useEffect(() => {
@@ -79,6 +81,8 @@ function Dashboard() {
         async (payload) => {
           const row = payload.new as { user_id?: string; group_id?: string } | null;
           if (row?.user_id && row?.group_id) {
+            const gid = row.group_id;
+            setNewClaims((cur) => ({ ...cur, [gid]: (cur[gid] ?? 0) + 1 }));
             try {
               const [{ data: prof }, { data: grp }] = await Promise.all([
                 supabase.from("profiles").select("full_name").eq("id", row.user_id).maybeSingle(),
@@ -86,10 +90,10 @@ function Dashboard() {
               ]);
               const name = prof?.full_name ?? "Seseorang";
               const groupName = grp?.name ?? "grup";
-              const entry = buffer.get(row.group_id) ?? { groupName, names: new Set<string>() };
+              const entry = buffer.get(gid) ?? { groupName, names: new Set<string>() };
               entry.names.add(name);
               entry.groupName = groupName;
-              buffer.set(row.group_id, entry);
+              buffer.set(gid, entry);
               if (flushTimer) clearTimeout(flushTimer);
               flushTimer = setTimeout(flush, 5000);
             } catch {
