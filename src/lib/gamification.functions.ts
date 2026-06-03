@@ -106,7 +106,7 @@ export async function recordActivityFor(
       .from("user_achievements")
       .select("achievement_id")
       .eq("user_id", userId);
-    const unlockedIds = new Set((unlocked ?? []).map((u) => u.achievement_id));
+    const unlockedIds = new Set((unlocked ?? []).map((u: { achievement_id: string }) => u.achievement_id));
     const toUnlock: string[] = [];
 
     const tryUnlock = (id: string) => {
@@ -124,7 +124,10 @@ export async function recordActivityFor(
         .eq("user_id", userId)
         .gte("logged_at", start)
         .lt("logged_at", end);
-      const total = (waterRows ?? []).reduce((s, r) => s + (r.amount_ml ?? 0), 0);
+      const total = (waterRows ?? []).reduce(
+        (s: number, r: { amount_ml: number | null }) => s + (r.amount_ml ?? 0),
+        0,
+      );
       if (total >= 2000) tryUnlock("hydration_hero");
     }
 
@@ -148,7 +151,7 @@ export async function recordActivityFor(
         }
         await supabase
           .from("user_achievements")
-          .insert(catalog.map((a) => ({ user_id: userId, achievement_id: a.id })));
+          .insert(catalog.map((a: { id: string }) => ({ user_id: userId, achievement_id: a.id })));
       }
     }
 
