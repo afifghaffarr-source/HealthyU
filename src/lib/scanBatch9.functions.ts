@@ -163,10 +163,10 @@ export const scanBarcode = createServerFn({ method: "POST" })
       carbs_g: num(n.carbohydrates_100g),
       fat_g: num(n.fat_100g),
       allergens: (p.allergens_tags as string[] | undefined)?.map((a) => a.replace(/^en:/, "")) ?? null,
-      raw: p,
+      raw: JSON.parse(JSON.stringify(p)) as never,
     };
-    await supabase.from("barcode_cache").insert(product);
-    return { product, cached: false };
+    await supabase.from("barcode_cache").insert(product as never);
+    return { product: product as unknown as Record<string, unknown>, cached: false };
   });
 
 // ---------- Story photo upload metadata ----------
