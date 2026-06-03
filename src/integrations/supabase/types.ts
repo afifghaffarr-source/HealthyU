@@ -179,6 +179,30 @@ export type Database = {
         }
         Relationships: []
       }
+      ai_weekly_reports: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          user_id: string
+          week_start: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          user_id: string
+          week_start: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          user_id?: string
+          week_start?: string
+        }
+        Relationships: []
+      }
       app_versions: {
         Row: {
           build_number: number | null
@@ -1038,6 +1062,30 @@ export type Database = {
         }
         Relationships: []
       }
+      currency_rates: {
+        Row: {
+          base: string
+          fetched_at: string
+          id: string
+          quote: string
+          rate: number
+        }
+        Insert: {
+          base?: string
+          fetched_at?: string
+          id?: string
+          quote: string
+          rate: number
+        }
+        Update: {
+          base?: string
+          fetched_at?: string
+          id?: string
+          quote?: string
+          rate?: number
+        }
+        Relationships: []
+      }
       daily_quotes: {
         Row: {
           category: string | null
@@ -1100,6 +1148,36 @@ export type Database = {
           source?: string
           steps?: number
           updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      doctor_referrals: {
+        Row: {
+          created_at: string
+          id: string
+          notes: string | null
+          reason: string
+          recommended_specialist: string | null
+          urgency: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          notes?: string | null
+          reason: string
+          recommended_specialist?: string | null
+          urgency?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          notes?: string | null
+          reason?: string
+          recommended_specialist?: string | null
+          urgency?: string
           user_id?: string
         }
         Relationships: []
@@ -1212,6 +1290,39 @@ export type Database = {
           times_performed?: number
           updated_at?: string
           video_url?: string | null
+        }
+        Relationships: []
+      }
+      family_invites: {
+        Row: {
+          created_at: string
+          created_by: string
+          expires_at: string
+          id: string
+          plan_id: string
+          token: string
+          used_at: string | null
+          used_by: string | null
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          expires_at?: string
+          id?: string
+          plan_id: string
+          token: string
+          used_at?: string | null
+          used_by?: string | null
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          expires_at?: string
+          id?: string
+          plan_id?: string
+          token?: string
+          used_at?: string | null
+          used_by?: string | null
         }
         Relationships: []
       }
@@ -2393,6 +2504,30 @@ export type Database = {
         }
         Relationships: []
       }
+      meditation_sessions: {
+        Row: {
+          completed_at: string
+          duration_min: number
+          id: string
+          type: string
+          user_id: string
+        }
+        Insert: {
+          completed_at?: string
+          duration_min: number
+          id?: string
+          type?: string
+          user_id: string
+        }
+        Update: {
+          completed_at?: string
+          duration_min?: number
+          id?: string
+          type?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       mood_logs: {
         Row: {
           anxiety_level: number | null
@@ -2572,6 +2707,39 @@ export type Database = {
           read_at?: string | null
           sent_at?: string | null
           title?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      notifications_log: {
+        Row: {
+          body: string | null
+          created_at: string
+          id: string
+          link: string | null
+          read: boolean
+          title: string
+          type: string
+          user_id: string
+        }
+        Insert: {
+          body?: string | null
+          created_at?: string
+          id?: string
+          link?: string | null
+          read?: boolean
+          title: string
+          type: string
+          user_id: string
+        }
+        Update: {
+          body?: string | null
+          created_at?: string
+          id?: string
+          link?: string | null
+          read?: boolean
+          title?: string
+          type?: string
           user_id?: string
         }
         Relationships: []
@@ -3249,6 +3417,36 @@ export type Database = {
           referrer_id?: string
           referrer_reward_coins?: number
           status?: string
+        }
+        Relationships: []
+      }
+      restaurants_nearby: {
+        Row: {
+          address: string | null
+          cached_at: string
+          id: string
+          lat: number
+          lng: number
+          menu: Json | null
+          name: string
+        }
+        Insert: {
+          address?: string | null
+          cached_at?: string
+          id?: string
+          lat: number
+          lng: number
+          menu?: Json | null
+          name: string
+        }
+        Update: {
+          address?: string | null
+          cached_at?: string
+          id?: string
+          lat?: number
+          lng?: number
+          menu?: Json | null
+          name?: string
         }
         Relationships: []
       }
