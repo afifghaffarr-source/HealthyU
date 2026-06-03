@@ -4,7 +4,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { weeklyReport, weeklyAiAnalysis, listAiReports } from "@/lib/reports.functions";
 import { BottomNav } from "@/components/bottom-nav";
 import { ArrowLeft, Download, FileText, Sparkles, Loader2, Share2 } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
@@ -39,6 +39,7 @@ function ReportsPage() {
   const listFn = useServerFn(listAiReports);
   const qc = useQueryClient();
   const [rangeWeeks, setRangeWeeks] = useState<number>(0); // 0 = semua
+  const manualGenAtRef = useRef<number>(0);
   const { data } = useQuery({
     queryKey: ["report", 7],
     queryFn: () => fetchFn({ data: { days: 7 } }),
@@ -89,7 +90,11 @@ function ReportsPage() {
           // immediately without waiting for the user to open it.
           qc.setQueryData(["profile-last-seen-report"], null);
           qc.invalidateQueries({ queryKey: ["ai-reports"] });
-          toast.success("📄 Laporan minggu baru tersedia");
+          // Suppress when the INSERT was caused by the user's own manual
+          // generation (toast would duplicate aiMut's result).
+          if (Date.now() - manualGenAtRef.current > 10000) {
+            toast.success("📄 Laporan minggu baru tersedia");
+          }
         },
       )
       .subscribe();
@@ -98,7 +103,10 @@ function ReportsPage() {
     };
   }, [qc]);
   const aiMut = useMutation({
-    mutationFn: () => aiFn({ data: { days: 7 } }),
+    mutationFn: () => {
+      manualGenAtRef.current = Date.now();
+      return aiFn({ data: { days: 7 } });
+    },
     onSuccess: () => qc.invalidateQueries({ queryKey: ["ai-reports"] }),
     onError: (e) => toast.error(e instanceof Error ? e.message : "Gagal generate"),
   });

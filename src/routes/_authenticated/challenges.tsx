@@ -86,6 +86,7 @@ function ChallengesPage() {
     (data?.participations ?? []).map((p) => [p.challenge_id, p] as const),
   );
   const [openLb, setOpenLb] = useState<string | null>(null);
+  const [streakAutoChallenge, setStreakAutoChallenge] = useState<string | null>(null);
   const articleRefs = useRef<Record<string, HTMLElement | null>>({});
 
   useEffect(() => {
@@ -106,6 +107,7 @@ function ChallengesPage() {
     const top = parts.slice().sort((a, b) => (b.streak ?? 0) - (a.streak ?? 0))[0];
     if (!top?.challenge_id) return;
     setOpenLb(top.challenge_id);
+    setStreakAutoChallenge(top.challenge_id);
     const t = setTimeout(() => {
       articleRefs.current[top.challenge_id]?.scrollIntoView({ behavior: "smooth", block: "start" });
     }, 250);
@@ -253,7 +255,13 @@ function ChallengesPage() {
                 <Medal className="size-3" />
                 {openLb === c.id ? "Sembunyikan leaderboard" : "Lihat leaderboard"}
               </button>
-              {openLb === c.id && <Leaderboard challengeId={c.id} initialGroup={focusChallenge === c.id ? focusGroup : undefined} />}
+              {openLb === c.id && (
+                <Leaderboard
+                  challengeId={c.id}
+                  initialGroup={focusChallenge === c.id ? focusGroup : undefined}
+                  autoSelectFirstGroup={streakAutoChallenge === c.id}
+                />
+              )}
               {joined && (
                 <GroupInviter
                   challengeId={c.id}
@@ -271,7 +279,15 @@ function ChallengesPage() {
   );
 }
 
-function Leaderboard({ challengeId, initialGroup }: { challengeId: string; initialGroup?: string }) {
+function Leaderboard({
+  challengeId,
+  initialGroup,
+  autoSelectFirstGroup,
+}: {
+  challengeId: string;
+  initialGroup?: string;
+  autoSelectFirstGroup?: boolean;
+}) {
   const fetchLb = useServerFn(getChallengeLeaderboard);
   const fetchGroups = useServerFn(listChallengeGroups);
   const [mode, setMode] = useState<"all" | "friends" | string>(initialGroup ?? "all");
@@ -279,6 +295,12 @@ function Leaderboard({ challengeId, initialGroup }: { challengeId: string; initi
     queryKey: ["challenge-groups", challengeId],
     queryFn: () => fetchGroups({ data: { challenge_id: challengeId } }),
   });
+  useEffect(() => {
+    if (!autoSelectFirstGroup) return;
+    if (mode !== "all") return;
+    if (groups.length === 0) return;
+    setMode(groups[0].id);
+  }, [autoSelectFirstGroup, groups, mode]);
   const { data: rows = [], isLoading } = useQuery({
     queryKey: ["challenge-lb", challengeId, mode],
     queryFn: () =>

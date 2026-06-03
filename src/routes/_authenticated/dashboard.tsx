@@ -48,6 +48,8 @@ function Dashboard() {
     queryKey: ["unlinked-joined-challenges"],
     queryFn: () => fetchUnlinked(),
   });
+  // Persistent per-group "+N klaim baru" counter, cleared when user clicks
+  const [newClaims, setNewClaims] = useState<Record<string, number>>({});
 
   // Realtime: refresh group challenge summary when bonuses/redemptions change
   useEffect(() => {
@@ -79,6 +81,8 @@ function Dashboard() {
         async (payload) => {
           const row = payload.new as { user_id?: string; group_id?: string } | null;
           if (row?.user_id && row?.group_id) {
+            const gid = row.group_id;
+            setNewClaims((cur) => ({ ...cur, [gid]: (cur[gid] ?? 0) + 1 }));
             try {
               const [{ data: prof }, { data: grp }] = await Promise.all([
                 supabase.from("profiles").select("full_name").eq("id", row.user_id).maybeSingle(),
@@ -86,10 +90,10 @@ function Dashboard() {
               ]);
               const name = prof?.full_name ?? "Seseorang";
               const groupName = grp?.name ?? "grup";
-              const entry = buffer.get(row.group_id) ?? { groupName, names: new Set<string>() };
+              const entry = buffer.get(gid) ?? { groupName, names: new Set<string>() };
               entry.names.add(name);
               entry.groupName = groupName;
-              buffer.set(row.group_id, entry);
+              buffer.set(gid, entry);
               if (flushTimer) clearTimeout(flushTimer);
               flushTimer = setTimeout(flush, 5000);
             } catch {
@@ -364,10 +368,25 @@ function Dashboard() {
                   key={i}
                   to="/challenges"
                   search={{ group: g.group_id, challenge: g.challenge_id }}
+                  onClick={() =>
+                    setNewClaims((cur) => {
+                      if (!cur[g.group_id]) return cur;
+                      const copy = { ...cur };
+                      delete copy[g.group_id];
+                      return copy;
+                    })
+                  }
                   className="flex items-center justify-between text-xs hover:bg-muted/50 rounded-xl p-1 -m-1"
                 >
                   <div className="min-w-0 flex-1">
-                    <p className="font-semibold truncate">{g.challenge}</p>
+                    <p className="font-semibold truncate inline-flex items-center gap-1.5">
+                      <span className="truncate">{g.challenge}</span>
+                      {(newClaims[g.group_id] ?? 0) > 0 && (
+                        <span className="shrink-0 text-[9px] font-bold uppercase bg-amber-100 text-amber-800 rounded-full px-1.5 py-0.5">
+                          +{newClaims[g.group_id]} klaim baru
+                        </span>
+                      )}
+                    </p>
                     <p className="text-[10px] text-muted-foreground truncate">{g.group}</p>
                   </div>
                   <div className="text-right shrink-0 ml-2">
