@@ -29,6 +29,7 @@ function RecipesPage() {
   const [cat, setCat] = useState<(typeof CATS)[number]["id"]>("all");
   const [q, setQ] = useState("");
   const [sort, setSort] = useState<SortMode>("title");
+  const [trendingOnly, setTrendingOnly] = useState(false);
   const [aiOpen, setAiOpen] = useState(false);
   const [ingredients, setIngredients] = useState("");
   const [prefs, setPrefs] = useState("");
@@ -41,6 +42,7 @@ function RecipesPage() {
   });
   const items = all
     .filter((r) => cat === "all" || r.category === cat)
+    .filter((r) => (sort === "trending" && trendingOnly ? Number(r.weekly_growth ?? 0) > 0 : true))
     .filter((r) => {
       if (!q.trim()) return true;
       const s = q.toLowerCase();
@@ -151,6 +153,16 @@ function RecipesPage() {
           >
             <TrendingUp className="size-3" /> Trending
           </button>
+          {sort === "trending" && (
+            <button
+              onClick={() => setTrendingOnly((v) => !v)}
+              className={`px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap ${
+                trendingOnly ? "bg-orange-100 text-orange-700 outline-1 outline-orange-300" : "bg-card outline-1 outline-black/10"
+              }`}
+            >
+              Hanya trending
+            </button>
+          )}
         </div>
 
         <section className="space-y-3">
