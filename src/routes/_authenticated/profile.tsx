@@ -276,6 +276,13 @@ function ProfilePage() {
             <AlertTriangle className="size-5 text-amber-600" />
             <span className="text-sm font-semibold">Sync Gagal</span>
           </Link>
+          <Link
+            to="/notifications"
+            className="bg-card p-4 rounded-2xl outline-1 outline-black/10 flex flex-col items-start gap-2"
+          >
+            <Bell className="size-5 text-primary" />
+            <span className="text-sm font-semibold">Notifikasi</span>
+          </Link>
         </section>
 
         <button
