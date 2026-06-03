@@ -278,11 +278,11 @@ function ReportsPage() {
       "📊 *Laporan HealthyU 7 Hari*",
       "",
       `🍽️ Total kalori masuk: ${Math.round(summary!.totals.cals)} kcal`,
-      `🔥 Kalori terbakar: ${summary.totals.burn} kcal`,
-      `💧 Total air: ${(summary.totals.ml / 1000).toFixed(1)} L`,
-      `😴 Total tidur: ${summary.totals.hours.toFixed(1)} jam`,
-      `🏃 Latihan: ${summary.workoutCount} sesi`,
-      `⏱️ Puasa selesai: ${summary.fastingDone} sesi`,
+      `🔥 Kalori terbakar: ${summary!.totals.burn} kcal`,
+      `💧 Total air: ${(summary!.totals.ml / 1000).toFixed(1)} L`,
+      `😴 Total tidur: ${summary!.totals.hours.toFixed(1)} jam`,
+      `🏃 Latihan: ${summary!.workoutCount} sesi`,
+      `⏱️ Puasa selesai: ${summary!.fastingDone} sesi`,
       "",
       aiMut.data?.report
         ? `_${aiMut.data.report.slice(0, 400)}${aiMut.data.report.length > 400 ? "…" : ""}_`
@@ -372,7 +372,7 @@ function ReportsPage() {
             <FileText className="size-4" /> <span className="text-sm">PDF</span>
           </button>
           <button
-            onClick={shareWhatsapp}
+            onClick={() => shareWhatsapp()}
             className="flex items-center justify-center gap-2 bg-[#25D366] text-white font-semibold py-3 rounded-2xl"
           >
             <Share2 className="size-4" /> <span className="text-sm">WA</span>
