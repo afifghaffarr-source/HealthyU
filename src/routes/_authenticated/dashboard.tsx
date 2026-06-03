@@ -7,10 +7,11 @@ import { todaysMeals } from "@/lib/meals.functions";
 import { currentFast } from "@/lib/fasting.functions";
 import { todaysWater, logWater } from "@/lib/water.functions";
 import { getGameSummary } from "@/lib/gamification.functions";
+import { addMood } from "@/lib/mood.functions";
 import { BottomNav } from "@/components/bottom-nav";
 import { CalorieRing } from "@/components/calorie-ring";
 import { formatDuration, fastingStage } from "@/lib/health";
-import { Droplet, Plus, Sparkles, ArrowRight, Flame, Trophy, Camera } from "lucide-react";
+import { Droplet, Plus, Sparkles, ArrowRight, Flame, Trophy, Camera, Smile } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
@@ -26,6 +27,7 @@ function Dashboard() {
   const fetchWater = useServerFn(todaysWater);
   const logWaterFn = useServerFn(logWater);
   const fetchGame = useServerFn(getGameSummary);
+  const addMoodFn = useServerFn(addMood);
 
   const { data: profile, isLoading: pLoad } = useQuery({ queryKey: ["profile"], queryFn: () => fetchProfile() });
   const { data: meals = [] } = useQuery({ queryKey: ["meals", "today"], queryFn: () => fetchMeals() });
@@ -47,6 +49,14 @@ function Dashboard() {
       toast.success("+250ml dicatat");
       const newlyUnlocked = res?.game?.newlyUnlocked ?? [];
       newlyUnlocked.forEach((a) => toast.success(`${a.icon} ${a.title} terbuka!`));
+    },
+  });
+
+  const moodMutation = useMutation({
+    mutationFn: (mood: number) => addMoodFn({ data: { mood } }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["mood"] });
+      toast.success("Mood tercatat");
     },
   });
 
@@ -166,6 +176,36 @@ function Dashboard() {
         </Link>
 
         {/* AI Scan CTA */}
+        {/* Mood quick log */}
+        <Link
+          to="/mood"
+          className="bg-card p-4 rounded-3xl outline-1 outline-black/5 shadow-sm flex items-center gap-3 animate-fade-up"
+        >
+          <div className="size-12 rounded-2xl bg-amber-100 grid place-items-center">
+            <Smile className="size-5 text-amber-600" />
+          </div>
+          <div className="flex-1">
+            <p className="text-xs font-bold uppercase text-muted-foreground tracking-wider">Mood hari ini</p>
+            <div className="flex gap-1 mt-1">
+              {[1, 2, 3, 4, 5].map((m) => (
+                <button
+                  key={m}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    moodMutation.mutate(m);
+                  }}
+                  disabled={moodMutation.isPending}
+                  className="text-xl hover:scale-125 transition-transform"
+                  aria-label={`Mood ${m}`}
+                >
+                  {["😢", "😕", "😐", "🙂", "😄"][m - 1]}
+                </button>
+              ))}
+            </div>
+          </div>
+        </Link>
+
         <Link
           to="/scan"
           className="block bg-card p-4 rounded-3xl outline-1 outline-primary/20 shadow-sm flex items-center gap-4 animate-fade-up"
