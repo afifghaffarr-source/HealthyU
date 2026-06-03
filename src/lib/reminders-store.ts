@@ -5,6 +5,7 @@ export type ReminderCategory =
   | "sleep"
   | "medication"
   | "fasting"
+  | "prayer"
   | "custom";
 
 export type Reminder = {
@@ -49,4 +50,76 @@ export function loadReminders(): Reminder[] {
 export function saveReminders(items: Reminder[]) {
   if (typeof window === "undefined") return;
   localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
+}
+
+export const PRAYER_PREFS_KEY = "prayer-notif-prefs-v1";
+
+export type PrayerPrefs = {
+  enabled: boolean;
+  sahur: boolean;
+  iftar: boolean;
+  fajr: boolean;
+  dhuhr: boolean;
+  asr: boolean;
+  maghrib: boolean;
+  isha: boolean;
+};
+
+export const DEFAULT_PRAYER_PREFS: PrayerPrefs = {
+  enabled: false,
+  sahur: true,
+  iftar: true,
+  fajr: true,
+  dhuhr: true,
+  asr: true,
+  maghrib: true,
+  isha: true,
+};
+
+export function loadPrayerPrefs(): PrayerPrefs {
+  if (typeof window === "undefined") return DEFAULT_PRAYER_PREFS;
+  try {
+    const raw = localStorage.getItem(PRAYER_PREFS_KEY);
+    if (!raw) return DEFAULT_PRAYER_PREFS;
+    return { ...DEFAULT_PRAYER_PREFS, ...(JSON.parse(raw) as Partial<PrayerPrefs>) };
+  } catch {
+    return DEFAULT_PRAYER_PREFS;
+  }
+}
+
+export function savePrayerPrefs(p: PrayerPrefs) {
+  if (typeof window === "undefined") return;
+  localStorage.setItem(PRAYER_PREFS_KEY, JSON.stringify(p));
+}
+
+function shift(time: string, deltaMin: number): string {
+  const [h, m] = time.split(":").map(Number);
+  let total = h * 60 + m + deltaMin;
+  total = ((total % 1440) + 1440) % 1440;
+  return `${String(Math.floor(total / 60)).padStart(2, "0")}:${String(total % 60).padStart(2, "0")}`;
+}
+
+export type PrayerTimings = {
+  Fajr: string; Dhuhr: string; Asr: string; Maghrib: string; Isha: string;
+};
+
+/** Replace all reminders with id prefix "prayer-" using current times + prefs. */
+export function syncPrayerReminders(times: PrayerTimings, prefs: PrayerPrefs) {
+  const others = loadReminders().filter((r) => !r.id.startsWith("prayer-"));
+  if (!prefs.enabled) {
+    saveReminders(others);
+    return;
+  }
+  const next: Reminder[] = [...others];
+  const add = (id: string, label: string, time: string, enabled: boolean) => {
+    if (!enabled) return;
+    next.push({ id, label, time: time.slice(0, 5), enabled: true, category: "prayer", days: [] });
+  };
+  add("prayer-sahur", "Waktu sahur (10 menit sebelum Subuh)", shift(times.Fajr, -20), prefs.sahur);
+  add("prayer-fajr", "Adzan Subuh", times.Fajr, prefs.fajr);
+  add("prayer-dhuhr", "Adzan Dzuhur", times.Dhuhr, prefs.dhuhr);
+  add("prayer-asr", "Adzan Ashar", times.Asr, prefs.asr);
+  add("prayer-maghrib", "Adzan Maghrib · Waktu berbuka", times.Maghrib, prefs.maghrib || prefs.iftar);
+  add("prayer-isha", "Adzan Isya", times.Isha, prefs.isha);
+  saveReminders(next);
 }
