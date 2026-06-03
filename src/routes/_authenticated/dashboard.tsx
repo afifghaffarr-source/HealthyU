@@ -432,6 +432,12 @@ function Dashboard() {
                   GROUP_BONUS_BADGE_TTL_MS - (nowTick - latestTs),
                 );
                 const pct = Math.round((remaining / GROUP_BONUS_BADGE_TTL_MS) * 100);
+                const breakdown = Object.entries(newClaims)
+                  .map(([gid, n]) => {
+                    const g = groupSummary.find((x) => x.group_id === gid);
+                    return `${g?.group ?? "Grup"}: +${n}`;
+                  })
+                  .join(" · ");
                 return (
                   <button
                     onClick={() => {
@@ -439,7 +445,7 @@ function Dashboard() {
                       navigate({ to: "/challenges" });
                     }}
                     className="ml-auto relative text-[9px] font-bold uppercase bg-amber-100 text-amber-800 rounded-full pl-2 pr-2 pt-0.5 pb-1 overflow-hidden"
-                    title="Lihat semua leaderboard"
+                    title={breakdown ? `${breakdown} — klik untuk lihat semua` : "Lihat semua leaderboard"}
                   >
                     +{total} klaim baru
                     <span
