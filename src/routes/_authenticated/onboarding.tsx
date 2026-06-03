@@ -5,10 +5,46 @@ import { useServerFn } from "@tanstack/react-start";
 import { getProfile, updateProfile } from "@/lib/profile.functions";
 import { calcAge, calcBMR, calcTDEE, type ActivityLevel } from "@/lib/health";
 import { toast } from "sonner";
+import { Check } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/onboarding")({
   component: Onboarding,
 });
+
+type Goal = "lose" | "maintain" | "gain";
+
+const HEALTH_CONDITIONS = [
+  "Diabetes",
+  "Hipertensi",
+  "Kolesterol tinggi",
+  "Asam lambung / GERD",
+  "Asam urat",
+  "PCOS",
+  "Tiroid",
+  "Penyakit jantung",
+] as const;
+
+const ALLERGIES = [
+  "Kacang",
+  "Susu / laktosa",
+  "Telur",
+  "Gluten",
+  "Seafood",
+  "Kedelai",
+  "Ikan",
+  "Wijen",
+] as const;
+
+const DIETARY = [
+  ["balanced", "Seimbang"],
+  ["high_protein", "Tinggi protein"],
+  ["low_carb", "Rendah karbo"],
+  ["vegetarian", "Vegetarian"],
+  ["vegan", "Vegan"],
+  ["halal", "Halal tradisional"],
+] as const;
+
+const TOTAL_STEPS = 5;
 
 function Onboarding() {
   const navigate = useNavigate();
@@ -19,6 +55,7 @@ function Onboarding() {
   const { data: profile } = useQuery({ queryKey: ["profile"], queryFn: () => fetchProfile() });
 
   const [step, setStep] = useState(1);
+  const [goal, setGoal] = useState<Goal>("lose");
   const [form, setForm] = useState({
     full_name: profile?.full_name ?? "",
     gender: "male" as "male" | "female",
@@ -29,6 +66,8 @@ function Onboarding() {
     activity_level: "moderate" as ActivityLevel,
     dietary_preference: "balanced",
     city: "Jakarta",
+    allergies: [] as string[],
+    health_conditions: [] as string[],
   });
 
   const mutation = useMutation({
@@ -49,15 +88,23 @@ function Onboarding() {
       gender: form.gender,
     });
     const tdee = calcTDEE(bmr, form.activity_level);
-    // Aim for slight deficit if user wants to lose weight
-    const target = form.target_weight_kg < form.weight_kg ? tdee - 400 : tdee;
+    const target =
+      goal === "lose" ? Math.max(1200, tdee - 400)
+      : goal === "gain" ? tdee + 300
+      : tdee;
     mutation.mutate({ ...form, daily_calorie_target: target, onboarded: true });
   };
+
+  const toggleIn = (key: "allergies" | "health_conditions", val: string) =>
+    setForm((f) => {
+      const has = f[key].includes(val);
+      return { ...f, [key]: has ? f[key].filter((x) => x !== val) : [...f[key], val] };
+    });
 
   return (
     <main className="min-h-screen bg-background px-6 py-10 max-w-md mx-auto">
       <div className="flex gap-1.5 mb-8">
-        {[1, 2, 3].map((i) => (
+        {Array.from({ length: TOTAL_STEPS }, (_, idx) => idx + 1).map((i) => (
           <div key={i} className={`h-1.5 flex-1 rounded-full ${i <= step ? "bg-primary" : "bg-mint"}`} />
         ))}
       </div>
@@ -118,6 +165,35 @@ function Onboarding() {
       {step === 3 && (
         <section className="space-y-5 animate-fade-up">
           <div>
+            <h1 className="text-2xl font-bold mb-1">Tujuanmu?</h1>
+            <p className="text-muted-foreground text-sm">Kami sesuaikan target kalori harian.</p>
+          </div>
+          <div className="space-y-2">
+            {([
+              ["lose", "Turun berat", "Defisit ~400 kkal"],
+              ["maintain", "Pertahankan", "Sesuai TDEE"],
+              ["gain", "Naik berat / massa", "Surplus ~300 kkal"],
+            ] as const).map(([k, title, sub]) => (
+              <button
+                key={k}
+                onClick={() => setGoal(k)}
+                className={`w-full text-left p-4 rounded-2xl transition ${goal === k ? "bg-primary text-primary-foreground" : "bg-card outline-1 outline-black/10"}`}
+              >
+                <div className="text-sm font-semibold">{title}</div>
+                <div className={`text-xs mt-0.5 ${goal === k ? "text-primary-foreground/80" : "text-muted-foreground"}`}>{sub}</div>
+              </button>
+            ))}
+          </div>
+          <div className="grid grid-cols-2 gap-3 pt-4">
+            <button onClick={() => setStep(2)} className="bg-card outline-1 outline-black/10 font-semibold py-4 rounded-2xl">Kembali</button>
+            <button onClick={() => setStep(4)} className="bg-primary text-primary-foreground font-semibold py-4 rounded-2xl">Lanjut</button>
+          </div>
+        </section>
+      )}
+
+      {step === 4 && (
+        <section className="space-y-5 animate-fade-up">
+          <div>
             <h1 className="text-2xl font-bold mb-1">Gaya hidup</h1>
             <p className="text-muted-foreground text-sm">Seberapa aktif kamu setiap hari?</p>
           </div>
@@ -138,6 +214,24 @@ function Onboarding() {
               </button>
             ))}
           </div>
+          <div>
+            <p className="text-sm font-medium mb-2">Preferensi diet</p>
+            <div className="flex flex-wrap gap-2">
+              {DIETARY.map(([k, label]) => (
+                <button
+                  key={k}
+                  onClick={() => setForm({ ...form, dietary_preference: k })}
+                  className={`px-3 py-2 rounded-xl text-xs font-semibold transition ${
+                    form.dietary_preference === k
+                      ? "bg-primary text-primary-foreground"
+                      : "bg-card outline-1 outline-black/10"
+                  }`}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+          </div>
           <input
             placeholder="Kota (untuk jadwal sholat)"
             value={form.city}
@@ -145,7 +239,60 @@ function Onboarding() {
             className="w-full bg-card outline-1 outline-black/10 rounded-2xl px-4 py-3.5"
           />
           <div className="grid grid-cols-2 gap-3 pt-4">
-            <button onClick={() => setStep(2)} className="bg-card outline-1 outline-black/10 font-semibold py-4 rounded-2xl">Kembali</button>
+            <button onClick={() => setStep(3)} className="bg-card outline-1 outline-black/10 font-semibold py-4 rounded-2xl">Kembali</button>
+            <button onClick={() => setStep(5)} className="bg-primary text-primary-foreground font-semibold py-4 rounded-2xl">Lanjut</button>
+          </div>
+        </section>
+      )}
+
+      {step === 5 && (
+        <section className="space-y-5 animate-fade-up">
+          <div>
+            <h1 className="text-2xl font-bold mb-1">Kondisi & alergi</h1>
+            <p className="text-muted-foreground text-sm">AI akan menyesuaikan rekomendasi makanan.</p>
+          </div>
+          <div>
+            <p className="text-sm font-medium mb-2">Kondisi kesehatan</p>
+            <div className="flex flex-wrap gap-2">
+              {HEALTH_CONDITIONS.map((c) => {
+                const active = form.health_conditions.includes(c);
+                return (
+                  <button
+                    key={c}
+                    onClick={() => toggleIn("health_conditions", c)}
+                    className={`px-3 py-2 rounded-xl text-xs font-semibold transition inline-flex items-center gap-1 ${
+                      active ? "bg-primary text-primary-foreground" : "bg-card outline-1 outline-black/10"
+                    }`}
+                  >
+                    {active ? <Check className="size-3" /> : null}
+                    {c}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+          <div>
+            <p className="text-sm font-medium mb-2">Alergi makanan</p>
+            <div className="flex flex-wrap gap-2">
+              {ALLERGIES.map((a) => {
+                const active = form.allergies.includes(a);
+                return (
+                  <button
+                    key={a}
+                    onClick={() => toggleIn("allergies", a)}
+                    className={`px-3 py-2 rounded-xl text-xs font-semibold transition inline-flex items-center gap-1 ${
+                      active ? "bg-primary text-primary-foreground" : "bg-card outline-1 outline-black/10"
+                    }`}
+                  >
+                    {active ? <Check className="size-3" /> : null}
+                    {a}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+          <div className="grid grid-cols-2 gap-3 pt-4">
+            <button onClick={() => setStep(4)} className="bg-card outline-1 outline-black/10 font-semibold py-4 rounded-2xl">Kembali</button>
             <button onClick={finish} disabled={mutation.isPending} className="bg-primary text-primary-foreground font-semibold py-4 rounded-2xl disabled:opacity-60">
               {mutation.isPending ? "Menyimpan..." : "Mulai"}
             </button>
