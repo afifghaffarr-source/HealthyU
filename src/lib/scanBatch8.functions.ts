@@ -116,7 +116,7 @@ export const generateWeeklyReport = createServerFn({ method: "POST" })
     const [meals, water, sleep, workouts] = await Promise.all([
       supabase.from("meal_logs").select("calories, protein_g").eq("user_id", userId).gte("logged_at", since),
       supabase.from("water_logs").select("amount_ml").eq("user_id", userId).gte("logged_at", since),
-      supabase.from("sleep_logs").select("duration_hours").eq("user_id", userId).gte("sleep_date", weekStartStr),
+      supabase.from("sleep_logs").select("duration_hours").eq("user_id", userId).gte("log_date", weekStartStr),
       supabase.from("workout_sessions").select("calories_burned, duration_minutes").eq("user_id", userId).gte("started_at", since),
     ]);
     const stats = {
@@ -216,12 +216,12 @@ export const getSleepScore = createServerFn({ method: "POST" })
     const since = new Date(Date.now() - 7 * 86400000).toISOString().slice(0, 10);
     const { data } = await supabase
       .from("sleep_logs")
-      .select("sleep_date, duration_hours, quality")
+      .select("log_date, duration_hours, quality")
       .eq("user_id", userId)
-      .gte("sleep_date", since)
-      .order("sleep_date");
+      .gte("log_date", since)
+      .order("log_date");
     const rows = (data ?? []).map((r: any) => ({
-      date: r.sleep_date,
+      date: r.log_date,
       score: Math.min(100, Math.round(((r.duration_hours ?? 0) / 8) * 60 + (r.quality ?? 3) * 8)),
     }));
     return { rows };
