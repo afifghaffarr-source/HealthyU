@@ -53,6 +53,7 @@ import { Route as AuthenticatedArticlesRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedAchievementsRouteImport } from './routes/_authenticated/achievements'
 import { Route as ApiChatStreamRouteImport } from './routes/api/chat.stream'
 import { Route as AuthenticatedScanHistoryRouteImport } from './routes/_authenticated/scan.history'
+import { Route as AuthenticatedScanBarcodeRouteImport } from './routes/_authenticated/scan.barcode'
 import { Route as AuthenticatedRecipesSavedRouteImport } from './routes/_authenticated/recipes.saved'
 import { Route as AuthenticatedRecipesIdRouteImport } from './routes/_authenticated/recipes.$id'
 import { Route as AuthenticatedProfileScanStatsRouteImport } from './routes/_authenticated/profile.scan-stats'
@@ -290,6 +291,12 @@ const AuthenticatedScanHistoryRoute =
     path: '/history',
     getParentRoute: () => AuthenticatedScanRoute,
   } as any)
+const AuthenticatedScanBarcodeRoute =
+  AuthenticatedScanBarcodeRouteImport.update({
+    id: '/barcode',
+    path: '/barcode',
+    getParentRoute: () => AuthenticatedScanRoute,
+  } as any)
 const AuthenticatedRecipesSavedRoute =
   AuthenticatedRecipesSavedRouteImport.update({
     id: '/saved',
@@ -383,6 +390,7 @@ export interface FileRoutesByFullPath {
   '/profile/scan-stats': typeof AuthenticatedProfileScanStatsRoute
   '/recipes/$id': typeof AuthenticatedRecipesIdRoute
   '/recipes/saved': typeof AuthenticatedRecipesSavedRoute
+  '/scan/barcode': typeof AuthenticatedScanBarcodeRoute
   '/scan/history': typeof AuthenticatedScanHistoryRoute
   '/api/chat/stream': typeof ApiChatStreamRoute
   '/api/public/hooks/daily-coach': typeof ApiPublicHooksDailyCoachRoute
@@ -436,6 +444,7 @@ export interface FileRoutesByTo {
   '/profile/scan-stats': typeof AuthenticatedProfileScanStatsRoute
   '/recipes/$id': typeof AuthenticatedRecipesIdRoute
   '/recipes/saved': typeof AuthenticatedRecipesSavedRoute
+  '/scan/barcode': typeof AuthenticatedScanBarcodeRoute
   '/scan/history': typeof AuthenticatedScanHistoryRoute
   '/api/chat/stream': typeof ApiChatStreamRoute
   '/api/public/hooks/daily-coach': typeof ApiPublicHooksDailyCoachRoute
@@ -491,6 +500,7 @@ export interface FileRoutesById {
   '/_authenticated/profile/scan-stats': typeof AuthenticatedProfileScanStatsRoute
   '/_authenticated/recipes/$id': typeof AuthenticatedRecipesIdRoute
   '/_authenticated/recipes/saved': typeof AuthenticatedRecipesSavedRoute
+  '/_authenticated/scan/barcode': typeof AuthenticatedScanBarcodeRoute
   '/_authenticated/scan/history': typeof AuthenticatedScanHistoryRoute
   '/api/chat/stream': typeof ApiChatStreamRoute
   '/api/public/hooks/daily-coach': typeof ApiPublicHooksDailyCoachRoute
@@ -546,6 +556,7 @@ export interface FileRouteTypes {
     | '/profile/scan-stats'
     | '/recipes/$id'
     | '/recipes/saved'
+    | '/scan/barcode'
     | '/scan/history'
     | '/api/chat/stream'
     | '/api/public/hooks/daily-coach'
@@ -599,6 +610,7 @@ export interface FileRouteTypes {
     | '/profile/scan-stats'
     | '/recipes/$id'
     | '/recipes/saved'
+    | '/scan/barcode'
     | '/scan/history'
     | '/api/chat/stream'
     | '/api/public/hooks/daily-coach'
@@ -653,6 +665,7 @@ export interface FileRouteTypes {
     | '/_authenticated/profile/scan-stats'
     | '/_authenticated/recipes/$id'
     | '/_authenticated/recipes/saved'
+    | '/_authenticated/scan/barcode'
     | '/_authenticated/scan/history'
     | '/api/chat/stream'
     | '/api/public/hooks/daily-coach'
@@ -984,6 +997,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedScanHistoryRouteImport
       parentRoute: typeof AuthenticatedScanRoute
     }
+    '/_authenticated/scan/barcode': {
+      id: '/_authenticated/scan/barcode'
+      path: '/barcode'
+      fullPath: '/scan/barcode'
+      preLoaderRoute: typeof AuthenticatedScanBarcodeRouteImport
+      parentRoute: typeof AuthenticatedScanRoute
+    }
     '/_authenticated/recipes/saved': {
       id: '/_authenticated/recipes/saved'
       path: '/saved'
@@ -1068,10 +1088,12 @@ const AuthenticatedRecipesRouteWithChildren =
   AuthenticatedRecipesRoute._addFileChildren(AuthenticatedRecipesRouteChildren)
 
 interface AuthenticatedScanRouteChildren {
+  AuthenticatedScanBarcodeRoute: typeof AuthenticatedScanBarcodeRoute
   AuthenticatedScanHistoryRoute: typeof AuthenticatedScanHistoryRoute
 }
 
 const AuthenticatedScanRouteChildren: AuthenticatedScanRouteChildren = {
+  AuthenticatedScanBarcodeRoute: AuthenticatedScanBarcodeRoute,
   AuthenticatedScanHistoryRoute: AuthenticatedScanHistoryRoute,
 }
 
