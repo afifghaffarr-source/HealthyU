@@ -105,8 +105,15 @@ function ChallengesPage() {
     if (focus !== "streak") return;
     const parts = data?.participations ?? [];
     if (!data) return; // wait for data
+    const scrollToFirstUnjoined = () => {
+      const joinedIds = new Set(parts.map((p) => p.challenge_id));
+      const target = (data?.challenges ?? []).find((c) => !joinedIds.has(c.id));
+      if (target) articleRefs.current[target.id]?.scrollIntoView({ behavior: "smooth", block: "start" });
+    };
     if (parts.length === 0) {
-      toast.info("Belum ada streak — gabung challenge dulu");
+      toast.info("Belum ada streak — gabung challenge dulu", {
+        action: { label: "Lihat challenge", onClick: scrollToFirstUnjoined },
+      });
       navigate({ to: "/challenges", search: {}, replace: true });
       return;
     }
@@ -115,7 +122,9 @@ function ChallengesPage() {
       return !s || s === "active";
     });
     if (active.length === 0) {
-      toast.info("Semua streak sudah selesai — mulai challenge baru");
+      toast.info("Semua streak sudah selesai — mulai challenge baru", {
+        action: { label: "Lihat challenge", onClick: scrollToFirstUnjoined },
+      });
       navigate({ to: "/challenges", search: {}, replace: true });
       return;
     }

@@ -192,6 +192,40 @@ function ReportsPage() {
     URL.revokeObjectURL(url);
   };
 
+  const exportAllArchivePdf = () => {
+    const filtered = history.filter((r) => {
+      if (rangeWeeks === 0) return true;
+      const cutoff = Date.now() - rangeWeeks * 7 * 86400000;
+      return new Date(r.created_at).getTime() >= cutoff;
+    });
+    if (filtered.length === 0) return;
+    const doc = new jsPDF({ unit: "pt", format: "a4" });
+    filtered.forEach((r, idx) => {
+      if (idx > 0) doc.addPage();
+      const text = Array.isArray(r.recommendations) ? String(r.recommendations[0] ?? "") : "";
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(18);
+      doc.text("Laporan HealthyU", 40, 50);
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(10);
+      doc.setTextColor(120);
+      const periode =
+        r.report_period_start && r.report_period_end
+          ? `Periode: ${r.report_period_start} → ${r.report_period_end}`
+          : `Dibuat: ${new Date(r.created_at).toLocaleDateString("id-ID")}`;
+      doc.text(periode, 40, 68);
+      doc.setTextColor(0);
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(12);
+      doc.text("Analisis AI", 40, 100);
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(10);
+      const lines = doc.splitTextToSize(text || "(kosong)", 515);
+      doc.text(lines, 40, 118);
+    });
+    doc.save(`laporan-healthyu-arsip-${new Date().toISOString().slice(0, 10)}.pdf`);
+  };
+
   const exportPdf = () => {
     if (!data || !summary) return;
     const doc = new jsPDF({ unit: "pt", format: "a4" });
@@ -435,7 +469,15 @@ function ReportsPage() {
               <h2 className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
                 Riwayat Laporan AI
               </h2>
-              <select
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={exportAllArchivePdf}
+                  className="inline-flex items-center gap-1 text-[11px] font-semibold bg-card outline-1 outline-black/10 rounded-lg px-2 py-1"
+                  title="Export semua laporan ke 1 PDF"
+                >
+                  <FileText className="size-3" /> Export semua
+                </button>
+                <select
                 value={rangeWeeks}
                 onChange={(e) => setRangeWeeks(Number(e.target.value))}
                 className="text-[11px] bg-card outline-1 outline-black/10 rounded-lg px-2 py-1"
@@ -445,6 +487,7 @@ function ReportsPage() {
                 <option value={12}>12 minggu</option>
                 <option value={26}>26 minggu</option>
               </select>
+              </div>
             </div>
             {history
               .filter((r) => {
