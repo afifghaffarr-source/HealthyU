@@ -55,14 +55,18 @@ export const disconnectGoogleFit = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
-async function refreshIfNeeded(supabase: SupabaseClientLike, userId: string) {
+type AnyClient = {
+  from: (t: string) => any;
+};
+
+async function refreshIfNeeded(supabase: AnyClient, userId: string): Promise<string> {
   const { data: row, error } = await supabase
     .from("wearable_tokens")
     .select("access_token, refresh_token, expires_at")
     .eq("user_id", userId)
     .maybeSingle();
   if (error || !row) throw new Error("Belum terhubung ke Google Fit");
-  const expires = new Date(row.expires_at).getTime();
+  const expires = new Date(row.expires_at as string).getTime();
   if (expires - Date.now() > 60_000) return row.access_token as string;
 
   const clientId = process.env.GOOGLE_FIT_CLIENT_ID!;
@@ -73,7 +77,7 @@ async function refreshIfNeeded(supabase: SupabaseClientLike, userId: string) {
     body: new URLSearchParams({
       client_id: clientId,
       client_secret: clientSecret,
-      refresh_token: row.refresh_token,
+      refresh_token: String(row.refresh_token),
       grant_type: "refresh_token",
     }),
   });
@@ -86,16 +90,6 @@ async function refreshIfNeeded(supabase: SupabaseClientLike, userId: string) {
     .eq("user_id", userId);
   return json.access_token;
 }
-
-type SupabaseClientLike = {
-  from: (t: string) => {
-    select: (q: string) => { eq: (c: string, v: string) => { maybeSingle: () => Promise<{ data: Record<string, unknown> | null; error: { message: string } | null }> } };
-    update: (v: Record<string, unknown>) => { eq: (c: string, v: string) => Promise<{ error: { message: string } | null }> };
-    upsert: (v: Record<string, unknown> | Record<string, unknown>[], o?: Record<string, unknown>) => Promise<{ error: { message: string } | null }>;
-    insert: (v: Record<string, unknown>) => Promise<{ error: { message: string } | null }>;
-    delete: () => { eq: (c: string, v: string) => Promise<{ error: { message: string } | null }> };
-  };
-};
 
 async function aggregate(token: string, dataTypeName: string, days: number) {
   const endMs = Date.now();
@@ -117,7 +111,7 @@ async function aggregate(token: string, dataTypeName: string, days: number) {
 export const syncGoogleFit = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
-    const { supabase, userId } = context as { supabase: SupabaseClientLike; userId: string };
+    const { supabase, userId } = context as unknown as { supabase: AnyClient; userId: string };
     const token = await refreshIfNeeded(supabase, userId);
 
     let stepsCount = 0;
