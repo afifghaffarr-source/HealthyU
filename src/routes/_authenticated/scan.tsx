@@ -7,6 +7,7 @@ import { Camera, Loader2, Sparkles, X, Check, Pencil, History, Zap } from "lucid
 import { toast } from "sonner";
 import { BottomNav } from "@/components/bottom-nav";
 import { recognizeFood, submitScanCorrection } from "@/lib/foodScan.functions";
+import { attachScanPhoto } from "@/lib/scanPhoto.functions";
 import { logMeal } from "@/lib/meals.functions";
 
 export const Route = createFileRoute("/_authenticated/scan")({
@@ -49,6 +50,7 @@ function ScanPage() {
   const scan = useServerFn(recognizeFood);
   const log = useServerFn(logMeal);
   const correct = useServerFn(submitScanCorrection);
+  const upload = useServerFn(attachScanPhoto);
 
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [items, setItems] = useState<Item[]>([]);
@@ -64,6 +66,9 @@ function ScanPage() {
       setItems(res.items);
       setOriginals(res.items.map((i) => ({ ...i })));
       setScanId(res.scan_id);
+      if (res.scan_id && imageUrl) {
+        upload({ data: { scan_id: res.scan_id, image_data_url: imageUrl } }).catch(() => {});
+      }
       if (res.items.length === 0) toast.error("Tidak ada makanan terdeteksi");
       else toast.success(`${res.items.length} makanan dikenali`);
     },
