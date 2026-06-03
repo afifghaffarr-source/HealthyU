@@ -297,7 +297,6 @@ function ReportsPage() {
         open: false,
         // Sembunyikan ikon sticky-note default; hanya tooltip hover yang aktif.
         name: "NoIcon",
-        flags: ["hidden", "noview"],
       });
       doc.setDrawColor(0);
       doc.setTextColor(0);
