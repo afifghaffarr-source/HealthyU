@@ -20,7 +20,7 @@ function Page() {
   const [token, setToken] = useState(initial ?? "");
   const create = useMutation({
     mutationFn: () => createFn({ data: { planId: planId! } }),
-    onSuccess: (r) => toast.success(`Token: ${r.invite.token}`),
+    onSuccess: (r) => toast.success(`Token: ${(r.invite as any)?.token}`),
     onError: (e: Error) => toast.error(e.message),
   });
   const redeem = useMutation({
@@ -28,7 +28,7 @@ function Page() {
     onSuccess: () => toast.success("Bergabung dengan family plan!"),
     onError: (e: Error) => toast.error(e.message),
   });
-  const inviteUrl = create.data ? `${window.location.origin}/family/invite?token=${create.data.invite.token}` : "";
+  const inviteUrl = create.data?.invite ? `${window.location.origin}/family/invite?token=${(create.data.invite as any).token}` : "";
   return (
     <div className="min-h-dvh pb-24 bg-background">
       <TopAppBar title="Family Invite" showBack />

@@ -87,6 +87,7 @@ import { Route as AuthenticatedPetShopRouteImport } from './routes/_authenticate
 import { Route as AuthenticatedNotificationsFeedRouteImport } from './routes/_authenticated/notifications.feed'
 import { Route as AuthenticatedMealplanGroceryRouteImport } from './routes/_authenticated/mealplan.grocery'
 import { Route as AuthenticatedHabitsStackRouteImport } from './routes/_authenticated/habits.stack'
+import { Route as AuthenticatedFamilyInviteRouteImport } from './routes/_authenticated/family.invite'
 import { Route as AuthenticatedCoachMealsRouteImport } from './routes/_authenticated/coach.meals'
 import { Route as AuthenticatedChallengesDailyRouteImport } from './routes/_authenticated/challenges.daily'
 import { Route as ApiWearableGoogleFitCallbackRouteImport } from './routes/api/wearable.google-fit.callback'
@@ -518,6 +519,12 @@ const AuthenticatedHabitsStackRoute =
     path: '/habits/stack',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedFamilyInviteRoute =
+  AuthenticatedFamilyInviteRouteImport.update({
+    id: '/invite',
+    path: '/invite',
+    getParentRoute: () => AuthenticatedFamilyRoute,
+  } as any)
 const AuthenticatedCoachMealsRoute = AuthenticatedCoachMealsRouteImport.update({
   id: '/meals',
   path: '/meals',
@@ -604,7 +611,7 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/discover': typeof AuthenticatedDiscoverRoute
   '/doctor': typeof AuthenticatedDoctorRoute
-  '/family': typeof AuthenticatedFamilyRoute
+  '/family': typeof AuthenticatedFamilyRouteWithChildren
   '/fasting': typeof AuthenticatedFastingRoute
   '/food': typeof AuthenticatedFoodRoute
   '/foods': typeof AuthenticatedFoodsRoute
@@ -642,6 +649,7 @@ export interface FileRoutesByFullPath {
   '/workout': typeof AuthenticatedWorkoutRoute
   '/challenges/daily': typeof AuthenticatedChallengesDailyRoute
   '/coach/meals': typeof AuthenticatedCoachMealsRoute
+  '/family/invite': typeof AuthenticatedFamilyInviteRoute
   '/habits/stack': typeof AuthenticatedHabitsStackRoute
   '/mealplan/grocery': typeof AuthenticatedMealplanGroceryRoute
   '/notifications/feed': typeof AuthenticatedNotificationsFeedRoute
@@ -695,7 +703,7 @@ export interface FileRoutesByTo {
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/discover': typeof AuthenticatedDiscoverRoute
   '/doctor': typeof AuthenticatedDoctorRoute
-  '/family': typeof AuthenticatedFamilyRoute
+  '/family': typeof AuthenticatedFamilyRouteWithChildren
   '/fasting': typeof AuthenticatedFastingRoute
   '/food': typeof AuthenticatedFoodRoute
   '/foods': typeof AuthenticatedFoodsRoute
@@ -733,6 +741,7 @@ export interface FileRoutesByTo {
   '/workout': typeof AuthenticatedWorkoutRoute
   '/challenges/daily': typeof AuthenticatedChallengesDailyRoute
   '/coach/meals': typeof AuthenticatedCoachMealsRoute
+  '/family/invite': typeof AuthenticatedFamilyInviteRoute
   '/habits/stack': typeof AuthenticatedHabitsStackRoute
   '/mealplan/grocery': typeof AuthenticatedMealplanGroceryRoute
   '/notifications/feed': typeof AuthenticatedNotificationsFeedRoute
@@ -788,7 +797,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/discover': typeof AuthenticatedDiscoverRoute
   '/_authenticated/doctor': typeof AuthenticatedDoctorRoute
-  '/_authenticated/family': typeof AuthenticatedFamilyRoute
+  '/_authenticated/family': typeof AuthenticatedFamilyRouteWithChildren
   '/_authenticated/fasting': typeof AuthenticatedFastingRoute
   '/_authenticated/food': typeof AuthenticatedFoodRoute
   '/_authenticated/foods': typeof AuthenticatedFoodsRoute
@@ -826,6 +835,7 @@ export interface FileRoutesById {
   '/_authenticated/workout': typeof AuthenticatedWorkoutRoute
   '/_authenticated/challenges/daily': typeof AuthenticatedChallengesDailyRoute
   '/_authenticated/coach/meals': typeof AuthenticatedCoachMealsRoute
+  '/_authenticated/family/invite': typeof AuthenticatedFamilyInviteRoute
   '/_authenticated/habits/stack': typeof AuthenticatedHabitsStackRoute
   '/_authenticated/mealplan/grocery': typeof AuthenticatedMealplanGroceryRoute
   '/_authenticated/notifications/feed': typeof AuthenticatedNotificationsFeedRoute
@@ -919,6 +929,7 @@ export interface FileRouteTypes {
     | '/workout'
     | '/challenges/daily'
     | '/coach/meals'
+    | '/family/invite'
     | '/habits/stack'
     | '/mealplan/grocery'
     | '/notifications/feed'
@@ -1010,6 +1021,7 @@ export interface FileRouteTypes {
     | '/workout'
     | '/challenges/daily'
     | '/coach/meals'
+    | '/family/invite'
     | '/habits/stack'
     | '/mealplan/grocery'
     | '/notifications/feed'
@@ -1102,6 +1114,7 @@ export interface FileRouteTypes {
     | '/_authenticated/workout'
     | '/_authenticated/challenges/daily'
     | '/_authenticated/coach/meals'
+    | '/_authenticated/family/invite'
     | '/_authenticated/habits/stack'
     | '/_authenticated/mealplan/grocery'
     | '/_authenticated/notifications/feed'
@@ -1702,6 +1715,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedHabitsStackRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/family/invite': {
+      id: '/_authenticated/family/invite'
+      path: '/invite'
+      fullPath: '/family/invite'
+      preLoaderRoute: typeof AuthenticatedFamilyInviteRouteImport
+      parentRoute: typeof AuthenticatedFamilyRoute
+    }
     '/_authenticated/coach/meals': {
       id: '/_authenticated/coach/meals'
       path: '/meals'
@@ -1813,6 +1833,17 @@ const AuthenticatedCoachRouteChildren: AuthenticatedCoachRouteChildren = {
 
 const AuthenticatedCoachRouteWithChildren =
   AuthenticatedCoachRoute._addFileChildren(AuthenticatedCoachRouteChildren)
+
+interface AuthenticatedFamilyRouteChildren {
+  AuthenticatedFamilyInviteRoute: typeof AuthenticatedFamilyInviteRoute
+}
+
+const AuthenticatedFamilyRouteChildren: AuthenticatedFamilyRouteChildren = {
+  AuthenticatedFamilyInviteRoute: AuthenticatedFamilyInviteRoute,
+}
+
+const AuthenticatedFamilyRouteWithChildren =
+  AuthenticatedFamilyRoute._addFileChildren(AuthenticatedFamilyRouteChildren)
 
 interface AuthenticatedGroupsRouteChildren {
   AuthenticatedGroupsIdLeaderboardRoute: typeof AuthenticatedGroupsIdLeaderboardRoute
@@ -1983,7 +2014,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedDiscoverRoute: typeof AuthenticatedDiscoverRoute
   AuthenticatedDoctorRoute: typeof AuthenticatedDoctorRoute
-  AuthenticatedFamilyRoute: typeof AuthenticatedFamilyRoute
+  AuthenticatedFamilyRoute: typeof AuthenticatedFamilyRouteWithChildren
   AuthenticatedFastingRoute: typeof AuthenticatedFastingRoute
   AuthenticatedFoodRoute: typeof AuthenticatedFoodRoute
   AuthenticatedFoodsRoute: typeof AuthenticatedFoodsRoute
@@ -2036,7 +2067,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedDiscoverRoute: AuthenticatedDiscoverRoute,
   AuthenticatedDoctorRoute: AuthenticatedDoctorRoute,
-  AuthenticatedFamilyRoute: AuthenticatedFamilyRoute,
+  AuthenticatedFamilyRoute: AuthenticatedFamilyRouteWithChildren,
   AuthenticatedFastingRoute: AuthenticatedFastingRoute,
   AuthenticatedFoodRoute: AuthenticatedFoodRoute,
   AuthenticatedFoodsRoute: AuthenticatedFoodsRoute,
