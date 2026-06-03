@@ -3,9 +3,11 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { weeklyReport, weeklyAiAnalysis } from "@/lib/reports.functions";
 import { BottomNav } from "@/components/bottom-nav";
-import { ArrowLeft, Download, Printer, Sparkles, Loader2, Share2 } from "lucide-react";
+import { ArrowLeft, Download, FileText, Sparkles, Loader2, Share2 } from "lucide-react";
 import { useMemo } from "react";
 import { toast } from "sonner";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 
 export const Route = createFileRoute("/_authenticated/reports")({
   component: ReportsPage,
@@ -65,6 +67,61 @@ function ReportsPage() {
     a.download = `laporan-${new Date().toISOString().slice(0, 10)}.csv`;
     a.click();
     URL.revokeObjectURL(url);
+  };
+
+  const exportPdf = () => {
+    if (!data || !summary) return;
+    const doc = new jsPDF({ unit: "pt", format: "a4" });
+    const today = new Date().toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" });
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(18);
+    doc.text("Laporan HealthyU - 7 Hari", 40, 50);
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(10);
+    doc.setTextColor(120);
+    doc.text(`Dicetak: ${today}`, 40, 68);
+    doc.setTextColor(0);
+
+    autoTable(doc, {
+      startY: 90,
+      head: [["Metrik", "Nilai"]],
+      body: [
+        ["Total kalori masuk", `${Math.round(summary.totals.cals)} kcal`],
+        ["Kalori terbakar", `${summary.totals.burn} kcal`],
+        ["Total air", `${(summary.totals.ml / 1000).toFixed(1)} L`],
+        ["Total tidur", `${summary.totals.hours.toFixed(1)} jam`],
+        ["Latihan", `${summary.workoutCount} sesi`],
+        ["Puasa selesai", `${summary.fastingDone} sesi`],
+      ],
+      styles: { font: "helvetica", fontSize: 10 },
+      headStyles: { fillColor: [107, 142, 90] },
+    });
+
+    autoTable(doc, {
+      head: [["Tanggal", "Kalori (kcal)", "Air (ml)", "Bakar (kcal)", "Tidur (jam)"]],
+      body: summary.byDay.map((d) => [
+        new Date(d.day).toLocaleDateString("id-ID", { weekday: "short", day: "numeric", month: "short" }),
+        Math.round(d.cals).toString(),
+        d.ml.toString(),
+        d.burn.toString(),
+        d.hours.toFixed(1),
+      ]),
+      styles: { font: "helvetica", fontSize: 9 },
+      headStyles: { fillColor: [107, 142, 90] },
+    });
+
+    if (aiMut.data?.report) {
+      const lastY = (doc as unknown as { lastAutoTable?: { finalY: number } }).lastAutoTable?.finalY ?? 200;
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(12);
+      doc.text("Analisis AI", 40, lastY + 30);
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(10);
+      const lines = doc.splitTextToSize(aiMut.data.report, 515);
+      doc.text(lines, 40, lastY + 48);
+    }
+
+    doc.save(`laporan-healthyu-${new Date().toISOString().slice(0, 10)}.pdf`);
   };
 
   const shareWhatsapp = () => {
@@ -133,8 +190,8 @@ function ReportsPage() {
           <button onClick={exportCsv} className="flex items-center justify-center gap-2 bg-primary text-primary-foreground font-semibold py-3 rounded-2xl">
             <Download className="size-4" /> <span className="text-sm">CSV</span>
           </button>
-          <button onClick={() => window.print()} className="flex items-center justify-center gap-2 bg-card outline-1 outline-black/10 font-semibold py-3 rounded-2xl">
-            <Printer className="size-4" /> <span className="text-sm">PDF</span>
+          <button onClick={exportPdf} className="flex items-center justify-center gap-2 bg-card outline-1 outline-black/10 font-semibold py-3 rounded-2xl">
+            <FileText className="size-4" /> <span className="text-sm">PDF</span>
           </button>
           <button onClick={shareWhatsapp} className="flex items-center justify-center gap-2 bg-[#25D366] text-white font-semibold py-3 rounded-2xl">
             <Share2 className="size-4" /> <span className="text-sm">WA</span>
