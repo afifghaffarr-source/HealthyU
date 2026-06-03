@@ -103,7 +103,7 @@ export async function sendWeeklyReportPush(userId: string, highlight?: string) {
       await sendWebPushTo(s as PushSub, {
         title: "Laporan mingguanmu siap 📊",
         body: highlight ?? "Buka untuk lihat insight AI minggu ini",
-        url: "/reports",
+        url: "/reports?focus=latest",
         tag: "weekly-report",
       });
     } catch (e) {
