@@ -238,6 +238,13 @@ function ScanPage() {
             {items.length > 0 && (
               <div className="space-y-2">
                 <p className="text-xs font-semibold text-muted-foreground">Terdeteksi</p>
+                <button
+                  onClick={() => items.forEach((it, idx) => logMut.mutate({ it, idx }))}
+                  disabled={logMut.isPending}
+                  className="w-full py-2 rounded-xl bg-primary/10 text-primary font-semibold text-xs disabled:opacity-50"
+                >
+                  Catat semua ({items.length})
+                </button>
                 {items.map((it, i) => {
                   const editing = editIdx === i;
                   return (
