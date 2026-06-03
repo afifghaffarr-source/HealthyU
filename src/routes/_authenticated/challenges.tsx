@@ -48,6 +48,17 @@ function ChallengesPage() {
   const qc = useQueryClient();
   const navigate = useNavigate();
   const { group: focusGroup, challenge: focusChallenge, focus } = Route.useSearch();
+  // prefers-reduced-motion → override transisi spring jadi 0ms supaya
+  // tidak ada delay sama sekali bagi user yang sensitif animasi.
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
+  useEffect(() => {
+    if (typeof window === "undefined" || !window.matchMedia) return;
+    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
+    setPrefersReducedMotion(mq.matches);
+    const onChange = (e: MediaQueryListEvent) => setPrefersReducedMotion(e.matches);
+    mq.addEventListener("change", onChange);
+    return () => mq.removeEventListener("change", onChange);
+  }, []);
   const fetchAll = useServerFn(listChallenges);
   const joinFn = useServerFn(joinChallenge);
   const logFn = useServerFn(logChallengeDay);
@@ -210,7 +221,9 @@ function ChallengesPage() {
               style={
                 highlightId === c.id
                   ? {
-                      transitionDuration: `${CHALLENGE_HIGHLIGHT_TRANSITION_MS}ms`,
+                      transitionDuration: prefersReducedMotion
+                        ? "0ms"
+                        : `${CHALLENGE_HIGHLIGHT_TRANSITION_MS}ms`,
                       ...(highlightFading
                         ? { opacity: CHALLENGE_HIGHLIGHT_FADE_OPACITY }
                         : null),
