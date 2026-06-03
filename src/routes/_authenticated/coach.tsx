@@ -4,7 +4,8 @@ import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useState } from "react";
 import { dailyCoach } from "@/lib/coach.functions";
 import { BottomNav } from "@/components/bottom-nav";
-import { ArrowLeft, Sparkles, Loader2, Sun, Target, Lightbulb, AlertTriangle, RefreshCw } from "lucide-react";
+import { Sparkles, Loader2, Sun, Target, Lightbulb, AlertTriangle, RefreshCw } from "lucide-react";
+import { TopAppBar } from "@/components/healthyu/top-app-bar";
 
 export const Route = createFileRoute("/_authenticated/coach")({
   component: CoachPage,
@@ -53,32 +54,22 @@ function CoachPage() {
 
   return (
     <main className="min-h-screen bg-background pb-28">
-      <div className="max-w-md mx-auto px-5 pt-8 space-y-5">
-        <header className="flex items-center gap-3">
-          <Link
-            to="/dashboard"
-            className="size-10 bg-card rounded-2xl outline-1 outline-black/10 grid place-items-center"
-          >
-            <ArrowLeft className="size-4" />
-          </Link>
-          <div className="flex-1">
-            <h1 className="text-2xl font-bold flex items-center gap-2">
-              <Sparkles className="size-5 text-primary" /> AI Coach
-            </h1>
-            <p className="text-xs text-muted-foreground">Rekomendasi pagi berbasis data 7 hari</p>
-          </div>
-          <button
-            onClick={() => mut.mutate()}
-            disabled={mut.isPending}
-            className="size-10 bg-card rounded-2xl outline-1 outline-black/10 grid place-items-center disabled:opacity-50"
-          >
-            {mut.isPending ? (
-              <Loader2 className="size-4 animate-spin" />
-            ) : (
-              <RefreshCw className="size-4" />
-            )}
-          </button>
-        </header>
+      <div className="max-w-md mx-auto px-5 pt-2 space-y-5">
+        <TopAppBar
+          title="AI Coach"
+          subtitle="Rekomendasi pagi berbasis data 7 hari"
+          showBack
+          action={
+            <button
+              onClick={() => mut.mutate()}
+              disabled={mut.isPending}
+              className="size-9 rounded-full bg-muted grid place-items-center disabled:opacity-50"
+              aria-label="Refresh"
+            >
+              {mut.isPending ? <Loader2 className="size-4 animate-spin" /> : <RefreshCw className="size-4" />}
+            </button>
+          }
+        />
 
         {mut.isPending && !data && (
           <div className="bg-card p-8 rounded-3xl outline-1 outline-black/5 text-center space-y-3">
