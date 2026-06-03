@@ -474,6 +474,11 @@ function Dashboard() {
                       onClick={() => setBreakdownOpen((o) => !o)}
                       className="relative text-[9px] font-bold uppercase bg-amber-100 text-amber-800 rounded-full pl-2 pr-2 pt-0.5 pb-1 overflow-hidden"
                       title={breakdown || "Breakdown klaim baru"}
+                      aria-haspopup="dialog"
+                      aria-expanded={breakdownOpen}
+                      aria-live="polite"
+                      aria-atomic="true"
+                      aria-label={`+${total} klaim baru. ${breakdown || ""}`.trim()}
                     >
                       +{total} klaim baru
                       <span
