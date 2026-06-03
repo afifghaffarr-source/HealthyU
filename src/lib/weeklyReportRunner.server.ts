@@ -9,6 +9,7 @@ type PushSub = { endpoint: string; p256dh: string; auth: string };
  * Inserts an ai_reports row and returns the report id.
  */
 export type WeeklyRunResult = { reportId: string | null; highlight: string };
+export type WeeklyPushPayload = { highlight: string; trendingRecipe: string | null };
 
 export async function runWeeklyReportForUser(userId: string, days = 7): Promise<WeeklyRunResult> {
   const apiKey = process.env.LOVABLE_API_KEY;
@@ -93,17 +94,44 @@ export async function runWeeklyReportForUser(userId: string, days = 7): Promise<
   return { reportId: saved?.id ?? null, highlight };
 }
 
-export async function sendWeeklyReportPush(userId: string, highlight?: string) {
+export async function getTopTrendingRecipe(): Promise<{ title: string } | null> {
+  const { data } = await supabaseAdmin
+    .from("recipes")
+    .select("title, save_count, save_count_snapshot")
+    .limit(200);
+  if (!data || data.length === 0) return null;
+  const ranked = data
+    .map((r) => ({
+      title: r.title as string,
+      growth: Math.max(0, (r.save_count ?? 0) - (r.save_count_snapshot ?? 0)),
+    }))
+    .filter((r) => r.growth > 0)
+    .sort((a, b) => b.growth - a.growth);
+  return ranked[0] ?? null;
+}
+
+export async function sendWeeklyReportPush(
+  userId: string,
+  highlight?: string,
+  trendingRecipe?: string | null,
+) {
   const { data: subs } = await supabaseAdmin
     .from("push_subscriptions")
     .select("endpoint, p256dh, auth")
     .eq("user_id", userId);
+  const body = [
+    highlight ?? "Buka untuk lihat insight AI minggu ini",
+    trendingRecipe ? `🔥 Trending: ${trendingRecipe}` : null,
+  ]
+    .filter(Boolean)
+    .join(" — ");
+  const url = trendingRecipe ? "/recipes?sort=trending" : "/reports?focus=latest";
   for (const s of subs ?? []) {
     try {
       await sendWebPushTo(s as PushSub, {
         title: "Laporan mingguanmu siap 📊",
-        body: highlight ?? "Buka untuk lihat insight AI minggu ini",
-        url: "/reports?focus=latest",
+        body,
+        url,
         tag: "weekly-report",
       });
     } catch (e) {

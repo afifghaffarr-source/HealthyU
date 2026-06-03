@@ -16,6 +16,7 @@ import { CalorieRing } from "@/components/calorie-ring";
 import { formatDuration, fastingStage } from "@/lib/health";
 import { Droplet, Plus, Sparkles, ArrowRight, Flame, Trophy, Camera, Smile } from "lucide-react";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   component: Dashboard,
@@ -47,6 +48,26 @@ function Dashboard() {
     queryKey: ["unlinked-joined-challenges"],
     queryFn: () => fetchUnlinked(),
   });
+
+  // Realtime: refresh group challenge summary when bonuses/redemptions change
+  useEffect(() => {
+    const ch = supabase
+      .channel("dashboard-group-summary")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "group_challenge_bonuses" },
+        () => qc.invalidateQueries({ queryKey: ["group-challenge-summary"] }),
+      )
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "coin_redemptions" },
+        () => qc.invalidateQueries({ queryKey: ["group-challenge-summary"] }),
+      )
+      .subscribe();
+    return () => {
+      supabase.removeChannel(ch);
+    };
+  }, [qc]);
 
   useEffect(() => {
     if (!pLoad && profile && !profile.onboarded) {
@@ -333,6 +354,30 @@ function Dashboard() {
                       <p className="text-[10px] text-muted-foreground">
                         {c.pending_members} anggota grup belum gabung
                       </p>
+                    )}
+                    {(c.preview_members?.length ?? 0) > 0 && (
+                      <div className="flex items-center mt-1.5">
+                        <div className="flex -space-x-1.5">
+                          {c.preview_members!.map((m) => (
+                            <span
+                              key={m.id}
+                              title={m.name}
+                              className="size-5 rounded-full bg-primary/15 outline-2 outline-card grid place-items-center text-[9px] font-bold text-primary overflow-hidden"
+                            >
+                              {m.avatar_url ? (
+                                <img src={m.avatar_url} alt={m.name} className="size-full object-cover" />
+                              ) : (
+                                (m.name ?? "?").slice(0, 1).toUpperCase()
+                              )}
+                            </span>
+                          ))}
+                        </div>
+                        {(c.pending_members ?? 0) > (c.preview_members?.length ?? 0) && (
+                          <span className="text-[9px] text-muted-foreground ml-1.5">
+                            +{(c.pending_members ?? 0) - (c.preview_members?.length ?? 0)}
+                          </span>
+                        )}
+                      </div>
                     )}
                   </div>
                   <span className="text-[10px] text-primary font-semibold inline-flex items-center gap-1 shrink-0">

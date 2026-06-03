@@ -63,11 +63,37 @@ export const myUnlinkedJoinedChallenges = createServerFn({ method: "GET" })
       if (!joinedByChallenge.has(j.challenge_id)) joinedByChallenge.set(j.challenge_id, new Set());
       joinedByChallenge.get(j.challenge_id)!.add(j.user_id);
     }
-    return ch.map((c) => ({
-      ...c,
-      pending_members: uniqueMemberIds.filter(
+    // Fetch preview profiles (name + avatar) for pending members
+    const allPendingIds = Array.from(
+      new Set(
+        ch.flatMap((c) =>
+          uniqueMemberIds.filter(
+            (uid) => uid !== userId && !(joinedByChallenge.get(c.id)?.has(uid)),
+          ),
+        ),
+      ),
+    );
+    const { data: profs } = allPendingIds.length
+      ? await supabase.from("profiles").select("id, full_name, avatar_url").in("id", allPendingIds)
+      : { data: [] as { id: string; full_name: string | null; avatar_url: string | null }[] };
+    const profMap = new Map((profs ?? []).map((p) => [p.id, p]));
+    return ch.map((c) => {
+      const pendingIds = uniqueMemberIds.filter(
         (uid) => uid !== userId && !(joinedByChallenge.get(c.id)?.has(uid)),
-      ).length,
-      total_members: uniqueMemberIds.length,
-    }));
+      );
+      const preview_members = pendingIds.slice(0, 3).map((uid) => {
+        const p = profMap.get(uid);
+        return {
+          id: uid,
+          name: p?.full_name ?? "Anggota",
+          avatar_url: p?.avatar_url ?? null,
+        };
+      });
+      return {
+        ...c,
+        pending_members: pendingIds.length,
+        total_members: uniqueMemberIds.length,
+        preview_members,
+      };
+    });
   });

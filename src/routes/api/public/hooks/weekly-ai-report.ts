@@ -3,6 +3,7 @@ import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import {
   runWeeklyReportForUser,
   sendWeeklyReportPush,
+  getTopTrendingRecipe,
 } from "@/lib/weeklyReportRunner.server";
 
 /**
@@ -40,6 +41,9 @@ export const Route = createFileRoute("/api/public/hooks/weekly-ai-report")({
 
         const targets = activeIds.filter((id) => !recentSet.has(id));
 
+        const trending = await getTopTrendingRecipe();
+        const trendingTitle = trending?.title ?? null;
+
         let processed = 0;
         let failed = 0;
         for (const uid of targets) {
@@ -48,7 +52,7 @@ export const Route = createFileRoute("/api/public/hooks/weekly-ai-report")({
             await supabaseAdmin
               .from("weekly_report_runs")
               .insert({ user_id: uid, report_id: reportId });
-            await sendWeeklyReportPush(uid, highlight);
+            await sendWeeklyReportPush(uid, highlight, trendingTitle);
             processed++;
           } catch (e) {
             failed++;
