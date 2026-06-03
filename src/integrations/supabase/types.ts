@@ -1845,6 +1845,7 @@ export type Database = {
           sodium_mg: number | null
           source: string | null
           sugar_g: number | null
+          tags: string[] | null
           user_id: string
         }
         Insert: {
@@ -1872,6 +1873,7 @@ export type Database = {
           sodium_mg?: number | null
           source?: string | null
           sugar_g?: number | null
+          tags?: string[] | null
           user_id: string
         }
         Update: {
@@ -1899,6 +1901,7 @@ export type Database = {
           sodium_mg?: number | null
           source?: string | null
           sugar_g?: number | null
+          tags?: string[] | null
           user_id?: string
         }
         Relationships: [
@@ -2218,6 +2221,7 @@ export type Database = {
           meal_reminder_enabled: boolean
           prayer_minutes_before: number | null
           prayer_reminder_enabled: boolean
+          scan_reminder_enabled: boolean
           social_enabled: boolean
           system_enabled: boolean
           updated_at: string
@@ -2246,6 +2250,7 @@ export type Database = {
           meal_reminder_enabled?: boolean
           prayer_minutes_before?: number | null
           prayer_reminder_enabled?: boolean
+          scan_reminder_enabled?: boolean
           social_enabled?: boolean
           system_enabled?: boolean
           updated_at?: string
@@ -2274,6 +2279,7 @@ export type Database = {
           meal_reminder_enabled?: boolean
           prayer_minutes_before?: number | null
           prayer_reminder_enabled?: boolean
+          scan_reminder_enabled?: boolean
           social_enabled?: boolean
           system_enabled?: boolean
           updated_at?: string
@@ -2501,6 +2507,7 @@ export type Database = {
           daily_fat_target: number | null
           daily_fiber_target: number | null
           daily_protein_target: number | null
+          daily_scan_limit: number
           daily_steps_target: number | null
           daily_water_target: number | null
           deleted_at: string | null
@@ -2517,6 +2524,7 @@ export type Database = {
           ideal_weight_max: number | null
           ideal_weight_min: number | null
           language: string | null
+          last_scan_date: string | null
           last_seen_report_id: string | null
           location_lat: number | null
           location_lng: number | null
@@ -2529,6 +2537,8 @@ export type Database = {
           referral_code: string | null
           referred_by: string | null
           scan_audit_opt_in: boolean
+          scan_streak_current: number
+          scan_streak_longest: number
           streak_days: number
           target_weight_kg: number | null
           tdee: number | null
@@ -2554,6 +2564,7 @@ export type Database = {
           daily_fat_target?: number | null
           daily_fiber_target?: number | null
           daily_protein_target?: number | null
+          daily_scan_limit?: number
           daily_steps_target?: number | null
           daily_water_target?: number | null
           deleted_at?: string | null
@@ -2570,6 +2581,7 @@ export type Database = {
           ideal_weight_max?: number | null
           ideal_weight_min?: number | null
           language?: string | null
+          last_scan_date?: string | null
           last_seen_report_id?: string | null
           location_lat?: number | null
           location_lng?: number | null
@@ -2582,6 +2594,8 @@ export type Database = {
           referral_code?: string | null
           referred_by?: string | null
           scan_audit_opt_in?: boolean
+          scan_streak_current?: number
+          scan_streak_longest?: number
           streak_days?: number
           target_weight_kg?: number | null
           tdee?: number | null
@@ -2607,6 +2621,7 @@ export type Database = {
           daily_fat_target?: number | null
           daily_fiber_target?: number | null
           daily_protein_target?: number | null
+          daily_scan_limit?: number
           daily_steps_target?: number | null
           daily_water_target?: number | null
           deleted_at?: string | null
@@ -2623,6 +2638,7 @@ export type Database = {
           ideal_weight_max?: number | null
           ideal_weight_min?: number | null
           language?: string | null
+          last_scan_date?: string | null
           last_seen_report_id?: string | null
           location_lat?: number | null
           location_lng?: number | null
@@ -2635,6 +2651,8 @@ export type Database = {
           referral_code?: string | null
           referred_by?: string | null
           scan_audit_opt_in?: boolean
+          scan_streak_current?: number
+          scan_streak_longest?: number
           streak_days?: number
           target_weight_kg?: number | null
           tdee?: number | null
