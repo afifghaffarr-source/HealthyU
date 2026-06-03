@@ -39,6 +39,7 @@ import { Route as AuthenticatedMoodRouteImport } from './routes/_authenticated/m
 import { Route as AuthenticatedMeditationRouteImport } from './routes/_authenticated/meditation'
 import { Route as AuthenticatedMedicationsRouteImport } from './routes/_authenticated/medications'
 import { Route as AuthenticatedMealplanRouteImport } from './routes/_authenticated/mealplan'
+import { Route as AuthenticatedLoginBonusRouteImport } from './routes/_authenticated/login-bonus'
 import { Route as AuthenticatedLeaderboardRouteImport } from './routes/_authenticated/leaderboard'
 import { Route as AuthenticatedInsightsRouteImport } from './routes/_authenticated/insights'
 import { Route as AuthenticatedHeatmapRouteImport } from './routes/_authenticated/heatmap'
@@ -260,6 +261,11 @@ const AuthenticatedMedicationsRoute =
 const AuthenticatedMealplanRoute = AuthenticatedMealplanRouteImport.update({
   id: '/mealplan',
   path: '/mealplan',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedLoginBonusRoute = AuthenticatedLoginBonusRouteImport.update({
+  id: '/login-bonus',
+  path: '/login-bonus',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedLeaderboardRoute =
@@ -661,6 +667,7 @@ export interface FileRoutesByFullPath {
   '/heatmap': typeof AuthenticatedHeatmapRoute
   '/insights': typeof AuthenticatedInsightsRoute
   '/leaderboard': typeof AuthenticatedLeaderboardRoute
+  '/login-bonus': typeof AuthenticatedLoginBonusRoute
   '/mealplan': typeof AuthenticatedMealplanRouteWithChildren
   '/medications': typeof AuthenticatedMedicationsRoute
   '/meditation': typeof AuthenticatedMeditationRoute
@@ -759,6 +766,7 @@ export interface FileRoutesByTo {
   '/heatmap': typeof AuthenticatedHeatmapRoute
   '/insights': typeof AuthenticatedInsightsRoute
   '/leaderboard': typeof AuthenticatedLeaderboardRoute
+  '/login-bonus': typeof AuthenticatedLoginBonusRoute
   '/mealplan': typeof AuthenticatedMealplanRouteWithChildren
   '/medications': typeof AuthenticatedMedicationsRoute
   '/meditation': typeof AuthenticatedMeditationRoute
@@ -859,6 +867,7 @@ export interface FileRoutesById {
   '/_authenticated/heatmap': typeof AuthenticatedHeatmapRoute
   '/_authenticated/insights': typeof AuthenticatedInsightsRoute
   '/_authenticated/leaderboard': typeof AuthenticatedLeaderboardRoute
+  '/_authenticated/login-bonus': typeof AuthenticatedLoginBonusRoute
   '/_authenticated/mealplan': typeof AuthenticatedMealplanRouteWithChildren
   '/_authenticated/medications': typeof AuthenticatedMedicationsRoute
   '/_authenticated/meditation': typeof AuthenticatedMeditationRoute
@@ -959,6 +968,7 @@ export interface FileRouteTypes {
     | '/heatmap'
     | '/insights'
     | '/leaderboard'
+    | '/login-bonus'
     | '/mealplan'
     | '/medications'
     | '/meditation'
@@ -1057,6 +1067,7 @@ export interface FileRouteTypes {
     | '/heatmap'
     | '/insights'
     | '/leaderboard'
+    | '/login-bonus'
     | '/mealplan'
     | '/medications'
     | '/meditation'
@@ -1156,6 +1167,7 @@ export interface FileRouteTypes {
     | '/_authenticated/heatmap'
     | '/_authenticated/insights'
     | '/_authenticated/leaderboard'
+    | '/_authenticated/login-bonus'
     | '/_authenticated/mealplan'
     | '/_authenticated/medications'
     | '/_authenticated/meditation'
@@ -1453,6 +1465,13 @@ declare module '@tanstack/react-router' {
       path: '/mealplan'
       fullPath: '/mealplan'
       preLoaderRoute: typeof AuthenticatedMealplanRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/login-bonus': {
+      id: '/_authenticated/login-bonus'
+      path: '/login-bonus'
+      fullPath: '/login-bonus'
+      preLoaderRoute: typeof AuthenticatedLoginBonusRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/leaderboard': {
@@ -2166,6 +2185,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedHeatmapRoute: typeof AuthenticatedHeatmapRoute
   AuthenticatedInsightsRoute: typeof AuthenticatedInsightsRoute
   AuthenticatedLeaderboardRoute: typeof AuthenticatedLeaderboardRoute
+  AuthenticatedLoginBonusRoute: typeof AuthenticatedLoginBonusRoute
   AuthenticatedMealplanRoute: typeof AuthenticatedMealplanRouteWithChildren
   AuthenticatedMedicationsRoute: typeof AuthenticatedMedicationsRoute
   AuthenticatedMeditationRoute: typeof AuthenticatedMeditationRoute
@@ -2222,6 +2242,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedHeatmapRoute: AuthenticatedHeatmapRoute,
   AuthenticatedInsightsRoute: AuthenticatedInsightsRoute,
   AuthenticatedLeaderboardRoute: AuthenticatedLeaderboardRoute,
+  AuthenticatedLoginBonusRoute: AuthenticatedLoginBonusRoute,
   AuthenticatedMealplanRoute: AuthenticatedMealplanRouteWithChildren,
   AuthenticatedMedicationsRoute: AuthenticatedMedicationsRoute,
   AuthenticatedMeditationRoute: AuthenticatedMeditationRoute,
