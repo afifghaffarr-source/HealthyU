@@ -5,7 +5,8 @@ import { getProfile } from "@/lib/profile.functions";
 import { BottomNav } from "@/components/bottom-nav";
 import { supabase } from "@/integrations/supabase/client";
 import { calcAge, calcBMI, bmiCategory, calcBMR, calcTDEE, type ActivityLevel } from "@/lib/health";
-import { ArrowLeft, LogOut, Settings, Trophy, Moon, Calendar, Pill, MoonStar, BarChart3, Bell } from "lucide-react";
+import { ArrowLeft, LogOut, Settings, Trophy, Moon, Calendar, Pill, MoonStar, BarChart3, Bell, Users, Sun } from "lucide-react";
+import { useTheme } from "@/components/theme-provider";
 
 export const Route = createFileRoute("/_authenticated/profile")({
   component: ProfilePage,
@@ -13,6 +14,7 @@ export const Route = createFileRoute("/_authenticated/profile")({
 
 function ProfilePage() {
   const navigate = useNavigate();
+  const { theme, toggle } = useTheme();
   const fetchProfile = useServerFn(getProfile);
   const { data: p } = useQuery({ queryKey: ["profile"], queryFn: () => fetchProfile() });
 
@@ -72,6 +74,17 @@ function ProfilePage() {
         </Link>
 
         <section className="grid grid-cols-2 gap-3">
+          <Link to="/community" className="bg-card p-4 rounded-2xl outline-1 outline-black/10 flex flex-col items-start gap-2">
+            <Users className="size-5 text-primary" />
+            <span className="text-sm font-semibold">Komunitas</span>
+          </Link>
+          <button
+            onClick={toggle}
+            className="bg-card p-4 rounded-2xl outline-1 outline-black/10 flex flex-col items-start gap-2 text-left"
+          >
+            {theme === "dark" ? <Sun className="size-5 text-coral" /> : <Moon className="size-5 text-primary" />}
+            <span className="text-sm font-semibold">{theme === "dark" ? "Mode Terang" : "Mode Gelap"}</span>
+          </button>
           <Link to="/reports" className="bg-card p-4 rounded-2xl outline-1 outline-black/10 flex flex-col items-start gap-2">
             <BarChart3 className="size-5 text-sage-deep" />
             <span className="text-sm font-semibold">Laporan</span>
