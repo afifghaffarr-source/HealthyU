@@ -35,21 +35,23 @@ describe("I18nProvider", () => {
     expect(window.localStorage.getItem("i18n:locale")).toBe("en");
   });
 
-  it("defaults to 'id' when localStorage.getItem throws (SSR-like)", () => {
-    const spy = vi.spyOn(window.localStorage.__proto__, "getItem").mockImplementation(() => {
-      throw new Error("no storage");
-    });
+  it("defaults to 'id' when localStorage.getItem throws (SSR-safe)", () => {
+    const spy = vi
+      .spyOn(window.localStorage.__proto__, "getItem")
+      .mockImplementation(() => {
+        throw new Error("no storage");
+      });
     function DefaultProbe() {
       const { t } = useTranslation();
       return <span data-testid="msg">{t("pdf.footer.pageLabel")}</span>;
     }
-    expect(() =>
-      render(
-        <I18nProvider>
-          <DefaultProbe />
-        </I18nProvider>,
-      ),
-    ).toThrow(); // current impl rethrows — keep as crash-detection canary
+    render(
+      <I18nProvider>
+        <DefaultProbe />
+      </I18nProvider>,
+    );
+    // Indonesian default ("hal") because storage read was swallowed.
+    expect(screen.getByTestId("msg").textContent).toBe("hal");
     spy.mockRestore();
   });
 });
