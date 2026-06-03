@@ -36,6 +36,7 @@ import { Route as AuthenticatedOnboardingRouteImport } from './routes/_authentic
 import { Route as AuthenticatedOfflineQueueRouteImport } from './routes/_authenticated/offline-queue'
 import { Route as AuthenticatedNotificationsRouteImport } from './routes/_authenticated/notifications'
 import { Route as AuthenticatedMoodRouteImport } from './routes/_authenticated/mood'
+import { Route as AuthenticatedMeditationRouteImport } from './routes/_authenticated/meditation'
 import { Route as AuthenticatedMedicationsRouteImport } from './routes/_authenticated/medications'
 import { Route as AuthenticatedMealplanRouteImport } from './routes/_authenticated/mealplan'
 import { Route as AuthenticatedLeaderboardRouteImport } from './routes/_authenticated/leaderboard'
@@ -61,6 +62,7 @@ import { Route as AuthenticatedArticlesRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedAchievementsRouteImport } from './routes/_authenticated/achievements'
 import { Route as ApiChatStreamRouteImport } from './routes/api/chat.stream'
 import { Route as AuthenticatedStoriesIdRouteImport } from './routes/_authenticated/stories.$id'
+import { Route as AuthenticatedShoppingListRouteImport } from './routes/_authenticated/shopping.list'
 import { Route as AuthenticatedScanVoiceRouteImport } from './routes/_authenticated/scan.voice'
 import { Route as AuthenticatedScanRecipeRouteImport } from './routes/_authenticated/scan.recipe'
 import { Route as AuthenticatedScanMenuRouteImport } from './routes/_authenticated/scan.menu'
@@ -241,6 +243,11 @@ const AuthenticatedMoodRoute = AuthenticatedMoodRouteImport.update({
   path: '/mood',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedMeditationRoute = AuthenticatedMeditationRouteImport.update({
+  id: '/meditation',
+  path: '/meditation',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedMedicationsRoute =
   AuthenticatedMedicationsRouteImport.update({
     id: '/medications',
@@ -370,6 +377,12 @@ const AuthenticatedStoriesIdRoute = AuthenticatedStoriesIdRouteImport.update({
   path: '/$id',
   getParentRoute: () => AuthenticatedStoriesRoute,
 } as any)
+const AuthenticatedShoppingListRoute =
+  AuthenticatedShoppingListRouteImport.update({
+    id: '/shopping/list',
+    path: '/shopping/list',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedScanVoiceRoute = AuthenticatedScanVoiceRouteImport.update({
   id: '/voice',
   path: '/voice',
@@ -630,6 +643,7 @@ export interface FileRoutesByFullPath {
   '/leaderboard': typeof AuthenticatedLeaderboardRoute
   '/mealplan': typeof AuthenticatedMealplanRouteWithChildren
   '/medications': typeof AuthenticatedMedicationsRoute
+  '/meditation': typeof AuthenticatedMeditationRoute
   '/mood': typeof AuthenticatedMoodRoute
   '/notifications': typeof AuthenticatedNotificationsRouteWithChildren
   '/offline-queue': typeof AuthenticatedOfflineQueueRoute
@@ -684,6 +698,7 @@ export interface FileRoutesByFullPath {
   '/scan/menu': typeof AuthenticatedScanMenuRoute
   '/scan/recipe': typeof AuthenticatedScanRecipeRoute
   '/scan/voice': typeof AuthenticatedScanVoiceRoute
+  '/shopping/list': typeof AuthenticatedShoppingListRoute
   '/stories/$id': typeof AuthenticatedStoriesIdRoute
   '/api/chat/stream': typeof ApiChatStreamRoute
   '/groups/$id/leaderboard': typeof AuthenticatedGroupsIdLeaderboardRoute
@@ -723,6 +738,7 @@ export interface FileRoutesByTo {
   '/leaderboard': typeof AuthenticatedLeaderboardRoute
   '/mealplan': typeof AuthenticatedMealplanRouteWithChildren
   '/medications': typeof AuthenticatedMedicationsRoute
+  '/meditation': typeof AuthenticatedMeditationRoute
   '/mood': typeof AuthenticatedMoodRoute
   '/notifications': typeof AuthenticatedNotificationsRouteWithChildren
   '/offline-queue': typeof AuthenticatedOfflineQueueRoute
@@ -777,6 +793,7 @@ export interface FileRoutesByTo {
   '/scan/menu': typeof AuthenticatedScanMenuRoute
   '/scan/recipe': typeof AuthenticatedScanRecipeRoute
   '/scan/voice': typeof AuthenticatedScanVoiceRoute
+  '/shopping/list': typeof AuthenticatedShoppingListRoute
   '/stories/$id': typeof AuthenticatedStoriesIdRoute
   '/api/chat/stream': typeof ApiChatStreamRoute
   '/groups/$id/leaderboard': typeof AuthenticatedGroupsIdLeaderboardRoute
@@ -818,6 +835,7 @@ export interface FileRoutesById {
   '/_authenticated/leaderboard': typeof AuthenticatedLeaderboardRoute
   '/_authenticated/mealplan': typeof AuthenticatedMealplanRouteWithChildren
   '/_authenticated/medications': typeof AuthenticatedMedicationsRoute
+  '/_authenticated/meditation': typeof AuthenticatedMeditationRoute
   '/_authenticated/mood': typeof AuthenticatedMoodRoute
   '/_authenticated/notifications': typeof AuthenticatedNotificationsRouteWithChildren
   '/_authenticated/offline-queue': typeof AuthenticatedOfflineQueueRoute
@@ -872,6 +890,7 @@ export interface FileRoutesById {
   '/_authenticated/scan/menu': typeof AuthenticatedScanMenuRoute
   '/_authenticated/scan/recipe': typeof AuthenticatedScanRecipeRoute
   '/_authenticated/scan/voice': typeof AuthenticatedScanVoiceRoute
+  '/_authenticated/shopping/list': typeof AuthenticatedShoppingListRoute
   '/_authenticated/stories/$id': typeof AuthenticatedStoriesIdRoute
   '/api/chat/stream': typeof ApiChatStreamRoute
   '/_authenticated/groups/$id/leaderboard': typeof AuthenticatedGroupsIdLeaderboardRoute
@@ -913,6 +932,7 @@ export interface FileRouteTypes {
     | '/leaderboard'
     | '/mealplan'
     | '/medications'
+    | '/meditation'
     | '/mood'
     | '/notifications'
     | '/offline-queue'
@@ -967,6 +987,7 @@ export interface FileRouteTypes {
     | '/scan/menu'
     | '/scan/recipe'
     | '/scan/voice'
+    | '/shopping/list'
     | '/stories/$id'
     | '/api/chat/stream'
     | '/groups/$id/leaderboard'
@@ -1006,6 +1027,7 @@ export interface FileRouteTypes {
     | '/leaderboard'
     | '/mealplan'
     | '/medications'
+    | '/meditation'
     | '/mood'
     | '/notifications'
     | '/offline-queue'
@@ -1060,6 +1082,7 @@ export interface FileRouteTypes {
     | '/scan/menu'
     | '/scan/recipe'
     | '/scan/voice'
+    | '/shopping/list'
     | '/stories/$id'
     | '/api/chat/stream'
     | '/groups/$id/leaderboard'
@@ -1100,6 +1123,7 @@ export interface FileRouteTypes {
     | '/_authenticated/leaderboard'
     | '/_authenticated/mealplan'
     | '/_authenticated/medications'
+    | '/_authenticated/meditation'
     | '/_authenticated/mood'
     | '/_authenticated/notifications'
     | '/_authenticated/offline-queue'
@@ -1154,6 +1178,7 @@ export interface FileRouteTypes {
     | '/_authenticated/scan/menu'
     | '/_authenticated/scan/recipe'
     | '/_authenticated/scan/voice'
+    | '/_authenticated/shopping/list'
     | '/_authenticated/stories/$id'
     | '/api/chat/stream'
     | '/_authenticated/groups/$id/leaderboard'
@@ -1371,6 +1396,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedMoodRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/meditation': {
+      id: '/_authenticated/meditation'
+      path: '/meditation'
+      fullPath: '/meditation'
+      preLoaderRoute: typeof AuthenticatedMeditationRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/medications': {
       id: '/_authenticated/medications'
       path: '/medications'
@@ -1545,6 +1577,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/stories/$id'
       preLoaderRoute: typeof AuthenticatedStoriesIdRouteImport
       parentRoute: typeof AuthenticatedStoriesRoute
+    }
+    '/_authenticated/shopping/list': {
+      id: '/_authenticated/shopping/list'
+      path: '/shopping/list'
+      fullPath: '/shopping/list'
+      preLoaderRoute: typeof AuthenticatedShoppingListRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/scan/voice': {
       id: '/_authenticated/scan/voice'
@@ -2057,6 +2096,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedLeaderboardRoute: typeof AuthenticatedLeaderboardRoute
   AuthenticatedMealplanRoute: typeof AuthenticatedMealplanRouteWithChildren
   AuthenticatedMedicationsRoute: typeof AuthenticatedMedicationsRoute
+  AuthenticatedMeditationRoute: typeof AuthenticatedMeditationRoute
   AuthenticatedMoodRoute: typeof AuthenticatedMoodRoute
   AuthenticatedNotificationsRoute: typeof AuthenticatedNotificationsRouteWithChildren
   AuthenticatedOfflineQueueRoute: typeof AuthenticatedOfflineQueueRoute
@@ -2084,6 +2124,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedHabitsStackRoute: typeof AuthenticatedHabitsStackRoute
   AuthenticatedQuizDailyRoute: typeof AuthenticatedQuizDailyRoute
   AuthenticatedRestaurantsNearbyRoute: typeof AuthenticatedRestaurantsNearbyRoute
+  AuthenticatedShoppingListRoute: typeof AuthenticatedShoppingListRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
@@ -2110,6 +2151,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedLeaderboardRoute: AuthenticatedLeaderboardRoute,
   AuthenticatedMealplanRoute: AuthenticatedMealplanRouteWithChildren,
   AuthenticatedMedicationsRoute: AuthenticatedMedicationsRoute,
+  AuthenticatedMeditationRoute: AuthenticatedMeditationRoute,
   AuthenticatedMoodRoute: AuthenticatedMoodRoute,
   AuthenticatedNotificationsRoute: AuthenticatedNotificationsRouteWithChildren,
   AuthenticatedOfflineQueueRoute: AuthenticatedOfflineQueueRoute,
@@ -2137,6 +2179,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedHabitsStackRoute: AuthenticatedHabitsStackRoute,
   AuthenticatedQuizDailyRoute: AuthenticatedQuizDailyRoute,
   AuthenticatedRestaurantsNearbyRoute: AuthenticatedRestaurantsNearbyRoute,
+  AuthenticatedShoppingListRoute: AuthenticatedShoppingListRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
@@ -2158,3 +2201,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
