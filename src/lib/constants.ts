@@ -8,6 +8,12 @@
 // | TRENDING_COUNTER_PULSE_MS      | Durasi pulse chip counter Trending saat angka bertambah.  |
 // | TRENDING_GROWTH_FLASH_MS       | Durasi flash "+N" pada badge growth resep.                |
 // | CHALLENGE_HIGHLIGHT_MS         | Durasi ring highlight kartu challenge (auto-scroll).      |
+// | CHALLENGE_HIGHLIGHT_FADE_MS    | Lama fade-out ring di akhir CHALLENGE_HIGHLIGHT_MS.       |
+//
+// CONVENTION: setiap konstanta tunable WAJIB ditambahkan ke tabel di atas
+// (nama + 1 baris efek). Reviewer boleh menolak PR yang menambah konstanta
+// baru tanpa memperbarui tabel ini. Group constants by domain (challenges /
+// trending / dashboard) lalu tambahkan dengan urutan deklarasi di bawah.
 
 /** Hari sebelum localStorage `recipes:trendingCount` dianggap basi & di-invalidate. */
 export const TRENDING_TTL_DAYS = 7;
@@ -26,3 +32,6 @@ export const TRENDING_GROWTH_FLASH_MS = 2500;
 
 /** Durasi ring highlight kartu challenge setelah scroll otomatis (ms). */
 export const CHALLENGE_HIGHLIGHT_MS = 2000;
+
+/** Lama fade-out ring di akhir CHALLENGE_HIGHLIGHT_MS (ms). */
+export const CHALLENGE_HIGHLIGHT_FADE_MS = 500;
