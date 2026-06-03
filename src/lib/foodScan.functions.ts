@@ -147,7 +147,7 @@ export const recognizeFood = createServerFn({ method: "POST" })
         .from("food_scans")
         .insert({
           user_id: userId,
-          detected_foods: enriched as unknown as Record<string, unknown>[],
+          detected_foods: JSON.parse(JSON.stringify(enriched)),
           total_calories: totalCal,
           total_protein: totalP,
           total_carbs: totalC,
@@ -168,8 +168,8 @@ export const recognizeFood = createServerFn({ method: "POST" })
 
 const CorrectionInput = z.object({
   scan_id: z.string().uuid().nullable(),
-  original: z.record(z.string(), z.unknown()),
-  corrected: z.record(z.string(), z.unknown()),
+  original: z.unknown(),
+  corrected: z.unknown(),
   note: z.string().max(500).optional(),
 });
 
@@ -181,8 +181,8 @@ export const submitScanCorrection = createServerFn({ method: "POST" })
     const { error } = await supabase.from("food_scan_corrections").insert({
       user_id: userId,
       scan_id: data.scan_id,
-      original: data.original,
-      corrected: data.corrected,
+      original: data.original as never,
+      corrected: data.corrected as never,
       note: data.note ?? null,
     });
     if (error) throw new Error(error.message);
