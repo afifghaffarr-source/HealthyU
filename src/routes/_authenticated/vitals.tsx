@@ -5,7 +5,8 @@ import { useServerFn } from "@tanstack/react-start";
 import { listVitals, addVitals, deleteVitals } from "@/lib/vitals.functions";
 import { listBodyMetrics, addBodyMetrics, deleteBodyMetrics } from "@/lib/bodyMetrics.functions";
 import { BottomNav } from "@/components/bottom-nav";
-import { ArrowLeft, Heart, Activity, Droplet, Trash2, WifiOff, RefreshCw, Ruler, ChevronDown } from "lucide-react";
+import { Heart, Activity, Droplet, Trash2, WifiOff, RefreshCw, Ruler, ChevronDown } from "lucide-react";
+import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { toast } from "sonner";
 import { enqueue } from "@/lib/offline-queue";
 import { useOfflineQueue } from "@/hooks/use-offline-queue";
@@ -139,22 +140,20 @@ function VitalsPage() {
 
   return (
     <main className="min-h-screen bg-background pb-28">
-      <div className="max-w-md mx-auto px-5 pt-8 space-y-5">
-        <header className="flex items-center gap-3">
-          <Link to="/profile" className="size-10 bg-card rounded-2xl outline-1 outline-black/10 grid place-items-center">
-            <ArrowLeft className="size-4" />
-          </Link>
-          <h1 className="text-2xl font-bold">Vital Signs</h1>
-          {(!online || pending > 0) && (
+      <div className="max-w-md mx-auto px-5 pt-2 space-y-5">
+        <TopAppBar
+          title="Vital Signs"
+          showBack
+          action={(!online || pending > 0) ? (
             <button
               onClick={() => sync()}
-              className={`ml-auto inline-flex items-center gap-1 text-[11px] font-semibold px-2.5 py-1.5 rounded-full ${online ? "bg-amber-100 text-amber-700" : "bg-muted text-muted-foreground"}`}
+              className={`inline-flex items-center gap-1 text-[11px] font-semibold px-2.5 py-1.5 rounded-full ${online ? "bg-amber-100 text-amber-700" : "bg-muted text-muted-foreground"}`}
             >
               {online ? <RefreshCw className="size-3" /> : <WifiOff className="size-3" />}
               {online ? `Sync ${pending}` : `Offline${pending ? ` · ${pending}` : ""}`}
             </button>
-          )}
-        </header>
+          ) : undefined}
+        />
 
         {latest && (
           <section className="grid grid-cols-3 gap-2 animate-fade-up">
