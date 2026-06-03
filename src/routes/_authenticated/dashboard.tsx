@@ -91,6 +91,15 @@ function Dashboard() {
     window.sessionStorage.setItem("dashboard:newClaims", JSON.stringify(payload));
   }, [newClaims]);
 
+  // Tick once per second while any claim badge is visible, so the TTL
+  // countdown bar inside the badge animates down toward zero.
+  const [nowTick, setNowTick] = useState(() => Date.now());
+  useEffect(() => {
+    if (Object.keys(newClaims).length === 0) return;
+    const id = window.setInterval(() => setNowTick(Date.now()), 1000);
+    return () => window.clearInterval(id);
+  }, [newClaims]);
+
   // Realtime: refresh group challenge summary when bonuses/redemptions change
   useEffect(() => {
     // Aggregator: collapse multiple claim toasts within a 5s window
