@@ -91,6 +91,7 @@ import { Route as ApiPublicHooksNotificationSchedulerRouteImport } from './route
 import { Route as ApiPublicHooksDailyCoachRouteImport } from './routes/api/public/hooks/daily-coach'
 import { Route as AuthenticatedRecipesIdRemixRouteImport } from './routes/_authenticated/recipes.$id.remix'
 import { Route as AuthenticatedProfilePublicIdRouteImport } from './routes/_authenticated/profile.public.$id'
+import { Route as AuthenticatedProfileFollowersIdRouteImport } from './routes/_authenticated/profile.followers.$id'
 import { Route as AuthenticatedGroupsIdMealsRouteImport } from './routes/_authenticated/groups.$id.meals'
 import { Route as AuthenticatedGroupsIdLeaderboardRouteImport } from './routes/_authenticated/groups.$id.leaderboard'
 
@@ -536,6 +537,12 @@ const AuthenticatedProfilePublicIdRoute =
     path: '/public/$id',
     getParentRoute: () => AuthenticatedProfileRoute,
   } as any)
+const AuthenticatedProfileFollowersIdRoute =
+  AuthenticatedProfileFollowersIdRouteImport.update({
+    id: '/followers/$id',
+    path: '/followers/$id',
+    getParentRoute: () => AuthenticatedProfileRoute,
+  } as any)
 const AuthenticatedGroupsIdMealsRoute =
   AuthenticatedGroupsIdMealsRouteImport.update({
     id: '/$id/meals',
@@ -626,6 +633,7 @@ export interface FileRoutesByFullPath {
   '/api/chat/stream': typeof ApiChatStreamRoute
   '/groups/$id/leaderboard': typeof AuthenticatedGroupsIdLeaderboardRoute
   '/groups/$id/meals': typeof AuthenticatedGroupsIdMealsRoute
+  '/profile/followers/$id': typeof AuthenticatedProfileFollowersIdRoute
   '/profile/public/$id': typeof AuthenticatedProfilePublicIdRoute
   '/recipes/$id/remix': typeof AuthenticatedRecipesIdRemixRoute
   '/api/public/hooks/daily-coach': typeof ApiPublicHooksDailyCoachRoute
@@ -711,6 +719,7 @@ export interface FileRoutesByTo {
   '/api/chat/stream': typeof ApiChatStreamRoute
   '/groups/$id/leaderboard': typeof AuthenticatedGroupsIdLeaderboardRoute
   '/groups/$id/meals': typeof AuthenticatedGroupsIdMealsRoute
+  '/profile/followers/$id': typeof AuthenticatedProfileFollowersIdRoute
   '/profile/public/$id': typeof AuthenticatedProfilePublicIdRoute
   '/recipes/$id/remix': typeof AuthenticatedRecipesIdRemixRoute
   '/api/public/hooks/daily-coach': typeof ApiPublicHooksDailyCoachRoute
@@ -798,6 +807,7 @@ export interface FileRoutesById {
   '/api/chat/stream': typeof ApiChatStreamRoute
   '/_authenticated/groups/$id/leaderboard': typeof AuthenticatedGroupsIdLeaderboardRoute
   '/_authenticated/groups/$id/meals': typeof AuthenticatedGroupsIdMealsRoute
+  '/_authenticated/profile/followers/$id': typeof AuthenticatedProfileFollowersIdRoute
   '/_authenticated/profile/public/$id': typeof AuthenticatedProfilePublicIdRoute
   '/_authenticated/recipes/$id/remix': typeof AuthenticatedRecipesIdRemixRoute
   '/api/public/hooks/daily-coach': typeof ApiPublicHooksDailyCoachRoute
@@ -885,6 +895,7 @@ export interface FileRouteTypes {
     | '/api/chat/stream'
     | '/groups/$id/leaderboard'
     | '/groups/$id/meals'
+    | '/profile/followers/$id'
     | '/profile/public/$id'
     | '/recipes/$id/remix'
     | '/api/public/hooks/daily-coach'
@@ -970,6 +981,7 @@ export interface FileRouteTypes {
     | '/api/chat/stream'
     | '/groups/$id/leaderboard'
     | '/groups/$id/meals'
+    | '/profile/followers/$id'
     | '/profile/public/$id'
     | '/recipes/$id/remix'
     | '/api/public/hooks/daily-coach'
@@ -1056,6 +1068,7 @@ export interface FileRouteTypes {
     | '/api/chat/stream'
     | '/_authenticated/groups/$id/leaderboard'
     | '/_authenticated/groups/$id/meals'
+    | '/_authenticated/profile/followers/$id'
     | '/_authenticated/profile/public/$id'
     | '/_authenticated/recipes/$id/remix'
     | '/api/public/hooks/daily-coach'
@@ -1653,6 +1666,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedProfilePublicIdRouteImport
       parentRoute: typeof AuthenticatedProfileRoute
     }
+    '/_authenticated/profile/followers/$id': {
+      id: '/_authenticated/profile/followers/$id'
+      path: '/followers/$id'
+      fullPath: '/profile/followers/$id'
+      preLoaderRoute: typeof AuthenticatedProfileFollowersIdRouteImport
+      parentRoute: typeof AuthenticatedProfileRoute
+    }
     '/_authenticated/groups/$id/meals': {
       id: '/_authenticated/groups/$id/meals'
       path: '/$id/meals'
@@ -1735,12 +1755,14 @@ const AuthenticatedPetRouteWithChildren =
 interface AuthenticatedProfileRouteChildren {
   AuthenticatedProfilePrivacyRoute: typeof AuthenticatedProfilePrivacyRoute
   AuthenticatedProfileScanStatsRoute: typeof AuthenticatedProfileScanStatsRoute
+  AuthenticatedProfileFollowersIdRoute: typeof AuthenticatedProfileFollowersIdRoute
   AuthenticatedProfilePublicIdRoute: typeof AuthenticatedProfilePublicIdRoute
 }
 
 const AuthenticatedProfileRouteChildren: AuthenticatedProfileRouteChildren = {
   AuthenticatedProfilePrivacyRoute: AuthenticatedProfilePrivacyRoute,
   AuthenticatedProfileScanStatsRoute: AuthenticatedProfileScanStatsRoute,
+  AuthenticatedProfileFollowersIdRoute: AuthenticatedProfileFollowersIdRoute,
   AuthenticatedProfilePublicIdRoute: AuthenticatedProfilePublicIdRoute,
 }
 
