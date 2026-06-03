@@ -40,6 +40,7 @@ function ReportsPage() {
   const qc = useQueryClient();
   const [rangeWeeks, setRangeWeeks] = useState<number>(0); // 0 = semua
   const manualGenAtRef = useRef<number>(0);
+  const [manualFlashId, setManualFlashId] = useState<string | null>(null);
   const { data } = useQuery({
     queryKey: ["report", 7],
     queryFn: () => fetchFn({ data: { days: 7 } }),
@@ -107,7 +108,16 @@ function ReportsPage() {
       manualGenAtRef.current = Date.now();
       return aiFn({ data: { days: 7 } });
     },
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["ai-reports"] }),
+    onSuccess: async () => {
+      const res = await qc.invalidateQueries({ queryKey: ["ai-reports"] });
+      void res;
+      // Mark latest report id (after refetch) for a 3s visual flash
+      const latest = qc.getQueryData<Array<{ id: string }>>(["ai-reports"])?.[0]?.id ?? null;
+      if (latest) {
+        setManualFlashId(latest);
+        window.setTimeout(() => setManualFlashId((cur) => (cur === latest ? null : cur)), 3000);
+      }
+    },
     onError: (e) => toast.error(e instanceof Error ? e.message : "Gagal generate"),
   });
 
@@ -399,12 +409,15 @@ function ReportsPage() {
               .map((r, idx) => {
               const text = Array.isArray(r.recommendations) ? String(r.recommendations[0] ?? "") : "";
               const isNew = idx === 0 && latestId === r.id && lastSeenId !== r.id;
+              const isManualFlash = manualFlashId === r.id;
               return (
                 <details
                   key={r.id}
                   open={(focus === "latest" && idx === 0) || isNew}
                   className={
-                    isNew
+                    isManualFlash
+                      ? "bg-card rounded-2xl outline-2 outline-amber-400 p-4 ring-4 ring-amber-200 shadow-md animate-fade-up"
+                      : isNew
                       ? "bg-card rounded-2xl outline-2 outline-primary p-4 ring-2 ring-primary/20 shadow-md animate-fade-up"
                       : "bg-card rounded-2xl outline-1 outline-black/5 p-4"
                   }
