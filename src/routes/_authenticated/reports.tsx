@@ -295,6 +295,36 @@ function ReportsPage() {
     window.open(url, "_blank", "noopener,noreferrer");
   };
 
+  const exportArchivePdf = (r: {
+    report_period_start?: string | null;
+    report_period_end?: string | null;
+    created_at: string;
+    recommendations: unknown;
+  }) => {
+    const text = Array.isArray(r.recommendations) ? String(r.recommendations[0] ?? "") : "";
+    const doc = new jsPDF({ unit: "pt", format: "a4" });
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(18);
+    doc.text("Laporan HealthyU", 40, 50);
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(10);
+    doc.setTextColor(120);
+    const periode =
+      r.report_period_start && r.report_period_end
+        ? `Periode: ${r.report_period_start} → ${r.report_period_end}`
+        : `Dicetak: ${new Date(r.created_at).toLocaleDateString("id-ID")}`;
+    doc.text(periode, 40, 68);
+    doc.setTextColor(0);
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(12);
+    doc.text("Analisis AI", 40, 100);
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(10);
+    const lines = doc.splitTextToSize(text || "(kosong)", 515);
+    doc.text(lines, 40, 118);
+    doc.save(`laporan-healthyu-${(r.report_period_end ?? r.created_at).slice(0, 10)}.pdf`);
+  };
+
   const maxCal = Math.max(1, ...(summary?.byDay.map((d) => d.cals) ?? [1]));
 
   return (
@@ -453,19 +483,30 @@ function ReportsPage() {
                   </summary>
                   <p className="mt-3 text-sm whitespace-pre-wrap leading-relaxed">{text}</p>
                   {isManualFlash && text && (
-                    <button
-                      onClick={(e) => {
-                        e.preventDefault();
-                        shareWhatsapp({
-                          text,
-                          periodStart: r.report_period_start ?? undefined,
-                          periodEnd: r.report_period_end ?? undefined,
-                        });
-                      }}
-                      className="mt-3 inline-flex items-center gap-1.5 bg-[#25D366] text-white text-xs font-semibold px-3 py-1.5 rounded-full"
-                    >
-                      <Share2 className="size-3" /> Share
-                    </button>
+                    <div className="mt-3 flex items-center gap-2">
+                      <button
+                        onClick={(e) => {
+                          e.preventDefault();
+                          shareWhatsapp({
+                            text,
+                            periodStart: r.report_period_start ?? undefined,
+                            periodEnd: r.report_period_end ?? undefined,
+                          });
+                        }}
+                        className="inline-flex items-center gap-1.5 bg-[#25D366] text-white text-xs font-semibold px-3 py-1.5 rounded-full"
+                      >
+                        <Share2 className="size-3" /> Share
+                      </button>
+                      <button
+                        onClick={(e) => {
+                          e.preventDefault();
+                          exportArchivePdf(r);
+                        }}
+                        className="inline-flex items-center gap-1.5 bg-card outline-1 outline-black/10 text-xs font-semibold px-3 py-1.5 rounded-full"
+                      >
+                        <FileText className="size-3" /> PDF
+                      </button>
+                    </div>
                   )}
                 </details>
               );

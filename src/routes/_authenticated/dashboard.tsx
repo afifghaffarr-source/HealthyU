@@ -375,9 +375,12 @@ function Dashboard() {
                 if (total === 0) return null;
                 return (
                   <button
-                    onClick={() => setNewClaims({})}
+                    onClick={() => {
+                      setNewClaims({});
+                      navigate({ to: "/challenges" });
+                    }}
                     className="ml-auto text-[9px] font-bold uppercase bg-amber-100 text-amber-800 rounded-full px-2 py-0.5 animate-pulse"
-                    title="Klik untuk reset"
+                    title="Lihat semua leaderboard"
                   >
                     +{total} klaim baru
                   </button>

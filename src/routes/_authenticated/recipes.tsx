@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { listRecipes } from "@/lib/recipes.functions";
+import { TRENDING_TTL_DAYS } from "@/lib/constants";
 import { generateRecipeFromIngredients, type GeneratedRecipe } from "@/lib/ai-extras.functions";
 import { BottomNav } from "@/components/bottom-nav";
 import { ArrowLeft, Clock, Flame, Search, Sparkles, Loader2, X, Star, Bookmark, TrendingUp } from "lucide-react";
@@ -58,10 +59,10 @@ function RecipesPage() {
           if (!raw) return null;
           try {
             const parsed = JSON.parse(raw) as { count: number; ts: number };
-            if (
+          if (
               typeof parsed?.count !== "number" ||
               typeof parsed?.ts !== "number" ||
-              Date.now() - parsed.ts > 7 * 86400000
+            Date.now() - parsed.ts > TRENDING_TTL_DAYS * 86400000
             ) {
               window.localStorage.removeItem("recipes:trendingCount");
               return null;
