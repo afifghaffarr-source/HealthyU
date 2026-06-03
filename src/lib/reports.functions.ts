@@ -40,7 +40,7 @@ export const weeklyAiAnalysis = createServerFn({ method: "POST" })
     const since = new Date(Date.now() - data.days * 86400000).toISOString();
 
     const [profileRes, meals, water, workouts, sleep, fasting] = await Promise.all([
-      supabase.from("profiles").select("full_name, dob, sex, height_cm, weight_kg, activity_level, daily_calorie_target, protein_target_g, carbs_target_g, fat_target_g, water_target_ml, health_conditions, allergies").eq("id", userId).maybeSingle(),
+      supabase.from("profiles").select("full_name, birth_date, sex, height_cm, weight_kg, activity_level, daily_calorie_target, protein_target_g, carbs_target_g, fat_target_g, water_target_ml, health_conditions, allergies").eq("id", userId).maybeSingle(),
       supabase.from("meal_logs").select("logged_at, calories, protein_g, carbs_g, fat_g, meal_type").eq("user_id", userId).gte("logged_at", since),
       supabase.from("water_logs").select("logged_at, amount_ml").eq("user_id", userId).gte("logged_at", since),
       supabase.from("workout_sessions").select("performed_at, duration_min, calories_burned, type").eq("user_id", userId).gte("performed_at", since),
