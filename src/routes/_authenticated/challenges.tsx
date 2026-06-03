@@ -5,6 +5,8 @@ import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
 import { Trophy, Flame, Users, Calendar, Check, Medal, UserPlus, Gift } from "lucide-react";
 import { TopAppBar } from "@/components/healthyu/top-app-bar";
+import { EmptyState } from "@/components/healthyu/empty-state";
+import { ListSkeleton } from "@/components/healthyu/skeletons";
 import { toast } from "sonner";
 import { z } from "zod";
 import { fallback, zodValidator } from "@tanstack/zod-adapter";
@@ -183,15 +185,9 @@ function ChallengesPage() {
       </div>
 
       <main className="max-w-md mx-auto px-4 pt-4 space-y-3">
-        {isLoading && (
-          <p className="text-sm text-muted-foreground text-center py-10">
-            Memuat…
-          </p>
-        )}
+        {isLoading && <ListSkeleton count={3} />}
         {!isLoading && challenges.length === 0 && (
-          <p className="text-sm text-muted-foreground text-center py-10">
-            Belum ada challenge tersedia.
-          </p>
+          <EmptyState icon={Trophy} title="Belum ada challenge" description="Challenge baru akan dirilis berkala." />
         )}
         {challenges.map((c) => {
           const part = partsByCh.get(c.id);
