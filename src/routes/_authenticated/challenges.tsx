@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
+import { supabase } from "@/integrations/supabase/client";
 import { ArrowLeft, Trophy, Flame, Users, Calendar, Check, Medal, UserPlus, Gift } from "lucide-react";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -237,7 +238,12 @@ function ChallengesPage() {
                 {openLb === c.id ? "Sembunyikan leaderboard" : "Lihat leaderboard"}
               </button>
               {openLb === c.id && <Leaderboard challengeId={c.id} initialGroup={focusChallenge === c.id ? focusGroup : undefined} />}
-              {joined && <GroupInviter challengeId={c.id} />}
+              {joined && (
+                <GroupInviter
+                  challengeId={c.id}
+                  initialOpen={focusChallenge === c.id}
+                />
+              )}
               {joined && <BonusClaimer challengeId={c.id} />}
             </article>
           );
@@ -304,11 +310,14 @@ function Leaderboard({ challengeId, initialGroup }: { challengeId: string; initi
   );
 }
 
-function GroupInviter({ challengeId }: { challengeId: string }) {
+function GroupInviter({ challengeId, initialOpen }: { challengeId: string; initialOpen?: boolean }) {
   const qc = useQueryClient();
   const fetchGroups = useServerFn(listMyGroupsForChallenge);
   const inviteFn = useServerFn(inviteGroupToChallenge);
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(!!initialOpen);
+  useEffect(() => {
+    if (initialOpen) setOpen(true);
+  }, [initialOpen]);
   const { data: groups = [], isLoading } = useQuery({
     queryKey: ["my-groups-for-challenge", challengeId],
     queryFn: () => fetchGroups({ data: { challenge_id: challengeId } }),
@@ -476,11 +485,35 @@ function BonusClaimers({
   challengeId: string;
   groupName: string;
 }) {
+  const qc = useQueryClient();
   const fetchClaimers = useServerFn(listGroupBonusClaimers);
   const { data: claimers = [] } = useQuery({
     queryKey: ["bonus-claimers", groupId, challengeId],
     queryFn: () => fetchClaimers({ data: { group_id: groupId, challenge_id: challengeId } }),
   });
+  useEffect(() => {
+    const ch = supabase
+      .channel(`bonus-${groupId}-${challengeId}`)
+      .on(
+        "postgres_changes",
+        {
+          event: "INSERT",
+          schema: "public",
+          table: "group_challenge_bonuses",
+          filter: `group_id=eq.${groupId}`,
+        },
+        (payload) => {
+          const row = payload.new as { challenge_id?: string };
+          if (row.challenge_id === challengeId) {
+            qc.invalidateQueries({ queryKey: ["bonus-claimers", groupId, challengeId] });
+          }
+        },
+      )
+      .subscribe();
+    return () => {
+      void supabase.removeChannel(ch);
+    };
+  }, [groupId, challengeId, qc]);
   if (claimers.length === 0) return null;
   return (
     <div className="flex flex-wrap items-center gap-1 px-1">

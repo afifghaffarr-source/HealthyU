@@ -8,6 +8,7 @@ import { currentFast } from "@/lib/fasting.functions";
 import { todaysWater, logWater } from "@/lib/water.functions";
 import { getGameSummary } from "@/lib/gamification.functions";
 import { myGroupChallengeSummary } from "@/lib/groupChallengeSummary.functions";
+import { myUnlinkedJoinedChallenges } from "@/lib/myUnlinkedChallenges.functions";
 import { addMood } from "@/lib/mood.functions";
 import { getAchievementToastPrefix } from "@/lib/achievement-icons";
 import { BottomNav } from "@/components/bottom-nav";
@@ -31,6 +32,7 @@ function Dashboard() {
   const fetchGame = useServerFn(getGameSummary);
   const addMoodFn = useServerFn(addMood);
   const fetchGroupChallenges = useServerFn(myGroupChallengeSummary);
+  const fetchUnlinked = useServerFn(myUnlinkedJoinedChallenges);
 
   const { data: profile, isLoading: pLoad } = useQuery({ queryKey: ["profile"], queryFn: () => fetchProfile() });
   const { data: meals = [] } = useQuery({ queryKey: ["meals", "today"], queryFn: () => fetchMeals() });
@@ -40,6 +42,10 @@ function Dashboard() {
   const { data: groupSummary = [] } = useQuery({
     queryKey: ["group-challenge-summary"],
     queryFn: () => fetchGroupChallenges(),
+  });
+  const { data: unlinkedChallenges = [] } = useQuery({
+    queryKey: ["unlinked-joined-challenges"],
+    queryFn: () => fetchUnlinked(),
   });
 
   useEffect(() => {
@@ -301,6 +307,30 @@ function Dashboard() {
                     <p className="font-bold">#{g.rank || "-"}<span className="text-muted-foreground font-normal">/{g.total_participants}</span></p>
                     <p className="text-[10px] text-muted-foreground">Hari {g.my_day}{g.duration_days ? `/${g.duration_days}` : ""}</p>
                   </div>
+                </Link>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {unlinkedChallenges.length > 0 && (
+          <div className="bg-card p-4 rounded-3xl outline-1 outline-primary/20 shadow-sm animate-fade-up">
+            <div className="flex items-center gap-2 mb-2">
+              <Trophy className="size-4 text-primary" />
+              <p className="text-xs font-bold uppercase tracking-wider">Ajak grup ikut challenge</p>
+            </div>
+            <div className="space-y-1.5">
+              {unlinkedChallenges.slice(0, 3).map((c) => (
+                <Link
+                  key={c.id}
+                  to="/challenges"
+                  search={{ challenge: c.id }}
+                  className="flex items-center justify-between gap-2 bg-muted/40 hover:bg-muted/70 rounded-xl px-3 py-2 text-xs"
+                >
+                  <span className="font-semibold truncate">{c.title}</span>
+                  <span className="text-[10px] text-primary font-semibold inline-flex items-center gap-1 shrink-0">
+                    Undang <ArrowRight className="size-3" />
+                  </span>
                 </Link>
               ))}
             </div>
