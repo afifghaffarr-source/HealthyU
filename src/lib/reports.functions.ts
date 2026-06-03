@@ -48,6 +48,10 @@ export const weeklyAiAnalysis = createServerFn({ method: "POST" })
       supabase.from("fasting_sessions").select("start_time, end_time, target_hours, completed, protocol").eq("user_id", userId).gte("start_time", since),
     ]);
 
+    // Group challenge progress & leaderboard rank in each shared group
+    const { computeGroupChallengeSummary } = await import("./reportsGroupChallenges.server");
+    const groupChallenges = await computeGroupChallengeSummary(userId);
+
     const totalCals = (meals.data ?? []).reduce((s, m) => s + Number(m.calories || 0), 0);
     const totalProtein = (meals.data ?? []).reduce((s, m) => s + Number(m.protein_g || 0), 0);
     const totalCarbs = (meals.data ?? []).reduce((s, m) => s + Number(m.carbs_g || 0), 0);
@@ -73,6 +77,7 @@ export const weeklyAiAnalysis = createServerFn({ method: "POST" })
       target_calories: profile?.daily_calorie_target ?? null,
       health_conditions: profile?.health_conditions ?? [],
       allergies: profile?.allergies ?? [],
+      group_challenges: groupChallenges,
     };
 
     const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
@@ -83,7 +88,7 @@ export const weeklyAiAnalysis = createServerFn({ method: "POST" })
         messages: [
           {
             role: "system",
-            content: `Kamu adalah Dr. HealthyU, AI health coach. Buat laporan analisis mingguan dalam Bahasa Indonesia berdasarkan data user. Format markdown ringkas dengan section:\n## 📊 Ringkasan\n## ✅ Yang Berjalan Baik\n## ⚠️ Area Perlu Perbaikan\n## 🔗 Korelasi & Insight\n(hubungkan tidur dengan kalori/olahraga, puasa dengan pola makan, hidrasi dengan aktivitas)\n## 🎯 Rekomendasi Minggu Depan\n(3-5 action items konkret)\n\nJangan diagnosis medis. Selalu beri disclaimer jika ada metrik di luar normal.`,
+            content: `Kamu adalah Dr. HealthyU, AI health coach. Buat laporan analisis mingguan dalam Bahasa Indonesia berdasarkan data user. Format markdown ringkas dengan section:\n## 📊 Ringkasan\n## ✅ Yang Berjalan Baik\n## ⚠️ Area Perlu Perbaikan\n## 🔗 Korelasi & Insight\n(hubungkan tidur dengan kalori/olahraga, puasa dengan pola makan, hidrasi dengan aktivitas)\n## 👥 Progress Challenge Grup\n(jika field group_challenges tidak kosong: sebutkan rank user di tiap grup, streak, dan beri dorongan; lewati section ini jika kosong)\n## 🎯 Rekomendasi Minggu Depan\n(3-5 action items konkret)\n\nJangan diagnosis medis. Selalu beri disclaimer jika ada metrik di luar normal.`,
           },
           { role: "user", content: `Data ${d} hari terakhir:\n${JSON.stringify(summary, null, 2)}` },
         ],

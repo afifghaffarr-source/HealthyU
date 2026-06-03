@@ -53,6 +53,17 @@ function RecipesPage() {
       return a.title.localeCompare(b.title);
     });
 
+  // Popularity badge: top 10% by bookmark_count (min 1 bookmark)
+  const popularThreshold = (() => {
+    const counts = all
+      .map((r) => Number(r.bookmark_count ?? 0))
+      .filter((n) => n > 0)
+      .sort((a, b) => b - a);
+    if (counts.length === 0) return Infinity;
+    const idx = Math.max(0, Math.floor(counts.length * 0.1) - 1);
+    return Math.max(1, counts[idx]);
+  })();
+
   return (
     <main className="min-h-screen bg-background pb-28">
       <div className="max-w-md mx-auto px-5 pt-8 space-y-5">
@@ -133,6 +144,11 @@ function RecipesPage() {
               className="block bg-card p-4 rounded-2xl outline-1 outline-black/5"
             >
               <h3 className="font-bold">{r.title}</h3>
+              {Number(r.bookmark_count ?? 0) >= popularThreshold && (
+                <span className="inline-block mt-1 text-[10px] font-bold uppercase tracking-wide bg-orange-100 text-orange-700 px-2 py-0.5 rounded-full">
+                  🔥 Populer
+                </span>
+              )}
               {r.description && <p className="text-xs text-muted-foreground mt-1 line-clamp-2">{r.description}</p>}
               <div className="flex gap-4 mt-3 text-xs text-muted-foreground">
                 <span className="inline-flex items-center gap-1"><Flame className="size-3" />{r.calories} kcal</span>
