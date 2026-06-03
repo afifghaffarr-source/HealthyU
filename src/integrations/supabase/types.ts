@@ -14,6 +14,24 @@ export type Database = {
   }
   public: {
     Tables: {
+      achievement_showcase_order: {
+        Row: {
+          achievement_id: string
+          position: number
+          user_id: string
+        }
+        Insert: {
+          achievement_id: string
+          position: number
+          user_id: string
+        }
+        Update: {
+          achievement_id?: string
+          position?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
       achievements: {
         Row: {
           badge_url: string | null
@@ -526,6 +544,33 @@ export type Database = {
         }
         Relationships: []
       }
+      budget_meal_plans: {
+        Row: {
+          budget_idr: number
+          created_at: string
+          days: number
+          id: string
+          plan: Json
+          user_id: string
+        }
+        Insert: {
+          budget_idr: number
+          created_at?: string
+          days: number
+          id?: string
+          plan: Json
+          user_id: string
+        }
+        Update: {
+          budget_idr?: number
+          created_at?: string
+          days?: number
+          id?: string
+          plan?: Json
+          user_id?: string
+        }
+        Relationships: []
+      }
       challenge_daily_logs: {
         Row: {
           challenge_participant_id: string
@@ -707,6 +752,30 @@ export type Database = {
           title_en?: string | null
           updated_at?: string
           xp_reward?: number
+        }
+        Relationships: []
+      }
+      charity_donations: {
+        Row: {
+          charity_name: string
+          coins_spent: number
+          donated_at: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          charity_name: string
+          coins_spent: number
+          donated_at?: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          charity_name?: string
+          coins_spent?: number
+          donated_at?: string
+          id?: string
+          user_id?: string
         }
         Relationships: []
       }
@@ -3731,6 +3800,39 @@ export type Database = {
         }
         Relationships: []
       }
+      sleep_diary: {
+        Row: {
+          bedtime: string | null
+          created_at: string
+          diary_date: string
+          id: string
+          notes: string | null
+          quality: number | null
+          user_id: string
+          wake_time: string | null
+        }
+        Insert: {
+          bedtime?: string | null
+          created_at?: string
+          diary_date: string
+          id?: string
+          notes?: string | null
+          quality?: number | null
+          user_id: string
+          wake_time?: string | null
+        }
+        Update: {
+          bedtime?: string | null
+          created_at?: string
+          diary_date?: string
+          id?: string
+          notes?: string | null
+          quality?: number | null
+          user_id?: string
+          wake_time?: string | null
+        }
+        Relationships: []
+      }
       sleep_logs: {
         Row: {
           bed_time: string | null
@@ -4909,6 +5011,33 @@ export type Database = {
           updated_at?: string
           user_id?: string
           workout_plan_id?: string | null
+        }
+        Relationships: []
+      }
+      workout_timer_sessions: {
+        Row: {
+          completed_at: string
+          exercise_name: string
+          id: string
+          rounds: number
+          total_seconds: number
+          user_id: string
+        }
+        Insert: {
+          completed_at?: string
+          exercise_name: string
+          id?: string
+          rounds?: number
+          total_seconds: number
+          user_id: string
+        }
+        Update: {
+          completed_at?: string
+          exercise_name?: string
+          id?: string
+          rounds?: number
+          total_seconds?: number
+          user_id?: string
         }
         Relationships: []
       }
