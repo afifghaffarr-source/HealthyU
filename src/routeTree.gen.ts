@@ -57,6 +57,7 @@ import { Route as AuthenticatedScanMenuRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedScanHistoryRouteImport } from './routes/_authenticated/scan.history'
 import { Route as AuthenticatedScanBarcodeRouteImport } from './routes/_authenticated/scan.barcode'
 import { Route as AuthenticatedReportsNutritionRouteImport } from './routes/_authenticated/reports.nutrition'
+import { Route as AuthenticatedReportsGalleryRouteImport } from './routes/_authenticated/reports.gallery'
 import { Route as AuthenticatedRecipesSavedRouteImport } from './routes/_authenticated/recipes.saved'
 import { Route as AuthenticatedRecipesRecommendationsRouteImport } from './routes/_authenticated/recipes.recommendations'
 import { Route as AuthenticatedRecipesIdRouteImport } from './routes/_authenticated/recipes.$id'
@@ -318,6 +319,12 @@ const AuthenticatedReportsNutritionRoute =
     path: '/nutrition',
     getParentRoute: () => AuthenticatedReportsRoute,
   } as any)
+const AuthenticatedReportsGalleryRoute =
+  AuthenticatedReportsGalleryRouteImport.update({
+    id: '/gallery',
+    path: '/gallery',
+    getParentRoute: () => AuthenticatedReportsRoute,
+  } as any)
 const AuthenticatedRecipesSavedRoute =
   AuthenticatedRecipesSavedRouteImport.update({
     id: '/saved',
@@ -425,6 +432,7 @@ export interface FileRoutesByFullPath {
   '/recipes/$id': typeof AuthenticatedRecipesIdRoute
   '/recipes/recommendations': typeof AuthenticatedRecipesRecommendationsRoute
   '/recipes/saved': typeof AuthenticatedRecipesSavedRoute
+  '/reports/gallery': typeof AuthenticatedReportsGalleryRoute
   '/reports/nutrition': typeof AuthenticatedReportsNutritionRoute
   '/scan/barcode': typeof AuthenticatedScanBarcodeRoute
   '/scan/history': typeof AuthenticatedScanHistoryRoute
@@ -484,6 +492,7 @@ export interface FileRoutesByTo {
   '/recipes/$id': typeof AuthenticatedRecipesIdRoute
   '/recipes/recommendations': typeof AuthenticatedRecipesRecommendationsRoute
   '/recipes/saved': typeof AuthenticatedRecipesSavedRoute
+  '/reports/gallery': typeof AuthenticatedReportsGalleryRoute
   '/reports/nutrition': typeof AuthenticatedReportsNutritionRoute
   '/scan/barcode': typeof AuthenticatedScanBarcodeRoute
   '/scan/history': typeof AuthenticatedScanHistoryRoute
@@ -545,6 +554,7 @@ export interface FileRoutesById {
   '/_authenticated/recipes/$id': typeof AuthenticatedRecipesIdRoute
   '/_authenticated/recipes/recommendations': typeof AuthenticatedRecipesRecommendationsRoute
   '/_authenticated/recipes/saved': typeof AuthenticatedRecipesSavedRoute
+  '/_authenticated/reports/gallery': typeof AuthenticatedReportsGalleryRoute
   '/_authenticated/reports/nutrition': typeof AuthenticatedReportsNutritionRoute
   '/_authenticated/scan/barcode': typeof AuthenticatedScanBarcodeRoute
   '/_authenticated/scan/history': typeof AuthenticatedScanHistoryRoute
@@ -606,6 +616,7 @@ export interface FileRouteTypes {
     | '/recipes/$id'
     | '/recipes/recommendations'
     | '/recipes/saved'
+    | '/reports/gallery'
     | '/reports/nutrition'
     | '/scan/barcode'
     | '/scan/history'
@@ -665,6 +676,7 @@ export interface FileRouteTypes {
     | '/recipes/$id'
     | '/recipes/recommendations'
     | '/recipes/saved'
+    | '/reports/gallery'
     | '/reports/nutrition'
     | '/scan/barcode'
     | '/scan/history'
@@ -725,6 +737,7 @@ export interface FileRouteTypes {
     | '/_authenticated/recipes/$id'
     | '/_authenticated/recipes/recommendations'
     | '/_authenticated/recipes/saved'
+    | '/_authenticated/reports/gallery'
     | '/_authenticated/reports/nutrition'
     | '/_authenticated/scan/barcode'
     | '/_authenticated/scan/history'
@@ -1088,6 +1101,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedReportsNutritionRouteImport
       parentRoute: typeof AuthenticatedReportsRoute
     }
+    '/_authenticated/reports/gallery': {
+      id: '/_authenticated/reports/gallery'
+      path: '/gallery'
+      fullPath: '/reports/gallery'
+      preLoaderRoute: typeof AuthenticatedReportsGalleryRouteImport
+      parentRoute: typeof AuthenticatedReportsRoute
+    }
     '/_authenticated/recipes/saved': {
       id: '/_authenticated/recipes/saved'
       path: '/saved'
@@ -1191,10 +1211,12 @@ const AuthenticatedRecipesRouteWithChildren =
   AuthenticatedRecipesRoute._addFileChildren(AuthenticatedRecipesRouteChildren)
 
 interface AuthenticatedReportsRouteChildren {
+  AuthenticatedReportsGalleryRoute: typeof AuthenticatedReportsGalleryRoute
   AuthenticatedReportsNutritionRoute: typeof AuthenticatedReportsNutritionRoute
 }
 
 const AuthenticatedReportsRouteChildren: AuthenticatedReportsRouteChildren = {
+  AuthenticatedReportsGalleryRoute: AuthenticatedReportsGalleryRoute,
   AuthenticatedReportsNutritionRoute: AuthenticatedReportsNutritionRoute,
 }
 
