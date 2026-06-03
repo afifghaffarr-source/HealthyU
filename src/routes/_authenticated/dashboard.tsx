@@ -122,6 +122,7 @@ function Dashboard() {
           const row = payload.new as { user_id?: string; group_id?: string } | null;
           if (row?.user_id && row?.group_id) {
             const gid = row.group_id;
+            claimsTsRef.current[gid] = Date.now();
             setNewClaims((cur) => ({ ...cur, [gid]: (cur[gid] ?? 0) + 1 }));
             // Auto-clear this group's badge after 30s if user ignores it
             setTimeout(() => {
