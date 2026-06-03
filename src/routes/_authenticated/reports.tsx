@@ -263,6 +263,12 @@ function ReportsPage() {
       doc.setFontSize(10);
       const lines = doc.splitTextToSize(text || "(kosong)", 515);
       doc.text(lines, 40, 118);
+      // Back-link to TOC (page 1) in the top-right corner.
+      doc.setTextColor(80, 80, 200);
+      doc.setFontSize(9);
+      doc.text("\u2190 Daftar Isi", 555, 40, { align: "right" });
+      doc.link(490, 28, 70, 16, { pageNumber: 1 });
+      doc.setTextColor(0);
     });
     doc.save(`laporan-healthyu-arsip-${new Date().toISOString().slice(0, 10)}.pdf`);
   };
