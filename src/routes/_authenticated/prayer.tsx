@@ -8,6 +8,7 @@ import { ArrowLeft, MapPin, Bell, BellOff } from "lucide-react";
 import { toast } from "sonner";
 import {
   loadPrayerPrefs,
+  savePrayerContext,
   savePrayerPrefs,
   syncPrayerReminders,
   type PrayerPrefs,
@@ -62,7 +63,18 @@ function PrayerPage() {
   useEffect(() => {
     if (!times) return;
     syncPrayerReminders(times, prefs);
-  }, [times, prefs]);
+    savePrayerContext({
+      city,
+      dateKey: new Date().toISOString().slice(0, 10),
+      times: {
+        Fajr: times.Fajr,
+        Dhuhr: times.Dhuhr,
+        Asr: times.Asr,
+        Maghrib: times.Maghrib,
+        Isha: times.Isha,
+      },
+    });
+  }, [city, times, prefs]);
 
   const requestPermAndEnable = async () => {
     if (!("Notification" in window)) {

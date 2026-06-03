@@ -53,6 +53,7 @@ export function saveReminders(items: Reminder[]) {
 }
 
 export const PRAYER_PREFS_KEY = "prayer-notif-prefs-v1";
+export const PRAYER_CONTEXT_KEY = "prayer-notif-context-v1";
 
 export type PrayerPrefs = {
   enabled: boolean;
@@ -103,6 +104,30 @@ export type PrayerTimings = {
   Fajr: string; Dhuhr: string; Asr: string; Maghrib: string; Isha: string;
 };
 
+export type PrayerNotificationContext = {
+  city: string;
+  dateKey: string;
+  times: PrayerTimings;
+};
+
+export function loadPrayerContext(): PrayerNotificationContext | null {
+  if (typeof window === "undefined") return null;
+  try {
+    const raw = localStorage.getItem(PRAYER_CONTEXT_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as Partial<PrayerNotificationContext>;
+    if (!parsed?.city || !parsed?.dateKey || !parsed?.times) return null;
+    return parsed as PrayerNotificationContext;
+  } catch {
+    return null;
+  }
+}
+
+export function savePrayerContext(context: PrayerNotificationContext) {
+  if (typeof window === "undefined") return;
+  localStorage.setItem(PRAYER_CONTEXT_KEY, JSON.stringify(context));
+}
+
 /** Replace all reminders with id prefix "prayer-" using current times + prefs. */
 export function syncPrayerReminders(times: PrayerTimings, prefs: PrayerPrefs) {
   const others = loadReminders().filter((r) => !r.id.startsWith("prayer-"));
@@ -115,11 +140,38 @@ export function syncPrayerReminders(times: PrayerTimings, prefs: PrayerPrefs) {
     if (!enabled) return;
     next.push({ id, label, time: time.slice(0, 5), enabled: true, category: "prayer", days: [] });
   };
-  add("prayer-sahur", "Waktu sahur (10 menit sebelum Subuh)", shift(times.Fajr, -20), prefs.sahur);
+  add("prayer-sahur", "Waktu sahur (20 menit sebelum Subuh)", shift(times.Fajr, -20), prefs.sahur);
   add("prayer-fajr", "Adzan Subuh", times.Fajr, prefs.fajr);
   add("prayer-dhuhr", "Adzan Dzuhur", times.Dhuhr, prefs.dhuhr);
   add("prayer-asr", "Adzan Ashar", times.Asr, prefs.asr);
-  add("prayer-maghrib", "Adzan Maghrib · Waktu berbuka", times.Maghrib, prefs.maghrib || prefs.iftar);
+  add("prayer-maghrib", "Adzan Maghrib", times.Maghrib, prefs.maghrib);
+  add("prayer-iftar", "Waktu berbuka puasa", times.Maghrib, prefs.iftar);
   add("prayer-isha", "Adzan Isya", times.Isha, prefs.isha);
   saveReminders(next);
+}
+
+export async function refreshPrayerRemindersForToday() {
+  if (typeof window === "undefined") return;
+
+  const prefs = loadPrayerPrefs();
+  const context = loadPrayerContext();
+  if (!prefs.enabled || !context?.city) return;
+
+  const today = new Date();
+  const dateKey = today.toISOString().slice(0, 10);
+  if (context.dateKey === dateKey) return;
+
+  const apiDate = `${String(today.getDate()).padStart(2, "0")}-${String(today.getMonth() + 1).padStart(2, "0")}-${today.getFullYear()}`;
+  try {
+    const res = await fetch(
+      `https://api.aladhan.com/v1/timingsByCity/${apiDate}?city=${encodeURIComponent(context.city)}&country=Indonesia&method=20`,
+    );
+    const json = await res.json();
+    const nextTimes = json?.data?.timings as PrayerTimings | undefined;
+    if (!nextTimes?.Fajr || !nextTimes?.Maghrib) return;
+    syncPrayerReminders(nextTimes, prefs);
+    savePrayerContext({ city: context.city, dateKey, times: nextTimes });
+  } catch {
+    return;
+  }
 }

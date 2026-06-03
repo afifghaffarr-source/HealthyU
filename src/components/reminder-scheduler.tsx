@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { FIRED_KEY, loadReminders, type Reminder } from "@/lib/reminders-store";
+import { FIRED_KEY, loadReminders, refreshPrayerRemindersForToday, type Reminder } from "@/lib/reminders-store";
 
 function shouldFire(r: Reminder, now: Date, fired: Record<string, string>, todayKey: string) {
   if (!r.enabled) return false;
@@ -17,6 +17,7 @@ export function ReminderScheduler() {
 
     const tick = () => {
       if (Notification.permission !== "granted") return;
+      void refreshPrayerRemindersForToday();
       const items = loadReminders();
       const now = new Date();
       const todayKey = now.toISOString().slice(0, 10);
