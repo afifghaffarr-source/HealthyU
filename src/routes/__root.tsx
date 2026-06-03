@@ -16,6 +16,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
 import { ThemeProvider } from "@/components/theme-provider";
 import { ReminderScheduler } from "@/components/reminder-scheduler";
+import { SWRegister } from "@/components/sw-register";
 
 function NotFoundComponent() {
   return (
@@ -138,6 +139,7 @@ function RootComponent() {
       <ThemeProvider>
         <AuthListener />
         <ReminderScheduler />
+        <SWRegister />
         <Outlet />
         <Toaster position="top-center" />
       </ThemeProvider>
