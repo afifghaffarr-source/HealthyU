@@ -170,8 +170,7 @@ export const syncGoogleFit = createServerFn({ method: "POST" })
       const rows = stepsRes.bucket
         .map((b) => {
           const day = new Date(Number(b.startTimeMillis)).toISOString().slice(0, 10);
-          const steps =
-            b.dataset[0]?.point.reduce((s, p) => s + (p.value[0]?.intVal ?? 0), 0) ?? 0;
+          const steps = b.dataset[0]?.point.reduce((s, p) => s + (p.value[0]?.intVal ?? 0), 0) ?? 0;
           return { user_id: userId, day, steps, source: "google_fit" };
         })
         .filter((r) => r.steps > 0);
