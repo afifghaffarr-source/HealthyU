@@ -67,6 +67,7 @@ import { Route as AuthenticatedScanVoiceRouteImport } from './routes/_authentica
 import { Route as AuthenticatedScanRecipeRouteImport } from './routes/_authenticated/scan.recipe'
 import { Route as AuthenticatedScanMenuRouteImport } from './routes/_authenticated/scan.menu'
 import { Route as AuthenticatedScanHistoryRouteImport } from './routes/_authenticated/scan.history'
+import { Route as AuthenticatedScanBarcodeLiveRouteImport } from './routes/_authenticated/scan.barcode-live'
 import { Route as AuthenticatedScanBarcodeRouteImport } from './routes/_authenticated/scan.barcode'
 import { Route as AuthenticatedRestaurantsNearbyRouteImport } from './routes/_authenticated/restaurants.nearby'
 import { Route as AuthenticatedReportsWorkoutMatchRouteImport } from './routes/_authenticated/reports.workout-match'
@@ -404,6 +405,12 @@ const AuthenticatedScanHistoryRoute =
     path: '/history',
     getParentRoute: () => AuthenticatedScanRoute,
   } as any)
+const AuthenticatedScanBarcodeLiveRoute =
+  AuthenticatedScanBarcodeLiveRouteImport.update({
+    id: '/barcode-live',
+    path: '/barcode-live',
+    getParentRoute: () => AuthenticatedScanRoute,
+  } as any)
 const AuthenticatedScanBarcodeRoute =
   AuthenticatedScanBarcodeRouteImport.update({
     id: '/barcode',
@@ -694,6 +701,7 @@ export interface FileRoutesByFullPath {
   '/reports/workout-match': typeof AuthenticatedReportsWorkoutMatchRoute
   '/restaurants/nearby': typeof AuthenticatedRestaurantsNearbyRoute
   '/scan/barcode': typeof AuthenticatedScanBarcodeRoute
+  '/scan/barcode-live': typeof AuthenticatedScanBarcodeLiveRoute
   '/scan/history': typeof AuthenticatedScanHistoryRoute
   '/scan/menu': typeof AuthenticatedScanMenuRoute
   '/scan/recipe': typeof AuthenticatedScanRecipeRoute
@@ -789,6 +797,7 @@ export interface FileRoutesByTo {
   '/reports/workout-match': typeof AuthenticatedReportsWorkoutMatchRoute
   '/restaurants/nearby': typeof AuthenticatedRestaurantsNearbyRoute
   '/scan/barcode': typeof AuthenticatedScanBarcodeRoute
+  '/scan/barcode-live': typeof AuthenticatedScanBarcodeLiveRoute
   '/scan/history': typeof AuthenticatedScanHistoryRoute
   '/scan/menu': typeof AuthenticatedScanMenuRoute
   '/scan/recipe': typeof AuthenticatedScanRecipeRoute
@@ -886,6 +895,7 @@ export interface FileRoutesById {
   '/_authenticated/reports/workout-match': typeof AuthenticatedReportsWorkoutMatchRoute
   '/_authenticated/restaurants/nearby': typeof AuthenticatedRestaurantsNearbyRoute
   '/_authenticated/scan/barcode': typeof AuthenticatedScanBarcodeRoute
+  '/_authenticated/scan/barcode-live': typeof AuthenticatedScanBarcodeLiveRoute
   '/_authenticated/scan/history': typeof AuthenticatedScanHistoryRoute
   '/_authenticated/scan/menu': typeof AuthenticatedScanMenuRoute
   '/_authenticated/scan/recipe': typeof AuthenticatedScanRecipeRoute
@@ -983,6 +993,7 @@ export interface FileRouteTypes {
     | '/reports/workout-match'
     | '/restaurants/nearby'
     | '/scan/barcode'
+    | '/scan/barcode-live'
     | '/scan/history'
     | '/scan/menu'
     | '/scan/recipe'
@@ -1078,6 +1089,7 @@ export interface FileRouteTypes {
     | '/reports/workout-match'
     | '/restaurants/nearby'
     | '/scan/barcode'
+    | '/scan/barcode-live'
     | '/scan/history'
     | '/scan/menu'
     | '/scan/recipe'
@@ -1174,6 +1186,7 @@ export interface FileRouteTypes {
     | '/_authenticated/reports/workout-match'
     | '/_authenticated/restaurants/nearby'
     | '/_authenticated/scan/barcode'
+    | '/_authenticated/scan/barcode-live'
     | '/_authenticated/scan/history'
     | '/_authenticated/scan/menu'
     | '/_authenticated/scan/recipe'
@@ -1613,6 +1626,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedScanHistoryRouteImport
       parentRoute: typeof AuthenticatedScanRoute
     }
+    '/_authenticated/scan/barcode-live': {
+      id: '/_authenticated/scan/barcode-live'
+      path: '/barcode-live'
+      fullPath: '/scan/barcode-live'
+      preLoaderRoute: typeof AuthenticatedScanBarcodeLiveRouteImport
+      parentRoute: typeof AuthenticatedScanRoute
+    }
     '/_authenticated/scan/barcode': {
       id: '/_authenticated/scan/barcode'
       path: '/barcode'
@@ -2044,6 +2064,7 @@ const AuthenticatedReportsRouteWithChildren =
 
 interface AuthenticatedScanRouteChildren {
   AuthenticatedScanBarcodeRoute: typeof AuthenticatedScanBarcodeRoute
+  AuthenticatedScanBarcodeLiveRoute: typeof AuthenticatedScanBarcodeLiveRoute
   AuthenticatedScanHistoryRoute: typeof AuthenticatedScanHistoryRoute
   AuthenticatedScanMenuRoute: typeof AuthenticatedScanMenuRoute
   AuthenticatedScanRecipeRoute: typeof AuthenticatedScanRecipeRoute
@@ -2052,6 +2073,7 @@ interface AuthenticatedScanRouteChildren {
 
 const AuthenticatedScanRouteChildren: AuthenticatedScanRouteChildren = {
   AuthenticatedScanBarcodeRoute: AuthenticatedScanBarcodeRoute,
+  AuthenticatedScanBarcodeLiveRoute: AuthenticatedScanBarcodeLiveRoute,
   AuthenticatedScanHistoryRoute: AuthenticatedScanHistoryRoute,
   AuthenticatedScanMenuRoute: AuthenticatedScanMenuRoute,
   AuthenticatedScanRecipeRoute: AuthenticatedScanRecipeRoute,
