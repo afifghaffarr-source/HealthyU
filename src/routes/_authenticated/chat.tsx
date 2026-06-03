@@ -2,7 +2,8 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { getChatHistory, sendChatMessage, clearChatHistory, weeklyHealthReport } from "@/lib/chat.functions";
+import { getChatHistory, clearChatHistory, weeklyHealthReport } from "@/lib/chat.functions";
+import { supabase } from "@/integrations/supabase/client";
 import { BottomNav } from "@/components/bottom-nav";
 import { ArrowLeft, Send, Sparkles, ImagePlus, X, Mic, MicOff, Volume2, VolumeX, Utensils, Timer, Flame, ChefHat, Trash2, BarChart3 } from "lucide-react";
 import { toast } from "sonner";
@@ -30,13 +31,13 @@ const QUICK_ACTIONS = [
 function ChatPage() {
   const qc = useQueryClient();
   const fetchHist = useServerFn(getChatHistory);
-  const send = useServerFn(sendChatMessage);
   const clearFn = useServerFn(clearChatHistory);
   const reportFn = useServerFn(weeklyHealthReport);
   const { data: messages = [] } = useQuery({ queryKey: ["chat"], queryFn: () => fetchHist() });
 
   const [input, setInput] = useState("");
   const [imageData, setImageData] = useState<{ base64: string; mime: string; preview: string } | null>(null);
+  const [streaming, setStreaming] = useState<string | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const [listening, setListening] = useState(false);
@@ -47,13 +48,56 @@ function ChatPage() {
   const ttsSupported = typeof window !== "undefined" && "speechSynthesis" in window;
 
   const mutation = useMutation({
-    mutationFn: (payload: { message: string; imageBase64?: string; imageMime?: string }) =>
-      send({ data: payload }),
+    mutationFn: async (payload: { message: string; imageBase64?: string; imageMime?: string }) => {
+      const { data: sess } = await supabase.auth.getSession();
+      const token = sess.session?.access_token;
+      if (!token) throw new Error("Sesi habis, silakan login ulang");
+      const res = await fetch("/api/chat/stream", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        body: JSON.stringify(payload),
+      });
+      if (!res.ok || !res.body) {
+        if (res.status === 429) throw new Error("Terlalu banyak permintaan. Coba lagi sebentar.");
+        if (res.status === 402) throw new Error("Kredit AI habis.");
+        throw new Error(`Gagal kirim (${res.status})`);
+      }
+      // Refresh history so user message appears immediately
+      qc.invalidateQueries({ queryKey: ["chat"] });
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      let buf = "";
+      let acc = "";
+      setStreaming("");
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        buf += decoder.decode(value, { stream: true });
+        const events = buf.split("\n\n");
+        buf = events.pop() ?? "";
+        for (const evt of events) {
+          const dataLine = evt.split("\n").find((l) => l.startsWith("data:"));
+          if (!dataLine) continue;
+          try {
+            const json = JSON.parse(dataLine.slice(5).trim());
+            if (typeof json.delta === "string") {
+              acc += json.delta;
+              setStreaming(acc);
+            }
+          } catch { /* ignore */ }
+        }
+      }
+      return acc;
+    },
     onSuccess: () => {
       setImageData(null);
+      setStreaming(null);
       qc.invalidateQueries({ queryKey: ["chat"] });
     },
-    onError: (e) => toast.error(e instanceof Error ? e.message : "Gagal kirim"),
+    onError: (e) => {
+      setStreaming(null);
+      toast.error(e instanceof Error ? e.message : "Gagal kirim");
+    },
   });
 
   const clearMut = useMutation({
@@ -80,7 +124,7 @@ function ChatPage() {
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
-  }, [messages, mutation.isPending]);
+  }, [messages, mutation.isPending, streaming]);
 
   // Auto-speak latest assistant reply when TTS is on
   useEffect(() => {
@@ -280,12 +324,16 @@ function ChatPage() {
           ))}
           {mutation.isPending && (
             <div className="flex justify-start">
-              <div className="bg-card outline-1 outline-black/5 px-4 py-3 rounded-3xl rounded-bl-md">
-                <div className="flex gap-1">
-                  <span className="size-1.5 bg-primary rounded-full animate-pulse" />
-                  <span className="size-1.5 bg-primary rounded-full animate-pulse [animation-delay:0.2s]" />
-                  <span className="size-1.5 bg-primary rounded-full animate-pulse [animation-delay:0.4s]" />
-                </div>
+              <div className="max-w-[85%] px-4 py-3 rounded-3xl rounded-bl-md text-sm leading-relaxed bg-card outline-1 outline-black/5 prose prose-sm max-w-none prose-p:my-1 prose-headings:my-2 prose-strong:text-foreground">
+                {streaming ? (
+                  <ReactMarkdown remarkPlugins={[remarkGfm]}>{streaming}</ReactMarkdown>
+                ) : (
+                  <div className="flex gap-1">
+                    <span className="size-1.5 bg-primary rounded-full animate-pulse" />
+                    <span className="size-1.5 bg-primary rounded-full animate-pulse [animation-delay:0.2s]" />
+                    <span className="size-1.5 bg-primary rounded-full animate-pulse [animation-delay:0.4s]" />
+                  </div>
+                )}
               </div>
             </div>
           )}

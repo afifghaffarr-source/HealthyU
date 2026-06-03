@@ -1,5 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
+import type { SupabaseClient } from "@supabase/supabase-js";
+import type { Database } from "@/integrations/supabase/types";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { todayRange, calcAge, calcBMI, calcBMR, calcTDEE, bmiCategory, type ActivityLevel } from "./health";
 
@@ -73,31 +75,32 @@ export const clearChatHistory = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
-export const sendChatMessage = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
-  .inputValidator((input: unknown) =>
-    z.object({
-      message: z.string().min(1).max(2000),
-      imageBase64: z.string().max(8_000_000).optional(),
-      imageMime: z.string().max(50).optional(),
-    }).parse(input),
-  )
-  .handler(async ({ data, context }) => {
-    const { supabase, userId } = context;
-    const apiKey = process.env.LOVABLE_API_KEY;
-    if (!apiKey) throw new Error("AI service not configured");
+// Shared helpers exported for use by the streaming server route.
+type SB = SupabaseClient<Database>;
 
-    // Save user message (mark image attachments in stored history)
-    const storedContent = data.imageBase64
-      ? `📷 [Foto terlampir]\n\n${data.message}`
-      : data.message;
-    await supabase.from("chat_messages").insert({
-      user_id: userId,
-      role: "user",
-      content: storedContent,
-    });
+export async function persistUserMessage(
+  supabase: SB,
+  userId: string,
+  message: string,
+  imageBase64?: string,
+) {
+  const storedContent = imageBase64
+    ? `📷 [Foto terlampir]\n\n${message}`
+    : message;
+  await supabase.from("chat_messages").insert({
+    user_id: userId,
+    role: "user",
+    content: storedContent,
+  });
+}
 
-    // Build rich context: profile + today's data + recent history
+export async function buildChatPayload(
+  supabase: SB,
+  userId: string,
+  message: string,
+  imageBase64?: string,
+  imageMime?: string,
+): Promise<{ messages: unknown[]; isEmergency: boolean }> {
     const { start, end } = todayRange();
     const weekStart = new Date(); weekStart.setDate(weekStart.getDate() - 6); weekStart.setHours(0,0,0,0);
     const [
@@ -231,32 +234,52 @@ ${weekBlock}
 
 Gunakan data di atas untuk personalisasi jawaban. Sebut angka konkret saat relevan.`;
 
-    const isEmergency = detectEmergency(data.message);
+    const isEmergency = detectEmergency(message);
     const emergencyNote = isEmergency
       ? "\n\n⚠️ PESAN USER MENGANDUNG INDIKASI DARURAT — WAJIB awali jawaban dengan blok peringatan darurat (119/118/IGD) sebelum konten lain."
       : "";
 
     const recent = (history ?? []).reverse();
-    // Replace last user entry with multimodal content when image attached
     const lastIdx = recent.length - 1;
-    const userParts: unknown = data.imageBase64
+    const userParts: unknown = imageBase64
       ? [
-          { type: "text", text: data.message || "Tolong analisis foto ini." },
+          { type: "text", text: message || "Tolong analisis foto ini." },
           {
             type: "image_url",
-            image_url: { url: `data:${data.imageMime ?? "image/jpeg"};base64,${data.imageBase64}` },
+            image_url: { url: `data:${imageMime ?? "image/jpeg"};base64,${imageBase64}` },
           },
         ]
-      : data.message;
+      : message;
 
     const messages = [
       { role: "system", content: SYSTEM_PROMPT + contextBlock + emergencyNote },
       ...recent.map((m, i) =>
-        i === lastIdx && data.imageBase64
+        i === lastIdx && imageBase64
           ? { role: m.role, content: userParts }
           : { role: m.role, content: m.content },
       ),
     ];
+  return { messages, isEmergency };
+}
+
+export const sendChatMessage = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) =>
+    z.object({
+      message: z.string().min(1).max(2000),
+      imageBase64: z.string().max(8_000_000).optional(),
+      imageMime: z.string().max(50).optional(),
+    }).parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    const apiKey = process.env.LOVABLE_API_KEY;
+    if (!apiKey) throw new Error("AI service not configured");
+
+    await persistUserMessage(supabase, userId, data.message, data.imageBase64);
+    const { messages, isEmergency } = await buildChatPayload(
+      supabase, userId, data.message, data.imageBase64, data.imageMime,
+    );
 
     const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
