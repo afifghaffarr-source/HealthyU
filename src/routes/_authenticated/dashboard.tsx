@@ -488,8 +488,18 @@ function Dashboard() {
                       />
                     </button>
                     {breakdownOpen && (
-                      <div className="absolute right-0 top-full mt-1 z-20 w-48 bg-card outline-1 outline-black/10 rounded-xl shadow-lg p-2 text-[11px] animate-fade-up">
-                        <p className="font-semibold mb-1 text-foreground">Breakdown</p>
+                      <div
+                        role="dialog"
+                        aria-modal="false"
+                        aria-labelledby="bonus-breakdown-heading"
+                        className="absolute right-0 top-full mt-1 z-20 w-48 bg-card outline-1 outline-black/10 rounded-xl shadow-lg p-2 text-[11px] animate-fade-up"
+                      >
+                        <p
+                          id="bonus-breakdown-heading"
+                          className="font-semibold mb-1 text-foreground"
+                        >
+                          Breakdown
+                        </p>
                         <ul className="space-y-0.5 max-h-40 overflow-y-auto">
                           {entries.map(([gid, n]) => {
                             const g = groupSummary.find((x) => x.group_id === gid);
