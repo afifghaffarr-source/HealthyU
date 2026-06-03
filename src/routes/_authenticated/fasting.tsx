@@ -134,6 +134,48 @@ function FastingPage() {
           </section>
         )}
 
+        <section className="space-y-3 bg-card p-5 rounded-3xl outline-1 outline-black/5 animate-fade-up">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="font-bold">Mode Ramadhan</p>
+              <p className="text-xs text-muted-foreground">Jadwal puasa berulang harian</p>
+            </div>
+            <input
+              type="checkbox"
+              className="size-5"
+              checked={ramadhan}
+              onChange={(e) => setRamadhan(e.target.checked)}
+            />
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <label className="text-xs space-y-1">
+              <span className="text-muted-foreground">Imsak</span>
+              <input
+                type="time"
+                value={imsak}
+                onChange={(e) => setImsak(e.target.value)}
+                className="w-full bg-secondary/40 rounded-lg px-2 py-2 text-sm"
+              />
+            </label>
+            <label className="text-xs space-y-1">
+              <span className="text-muted-foreground">Berbuka</span>
+              <input
+                type="time"
+                value={iftar}
+                onChange={(e) => setIftar(e.target.value)}
+                className="w-full bg-secondary/40 rounded-lg px-2 py-2 text-sm"
+              />
+            </label>
+          </div>
+          <button
+            onClick={() => saveSchedule.mutate({ ramadhan, imsak, iftar })}
+            disabled={saveSchedule.isPending}
+            className="w-full bg-primary text-primary-foreground font-semibold py-3 rounded-2xl disabled:opacity-60"
+          >
+            Simpan jadwal
+          </button>
+        </section>
+
         {history.length > 0 && (
           <section className="space-y-2 animate-fade-up">
             <h2 className="text-sm font-bold uppercase tracking-wider text-muted-foreground">Riwayat</h2>
