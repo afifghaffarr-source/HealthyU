@@ -91,6 +91,7 @@ import { Route as AuthenticatedReportsExportRouteImport } from './routes/_authen
 import { Route as AuthenticatedReportsCompareRouteImport } from './routes/_authenticated/reports.compare'
 import { Route as AuthenticatedRecipesSavedRouteImport } from './routes/_authenticated/recipes.saved'
 import { Route as AuthenticatedRecipesRecommendationsRouteImport } from './routes/_authenticated/recipes.recommendations'
+import { Route as AuthenticatedRecipesImportRouteImport } from './routes/_authenticated/recipes.import'
 import { Route as AuthenticatedRecipesIdRouteImport } from './routes/_authenticated/recipes.$id'
 import { Route as AuthenticatedQuizDailyRouteImport } from './routes/_authenticated/quiz.daily'
 import { Route as AuthenticatedProfileScanStatsRouteImport } from './routes/_authenticated/profile.scan-stats'
@@ -558,6 +559,12 @@ const AuthenticatedRecipesRecommendationsRoute =
     path: '/recommendations',
     getParentRoute: () => AuthenticatedRecipesRoute,
   } as any)
+const AuthenticatedRecipesImportRoute =
+  AuthenticatedRecipesImportRouteImport.update({
+    id: '/import',
+    path: '/import',
+    getParentRoute: () => AuthenticatedRecipesRoute,
+  } as any)
 const AuthenticatedRecipesIdRoute = AuthenticatedRecipesIdRouteImport.update({
   id: '/$id',
   path: '/$id',
@@ -801,6 +808,7 @@ export interface FileRoutesByFullPath {
   '/profile/scan-stats': typeof AuthenticatedProfileScanStatsRoute
   '/quiz/daily': typeof AuthenticatedQuizDailyRoute
   '/recipes/$id': typeof AuthenticatedRecipesIdRouteWithChildren
+  '/recipes/import': typeof AuthenticatedRecipesImportRoute
   '/recipes/recommendations': typeof AuthenticatedRecipesRecommendationsRoute
   '/recipes/saved': typeof AuthenticatedRecipesSavedRoute
   '/reports/compare': typeof AuthenticatedReportsCompareRoute
@@ -913,6 +921,7 @@ export interface FileRoutesByTo {
   '/profile/scan-stats': typeof AuthenticatedProfileScanStatsRoute
   '/quiz/daily': typeof AuthenticatedQuizDailyRoute
   '/recipes/$id': typeof AuthenticatedRecipesIdRouteWithChildren
+  '/recipes/import': typeof AuthenticatedRecipesImportRoute
   '/recipes/recommendations': typeof AuthenticatedRecipesRecommendationsRoute
   '/recipes/saved': typeof AuthenticatedRecipesSavedRoute
   '/reports/compare': typeof AuthenticatedReportsCompareRoute
@@ -1027,6 +1036,7 @@ export interface FileRoutesById {
   '/_authenticated/profile/scan-stats': typeof AuthenticatedProfileScanStatsRoute
   '/_authenticated/quiz/daily': typeof AuthenticatedQuizDailyRoute
   '/_authenticated/recipes/$id': typeof AuthenticatedRecipesIdRouteWithChildren
+  '/_authenticated/recipes/import': typeof AuthenticatedRecipesImportRoute
   '/_authenticated/recipes/recommendations': typeof AuthenticatedRecipesRecommendationsRoute
   '/_authenticated/recipes/saved': typeof AuthenticatedRecipesSavedRoute
   '/_authenticated/reports/compare': typeof AuthenticatedReportsCompareRoute
@@ -1141,6 +1151,7 @@ export interface FileRouteTypes {
     | '/profile/scan-stats'
     | '/quiz/daily'
     | '/recipes/$id'
+    | '/recipes/import'
     | '/recipes/recommendations'
     | '/recipes/saved'
     | '/reports/compare'
@@ -1253,6 +1264,7 @@ export interface FileRouteTypes {
     | '/profile/scan-stats'
     | '/quiz/daily'
     | '/recipes/$id'
+    | '/recipes/import'
     | '/recipes/recommendations'
     | '/recipes/saved'
     | '/reports/compare'
@@ -1366,6 +1378,7 @@ export interface FileRouteTypes {
     | '/_authenticated/profile/scan-stats'
     | '/_authenticated/quiz/daily'
     | '/_authenticated/recipes/$id'
+    | '/_authenticated/recipes/import'
     | '/_authenticated/recipes/recommendations'
     | '/_authenticated/recipes/saved'
     | '/_authenticated/reports/compare'
@@ -1994,6 +2007,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedRecipesRecommendationsRouteImport
       parentRoute: typeof AuthenticatedRecipesRoute
     }
+    '/_authenticated/recipes/import': {
+      id: '/_authenticated/recipes/import'
+      path: '/import'
+      fullPath: '/recipes/import'
+      preLoaderRoute: typeof AuthenticatedRecipesImportRouteImport
+      parentRoute: typeof AuthenticatedRecipesRoute
+    }
     '/_authenticated/recipes/$id': {
       id: '/_authenticated/recipes/$id'
       path: '/$id'
@@ -2360,12 +2380,14 @@ const AuthenticatedRecipesIdRouteWithChildren =
 
 interface AuthenticatedRecipesRouteChildren {
   AuthenticatedRecipesIdRoute: typeof AuthenticatedRecipesIdRouteWithChildren
+  AuthenticatedRecipesImportRoute: typeof AuthenticatedRecipesImportRoute
   AuthenticatedRecipesRecommendationsRoute: typeof AuthenticatedRecipesRecommendationsRoute
   AuthenticatedRecipesSavedRoute: typeof AuthenticatedRecipesSavedRoute
 }
 
 const AuthenticatedRecipesRouteChildren: AuthenticatedRecipesRouteChildren = {
   AuthenticatedRecipesIdRoute: AuthenticatedRecipesIdRouteWithChildren,
+  AuthenticatedRecipesImportRoute: AuthenticatedRecipesImportRoute,
   AuthenticatedRecipesRecommendationsRoute:
     AuthenticatedRecipesRecommendationsRoute,
   AuthenticatedRecipesSavedRoute: AuthenticatedRecipesSavedRoute,
