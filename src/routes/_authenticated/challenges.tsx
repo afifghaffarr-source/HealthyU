@@ -26,6 +26,7 @@ import {
   listGroupBonusClaimers,
 } from "@/lib/groupChallengeBonus.functions";
 import { groupChallengePendingMembers } from "@/lib/groupChallengePending.functions";
+import { CHALLENGE_HIGHLIGHT_MS } from "@/lib/constants";
 
 const challengesSearchSchema = z.object({
   group: fallback(z.string().uuid().optional(), undefined),
@@ -92,7 +93,10 @@ function ChallengesPage() {
   const articleRefs = useRef<Record<string, HTMLElement | null>>({});
   const flashHighlight = (id: string) => {
     setHighlightId(id);
-    window.setTimeout(() => setHighlightId((cur) => (cur === id ? null : cur)), 2000);
+    window.setTimeout(
+      () => setHighlightId((cur) => (cur === id ? null : cur)),
+      CHALLENGE_HIGHLIGHT_MS,
+    );
   };
 
   useEffect(() => {
@@ -142,6 +146,7 @@ function ChallengesPage() {
     setStreakAutoChallenge(top.challenge_id);
     const t = setTimeout(() => {
       articleRefs.current[top.challenge_id]?.scrollIntoView({ behavior: "smooth", block: "start" });
+      flashHighlight(top.challenge_id);
     }, 250);
     return () => clearTimeout(t);
   }, [focus, data, navigate]);
