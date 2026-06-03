@@ -125,6 +125,15 @@ function FoodPage() {
             <ArrowLeft className="size-4" />
           </Link>
           <h1 className="text-2xl font-bold">Catat makanan</h1>
+          {(!online || pending > 0) && (
+            <button
+              onClick={() => sync()}
+              className={`ml-auto inline-flex items-center gap-1 text-[11px] font-semibold px-2.5 py-1.5 rounded-full ${online ? "bg-amber-100 text-amber-700" : "bg-muted text-muted-foreground"}`}
+            >
+              {online ? <RefreshCw className="size-3" /> : <WifiOff className="size-3" />}
+              {online ? `Sync ${pending}` : `Offline${pending ? ` · ${pending}` : ""}`}
+            </button>
+          )}
         </header>
 
         <div className="flex gap-2 overflow-x-auto no-scrollbar -mx-5 px-5">
