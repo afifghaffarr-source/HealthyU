@@ -334,10 +334,19 @@ function ReportsPage() {
                 <details
                   key={r.id}
                   open={focus === "latest" && idx === 0}
-                  className="bg-card rounded-2xl outline-1 outline-black/5 p-4"
+                  className={
+                    focus === "latest" && idx === 0
+                      ? "bg-card rounded-2xl outline-2 outline-primary p-4 ring-2 ring-primary/20 shadow-md animate-fade-up"
+                      : "bg-card rounded-2xl outline-1 outline-black/5 p-4"
+                  }
                 >
                   <summary className="cursor-pointer text-sm font-semibold flex items-center justify-between">
-                    <span>
+                    <span className="inline-flex items-center gap-2">
+                      {focus === "latest" && idx === 0 && (
+                        <span className="text-[9px] font-bold uppercase tracking-wider bg-primary text-primary-foreground rounded-full px-2 py-0.5">
+                          Baru
+                        </span>
+                      )}
                       {r.report_period_start} → {r.report_period_end}
                     </span>
                     <span className="text-xs text-muted-foreground">
