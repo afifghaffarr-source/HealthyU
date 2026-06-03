@@ -16,6 +16,10 @@ import {
   PDF_PAGE_FOOTER_Y,
   PDF_MARGIN_X,
   PDF_PAGE_W,
+  PDF_DIVIDER_GRAY,
+  PDF_HEADER_BASELINE_Y,
+  PDF_HEADER_SUBTITLE_Y,
+  PDF_BODY_TOP_Y,
 } from "@/lib/constants";
 
 export const Route = createFileRoute("/_authenticated/reports")({
@@ -320,7 +324,7 @@ function ReportsPage() {
       doc.setFontSize(8);
       doc.setTextColor(120);
       // Divider tipis di atas baris footer.
-      doc.setDrawColor(220);
+      doc.setDrawColor(PDF_DIVIDER_GRAY);
       doc.setLineWidth(0.5);
       doc.line(
         PDF_MARGIN_X,
