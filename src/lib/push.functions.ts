@@ -58,14 +58,20 @@ export const sendTestPush = createServerFn({ method: "POST" })
     if (!subs?.length) throw new Error("Belum ada device yang berlangganan");
 
     const results = await Promise.all(
-      subs.map((s) =>
-        sendWebPushTo(s, {
-          title: "Sehatify",
-          body: "Notifikasi push berfungsi! 🎉",
-          url: "/dashboard",
-        }).catch((e) => ({ error: e instanceof Error ? e.message : String(e) })),
-      ),
+      subs.map(async (s) => {
+        try {
+          await sendWebPushTo(s, {
+            title: "Sehatify",
+            body: "Notifikasi push berfungsi! 🎉",
+            url: "/dashboard",
+          });
+          return { ok: true as const };
+        } catch (e) {
+          return { ok: false as const, error: e instanceof Error ? e.message : String(e) };
+        }
+      }),
     );
-    const failed = results.filter((r) => r && typeof r === "object" && "error" in r);
-    return { sent: subs.length - failed.length, failed: failed.length };
+    const failed = results.filter((r) => !r.ok);
+    return { sent: results.length - failed.length, failed: failed.length };
+    void context;
   });
