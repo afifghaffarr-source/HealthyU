@@ -1,10 +1,11 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
+import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { generateMealPlan, acceptMealPlan } from "@/lib/recommendations.functions";
 import { BottomNav } from "@/components/bottom-nav";
-import { ArrowLeft, Sparkles, Loader2, Sunrise, Sun, Moon, Cookie, Check } from "lucide-react";
+import { Sparkles, Loader2, Sunrise, Sun, Moon, Cookie, Check } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/recommendations")({
@@ -48,16 +49,8 @@ function RecommendationsPage() {
 
   return (
     <main className="min-h-screen bg-background pb-28">
-      <div className="max-w-md mx-auto px-5 pt-8 space-y-5">
-        <header className="flex items-center gap-3">
-          <Link to="/dashboard" className="size-10 bg-card rounded-2xl outline-1 outline-black/10 grid place-items-center">
-            <ArrowLeft className="size-4" />
-          </Link>
-          <div>
-            <h1 className="text-2xl font-bold flex items-center gap-2">Rekomendasi AI <Sparkles className="size-5 text-primary" /></h1>
-            <p className="text-xs text-muted-foreground">Meal plan personal sesuai profil & sisa kalori</p>
-          </div>
-        </header>
+      <div className="max-w-md mx-auto px-5 pt-2 space-y-5">
+        <TopAppBar title="Rekomendasi AI" subtitle="Meal plan personal sesuai profil & sisa kalori" showBack />
 
         <section className="bg-card p-4 rounded-3xl outline-1 outline-black/5 space-y-3 animate-fade-up">
           <label className="block text-xs font-semibold text-muted-foreground">Catatan khusus (opsional)</label>

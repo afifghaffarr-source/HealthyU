@@ -1,4 +1,5 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
+import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { useEffect, useRef, useState } from "react";
 import { z } from "zod";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -12,7 +13,6 @@ import {
 } from "@/lib/groups.functions";
 import { BottomNav } from "@/components/bottom-nav";
 import {
-  ArrowLeft,
   Users,
   Plus,
   LogIn,
@@ -77,19 +77,8 @@ function GroupsPage() {
 
   return (
     <main className="min-h-screen bg-background pb-28">
-      <div className="max-w-md mx-auto px-5 pt-8 space-y-5">
-        <header className="flex items-center gap-3">
-          <Link
-            to="/profile"
-            className="size-10 bg-card rounded-2xl outline-1 outline-black/10 grid place-items-center"
-          >
-            <ArrowLeft className="size-4" />
-          </Link>
-          <div>
-            <h1 className="text-2xl font-bold">Grup Teman</h1>
-            <p className="text-xs text-muted-foreground">Leaderboard privat bersama teman</p>
-          </div>
-        </header>
+      <div className="max-w-md mx-auto px-5 pt-2 space-y-5">
+        <TopAppBar title="Grup Teman" subtitle="Leaderboard privat bersama teman" showBack />
 
         <section className="bg-card p-5 rounded-3xl outline-1 outline-black/5 space-y-3">
           <div className="flex items-center gap-2">

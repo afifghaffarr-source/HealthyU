@@ -1,9 +1,10 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
+import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
 import { exportAllData } from "@/lib/export.functions";
 import { BottomNav } from "@/components/bottom-nav";
-import { ArrowLeft, Download, FileJson, FileSpreadsheet, Loader2 } from "lucide-react";
+import { Download, FileJson, FileSpreadsheet, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/backup")({
@@ -74,16 +75,8 @@ function BackupPage() {
 
   return (
     <main className="min-h-screen bg-background pb-28">
-      <div className="max-w-md mx-auto px-5 pt-8 space-y-5">
-        <header className="flex items-center gap-3">
-          <Link
-            to="/profile"
-            className="size-10 bg-card rounded-2xl outline-1 outline-black/10 grid place-items-center"
-          >
-            <ArrowLeft className="size-4" />
-          </Link>
-          <h1 className="text-2xl font-bold">Backup & Ekspor</h1>
-        </header>
+      <div className="max-w-md mx-auto px-5 pt-2 space-y-5">
+        <TopAppBar title="Backup & Ekspor" showBack />
 
         <section className="bg-card p-5 rounded-3xl outline-1 outline-black/5 space-y-2">
           <div className="size-12 rounded-2xl bg-primary/10 grid place-items-center text-primary">
