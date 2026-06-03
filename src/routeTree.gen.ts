@@ -52,6 +52,7 @@ import { Route as AuthenticatedBackupRouteImport } from './routes/_authenticated
 import { Route as AuthenticatedArticlesRouteImport } from './routes/_authenticated/articles'
 import { Route as AuthenticatedAchievementsRouteImport } from './routes/_authenticated/achievements'
 import { Route as ApiChatStreamRouteImport } from './routes/api/chat.stream'
+import { Route as AuthenticatedScanVoiceRouteImport } from './routes/_authenticated/scan.voice'
 import { Route as AuthenticatedScanRecipeRouteImport } from './routes/_authenticated/scan.recipe'
 import { Route as AuthenticatedScanMenuRouteImport } from './routes/_authenticated/scan.menu'
 import { Route as AuthenticatedScanHistoryRouteImport } from './routes/_authenticated/scan.history'
@@ -291,6 +292,11 @@ const ApiChatStreamRoute = ApiChatStreamRouteImport.update({
   path: '/api/chat/stream',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedScanVoiceRoute = AuthenticatedScanVoiceRouteImport.update({
+  id: '/voice',
+  path: '/voice',
+  getParentRoute: () => AuthenticatedScanRoute,
+} as any)
 const AuthenticatedScanRecipeRoute = AuthenticatedScanRecipeRouteImport.update({
   id: '/recipe',
   path: '/recipe',
@@ -438,6 +444,7 @@ export interface FileRoutesByFullPath {
   '/scan/history': typeof AuthenticatedScanHistoryRoute
   '/scan/menu': typeof AuthenticatedScanMenuRoute
   '/scan/recipe': typeof AuthenticatedScanRecipeRoute
+  '/scan/voice': typeof AuthenticatedScanVoiceRoute
   '/api/chat/stream': typeof ApiChatStreamRoute
   '/api/public/hooks/daily-coach': typeof ApiPublicHooksDailyCoachRoute
   '/api/public/hooks/notification-scheduler': typeof ApiPublicHooksNotificationSchedulerRoute
@@ -498,6 +505,7 @@ export interface FileRoutesByTo {
   '/scan/history': typeof AuthenticatedScanHistoryRoute
   '/scan/menu': typeof AuthenticatedScanMenuRoute
   '/scan/recipe': typeof AuthenticatedScanRecipeRoute
+  '/scan/voice': typeof AuthenticatedScanVoiceRoute
   '/api/chat/stream': typeof ApiChatStreamRoute
   '/api/public/hooks/daily-coach': typeof ApiPublicHooksDailyCoachRoute
   '/api/public/hooks/notification-scheduler': typeof ApiPublicHooksNotificationSchedulerRoute
@@ -560,6 +568,7 @@ export interface FileRoutesById {
   '/_authenticated/scan/history': typeof AuthenticatedScanHistoryRoute
   '/_authenticated/scan/menu': typeof AuthenticatedScanMenuRoute
   '/_authenticated/scan/recipe': typeof AuthenticatedScanRecipeRoute
+  '/_authenticated/scan/voice': typeof AuthenticatedScanVoiceRoute
   '/api/chat/stream': typeof ApiChatStreamRoute
   '/api/public/hooks/daily-coach': typeof ApiPublicHooksDailyCoachRoute
   '/api/public/hooks/notification-scheduler': typeof ApiPublicHooksNotificationSchedulerRoute
@@ -622,6 +631,7 @@ export interface FileRouteTypes {
     | '/scan/history'
     | '/scan/menu'
     | '/scan/recipe'
+    | '/scan/voice'
     | '/api/chat/stream'
     | '/api/public/hooks/daily-coach'
     | '/api/public/hooks/notification-scheduler'
@@ -682,6 +692,7 @@ export interface FileRouteTypes {
     | '/scan/history'
     | '/scan/menu'
     | '/scan/recipe'
+    | '/scan/voice'
     | '/api/chat/stream'
     | '/api/public/hooks/daily-coach'
     | '/api/public/hooks/notification-scheduler'
@@ -743,6 +754,7 @@ export interface FileRouteTypes {
     | '/_authenticated/scan/history'
     | '/_authenticated/scan/menu'
     | '/_authenticated/scan/recipe'
+    | '/_authenticated/scan/voice'
     | '/api/chat/stream'
     | '/api/public/hooks/daily-coach'
     | '/api/public/hooks/notification-scheduler'
@@ -1066,6 +1078,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiChatStreamRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/scan/voice': {
+      id: '/_authenticated/scan/voice'
+      path: '/voice'
+      fullPath: '/scan/voice'
+      preLoaderRoute: typeof AuthenticatedScanVoiceRouteImport
+      parentRoute: typeof AuthenticatedScanRoute
+    }
     '/_authenticated/scan/recipe': {
       id: '/_authenticated/scan/recipe'
       path: '/recipe'
@@ -1228,6 +1247,7 @@ interface AuthenticatedScanRouteChildren {
   AuthenticatedScanHistoryRoute: typeof AuthenticatedScanHistoryRoute
   AuthenticatedScanMenuRoute: typeof AuthenticatedScanMenuRoute
   AuthenticatedScanRecipeRoute: typeof AuthenticatedScanRecipeRoute
+  AuthenticatedScanVoiceRoute: typeof AuthenticatedScanVoiceRoute
 }
 
 const AuthenticatedScanRouteChildren: AuthenticatedScanRouteChildren = {
@@ -1235,6 +1255,7 @@ const AuthenticatedScanRouteChildren: AuthenticatedScanRouteChildren = {
   AuthenticatedScanHistoryRoute: AuthenticatedScanHistoryRoute,
   AuthenticatedScanMenuRoute: AuthenticatedScanMenuRoute,
   AuthenticatedScanRecipeRoute: AuthenticatedScanRecipeRoute,
+  AuthenticatedScanVoiceRoute: AuthenticatedScanVoiceRoute,
 }
 
 const AuthenticatedScanRouteWithChildren =
