@@ -6,6 +6,8 @@ import { getChatHistory, sendChatMessage, clearChatHistory, weeklyHealthReport }
 import { BottomNav } from "@/components/bottom-nav";
 import { ArrowLeft, Send, Sparkles, ImagePlus, X, Mic, MicOff, Volume2, VolumeX, Utensils, Timer, Flame, ChefHat, Trash2, BarChart3 } from "lucide-react";
 import { toast } from "sonner";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 export const Route = createFileRoute("/_authenticated/chat")({
   component: ChatPage,
@@ -263,12 +265,16 @@ function ChatPage() {
         <div className="space-y-3 py-4">
           {messages.map((m) => (
             <div key={m.id} className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}>
-              <div className={`max-w-[85%] px-4 py-3 rounded-3xl text-sm whitespace-pre-wrap leading-relaxed ${
+              <div className={`max-w-[85%] px-4 py-3 rounded-3xl text-sm leading-relaxed ${
                 m.role === "user"
-                  ? "bg-primary text-primary-foreground rounded-br-md"
-                  : "bg-card outline-1 outline-black/5 rounded-bl-md"
+                  ? "bg-primary text-primary-foreground rounded-br-md whitespace-pre-wrap"
+                  : "bg-card outline-1 outline-black/5 rounded-bl-md prose prose-sm max-w-none prose-p:my-1 prose-headings:my-2 prose-headings:font-bold prose-ul:my-1 prose-ol:my-1 prose-li:my-0 prose-strong:text-foreground prose-code:bg-secondary prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-code:text-xs prose-code:before:content-none prose-code:after:content-none"
               }`}>
-                {m.content}
+                {m.role === "assistant" ? (
+                  <ReactMarkdown remarkPlugins={[remarkGfm]}>{m.content}</ReactMarkdown>
+                ) : (
+                  m.content
+                )}
               </div>
             </div>
           ))}
