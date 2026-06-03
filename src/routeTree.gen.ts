@@ -21,6 +21,7 @@ import { Route as AuthenticatedSubscriptionRouteImport } from './routes/_authent
 import { Route as AuthenticatedSleepRouteImport } from './routes/_authenticated/sleep'
 import { Route as AuthenticatedScanRouteImport } from './routes/_authenticated/scan'
 import { Route as AuthenticatedRewardsRouteImport } from './routes/_authenticated/rewards'
+import { Route as AuthenticatedReverseCalorieRouteImport } from './routes/_authenticated/reverse-calorie'
 import { Route as AuthenticatedReportsRouteImport } from './routes/_authenticated/reports'
 import { Route as AuthenticatedRemindersRouteImport } from './routes/_authenticated/reminders'
 import { Route as AuthenticatedReferralsRouteImport } from './routes/_authenticated/referrals'
@@ -134,6 +135,12 @@ const AuthenticatedRewardsRoute = AuthenticatedRewardsRouteImport.update({
   path: '/rewards',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedReverseCalorieRoute =
+  AuthenticatedReverseCalorieRouteImport.update({
+    id: '/reverse-calorie',
+    path: '/reverse-calorie',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedReportsRoute = AuthenticatedReportsRouteImport.update({
   id: '/reports',
   path: '/reports',
@@ -451,6 +458,7 @@ export interface FileRoutesByFullPath {
   '/referrals': typeof AuthenticatedReferralsRoute
   '/reminders': typeof AuthenticatedRemindersRoute
   '/reports': typeof AuthenticatedReportsRouteWithChildren
+  '/reverse-calorie': typeof AuthenticatedReverseCalorieRoute
   '/rewards': typeof AuthenticatedRewardsRoute
   '/scan': typeof AuthenticatedScanRouteWithChildren
   '/sleep': typeof AuthenticatedSleepRoute
@@ -516,6 +524,7 @@ export interface FileRoutesByTo {
   '/referrals': typeof AuthenticatedReferralsRoute
   '/reminders': typeof AuthenticatedRemindersRoute
   '/reports': typeof AuthenticatedReportsRouteWithChildren
+  '/reverse-calorie': typeof AuthenticatedReverseCalorieRoute
   '/rewards': typeof AuthenticatedRewardsRoute
   '/scan': typeof AuthenticatedScanRouteWithChildren
   '/sleep': typeof AuthenticatedSleepRoute
@@ -583,6 +592,7 @@ export interface FileRoutesById {
   '/_authenticated/referrals': typeof AuthenticatedReferralsRoute
   '/_authenticated/reminders': typeof AuthenticatedRemindersRoute
   '/_authenticated/reports': typeof AuthenticatedReportsRouteWithChildren
+  '/_authenticated/reverse-calorie': typeof AuthenticatedReverseCalorieRoute
   '/_authenticated/rewards': typeof AuthenticatedRewardsRoute
   '/_authenticated/scan': typeof AuthenticatedScanRouteWithChildren
   '/_authenticated/sleep': typeof AuthenticatedSleepRoute
@@ -650,6 +660,7 @@ export interface FileRouteTypes {
     | '/referrals'
     | '/reminders'
     | '/reports'
+    | '/reverse-calorie'
     | '/rewards'
     | '/scan'
     | '/sleep'
@@ -715,6 +726,7 @@ export interface FileRouteTypes {
     | '/referrals'
     | '/reminders'
     | '/reports'
+    | '/reverse-calorie'
     | '/rewards'
     | '/scan'
     | '/sleep'
@@ -781,6 +793,7 @@ export interface FileRouteTypes {
     | '/_authenticated/referrals'
     | '/_authenticated/reminders'
     | '/_authenticated/reports'
+    | '/_authenticated/reverse-calorie'
     | '/_authenticated/rewards'
     | '/_authenticated/scan'
     | '/_authenticated/sleep'
@@ -910,6 +923,13 @@ declare module '@tanstack/react-router' {
       path: '/rewards'
       fullPath: '/rewards'
       preLoaderRoute: typeof AuthenticatedRewardsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/reverse-calorie': {
+      id: '/_authenticated/reverse-calorie'
+      path: '/reverse-calorie'
+      fullPath: '/reverse-calorie'
+      preLoaderRoute: typeof AuthenticatedReverseCalorieRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/reports': {
@@ -1397,6 +1417,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedReferralsRoute: typeof AuthenticatedReferralsRoute
   AuthenticatedRemindersRoute: typeof AuthenticatedRemindersRoute
   AuthenticatedReportsRoute: typeof AuthenticatedReportsRouteWithChildren
+  AuthenticatedReverseCalorieRoute: typeof AuthenticatedReverseCalorieRoute
   AuthenticatedRewardsRoute: typeof AuthenticatedRewardsRoute
   AuthenticatedScanRoute: typeof AuthenticatedScanRouteWithChildren
   AuthenticatedSleepRoute: typeof AuthenticatedSleepRoute
@@ -1439,6 +1460,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedReferralsRoute: AuthenticatedReferralsRoute,
   AuthenticatedRemindersRoute: AuthenticatedRemindersRoute,
   AuthenticatedReportsRoute: AuthenticatedReportsRouteWithChildren,
+  AuthenticatedReverseCalorieRoute: AuthenticatedReverseCalorieRoute,
   AuthenticatedRewardsRoute: AuthenticatedRewardsRoute,
   AuthenticatedScanRoute: AuthenticatedScanRouteWithChildren,
   AuthenticatedSleepRoute: AuthenticatedSleepRoute,
