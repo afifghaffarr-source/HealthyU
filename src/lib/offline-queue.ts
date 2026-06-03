@@ -2,7 +2,14 @@
 // Items dequeue when navigator.onLine and the sync function succeeds.
 
 type QueueKind = "water" | "weight" | "meal" | "mood" | "vitals" | "workout";
-type QueueItem = { id?: number; kind: QueueKind; payload: unknown; created_at: number };
+type QueueItem = {
+  id?: number;
+  kind: QueueKind;
+  payload: unknown;
+  created_at: number;
+  attempts?: number;
+  next_attempt_at?: number;
+};
 
 const DB_NAME = "sehatify-offline";
 const STORE = "queue";
@@ -33,7 +40,7 @@ async function tx<T>(mode: IDBTransactionMode, fn: (s: IDBObjectStore) => Promis
 
 export async function enqueue(kind: QueueKind, payload: unknown): Promise<void> {
   await tx("readwrite", (s) => {
-    s.add({ kind, payload, created_at: Date.now() } satisfies QueueItem);
+    s.add({ kind, payload, created_at: Date.now(), attempts: 0, next_attempt_at: 0 } satisfies QueueItem);
   });
   window.dispatchEvent(new CustomEvent("offline-queue:changed"));
 }
@@ -65,23 +72,42 @@ export async function count(): Promise<number> {
   );
 }
 
+async function update(item: QueueItem): Promise<void> {
+  await tx("readwrite", (s) => {
+    s.put(item);
+  });
+}
+
 type Syncer = (item: QueueItem) => Promise<void>;
 
-/** Drains the queue. Stops on first error to retry later. */
+const MAX_ATTEMPTS = 6;
+const BASE_DELAY_MS = 2_000;
+
+/** Drains the queue with exponential backoff per item. */
 export async function flush(syncers: Record<QueueKind, Syncer>): Promise<{ synced: number; failed: number }> {
   if (!navigator.onLine) return { synced: 0, failed: 0 };
   const items = await listAll();
+  const now = Date.now();
   let synced = 0;
   let failed = 0;
   for (const item of items) {
+    if ((item.next_attempt_at ?? 0) > now) continue;
     try {
       await syncers[item.kind](item);
       if (item.id != null) await remove(item.id);
       synced++;
     } catch {
       failed++;
-      break;
+      const attempts = (item.attempts ?? 0) + 1;
+      if (attempts >= MAX_ATTEMPTS && item.id != null) {
+        await remove(item.id);
+      } else {
+        // 2s, 4s, 8s, 16s, 32s, 64s
+        const delay = Math.min(BASE_DELAY_MS * 2 ** (attempts - 1), 60_000);
+        await update({ ...item, attempts, next_attempt_at: Date.now() + delay });
+      }
     }
   }
+  window.dispatchEvent(new CustomEvent("offline-queue:changed"));
   return { synced, failed };
 }
