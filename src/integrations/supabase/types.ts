@@ -1191,6 +1191,56 @@ export type Database = {
         }
         Relationships: []
       }
+      family_plan_members: {
+        Row: {
+          joined_at: string
+          plan_id: string
+          user_id: string
+        }
+        Insert: {
+          joined_at?: string
+          plan_id: string
+          user_id: string
+        }
+        Update: {
+          joined_at?: string
+          plan_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "family_plan_members_plan_id_fkey"
+            columns: ["plan_id"]
+            isOneToOne: false
+            referencedRelation: "family_plans"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      family_plans: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+          owner_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name?: string
+          owner_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+          owner_id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       fasting_schedules: {
         Row: {
           created_at: string
@@ -2586,6 +2636,7 @@ export type Database = {
           daily_water_target: number | null
           deleted_at: string | null
           dietary_preference: string | null
+          display_currency: string
           fcm_token: string | null
           full_name: string | null
           gender: string | null
@@ -2645,6 +2696,7 @@ export type Database = {
           daily_water_target?: number | null
           deleted_at?: string | null
           dietary_preference?: string | null
+          display_currency?: string
           fcm_token?: string | null
           full_name?: string | null
           gender?: string | null
@@ -2704,6 +2756,7 @@ export type Database = {
           daily_water_target?: number | null
           deleted_at?: string | null
           dietary_preference?: string | null
+          display_currency?: string
           fcm_token?: string | null
           full_name?: string | null
           gender?: string | null
@@ -3166,6 +3219,64 @@ export type Database = {
         }
         Relationships: []
       }
+      story_comments: {
+        Row: {
+          body: string
+          created_at: string
+          id: string
+          story_id: string
+          user_id: string
+        }
+        Insert: {
+          body: string
+          created_at?: string
+          id?: string
+          story_id: string
+          user_id: string
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          id?: string
+          story_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "story_comments_story_id_fkey"
+            columns: ["story_id"]
+            isOneToOne: false
+            referencedRelation: "meal_stories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      story_likes: {
+        Row: {
+          created_at: string
+          story_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          story_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          story_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "story_likes_story_id_fkey"
+            columns: ["story_id"]
+            isOneToOne: false
+            referencedRelation: "meal_stories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       subscription_plans: {
         Row: {
           ai_chat_daily_limit: number | null
@@ -3557,6 +3668,7 @@ export type Database = {
           last_played_at: string | null
           pet_avatar_url: string | null
           pet_name: string
+          pet_stage: string
           pet_type: string
           updated_at: string
           user_id: string
@@ -3575,6 +3687,7 @@ export type Database = {
           last_played_at?: string | null
           pet_avatar_url?: string | null
           pet_name: string
+          pet_stage?: string
           pet_type?: string
           updated_at?: string
           user_id: string
@@ -3593,6 +3706,7 @@ export type Database = {
           last_played_at?: string | null
           pet_avatar_url?: string | null
           pet_name?: string
+          pet_stage?: string
           pet_type?: string
           updated_at?: string
           user_id?: string
