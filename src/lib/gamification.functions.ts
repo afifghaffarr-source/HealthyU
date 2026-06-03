@@ -53,12 +53,15 @@ export const getGameSummary = createServerFn({ method: "GET" })
     };
   });
 
-export const recordActivity = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
-  .inputValidator((input: unknown) => ActivitySchema.parse(input))
-  .handler(async ({ data, context }) => {
-    const { supabase, userId } = context;
-    const today = isoDate(new Date());
+type ActivityType = z.infer<typeof ActivitySchema>["type"];
+
+// Internal helper callable from other server fns.
+export async function recordActivityFor(
+  supabase: any,
+  userId: string,
+  type: ActivityType,
+) {
+  const today = isoDate(new Date());
 
     // 1) Streak + base XP for activity
     const { data: existing } = await supabase
@@ -67,7 +70,7 @@ export const recordActivity = createServerFn({ method: "POST" })
       .eq("user_id", userId)
       .maybeSingle();
 
-    const baseXp = data.type === "fast_completed" ? 50 : data.type === "meal_logged" ? 15 : 5;
+    const baseXp = type === "fast_completed" ? 50 : type === "meal_logged" ? 15 : 5;
 
     let current_streak = 1;
     let longest_streak = 1;
@@ -110,10 +113,10 @@ export const recordActivity = createServerFn({ method: "POST" })
       if (!unlockedIds.has(id)) toUnlock.push(id);
     };
 
-    if (data.type === "meal_logged") tryUnlock("first_meal");
-    if (data.type === "fast_completed") tryUnlock("first_fast");
+    if (type === "meal_logged") tryUnlock("first_meal");
+    if (type === "fast_completed") tryUnlock("first_fast");
 
-    if (data.type === "water_logged") {
+    if (type === "water_logged") {
       const { start, end } = todayRange();
       const { data: waterRows } = await supabase
         .from("water_logs")
@@ -159,4 +162,11 @@ export const recordActivity = createServerFn({ method: "POST" })
     }
 
     return { xp, level, current_streak, longest_streak, awarded: baseXp + bonusXp, newlyUnlocked };
+}
+
+export const recordActivity = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => ActivitySchema.parse(input))
+  .handler(async ({ data, context }) => {
+    return recordActivityFor(context.supabase, context.userId, data.type);
   });
