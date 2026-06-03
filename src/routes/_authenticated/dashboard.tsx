@@ -300,9 +300,13 @@ function Dashboard() {
         {/* Top row: Calorie + Fasting */}
         <div className="grid grid-cols-2 gap-3 animate-fade-up">
           <div className="bg-card p-4 rounded-3xl outline-1 outline-black/5 shadow-sm flex flex-col items-center justify-center">
-            <CalorieRing consumed={totals.cal} target={calTarget} size={112} />
-            <p className="text-xs font-semibold mt-2">Nutrisi hari ini</p>
-            <p className="text-[10px] text-muted-foreground">{Math.round(totals.cal)} / {calTarget} kcal</p>
+            <CalorieRing
+              consumed={totals.cal}
+              target={calTarget}
+              size={128}
+              macros={{ protein: totals.p, carbs: totals.c, fat: totals.f }}
+            />
+            <p className="text-xs font-semibold mt-2" style={{ fontFamily: "var(--font-display)" }}>Nutrisi hari ini</p>
           </div>
           <Link to="/fasting" className="bg-card p-4 rounded-3xl outline-1 outline-black/5 shadow-sm flex flex-col justify-between">
             <p className="text-[10px] font-bold uppercase text-muted-foreground tracking-wider">Puasa</p>
