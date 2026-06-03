@@ -101,17 +101,20 @@ function Dashboard() {
   const [breakdownOpen, setBreakdownOpen] = useState(false);
   const breakdownRef = useRef<HTMLDivElement | null>(null);
   const badgeBtnRef = useRef<HTMLButtonElement | null>(null);
+  const [restoredFromBreakdown, setRestoredFromBreakdown] = useState(false);
   useEffect(() => {
     if (!breakdownOpen) return;
     const onDown = (e: MouseEvent) => {
       if (!breakdownRef.current?.contains(e.target as Node)) {
         setBreakdownOpen(false);
+        setRestoredFromBreakdown(true);
         badgeBtnRef.current?.focus();
       }
     };
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
         setBreakdownOpen(false);
+        setRestoredFromBreakdown(true);
         badgeBtnRef.current?.focus();
       }
     };
@@ -122,6 +125,11 @@ function Dashboard() {
       document.removeEventListener("keydown", onKey);
     };
   }, [breakdownOpen]);
+  useEffect(() => {
+    if (!restoredFromBreakdown) return;
+    const t = window.setTimeout(() => setRestoredFromBreakdown(false), 1500);
+    return () => window.clearTimeout(t);
+  }, [restoredFromBreakdown]);
   useEffect(() => {
     if (Object.keys(newClaims).length === 0) return;
     const id = window.setInterval(() => setNowTick(Date.now()), GROUP_BONUS_BADGE_TICK_MS);
@@ -474,6 +482,7 @@ function Dashboard() {
                       onClick={() => setBreakdownOpen((o) => !o)}
                       className="relative text-[9px] font-bold uppercase bg-amber-100 text-amber-800 rounded-full pl-2 pr-2 pt-0.5 pb-1 overflow-hidden"
                       title={breakdown || "Breakdown klaim baru"}
+                      data-restored-from={restoredFromBreakdown ? "breakdown" : undefined}
                       aria-haspopup="dialog"
                       aria-expanded={breakdownOpen}
                       aria-live="polite"
