@@ -266,8 +266,15 @@ function ReportsPage() {
       // Back-link to TOC (page 1) in the top-right corner.
       doc.setTextColor(80, 80, 200);
       doc.setFontSize(9);
-      doc.text("\u2190 Daftar Isi", 555, 40, { align: "right" });
-      doc.link(490, 28, 70, 16, { pageNumber: 1 });
+      const linkLabel = "\u2190 Daftar Isi";
+      doc.text(linkLabel, 555, 40, { align: "right" });
+      // Underline manually (jsPDF text has no built-in underline style).
+      const linkW = doc.getTextWidth(linkLabel);
+      doc.setDrawColor(80, 80, 200);
+      doc.setLineWidth(0.5);
+      doc.line(555 - linkW, 42, 555, 42);
+      doc.link(555 - linkW - 4, 30, linkW + 8, 16, { pageNumber: 1 });
+      doc.setDrawColor(0);
       doc.setTextColor(0);
     });
     doc.save(`laporan-healthyu-arsip-${new Date().toISOString().slice(0, 10)}.pdf`);
