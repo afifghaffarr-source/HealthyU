@@ -5,7 +5,7 @@ import { getProfile } from "@/lib/profile.functions";
 import { BottomNav } from "@/components/bottom-nav";
 import { supabase } from "@/integrations/supabase/client";
 import { calcAge, calcBMI, bmiCategory, calcBMR, calcTDEE, type ActivityLevel } from "@/lib/health";
-import { ArrowLeft, LogOut, Settings, Trophy, Moon, Calendar, Pill, MoonStar, BarChart3, Bell, Users, Sun, Medal, Camera, ChefHat } from "lucide-react";
+import { ArrowLeft, LogOut, Settings, Trophy, Moon, Calendar, Pill, MoonStar, BarChart3, Bell, Users, Sun, Medal, Camera, ChefHat, Smile, Droplet } from "lucide-react";
 import { useTheme } from "@/components/theme-provider";
 
 export const Route = createFileRoute("/_authenticated/profile")({
@@ -120,6 +120,14 @@ function ProfilePage() {
           <Link to="/prayer" className="bg-card p-4 rounded-2xl outline-1 outline-black/10 flex flex-col items-start gap-2">
             <Moon className="size-5 text-primary" />
             <span className="text-sm font-semibold">Sholat</span>
+          </Link>
+          <Link to="/mood" className="bg-card p-4 rounded-2xl outline-1 outline-black/10 flex flex-col items-start gap-2">
+            <Smile className="size-5 text-amber-500" />
+            <span className="text-sm font-semibold">Mood & Jurnal</span>
+          </Link>
+          <Link to="/water" className="bg-card p-4 rounded-2xl outline-1 outline-black/10 flex flex-col items-start gap-2">
+            <Droplet className="size-5 text-sky-600" />
+            <span className="text-sm font-semibold">Hidrasi</span>
           </Link>
         </section>
 

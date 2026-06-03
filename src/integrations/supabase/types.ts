@@ -463,6 +463,30 @@ export type Database = {
         }
         Relationships: []
       }
+      mood_logs: {
+        Row: {
+          id: string
+          logged_at: string
+          mood: number
+          note: string | null
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          logged_at?: string
+          mood: number
+          note?: string | null
+          user_id: string
+        }
+        Update: {
+          id?: string
+          logged_at?: string
+          mood?: number
+          note?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           activity_level: string | null
