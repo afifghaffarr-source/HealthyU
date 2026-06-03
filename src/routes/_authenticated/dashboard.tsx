@@ -456,11 +456,24 @@ function Dashboard() {
                   <div className="min-w-0 flex-1">
                     <p className="font-semibold truncate inline-flex items-center gap-1.5">
                       <span className="truncate">{g.challenge}</span>
-                      {(newClaims[g.group_id] ?? 0) > 0 && (
-                        <span className="shrink-0 text-[9px] font-bold uppercase bg-amber-100 text-amber-800 rounded-full px-1.5 py-0.5">
-                          +{newClaims[g.group_id]} klaim baru
-                        </span>
-                      )}
+                      {(newClaims[g.group_id] ?? 0) > 0 && (() => {
+                        const ts = claimsTsRef.current[g.group_id] ?? nowTick;
+                        const remaining = Math.max(
+                          0,
+                          GROUP_BONUS_BADGE_TTL_MS - (nowTick - ts),
+                        );
+                        const pct = Math.round((remaining / GROUP_BONUS_BADGE_TTL_MS) * 100);
+                        return (
+                          <span className="relative shrink-0 text-[9px] font-bold uppercase bg-amber-100 text-amber-800 rounded-full pl-1.5 pr-1.5 pt-0.5 pb-1 overflow-hidden">
+                            +{newClaims[g.group_id]} klaim baru
+                            <span
+                              aria-hidden
+                              className="absolute left-0 bottom-0 h-0.5 bg-amber-500/70 transition-[width] duration-1000 ease-linear"
+                              style={{ width: `${pct}%` }}
+                            />
+                          </span>
+                        );
+                      })()}
                     </p>
                     <p className="text-[10px] text-muted-foreground truncate">{g.group}</p>
                   </div>
