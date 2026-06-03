@@ -20,7 +20,9 @@ import {
 export type TranslationKey =
   | "pdf.footer.pageLabel"
   | "pdf.footer.brandLabel"
-  | "pdf.backLink";
+  | "pdf.backLink"
+  | "pdf.toc.continued"
+  | "pdf.tooltip.navigation";
 
 /** Template string `{page}` → page number. */
 export type TranslationBundle = Record<TranslationKey, string>;
@@ -30,11 +32,15 @@ export const bundles = {
   "pdf.footer.pageLabel": DEFAULT_PDF_FOOTER_PAGE_LABEL,
   "pdf.footer.brandLabel": DEFAULT_PDF_FOOTER_BRAND_LABEL,
     "pdf.backLink": "hal. {page} \u2190 Daftar Isi",
+    "pdf.toc.continued": "Daftar Isi (lanjutan {n}/{m})",
+    "pdf.tooltip.navigation": "Navigasi",
   },
   en: {
     "pdf.footer.pageLabel": "page",
     "pdf.footer.brandLabel": "HealthyU \u00B7 exported",
     "pdf.backLink": "p. {page} \u2190 Contents",
+    "pdf.toc.continued": "Contents (continued {n}/{m})",
+    "pdf.tooltip.navigation": "Navigation",
   },
 } satisfies Record<string, TranslationBundle>;
 
