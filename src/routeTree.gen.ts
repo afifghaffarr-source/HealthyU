@@ -64,6 +64,7 @@ import { Route as AuthenticatedReportsWorkoutMatchRouteImport } from './routes/_
 import { Route as AuthenticatedReportsSleepMealRouteImport } from './routes/_authenticated/reports.sleep-meal'
 import { Route as AuthenticatedReportsNutritionRouteImport } from './routes/_authenticated/reports.nutrition'
 import { Route as AuthenticatedReportsMoodRouteImport } from './routes/_authenticated/reports.mood'
+import { Route as AuthenticatedReportsHydrationRouteImport } from './routes/_authenticated/reports.hydration'
 import { Route as AuthenticatedReportsGalleryRouteImport } from './routes/_authenticated/reports.gallery'
 import { Route as AuthenticatedReportsExportRouteImport } from './routes/_authenticated/reports.export'
 import { Route as AuthenticatedReportsCompareRouteImport } from './routes/_authenticated/reports.compare'
@@ -373,6 +374,12 @@ const AuthenticatedReportsMoodRoute =
     path: '/mood',
     getParentRoute: () => AuthenticatedReportsRoute,
   } as any)
+const AuthenticatedReportsHydrationRoute =
+  AuthenticatedReportsHydrationRouteImport.update({
+    id: '/hydration',
+    path: '/hydration',
+    getParentRoute: () => AuthenticatedReportsRoute,
+  } as any)
 const AuthenticatedReportsGalleryRoute =
   AuthenticatedReportsGalleryRouteImport.update({
     id: '/gallery',
@@ -542,6 +549,7 @@ export interface FileRoutesByFullPath {
   '/reports/compare': typeof AuthenticatedReportsCompareRoute
   '/reports/export': typeof AuthenticatedReportsExportRoute
   '/reports/gallery': typeof AuthenticatedReportsGalleryRoute
+  '/reports/hydration': typeof AuthenticatedReportsHydrationRoute
   '/reports/mood': typeof AuthenticatedReportsMoodRoute
   '/reports/nutrition': typeof AuthenticatedReportsNutritionRoute
   '/reports/sleep-meal': typeof AuthenticatedReportsSleepMealRoute
@@ -617,6 +625,7 @@ export interface FileRoutesByTo {
   '/reports/compare': typeof AuthenticatedReportsCompareRoute
   '/reports/export': typeof AuthenticatedReportsExportRoute
   '/reports/gallery': typeof AuthenticatedReportsGalleryRoute
+  '/reports/hydration': typeof AuthenticatedReportsHydrationRoute
   '/reports/mood': typeof AuthenticatedReportsMoodRoute
   '/reports/nutrition': typeof AuthenticatedReportsNutritionRoute
   '/reports/sleep-meal': typeof AuthenticatedReportsSleepMealRoute
@@ -694,6 +703,7 @@ export interface FileRoutesById {
   '/_authenticated/reports/compare': typeof AuthenticatedReportsCompareRoute
   '/_authenticated/reports/export': typeof AuthenticatedReportsExportRoute
   '/_authenticated/reports/gallery': typeof AuthenticatedReportsGalleryRoute
+  '/_authenticated/reports/hydration': typeof AuthenticatedReportsHydrationRoute
   '/_authenticated/reports/mood': typeof AuthenticatedReportsMoodRoute
   '/_authenticated/reports/nutrition': typeof AuthenticatedReportsNutritionRoute
   '/_authenticated/reports/sleep-meal': typeof AuthenticatedReportsSleepMealRoute
@@ -771,6 +781,7 @@ export interface FileRouteTypes {
     | '/reports/compare'
     | '/reports/export'
     | '/reports/gallery'
+    | '/reports/hydration'
     | '/reports/mood'
     | '/reports/nutrition'
     | '/reports/sleep-meal'
@@ -846,6 +857,7 @@ export interface FileRouteTypes {
     | '/reports/compare'
     | '/reports/export'
     | '/reports/gallery'
+    | '/reports/hydration'
     | '/reports/mood'
     | '/reports/nutrition'
     | '/reports/sleep-meal'
@@ -922,6 +934,7 @@ export interface FileRouteTypes {
     | '/_authenticated/reports/compare'
     | '/_authenticated/reports/export'
     | '/_authenticated/reports/gallery'
+    | '/_authenticated/reports/hydration'
     | '/_authenticated/reports/mood'
     | '/_authenticated/reports/nutrition'
     | '/_authenticated/reports/sleep-meal'
@@ -1341,6 +1354,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedReportsMoodRouteImport
       parentRoute: typeof AuthenticatedReportsRoute
     }
+    '/_authenticated/reports/hydration': {
+      id: '/_authenticated/reports/hydration'
+      path: '/hydration'
+      fullPath: '/reports/hydration'
+      preLoaderRoute: typeof AuthenticatedReportsHydrationRouteImport
+      parentRoute: typeof AuthenticatedReportsRoute
+    }
     '/_authenticated/reports/gallery': {
       id: '/_authenticated/reports/gallery'
       path: '/gallery'
@@ -1563,6 +1583,7 @@ interface AuthenticatedReportsRouteChildren {
   AuthenticatedReportsCompareRoute: typeof AuthenticatedReportsCompareRoute
   AuthenticatedReportsExportRoute: typeof AuthenticatedReportsExportRoute
   AuthenticatedReportsGalleryRoute: typeof AuthenticatedReportsGalleryRoute
+  AuthenticatedReportsHydrationRoute: typeof AuthenticatedReportsHydrationRoute
   AuthenticatedReportsMoodRoute: typeof AuthenticatedReportsMoodRoute
   AuthenticatedReportsNutritionRoute: typeof AuthenticatedReportsNutritionRoute
   AuthenticatedReportsSleepMealRoute: typeof AuthenticatedReportsSleepMealRoute
@@ -1573,6 +1594,7 @@ const AuthenticatedReportsRouteChildren: AuthenticatedReportsRouteChildren = {
   AuthenticatedReportsCompareRoute: AuthenticatedReportsCompareRoute,
   AuthenticatedReportsExportRoute: AuthenticatedReportsExportRoute,
   AuthenticatedReportsGalleryRoute: AuthenticatedReportsGalleryRoute,
+  AuthenticatedReportsHydrationRoute: AuthenticatedReportsHydrationRoute,
   AuthenticatedReportsMoodRoute: AuthenticatedReportsMoodRoute,
   AuthenticatedReportsNutritionRoute: AuthenticatedReportsNutritionRoute,
   AuthenticatedReportsSleepMealRoute: AuthenticatedReportsSleepMealRoute,
