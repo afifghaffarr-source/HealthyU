@@ -16,6 +16,7 @@ import { CalorieRing } from "@/components/calorie-ring";
 import { formatDuration, fastingStage } from "@/lib/health";
 import { Droplet, Plus, Sparkles, ArrowRight, Flame, Trophy, Camera, Smile } from "lucide-react";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   component: Dashboard,
@@ -47,6 +48,26 @@ function Dashboard() {
     queryKey: ["unlinked-joined-challenges"],
     queryFn: () => fetchUnlinked(),
   });
+
+  // Realtime: refresh group challenge summary when bonuses/redemptions change
+  useEffect(() => {
+    const ch = supabase
+      .channel("dashboard-group-summary")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "group_challenge_bonuses" },
+        () => qc.invalidateQueries({ queryKey: ["group-challenge-summary"] }),
+      )
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "coin_redemptions" },
+        () => qc.invalidateQueries({ queryKey: ["group-challenge-summary"] }),
+      )
+      .subscribe();
+    return () => {
+      supabase.removeChannel(ch);
+    };
+  }, [qc]);
 
   useEffect(() => {
     if (!pLoad && profile && !profile.onboarded) {
