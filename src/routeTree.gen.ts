@@ -37,6 +37,7 @@ import { Route as AuthenticatedFoodRouteImport } from './routes/_authenticated/f
 import { Route as AuthenticatedFastingRouteImport } from './routes/_authenticated/fasting'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedCommunityRouteImport } from './routes/_authenticated/community'
+import { Route as AuthenticatedCoachRouteImport } from './routes/_authenticated/coach'
 import { Route as AuthenticatedChatRouteImport } from './routes/_authenticated/chat'
 import { Route as AuthenticatedBackupRouteImport } from './routes/_authenticated/backup'
 import { Route as AuthenticatedAchievementsRouteImport } from './routes/_authenticated/achievements'
@@ -186,6 +187,11 @@ const AuthenticatedCommunityRoute = AuthenticatedCommunityRouteImport.update({
   path: '/community',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedCoachRoute = AuthenticatedCoachRouteImport.update({
+  id: '/coach',
+  path: '/coach',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedChatRoute = AuthenticatedChatRouteImport.update({
   id: '/chat',
   path: '/chat',
@@ -225,6 +231,7 @@ export interface FileRoutesByFullPath {
   '/achievements': typeof AuthenticatedAchievementsRoute
   '/backup': typeof AuthenticatedBackupRoute
   '/chat': typeof AuthenticatedChatRoute
+  '/coach': typeof AuthenticatedCoachRoute
   '/community': typeof AuthenticatedCommunityRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/fasting': typeof AuthenticatedFastingRoute
@@ -260,6 +267,7 @@ export interface FileRoutesByTo {
   '/achievements': typeof AuthenticatedAchievementsRoute
   '/backup': typeof AuthenticatedBackupRoute
   '/chat': typeof AuthenticatedChatRoute
+  '/coach': typeof AuthenticatedCoachRoute
   '/community': typeof AuthenticatedCommunityRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/fasting': typeof AuthenticatedFastingRoute
@@ -297,6 +305,7 @@ export interface FileRoutesById {
   '/_authenticated/achievements': typeof AuthenticatedAchievementsRoute
   '/_authenticated/backup': typeof AuthenticatedBackupRoute
   '/_authenticated/chat': typeof AuthenticatedChatRoute
+  '/_authenticated/coach': typeof AuthenticatedCoachRoute
   '/_authenticated/community': typeof AuthenticatedCommunityRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/fasting': typeof AuthenticatedFastingRoute
@@ -334,6 +343,7 @@ export interface FileRouteTypes {
     | '/achievements'
     | '/backup'
     | '/chat'
+    | '/coach'
     | '/community'
     | '/dashboard'
     | '/fasting'
@@ -369,6 +379,7 @@ export interface FileRouteTypes {
     | '/achievements'
     | '/backup'
     | '/chat'
+    | '/coach'
     | '/community'
     | '/dashboard'
     | '/fasting'
@@ -405,6 +416,7 @@ export interface FileRouteTypes {
     | '/_authenticated/achievements'
     | '/_authenticated/backup'
     | '/_authenticated/chat'
+    | '/_authenticated/coach'
     | '/_authenticated/community'
     | '/_authenticated/dashboard'
     | '/_authenticated/fasting'
@@ -641,6 +653,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedCommunityRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/coach': {
+      id: '/_authenticated/coach'
+      path: '/coach'
+      fullPath: '/coach'
+      preLoaderRoute: typeof AuthenticatedCoachRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/chat': {
       id: '/_authenticated/chat'
       path: '/chat'
@@ -701,6 +720,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAchievementsRoute: typeof AuthenticatedAchievementsRoute
   AuthenticatedBackupRoute: typeof AuthenticatedBackupRoute
   AuthenticatedChatRoute: typeof AuthenticatedChatRoute
+  AuthenticatedCoachRoute: typeof AuthenticatedCoachRoute
   AuthenticatedCommunityRoute: typeof AuthenticatedCommunityRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedFastingRoute: typeof AuthenticatedFastingRoute
@@ -732,6 +752,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAchievementsRoute: AuthenticatedAchievementsRoute,
   AuthenticatedBackupRoute: AuthenticatedBackupRoute,
   AuthenticatedChatRoute: AuthenticatedChatRoute,
+  AuthenticatedCoachRoute: AuthenticatedCoachRoute,
   AuthenticatedCommunityRoute: AuthenticatedCommunityRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedFastingRoute: AuthenticatedFastingRoute,
@@ -772,3 +793,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
