@@ -469,7 +469,15 @@ function ReportsPage() {
               <h2 className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
                 Riwayat Laporan AI
               </h2>
-              <select
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={exportAllArchivePdf}
+                  className="inline-flex items-center gap-1 text-[11px] font-semibold bg-card outline-1 outline-black/10 rounded-lg px-2 py-1"
+                  title="Export semua laporan ke 1 PDF"
+                >
+                  <FileText className="size-3" /> Export semua
+                </button>
+                <select
                 value={rangeWeeks}
                 onChange={(e) => setRangeWeeks(Number(e.target.value))}
                 className="text-[11px] bg-card outline-1 outline-black/10 rounded-lg px-2 py-1"
@@ -479,6 +487,7 @@ function ReportsPage() {
                 <option value={12}>12 minggu</option>
                 <option value={26}>26 minggu</option>
               </select>
+              </div>
             </div>
             {history
               .filter((r) => {
