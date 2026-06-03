@@ -13,6 +13,7 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedWorkoutRouteImport } from './routes/_authenticated/workout'
+import { Route as AuthenticatedWaterRouteImport } from './routes/_authenticated/water'
 import { Route as AuthenticatedSleepRouteImport } from './routes/_authenticated/sleep'
 import { Route as AuthenticatedScanRouteImport } from './routes/_authenticated/scan'
 import { Route as AuthenticatedReportsRouteImport } from './routes/_authenticated/reports'
@@ -52,6 +53,11 @@ const IndexRoute = IndexRouteImport.update({
 const AuthenticatedWorkoutRoute = AuthenticatedWorkoutRouteImport.update({
   id: '/workout',
   path: '/workout',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedWaterRoute = AuthenticatedWaterRouteImport.update({
+  id: '/water',
+  path: '/water',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedSleepRoute = AuthenticatedSleepRouteImport.update({
@@ -187,6 +193,7 @@ export interface FileRoutesByFullPath {
   '/reports': typeof AuthenticatedReportsRoute
   '/scan': typeof AuthenticatedScanRoute
   '/sleep': typeof AuthenticatedSleepRoute
+  '/water': typeof AuthenticatedWaterRoute
   '/workout': typeof AuthenticatedWorkoutRoute
   '/recipes/$id': typeof AuthenticatedRecipesIdRoute
 }
@@ -213,6 +220,7 @@ export interface FileRoutesByTo {
   '/reports': typeof AuthenticatedReportsRoute
   '/scan': typeof AuthenticatedScanRoute
   '/sleep': typeof AuthenticatedSleepRoute
+  '/water': typeof AuthenticatedWaterRoute
   '/workout': typeof AuthenticatedWorkoutRoute
   '/recipes/$id': typeof AuthenticatedRecipesIdRoute
 }
@@ -241,6 +249,7 @@ export interface FileRoutesById {
   '/_authenticated/reports': typeof AuthenticatedReportsRoute
   '/_authenticated/scan': typeof AuthenticatedScanRoute
   '/_authenticated/sleep': typeof AuthenticatedSleepRoute
+  '/_authenticated/water': typeof AuthenticatedWaterRoute
   '/_authenticated/workout': typeof AuthenticatedWorkoutRoute
   '/_authenticated/recipes/$id': typeof AuthenticatedRecipesIdRoute
 }
@@ -269,6 +278,7 @@ export interface FileRouteTypes {
     | '/reports'
     | '/scan'
     | '/sleep'
+    | '/water'
     | '/workout'
     | '/recipes/$id'
   fileRoutesByTo: FileRoutesByTo
@@ -295,6 +305,7 @@ export interface FileRouteTypes {
     | '/reports'
     | '/scan'
     | '/sleep'
+    | '/water'
     | '/workout'
     | '/recipes/$id'
   id:
@@ -322,6 +333,7 @@ export interface FileRouteTypes {
     | '/_authenticated/reports'
     | '/_authenticated/scan'
     | '/_authenticated/sleep'
+    | '/_authenticated/water'
     | '/_authenticated/workout'
     | '/_authenticated/recipes/$id'
   fileRoutesById: FileRoutesById
@@ -360,6 +372,13 @@ declare module '@tanstack/react-router' {
       path: '/workout'
       fullPath: '/workout'
       preLoaderRoute: typeof AuthenticatedWorkoutRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/water': {
+      id: '/_authenticated/water'
+      path: '/water'
+      fullPath: '/water'
+      preLoaderRoute: typeof AuthenticatedWaterRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/sleep': {
@@ -544,6 +563,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedReportsRoute: typeof AuthenticatedReportsRoute
   AuthenticatedScanRoute: typeof AuthenticatedScanRoute
   AuthenticatedSleepRoute: typeof AuthenticatedSleepRoute
+  AuthenticatedWaterRoute: typeof AuthenticatedWaterRoute
   AuthenticatedWorkoutRoute: typeof AuthenticatedWorkoutRoute
 }
 
@@ -568,6 +588,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedReportsRoute: AuthenticatedReportsRoute,
   AuthenticatedScanRoute: AuthenticatedScanRoute,
   AuthenticatedSleepRoute: AuthenticatedSleepRoute,
+  AuthenticatedWaterRoute: AuthenticatedWaterRoute,
   AuthenticatedWorkoutRoute: AuthenticatedWorkoutRoute,
 }
 
@@ -582,13 +603,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

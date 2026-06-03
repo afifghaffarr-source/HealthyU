@@ -139,7 +139,10 @@ function Dashboard() {
         </div>
 
         {/* Water */}
-        <div className="bg-card p-4 rounded-3xl outline-1 outline-black/5 shadow-sm flex items-center gap-4 animate-fade-up">
+        <Link
+          to="/water"
+          className="bg-card p-4 rounded-3xl outline-1 outline-black/5 shadow-sm flex items-center gap-4 animate-fade-up"
+        >
           <div className="size-12 rounded-2xl bg-sky-100 grid place-items-center">
             <Droplet className="size-5 text-sky-600" />
           </div>
@@ -150,13 +153,17 @@ function Dashboard() {
             </p>
           </div>
           <button
-            onClick={() => waterMutation.mutate(250)}
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              waterMutation.mutate(250);
+            }}
             disabled={waterMutation.isPending}
             className="bg-primary text-primary-foreground text-xs font-semibold px-3 py-2 rounded-xl inline-flex items-center gap-1"
           >
             <Plus className="size-3.5" /> 250ml
           </button>
-        </div>
+        </Link>
 
         {/* AI Scan CTA */}
         <Link
