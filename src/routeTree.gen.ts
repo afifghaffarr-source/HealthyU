@@ -20,8 +20,10 @@ import { Route as AuthenticatedVitalsRouteImport } from './routes/_authenticated
 import { Route as AuthenticatedSubscriptionRouteImport } from './routes/_authenticated/subscription'
 import { Route as AuthenticatedSleepRouteImport } from './routes/_authenticated/sleep'
 import { Route as AuthenticatedScanRouteImport } from './routes/_authenticated/scan'
+import { Route as AuthenticatedRewardsRouteImport } from './routes/_authenticated/rewards'
 import { Route as AuthenticatedReportsRouteImport } from './routes/_authenticated/reports'
 import { Route as AuthenticatedRemindersRouteImport } from './routes/_authenticated/reminders'
+import { Route as AuthenticatedReferralsRouteImport } from './routes/_authenticated/referrals'
 import { Route as AuthenticatedRecommendationsRouteImport } from './routes/_authenticated/recommendations'
 import { Route as AuthenticatedRecipesRouteImport } from './routes/_authenticated/recipes'
 import { Route as AuthenticatedProgressRouteImport } from './routes/_authenticated/progress'
@@ -51,6 +53,7 @@ import { Route as AuthenticatedAchievementsRouteImport } from './routes/_authent
 import { Route as ApiChatStreamRouteImport } from './routes/api/chat.stream'
 import { Route as AuthenticatedRecipesIdRouteImport } from './routes/_authenticated/recipes.$id'
 import { Route as ApiWearableGoogleFitCallbackRouteImport } from './routes/api/wearable.google-fit.callback'
+import { Route as ApiPublicHooksNotificationSchedulerRouteImport } from './routes/api/public/hooks/notification-scheduler'
 import { Route as ApiPublicHooksDailyCoachRouteImport } from './routes/api/public/hooks/daily-coach'
 
 const AuthRoute = AuthRouteImport.update({
@@ -108,6 +111,11 @@ const AuthenticatedScanRoute = AuthenticatedScanRouteImport.update({
   path: '/scan',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedRewardsRoute = AuthenticatedRewardsRouteImport.update({
+  id: '/rewards',
+  path: '/rewards',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedReportsRoute = AuthenticatedReportsRouteImport.update({
   id: '/reports',
   path: '/reports',
@@ -116,6 +124,11 @@ const AuthenticatedReportsRoute = AuthenticatedReportsRouteImport.update({
 const AuthenticatedRemindersRoute = AuthenticatedRemindersRouteImport.update({
   id: '/reminders',
   path: '/reminders',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedReferralsRoute = AuthenticatedReferralsRouteImport.update({
+  id: '/referrals',
+  path: '/referrals',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedRecommendationsRoute =
@@ -271,6 +284,12 @@ const ApiWearableGoogleFitCallbackRoute =
     path: '/api/wearable/google-fit/callback',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicHooksNotificationSchedulerRoute =
+  ApiPublicHooksNotificationSchedulerRouteImport.update({
+    id: '/api/public/hooks/notification-scheduler',
+    path: '/api/public/hooks/notification-scheduler',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicHooksDailyCoachRoute =
   ApiPublicHooksDailyCoachRouteImport.update({
     id: '/api/public/hooks/daily-coach',
@@ -307,8 +326,10 @@ export interface FileRoutesByFullPath {
   '/progress': typeof AuthenticatedProgressRoute
   '/recipes': typeof AuthenticatedRecipesRouteWithChildren
   '/recommendations': typeof AuthenticatedRecommendationsRoute
+  '/referrals': typeof AuthenticatedReferralsRoute
   '/reminders': typeof AuthenticatedRemindersRoute
   '/reports': typeof AuthenticatedReportsRoute
+  '/rewards': typeof AuthenticatedRewardsRoute
   '/scan': typeof AuthenticatedScanRoute
   '/sleep': typeof AuthenticatedSleepRoute
   '/subscription': typeof AuthenticatedSubscriptionRoute
@@ -320,6 +341,7 @@ export interface FileRoutesByFullPath {
   '/recipes/$id': typeof AuthenticatedRecipesIdRoute
   '/api/chat/stream': typeof ApiChatStreamRoute
   '/api/public/hooks/daily-coach': typeof ApiPublicHooksDailyCoachRoute
+  '/api/public/hooks/notification-scheduler': typeof ApiPublicHooksNotificationSchedulerRoute
   '/api/wearable/google-fit/callback': typeof ApiWearableGoogleFitCallbackRoute
 }
 export interface FileRoutesByTo {
@@ -351,8 +373,10 @@ export interface FileRoutesByTo {
   '/progress': typeof AuthenticatedProgressRoute
   '/recipes': typeof AuthenticatedRecipesRouteWithChildren
   '/recommendations': typeof AuthenticatedRecommendationsRoute
+  '/referrals': typeof AuthenticatedReferralsRoute
   '/reminders': typeof AuthenticatedRemindersRoute
   '/reports': typeof AuthenticatedReportsRoute
+  '/rewards': typeof AuthenticatedRewardsRoute
   '/scan': typeof AuthenticatedScanRoute
   '/sleep': typeof AuthenticatedSleepRoute
   '/subscription': typeof AuthenticatedSubscriptionRoute
@@ -364,6 +388,7 @@ export interface FileRoutesByTo {
   '/recipes/$id': typeof AuthenticatedRecipesIdRoute
   '/api/chat/stream': typeof ApiChatStreamRoute
   '/api/public/hooks/daily-coach': typeof ApiPublicHooksDailyCoachRoute
+  '/api/public/hooks/notification-scheduler': typeof ApiPublicHooksNotificationSchedulerRoute
   '/api/wearable/google-fit/callback': typeof ApiWearableGoogleFitCallbackRoute
 }
 export interface FileRoutesById {
@@ -397,8 +422,10 @@ export interface FileRoutesById {
   '/_authenticated/progress': typeof AuthenticatedProgressRoute
   '/_authenticated/recipes': typeof AuthenticatedRecipesRouteWithChildren
   '/_authenticated/recommendations': typeof AuthenticatedRecommendationsRoute
+  '/_authenticated/referrals': typeof AuthenticatedReferralsRoute
   '/_authenticated/reminders': typeof AuthenticatedRemindersRoute
   '/_authenticated/reports': typeof AuthenticatedReportsRoute
+  '/_authenticated/rewards': typeof AuthenticatedRewardsRoute
   '/_authenticated/scan': typeof AuthenticatedScanRoute
   '/_authenticated/sleep': typeof AuthenticatedSleepRoute
   '/_authenticated/subscription': typeof AuthenticatedSubscriptionRoute
@@ -410,6 +437,7 @@ export interface FileRoutesById {
   '/_authenticated/recipes/$id': typeof AuthenticatedRecipesIdRoute
   '/api/chat/stream': typeof ApiChatStreamRoute
   '/api/public/hooks/daily-coach': typeof ApiPublicHooksDailyCoachRoute
+  '/api/public/hooks/notification-scheduler': typeof ApiPublicHooksNotificationSchedulerRoute
   '/api/wearable/google-fit/callback': typeof ApiWearableGoogleFitCallbackRoute
 }
 export interface FileRouteTypes {
@@ -443,8 +471,10 @@ export interface FileRouteTypes {
     | '/progress'
     | '/recipes'
     | '/recommendations'
+    | '/referrals'
     | '/reminders'
     | '/reports'
+    | '/rewards'
     | '/scan'
     | '/sleep'
     | '/subscription'
@@ -456,6 +486,7 @@ export interface FileRouteTypes {
     | '/recipes/$id'
     | '/api/chat/stream'
     | '/api/public/hooks/daily-coach'
+    | '/api/public/hooks/notification-scheduler'
     | '/api/wearable/google-fit/callback'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -487,8 +518,10 @@ export interface FileRouteTypes {
     | '/progress'
     | '/recipes'
     | '/recommendations'
+    | '/referrals'
     | '/reminders'
     | '/reports'
+    | '/rewards'
     | '/scan'
     | '/sleep'
     | '/subscription'
@@ -500,6 +533,7 @@ export interface FileRouteTypes {
     | '/recipes/$id'
     | '/api/chat/stream'
     | '/api/public/hooks/daily-coach'
+    | '/api/public/hooks/notification-scheduler'
     | '/api/wearable/google-fit/callback'
   id:
     | '__root__'
@@ -532,8 +566,10 @@ export interface FileRouteTypes {
     | '/_authenticated/progress'
     | '/_authenticated/recipes'
     | '/_authenticated/recommendations'
+    | '/_authenticated/referrals'
     | '/_authenticated/reminders'
     | '/_authenticated/reports'
+    | '/_authenticated/rewards'
     | '/_authenticated/scan'
     | '/_authenticated/sleep'
     | '/_authenticated/subscription'
@@ -545,6 +581,7 @@ export interface FileRouteTypes {
     | '/_authenticated/recipes/$id'
     | '/api/chat/stream'
     | '/api/public/hooks/daily-coach'
+    | '/api/public/hooks/notification-scheduler'
     | '/api/wearable/google-fit/callback'
   fileRoutesById: FileRoutesById
 }
@@ -554,6 +591,7 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   ApiChatStreamRoute: typeof ApiChatStreamRoute
   ApiPublicHooksDailyCoachRoute: typeof ApiPublicHooksDailyCoachRoute
+  ApiPublicHooksNotificationSchedulerRoute: typeof ApiPublicHooksNotificationSchedulerRoute
   ApiWearableGoogleFitCallbackRoute: typeof ApiWearableGoogleFitCallbackRoute
 }
 
@@ -636,6 +674,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedScanRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/rewards': {
+      id: '/_authenticated/rewards'
+      path: '/rewards'
+      fullPath: '/rewards'
+      preLoaderRoute: typeof AuthenticatedRewardsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/reports': {
       id: '/_authenticated/reports'
       path: '/reports'
@@ -648,6 +693,13 @@ declare module '@tanstack/react-router' {
       path: '/reminders'
       fullPath: '/reminders'
       preLoaderRoute: typeof AuthenticatedRemindersRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/referrals': {
+      id: '/_authenticated/referrals'
+      path: '/referrals'
+      fullPath: '/referrals'
+      preLoaderRoute: typeof AuthenticatedReferralsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/recommendations': {
@@ -853,6 +905,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiWearableGoogleFitCallbackRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/hooks/notification-scheduler': {
+      id: '/api/public/hooks/notification-scheduler'
+      path: '/api/public/hooks/notification-scheduler'
+      fullPath: '/api/public/hooks/notification-scheduler'
+      preLoaderRoute: typeof ApiPublicHooksNotificationSchedulerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/hooks/daily-coach': {
       id: '/api/public/hooks/daily-coach'
       path: '/api/public/hooks/daily-coach'
@@ -901,8 +960,10 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedProgressRoute: typeof AuthenticatedProgressRoute
   AuthenticatedRecipesRoute: typeof AuthenticatedRecipesRouteWithChildren
   AuthenticatedRecommendationsRoute: typeof AuthenticatedRecommendationsRoute
+  AuthenticatedReferralsRoute: typeof AuthenticatedReferralsRoute
   AuthenticatedRemindersRoute: typeof AuthenticatedRemindersRoute
   AuthenticatedReportsRoute: typeof AuthenticatedReportsRoute
+  AuthenticatedRewardsRoute: typeof AuthenticatedRewardsRoute
   AuthenticatedScanRoute: typeof AuthenticatedScanRoute
   AuthenticatedSleepRoute: typeof AuthenticatedSleepRoute
   AuthenticatedSubscriptionRoute: typeof AuthenticatedSubscriptionRoute
@@ -940,8 +1001,10 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedProgressRoute: AuthenticatedProgressRoute,
   AuthenticatedRecipesRoute: AuthenticatedRecipesRouteWithChildren,
   AuthenticatedRecommendationsRoute: AuthenticatedRecommendationsRoute,
+  AuthenticatedReferralsRoute: AuthenticatedReferralsRoute,
   AuthenticatedRemindersRoute: AuthenticatedRemindersRoute,
   AuthenticatedReportsRoute: AuthenticatedReportsRoute,
+  AuthenticatedRewardsRoute: AuthenticatedRewardsRoute,
   AuthenticatedScanRoute: AuthenticatedScanRoute,
   AuthenticatedSleepRoute: AuthenticatedSleepRoute,
   AuthenticatedSubscriptionRoute: AuthenticatedSubscriptionRoute,
@@ -961,6 +1024,8 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   ApiChatStreamRoute: ApiChatStreamRoute,
   ApiPublicHooksDailyCoachRoute: ApiPublicHooksDailyCoachRoute,
+  ApiPublicHooksNotificationSchedulerRoute:
+    ApiPublicHooksNotificationSchedulerRoute,
   ApiWearableGoogleFitCallbackRoute: ApiWearableGoogleFitCallbackRoute,
 }
 export const routeTree = rootRouteImport
