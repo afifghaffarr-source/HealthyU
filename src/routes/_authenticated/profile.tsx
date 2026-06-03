@@ -3,10 +3,11 @@ import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { getProfile } from "@/lib/profile.functions";
 import { BottomNav } from "@/components/bottom-nav";
+import { TopAppBar } from "@/components/healthyu/top-app-bar";
+import { HealthCard } from "@/components/healthyu/health-card";
 import { supabase } from "@/integrations/supabase/client";
 import { calcAge, calcBMI, bmiCategory, calcBMR, calcTDEE, type ActivityLevel } from "@/lib/health";
 import {
-  ArrowLeft,
   LogOut,
   Settings,
   Trophy,
@@ -65,16 +66,8 @@ function ProfilePage() {
 
   return (
     <main className="min-h-screen bg-background pb-28">
-      <div className="max-w-md mx-auto px-5 pt-8 space-y-5">
-        <header className="flex items-center gap-3">
-          <Link
-            to="/dashboard"
-            className="size-10 bg-card rounded-2xl outline-1 outline-black/10 grid place-items-center"
-          >
-            <ArrowLeft className="size-4" />
-          </Link>
-          <h1 className="text-2xl font-bold">Profil</h1>
-        </header>
+      <div className="max-w-md mx-auto px-5 pt-2 space-y-5">
+        <TopAppBar title="Profil" subtitle={p?.full_name ?? "Sahabat"} showBack />
 
         <section className="bg-card p-6 rounded-3xl outline-1 outline-black/5 text-center animate-fade-up">
           <div className="size-20 mx-auto rounded-full bg-primary text-primary-foreground grid place-items-center text-2xl font-bold mb-3">
@@ -88,9 +81,9 @@ function ProfilePage() {
 
         {bmi && (
           <section className="grid grid-cols-3 gap-3 animate-fade-up">
-            <Stat label="BMI" value={bmi.toString()} sub={cat?.label} />
-            <Stat label="BMR" value={bmr ? `${bmr}` : "-"} sub="kcal/hari" />
-            <Stat label="TDEE" value={tdee ? `${tdee}` : "-"} sub="kcal/hari" />
+            <HealthCard label="BMI" value={bmi.toString()} trend={cat?.label} tone="green" icon={Scale} />
+            <HealthCard label="BMR" value={bmr ?? "-"} unit="kcal" tone="orange" icon={HeartPulse} />
+            <HealthCard label="TDEE" value={tdee ?? "-"} unit="kcal" tone="blue" icon={Activity} />
           </section>
         )}
 
