@@ -38,9 +38,13 @@ function FoodPage() {
   };
   const logMutation = useMutation({
     mutationFn: (payload: LogPayload) => log({ data: payload }),
-    onSuccess: () => {
+    onSuccess: (res) => {
       qc.invalidateQueries({ queryKey: ["meals"] });
+      qc.invalidateQueries({ queryKey: ["game", "summary"] });
       toast.success("Makanan dicatat");
+      (res?.game?.newlyUnlocked ?? []).forEach((a) =>
+        toast.success(`${a.icon} ${a.title} terbuka!`),
+      );
     },
     onError: (e) => toast.error(e instanceof Error ? e.message : "Gagal"),
   });
