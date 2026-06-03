@@ -50,12 +50,22 @@ function RecipesPage() {
   const [pulseCounter, setPulseCounter] = useState(false);
   const [flashIds, setFlashIds] = useState<Record<string, number>>({});
   const prevGrowth = useRef<Record<string, number>>({});
-  const prevTrendingCount = useRef<number | null>(null);
+  const prevTrendingCount = useRef<number | null>(
+    typeof window === "undefined"
+      ? null
+      : (() => {
+          const v = window.localStorage.getItem("recipes:trendingCount");
+          return v === null ? null : Number(v);
+        })(),
+  );
 
   const trendingCount = all.filter((r) => Number(r.weekly_growth ?? 0) > 0).length;
   useEffect(() => {
     const prev = prevTrendingCount.current;
     prevTrendingCount.current = trendingCount;
+    if (typeof window !== "undefined") {
+      window.localStorage.setItem("recipes:trendingCount", String(trendingCount));
+    }
     if (prev === null) return;
     if (trendingCount > prev) {
       setPulseCounter(true);
