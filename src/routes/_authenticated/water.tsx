@@ -61,7 +61,7 @@ function WaterPage() {
         return;
       }
       toast.success(`+${ml}ml dicatat`);
-      const newly = res?.game?.newlyUnlocked ?? [];
+      const newly = ("game" in res ? res.game?.newlyUnlocked : undefined) ?? [];
       newly.forEach((a: { icon: string; title: string }) =>
         toast.success(`${getAchievementToastPrefix(a.icon)} ${a.title} terbuka!`),
       );
