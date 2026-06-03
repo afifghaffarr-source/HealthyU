@@ -131,6 +131,7 @@ function ChallengesPage() {
           return (
             <article
               key={c.id}
+              ref={(el) => { articleRefs.current[c.id] = el; }}
               className="rounded-3xl bg-card outline-1 outline-black/5 p-4 shadow-sm"
             >
               <div className="flex items-start justify-between gap-3">
