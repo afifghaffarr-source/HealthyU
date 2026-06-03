@@ -1,8 +1,13 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
-const TABLES = [
-  "profiles",
+type ExportPayload = {
+  exported_at: string;
+  user_id: string;
+  tables: Record<string, unknown[]>;
+};
+
+const USER_TABLES = [
   "meal_logs",
   "meal_plans",
   "water_logs",
@@ -25,18 +30,29 @@ const TABLES = [
 
 export const exportAllData = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
-  .handler(async ({ context }) => {
+  .handler(async ({ context }): Promise<ExportPayload> => {
     const { supabase, userId } = context;
-    const out: Record<string, unknown> = {
+    const tables: Record<string, unknown[]> = {};
+
+    const { data: profile, error: pErr } = await supabase
+      .from("profiles")
+      .select("*")
+      .eq("id", userId);
+    if (pErr) throw new Error(`profiles: ${pErr.message}`);
+    tables.profiles = profile ?? [];
+
+    for (const t of USER_TABLES) {
+      const { data, error } = await supabase
+        .from(t)
+        .select("*")
+        .eq("user_id", userId);
+      if (error) throw new Error(`${t}: ${error.message}`);
+      tables[t] = data ?? [];
+    }
+
+    return {
       exported_at: new Date().toISOString(),
       user_id: userId,
+      tables,
     };
-    for (const t of TABLES) {
-      const query = supabase.from(t).select("*");
-      const { data, error } =
-        t === "profiles" ? await query.eq("id", userId) : await query.eq("user_id", userId);
-      if (error) throw new Error(`${t}: ${error.message}`);
-      out[t] = data ?? [];
-    }
-    return out;
   });
