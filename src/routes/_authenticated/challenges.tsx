@@ -447,19 +447,52 @@ function BonusClaimer({ challengeId }: { challengeId: string }) {
       {groups.map((g) => {
         const done = claimedSet.has(g.id);
         return (
-          <button
-            key={g.id}
-            onClick={() => !done && claimM.mutate(g.id)}
-            disabled={done || claimM.isPending}
-            className={`w-full text-[11px] font-semibold rounded-xl py-1.5 px-2 inline-flex items-center justify-center gap-1 ${
-              done ? "bg-muted text-muted-foreground" : "bg-amber-100 text-amber-800"
-            }`}
-          >
-            <Gift className="size-3" />
-            {done ? `Bonus "${g.name}" terklaim` : `Klaim bonus grup "${g.name}"`}
-          </button>
+          <div key={g.id} className="space-y-1">
+            <button
+              onClick={() => !done && claimM.mutate(g.id)}
+              disabled={done || claimM.isPending}
+              className={`w-full text-[11px] font-semibold rounded-xl py-1.5 px-2 inline-flex items-center justify-center gap-1 ${
+                done ? "bg-muted text-muted-foreground" : "bg-amber-100 text-amber-800"
+              }`}
+            >
+              <Gift className="size-3" />
+              {done ? `Bonus "${g.name}" terklaim` : `Klaim bonus grup "${g.name}"`}
+            </button>
+            <BonusClaimers groupId={g.id} challengeId={challengeId} groupName={g.name} />
+          </div>
         );
       })}
+    </div>
+  );
+}
+
+function BonusClaimers({
+  groupId,
+  challengeId,
+  groupName,
+}: {
+  groupId: string;
+  challengeId: string;
+  groupName: string;
+}) {
+  const fetchClaimers = useServerFn(listGroupBonusClaimers);
+  const { data: claimers = [] } = useQuery({
+    queryKey: ["bonus-claimers", groupId, challengeId],
+    queryFn: () => fetchClaimers({ data: { group_id: groupId, challenge_id: challengeId } }),
+  });
+  if (claimers.length === 0) return null;
+  return (
+    <div className="flex flex-wrap items-center gap-1 px-1">
+      <span className="text-[10px] text-muted-foreground">Sudah klaim di {groupName}:</span>
+      {claimers.map((c) => (
+        <span
+          key={c.user_id}
+          title={`+${c.coins} 🪙`}
+          className="inline-flex items-center gap-0.5 text-[10px] font-semibold bg-amber-50 text-amber-700 rounded-full px-1.5 py-0.5"
+        >
+          🪙 {c.name.split(" ")[0]}
+        </span>
+      ))}
     </div>
   );
 }
