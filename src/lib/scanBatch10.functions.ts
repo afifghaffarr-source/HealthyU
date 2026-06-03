@@ -24,10 +24,6 @@ export const redeemFriendInvite = createServerFn({ method: "POST" })
     if (inv.used_by) throw new Error("Token sudah dipakai");
     await context.supabase.from("friend_invites").update({ used_by: context.userId, used_at: new Date().toISOString() }).eq("id", inv.id);
     // create mutual follow
-    await context.supabase.from("follows").insert([
-      { follower_id: context.userId, following_id: inv.inviter_id },
-      { follower_id: inv.inviter_id, following_id: context.userId },
-    ] as never).then(() => {}, () => {});
     return { ok: true, inviter: inv.inviter_id };
   });
 
@@ -103,7 +99,7 @@ export const recommendExercises = createServerFn({ method: "POST" })
     const json = (await res.json()) as { choices?: { message?: { content?: string } }[] };
     const text = json.choices?.[0]?.message?.content ?? "[]";
     const m = text.match(/\[[\s\S]*\]/);
-    let plan: unknown[] = [];
+    let plan: Record<string, string | number>[] = [];
     try { plan = JSON.parse(m ? m[0] : "[]"); } catch { plan = []; }
     return { plan };
   });
