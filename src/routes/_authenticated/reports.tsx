@@ -297,6 +297,30 @@ function ReportsPage() {
             </article>
           )}
         </section>
+
+        {history.length > 0 && (
+          <section className="space-y-2 animate-fade-up">
+            <h2 className="text-xs font-bold uppercase tracking-wider text-muted-foreground px-1">
+              Riwayat Laporan AI
+            </h2>
+            {history.map((r) => {
+              const text = Array.isArray(r.recommendations) ? String(r.recommendations[0] ?? "") : "";
+              return (
+                <details key={r.id} className="bg-card rounded-2xl outline-1 outline-black/5 p-4">
+                  <summary className="cursor-pointer text-sm font-semibold flex items-center justify-between">
+                    <span>
+                      {r.report_period_start} → {r.report_period_end}
+                    </span>
+                    <span className="text-xs text-muted-foreground">
+                      {new Date(r.created_at).toLocaleDateString("id-ID")}
+                    </span>
+                  </summary>
+                  <p className="mt-3 text-sm whitespace-pre-wrap leading-relaxed">{text}</p>
+                </details>
+              );
+            })}
+          </section>
+        )}
       </div>
       <BottomNav />
     </main>
