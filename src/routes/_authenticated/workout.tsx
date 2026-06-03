@@ -1,9 +1,10 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { logWorkout, recentWorkouts, deleteWorkout } from "@/lib/workouts.functions";
 import { BottomNav } from "@/components/bottom-nav";
+import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { Activity, Trash2, WifiOff, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
 import { enqueue } from "@/lib/offline-queue";
@@ -77,25 +78,21 @@ function WorkoutPage() {
 
   return (
     <main className="min-h-screen bg-background pb-28">
-      <div className="max-w-md mx-auto px-5 pt-8 space-y-5">
-        <header className="flex items-center gap-3">
-          <Link to="/dashboard" className="size-10 bg-card rounded-2xl outline-1 outline-black/10 grid place-items-center">
-            ←
-          </Link>
-          <div>
-            <h1 className="text-2xl font-bold">Latihan</h1>
-            <p className="text-xs text-muted-foreground">{sessions.length} sesi · {totalMin} menit · {totalCal} kcal</p>
-          </div>
-          {(!online || pending > 0) && (
+      <div className="max-w-md mx-auto px-5 pt-2 space-y-5">
+        <TopAppBar
+          title="Latihan"
+          subtitle={`${sessions.length} sesi · ${totalMin} menit · ${totalCal} kcal`}
+          showBack
+          action={(!online || pending > 0) ? (
             <button
               onClick={() => sync()}
-              className={`ml-auto inline-flex items-center gap-1 text-[11px] font-semibold px-2.5 py-1.5 rounded-full ${online ? "bg-amber-100 text-amber-700" : "bg-muted text-muted-foreground"}`}
+              className={`inline-flex items-center gap-1 text-[11px] font-semibold px-2.5 py-1.5 rounded-full ${online ? "bg-amber-100 text-amber-700" : "bg-muted text-muted-foreground"}`}
             >
               {online ? <RefreshCw className="size-3" /> : <WifiOff className="size-3" />}
               {online ? `Sync ${pending}` : `Offline${pending ? ` · ${pending}` : ""}`}
             </button>
-          )}
-        </header>
+          ) : undefined}
+        />
 
         <section className="bg-card p-4 rounded-3xl outline-1 outline-black/5 space-y-3 animate-fade-up">
           <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Catat sesi baru</p>

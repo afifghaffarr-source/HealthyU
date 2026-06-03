@@ -10,7 +10,8 @@ import {
 } from "@/lib/constants";
 import { generateRecipeFromIngredients, type GeneratedRecipe } from "@/lib/ai-extras.functions";
 import { BottomNav } from "@/components/bottom-nav";
-import { ArrowLeft, Clock, Flame, Search, Sparkles, Loader2, X, Star, Bookmark, TrendingUp } from "lucide-react";
+import { TopAppBar } from "@/components/healthyu/top-app-bar";
+import { Clock, Flame, Search, Sparkles, Loader2, X, Star, Bookmark, TrendingUp } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -190,23 +191,21 @@ function RecipesPage() {
 
   return (
     <main className="min-h-screen bg-background pb-28">
-      <div className="max-w-md mx-auto px-5 pt-8 space-y-5">
-        <header className="flex items-center gap-3">
-          <Link to="/profile" className="size-10 bg-card rounded-2xl outline-1 outline-black/10 grid place-items-center">
-            <ArrowLeft className="size-4" />
-          </Link>
-          <div>
-            <h1 className="text-2xl font-bold">Resep Sehat</h1>
-            <p className="text-xs text-muted-foreground">Pilihan menu Indonesia</p>
-          </div>
-          <Link
-            to="/recipes/saved"
-            className="ml-auto size-10 bg-card rounded-2xl outline-1 outline-black/10 grid place-items-center"
-            aria-label="Resep tersimpan"
-          >
-            <Bookmark className="size-4" />
-          </Link>
-        </header>
+      <div className="max-w-md mx-auto px-5 pt-2 space-y-5">
+        <TopAppBar
+          title="Resep Sehat"
+          subtitle="Pilihan menu Indonesia"
+          showBack
+          action={
+            <Link
+              to="/recipes/saved"
+              className="size-10 bg-card rounded-2xl outline-1 outline-black/10 grid place-items-center"
+              aria-label="Resep tersimpan"
+            >
+              <Bookmark className="size-4" />
+            </Link>
+          }
+        />
 
         <div className="relative">
           <Search className="size-4 absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground" />

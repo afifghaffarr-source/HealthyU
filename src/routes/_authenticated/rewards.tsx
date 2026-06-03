@@ -1,9 +1,10 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { listRewards, redeemReward } from "@/lib/rewards.functions";
 import { BottomNav } from "@/components/bottom-nav";
-import { ArrowLeft, Coins, Gift } from "lucide-react";
+import { TopAppBar } from "@/components/healthyu/top-app-bar";
+import { Coins, Gift } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/rewards")({
@@ -30,19 +31,17 @@ function RewardsPage() {
 
   return (
     <main className="min-h-screen bg-background pb-28">
-      <div className="max-w-md mx-auto px-5 pt-8 space-y-5">
-        <header className="flex items-center gap-3">
-          <Link to="/profile" className="size-10 bg-card rounded-2xl outline-1 outline-black/10 grid place-items-center">
-            <ArrowLeft className="size-4" />
-          </Link>
-          <div className="flex-1">
-            <h1 className="text-2xl font-bold">Tukar Koin</h1>
-            <p className="text-xs text-muted-foreground">Marketplace reward partner</p>
-          </div>
-          <div className="flex items-center gap-1 bg-amber-100 text-amber-700 px-3 py-2 rounded-2xl font-bold">
-            <Coins className="size-4" /> <span className="tabular-nums">{coins}</span>
-          </div>
-        </header>
+      <div className="max-w-md mx-auto px-5 pt-2 space-y-5">
+        <TopAppBar
+          title="Tukar Koin"
+          subtitle="Marketplace reward partner"
+          showBack
+          action={
+            <div className="flex items-center gap-1 bg-amber-100 text-amber-700 px-3 py-2 rounded-2xl font-bold">
+              <Coins className="size-4" /> <span className="tabular-nums">{coins}</span>
+            </div>
+          }
+        />
 
         <section className="space-y-3 animate-fade-up">
           {(data?.rewards ?? []).map((r) => {
