@@ -20,6 +20,14 @@ import {
   PDF_HEADER_BASELINE_Y,
   PDF_HEADER_SUBTITLE_Y,
   PDF_BODY_TOP_Y,
+  PDF_TITLE_FONT_SIZE,
+  PDF_SUBTITLE_FONT_SIZE,
+  PDF_BODY_FONT_SIZE,
+  PDF_FOOTER_FONT_SIZE,
+  PDF_FOOTER_PAGE_LABEL,
+  PDF_PAGE_CONTENT_W,
+  PDF_LINE_HEIGHT,
+  PDF_SECTION_GAP,
 } from "@/lib/constants";
 
 export const Route = createFileRoute("/_authenticated/reports")({
@@ -211,18 +219,18 @@ function ReportsPage() {
     const doc = new jsPDF({ unit: "pt", format: "a4" });
     // Index page (TOC)
     doc.setFont("helvetica", "bold");
-    doc.setFontSize(18);
+    doc.setFontSize(PDF_TITLE_FONT_SIZE);
     doc.text("Arsip Laporan HealthyU", PDF_MARGIN_X, PDF_HEADER_BASELINE_Y);
     doc.setFont("helvetica", "normal");
-    doc.setFontSize(10);
+    doc.setFontSize(PDF_BODY_FONT_SIZE);
     doc.setTextColor(120);
     doc.text(`Total: ${filtered.length} laporan`, PDF_MARGIN_X, PDF_HEADER_SUBTITLE_Y);
     doc.setTextColor(0);
     doc.setFont("helvetica", "bold");
-    doc.setFontSize(12);
+    doc.setFontSize(PDF_SUBTITLE_FONT_SIZE);
     doc.text("Daftar Isi", PDF_MARGIN_X, PDF_BODY_TOP_Y);
     doc.setFont("helvetica", "normal");
-    doc.setFontSize(10);
+    doc.setFontSize(PDF_BODY_FONT_SIZE);
     // Compute how many TOC pages we need so body page numbers stay correct.
     const ROWS_PER_TOC_PAGE = 40;
     const tocPages = Math.max(1, Math.ceil(filtered.length / ROWS_PER_TOC_PAGE));
@@ -238,10 +246,10 @@ function ReportsPage() {
         doc.addPage();
         tocPageIdx += 1;
         doc.setFont("helvetica", "bold");
-        doc.setFontSize(12);
+        doc.setFontSize(PDF_SUBTITLE_FONT_SIZE);
         doc.text(`Daftar Isi (lanjutan ${tocPageIdx + 1}/${tocPages})`, PDF_MARGIN_X, PDF_HEADER_BASELINE_Y);
         doc.setFont("helvetica", "normal");
-        doc.setFontSize(10);
+        doc.setFontSize(PDF_BODY_FONT_SIZE);
         tocY = 80;
       }
       doc.text(`${idx + 1}. ${periode}`, 40, tocY);
@@ -255,10 +263,10 @@ function ReportsPage() {
       const currentPage = tocPages + bodyIdx + 1;
       const text = Array.isArray(r.recommendations) ? String(r.recommendations[0] ?? "") : "";
       doc.setFont("helvetica", "bold");
-      doc.setFontSize(18);
+      doc.setFontSize(PDF_TITLE_FONT_SIZE);
       doc.text("Laporan HealthyU", PDF_MARGIN_X, PDF_HEADER_BASELINE_Y);
       doc.setFont("helvetica", "normal");
-      doc.setFontSize(10);
+      doc.setFontSize(PDF_BODY_FONT_SIZE);
       doc.setTextColor(120);
       const periode =
         r.report_period_start && r.report_period_end
@@ -267,12 +275,12 @@ function ReportsPage() {
       doc.text(periode, PDF_MARGIN_X, PDF_HEADER_SUBTITLE_Y);
       doc.setTextColor(0);
       doc.setFont("helvetica", "bold");
-      doc.setFontSize(12);
+      doc.setFontSize(PDF_SUBTITLE_FONT_SIZE);
       doc.text("Analisis AI", PDF_MARGIN_X, PDF_BODY_TOP_Y);
       doc.setFont("helvetica", "normal");
-      doc.setFontSize(10);
-      const lines = doc.splitTextToSize(text || "(kosong)", 515);
-      doc.text(lines, 40, 118);
+      doc.setFontSize(PDF_BODY_FONT_SIZE);
+      const lines = doc.splitTextToSize(text || "(kosong)", PDF_PAGE_CONTENT_W);
+      doc.text(lines, PDF_MARGIN_X, PDF_BODY_TOP_Y + PDF_LINE_HEIGHT);
       // Back-link to TOC (page 1) in the top-right corner.
       doc.setTextColor(80, 80, 200);
       doc.setFontSize(9);
@@ -321,7 +329,7 @@ function ReportsPage() {
     for (let p = 1; p <= totalPages; p++) {
       doc.setPage(p);
       doc.setFont("helvetica", "normal");
-      doc.setFontSize(8);
+      doc.setFontSize(PDF_FOOTER_FONT_SIZE);
       doc.setTextColor(120);
       // Divider tipis di atas baris footer.
       doc.setDrawColor(PDF_DIVIDER_GRAY);
@@ -337,7 +345,7 @@ function ReportsPage() {
         PDF_MARGIN_X,
         PDF_PAGE_FOOTER_Y,
       );
-      doc.text(`hal ${p} / ${totalPages}`, pageRightX, PDF_PAGE_FOOTER_Y, {
+      doc.text(`${PDF_FOOTER_PAGE_LABEL} ${p} / ${totalPages}`, pageRightX, PDF_PAGE_FOOTER_Y, {
         align: "right",
       });
       doc.setTextColor(0);
@@ -354,10 +362,10 @@ function ReportsPage() {
       year: "numeric",
     });
     doc.setFont("helvetica", "bold");
-    doc.setFontSize(18);
+    doc.setFontSize(PDF_TITLE_FONT_SIZE);
     doc.text("Laporan HealthyU - 7 Hari", PDF_MARGIN_X, PDF_HEADER_BASELINE_Y);
     doc.setFont("helvetica", "normal");
-    doc.setFontSize(10);
+    doc.setFontSize(PDF_BODY_FONT_SIZE);
     doc.setTextColor(120);
     doc.text(`Dicetak: ${today}`, PDF_MARGIN_X, PDF_HEADER_SUBTITLE_Y);
     doc.setTextColor(0);
@@ -398,12 +406,12 @@ function ReportsPage() {
       const lastY =
         (doc as unknown as { lastAutoTable?: { finalY: number } }).lastAutoTable?.finalY ?? 200;
       doc.setFont("helvetica", "bold");
-      doc.setFontSize(12);
-      doc.text("Analisis AI", 40, lastY + 30);
+      doc.setFontSize(PDF_SUBTITLE_FONT_SIZE);
+      doc.text("Analisis AI", PDF_MARGIN_X, lastY + PDF_SECTION_GAP);
       doc.setFont("helvetica", "normal");
-      doc.setFontSize(10);
-      const lines = doc.splitTextToSize(aiMut.data.report, 515);
-      doc.text(lines, 40, lastY + 48);
+      doc.setFontSize(PDF_BODY_FONT_SIZE);
+      const lines = doc.splitTextToSize(aiMut.data.report, PDF_PAGE_CONTENT_W);
+      doc.text(lines, PDF_MARGIN_X, lastY + PDF_SECTION_GAP + PDF_LINE_HEIGHT);
     }
 
     doc.save(`laporan-healthyu-${new Date().toISOString().slice(0, 10)}.pdf`);
@@ -457,10 +465,10 @@ function ReportsPage() {
     const text = Array.isArray(r.recommendations) ? String(r.recommendations[0] ?? "") : "";
     const doc = new jsPDF({ unit: "pt", format: "a4" });
     doc.setFont("helvetica", "bold");
-    doc.setFontSize(18);
+    doc.setFontSize(PDF_TITLE_FONT_SIZE);
     doc.text("Laporan HealthyU", PDF_MARGIN_X, PDF_HEADER_BASELINE_Y);
     doc.setFont("helvetica", "normal");
-    doc.setFontSize(10);
+    doc.setFontSize(PDF_BODY_FONT_SIZE);
     doc.setTextColor(120);
     const periode =
       r.report_period_start && r.report_period_end
@@ -469,12 +477,12 @@ function ReportsPage() {
     doc.text(periode, PDF_MARGIN_X, PDF_HEADER_SUBTITLE_Y);
     doc.setTextColor(0);
     doc.setFont("helvetica", "bold");
-    doc.setFontSize(12);
+    doc.setFontSize(PDF_SUBTITLE_FONT_SIZE);
     doc.text("Analisis AI", PDF_MARGIN_X, PDF_BODY_TOP_Y);
     doc.setFont("helvetica", "normal");
-    doc.setFontSize(10);
-    const lines = doc.splitTextToSize(text || "(kosong)", 515);
-    doc.text(lines, 40, 118);
+    doc.setFontSize(PDF_BODY_FONT_SIZE);
+    const lines = doc.splitTextToSize(text || "(kosong)", PDF_PAGE_CONTENT_W);
+    doc.text(lines, PDF_MARGIN_X, PDF_BODY_TOP_Y + PDF_LINE_HEIGHT);
     doc.save(`laporan-healthyu-${(r.report_period_end ?? r.created_at).slice(0, 10)}.pdf`);
   };
 
