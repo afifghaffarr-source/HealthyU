@@ -114,8 +114,12 @@ function ChallengesPage() {
       const s = (p as { status?: string }).status;
       return !s || s === "active";
     });
-    const pool = active.length > 0 ? active : parts;
-    const top = pool.slice().sort((a, b) => (b.streak ?? 0) - (a.streak ?? 0))[0];
+    if (active.length === 0) {
+      toast.info("Semua streak sudah selesai — mulai challenge baru");
+      navigate({ to: "/challenges", search: {}, replace: true });
+      return;
+    }
+    const top = active.slice().sort((a, b) => (b.streak ?? 0) - (a.streak ?? 0))[0];
     if (!top?.challenge_id) return;
     setOpenLb(top.challenge_id);
     setStreakAutoChallenge(top.challenge_id);
