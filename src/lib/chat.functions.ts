@@ -99,6 +99,7 @@ export const sendChatMessage = createServerFn({ method: "POST" })
 
     // Build rich context: profile + today's data + recent history
     const { start, end } = todayRange();
+    const weekStart = new Date(); weekStart.setDate(weekStart.getDate() - 6); weekStart.setHours(0,0,0,0);
     const [
       { data: profile },
       { data: history },
@@ -107,6 +108,11 @@ export const sendChatMessage = createServerFn({ method: "POST" })
       { data: workouts },
       { data: fasting },
       { data: sleep },
+      { data: weekMeals },
+      { data: weekWorkouts },
+      { data: weekFasting },
+      { data: weekWeight },
+      { data: weekMood },
     ] = await Promise.all([
       supabase
         .from("profiles")
@@ -119,6 +125,11 @@ export const sendChatMessage = createServerFn({ method: "POST" })
       supabase.from("workout_sessions").select("name, duration_min, calories_burned").eq("user_id", userId).gte("performed_at", start).lt("performed_at", end),
       supabase.from("fasting_sessions").select("start_time, end_time, target_hours, protocol, completed").eq("user_id", userId).order("start_time", { ascending: false }).limit(1),
       supabase.from("sleep_logs").select("sleep_start, sleep_end, quality").eq("user_id", userId).order("sleep_end", { ascending: false }).limit(1),
+      supabase.from("meal_logs").select("calories, logged_at").eq("user_id", userId).gte("logged_at", weekStart.toISOString()),
+      supabase.from("workout_sessions").select("performed_at").eq("user_id", userId).gte("performed_at", weekStart.toISOString()),
+      supabase.from("fasting_sessions").select("completed").eq("user_id", userId).gte("start_time", weekStart.toISOString()),
+      supabase.from("weight_logs").select("weight_kg, logged_at").eq("user_id", userId).gte("logged_at", weekStart.toISOString()).order("logged_at", { ascending: true }),
+      supabase.from("mood_logs").select("mood").eq("user_id", userId).gte("logged_at", weekStart.toISOString()),
     ]);
 
     // Derive metrics
@@ -176,6 +187,30 @@ export const sendChatMessage = createServerFn({ method: "POST" })
       ? (workouts ?? []).map((w) => `${w.name} (${w.duration_min}m, ${w.calories_burned} kkal)`).join("; ")
       : "Belum olahraga hari ini.";
 
+    // Week aggregates
+    const days: Record<string, number> = {};
+    (weekMeals ?? []).forEach((m) => {
+      const k = String(m.logged_at).slice(0, 10);
+      days[k] = (days[k] ?? 0) + Number(m.calories ?? 0);
+    });
+    const dayKeys = Object.keys(days);
+    const weekAvgCal = dayKeys.length ? Math.round(dayKeys.reduce((s, k) => s + days[k], 0) / dayKeys.length) : 0;
+    const weekWorkoutDays = new Set((weekWorkouts ?? []).map((w) => String(w.performed_at).slice(0, 10))).size;
+    const weekFastingSuccess = (weekFasting ?? []).filter((f) => f.completed).length;
+    const weekFastingTotal = (weekFasting ?? []).length;
+    const wFirst = weekWeight?.[0]?.weight_kg ? Number(weekWeight[0].weight_kg) : null;
+    const wLast = weekWeight && weekWeight.length ? Number(weekWeight[weekWeight.length - 1].weight_kg) : null;
+    const weightDelta = wFirst != null && wLast != null ? (wLast - wFirst) : null;
+    const moodAvg = (weekMood ?? []).length ? ((weekMood ?? []).reduce((s, m) => s + Number(m.mood), 0) / (weekMood ?? []).length) : null;
+
+    const weekBlock = [
+      `- Rata-rata kalori 7 hari: ${weekAvgCal} kkal`,
+      `- Hari olahraga 7 hari: ${weekWorkoutDays}/7`,
+      `- Puasa berhasil: ${weekFastingSuccess}/${weekFastingTotal || 0} sesi`,
+      `- Δ Berat 7 hari: ${weightDelta != null ? `${weightDelta > 0 ? "+" : ""}${weightDelta.toFixed(1)} kg` : "-"}`,
+      `- Mood rata-rata: ${moodAvg != null ? `${moodAvg.toFixed(1)}/5` : "-"}`,
+    ].join("\n");
+
     const contextBlock = `
 
 === PROFIL USER ===
@@ -190,6 +225,9 @@ ${profileBlock}
 - Olahraga: ${workoutBlock}
 - Puasa: ${fastingBlock}
 - Tidur: ${sleepBlock}
+
+=== TREN 7 HARI ===
+${weekBlock}
 
 Gunakan data di atas untuk personalisasi jawaban. Sebut angka konkret saat relevan.`;
 
