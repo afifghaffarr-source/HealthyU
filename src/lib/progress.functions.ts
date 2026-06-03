@@ -14,7 +14,7 @@ export const listProgress = createServerFn({ method: "GET" })
     if (error) throw new Error(error.message);
     const items = data ?? [];
     const paths = items.map((i) => i.photo_url);
-    let urlMap = new Map<string, string>();
+    let urlMap = new Map<string, string | null>();
     if (paths.length) {
       const { data: signed } = await supabase.storage
         .from("progress-photos")
