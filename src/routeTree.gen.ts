@@ -20,8 +20,10 @@ import { Route as AuthenticatedVitalsRouteImport } from './routes/_authenticated
 import { Route as AuthenticatedSubscriptionRouteImport } from './routes/_authenticated/subscription'
 import { Route as AuthenticatedSleepRouteImport } from './routes/_authenticated/sleep'
 import { Route as AuthenticatedScanRouteImport } from './routes/_authenticated/scan'
+import { Route as AuthenticatedRewardsRouteImport } from './routes/_authenticated/rewards'
 import { Route as AuthenticatedReportsRouteImport } from './routes/_authenticated/reports'
 import { Route as AuthenticatedRemindersRouteImport } from './routes/_authenticated/reminders'
+import { Route as AuthenticatedReferralsRouteImport } from './routes/_authenticated/referrals'
 import { Route as AuthenticatedRecommendationsRouteImport } from './routes/_authenticated/recommendations'
 import { Route as AuthenticatedRecipesRouteImport } from './routes/_authenticated/recipes'
 import { Route as AuthenticatedProgressRouteImport } from './routes/_authenticated/progress'
@@ -108,6 +110,11 @@ const AuthenticatedScanRoute = AuthenticatedScanRouteImport.update({
   path: '/scan',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedRewardsRoute = AuthenticatedRewardsRouteImport.update({
+  id: '/rewards',
+  path: '/rewards',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedReportsRoute = AuthenticatedReportsRouteImport.update({
   id: '/reports',
   path: '/reports',
@@ -116,6 +123,11 @@ const AuthenticatedReportsRoute = AuthenticatedReportsRouteImport.update({
 const AuthenticatedRemindersRoute = AuthenticatedRemindersRouteImport.update({
   id: '/reminders',
   path: '/reminders',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedReferralsRoute = AuthenticatedReferralsRouteImport.update({
+  id: '/referrals',
+  path: '/referrals',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedRecommendationsRoute =
@@ -307,8 +319,10 @@ export interface FileRoutesByFullPath {
   '/progress': typeof AuthenticatedProgressRoute
   '/recipes': typeof AuthenticatedRecipesRouteWithChildren
   '/recommendations': typeof AuthenticatedRecommendationsRoute
+  '/referrals': typeof AuthenticatedReferralsRoute
   '/reminders': typeof AuthenticatedRemindersRoute
   '/reports': typeof AuthenticatedReportsRoute
+  '/rewards': typeof AuthenticatedRewardsRoute
   '/scan': typeof AuthenticatedScanRoute
   '/sleep': typeof AuthenticatedSleepRoute
   '/subscription': typeof AuthenticatedSubscriptionRoute
@@ -351,8 +365,10 @@ export interface FileRoutesByTo {
   '/progress': typeof AuthenticatedProgressRoute
   '/recipes': typeof AuthenticatedRecipesRouteWithChildren
   '/recommendations': typeof AuthenticatedRecommendationsRoute
+  '/referrals': typeof AuthenticatedReferralsRoute
   '/reminders': typeof AuthenticatedRemindersRoute
   '/reports': typeof AuthenticatedReportsRoute
+  '/rewards': typeof AuthenticatedRewardsRoute
   '/scan': typeof AuthenticatedScanRoute
   '/sleep': typeof AuthenticatedSleepRoute
   '/subscription': typeof AuthenticatedSubscriptionRoute
@@ -397,8 +413,10 @@ export interface FileRoutesById {
   '/_authenticated/progress': typeof AuthenticatedProgressRoute
   '/_authenticated/recipes': typeof AuthenticatedRecipesRouteWithChildren
   '/_authenticated/recommendations': typeof AuthenticatedRecommendationsRoute
+  '/_authenticated/referrals': typeof AuthenticatedReferralsRoute
   '/_authenticated/reminders': typeof AuthenticatedRemindersRoute
   '/_authenticated/reports': typeof AuthenticatedReportsRoute
+  '/_authenticated/rewards': typeof AuthenticatedRewardsRoute
   '/_authenticated/scan': typeof AuthenticatedScanRoute
   '/_authenticated/sleep': typeof AuthenticatedSleepRoute
   '/_authenticated/subscription': typeof AuthenticatedSubscriptionRoute
@@ -443,8 +461,10 @@ export interface FileRouteTypes {
     | '/progress'
     | '/recipes'
     | '/recommendations'
+    | '/referrals'
     | '/reminders'
     | '/reports'
+    | '/rewards'
     | '/scan'
     | '/sleep'
     | '/subscription'
@@ -487,8 +507,10 @@ export interface FileRouteTypes {
     | '/progress'
     | '/recipes'
     | '/recommendations'
+    | '/referrals'
     | '/reminders'
     | '/reports'
+    | '/rewards'
     | '/scan'
     | '/sleep'
     | '/subscription'
@@ -532,8 +554,10 @@ export interface FileRouteTypes {
     | '/_authenticated/progress'
     | '/_authenticated/recipes'
     | '/_authenticated/recommendations'
+    | '/_authenticated/referrals'
     | '/_authenticated/reminders'
     | '/_authenticated/reports'
+    | '/_authenticated/rewards'
     | '/_authenticated/scan'
     | '/_authenticated/sleep'
     | '/_authenticated/subscription'
@@ -636,6 +660,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedScanRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/rewards': {
+      id: '/_authenticated/rewards'
+      path: '/rewards'
+      fullPath: '/rewards'
+      preLoaderRoute: typeof AuthenticatedRewardsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/reports': {
       id: '/_authenticated/reports'
       path: '/reports'
@@ -648,6 +679,13 @@ declare module '@tanstack/react-router' {
       path: '/reminders'
       fullPath: '/reminders'
       preLoaderRoute: typeof AuthenticatedRemindersRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/referrals': {
+      id: '/_authenticated/referrals'
+      path: '/referrals'
+      fullPath: '/referrals'
+      preLoaderRoute: typeof AuthenticatedReferralsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/recommendations': {
@@ -901,8 +939,10 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedProgressRoute: typeof AuthenticatedProgressRoute
   AuthenticatedRecipesRoute: typeof AuthenticatedRecipesRouteWithChildren
   AuthenticatedRecommendationsRoute: typeof AuthenticatedRecommendationsRoute
+  AuthenticatedReferralsRoute: typeof AuthenticatedReferralsRoute
   AuthenticatedRemindersRoute: typeof AuthenticatedRemindersRoute
   AuthenticatedReportsRoute: typeof AuthenticatedReportsRoute
+  AuthenticatedRewardsRoute: typeof AuthenticatedRewardsRoute
   AuthenticatedScanRoute: typeof AuthenticatedScanRoute
   AuthenticatedSleepRoute: typeof AuthenticatedSleepRoute
   AuthenticatedSubscriptionRoute: typeof AuthenticatedSubscriptionRoute
@@ -940,8 +980,10 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedProgressRoute: AuthenticatedProgressRoute,
   AuthenticatedRecipesRoute: AuthenticatedRecipesRouteWithChildren,
   AuthenticatedRecommendationsRoute: AuthenticatedRecommendationsRoute,
+  AuthenticatedReferralsRoute: AuthenticatedReferralsRoute,
   AuthenticatedRemindersRoute: AuthenticatedRemindersRoute,
   AuthenticatedReportsRoute: AuthenticatedReportsRoute,
+  AuthenticatedRewardsRoute: AuthenticatedRewardsRoute,
   AuthenticatedScanRoute: AuthenticatedScanRoute,
   AuthenticatedSleepRoute: AuthenticatedSleepRoute,
   AuthenticatedSubscriptionRoute: AuthenticatedSubscriptionRoute,
@@ -966,3 +1008,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
