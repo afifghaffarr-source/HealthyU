@@ -10,6 +10,7 @@
     "preview": "vite preview",
     "lint": "eslint .",
     "lint:constants": "eslint src/lib/constants.ts",
+    "precommit": "bun run lint:constants && bun run lint",
     "format": "prettier --write ."
   },
   "dependencies": {

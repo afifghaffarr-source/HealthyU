@@ -10,6 +10,7 @@
 // | CHALLENGE_HIGHLIGHT_MS         | Durasi ring highlight kartu challenge (auto-scroll).      |
 // | CHALLENGE_HIGHLIGHT_FADE_MS    | Lama fade-out ring di akhir CHALLENGE_HIGHLIGHT_MS.       |
 // | CHALLENGE_HIGHLIGHT_FADE_OPACITY | Opacity kartu di akhir fade ring highlight (0..1).      |
+// | CHALLENGE_HIGHLIGHT_TRANSITION_MS | Durasi transisi spring opacity+ring highlight (ms).    |
 //
 // CONVENTION: setiap konstanta tunable WAJIB ditambahkan ke tabel di atas
 // (nama + 1 baris efek). Reviewer boleh menolak PR yang menambah konstanta
@@ -47,3 +48,7 @@ export const CHALLENGE_HIGHLIGHT_FADE_MS = 500;
 /** Opacity kartu challenge di akhir fade ring (0..1). */
 // eslint-disable-next-line no-restricted-syntax -- listed in header table
 export const CHALLENGE_HIGHLIGHT_FADE_OPACITY = 0.9;
+
+/** Durasi transisi spring (opacity & box-shadow) untuk ring highlight (ms). */
+// eslint-disable-next-line no-restricted-syntax -- listed in header table
+export const CHALLENGE_HIGHLIGHT_TRANSITION_MS = 700;
