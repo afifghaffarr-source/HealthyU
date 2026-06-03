@@ -66,6 +66,7 @@ import { Route as AuthenticatedScanMenuRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedScanHistoryRouteImport } from './routes/_authenticated/scan.history'
 import { Route as AuthenticatedScanBarcodeRouteImport } from './routes/_authenticated/scan.barcode'
 import { Route as AuthenticatedReportsWorkoutMatchRouteImport } from './routes/_authenticated/reports.workout-match'
+import { Route as AuthenticatedReportsWeeklyRouteImport } from './routes/_authenticated/reports.weekly'
 import { Route as AuthenticatedReportsSleepMealRouteImport } from './routes/_authenticated/reports.sleep-meal'
 import { Route as AuthenticatedReportsNutritionRouteImport } from './routes/_authenticated/reports.nutrition'
 import { Route as AuthenticatedReportsMoodRouteImport } from './routes/_authenticated/reports.mood'
@@ -80,6 +81,7 @@ import { Route as AuthenticatedQuizDailyRouteImport } from './routes/_authentica
 import { Route as AuthenticatedProfileScanStatsRouteImport } from './routes/_authenticated/profile.scan-stats'
 import { Route as AuthenticatedProfilePrivacyRouteImport } from './routes/_authenticated/profile.privacy'
 import { Route as AuthenticatedPetShopRouteImport } from './routes/_authenticated/pet.shop'
+import { Route as AuthenticatedNotificationsFeedRouteImport } from './routes/_authenticated/notifications.feed'
 import { Route as AuthenticatedMealplanGroceryRouteImport } from './routes/_authenticated/mealplan.grocery'
 import { Route as AuthenticatedHabitsStackRouteImport } from './routes/_authenticated/habits.stack'
 import { Route as AuthenticatedCoachMealsRouteImport } from './routes/_authenticated/coach.meals'
@@ -391,6 +393,12 @@ const AuthenticatedReportsWorkoutMatchRoute =
     path: '/workout-match',
     getParentRoute: () => AuthenticatedReportsRoute,
   } as any)
+const AuthenticatedReportsWeeklyRoute =
+  AuthenticatedReportsWeeklyRouteImport.update({
+    id: '/weekly',
+    path: '/weekly',
+    getParentRoute: () => AuthenticatedReportsRoute,
+  } as any)
 const AuthenticatedReportsSleepMealRoute =
   AuthenticatedReportsSleepMealRouteImport.update({
     id: '/sleep-meal',
@@ -472,6 +480,12 @@ const AuthenticatedPetShopRoute = AuthenticatedPetShopRouteImport.update({
   path: '/shop',
   getParentRoute: () => AuthenticatedPetRoute,
 } as any)
+const AuthenticatedNotificationsFeedRoute =
+  AuthenticatedNotificationsFeedRouteImport.update({
+    id: '/feed',
+    path: '/feed',
+    getParentRoute: () => AuthenticatedNotificationsRoute,
+  } as any)
 const AuthenticatedMealplanGroceryRoute =
   AuthenticatedMealplanGroceryRouteImport.update({
     id: '/grocery',
@@ -582,7 +596,7 @@ export interface FileRoutesByFullPath {
   '/mealplan': typeof AuthenticatedMealplanRouteWithChildren
   '/medications': typeof AuthenticatedMedicationsRoute
   '/mood': typeof AuthenticatedMoodRoute
-  '/notifications': typeof AuthenticatedNotificationsRoute
+  '/notifications': typeof AuthenticatedNotificationsRouteWithChildren
   '/offline-queue': typeof AuthenticatedOfflineQueueRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/pet': typeof AuthenticatedPetRouteWithChildren
@@ -609,6 +623,7 @@ export interface FileRoutesByFullPath {
   '/coach/meals': typeof AuthenticatedCoachMealsRoute
   '/habits/stack': typeof AuthenticatedHabitsStackRoute
   '/mealplan/grocery': typeof AuthenticatedMealplanGroceryRoute
+  '/notifications/feed': typeof AuthenticatedNotificationsFeedRoute
   '/pet/shop': typeof AuthenticatedPetShopRoute
   '/profile/privacy': typeof AuthenticatedProfilePrivacyRoute
   '/profile/scan-stats': typeof AuthenticatedProfileScanStatsRoute
@@ -623,6 +638,7 @@ export interface FileRoutesByFullPath {
   '/reports/mood': typeof AuthenticatedReportsMoodRoute
   '/reports/nutrition': typeof AuthenticatedReportsNutritionRoute
   '/reports/sleep-meal': typeof AuthenticatedReportsSleepMealRoute
+  '/reports/weekly': typeof AuthenticatedReportsWeeklyRoute
   '/reports/workout-match': typeof AuthenticatedReportsWorkoutMatchRoute
   '/scan/barcode': typeof AuthenticatedScanBarcodeRoute
   '/scan/history': typeof AuthenticatedScanHistoryRoute
@@ -668,7 +684,7 @@ export interface FileRoutesByTo {
   '/mealplan': typeof AuthenticatedMealplanRouteWithChildren
   '/medications': typeof AuthenticatedMedicationsRoute
   '/mood': typeof AuthenticatedMoodRoute
-  '/notifications': typeof AuthenticatedNotificationsRoute
+  '/notifications': typeof AuthenticatedNotificationsRouteWithChildren
   '/offline-queue': typeof AuthenticatedOfflineQueueRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/pet': typeof AuthenticatedPetRouteWithChildren
@@ -695,6 +711,7 @@ export interface FileRoutesByTo {
   '/coach/meals': typeof AuthenticatedCoachMealsRoute
   '/habits/stack': typeof AuthenticatedHabitsStackRoute
   '/mealplan/grocery': typeof AuthenticatedMealplanGroceryRoute
+  '/notifications/feed': typeof AuthenticatedNotificationsFeedRoute
   '/pet/shop': typeof AuthenticatedPetShopRoute
   '/profile/privacy': typeof AuthenticatedProfilePrivacyRoute
   '/profile/scan-stats': typeof AuthenticatedProfileScanStatsRoute
@@ -709,6 +726,7 @@ export interface FileRoutesByTo {
   '/reports/mood': typeof AuthenticatedReportsMoodRoute
   '/reports/nutrition': typeof AuthenticatedReportsNutritionRoute
   '/reports/sleep-meal': typeof AuthenticatedReportsSleepMealRoute
+  '/reports/weekly': typeof AuthenticatedReportsWeeklyRoute
   '/reports/workout-match': typeof AuthenticatedReportsWorkoutMatchRoute
   '/scan/barcode': typeof AuthenticatedScanBarcodeRoute
   '/scan/history': typeof AuthenticatedScanHistoryRoute
@@ -756,7 +774,7 @@ export interface FileRoutesById {
   '/_authenticated/mealplan': typeof AuthenticatedMealplanRouteWithChildren
   '/_authenticated/medications': typeof AuthenticatedMedicationsRoute
   '/_authenticated/mood': typeof AuthenticatedMoodRoute
-  '/_authenticated/notifications': typeof AuthenticatedNotificationsRoute
+  '/_authenticated/notifications': typeof AuthenticatedNotificationsRouteWithChildren
   '/_authenticated/offline-queue': typeof AuthenticatedOfflineQueueRoute
   '/_authenticated/onboarding': typeof AuthenticatedOnboardingRoute
   '/_authenticated/pet': typeof AuthenticatedPetRouteWithChildren
@@ -783,6 +801,7 @@ export interface FileRoutesById {
   '/_authenticated/coach/meals': typeof AuthenticatedCoachMealsRoute
   '/_authenticated/habits/stack': typeof AuthenticatedHabitsStackRoute
   '/_authenticated/mealplan/grocery': typeof AuthenticatedMealplanGroceryRoute
+  '/_authenticated/notifications/feed': typeof AuthenticatedNotificationsFeedRoute
   '/_authenticated/pet/shop': typeof AuthenticatedPetShopRoute
   '/_authenticated/profile/privacy': typeof AuthenticatedProfilePrivacyRoute
   '/_authenticated/profile/scan-stats': typeof AuthenticatedProfileScanStatsRoute
@@ -797,6 +816,7 @@ export interface FileRoutesById {
   '/_authenticated/reports/mood': typeof AuthenticatedReportsMoodRoute
   '/_authenticated/reports/nutrition': typeof AuthenticatedReportsNutritionRoute
   '/_authenticated/reports/sleep-meal': typeof AuthenticatedReportsSleepMealRoute
+  '/_authenticated/reports/weekly': typeof AuthenticatedReportsWeeklyRoute
   '/_authenticated/reports/workout-match': typeof AuthenticatedReportsWorkoutMatchRoute
   '/_authenticated/scan/barcode': typeof AuthenticatedScanBarcodeRoute
   '/_authenticated/scan/history': typeof AuthenticatedScanHistoryRoute
@@ -871,6 +891,7 @@ export interface FileRouteTypes {
     | '/coach/meals'
     | '/habits/stack'
     | '/mealplan/grocery'
+    | '/notifications/feed'
     | '/pet/shop'
     | '/profile/privacy'
     | '/profile/scan-stats'
@@ -885,6 +906,7 @@ export interface FileRouteTypes {
     | '/reports/mood'
     | '/reports/nutrition'
     | '/reports/sleep-meal'
+    | '/reports/weekly'
     | '/reports/workout-match'
     | '/scan/barcode'
     | '/scan/history'
@@ -957,6 +979,7 @@ export interface FileRouteTypes {
     | '/coach/meals'
     | '/habits/stack'
     | '/mealplan/grocery'
+    | '/notifications/feed'
     | '/pet/shop'
     | '/profile/privacy'
     | '/profile/scan-stats'
@@ -971,6 +994,7 @@ export interface FileRouteTypes {
     | '/reports/mood'
     | '/reports/nutrition'
     | '/reports/sleep-meal'
+    | '/reports/weekly'
     | '/reports/workout-match'
     | '/scan/barcode'
     | '/scan/history'
@@ -1044,6 +1068,7 @@ export interface FileRouteTypes {
     | '/_authenticated/coach/meals'
     | '/_authenticated/habits/stack'
     | '/_authenticated/mealplan/grocery'
+    | '/_authenticated/notifications/feed'
     | '/_authenticated/pet/shop'
     | '/_authenticated/profile/privacy'
     | '/_authenticated/profile/scan-stats'
@@ -1058,6 +1083,7 @@ export interface FileRouteTypes {
     | '/_authenticated/reports/mood'
     | '/_authenticated/reports/nutrition'
     | '/_authenticated/reports/sleep-meal'
+    | '/_authenticated/reports/weekly'
     | '/_authenticated/reports/workout-match'
     | '/_authenticated/scan/barcode'
     | '/_authenticated/scan/history'
@@ -1491,6 +1517,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedReportsWorkoutMatchRouteImport
       parentRoute: typeof AuthenticatedReportsRoute
     }
+    '/_authenticated/reports/weekly': {
+      id: '/_authenticated/reports/weekly'
+      path: '/weekly'
+      fullPath: '/reports/weekly'
+      preLoaderRoute: typeof AuthenticatedReportsWeeklyRouteImport
+      parentRoute: typeof AuthenticatedReportsRoute
+    }
     '/_authenticated/reports/sleep-meal': {
       id: '/_authenticated/reports/sleep-meal'
       path: '/sleep-meal'
@@ -1588,6 +1621,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/pet/shop'
       preLoaderRoute: typeof AuthenticatedPetShopRouteImport
       parentRoute: typeof AuthenticatedPetRoute
+    }
+    '/_authenticated/notifications/feed': {
+      id: '/_authenticated/notifications/feed'
+      path: '/feed'
+      fullPath: '/notifications/feed'
+      preLoaderRoute: typeof AuthenticatedNotificationsFeedRouteImport
+      parentRoute: typeof AuthenticatedNotificationsRoute
     }
     '/_authenticated/mealplan/grocery': {
       id: '/_authenticated/mealplan/grocery'
@@ -1741,6 +1781,20 @@ const AuthenticatedMealplanRouteWithChildren =
     AuthenticatedMealplanRouteChildren,
   )
 
+interface AuthenticatedNotificationsRouteChildren {
+  AuthenticatedNotificationsFeedRoute: typeof AuthenticatedNotificationsFeedRoute
+}
+
+const AuthenticatedNotificationsRouteChildren: AuthenticatedNotificationsRouteChildren =
+  {
+    AuthenticatedNotificationsFeedRoute: AuthenticatedNotificationsFeedRoute,
+  }
+
+const AuthenticatedNotificationsRouteWithChildren =
+  AuthenticatedNotificationsRoute._addFileChildren(
+    AuthenticatedNotificationsRouteChildren,
+  )
+
 interface AuthenticatedPetRouteChildren {
   AuthenticatedPetShopRoute: typeof AuthenticatedPetShopRoute
 }
@@ -1807,6 +1861,7 @@ interface AuthenticatedReportsRouteChildren {
   AuthenticatedReportsMoodRoute: typeof AuthenticatedReportsMoodRoute
   AuthenticatedReportsNutritionRoute: typeof AuthenticatedReportsNutritionRoute
   AuthenticatedReportsSleepMealRoute: typeof AuthenticatedReportsSleepMealRoute
+  AuthenticatedReportsWeeklyRoute: typeof AuthenticatedReportsWeeklyRoute
   AuthenticatedReportsWorkoutMatchRoute: typeof AuthenticatedReportsWorkoutMatchRoute
 }
 
@@ -1818,6 +1873,7 @@ const AuthenticatedReportsRouteChildren: AuthenticatedReportsRouteChildren = {
   AuthenticatedReportsMoodRoute: AuthenticatedReportsMoodRoute,
   AuthenticatedReportsNutritionRoute: AuthenticatedReportsNutritionRoute,
   AuthenticatedReportsSleepMealRoute: AuthenticatedReportsSleepMealRoute,
+  AuthenticatedReportsWeeklyRoute: AuthenticatedReportsWeeklyRoute,
   AuthenticatedReportsWorkoutMatchRoute: AuthenticatedReportsWorkoutMatchRoute,
 }
 
@@ -1878,7 +1934,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedMealplanRoute: typeof AuthenticatedMealplanRouteWithChildren
   AuthenticatedMedicationsRoute: typeof AuthenticatedMedicationsRoute
   AuthenticatedMoodRoute: typeof AuthenticatedMoodRoute
-  AuthenticatedNotificationsRoute: typeof AuthenticatedNotificationsRoute
+  AuthenticatedNotificationsRoute: typeof AuthenticatedNotificationsRouteWithChildren
   AuthenticatedOfflineQueueRoute: typeof AuthenticatedOfflineQueueRoute
   AuthenticatedOnboardingRoute: typeof AuthenticatedOnboardingRoute
   AuthenticatedPetRoute: typeof AuthenticatedPetRouteWithChildren
@@ -1929,7 +1985,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedMealplanRoute: AuthenticatedMealplanRouteWithChildren,
   AuthenticatedMedicationsRoute: AuthenticatedMedicationsRoute,
   AuthenticatedMoodRoute: AuthenticatedMoodRoute,
-  AuthenticatedNotificationsRoute: AuthenticatedNotificationsRoute,
+  AuthenticatedNotificationsRoute: AuthenticatedNotificationsRouteWithChildren,
   AuthenticatedOfflineQueueRoute: AuthenticatedOfflineQueueRoute,
   AuthenticatedOnboardingRoute: AuthenticatedOnboardingRoute,
   AuthenticatedPetRoute: AuthenticatedPetRouteWithChildren,
@@ -1975,3 +2031,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
