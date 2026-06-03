@@ -1,10 +1,11 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
+import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { getProfile } from "@/lib/profile.functions";
 import { BottomNav } from "@/components/bottom-nav";
-import { ArrowLeft, MapPin, Bell, BellOff } from "lucide-react";
+import { MapPin, Bell, BellOff } from "lucide-react";
 import { toast } from "sonner";
 import {
   loadPrayerPrefs,
@@ -102,13 +103,8 @@ function PrayerPage() {
 
   return (
     <main className="min-h-screen bg-background pb-28">
-      <div className="max-w-md mx-auto px-5 pt-8 space-y-5">
-        <header className="flex items-center gap-3">
-          <Link to="/dashboard" className="size-10 bg-card rounded-2xl outline-1 outline-black/10 grid place-items-center">
-            <ArrowLeft className="size-4" />
-          </Link>
-          <h1 className="text-2xl font-bold">Jadwal Sholat</h1>
-        </header>
+      <div className="max-w-md mx-auto px-5 pt-2 space-y-5">
+        <TopAppBar title="Jadwal Sholat" showBack />
 
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
           <MapPin className="size-4" />

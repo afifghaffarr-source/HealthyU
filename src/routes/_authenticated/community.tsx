@@ -1,11 +1,12 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
+import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { listPosts, createPost, deletePost, toggleLike } from "@/lib/community.functions";
 import { listComments, createComment, deleteComment } from "@/lib/social.functions";
 import { BottomNav } from "@/components/bottom-nav";
-import { ArrowLeft, Heart, Trash2, Send, MessageCircle } from "lucide-react";
+import { Heart, Trash2, Send, MessageCircle } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/community")({
@@ -57,16 +58,8 @@ function CommunityPage() {
 
   return (
     <main className="min-h-screen bg-background pb-28">
-      <div className="max-w-md mx-auto px-5 pt-8 space-y-5">
-        <header className="flex items-center gap-3">
-          <Link to="/profile" className="size-10 bg-card rounded-2xl outline-1 outline-black/10 grid place-items-center">
-            <ArrowLeft className="size-4" />
-          </Link>
-          <div>
-            <h1 className="text-2xl font-bold">Komunitas</h1>
-            <p className="text-xs text-muted-foreground">Berbagi tips & dukungan</p>
-          </div>
-        </header>
+      <div className="max-w-md mx-auto px-5 pt-2 space-y-5">
+        <TopAppBar title="Komunitas" subtitle="Berbagi tips & dukungan" showBack />
 
         <section className="bg-card p-4 rounded-3xl outline-1 outline-black/5 space-y-3 animate-fade-up">
           <textarea
