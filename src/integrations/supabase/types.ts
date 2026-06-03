@@ -2754,8 +2754,10 @@ export type Database = {
           protein_g: number
           rating_count: number
           save_count: number
+          save_count_snapshot: number
           servings: number
           slug: string | null
+          snapshot_at: string | null
           tags: Json | null
           title: string
           updated_at: string
@@ -2792,8 +2794,10 @@ export type Database = {
           protein_g?: number
           rating_count?: number
           save_count?: number
+          save_count_snapshot?: number
           servings?: number
           slug?: string | null
+          snapshot_at?: string | null
           tags?: Json | null
           title: string
           updated_at?: string
@@ -2830,8 +2834,10 @@ export type Database = {
           protein_g?: number
           rating_count?: number
           save_count?: number
+          save_count_snapshot?: number
           servings?: number
           slug?: string | null
+          snapshot_at?: string | null
           tags?: Json | null
           title?: string
           updated_at?: string
@@ -3534,6 +3540,27 @@ export type Database = {
           refresh_token?: string
           scope?: string | null
           updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      weekly_report_runs: {
+        Row: {
+          id: string
+          report_id: string | null
+          run_at: string
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          report_id?: string | null
+          run_at?: string
+          user_id: string
+        }
+        Update: {
+          id?: string
+          report_id?: string | null
+          run_at?: string
           user_id?: string
         }
         Relationships: []
