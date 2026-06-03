@@ -4,7 +4,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { getChatHistory, sendChatMessage } from "@/lib/chat.functions";
 import { BottomNav } from "@/components/bottom-nav";
-import { ArrowLeft, Send, Sparkles, ImagePlus, X } from "lucide-react";
+import { ArrowLeft, Send, Sparkles, ImagePlus, X, Mic, MicOff, Volume2, VolumeX } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/chat")({
@@ -28,6 +28,12 @@ function ChatPage() {
   const [imageData, setImageData] = useState<{ base64: string; mime: string; preview: string } | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const [listening, setListening] = useState(false);
+  const [ttsOn, setTtsOn] = useState(false);
+  const recogRef = useRef<any>(null);
+  const lastSpokenRef = useRef<string | null>(null);
+  const sttSupported = typeof window !== "undefined" && !!((window as any).SpeechRecognition || (window as any).webkitSpeechRecognition);
+  const ttsSupported = typeof window !== "undefined" && "speechSynthesis" in window;
 
   const mutation = useMutation({
     mutationFn: (payload: { message: string; imageBase64?: string; imageMime?: string }) =>
@@ -42,6 +48,83 @@ function ChatPage() {
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
   }, [messages, mutation.isPending]);
+
+  // Auto-speak latest assistant reply when TTS is on
+  useEffect(() => {
+    if (!ttsOn || !ttsSupported || messages.length === 0) return;
+    const last = messages[messages.length - 1];
+    if (last.role !== "assistant") return;
+    if (lastSpokenRef.current === last.id) return;
+    lastSpokenRef.current = last.id;
+    try {
+      window.speechSynthesis.cancel();
+      const u = new SpeechSynthesisUtterance(last.content.replace(/[*_#`>]/g, ""));
+      u.lang = "id-ID";
+      u.rate = 1;
+      window.speechSynthesis.speak(u);
+    } catch {}
+  }, [messages, ttsOn, ttsSupported]);
+
+  useEffect(() => {
+    return () => {
+      try { window.speechSynthesis?.cancel(); } catch {}
+      try { recogRef.current?.stop?.(); } catch {}
+    };
+  }, []);
+
+  const toggleTts = () => {
+    if (!ttsSupported) {
+      toast.error("Browser tidak mendukung text-to-speech");
+      return;
+    }
+    setTtsOn((v) => {
+      if (v) {
+        try { window.speechSynthesis.cancel(); } catch {}
+      }
+      return !v;
+    });
+  };
+
+  const toggleMic = () => {
+    if (!sttSupported) {
+      toast.error("Browser tidak mendukung voice input");
+      return;
+    }
+    if (listening) {
+      try { recogRef.current?.stop?.(); } catch {}
+      return;
+    }
+    const SR: any = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    const r = new SR();
+    r.lang = "id-ID";
+    r.interimResults = true;
+    r.continuous = false;
+    let finalText = "";
+    r.onresult = (e: any) => {
+      let interim = "";
+      for (let i = e.resultIndex; i < e.results.length; i++) {
+        const t = e.results[i][0].transcript;
+        if (e.results[i].isFinal) finalText += t;
+        else interim += t;
+      }
+      setInput((finalText + interim).trim());
+    };
+    r.onerror = (e: any) => {
+      toast.error(`Voice error: ${e.error ?? "unknown"}`);
+      setListening(false);
+    };
+    r.onend = () => {
+      setListening(false);
+      const txt = finalText.trim();
+      if (txt) {
+        setInput("");
+        mutation.mutate({ message: txt });
+      }
+    };
+    recogRef.current = r;
+    setListening(true);
+    try { r.start(); } catch { setListening(false); }
+  };
 
   const handleSend = (text?: string) => {
     const msg = (text ?? input).trim();
@@ -80,6 +163,15 @@ function ChatPage() {
           </div>
           <p className="text-[11px] text-muted-foreground">AI nutrition coach</p>
         </div>
+        <button
+          onClick={toggleTts}
+          className={`ml-auto size-10 rounded-2xl grid place-items-center outline-1 outline-black/10 transition ${
+            ttsOn ? "bg-primary text-primary-foreground" : "bg-card text-muted-foreground"
+          }`}
+          aria-label="Toggle suara balasan"
+        >
+          {ttsOn ? <Volume2 className="size-4" /> : <VolumeX className="size-4" />}
+        </button>
       </header>
 
       <div ref={scrollRef} className="flex-1 overflow-y-auto max-w-md w-full mx-auto px-5 pb-40">
@@ -168,10 +260,20 @@ function ChatPage() {
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && handleSend()}
-              placeholder={imageData ? "Tambah pertanyaan (opsional)..." : "Tanya Dr. Healthy..."}
+              placeholder={listening ? "Mendengarkan..." : imageData ? "Tambah pertanyaan (opsional)..." : "Tanya Dr. Healthy..."}
               disabled={mutation.isPending}
               className="flex-1 bg-transparent px-3 py-2 text-sm focus:outline-none disabled:opacity-50"
             />
+            <button
+              onClick={toggleMic}
+              disabled={mutation.isPending}
+              className={`size-10 grid place-items-center rounded-2xl transition disabled:opacity-40 ${
+                listening ? "bg-destructive text-destructive-foreground animate-pulse" : "text-muted-foreground hover:bg-secondary/50"
+              }`}
+              aria-label="Voice input"
+            >
+              {listening ? <MicOff className="size-4" /> : <Mic className="size-4" />}
+            </button>
             <button
               onClick={() => handleSend()}
               disabled={mutation.isPending || (!input.trim() && !imageData)}
