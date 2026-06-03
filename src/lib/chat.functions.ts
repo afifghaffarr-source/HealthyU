@@ -1,5 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
+import type { SupabaseClient } from "@supabase/supabase-js";
+import type { Database } from "@/integrations/supabase/types";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { todayRange, calcAge, calcBMI, calcBMR, calcTDEE, bmiCategory, type ActivityLevel } from "./health";
 
@@ -74,8 +76,10 @@ export const clearChatHistory = createServerFn({ method: "POST" })
   });
 
 // Shared helpers exported for use by the streaming server route.
+type SB = SupabaseClient<Database>;
+
 export async function persistUserMessage(
-  supabase: any,
+  supabase: SB,
   userId: string,
   message: string,
   imageBase64?: string,
@@ -91,7 +95,7 @@ export async function persistUserMessage(
 }
 
 export async function buildChatPayload(
-  supabase: any,
+  supabase: SB,
   userId: string,
   message: string,
   imageBase64?: string,
