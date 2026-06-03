@@ -13,6 +13,7 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedWorkoutRouteImport } from './routes/_authenticated/workout'
+import { Route as AuthenticatedWeightRouteImport } from './routes/_authenticated/weight'
 import { Route as AuthenticatedWaterRouteImport } from './routes/_authenticated/water'
 import { Route as AuthenticatedSleepRouteImport } from './routes/_authenticated/sleep'
 import { Route as AuthenticatedScanRouteImport } from './routes/_authenticated/scan'
@@ -54,6 +55,11 @@ const IndexRoute = IndexRouteImport.update({
 const AuthenticatedWorkoutRoute = AuthenticatedWorkoutRouteImport.update({
   id: '/workout',
   path: '/workout',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedWeightRoute = AuthenticatedWeightRouteImport.update({
+  id: '/weight',
+  path: '/weight',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedWaterRoute = AuthenticatedWaterRouteImport.update({
@@ -201,6 +207,7 @@ export interface FileRoutesByFullPath {
   '/scan': typeof AuthenticatedScanRoute
   '/sleep': typeof AuthenticatedSleepRoute
   '/water': typeof AuthenticatedWaterRoute
+  '/weight': typeof AuthenticatedWeightRoute
   '/workout': typeof AuthenticatedWorkoutRoute
   '/recipes/$id': typeof AuthenticatedRecipesIdRoute
 }
@@ -229,6 +236,7 @@ export interface FileRoutesByTo {
   '/scan': typeof AuthenticatedScanRoute
   '/sleep': typeof AuthenticatedSleepRoute
   '/water': typeof AuthenticatedWaterRoute
+  '/weight': typeof AuthenticatedWeightRoute
   '/workout': typeof AuthenticatedWorkoutRoute
   '/recipes/$id': typeof AuthenticatedRecipesIdRoute
 }
@@ -259,6 +267,7 @@ export interface FileRoutesById {
   '/_authenticated/scan': typeof AuthenticatedScanRoute
   '/_authenticated/sleep': typeof AuthenticatedSleepRoute
   '/_authenticated/water': typeof AuthenticatedWaterRoute
+  '/_authenticated/weight': typeof AuthenticatedWeightRoute
   '/_authenticated/workout': typeof AuthenticatedWorkoutRoute
   '/_authenticated/recipes/$id': typeof AuthenticatedRecipesIdRoute
 }
@@ -289,6 +298,7 @@ export interface FileRouteTypes {
     | '/scan'
     | '/sleep'
     | '/water'
+    | '/weight'
     | '/workout'
     | '/recipes/$id'
   fileRoutesByTo: FileRoutesByTo
@@ -317,6 +327,7 @@ export interface FileRouteTypes {
     | '/scan'
     | '/sleep'
     | '/water'
+    | '/weight'
     | '/workout'
     | '/recipes/$id'
   id:
@@ -346,6 +357,7 @@ export interface FileRouteTypes {
     | '/_authenticated/scan'
     | '/_authenticated/sleep'
     | '/_authenticated/water'
+    | '/_authenticated/weight'
     | '/_authenticated/workout'
     | '/_authenticated/recipes/$id'
   fileRoutesById: FileRoutesById
@@ -384,6 +396,13 @@ declare module '@tanstack/react-router' {
       path: '/workout'
       fullPath: '/workout'
       preLoaderRoute: typeof AuthenticatedWorkoutRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/weight': {
+      id: '/_authenticated/weight'
+      path: '/weight'
+      fullPath: '/weight'
+      preLoaderRoute: typeof AuthenticatedWeightRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/water': {
@@ -584,6 +603,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedScanRoute: typeof AuthenticatedScanRoute
   AuthenticatedSleepRoute: typeof AuthenticatedSleepRoute
   AuthenticatedWaterRoute: typeof AuthenticatedWaterRoute
+  AuthenticatedWeightRoute: typeof AuthenticatedWeightRoute
   AuthenticatedWorkoutRoute: typeof AuthenticatedWorkoutRoute
 }
 
@@ -610,6 +630,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedScanRoute: AuthenticatedScanRoute,
   AuthenticatedSleepRoute: AuthenticatedSleepRoute,
   AuthenticatedWaterRoute: AuthenticatedWaterRoute,
+  AuthenticatedWeightRoute: AuthenticatedWeightRoute,
   AuthenticatedWorkoutRoute: AuthenticatedWorkoutRoute,
 }
 
