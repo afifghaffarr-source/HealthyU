@@ -1,64 +1,63 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { BottomNav } from "@/components/bottom-nav";
-import { ArrowLeft, Bell, BellOff } from "lucide-react";
+import {
+  ArrowLeft,
+  Bell,
+  BellOff,
+  Droplet,
+  Utensils,
+  Dumbbell,
+  Moon,
+  Pill,
+  Timer,
+  Sparkles,
+  Plus,
+  Trash2,
+} from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import {
+  DEFAULT_REMINDERS,
+  loadReminders,
+  saveReminders,
+  type Reminder,
+  type ReminderCategory,
+} from "@/lib/reminders-store";
 
 export const Route = createFileRoute("/_authenticated/reminders")({
   component: RemindersPage,
 });
 
-type Reminder = { id: string; label: string; time: string; enabled: boolean };
+const CATEGORY_META: Record<ReminderCategory, { icon: typeof Bell; label: string }> = {
+  water: { icon: Droplet, label: "Air" },
+  meal: { icon: Utensils, label: "Makan" },
+  workout: { icon: Dumbbell, label: "Olahraga" },
+  sleep: { icon: Moon, label: "Tidur" },
+  medication: { icon: Pill, label: "Obat" },
+  fasting: { icon: Timer, label: "Puasa" },
+  custom: { icon: Sparkles, label: "Lain" },
+};
 
-const DEFAULTS: Reminder[] = [
-  { id: "water-morning", label: "Minum air pagi", time: "07:00", enabled: true },
-  { id: "water-noon", label: "Minum air siang", time: "12:00", enabled: true },
-  { id: "water-evening", label: "Minum air sore", time: "17:00", enabled: true },
-  { id: "meds", label: "Cek obat & vitamin", time: "08:00", enabled: false },
-  { id: "sleep", label: "Waktunya tidur", time: "22:00", enabled: false },
-];
-
-const STORAGE_KEY = "reminders-v1";
+const DAY_LABELS = ["M", "S", "S", "R", "K", "J", "S"];
 
 function RemindersPage() {
-  const [items, setItems] = useState<Reminder[]>(DEFAULTS);
+  const [items, setItems] = useState<Reminder[]>(DEFAULT_REMINDERS);
   const [permission, setPermission] = useState<NotificationPermission>("default");
+  const [showAdd, setShowAdd] = useState(false);
+  const [newLabel, setNewLabel] = useState("");
+  const [newTime, setNewTime] = useState("09:00");
+  const [newCategory, setNewCategory] = useState<ReminderCategory>("custom");
 
   useEffect(() => {
-    try {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      if (raw) setItems(JSON.parse(raw));
-    } catch {/* ignore */}
+    setItems(loadReminders());
     if ("Notification" in window) setPermission(Notification.permission);
   }, []);
 
   useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
+    saveReminders(items);
   }, [items]);
 
-  // Scheduler: ticks every 30s and fires due reminders once per day
-  useEffect(() => {
-    if (permission !== "granted") return;
-    const firedKey = "reminders-fired";
-    const fired: Record<string, string> = JSON.parse(localStorage.getItem(firedKey) || "{}");
-    const today = new Date().toISOString().slice(0, 10);
-
-    const tick = () => {
-      const now = new Date();
-      const hhmm = `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`;
-      items.forEach((it) => {
-        if (!it.enabled) return;
-        if (it.time !== hhmm) return;
-        if (fired[it.id] === today) return;
-        new Notification("Pengingat", { body: it.label, icon: "/favicon.ico" });
-        fired[it.id] = today;
-        localStorage.setItem(firedKey, JSON.stringify(fired));
-      });
-    };
-    const id = setInterval(tick, 30000);
-    tick();
-    return () => clearInterval(id);
-  }, [items, permission]);
+  // The global ReminderScheduler (mounted in __root) handles firing notifications app-wide.
 
   const requestPerm = async () => {
     if (!("Notification" in window)) {
@@ -67,8 +66,12 @@ function RemindersPage() {
     }
     const p = await Notification.requestPermission();
     setPermission(p);
-    if (p === "granted") toast.success("Notifikasi diaktifkan");
-    else toast.error("Izin notifikasi ditolak");
+    if (p === "granted") {
+      toast.success("Notifikasi diaktifkan");
+      try {
+        new Notification("HealthyU", { body: "Pengingat siap dikirim 🔔", icon: "/icon-192.svg" });
+      } catch {/* ignore */}
+    } else toast.error("Izin notifikasi ditolak");
   };
 
   const toggle = (id: string) =>
@@ -77,6 +80,35 @@ function RemindersPage() {
   const updateTime = (id: string, time: string) =>
     setItems((arr) => arr.map((i) => (i.id === id ? { ...i, time } : i)));
 
+  const toggleDay = (id: string, day: number) =>
+    setItems((arr) =>
+      arr.map((i) => {
+        if (i.id !== id) return i;
+        const has = i.days.includes(day);
+        return { ...i, days: has ? i.days.filter((d) => d !== day) : [...i.days, day].sort() };
+      }),
+    );
+
+  const removeItem = (id: string) =>
+    setItems((arr) => arr.filter((i) => i.id !== id));
+
+  const addItem = () => {
+    if (!newLabel.trim()) {
+      toast.error("Isi nama pengingat");
+      return;
+    }
+    const id = `custom-${Date.now()}`;
+    setItems((arr) => [
+      ...arr,
+      { id, label: newLabel.trim(), time: newTime, enabled: true, category: newCategory, days: [] },
+    ]);
+    setNewLabel("");
+    setNewTime("09:00");
+    setNewCategory("custom");
+    setShowAdd(false);
+    toast.success("Pengingat ditambahkan");
+  };
+
   return (
     <main className="min-h-screen bg-background pb-28">
       <div className="max-w-md mx-auto px-5 pt-8 space-y-5">
@@ -84,7 +116,14 @@ function RemindersPage() {
           <Link to="/profile" className="size-10 bg-card rounded-2xl outline-1 outline-black/10 grid place-items-center">
             <ArrowLeft className="size-4" />
           </Link>
-          <h1 className="text-2xl font-bold">Pengingat</h1>
+          <h1 className="text-2xl font-bold flex-1">Pengingat Cerdas</h1>
+          <button
+            onClick={() => setShowAdd((v) => !v)}
+            className="size-10 bg-primary text-primary-foreground rounded-2xl grid place-items-center"
+            aria-label="Tambah pengingat"
+          >
+            <Plus className="size-4" />
+          </button>
         </header>
 
         {permission !== "granted" ? (
@@ -101,32 +140,110 @@ function RemindersPage() {
         )}
 
         <p className="text-xs text-muted-foreground px-1">
-          Pengingat hanya berjalan saat aplikasi terbuka di browser. Untuk pengingat sistem penuh, install sebagai PWA.
+          Pengingat berjalan saat aplikasi terbuka. Install sebagai PWA agar tetap aktif di latar belakang.
         </p>
 
-        <section className="space-y-2 animate-fade-up">
-          {items.map((it) => (
-            <div key={it.id} className="bg-card p-4 rounded-2xl outline-1 outline-black/5 flex items-center gap-3">
-              <div className={`size-10 rounded-xl grid place-items-center ${it.enabled ? "bg-mint" : "bg-muted"}`}>
-                {it.enabled ? <Bell className="size-4 text-sage-deep" /> : <BellOff className="size-4 text-muted-foreground" />}
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="font-semibold text-sm">{it.label}</p>
-                <input
-                  type="time"
-                  value={it.time}
-                  onChange={(e) => updateTime(it.id, e.target.value)}
-                  className="text-xs text-muted-foreground bg-transparent outline-none mt-0.5"
-                />
-              </div>
-              <button
-                onClick={() => toggle(it.id)}
-                className={`w-11 h-6 rounded-full transition-colors relative ${it.enabled ? "bg-primary" : "bg-muted"}`}
+        {showAdd ? (
+          <section className="bg-card p-4 rounded-2xl outline-1 outline-black/5 space-y-3 animate-fade-up">
+            <input
+              type="text"
+              placeholder="Nama pengingat"
+              value={newLabel}
+              onChange={(e) => setNewLabel(e.target.value)}
+              className="w-full bg-muted rounded-xl px-3 py-2.5 text-sm outline-none"
+            />
+            <div className="flex items-center gap-2">
+              <input
+                type="time"
+                value={newTime}
+                onChange={(e) => setNewTime(e.target.value)}
+                className="bg-muted rounded-xl px-3 py-2.5 text-sm outline-none"
+              />
+              <select
+                value={newCategory}
+                onChange={(e) => setNewCategory(e.target.value as ReminderCategory)}
+                className="flex-1 bg-muted rounded-xl px-3 py-2.5 text-sm outline-none"
               >
-                <span className={`absolute top-0.5 size-5 rounded-full bg-white transition-transform ${it.enabled ? "translate-x-5" : "translate-x-0.5"}`} />
+                {Object.entries(CATEGORY_META).map(([k, v]) => (
+                  <option key={k} value={k}>{v.label}</option>
+                ))}
+              </select>
+            </div>
+            <div className="flex gap-2">
+              <button
+                onClick={() => setShowAdd(false)}
+                className="flex-1 bg-muted text-foreground font-semibold py-2.5 rounded-xl text-sm"
+              >
+                Batal
+              </button>
+              <button
+                onClick={addItem}
+                className="flex-1 bg-primary text-primary-foreground font-semibold py-2.5 rounded-xl text-sm"
+              >
+                Simpan
               </button>
             </div>
-          ))}
+          </section>
+        ) : null}
+
+        <section className="space-y-2 animate-fade-up">
+          {items.map((it) => {
+            const Meta = CATEGORY_META[it.category] ?? CATEGORY_META.custom;
+            const Icon = it.enabled ? Meta.icon : BellOff;
+            return (
+              <div key={it.id} className="bg-card p-4 rounded-2xl outline-1 outline-black/5 space-y-3">
+                <div className="flex items-center gap-3">
+                  <div className={`size-10 rounded-xl grid place-items-center ${it.enabled ? "bg-mint" : "bg-muted"}`}>
+                    <Icon className={`size-4 ${it.enabled ? "text-sage-deep" : "text-muted-foreground"}`} />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="font-semibold text-sm truncate">{it.label}</p>
+                    <input
+                      type="time"
+                      value={it.time}
+                      onChange={(e) => updateTime(it.id, e.target.value)}
+                      className="text-xs text-muted-foreground bg-transparent outline-none mt-0.5"
+                    />
+                  </div>
+                  <button
+                    onClick={() => toggle(it.id)}
+                    className={`w-11 h-6 rounded-full transition-colors relative ${it.enabled ? "bg-primary" : "bg-muted"}`}
+                    aria-label="Toggle"
+                  >
+                    <span className={`absolute top-0.5 size-5 rounded-full bg-white transition-transform ${it.enabled ? "translate-x-5" : "translate-x-0.5"}`} />
+                  </button>
+                  <button
+                    onClick={() => removeItem(it.id)}
+                    className="size-8 grid place-items-center text-muted-foreground hover:text-destructive"
+                    aria-label="Hapus"
+                  >
+                    <Trash2 className="size-4" />
+                  </button>
+                </div>
+                <div className="flex items-center gap-1.5 pl-13">
+                  {DAY_LABELS.map((d, idx) => {
+                    const active = it.days.length === 0 || it.days.includes(idx);
+                    return (
+                      <button
+                        key={idx}
+                        onClick={() => toggleDay(it.id, idx)}
+                        className={`size-7 rounded-lg text-[11px] font-semibold transition-colors ${
+                          active
+                            ? "bg-primary/15 text-primary"
+                            : "bg-muted text-muted-foreground"
+                        }`}
+                      >
+                        {d}
+                      </button>
+                    );
+                  })}
+                  <span className="text-[10px] text-muted-foreground ml-1">
+                    {it.days.length === 0 ? "Setiap hari" : `${it.days.length} hari`}
+                  </span>
+                </div>
+              </div>
+            );
+          })}
         </section>
       </div>
       <BottomNav />
