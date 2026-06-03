@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router";
-import { Home, Camera, Database, Timer, Activity, User, WifiOff, RefreshCw } from "lucide-react";
+import { Home, Camera, Database, Timer, Activity, User } from "lucide-react";
 import { useOfflineQueue } from "@/hooks/use-offline-queue";
+import { SyncPill } from "@/components/healthyu/sync-pill";
 
 const items = [
   { to: "/dashboard", label: "Beranda", icon: Home },
@@ -16,28 +17,30 @@ export function BottomNav() {
   return (
     <>
       {(!online || pending > 0) && (
-        <button
-          onClick={() => sync()}
-          className={`fixed bottom-24 left-1/2 -translate-x-1/2 z-40 inline-flex items-center gap-1.5 text-[11px] font-semibold px-3 py-1.5 rounded-full shadow-lg ${online ? "bg-amber-100 text-amber-700" : "bg-foreground text-background"}`}
-          aria-label={online ? "Sync sekarang" : "Offline"}
-        >
-          {online ? <RefreshCw className="size-3" /> : <WifiOff className="size-3" />}
-          {online ? `Sync ${pending}` : `Offline${pending ? ` · ${pending}` : ""}`}
-        </button>
+        <div className="fixed bottom-24 left-1/2 -translate-x-1/2 z-40 shadow-lg rounded-full">
+          <SyncPill online={online} pending={pending} onSync={() => sync()} />
+        </div>
       )}
-    <nav className="fixed bottom-4 left-4 right-4 z-40 h-16 bg-card/85 backdrop-blur-xl rounded-3xl outline-1 outline-black/5 shadow-lg shadow-black/5 flex items-center justify-around px-2 max-w-md mx-auto">
-      {items.map(({ to, label, icon: Icon }) => (
-        <Link
-          key={to}
-          to={to}
-          className="flex flex-col items-center gap-1 px-3 py-2 rounded-2xl text-muted-foreground transition-colors"
-          activeProps={{ className: "text-primary" }}
-        >
-          <Icon className="size-5" strokeWidth={2.2} />
-          <span className="text-[10px] font-semibold">{label}</span>
-        </Link>
-      ))}
-    </nav>
+      <nav
+        aria-label="Navigasi utama"
+        className="fixed bottom-4 left-4 right-4 z-40 h-16 bg-card/90 backdrop-blur-xl rounded-3xl outline-1 outline-black/5 shadow-lg shadow-black/5 flex items-center justify-around px-2 max-w-md mx-auto"
+      >
+        {items.map(({ to, label, icon: Icon }) => (
+          <Link
+            key={to}
+            to={to}
+            aria-label={label}
+            className="flex flex-col items-center gap-0.5 px-3 py-2 rounded-2xl text-muted-foreground transition-all duration-200 motion-safe:active:scale-90"
+            activeProps={{ className: "text-primary [&_.nav-dot]:opacity-100 [&_.nav-icon-wrap]:bg-primary/12" }}
+          >
+            <span className="nav-icon-wrap inline-flex size-8 items-center justify-center rounded-full transition-colors">
+              <Icon className="size-5" strokeWidth={2.2} />
+            </span>
+            <span className="text-[10px] font-semibold">{label}</span>
+            <span className="nav-dot size-1 rounded-full bg-primary opacity-0 transition-opacity" />
+          </Link>
+        ))}
+      </nav>
     </>
   );
 }
