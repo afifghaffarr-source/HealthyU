@@ -13,6 +13,7 @@ import { addMood } from "@/lib/mood.functions";
 import { getAchievementToastPrefix } from "@/lib/achievement-icons";
 import { BottomNav } from "@/components/bottom-nav";
 import { CalorieRing } from "@/components/calorie-ring";
+import { Coachmark } from "@/components/healthyu/coachmark";
 import { formatDuration, fastingStage } from "@/lib/health";
 import { Droplet, Plus, Sparkles, ArrowRight, Flame, Trophy, Camera, Smile } from "lucide-react";
 import { toast } from "sonner";
