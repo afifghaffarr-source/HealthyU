@@ -14,7 +14,251 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      chat_messages: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          role: string
+          user_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          role: string
+          user_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          role?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      fasting_sessions: {
+        Row: {
+          completed: boolean | null
+          created_at: string
+          end_time: string | null
+          id: string
+          notes: string | null
+          protocol: string
+          start_time: string
+          target_hours: number
+          user_id: string
+        }
+        Insert: {
+          completed?: boolean | null
+          created_at?: string
+          end_time?: string | null
+          id?: string
+          notes?: string | null
+          protocol?: string
+          start_time?: string
+          target_hours?: number
+          user_id: string
+        }
+        Update: {
+          completed?: boolean | null
+          created_at?: string
+          end_time?: string | null
+          id?: string
+          notes?: string | null
+          protocol?: string
+          start_time?: string
+          target_hours?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
+      food_items: {
+        Row: {
+          calories: number
+          carbs_g: number | null
+          category: string | null
+          created_at: string
+          fat_g: number | null
+          fiber_g: number | null
+          id: string
+          is_indonesian: boolean | null
+          name: string
+          name_en: string | null
+          protein_g: number | null
+          serving_size: number | null
+          serving_unit: string | null
+        }
+        Insert: {
+          calories: number
+          carbs_g?: number | null
+          category?: string | null
+          created_at?: string
+          fat_g?: number | null
+          fiber_g?: number | null
+          id?: string
+          is_indonesian?: boolean | null
+          name: string
+          name_en?: string | null
+          protein_g?: number | null
+          serving_size?: number | null
+          serving_unit?: string | null
+        }
+        Update: {
+          calories?: number
+          carbs_g?: number | null
+          category?: string | null
+          created_at?: string
+          fat_g?: number | null
+          fiber_g?: number | null
+          id?: string
+          is_indonesian?: boolean | null
+          name?: string
+          name_en?: string | null
+          protein_g?: number | null
+          serving_size?: number | null
+          serving_unit?: string | null
+        }
+        Relationships: []
+      }
+      meal_logs: {
+        Row: {
+          calories: number
+          carbs_g: number | null
+          created_at: string
+          custom_name: string | null
+          fat_g: number | null
+          food_item_id: string | null
+          id: string
+          logged_at: string
+          meal_type: string
+          protein_g: number | null
+          serving_qty: number
+          user_id: string
+        }
+        Insert: {
+          calories: number
+          carbs_g?: number | null
+          created_at?: string
+          custom_name?: string | null
+          fat_g?: number | null
+          food_item_id?: string | null
+          id?: string
+          logged_at?: string
+          meal_type: string
+          protein_g?: number | null
+          serving_qty?: number
+          user_id: string
+        }
+        Update: {
+          calories?: number
+          carbs_g?: number | null
+          created_at?: string
+          custom_name?: string | null
+          fat_g?: number | null
+          food_item_id?: string | null
+          id?: string
+          logged_at?: string
+          meal_type?: string
+          protein_g?: number | null
+          serving_qty?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "meal_logs_food_item_id_fkey"
+            columns: ["food_item_id"]
+            isOneToOne: false
+            referencedRelation: "food_items"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          activity_level: string | null
+          allergies: string[] | null
+          avatar_url: string | null
+          birth_date: string | null
+          city: string | null
+          created_at: string
+          daily_calorie_target: number | null
+          dietary_preference: string | null
+          full_name: string | null
+          gender: string | null
+          health_conditions: string[] | null
+          height_cm: number | null
+          id: string
+          language: string | null
+          onboarded: boolean
+          target_weight_kg: number | null
+          updated_at: string
+          weight_kg: number | null
+        }
+        Insert: {
+          activity_level?: string | null
+          allergies?: string[] | null
+          avatar_url?: string | null
+          birth_date?: string | null
+          city?: string | null
+          created_at?: string
+          daily_calorie_target?: number | null
+          dietary_preference?: string | null
+          full_name?: string | null
+          gender?: string | null
+          health_conditions?: string[] | null
+          height_cm?: number | null
+          id: string
+          language?: string | null
+          onboarded?: boolean
+          target_weight_kg?: number | null
+          updated_at?: string
+          weight_kg?: number | null
+        }
+        Update: {
+          activity_level?: string | null
+          allergies?: string[] | null
+          avatar_url?: string | null
+          birth_date?: string | null
+          city?: string | null
+          created_at?: string
+          daily_calorie_target?: number | null
+          dietary_preference?: string | null
+          full_name?: string | null
+          gender?: string | null
+          health_conditions?: string[] | null
+          height_cm?: number | null
+          id?: string
+          language?: string | null
+          onboarded?: boolean
+          target_weight_kg?: number | null
+          updated_at?: string
+          weight_kg?: number | null
+        }
+        Relationships: []
+      }
+      water_logs: {
+        Row: {
+          amount_ml: number
+          id: string
+          logged_at: string
+          user_id: string
+        }
+        Insert: {
+          amount_ml: number
+          id?: string
+          logged_at?: string
+          user_id: string
+        }
+        Update: {
+          amount_ml?: number
+          id?: string
+          logged_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
