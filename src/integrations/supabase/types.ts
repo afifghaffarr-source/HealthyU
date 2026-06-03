@@ -2479,6 +2479,7 @@ export type Database = {
           ideal_weight_max: number | null
           ideal_weight_min: number | null
           language: string | null
+          last_seen_report_id: string | null
           location_lat: number | null
           location_lng: number | null
           location_province: string | null
@@ -2530,6 +2531,7 @@ export type Database = {
           ideal_weight_max?: number | null
           ideal_weight_min?: number | null
           language?: string | null
+          last_seen_report_id?: string | null
           location_lat?: number | null
           location_lng?: number | null
           location_province?: string | null
@@ -2581,6 +2583,7 @@ export type Database = {
           ideal_weight_max?: number | null
           ideal_weight_min?: number | null
           language?: string | null
+          last_seen_report_id?: string | null
           location_lat?: number | null
           location_lng?: number | null
           location_province?: string | null
