@@ -60,6 +60,8 @@ import { Route as AuthenticatedScanRecipeRouteImport } from './routes/_authentic
 import { Route as AuthenticatedScanMenuRouteImport } from './routes/_authenticated/scan.menu'
 import { Route as AuthenticatedScanHistoryRouteImport } from './routes/_authenticated/scan.history'
 import { Route as AuthenticatedScanBarcodeRouteImport } from './routes/_authenticated/scan.barcode'
+import { Route as AuthenticatedReportsWorkoutMatchRouteImport } from './routes/_authenticated/reports.workout-match'
+import { Route as AuthenticatedReportsSleepMealRouteImport } from './routes/_authenticated/reports.sleep-meal'
 import { Route as AuthenticatedReportsNutritionRouteImport } from './routes/_authenticated/reports.nutrition'
 import { Route as AuthenticatedReportsMoodRouteImport } from './routes/_authenticated/reports.mood'
 import { Route as AuthenticatedReportsGalleryRouteImport } from './routes/_authenticated/reports.gallery'
@@ -347,6 +349,18 @@ const AuthenticatedScanBarcodeRoute =
     path: '/barcode',
     getParentRoute: () => AuthenticatedScanRoute,
   } as any)
+const AuthenticatedReportsWorkoutMatchRoute =
+  AuthenticatedReportsWorkoutMatchRouteImport.update({
+    id: '/workout-match',
+    path: '/workout-match',
+    getParentRoute: () => AuthenticatedReportsRoute,
+  } as any)
+const AuthenticatedReportsSleepMealRoute =
+  AuthenticatedReportsSleepMealRouteImport.update({
+    id: '/sleep-meal',
+    path: '/sleep-meal',
+    getParentRoute: () => AuthenticatedReportsRoute,
+  } as any)
 const AuthenticatedReportsNutritionRoute =
   AuthenticatedReportsNutritionRouteImport.update({
     id: '/nutrition',
@@ -530,6 +544,8 @@ export interface FileRoutesByFullPath {
   '/reports/gallery': typeof AuthenticatedReportsGalleryRoute
   '/reports/mood': typeof AuthenticatedReportsMoodRoute
   '/reports/nutrition': typeof AuthenticatedReportsNutritionRoute
+  '/reports/sleep-meal': typeof AuthenticatedReportsSleepMealRoute
+  '/reports/workout-match': typeof AuthenticatedReportsWorkoutMatchRoute
   '/scan/barcode': typeof AuthenticatedScanBarcodeRoute
   '/scan/history': typeof AuthenticatedScanHistoryRoute
   '/scan/menu': typeof AuthenticatedScanMenuRoute
@@ -603,6 +619,8 @@ export interface FileRoutesByTo {
   '/reports/gallery': typeof AuthenticatedReportsGalleryRoute
   '/reports/mood': typeof AuthenticatedReportsMoodRoute
   '/reports/nutrition': typeof AuthenticatedReportsNutritionRoute
+  '/reports/sleep-meal': typeof AuthenticatedReportsSleepMealRoute
+  '/reports/workout-match': typeof AuthenticatedReportsWorkoutMatchRoute
   '/scan/barcode': typeof AuthenticatedScanBarcodeRoute
   '/scan/history': typeof AuthenticatedScanHistoryRoute
   '/scan/menu': typeof AuthenticatedScanMenuRoute
@@ -678,6 +696,8 @@ export interface FileRoutesById {
   '/_authenticated/reports/gallery': typeof AuthenticatedReportsGalleryRoute
   '/_authenticated/reports/mood': typeof AuthenticatedReportsMoodRoute
   '/_authenticated/reports/nutrition': typeof AuthenticatedReportsNutritionRoute
+  '/_authenticated/reports/sleep-meal': typeof AuthenticatedReportsSleepMealRoute
+  '/_authenticated/reports/workout-match': typeof AuthenticatedReportsWorkoutMatchRoute
   '/_authenticated/scan/barcode': typeof AuthenticatedScanBarcodeRoute
   '/_authenticated/scan/history': typeof AuthenticatedScanHistoryRoute
   '/_authenticated/scan/menu': typeof AuthenticatedScanMenuRoute
@@ -753,6 +773,8 @@ export interface FileRouteTypes {
     | '/reports/gallery'
     | '/reports/mood'
     | '/reports/nutrition'
+    | '/reports/sleep-meal'
+    | '/reports/workout-match'
     | '/scan/barcode'
     | '/scan/history'
     | '/scan/menu'
@@ -826,6 +848,8 @@ export interface FileRouteTypes {
     | '/reports/gallery'
     | '/reports/mood'
     | '/reports/nutrition'
+    | '/reports/sleep-meal'
+    | '/reports/workout-match'
     | '/scan/barcode'
     | '/scan/history'
     | '/scan/menu'
@@ -900,6 +924,8 @@ export interface FileRouteTypes {
     | '/_authenticated/reports/gallery'
     | '/_authenticated/reports/mood'
     | '/_authenticated/reports/nutrition'
+    | '/_authenticated/reports/sleep-meal'
+    | '/_authenticated/reports/workout-match'
     | '/_authenticated/scan/barcode'
     | '/_authenticated/scan/history'
     | '/_authenticated/scan/menu'
@@ -1287,6 +1313,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedScanBarcodeRouteImport
       parentRoute: typeof AuthenticatedScanRoute
     }
+    '/_authenticated/reports/workout-match': {
+      id: '/_authenticated/reports/workout-match'
+      path: '/workout-match'
+      fullPath: '/reports/workout-match'
+      preLoaderRoute: typeof AuthenticatedReportsWorkoutMatchRouteImport
+      parentRoute: typeof AuthenticatedReportsRoute
+    }
+    '/_authenticated/reports/sleep-meal': {
+      id: '/_authenticated/reports/sleep-meal'
+      path: '/sleep-meal'
+      fullPath: '/reports/sleep-meal'
+      preLoaderRoute: typeof AuthenticatedReportsSleepMealRouteImport
+      parentRoute: typeof AuthenticatedReportsRoute
+    }
     '/_authenticated/reports/nutrition': {
       id: '/_authenticated/reports/nutrition'
       path: '/nutrition'
@@ -1525,6 +1565,8 @@ interface AuthenticatedReportsRouteChildren {
   AuthenticatedReportsGalleryRoute: typeof AuthenticatedReportsGalleryRoute
   AuthenticatedReportsMoodRoute: typeof AuthenticatedReportsMoodRoute
   AuthenticatedReportsNutritionRoute: typeof AuthenticatedReportsNutritionRoute
+  AuthenticatedReportsSleepMealRoute: typeof AuthenticatedReportsSleepMealRoute
+  AuthenticatedReportsWorkoutMatchRoute: typeof AuthenticatedReportsWorkoutMatchRoute
 }
 
 const AuthenticatedReportsRouteChildren: AuthenticatedReportsRouteChildren = {
@@ -1533,6 +1575,8 @@ const AuthenticatedReportsRouteChildren: AuthenticatedReportsRouteChildren = {
   AuthenticatedReportsGalleryRoute: AuthenticatedReportsGalleryRoute,
   AuthenticatedReportsMoodRoute: AuthenticatedReportsMoodRoute,
   AuthenticatedReportsNutritionRoute: AuthenticatedReportsNutritionRoute,
+  AuthenticatedReportsSleepMealRoute: AuthenticatedReportsSleepMealRoute,
+  AuthenticatedReportsWorkoutMatchRoute: AuthenticatedReportsWorkoutMatchRoute,
 }
 
 const AuthenticatedReportsRouteWithChildren =
@@ -1666,3 +1710,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
