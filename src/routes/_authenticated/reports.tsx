@@ -338,7 +338,7 @@ function ReportsPage() {
       doc.setFont("helvetica", "normal");
       doc.setFontSize(PDF_BODY_FONT_SIZE);
       const lines = doc.splitTextToSize(text || "(kosong)", PDF_PAGE_CONTENT_W);
-      doc.text(lines, PDF_MARGIN_X, PDF_BODY_TOP_Y + PDF_LINE_HEIGHT);
+      doc.text(lines, PDF_MARGIN_X, PDF_BODY_TEXT_OFFSET_Y);
       // Back-link to TOC (page 1) in the top-right corner.
       doc.setTextColor(PDF_LINK_RGB[0], PDF_LINK_RGB[1], PDF_LINK_RGB[2]);
       doc.setFontSize(PDF_LINK_FONT_SIZE);
@@ -559,7 +559,7 @@ function ReportsPage() {
     doc.setFont("helvetica", "normal");
     doc.setFontSize(PDF_BODY_FONT_SIZE);
     const lines = doc.splitTextToSize(text || "(kosong)", PDF_PAGE_CONTENT_W);
-    doc.text(lines, PDF_MARGIN_X, PDF_BODY_TOP_Y + PDF_LINE_HEIGHT);
+    doc.text(lines, PDF_MARGIN_X, PDF_BODY_TEXT_OFFSET_Y);
     doc.save(`laporan-healthyu-${(r.report_period_end ?? r.created_at).slice(0, 10)}.pdf`);
   };
 
