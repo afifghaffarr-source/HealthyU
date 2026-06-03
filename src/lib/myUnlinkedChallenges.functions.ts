@@ -43,5 +43,31 @@ export const myUnlinkedJoinedChallenges = createServerFn({ method: "GET" })
       .from("challenges")
       .select("id, title, duration_days")
       .in("id", unlinked);
-    return ch ?? [];
+    if (!ch || ch.length === 0) return [];
+
+    // Count unique members across user's groups who haven't joined each unlinked challenge
+    const { data: groupMembers } = await supabase
+      .from("friend_group_members")
+      .select("user_id")
+      .in("group_id", myGroupIds);
+    const uniqueMemberIds = Array.from(
+      new Set((groupMembers ?? []).map((m) => m.user_id)),
+    );
+    const { data: joined } = await supabase
+      .from("challenge_participants")
+      .select("user_id, challenge_id")
+      .in("user_id", uniqueMemberIds.length ? uniqueMemberIds : ["00000000-0000-0000-0000-000000000000"])
+      .in("challenge_id", unlinked);
+    const joinedByChallenge = new Map<string, Set<string>>();
+    for (const j of joined ?? []) {
+      if (!joinedByChallenge.has(j.challenge_id)) joinedByChallenge.set(j.challenge_id, new Set());
+      joinedByChallenge.get(j.challenge_id)!.add(j.user_id);
+    }
+    return ch.map((c) => ({
+      ...c,
+      pending_members: uniqueMemberIds.filter(
+        (uid) => uid !== userId && !(joinedByChallenge.get(c.id)?.has(uid)),
+      ).length,
+      total_members: uniqueMemberIds.length,
+    }));
   });
