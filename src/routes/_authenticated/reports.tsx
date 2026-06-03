@@ -1,10 +1,11 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { weeklyReport } from "@/lib/reports.functions";
+import { weeklyReport, weeklyAiAnalysis } from "@/lib/reports.functions";
 import { BottomNav } from "@/components/bottom-nav";
-import { ArrowLeft, Download, Printer } from "lucide-react";
+import { ArrowLeft, Download, Printer, Sparkles, Loader2 } from "lucide-react";
 import { useMemo } from "react";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/reports")({
   component: ReportsPage,
@@ -16,9 +17,14 @@ function dayKey(d: string | Date) {
 
 function ReportsPage() {
   const fetchFn = useServerFn(weeklyReport);
+  const aiFn = useServerFn(weeklyAiAnalysis);
   const { data } = useQuery({
     queryKey: ["report", 7],
     queryFn: () => fetchFn({ data: { days: 7 } }),
+  });
+  const aiMut = useMutation({
+    mutationFn: () => aiFn({ data: { days: 7 } }),
+    onError: (e) => toast.error(e instanceof Error ? e.message : "Gagal generate"),
   });
 
   const summary = useMemo(() => {
@@ -111,6 +117,22 @@ function ReportsPage() {
           <button onClick={() => window.print()} className="flex items-center justify-center gap-2 bg-card outline-1 outline-black/10 font-semibold py-3 rounded-2xl">
             <Printer className="size-4" /> Cetak PDF
           </button>
+        </section>
+
+        <section className="space-y-3 animate-fade-up">
+          <button
+            onClick={() => aiMut.mutate()}
+            disabled={aiMut.isPending}
+            className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-primary to-primary/80 text-primary-foreground font-semibold py-3 rounded-2xl shadow-lg disabled:opacity-60"
+          >
+            {aiMut.isPending ? <Loader2 className="size-4 animate-spin" /> : <Sparkles className="size-4" />}
+            {aiMut.isPending ? "Menganalisis..." : "Analisis AI Mingguan"}
+          </button>
+          {aiMut.data && (
+            <article className="bg-card p-5 rounded-3xl outline-1 outline-black/5 text-sm leading-relaxed whitespace-pre-wrap">
+              {aiMut.data.report}
+            </article>
+          )}
         </section>
       </div>
       <BottomNav />
