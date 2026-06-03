@@ -4,7 +4,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { getChatHistory, sendChatMessage } from "@/lib/chat.functions";
 import { BottomNav } from "@/components/bottom-nav";
-import { ArrowLeft, Send, Sparkles, ImagePlus, X, Mic, MicOff, Volume2, VolumeX } from "lucide-react";
+import { ArrowLeft, Send, Sparkles, ImagePlus, X, Mic, MicOff, Volume2, VolumeX, Utensils, Timer, Flame, Droplet } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/chat")({
@@ -16,6 +16,13 @@ const SUGGESTIONS = [
   "Rekomendasi sarapan rendah karbo",
   "Apakah puasa 16:8 cocok untuk saya?",
   "Sahur sehat untuk Ramadhan",
+];
+
+const QUICK_ACTIONS = [
+  { label: "Log makanan", icon: Utensils, to: "/food" as const },
+  { label: "Mulai puasa", icon: Timer, to: "/fasting" as const },
+  { label: "Budget kalori", icon: Flame, prompt: "Berapa sisa budget kalori saya hari ini? Berikan rekomendasi makanan." },
+  { label: "Cek hidrasi", icon: Droplet, prompt: "Cek progres minum air saya hari ini, apa rekomendasinya?" },
 ];
 
 function ChatPage() {
@@ -175,6 +182,24 @@ function ChatPage() {
       </header>
 
       <div ref={scrollRef} className="flex-1 overflow-y-auto max-w-md w-full mx-auto px-5 pb-40">
+        <div className="flex gap-2 overflow-x-auto pt-2 -mx-1 px-1 pb-1 no-scrollbar">
+          {QUICK_ACTIONS.map((a) => {
+            const Icon = a.icon;
+            const content = (
+              <span className="flex items-center gap-1.5 bg-card outline-1 outline-black/10 px-3 py-2 rounded-2xl text-xs font-medium whitespace-nowrap hover:bg-secondary/40 transition">
+                <Icon className="size-3.5 text-primary" />
+                {a.label}
+              </span>
+            );
+            return "to" in a ? (
+              <Link key={a.label} to={a.to}>{content}</Link>
+            ) : (
+              <button key={a.label} onClick={() => handleSend(a.prompt)} disabled={mutation.isPending}>
+                {content}
+              </button>
+            );
+          })}
+        </div>
         {messages.length === 0 && !mutation.isPending && (
           <div className="py-8 space-y-4 animate-fade-up">
             <div className="bg-card p-5 rounded-3xl outline-1 outline-black/5">
