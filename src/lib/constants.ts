@@ -14,6 +14,8 @@
 // | GROUP_BONUS_BADGE_TICK_MS      | Interval re-render countdown badge "+N klaim baru" (ms).  |
 // | PDF_PAGE_FOOTER_Y              | Y koordinat baris footer halaman A4 (pt).                |
 // | PDF_MARGIN_X                   | Margin kiri (juga basis kanan = 595 - margin) PDF (pt).  |
+// | PDF_PAGE_W                     | Lebar halaman A4 PDF (pt, jsPDF).                        |
+// | PDF_PAGE_H                     | Tinggi halaman A4 PDF (pt, jsPDF).                       |
 //
 // CONVENTION: setiap konstanta tunable WAJIB ditambahkan ke tabel di atas
 // (nama + 1 baris efek). Reviewer boleh menolak PR yang menambah konstanta
@@ -67,3 +69,11 @@ export const PDF_PAGE_FOOTER_Y = 820;
 /** Margin horizontal kiri PDF (pt). Kanan dihitung 595 - PDF_MARGIN_X. */
 // eslint-disable-next-line no-restricted-syntax -- listed in header table
 export const PDF_MARGIN_X = 40;
+
+/** Lebar halaman A4 PDF (pt, jsPDF). */
+// eslint-disable-next-line no-restricted-syntax -- listed in header table
+export const PDF_PAGE_W = 595;
+
+/** Tinggi halaman A4 PDF (pt, jsPDF). */
+// eslint-disable-next-line no-restricted-syntax -- listed in header table
+export const PDF_PAGE_H = 842;
