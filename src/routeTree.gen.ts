@@ -83,6 +83,7 @@ import { Route as ApiPublicHooksWeeklyAiReportRouteImport } from './routes/api/p
 import { Route as ApiPublicHooksRecipesTrendingSnapshotRouteImport } from './routes/api/public/hooks/recipes-trending-snapshot'
 import { Route as ApiPublicHooksNotificationSchedulerRouteImport } from './routes/api/public/hooks/notification-scheduler'
 import { Route as ApiPublicHooksDailyCoachRouteImport } from './routes/api/public/hooks/daily-coach'
+import { Route as AuthenticatedRecipesIdRemixRouteImport } from './routes/_authenticated/recipes.$id.remix'
 import { Route as AuthenticatedProfilePublicIdRouteImport } from './routes/_authenticated/profile.public.$id'
 import { Route as AuthenticatedGroupsIdMealsRouteImport } from './routes/_authenticated/groups.$id.meals'
 import { Route as AuthenticatedGroupsIdLeaderboardRouteImport } from './routes/_authenticated/groups.$id.leaderboard'
@@ -486,6 +487,12 @@ const ApiPublicHooksDailyCoachRoute =
     path: '/api/public/hooks/daily-coach',
     getParentRoute: () => rootRouteImport,
   } as any)
+const AuthenticatedRecipesIdRemixRoute =
+  AuthenticatedRecipesIdRemixRouteImport.update({
+    id: '/remix',
+    path: '/remix',
+    getParentRoute: () => AuthenticatedRecipesIdRoute,
+  } as any)
 const AuthenticatedProfilePublicIdRoute =
   AuthenticatedProfilePublicIdRouteImport.update({
     id: '/public/$id',
@@ -556,7 +563,7 @@ export interface FileRoutesByFullPath {
   '/mealplan/grocery': typeof AuthenticatedMealplanGroceryRoute
   '/profile/privacy': typeof AuthenticatedProfilePrivacyRoute
   '/profile/scan-stats': typeof AuthenticatedProfileScanStatsRoute
-  '/recipes/$id': typeof AuthenticatedRecipesIdRoute
+  '/recipes/$id': typeof AuthenticatedRecipesIdRouteWithChildren
   '/recipes/recommendations': typeof AuthenticatedRecipesRecommendationsRoute
   '/recipes/saved': typeof AuthenticatedRecipesSavedRoute
   '/reports/compare': typeof AuthenticatedReportsCompareRoute
@@ -577,6 +584,7 @@ export interface FileRoutesByFullPath {
   '/groups/$id/leaderboard': typeof AuthenticatedGroupsIdLeaderboardRoute
   '/groups/$id/meals': typeof AuthenticatedGroupsIdMealsRoute
   '/profile/public/$id': typeof AuthenticatedProfilePublicIdRoute
+  '/recipes/$id/remix': typeof AuthenticatedRecipesIdRemixRoute
   '/api/public/hooks/daily-coach': typeof ApiPublicHooksDailyCoachRoute
   '/api/public/hooks/notification-scheduler': typeof ApiPublicHooksNotificationSchedulerRoute
   '/api/public/hooks/recipes-trending-snapshot': typeof ApiPublicHooksRecipesTrendingSnapshotRoute
@@ -634,7 +642,7 @@ export interface FileRoutesByTo {
   '/mealplan/grocery': typeof AuthenticatedMealplanGroceryRoute
   '/profile/privacy': typeof AuthenticatedProfilePrivacyRoute
   '/profile/scan-stats': typeof AuthenticatedProfileScanStatsRoute
-  '/recipes/$id': typeof AuthenticatedRecipesIdRoute
+  '/recipes/$id': typeof AuthenticatedRecipesIdRouteWithChildren
   '/recipes/recommendations': typeof AuthenticatedRecipesRecommendationsRoute
   '/recipes/saved': typeof AuthenticatedRecipesSavedRoute
   '/reports/compare': typeof AuthenticatedReportsCompareRoute
@@ -655,6 +663,7 @@ export interface FileRoutesByTo {
   '/groups/$id/leaderboard': typeof AuthenticatedGroupsIdLeaderboardRoute
   '/groups/$id/meals': typeof AuthenticatedGroupsIdMealsRoute
   '/profile/public/$id': typeof AuthenticatedProfilePublicIdRoute
+  '/recipes/$id/remix': typeof AuthenticatedRecipesIdRemixRoute
   '/api/public/hooks/daily-coach': typeof ApiPublicHooksDailyCoachRoute
   '/api/public/hooks/notification-scheduler': typeof ApiPublicHooksNotificationSchedulerRoute
   '/api/public/hooks/recipes-trending-snapshot': typeof ApiPublicHooksRecipesTrendingSnapshotRoute
@@ -714,7 +723,7 @@ export interface FileRoutesById {
   '/_authenticated/mealplan/grocery': typeof AuthenticatedMealplanGroceryRoute
   '/_authenticated/profile/privacy': typeof AuthenticatedProfilePrivacyRoute
   '/_authenticated/profile/scan-stats': typeof AuthenticatedProfileScanStatsRoute
-  '/_authenticated/recipes/$id': typeof AuthenticatedRecipesIdRoute
+  '/_authenticated/recipes/$id': typeof AuthenticatedRecipesIdRouteWithChildren
   '/_authenticated/recipes/recommendations': typeof AuthenticatedRecipesRecommendationsRoute
   '/_authenticated/recipes/saved': typeof AuthenticatedRecipesSavedRoute
   '/_authenticated/reports/compare': typeof AuthenticatedReportsCompareRoute
@@ -735,6 +744,7 @@ export interface FileRoutesById {
   '/_authenticated/groups/$id/leaderboard': typeof AuthenticatedGroupsIdLeaderboardRoute
   '/_authenticated/groups/$id/meals': typeof AuthenticatedGroupsIdMealsRoute
   '/_authenticated/profile/public/$id': typeof AuthenticatedProfilePublicIdRoute
+  '/_authenticated/recipes/$id/remix': typeof AuthenticatedRecipesIdRemixRoute
   '/api/public/hooks/daily-coach': typeof ApiPublicHooksDailyCoachRoute
   '/api/public/hooks/notification-scheduler': typeof ApiPublicHooksNotificationSchedulerRoute
   '/api/public/hooks/recipes-trending-snapshot': typeof ApiPublicHooksRecipesTrendingSnapshotRoute
@@ -815,6 +825,7 @@ export interface FileRouteTypes {
     | '/groups/$id/leaderboard'
     | '/groups/$id/meals'
     | '/profile/public/$id'
+    | '/recipes/$id/remix'
     | '/api/public/hooks/daily-coach'
     | '/api/public/hooks/notification-scheduler'
     | '/api/public/hooks/recipes-trending-snapshot'
@@ -893,6 +904,7 @@ export interface FileRouteTypes {
     | '/groups/$id/leaderboard'
     | '/groups/$id/meals'
     | '/profile/public/$id'
+    | '/recipes/$id/remix'
     | '/api/public/hooks/daily-coach'
     | '/api/public/hooks/notification-scheduler'
     | '/api/public/hooks/recipes-trending-snapshot'
@@ -972,6 +984,7 @@ export interface FileRouteTypes {
     | '/_authenticated/groups/$id/leaderboard'
     | '/_authenticated/groups/$id/meals'
     | '/_authenticated/profile/public/$id'
+    | '/_authenticated/recipes/$id/remix'
     | '/api/public/hooks/daily-coach'
     | '/api/public/hooks/notification-scheduler'
     | '/api/public/hooks/recipes-trending-snapshot'
@@ -1511,6 +1524,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicHooksDailyCoachRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/recipes/$id/remix': {
+      id: '/_authenticated/recipes/$id/remix'
+      path: '/remix'
+      fullPath: '/recipes/$id/remix'
+      preLoaderRoute: typeof AuthenticatedRecipesIdRemixRouteImport
+      parentRoute: typeof AuthenticatedRecipesIdRoute
+    }
     '/_authenticated/profile/public/$id': {
       id: '/_authenticated/profile/public/$id'
       path: '/public/$id'
@@ -1601,14 +1621,28 @@ const AuthenticatedProfileRouteChildren: AuthenticatedProfileRouteChildren = {
 const AuthenticatedProfileRouteWithChildren =
   AuthenticatedProfileRoute._addFileChildren(AuthenticatedProfileRouteChildren)
 
+interface AuthenticatedRecipesIdRouteChildren {
+  AuthenticatedRecipesIdRemixRoute: typeof AuthenticatedRecipesIdRemixRoute
+}
+
+const AuthenticatedRecipesIdRouteChildren: AuthenticatedRecipesIdRouteChildren =
+  {
+    AuthenticatedRecipesIdRemixRoute: AuthenticatedRecipesIdRemixRoute,
+  }
+
+const AuthenticatedRecipesIdRouteWithChildren =
+  AuthenticatedRecipesIdRoute._addFileChildren(
+    AuthenticatedRecipesIdRouteChildren,
+  )
+
 interface AuthenticatedRecipesRouteChildren {
-  AuthenticatedRecipesIdRoute: typeof AuthenticatedRecipesIdRoute
+  AuthenticatedRecipesIdRoute: typeof AuthenticatedRecipesIdRouteWithChildren
   AuthenticatedRecipesRecommendationsRoute: typeof AuthenticatedRecipesRecommendationsRoute
   AuthenticatedRecipesSavedRoute: typeof AuthenticatedRecipesSavedRoute
 }
 
 const AuthenticatedRecipesRouteChildren: AuthenticatedRecipesRouteChildren = {
-  AuthenticatedRecipesIdRoute: AuthenticatedRecipesIdRoute,
+  AuthenticatedRecipesIdRoute: AuthenticatedRecipesIdRouteWithChildren,
   AuthenticatedRecipesRecommendationsRoute:
     AuthenticatedRecipesRecommendationsRoute,
   AuthenticatedRecipesSavedRoute: AuthenticatedRecipesSavedRoute,
