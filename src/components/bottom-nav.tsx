@@ -1,9 +1,10 @@
 import { Link } from "@tanstack/react-router";
-import { Home, Utensils, Timer, Activity, User } from "lucide-react";
+import { Home, Utensils, Database, Timer, Activity, User } from "lucide-react";
 
 const items = [
   { to: "/dashboard", label: "Beranda", icon: Home },
   { to: "/food", label: "Makanan", icon: Utensils },
+  { to: "/foods", label: "Database", icon: Database },
   { to: "/fasting", label: "Puasa", icon: Timer },
   { to: "/workout", label: "Latihan", icon: Activity },
   { to: "/profile", label: "Saya", icon: User },
