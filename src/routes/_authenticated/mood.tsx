@@ -4,8 +4,10 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { listMood, addMood, deleteMood } from "@/lib/mood.functions";
 import { BottomNav } from "@/components/bottom-nav";
-import { ArrowLeft, Trash2, Loader2 } from "lucide-react";
+import { ArrowLeft, Trash2, Loader2, WifiOff, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
+import { enqueue } from "@/lib/offline-queue";
+import { useOfflineQueue } from "@/hooks/use-offline-queue";
 
 export const Route = createFileRoute("/_authenticated/mood")({
   component: MoodPage,
@@ -24,6 +26,7 @@ function MoodPage() {
   const fetchList = useServerFn(listMood);
   const add = useServerFn(addMood);
   const del = useServerFn(deleteMood);
+  const { online, pending, sync } = useOfflineQueue();
 
   const { data: logs = [] } = useQuery({ queryKey: ["mood"], queryFn: () => fetchList() });
 
@@ -31,12 +34,23 @@ function MoodPage() {
   const [note, setNote] = useState("");
 
   const addMut = useMutation({
-    mutationFn: () => add({ data: { mood: mood!, note: note.trim() || undefined } }),
-    onSuccess: () => {
+    mutationFn: async () => {
+      const payload = { mood: mood!, note: note.trim() || undefined };
+      if (!navigator.onLine) {
+        await enqueue("mood", payload);
+        return { offline: true as const };
+      }
+      return add({ data: payload });
+    },
+    onSuccess: (res) => {
       setMood(null);
       setNote("");
       qc.invalidateQueries({ queryKey: ["mood"] });
-      toast.success("Mood tercatat");
+      toast.success(
+        res && "offline" in res && res.offline
+          ? "Mood disimpan offline. Akan sync otomatis."
+          : "Mood tercatat",
+      );
     },
     onError: (e: Error) => toast.error(e.message),
   });
@@ -70,6 +84,15 @@ function MoodPage() {
               {avg ? `Rata-rata 30 hari: ${avg.toFixed(1)} / 5` : "Catat perasaanmu hari ini"}
             </p>
           </div>
+          {(!online || pending > 0) && (
+            <button
+              onClick={() => sync()}
+              className={`ml-auto inline-flex items-center gap-1 text-[11px] font-semibold px-2.5 py-1.5 rounded-full ${online ? "bg-amber-100 text-amber-700" : "bg-muted text-muted-foreground"}`}
+            >
+              {online ? <RefreshCw className="size-3" /> : <WifiOff className="size-3" />}
+              {online ? `Sync ${pending}` : `Offline${pending ? ` · ${pending}` : ""}`}
+            </button>
+          )}
         </div>
       </header>
 
