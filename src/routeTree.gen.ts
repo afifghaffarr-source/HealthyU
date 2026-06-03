@@ -51,6 +51,7 @@ import { Route as AuthenticatedFamilyRouteImport } from './routes/_authenticated
 import { Route as AuthenticatedDoctorRouteImport } from './routes/_authenticated/doctor'
 import { Route as AuthenticatedDiscoverRouteImport } from './routes/_authenticated/discover'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as AuthenticatedCurrencyRouteImport } from './routes/_authenticated/currency'
 import { Route as AuthenticatedCommunityRouteImport } from './routes/_authenticated/community'
 import { Route as AuthenticatedCoachRouteImport } from './routes/_authenticated/coach'
 import { Route as AuthenticatedChatRouteImport } from './routes/_authenticated/chat'
@@ -313,6 +314,11 @@ const AuthenticatedDiscoverRoute = AuthenticatedDiscoverRouteImport.update({
 const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedCurrencyRoute = AuthenticatedCurrencyRouteImport.update({
+  id: '/currency',
+  path: '/currency',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedCommunityRoute = AuthenticatedCommunityRouteImport.update({
@@ -587,6 +593,7 @@ export interface FileRoutesByFullPath {
   '/chat': typeof AuthenticatedChatRoute
   '/coach': typeof AuthenticatedCoachRouteWithChildren
   '/community': typeof AuthenticatedCommunityRoute
+  '/currency': typeof AuthenticatedCurrencyRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/discover': typeof AuthenticatedDiscoverRoute
   '/doctor': typeof AuthenticatedDoctorRoute
@@ -676,6 +683,7 @@ export interface FileRoutesByTo {
   '/chat': typeof AuthenticatedChatRoute
   '/coach': typeof AuthenticatedCoachRouteWithChildren
   '/community': typeof AuthenticatedCommunityRoute
+  '/currency': typeof AuthenticatedCurrencyRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/discover': typeof AuthenticatedDiscoverRoute
   '/doctor': typeof AuthenticatedDoctorRoute
@@ -767,6 +775,7 @@ export interface FileRoutesById {
   '/_authenticated/chat': typeof AuthenticatedChatRoute
   '/_authenticated/coach': typeof AuthenticatedCoachRouteWithChildren
   '/_authenticated/community': typeof AuthenticatedCommunityRoute
+  '/_authenticated/currency': typeof AuthenticatedCurrencyRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/discover': typeof AuthenticatedDiscoverRoute
   '/_authenticated/doctor': typeof AuthenticatedDoctorRoute
@@ -858,6 +867,7 @@ export interface FileRouteTypes {
     | '/chat'
     | '/coach'
     | '/community'
+    | '/currency'
     | '/dashboard'
     | '/discover'
     | '/doctor'
@@ -947,6 +957,7 @@ export interface FileRouteTypes {
     | '/chat'
     | '/coach'
     | '/community'
+    | '/currency'
     | '/dashboard'
     | '/discover'
     | '/doctor'
@@ -1037,6 +1048,7 @@ export interface FileRouteTypes {
     | '/_authenticated/chat'
     | '/_authenticated/coach'
     | '/_authenticated/community'
+    | '/_authenticated/currency'
     | '/_authenticated/dashboard'
     | '/_authenticated/discover'
     | '/_authenticated/doctor'
@@ -1423,6 +1435,13 @@ declare module '@tanstack/react-router' {
       path: '/dashboard'
       fullPath: '/dashboard'
       preLoaderRoute: typeof AuthenticatedDashboardRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/currency': {
+      id: '/_authenticated/currency'
+      path: '/currency'
+      fullPath: '/currency'
+      preLoaderRoute: typeof AuthenticatedCurrencyRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/community': {
@@ -1938,6 +1957,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedChatRoute: typeof AuthenticatedChatRoute
   AuthenticatedCoachRoute: typeof AuthenticatedCoachRouteWithChildren
   AuthenticatedCommunityRoute: typeof AuthenticatedCommunityRoute
+  AuthenticatedCurrencyRoute: typeof AuthenticatedCurrencyRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedDiscoverRoute: typeof AuthenticatedDiscoverRoute
   AuthenticatedDoctorRoute: typeof AuthenticatedDoctorRoute
@@ -1990,6 +2010,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedChatRoute: AuthenticatedChatRoute,
   AuthenticatedCoachRoute: AuthenticatedCoachRouteWithChildren,
   AuthenticatedCommunityRoute: AuthenticatedCommunityRoute,
+  AuthenticatedCurrencyRoute: AuthenticatedCurrencyRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedDiscoverRoute: AuthenticatedDiscoverRoute,
   AuthenticatedDoctorRoute: AuthenticatedDoctorRoute,
