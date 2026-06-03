@@ -10,7 +10,7 @@ import { getGameSummary } from "@/lib/gamification.functions";
 import { BottomNav } from "@/components/bottom-nav";
 import { CalorieRing } from "@/components/calorie-ring";
 import { formatDuration, fastingStage } from "@/lib/health";
-import { Droplet, Plus, Sparkles, ArrowRight, Flame, Trophy } from "lucide-react";
+import { Droplet, Plus, Sparkles, ArrowRight, Flame, Trophy, Camera } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
@@ -157,6 +157,23 @@ function Dashboard() {
             <Plus className="size-3.5" /> 250ml
           </button>
         </div>
+
+        {/* AI Scan CTA */}
+        <Link
+          to="/scan"
+          className="block bg-card p-4 rounded-3xl outline-1 outline-primary/20 shadow-sm flex items-center gap-4 animate-fade-up"
+        >
+          <div className="size-12 rounded-2xl bg-primary/10 grid place-items-center">
+            <Camera className="size-6 text-primary" />
+          </div>
+          <div className="flex-1">
+            <p className="font-bold text-sm inline-flex items-center gap-1">
+              Scan Makanan <Sparkles className="size-3 text-primary" />
+            </p>
+            <p className="text-[11px] text-muted-foreground">Foto → AI kenali kalori otomatis</p>
+          </div>
+          <ArrowRight className="size-5 text-muted-foreground" />
+        </Link>
 
         {/* AI Chat CTA */}
         <Link
