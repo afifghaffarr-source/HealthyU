@@ -95,6 +95,15 @@ function Dashboard() {
   // countdown bar inside the badge animates down toward zero.
   const [nowTick, setNowTick] = useState(() => Date.now());
   const [breakdownOpen, setBreakdownOpen] = useState(false);
+  const breakdownRef = useRef<HTMLDivElement | null>(null);
+  useEffect(() => {
+    if (!breakdownOpen) return;
+    const onDown = (e: MouseEvent) => {
+      if (!breakdownRef.current?.contains(e.target as Node)) setBreakdownOpen(false);
+    };
+    document.addEventListener("mousedown", onDown);
+    return () => document.removeEventListener("mousedown", onDown);
+  }, [breakdownOpen]);
   useEffect(() => {
     if (Object.keys(newClaims).length === 0) return;
     const id = window.setInterval(() => setNowTick(Date.now()), 1000);
@@ -441,7 +450,7 @@ function Dashboard() {
                   .join(" · ");
                 const entries = Object.entries(newClaims);
                 return (
-                  <div className="ml-auto relative">
+                  <div className="ml-auto relative" ref={breakdownRef}>
                     <button
                       onClick={() => setBreakdownOpen((o) => !o)}
                       className="relative text-[9px] font-bold uppercase bg-amber-100 text-amber-800 rounded-full pl-2 pr-2 pt-0.5 pb-1 overflow-hidden"
