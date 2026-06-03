@@ -2,9 +2,9 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { getChatHistory, sendChatMessage, clearChatHistory } from "@/lib/chat.functions";
+import { getChatHistory, sendChatMessage, clearChatHistory, weeklyHealthReport } from "@/lib/chat.functions";
 import { BottomNav } from "@/components/bottom-nav";
-import { ArrowLeft, Send, Sparkles, ImagePlus, X, Mic, MicOff, Volume2, VolumeX, Utensils, Timer, Flame, ChefHat, Trash2 } from "lucide-react";
+import { ArrowLeft, Send, Sparkles, ImagePlus, X, Mic, MicOff, Volume2, VolumeX, Utensils, Timer, Flame, ChefHat, Trash2, BarChart3 } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/chat")({
@@ -30,6 +30,7 @@ function ChatPage() {
   const fetchHist = useServerFn(getChatHistory);
   const send = useServerFn(sendChatMessage);
   const clearFn = useServerFn(clearChatHistory);
+  const reportFn = useServerFn(weeklyHealthReport);
   const { data: messages = [] } = useQuery({ queryKey: ["chat"], queryFn: () => fetchHist() });
 
   const [input, setInput] = useState("");
@@ -61,6 +62,12 @@ function ChatPage() {
       lastSpokenRef.current = null;
       toast.success("Riwayat dihapus");
     },
+  });
+
+  const reportMut = useMutation({
+    mutationFn: () => reportFn(),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["chat"] }),
+    onError: (e: Error) => toast.error(e.message),
   });
 
   const handleClear = () => {
