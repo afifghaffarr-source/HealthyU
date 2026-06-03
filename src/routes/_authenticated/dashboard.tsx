@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { getProfile } from "@/lib/profile.functions";
@@ -51,6 +51,22 @@ function Dashboard() {
 
   // Realtime: refresh group challenge summary when bonuses/redemptions change
   useEffect(() => {
+    // Aggregator: collapse multiple claim toasts within a 5s window
+    // into a single "🎉 N anggota klaim bonus di [Grup]" toast.
+    const buffer = new Map<string, { groupName: string; names: Set<string> }>();
+    let flushTimer: ReturnType<typeof setTimeout> | null = null;
+    const flush = () => {
+      flushTimer = null;
+      for (const { groupName, names } of buffer.values()) {
+        if (names.size === 1) {
+          const [only] = Array.from(names);
+          toast.success(`🎉 ${only} klaim bonus di ${groupName}`);
+        } else if (names.size > 1) {
+          toast.success(`🎉 ${names.size} anggota klaim bonus di ${groupName}`);
+        }
+      }
+      buffer.clear();
+    };
     const ch = supabase
       .channel("dashboard-group-summary")
       .on(
@@ -66,7 +82,12 @@ function Dashboard() {
               ]);
               const name = prof?.full_name ?? "Seseorang";
               const groupName = grp?.name ?? "grup";
-              toast.success(`🎉 ${name} klaim bonus di ${groupName}`);
+              const entry = buffer.get(row.group_id) ?? { groupName, names: new Set<string>() };
+              entry.names.add(name);
+              entry.groupName = groupName;
+              buffer.set(row.group_id, entry);
+              if (flushTimer) clearTimeout(flushTimer);
+              flushTimer = setTimeout(flush, 5000);
             } catch {
               /* ignore */
             }
@@ -85,6 +106,7 @@ function Dashboard() {
       )
       .subscribe();
     return () => {
+      if (flushTimer) clearTimeout(flushTimer);
       supabase.removeChannel(ch);
     };
   }, [qc]);
