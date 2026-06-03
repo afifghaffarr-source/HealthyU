@@ -5,7 +5,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { listRecipes } from "@/lib/recipes.functions";
 import { generateRecipeFromIngredients, type GeneratedRecipe } from "@/lib/ai-extras.functions";
 import { BottomNav } from "@/components/bottom-nav";
-import { ArrowLeft, Clock, Flame, Search, Sparkles, Loader2, X, Star } from "lucide-react";
+import { ArrowLeft, Clock, Flame, Search, Sparkles, Loader2, X, Star, Bookmark } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/recipes")({
@@ -62,6 +62,13 @@ function RecipesPage() {
             <h1 className="text-2xl font-bold">Resep Sehat</h1>
             <p className="text-xs text-muted-foreground">Pilihan menu Indonesia</p>
           </div>
+          <Link
+            to="/recipes/saved"
+            className="ml-auto size-10 bg-card rounded-2xl outline-1 outline-black/10 grid place-items-center"
+            aria-label="Resep tersimpan"
+          >
+            <Bookmark className="size-4" />
+          </Link>
         </header>
 
         <div className="relative">
