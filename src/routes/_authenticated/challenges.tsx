@@ -86,6 +86,7 @@ function ChallengesPage() {
     (data?.participations ?? []).map((p) => [p.challenge_id, p] as const),
   );
   const [openLb, setOpenLb] = useState<string | null>(null);
+  const [streakAutoChallenge, setStreakAutoChallenge] = useState<string | null>(null);
   const articleRefs = useRef<Record<string, HTMLElement | null>>({});
 
   useEffect(() => {
@@ -106,6 +107,7 @@ function ChallengesPage() {
     const top = parts.slice().sort((a, b) => (b.streak ?? 0) - (a.streak ?? 0))[0];
     if (!top?.challenge_id) return;
     setOpenLb(top.challenge_id);
+    setStreakAutoChallenge(top.challenge_id);
     const t = setTimeout(() => {
       articleRefs.current[top.challenge_id]?.scrollIntoView({ behavior: "smooth", block: "start" });
     }, 250);
@@ -253,7 +255,13 @@ function ChallengesPage() {
                 <Medal className="size-3" />
                 {openLb === c.id ? "Sembunyikan leaderboard" : "Lihat leaderboard"}
               </button>
-              {openLb === c.id && <Leaderboard challengeId={c.id} initialGroup={focusChallenge === c.id ? focusGroup : undefined} />}
+              {openLb === c.id && (
+                <Leaderboard
+                  challengeId={c.id}
+                  initialGroup={focusChallenge === c.id ? focusGroup : undefined}
+                  autoSelectFirstGroup={streakAutoChallenge === c.id}
+                />
+              )}
               {joined && (
                 <GroupInviter
                   challengeId={c.id}
