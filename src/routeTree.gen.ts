@@ -102,6 +102,7 @@ import { Route as ApiPublicHooksWeeklyAiReportRouteImport } from './routes/api/p
 import { Route as ApiPublicHooksRecipesTrendingSnapshotRouteImport } from './routes/api/public/hooks/recipes-trending-snapshot'
 import { Route as ApiPublicHooksNotificationSchedulerRouteImport } from './routes/api/public/hooks/notification-scheduler'
 import { Route as ApiPublicHooksDailyCoachRouteImport } from './routes/api/public/hooks/daily-coach'
+import { Route as AuthenticatedRecipesIdReviewsRouteImport } from './routes/_authenticated/recipes.$id.reviews'
 import { Route as AuthenticatedRecipesIdRemixRouteImport } from './routes/_authenticated/recipes.$id.remix'
 import { Route as AuthenticatedProfilePublicIdRouteImport } from './routes/_authenticated/profile.public.$id'
 import { Route as AuthenticatedProfileFollowersIdRouteImport } from './routes/_authenticated/profile.followers.$id'
@@ -612,6 +613,12 @@ const ApiPublicHooksDailyCoachRoute =
     path: '/api/public/hooks/daily-coach',
     getParentRoute: () => rootRouteImport,
   } as any)
+const AuthenticatedRecipesIdReviewsRoute =
+  AuthenticatedRecipesIdReviewsRouteImport.update({
+    id: '/reviews',
+    path: '/reviews',
+    getParentRoute: () => AuthenticatedRecipesIdRoute,
+  } as any)
 const AuthenticatedRecipesIdRemixRoute =
   AuthenticatedRecipesIdRemixRouteImport.update({
     id: '/remix',
@@ -736,6 +743,7 @@ export interface FileRoutesByFullPath {
   '/profile/followers/$id': typeof AuthenticatedProfileFollowersIdRoute
   '/profile/public/$id': typeof AuthenticatedProfilePublicIdRoute
   '/recipes/$id/remix': typeof AuthenticatedRecipesIdRemixRoute
+  '/recipes/$id/reviews': typeof AuthenticatedRecipesIdReviewsRoute
   '/api/public/hooks/daily-coach': typeof ApiPublicHooksDailyCoachRoute
   '/api/public/hooks/notification-scheduler': typeof ApiPublicHooksNotificationSchedulerRoute
   '/api/public/hooks/recipes-trending-snapshot': typeof ApiPublicHooksRecipesTrendingSnapshotRoute
@@ -835,6 +843,7 @@ export interface FileRoutesByTo {
   '/profile/followers/$id': typeof AuthenticatedProfileFollowersIdRoute
   '/profile/public/$id': typeof AuthenticatedProfilePublicIdRoute
   '/recipes/$id/remix': typeof AuthenticatedRecipesIdRemixRoute
+  '/recipes/$id/reviews': typeof AuthenticatedRecipesIdReviewsRoute
   '/api/public/hooks/daily-coach': typeof ApiPublicHooksDailyCoachRoute
   '/api/public/hooks/notification-scheduler': typeof ApiPublicHooksNotificationSchedulerRoute
   '/api/public/hooks/recipes-trending-snapshot': typeof ApiPublicHooksRecipesTrendingSnapshotRoute
@@ -936,6 +945,7 @@ export interface FileRoutesById {
   '/_authenticated/profile/followers/$id': typeof AuthenticatedProfileFollowersIdRoute
   '/_authenticated/profile/public/$id': typeof AuthenticatedProfilePublicIdRoute
   '/_authenticated/recipes/$id/remix': typeof AuthenticatedRecipesIdRemixRoute
+  '/_authenticated/recipes/$id/reviews': typeof AuthenticatedRecipesIdReviewsRoute
   '/api/public/hooks/daily-coach': typeof ApiPublicHooksDailyCoachRoute
   '/api/public/hooks/notification-scheduler': typeof ApiPublicHooksNotificationSchedulerRoute
   '/api/public/hooks/recipes-trending-snapshot': typeof ApiPublicHooksRecipesTrendingSnapshotRoute
@@ -1037,6 +1047,7 @@ export interface FileRouteTypes {
     | '/profile/followers/$id'
     | '/profile/public/$id'
     | '/recipes/$id/remix'
+    | '/recipes/$id/reviews'
     | '/api/public/hooks/daily-coach'
     | '/api/public/hooks/notification-scheduler'
     | '/api/public/hooks/recipes-trending-snapshot'
@@ -1136,6 +1147,7 @@ export interface FileRouteTypes {
     | '/profile/followers/$id'
     | '/profile/public/$id'
     | '/recipes/$id/remix'
+    | '/recipes/$id/reviews'
     | '/api/public/hooks/daily-coach'
     | '/api/public/hooks/notification-scheduler'
     | '/api/public/hooks/recipes-trending-snapshot'
@@ -1236,6 +1248,7 @@ export interface FileRouteTypes {
     | '/_authenticated/profile/followers/$id'
     | '/_authenticated/profile/public/$id'
     | '/_authenticated/recipes/$id/remix'
+    | '/_authenticated/recipes/$id/reviews'
     | '/api/public/hooks/daily-coach'
     | '/api/public/hooks/notification-scheduler'
     | '/api/public/hooks/recipes-trending-snapshot'
@@ -1908,6 +1921,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicHooksDailyCoachRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/recipes/$id/reviews': {
+      id: '/_authenticated/recipes/$id/reviews'
+      path: '/reviews'
+      fullPath: '/recipes/$id/reviews'
+      preLoaderRoute: typeof AuthenticatedRecipesIdReviewsRouteImport
+      parentRoute: typeof AuthenticatedRecipesIdRoute
+    }
     '/_authenticated/recipes/$id/remix': {
       id: '/_authenticated/recipes/$id/remix'
       path: '/remix'
@@ -2063,11 +2083,13 @@ const AuthenticatedProfileRouteWithChildren =
 
 interface AuthenticatedRecipesIdRouteChildren {
   AuthenticatedRecipesIdRemixRoute: typeof AuthenticatedRecipesIdRemixRoute
+  AuthenticatedRecipesIdReviewsRoute: typeof AuthenticatedRecipesIdReviewsRoute
 }
 
 const AuthenticatedRecipesIdRouteChildren: AuthenticatedRecipesIdRouteChildren =
   {
     AuthenticatedRecipesIdRemixRoute: AuthenticatedRecipesIdRemixRoute,
+    AuthenticatedRecipesIdReviewsRoute: AuthenticatedRecipesIdReviewsRoute,
   }
 
 const AuthenticatedRecipesIdRouteWithChildren =
