@@ -68,6 +68,8 @@ import { Route as AuthenticatedAchievementsRouteImport } from './routes/_authent
 import { Route as ApiChatStreamRouteImport } from './routes/api/chat.stream'
 import { Route as AuthenticatedWorkoutTimerRouteImport } from './routes/_authenticated/workout.timer'
 import { Route as AuthenticatedWeightGoalRouteImport } from './routes/_authenticated/weight.goal'
+import { Route as AuthenticatedWeightChartRouteImport } from './routes/_authenticated/weight.chart'
+import { Route as AuthenticatedVoiceRoomsRouteImport } from './routes/_authenticated/voice.rooms'
 import { Route as AuthenticatedStreakFreezeWidgetRouteImport } from './routes/_authenticated/streak.freeze-widget'
 import { Route as AuthenticatedStoriesUploadRouteImport } from './routes/_authenticated/stories.upload'
 import { Route as AuthenticatedStoriesIdRouteImport } from './routes/_authenticated/stories.$id'
@@ -81,6 +83,7 @@ import { Route as AuthenticatedScanMenuRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedScanHistoryRouteImport } from './routes/_authenticated/scan.history'
 import { Route as AuthenticatedScanFridgeRouteImport } from './routes/_authenticated/scan.fridge'
 import { Route as AuthenticatedScanBarcodeLiveRouteImport } from './routes/_authenticated/scan.barcode-live'
+import { Route as AuthenticatedScanBarcodeCameraRouteImport } from './routes/_authenticated/scan.barcode-camera'
 import { Route as AuthenticatedScanBarcodeRouteImport } from './routes/_authenticated/scan.barcode'
 import { Route as AuthenticatedRestaurantsNearbyRouteImport } from './routes/_authenticated/restaurants.nearby'
 import { Route as AuthenticatedReportsWorkoutMatchRouteImport } from './routes/_authenticated/reports.workout-match'
@@ -98,6 +101,7 @@ import { Route as AuthenticatedRecipesRecommendationsRouteImport } from './route
 import { Route as AuthenticatedRecipesImportRouteImport } from './routes/_authenticated/recipes.import'
 import { Route as AuthenticatedRecipesIdRouteImport } from './routes/_authenticated/recipes.$id'
 import { Route as AuthenticatedQuizDailyRouteImport } from './routes/_authenticated/quiz.daily'
+import { Route as AuthenticatedPushAlarmRouteImport } from './routes/_authenticated/push.alarm'
 import { Route as AuthenticatedProfileScanStatsRouteImport } from './routes/_authenticated/profile.scan-stats'
 import { Route as AuthenticatedProfilePrivacyRouteImport } from './routes/_authenticated/profile.privacy'
 import { Route as AuthenticatedPodcastWeeklyRouteImport } from './routes/_authenticated/podcast.weekly'
@@ -110,6 +114,7 @@ import { Route as AuthenticatedMoodHeatmapRouteImport } from './routes/_authenti
 import { Route as AuthenticatedMealplanGroceryRouteImport } from './routes/_authenticated/mealplan.grocery'
 import { Route as AuthenticatedMealplanBudgetRouteImport } from './routes/_authenticated/mealplan.budget'
 import { Route as AuthenticatedLeaderboardWeeklyRouteImport } from './routes/_authenticated/leaderboard.weekly'
+import { Route as AuthenticatedHydrationGroupRouteImport } from './routes/_authenticated/hydration.group'
 import { Route as AuthenticatedHabitsStackRouteImport } from './routes/_authenticated/habits.stack'
 import { Route as AuthenticatedGrocerySmartRouteImport } from './routes/_authenticated/grocery.smart'
 import { Route as AuthenticatedFriendsInviteRouteImport } from './routes/_authenticated/friends.invite'
@@ -437,6 +442,17 @@ const AuthenticatedWeightGoalRoute = AuthenticatedWeightGoalRouteImport.update({
   path: '/goal',
   getParentRoute: () => AuthenticatedWeightRoute,
 } as any)
+const AuthenticatedWeightChartRoute =
+  AuthenticatedWeightChartRouteImport.update({
+    id: '/chart',
+    path: '/chart',
+    getParentRoute: () => AuthenticatedWeightRoute,
+  } as any)
+const AuthenticatedVoiceRoomsRoute = AuthenticatedVoiceRoomsRouteImport.update({
+  id: '/voice/rooms',
+  path: '/voice/rooms',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedStreakFreezeWidgetRoute =
   AuthenticatedStreakFreezeWidgetRouteImport.update({
     id: '/streak/freeze-widget',
@@ -507,6 +523,12 @@ const AuthenticatedScanBarcodeLiveRoute =
   AuthenticatedScanBarcodeLiveRouteImport.update({
     id: '/barcode-live',
     path: '/barcode-live',
+    getParentRoute: () => AuthenticatedScanRoute,
+  } as any)
+const AuthenticatedScanBarcodeCameraRoute =
+  AuthenticatedScanBarcodeCameraRouteImport.update({
+    id: '/barcode-camera',
+    path: '/barcode-camera',
     getParentRoute: () => AuthenticatedScanRoute,
   } as any)
 const AuthenticatedScanBarcodeRoute =
@@ -609,6 +631,11 @@ const AuthenticatedQuizDailyRoute = AuthenticatedQuizDailyRouteImport.update({
   path: '/quiz/daily',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedPushAlarmRoute = AuthenticatedPushAlarmRouteImport.update({
+  id: '/push/alarm',
+  path: '/push/alarm',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedProfileScanStatsRoute =
   AuthenticatedProfileScanStatsRouteImport.update({
     id: '/scan-stats',
@@ -678,6 +705,12 @@ const AuthenticatedLeaderboardWeeklyRoute =
     id: '/weekly',
     path: '/weekly',
     getParentRoute: () => AuthenticatedLeaderboardRoute,
+  } as any)
+const AuthenticatedHydrationGroupRoute =
+  AuthenticatedHydrationGroupRouteImport.update({
+    id: '/hydration/group',
+    path: '/hydration/group',
+    getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedHabitsStackRoute =
   AuthenticatedHabitsStackRouteImport.update({
@@ -878,6 +911,7 @@ export interface FileRoutesByFullPath {
   '/friends/invite': typeof AuthenticatedFriendsInviteRoute
   '/grocery/smart': typeof AuthenticatedGrocerySmartRoute
   '/habits/stack': typeof AuthenticatedHabitsStackRoute
+  '/hydration/group': typeof AuthenticatedHydrationGroupRoute
   '/leaderboard/weekly': typeof AuthenticatedLeaderboardWeeklyRoute
   '/mealplan/budget': typeof AuthenticatedMealplanBudgetRoute
   '/mealplan/grocery': typeof AuthenticatedMealplanGroceryRoute
@@ -890,6 +924,7 @@ export interface FileRoutesByFullPath {
   '/podcast/weekly': typeof AuthenticatedPodcastWeeklyRoute
   '/profile/privacy': typeof AuthenticatedProfilePrivacyRoute
   '/profile/scan-stats': typeof AuthenticatedProfileScanStatsRoute
+  '/push/alarm': typeof AuthenticatedPushAlarmRoute
   '/quiz/daily': typeof AuthenticatedQuizDailyRoute
   '/recipes/$id': typeof AuthenticatedRecipesIdRouteWithChildren
   '/recipes/import': typeof AuthenticatedRecipesImportRoute
@@ -907,6 +942,7 @@ export interface FileRoutesByFullPath {
   '/reports/workout-match': typeof AuthenticatedReportsWorkoutMatchRoute
   '/restaurants/nearby': typeof AuthenticatedRestaurantsNearbyRoute
   '/scan/barcode': typeof AuthenticatedScanBarcodeRoute
+  '/scan/barcode-camera': typeof AuthenticatedScanBarcodeCameraRoute
   '/scan/barcode-live': typeof AuthenticatedScanBarcodeLiveRoute
   '/scan/fridge': typeof AuthenticatedScanFridgeRoute
   '/scan/history': typeof AuthenticatedScanHistoryRoute
@@ -920,6 +956,8 @@ export interface FileRoutesByFullPath {
   '/stories/$id': typeof AuthenticatedStoriesIdRoute
   '/stories/upload': typeof AuthenticatedStoriesUploadRoute
   '/streak/freeze-widget': typeof AuthenticatedStreakFreezeWidgetRoute
+  '/voice/rooms': typeof AuthenticatedVoiceRoomsRoute
+  '/weight/chart': typeof AuthenticatedWeightChartRoute
   '/weight/goal': typeof AuthenticatedWeightGoalRoute
   '/workout/timer': typeof AuthenticatedWorkoutTimerRoute
   '/api/chat/stream': typeof ApiChatStreamRoute
@@ -1002,6 +1040,7 @@ export interface FileRoutesByTo {
   '/friends/invite': typeof AuthenticatedFriendsInviteRoute
   '/grocery/smart': typeof AuthenticatedGrocerySmartRoute
   '/habits/stack': typeof AuthenticatedHabitsStackRoute
+  '/hydration/group': typeof AuthenticatedHydrationGroupRoute
   '/leaderboard/weekly': typeof AuthenticatedLeaderboardWeeklyRoute
   '/mealplan/budget': typeof AuthenticatedMealplanBudgetRoute
   '/mealplan/grocery': typeof AuthenticatedMealplanGroceryRoute
@@ -1014,6 +1053,7 @@ export interface FileRoutesByTo {
   '/podcast/weekly': typeof AuthenticatedPodcastWeeklyRoute
   '/profile/privacy': typeof AuthenticatedProfilePrivacyRoute
   '/profile/scan-stats': typeof AuthenticatedProfileScanStatsRoute
+  '/push/alarm': typeof AuthenticatedPushAlarmRoute
   '/quiz/daily': typeof AuthenticatedQuizDailyRoute
   '/recipes/$id': typeof AuthenticatedRecipesIdRouteWithChildren
   '/recipes/import': typeof AuthenticatedRecipesImportRoute
@@ -1031,6 +1071,7 @@ export interface FileRoutesByTo {
   '/reports/workout-match': typeof AuthenticatedReportsWorkoutMatchRoute
   '/restaurants/nearby': typeof AuthenticatedRestaurantsNearbyRoute
   '/scan/barcode': typeof AuthenticatedScanBarcodeRoute
+  '/scan/barcode-camera': typeof AuthenticatedScanBarcodeCameraRoute
   '/scan/barcode-live': typeof AuthenticatedScanBarcodeLiveRoute
   '/scan/fridge': typeof AuthenticatedScanFridgeRoute
   '/scan/history': typeof AuthenticatedScanHistoryRoute
@@ -1044,6 +1085,8 @@ export interface FileRoutesByTo {
   '/stories/$id': typeof AuthenticatedStoriesIdRoute
   '/stories/upload': typeof AuthenticatedStoriesUploadRoute
   '/streak/freeze-widget': typeof AuthenticatedStreakFreezeWidgetRoute
+  '/voice/rooms': typeof AuthenticatedVoiceRoomsRoute
+  '/weight/chart': typeof AuthenticatedWeightChartRoute
   '/weight/goal': typeof AuthenticatedWeightGoalRoute
   '/workout/timer': typeof AuthenticatedWorkoutTimerRoute
   '/api/chat/stream': typeof ApiChatStreamRoute
@@ -1128,6 +1171,7 @@ export interface FileRoutesById {
   '/_authenticated/friends/invite': typeof AuthenticatedFriendsInviteRoute
   '/_authenticated/grocery/smart': typeof AuthenticatedGrocerySmartRoute
   '/_authenticated/habits/stack': typeof AuthenticatedHabitsStackRoute
+  '/_authenticated/hydration/group': typeof AuthenticatedHydrationGroupRoute
   '/_authenticated/leaderboard/weekly': typeof AuthenticatedLeaderboardWeeklyRoute
   '/_authenticated/mealplan/budget': typeof AuthenticatedMealplanBudgetRoute
   '/_authenticated/mealplan/grocery': typeof AuthenticatedMealplanGroceryRoute
@@ -1140,6 +1184,7 @@ export interface FileRoutesById {
   '/_authenticated/podcast/weekly': typeof AuthenticatedPodcastWeeklyRoute
   '/_authenticated/profile/privacy': typeof AuthenticatedProfilePrivacyRoute
   '/_authenticated/profile/scan-stats': typeof AuthenticatedProfileScanStatsRoute
+  '/_authenticated/push/alarm': typeof AuthenticatedPushAlarmRoute
   '/_authenticated/quiz/daily': typeof AuthenticatedQuizDailyRoute
   '/_authenticated/recipes/$id': typeof AuthenticatedRecipesIdRouteWithChildren
   '/_authenticated/recipes/import': typeof AuthenticatedRecipesImportRoute
@@ -1157,6 +1202,7 @@ export interface FileRoutesById {
   '/_authenticated/reports/workout-match': typeof AuthenticatedReportsWorkoutMatchRoute
   '/_authenticated/restaurants/nearby': typeof AuthenticatedRestaurantsNearbyRoute
   '/_authenticated/scan/barcode': typeof AuthenticatedScanBarcodeRoute
+  '/_authenticated/scan/barcode-camera': typeof AuthenticatedScanBarcodeCameraRoute
   '/_authenticated/scan/barcode-live': typeof AuthenticatedScanBarcodeLiveRoute
   '/_authenticated/scan/fridge': typeof AuthenticatedScanFridgeRoute
   '/_authenticated/scan/history': typeof AuthenticatedScanHistoryRoute
@@ -1170,6 +1216,8 @@ export interface FileRoutesById {
   '/_authenticated/stories/$id': typeof AuthenticatedStoriesIdRoute
   '/_authenticated/stories/upload': typeof AuthenticatedStoriesUploadRoute
   '/_authenticated/streak/freeze-widget': typeof AuthenticatedStreakFreezeWidgetRoute
+  '/_authenticated/voice/rooms': typeof AuthenticatedVoiceRoomsRoute
+  '/_authenticated/weight/chart': typeof AuthenticatedWeightChartRoute
   '/_authenticated/weight/goal': typeof AuthenticatedWeightGoalRoute
   '/_authenticated/workout/timer': typeof AuthenticatedWorkoutTimerRoute
   '/api/chat/stream': typeof ApiChatStreamRoute
@@ -1254,6 +1302,7 @@ export interface FileRouteTypes {
     | '/friends/invite'
     | '/grocery/smart'
     | '/habits/stack'
+    | '/hydration/group'
     | '/leaderboard/weekly'
     | '/mealplan/budget'
     | '/mealplan/grocery'
@@ -1266,6 +1315,7 @@ export interface FileRouteTypes {
     | '/podcast/weekly'
     | '/profile/privacy'
     | '/profile/scan-stats'
+    | '/push/alarm'
     | '/quiz/daily'
     | '/recipes/$id'
     | '/recipes/import'
@@ -1283,6 +1333,7 @@ export interface FileRouteTypes {
     | '/reports/workout-match'
     | '/restaurants/nearby'
     | '/scan/barcode'
+    | '/scan/barcode-camera'
     | '/scan/barcode-live'
     | '/scan/fridge'
     | '/scan/history'
@@ -1296,6 +1347,8 @@ export interface FileRouteTypes {
     | '/stories/$id'
     | '/stories/upload'
     | '/streak/freeze-widget'
+    | '/voice/rooms'
+    | '/weight/chart'
     | '/weight/goal'
     | '/workout/timer'
     | '/api/chat/stream'
@@ -1378,6 +1431,7 @@ export interface FileRouteTypes {
     | '/friends/invite'
     | '/grocery/smart'
     | '/habits/stack'
+    | '/hydration/group'
     | '/leaderboard/weekly'
     | '/mealplan/budget'
     | '/mealplan/grocery'
@@ -1390,6 +1444,7 @@ export interface FileRouteTypes {
     | '/podcast/weekly'
     | '/profile/privacy'
     | '/profile/scan-stats'
+    | '/push/alarm'
     | '/quiz/daily'
     | '/recipes/$id'
     | '/recipes/import'
@@ -1407,6 +1462,7 @@ export interface FileRouteTypes {
     | '/reports/workout-match'
     | '/restaurants/nearby'
     | '/scan/barcode'
+    | '/scan/barcode-camera'
     | '/scan/barcode-live'
     | '/scan/fridge'
     | '/scan/history'
@@ -1420,6 +1476,8 @@ export interface FileRouteTypes {
     | '/stories/$id'
     | '/stories/upload'
     | '/streak/freeze-widget'
+    | '/voice/rooms'
+    | '/weight/chart'
     | '/weight/goal'
     | '/workout/timer'
     | '/api/chat/stream'
@@ -1503,6 +1561,7 @@ export interface FileRouteTypes {
     | '/_authenticated/friends/invite'
     | '/_authenticated/grocery/smart'
     | '/_authenticated/habits/stack'
+    | '/_authenticated/hydration/group'
     | '/_authenticated/leaderboard/weekly'
     | '/_authenticated/mealplan/budget'
     | '/_authenticated/mealplan/grocery'
@@ -1515,6 +1574,7 @@ export interface FileRouteTypes {
     | '/_authenticated/podcast/weekly'
     | '/_authenticated/profile/privacy'
     | '/_authenticated/profile/scan-stats'
+    | '/_authenticated/push/alarm'
     | '/_authenticated/quiz/daily'
     | '/_authenticated/recipes/$id'
     | '/_authenticated/recipes/import'
@@ -1532,6 +1592,7 @@ export interface FileRouteTypes {
     | '/_authenticated/reports/workout-match'
     | '/_authenticated/restaurants/nearby'
     | '/_authenticated/scan/barcode'
+    | '/_authenticated/scan/barcode-camera'
     | '/_authenticated/scan/barcode-live'
     | '/_authenticated/scan/fridge'
     | '/_authenticated/scan/history'
@@ -1545,6 +1606,8 @@ export interface FileRouteTypes {
     | '/_authenticated/stories/$id'
     | '/_authenticated/stories/upload'
     | '/_authenticated/streak/freeze-widget'
+    | '/_authenticated/voice/rooms'
+    | '/_authenticated/weight/chart'
     | '/_authenticated/weight/goal'
     | '/_authenticated/workout/timer'
     | '/api/chat/stream'
@@ -1988,6 +2051,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedWeightGoalRouteImport
       parentRoute: typeof AuthenticatedWeightRoute
     }
+    '/_authenticated/weight/chart': {
+      id: '/_authenticated/weight/chart'
+      path: '/chart'
+      fullPath: '/weight/chart'
+      preLoaderRoute: typeof AuthenticatedWeightChartRouteImport
+      parentRoute: typeof AuthenticatedWeightRoute
+    }
+    '/_authenticated/voice/rooms': {
+      id: '/_authenticated/voice/rooms'
+      path: '/voice/rooms'
+      fullPath: '/voice/rooms'
+      preLoaderRoute: typeof AuthenticatedVoiceRoomsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/streak/freeze-widget': {
       id: '/_authenticated/streak/freeze-widget'
       path: '/streak/freeze-widget'
@@ -2077,6 +2154,13 @@ declare module '@tanstack/react-router' {
       path: '/barcode-live'
       fullPath: '/scan/barcode-live'
       preLoaderRoute: typeof AuthenticatedScanBarcodeLiveRouteImport
+      parentRoute: typeof AuthenticatedScanRoute
+    }
+    '/_authenticated/scan/barcode-camera': {
+      id: '/_authenticated/scan/barcode-camera'
+      path: '/barcode-camera'
+      fullPath: '/scan/barcode-camera'
+      preLoaderRoute: typeof AuthenticatedScanBarcodeCameraRouteImport
       parentRoute: typeof AuthenticatedScanRoute
     }
     '/_authenticated/scan/barcode': {
@@ -2198,6 +2282,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedQuizDailyRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/push/alarm': {
+      id: '/_authenticated/push/alarm'
+      path: '/push/alarm'
+      fullPath: '/push/alarm'
+      preLoaderRoute: typeof AuthenticatedPushAlarmRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/profile/scan-stats': {
       id: '/_authenticated/profile/scan-stats'
       path: '/scan-stats'
@@ -2281,6 +2372,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/leaderboard/weekly'
       preLoaderRoute: typeof AuthenticatedLeaderboardWeeklyRouteImport
       parentRoute: typeof AuthenticatedLeaderboardRoute
+    }
+    '/_authenticated/hydration/group': {
+      id: '/_authenticated/hydration/group'
+      path: '/hydration/group'
+      fullPath: '/hydration/group'
+      preLoaderRoute: typeof AuthenticatedHydrationGroupRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/habits/stack': {
       id: '/_authenticated/habits/stack'
@@ -2664,6 +2762,7 @@ const AuthenticatedReportsRouteWithChildren =
 
 interface AuthenticatedScanRouteChildren {
   AuthenticatedScanBarcodeRoute: typeof AuthenticatedScanBarcodeRoute
+  AuthenticatedScanBarcodeCameraRoute: typeof AuthenticatedScanBarcodeCameraRoute
   AuthenticatedScanBarcodeLiveRoute: typeof AuthenticatedScanBarcodeLiveRoute
   AuthenticatedScanFridgeRoute: typeof AuthenticatedScanFridgeRoute
   AuthenticatedScanHistoryRoute: typeof AuthenticatedScanHistoryRoute
@@ -2675,6 +2774,7 @@ interface AuthenticatedScanRouteChildren {
 
 const AuthenticatedScanRouteChildren: AuthenticatedScanRouteChildren = {
   AuthenticatedScanBarcodeRoute: AuthenticatedScanBarcodeRoute,
+  AuthenticatedScanBarcodeCameraRoute: AuthenticatedScanBarcodeCameraRoute,
   AuthenticatedScanBarcodeLiveRoute: AuthenticatedScanBarcodeLiveRoute,
   AuthenticatedScanFridgeRoute: AuthenticatedScanFridgeRoute,
   AuthenticatedScanHistoryRoute: AuthenticatedScanHistoryRoute,
@@ -2712,10 +2812,12 @@ const AuthenticatedStoriesRouteWithChildren =
   AuthenticatedStoriesRoute._addFileChildren(AuthenticatedStoriesRouteChildren)
 
 interface AuthenticatedWeightRouteChildren {
+  AuthenticatedWeightChartRoute: typeof AuthenticatedWeightChartRoute
   AuthenticatedWeightGoalRoute: typeof AuthenticatedWeightGoalRoute
 }
 
 const AuthenticatedWeightRouteChildren: AuthenticatedWeightRouteChildren = {
+  AuthenticatedWeightChartRoute: AuthenticatedWeightChartRoute,
   AuthenticatedWeightGoalRoute: AuthenticatedWeightGoalRoute,
 }
 
@@ -2794,12 +2896,15 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedFriendsInviteRoute: typeof AuthenticatedFriendsInviteRoute
   AuthenticatedGrocerySmartRoute: typeof AuthenticatedGrocerySmartRoute
   AuthenticatedHabitsStackRoute: typeof AuthenticatedHabitsStackRoute
+  AuthenticatedHydrationGroupRoute: typeof AuthenticatedHydrationGroupRoute
   AuthenticatedPodcastWeeklyRoute: typeof AuthenticatedPodcastWeeklyRoute
+  AuthenticatedPushAlarmRoute: typeof AuthenticatedPushAlarmRoute
   AuthenticatedQuizDailyRoute: typeof AuthenticatedQuizDailyRoute
   AuthenticatedRestaurantsNearbyRoute: typeof AuthenticatedRestaurantsNearbyRoute
   AuthenticatedShoppingListRoute: typeof AuthenticatedShoppingListRoute
   AuthenticatedShowcaseReorderRoute: typeof AuthenticatedShowcaseReorderRoute
   AuthenticatedStreakFreezeWidgetRoute: typeof AuthenticatedStreakFreezeWidgetRoute
+  AuthenticatedVoiceRoomsRoute: typeof AuthenticatedVoiceRoomsRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
@@ -2863,12 +2968,15 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedFriendsInviteRoute: AuthenticatedFriendsInviteRoute,
   AuthenticatedGrocerySmartRoute: AuthenticatedGrocerySmartRoute,
   AuthenticatedHabitsStackRoute: AuthenticatedHabitsStackRoute,
+  AuthenticatedHydrationGroupRoute: AuthenticatedHydrationGroupRoute,
   AuthenticatedPodcastWeeklyRoute: AuthenticatedPodcastWeeklyRoute,
+  AuthenticatedPushAlarmRoute: AuthenticatedPushAlarmRoute,
   AuthenticatedQuizDailyRoute: AuthenticatedQuizDailyRoute,
   AuthenticatedRestaurantsNearbyRoute: AuthenticatedRestaurantsNearbyRoute,
   AuthenticatedShoppingListRoute: AuthenticatedShoppingListRoute,
   AuthenticatedShowcaseReorderRoute: AuthenticatedShowcaseReorderRoute,
   AuthenticatedStreakFreezeWidgetRoute: AuthenticatedStreakFreezeWidgetRoute,
+  AuthenticatedVoiceRoomsRoute: AuthenticatedVoiceRoomsRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
