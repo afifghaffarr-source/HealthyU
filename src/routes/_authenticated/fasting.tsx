@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -6,7 +6,8 @@ import { currentFast, startFast, stopFast, fastHistory } from "@/lib/fasting.fun
 import { getFastingSchedule, saveFastingSchedule } from "@/lib/fasting.functions";
 import { getAchievementToastPrefix } from "@/lib/achievement-icons";
 import { BottomNav } from "@/components/bottom-nav";
-import { ArrowLeft, Check, X } from "lucide-react";
+import { TopAppBar } from "@/components/healthyu/top-app-bar";
+import { Check, X } from "lucide-react";
 import { FASTING_PROTOCOLS, fastingStage, formatDuration } from "@/lib/health";
 import { toast } from "sonner";
 
@@ -86,13 +87,8 @@ function FastingPage() {
 
   return (
     <main className="min-h-screen bg-background pb-28">
-      <div className="max-w-md mx-auto px-5 pt-8 space-y-5">
-        <header className="flex items-center gap-3">
-          <Link to="/dashboard" className="size-10 bg-card rounded-2xl outline-1 outline-black/10 grid place-items-center">
-            <ArrowLeft className="size-4" />
-          </Link>
-          <h1 className="text-2xl font-bold">Puasa</h1>
-        </header>
+      <div className="max-w-md mx-auto px-5 pt-2 space-y-5">
+        <TopAppBar title="Puasa" subtitle="Atur protokol & jadwal" showBack />
 
         {fast ? (
           <section className="bg-gradient-to-br from-sage to-sage-deep text-primary-foreground p-8 rounded-[2rem] relative overflow-hidden animate-fade-up">
