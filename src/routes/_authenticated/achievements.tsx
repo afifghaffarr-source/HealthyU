@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { getGameSummary, levelFromXp, xpForLevel } from "@/lib/gamification.functions";
+import { AchievementIcon } from "@/lib/achievement-icons";
 import { BottomNav } from "@/components/bottom-nav";
 import { ArrowLeft, Flame, Trophy, Star } from "lucide-react";
 
@@ -87,10 +88,10 @@ function AchievementsPage() {
                   unlocked ? "bg-card" : "bg-card/60"
                 }`}
               >
-                <div className={`size-12 rounded-2xl grid place-items-center text-2xl ${
+                <div className={`size-12 rounded-2xl grid place-items-center ${
                   unlocked ? "bg-mint" : "bg-muted grayscale opacity-50"
                 }`}>
-                  {a.icon}
+                  <AchievementIcon icon={a.icon} className="size-5" />
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className={`font-semibold ${unlocked ? "" : "text-muted-foreground"}`}>{a.title}</p>

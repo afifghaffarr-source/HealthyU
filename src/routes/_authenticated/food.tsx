@@ -3,6 +3,7 @@ import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { searchFoods, logMeal, todaysMeals, deleteMeal } from "@/lib/meals.functions";
+import { getAchievementToastPrefix } from "@/lib/achievement-icons";
 import { BottomNav } from "@/components/bottom-nav";
 import { ArrowLeft, Search, Trash2 } from "lucide-react";
 import { toast } from "sonner";
@@ -43,7 +44,7 @@ function FoodPage() {
       qc.invalidateQueries({ queryKey: ["game", "summary"] });
       toast.success("Makanan dicatat");
       (res?.game?.newlyUnlocked ?? []).forEach((a) =>
-        toast.success(`${a.icon} ${a.title} terbuka!`),
+        toast.success(`${getAchievementToastPrefix(a.icon)} ${a.title} terbuka!`),
       );
     },
     onError: (e) => toast.error(e instanceof Error ? e.message : "Gagal"),
