@@ -14,12 +14,6 @@ export const Route = createFileRoute("/api/public/hooks/recipes-trending-snapsho
         if (!apiKey || !expected || apiKey !== expected) {
           return new Response("Unauthorized", { status: 401 });
         }
-        const { error } = await supabaseAdmin.rpc("exec_sql" as never, {} as never).then(
-          () => ({ error: null as null | Error }),
-          () => ({ error: null as null | Error }),
-        );
-        // Use a direct SQL via a simple update (no rpc helper available);
-        // fall back to two queries: fetch ids+save_count then upsert.
         const { data: recipes } = await supabaseAdmin
           .from("recipes")
           .select("id, save_count");
@@ -31,7 +25,7 @@ export const Route = createFileRoute("/api/public/hooks/recipes-trending-snapsho
             .eq("id", r.id);
           if (!uerr) updated++;
         }
-        return Response.json({ ok: true, updated, error: error?.message });
+        return Response.json({ ok: true, updated });
       },
     },
   },
