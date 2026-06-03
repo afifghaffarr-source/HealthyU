@@ -102,6 +102,7 @@ import { Route as AuthenticatedPodcastWeeklyRouteImport } from './routes/_authen
 import { Route as AuthenticatedPetShopRouteImport } from './routes/_authenticated/pet.shop'
 import { Route as AuthenticatedNotificationsFeedRouteImport } from './routes/_authenticated/notifications.feed'
 import { Route as AuthenticatedMoodVoiceRouteImport } from './routes/_authenticated/mood.voice'
+import { Route as AuthenticatedMoodHeatmapRouteImport } from './routes/_authenticated/mood.heatmap'
 import { Route as AuthenticatedMealplanGroceryRouteImport } from './routes/_authenticated/mealplan.grocery'
 import { Route as AuthenticatedMealplanBudgetRouteImport } from './routes/_authenticated/mealplan.budget'
 import { Route as AuthenticatedLeaderboardWeeklyRouteImport } from './routes/_authenticated/leaderboard.weekly'
@@ -624,6 +625,12 @@ const AuthenticatedMoodVoiceRoute = AuthenticatedMoodVoiceRouteImport.update({
   path: '/voice',
   getParentRoute: () => AuthenticatedMoodRoute,
 } as any)
+const AuthenticatedMoodHeatmapRoute =
+  AuthenticatedMoodHeatmapRouteImport.update({
+    id: '/heatmap',
+    path: '/heatmap',
+    getParentRoute: () => AuthenticatedMoodRoute,
+  } as any)
 const AuthenticatedMealplanGroceryRoute =
   AuthenticatedMealplanGroceryRouteImport.update({
     id: '/grocery',
@@ -830,6 +837,7 @@ export interface FileRoutesByFullPath {
   '/leaderboard/weekly': typeof AuthenticatedLeaderboardWeeklyRoute
   '/mealplan/budget': typeof AuthenticatedMealplanBudgetRoute
   '/mealplan/grocery': typeof AuthenticatedMealplanGroceryRoute
+  '/mood/heatmap': typeof AuthenticatedMoodHeatmapRoute
   '/mood/voice': typeof AuthenticatedMoodVoiceRoute
   '/notifications/feed': typeof AuthenticatedNotificationsFeedRoute
   '/pet/shop': typeof AuthenticatedPetShopRoute
@@ -947,6 +955,7 @@ export interface FileRoutesByTo {
   '/leaderboard/weekly': typeof AuthenticatedLeaderboardWeeklyRoute
   '/mealplan/budget': typeof AuthenticatedMealplanBudgetRoute
   '/mealplan/grocery': typeof AuthenticatedMealplanGroceryRoute
+  '/mood/heatmap': typeof AuthenticatedMoodHeatmapRoute
   '/mood/voice': typeof AuthenticatedMoodVoiceRoute
   '/notifications/feed': typeof AuthenticatedNotificationsFeedRoute
   '/pet/shop': typeof AuthenticatedPetShopRoute
@@ -1066,6 +1075,7 @@ export interface FileRoutesById {
   '/_authenticated/leaderboard/weekly': typeof AuthenticatedLeaderboardWeeklyRoute
   '/_authenticated/mealplan/budget': typeof AuthenticatedMealplanBudgetRoute
   '/_authenticated/mealplan/grocery': typeof AuthenticatedMealplanGroceryRoute
+  '/_authenticated/mood/heatmap': typeof AuthenticatedMoodHeatmapRoute
   '/_authenticated/mood/voice': typeof AuthenticatedMoodVoiceRoute
   '/_authenticated/notifications/feed': typeof AuthenticatedNotificationsFeedRoute
   '/_authenticated/pet/shop': typeof AuthenticatedPetShopRoute
@@ -1185,6 +1195,7 @@ export interface FileRouteTypes {
     | '/leaderboard/weekly'
     | '/mealplan/budget'
     | '/mealplan/grocery'
+    | '/mood/heatmap'
     | '/mood/voice'
     | '/notifications/feed'
     | '/pet/shop'
@@ -1302,6 +1313,7 @@ export interface FileRouteTypes {
     | '/leaderboard/weekly'
     | '/mealplan/budget'
     | '/mealplan/grocery'
+    | '/mood/heatmap'
     | '/mood/voice'
     | '/notifications/feed'
     | '/pet/shop'
@@ -1420,6 +1432,7 @@ export interface FileRouteTypes {
     | '/_authenticated/leaderboard/weekly'
     | '/_authenticated/mealplan/budget'
     | '/_authenticated/mealplan/grocery'
+    | '/_authenticated/mood/heatmap'
     | '/_authenticated/mood/voice'
     | '/_authenticated/notifications/feed'
     | '/_authenticated/pet/shop'
@@ -2135,6 +2148,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedMoodVoiceRouteImport
       parentRoute: typeof AuthenticatedMoodRoute
     }
+    '/_authenticated/mood/heatmap': {
+      id: '/_authenticated/mood/heatmap'
+      path: '/heatmap'
+      fullPath: '/mood/heatmap'
+      preLoaderRoute: typeof AuthenticatedMoodHeatmapRouteImport
+      parentRoute: typeof AuthenticatedMoodRoute
+    }
     '/_authenticated/mealplan/grocery': {
       id: '/_authenticated/mealplan/grocery'
       path: '/grocery'
@@ -2389,10 +2409,12 @@ const AuthenticatedMealplanRouteWithChildren =
   )
 
 interface AuthenticatedMoodRouteChildren {
+  AuthenticatedMoodHeatmapRoute: typeof AuthenticatedMoodHeatmapRoute
   AuthenticatedMoodVoiceRoute: typeof AuthenticatedMoodVoiceRoute
 }
 
 const AuthenticatedMoodRouteChildren: AuthenticatedMoodRouteChildren = {
+  AuthenticatedMoodHeatmapRoute: AuthenticatedMoodHeatmapRoute,
   AuthenticatedMoodVoiceRoute: AuthenticatedMoodVoiceRoute,
 }
 
