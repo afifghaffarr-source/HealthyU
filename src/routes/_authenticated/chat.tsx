@@ -215,6 +215,14 @@ function ChatPage() {
 
       <div ref={scrollRef} className="flex-1 overflow-y-auto max-w-md w-full mx-auto px-5 pb-40">
         <div className="flex gap-2 overflow-x-auto pt-2 -mx-1 px-1 pb-1 no-scrollbar">
+          <button
+            onClick={() => reportMut.mutate()}
+            disabled={reportMut.isPending}
+            className="flex items-center gap-1.5 bg-primary/10 outline-1 outline-primary/30 text-primary px-3 py-2 rounded-2xl text-xs font-semibold whitespace-nowrap disabled:opacity-50"
+          >
+            <BarChart3 className="size-3.5" />
+            {reportMut.isPending ? "Membuat..." : "Laporan Mingguan"}
+          </button>
           {QUICK_ACTIONS.map((a) => {
             const Icon = a.icon;
             const content = (
