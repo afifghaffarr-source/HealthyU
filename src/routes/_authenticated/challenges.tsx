@@ -218,14 +218,54 @@ function ChallengesPage() {
 
 function Leaderboard({ challengeId }: { challengeId: string }) {
   const fetchLb = useServerFn(getChallengeLeaderboard);
+  const [friendsOnly, setFriendsOnly] = useState(false);
   const { data: rows = [], isLoading } = useQuery({
-    queryKey: ["challenge-lb", challengeId],
-    queryFn: () => fetchLb({ data: { challenge_id: challengeId } }),
+    queryKey: ["challenge-lb", challengeId, friendsOnly],
+    queryFn: () => fetchLb({ data: { challenge_id: challengeId, friends_only: friendsOnly } }),
   });
+  return (
+    <div className="mt-3 space-y-2">
+      <div className="flex gap-1.5 bg-muted/50 rounded-full p-1">
+        <button
+          onClick={() => setFriendsOnly(false)}
+          className={`flex-1 text-[11px] font-semibold py-1 rounded-full transition ${
+            !friendsOnly ? "bg-card shadow-sm" : "text-muted-foreground"
+          }`}
+        >
+          Semua
+        </button>
+        <button
+          onClick={() => setFriendsOnly(true)}
+          className={`flex-1 text-[11px] font-semibold py-1 rounded-full transition ${
+            friendsOnly ? "bg-card shadow-sm" : "text-muted-foreground"
+          }`}
+        >
+          Teman
+        </button>
+      </div>
+      <LeaderboardList rows={rows} isLoading={isLoading} />
+    </div>
+  );
+}
+
+function LeaderboardList({
+  rows,
+  isLoading,
+}: {
+  rows: Array<{
+    user_id: string;
+    rank: number;
+    is_me: boolean;
+    full_name: string;
+    streak: number;
+    current_day: number;
+  }>;
+  isLoading: boolean;
+}) {
   if (isLoading) return <p className="text-xs text-muted-foreground text-center mt-2">Memuat…</p>;
   if (rows.length === 0) return <p className="text-xs text-muted-foreground text-center mt-2">Belum ada peserta.</p>;
   return (
-    <ol className="mt-3 space-y-1.5">
+    <ol className="space-y-1.5">
       {rows.map((r) => (
         <li
           key={r.user_id}

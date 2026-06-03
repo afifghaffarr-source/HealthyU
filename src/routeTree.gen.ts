@@ -51,6 +51,7 @@ import { Route as AuthenticatedBackupRouteImport } from './routes/_authenticated
 import { Route as AuthenticatedArticlesRouteImport } from './routes/_authenticated/articles'
 import { Route as AuthenticatedAchievementsRouteImport } from './routes/_authenticated/achievements'
 import { Route as ApiChatStreamRouteImport } from './routes/api/chat.stream'
+import { Route as AuthenticatedRecipesSavedRouteImport } from './routes/_authenticated/recipes.saved'
 import { Route as AuthenticatedRecipesIdRouteImport } from './routes/_authenticated/recipes.$id'
 import { Route as ApiWearableGoogleFitCallbackRouteImport } from './routes/api/wearable.google-fit.callback'
 import { Route as ApiPublicHooksNotificationSchedulerRouteImport } from './routes/api/public/hooks/notification-scheduler'
@@ -273,6 +274,12 @@ const ApiChatStreamRoute = ApiChatStreamRouteImport.update({
   path: '/api/chat/stream',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedRecipesSavedRoute =
+  AuthenticatedRecipesSavedRouteImport.update({
+    id: '/saved',
+    path: '/saved',
+    getParentRoute: () => AuthenticatedRecipesRoute,
+  } as any)
 const AuthenticatedRecipesIdRoute = AuthenticatedRecipesIdRouteImport.update({
   id: '/$id',
   path: '/$id',
@@ -339,6 +346,7 @@ export interface FileRoutesByFullPath {
   '/weight': typeof AuthenticatedWeightRoute
   '/workout': typeof AuthenticatedWorkoutRoute
   '/recipes/$id': typeof AuthenticatedRecipesIdRoute
+  '/recipes/saved': typeof AuthenticatedRecipesSavedRoute
   '/api/chat/stream': typeof ApiChatStreamRoute
   '/api/public/hooks/daily-coach': typeof ApiPublicHooksDailyCoachRoute
   '/api/public/hooks/notification-scheduler': typeof ApiPublicHooksNotificationSchedulerRoute
@@ -386,6 +394,7 @@ export interface FileRoutesByTo {
   '/weight': typeof AuthenticatedWeightRoute
   '/workout': typeof AuthenticatedWorkoutRoute
   '/recipes/$id': typeof AuthenticatedRecipesIdRoute
+  '/recipes/saved': typeof AuthenticatedRecipesSavedRoute
   '/api/chat/stream': typeof ApiChatStreamRoute
   '/api/public/hooks/daily-coach': typeof ApiPublicHooksDailyCoachRoute
   '/api/public/hooks/notification-scheduler': typeof ApiPublicHooksNotificationSchedulerRoute
@@ -435,6 +444,7 @@ export interface FileRoutesById {
   '/_authenticated/weight': typeof AuthenticatedWeightRoute
   '/_authenticated/workout': typeof AuthenticatedWorkoutRoute
   '/_authenticated/recipes/$id': typeof AuthenticatedRecipesIdRoute
+  '/_authenticated/recipes/saved': typeof AuthenticatedRecipesSavedRoute
   '/api/chat/stream': typeof ApiChatStreamRoute
   '/api/public/hooks/daily-coach': typeof ApiPublicHooksDailyCoachRoute
   '/api/public/hooks/notification-scheduler': typeof ApiPublicHooksNotificationSchedulerRoute
@@ -484,6 +494,7 @@ export interface FileRouteTypes {
     | '/weight'
     | '/workout'
     | '/recipes/$id'
+    | '/recipes/saved'
     | '/api/chat/stream'
     | '/api/public/hooks/daily-coach'
     | '/api/public/hooks/notification-scheduler'
@@ -531,6 +542,7 @@ export interface FileRouteTypes {
     | '/weight'
     | '/workout'
     | '/recipes/$id'
+    | '/recipes/saved'
     | '/api/chat/stream'
     | '/api/public/hooks/daily-coach'
     | '/api/public/hooks/notification-scheduler'
@@ -579,6 +591,7 @@ export interface FileRouteTypes {
     | '/_authenticated/weight'
     | '/_authenticated/workout'
     | '/_authenticated/recipes/$id'
+    | '/_authenticated/recipes/saved'
     | '/api/chat/stream'
     | '/api/public/hooks/daily-coach'
     | '/api/public/hooks/notification-scheduler'
@@ -891,6 +904,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiChatStreamRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/recipes/saved': {
+      id: '/_authenticated/recipes/saved'
+      path: '/saved'
+      fullPath: '/recipes/saved'
+      preLoaderRoute: typeof AuthenticatedRecipesSavedRouteImport
+      parentRoute: typeof AuthenticatedRecipesRoute
+    }
     '/_authenticated/recipes/$id': {
       id: '/_authenticated/recipes/$id'
       path: '/$id'
@@ -924,10 +944,12 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedRecipesRouteChildren {
   AuthenticatedRecipesIdRoute: typeof AuthenticatedRecipesIdRoute
+  AuthenticatedRecipesSavedRoute: typeof AuthenticatedRecipesSavedRoute
 }
 
 const AuthenticatedRecipesRouteChildren: AuthenticatedRecipesRouteChildren = {
   AuthenticatedRecipesIdRoute: AuthenticatedRecipesIdRoute,
+  AuthenticatedRecipesSavedRoute: AuthenticatedRecipesSavedRoute,
 }
 
 const AuthenticatedRecipesRouteWithChildren =

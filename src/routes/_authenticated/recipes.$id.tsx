@@ -4,8 +4,9 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { getRecipe } from "@/lib/recipes.functions";
 import { getRecipeRating, rateRecipe } from "@/lib/recipeRatings.functions";
+import { isRecipeBookmarked, toggleRecipeBookmark } from "@/lib/recipeBookmarks.functions";
 import { BottomNav } from "@/components/bottom-nav";
-import { ArrowLeft, Clock, Flame, Users, Star } from "lucide-react";
+import { ArrowLeft, Clock, Flame, Users, Star, Bookmark } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/recipes/$id")({
@@ -18,10 +19,25 @@ function RecipeDetail() {
   const fetch = useServerFn(getRecipe);
   const fetchRating = useServerFn(getRecipeRating);
   const rateFn = useServerFn(rateRecipe);
+  const checkBm = useServerFn(isRecipeBookmarked);
+  const toggleBm = useServerFn(toggleRecipeBookmark);
   const { data: r, isLoading } = useQuery({ queryKey: ["recipe", id], queryFn: () => fetch({ data: { id } }) });
   const { data: rating } = useQuery({
     queryKey: ["recipe", id, "rating"],
     queryFn: () => fetchRating({ data: { recipe_id: id } }),
+  });
+  const { data: bm } = useQuery({
+    queryKey: ["recipe", id, "bookmark"],
+    queryFn: () => checkBm({ data: { recipe_id: id } }),
+  });
+  const bmM = useMutation({
+    mutationFn: () => toggleBm({ data: { recipe_id: id } }),
+    onSuccess: (res) => {
+      toast.success(res.bookmarked ? "Resep disimpan" : "Bookmark dihapus");
+      qc.invalidateQueries({ queryKey: ["recipe", id, "bookmark"] });
+      qc.invalidateQueries({ queryKey: ["recipe-bookmarks"] });
+    },
+    onError: (e: Error) => toast.error(e.message),
   });
 
   const [stars, setStars] = useState(0);
@@ -48,6 +64,14 @@ function RecipeDetail() {
             <ArrowLeft className="size-4" />
           </Link>
           <h1 className="text-xl font-bold flex-1 truncate">{r?.title ?? "Resep"}</h1>
+          <button
+            onClick={() => bmM.mutate()}
+            disabled={bmM.isPending}
+            className="size-10 bg-card rounded-2xl outline-1 outline-black/10 grid place-items-center"
+            aria-label={bm?.bookmarked ? "Hapus bookmark" : "Simpan resep"}
+          >
+            <Bookmark className={`size-4 ${bm?.bookmarked ? "fill-primary text-primary" : ""}`} />
+          </button>
         </header>
 
         {isLoading && <p className="text-sm text-muted-foreground">Memuat...</p>}

@@ -6,16 +6,44 @@ import { supabaseAdmin } from "@/integrations/supabase/client.server";
 export const getChallengeLeaderboard = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .inputValidator((i: unknown) =>
-    z.object({ challenge_id: z.string().uuid(), limit: z.number().int().min(1).max(50).optional() }).parse(i),
+    z.object({
+      challenge_id: z.string().uuid(),
+      limit: z.number().int().min(1).max(50).optional(),
+      friends_only: z.boolean().optional(),
+    }).parse(i),
   )
   .handler(async ({ data, context }) => {
-    const { userId } = context;
+    const { userId, supabase } = context;
     const limit = data.limit ?? 20;
+
+    let friendIds: string[] | null = null;
+    if (data.friends_only) {
+      // groups I'm in
+      const { data: myGroups } = await supabase
+        .from("friend_group_members")
+        .select("group_id")
+        .eq("user_id", userId);
+      const gids = (myGroups ?? []).map((g) => g.group_id);
+      if (gids.length === 0) {
+        friendIds = [userId];
+      } else {
+        const { data: members } = await supabaseAdmin
+          .from("friend_group_members")
+          .select("user_id")
+          .in("group_id", gids);
+        const set = new Set<string>((members ?? []).map((m) => m.user_id));
+        set.add(userId);
+        friendIds = Array.from(set);
+      }
+    }
+
     // use admin to read other users' profile display names (read-only)
-    const { data: parts, error } = await supabaseAdmin
+    let q = supabaseAdmin
       .from("challenge_participants")
       .select("id, user_id, current_day, streak, coins_earned, xp_earned, status")
-      .eq("challenge_id", data.challenge_id)
+      .eq("challenge_id", data.challenge_id);
+    if (friendIds) q = q.in("user_id", friendIds);
+    const { data: parts, error } = await q
       .order("current_day", { ascending: false })
       .order("streak", { ascending: false })
       .limit(limit);
