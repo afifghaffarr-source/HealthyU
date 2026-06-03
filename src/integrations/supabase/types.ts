@@ -80,6 +80,42 @@ export type Database = {
         }
         Relationships: []
       }
+      ai_daily_challenges: {
+        Row: {
+          challenge_date: string
+          completed: boolean
+          created_at: string
+          description: string | null
+          goal_type: string | null
+          goal_value: number | null
+          id: string
+          title: string
+          user_id: string
+        }
+        Insert: {
+          challenge_date?: string
+          completed?: boolean
+          created_at?: string
+          description?: string | null
+          goal_type?: string | null
+          goal_value?: number | null
+          id?: string
+          title: string
+          user_id: string
+        }
+        Update: {
+          challenge_date?: string
+          completed?: boolean
+          created_at?: string
+          description?: string | null
+          goal_type?: string | null
+          goal_value?: number | null
+          id?: string
+          title?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       ai_reports: {
         Row: {
           ai_model: string | null
@@ -2084,6 +2120,44 @@ export type Database = {
         }
         Relationships: []
       }
+      meal_stories: {
+        Row: {
+          caption: string | null
+          created_at: string
+          expires_at: string
+          id: string
+          image_url: string | null
+          meal_log_id: string | null
+          user_id: string
+        }
+        Insert: {
+          caption?: string | null
+          created_at?: string
+          expires_at?: string
+          id?: string
+          image_url?: string | null
+          meal_log_id?: string | null
+          user_id: string
+        }
+        Update: {
+          caption?: string | null
+          created_at?: string
+          expires_at?: string
+          id?: string
+          image_url?: string | null
+          meal_log_id?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "meal_stories_meal_log_id_fkey"
+            columns: ["meal_log_id"]
+            isOneToOne: false
+            referencedRelation: "meal_logs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       medication_logs: {
         Row: {
           id: string
@@ -2534,12 +2608,14 @@ export type Database = {
           platform: string | null
           premium_expires_at: string | null
           premium_status: string
+          public_profile: boolean
           referral_code: string | null
           referred_by: string | null
           scan_audit_opt_in: boolean
           scan_streak_current: number
           scan_streak_longest: number
           streak_days: number
+          streak_freeze_used_at: string | null
           target_weight_kg: number | null
           tdee: number | null
           theme: string | null
@@ -2591,12 +2667,14 @@ export type Database = {
           platform?: string | null
           premium_expires_at?: string | null
           premium_status?: string
+          public_profile?: boolean
           referral_code?: string | null
           referred_by?: string | null
           scan_audit_opt_in?: boolean
           scan_streak_current?: number
           scan_streak_longest?: number
           streak_days?: number
+          streak_freeze_used_at?: string | null
           target_weight_kg?: number | null
           tdee?: number | null
           theme?: string | null
@@ -2648,12 +2726,14 @@ export type Database = {
           platform?: string | null
           premium_expires_at?: string | null
           premium_status?: string
+          public_profile?: boolean
           referral_code?: string | null
           referred_by?: string | null
           scan_audit_opt_in?: boolean
           scan_streak_current?: number
           scan_streak_longest?: number
           streak_days?: number
+          streak_freeze_used_at?: string | null
           target_weight_kg?: number | null
           tdee?: number | null
           theme?: string | null
@@ -3313,6 +3393,27 @@ export type Database = {
           token_expires_at?: string | null
           updated_at?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      user_follows: {
+        Row: {
+          created_at: string
+          follower_id: string
+          following_id: string
+          id: string
+        }
+        Insert: {
+          created_at?: string
+          follower_id: string
+          following_id: string
+          id?: string
+        }
+        Update: {
+          created_at?: string
+          follower_id?: string
+          following_id?: string
+          id?: string
         }
         Relationships: []
       }
