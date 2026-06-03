@@ -4,8 +4,10 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { listVitals, addVitals, deleteVitals } from "@/lib/vitals.functions";
 import { BottomNav } from "@/components/bottom-nav";
-import { ArrowLeft, Heart, Activity, Droplet, Trash2 } from "lucide-react";
+import { ArrowLeft, Heart, Activity, Droplet, Trash2, WifiOff, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
+import { enqueue } from "@/lib/offline-queue";
+import { useOfflineQueue } from "@/hooks/use-offline-queue";
 
 export const Route = createFileRoute("/_authenticated/vitals")({
   component: VitalsPage,
@@ -41,6 +43,7 @@ function VitalsPage() {
   const fetchList = useServerFn(listVitals);
   const add = useServerFn(addVitals);
   const del = useServerFn(deleteVitals);
+  const { online, pending, sync } = useOfflineQueue();
 
   const { data: logs = [] } = useQuery({ queryKey: ["vitals"], queryFn: () => fetchList() });
 
@@ -52,21 +55,29 @@ function VitalsPage() {
   const [note, setNote] = useState("");
 
   const addMut = useMutation({
-    mutationFn: () =>
-      add({
-        data: {
-          systolic: sys ? Number(sys) : undefined,
-          diastolic: dia ? Number(dia) : undefined,
-          heart_rate: hr ? Number(hr) : undefined,
-          glucose_mgdl: glu ? Number(glu) : undefined,
-          glucose_state: glu ? state : undefined,
-          note: note.trim() || undefined,
-        },
-      }),
-    onSuccess: () => {
+    mutationFn: async () => {
+      const payload = {
+        systolic: sys ? Number(sys) : undefined,
+        diastolic: dia ? Number(dia) : undefined,
+        heart_rate: hr ? Number(hr) : undefined,
+        glucose_mgdl: glu ? Number(glu) : undefined,
+        glucose_state: glu ? state : undefined,
+        note: note.trim() || undefined,
+      };
+      if (!navigator.onLine) {
+        await enqueue("vitals", payload);
+        return { offline: true as const };
+      }
+      return add({ data: payload });
+    },
+    onSuccess: (res) => {
       qc.invalidateQueries({ queryKey: ["vitals"] });
       setSys(""); setDia(""); setHr(""); setGlu(""); setNote("");
-      toast.success("Vital signs tercatat");
+      toast.success(
+        res && "offline" in res && res.offline
+          ? "Vitals disimpan offline. Akan sync otomatis."
+          : "Vital signs tercatat",
+      );
     },
     onError: (e: Error) => toast.error(e.message),
   });
@@ -88,6 +99,15 @@ function VitalsPage() {
             <ArrowLeft className="size-4" />
           </Link>
           <h1 className="text-2xl font-bold">Vital Signs</h1>
+          {(!online || pending > 0) && (
+            <button
+              onClick={() => sync()}
+              className={`ml-auto inline-flex items-center gap-1 text-[11px] font-semibold px-2.5 py-1.5 rounded-full ${online ? "bg-amber-100 text-amber-700" : "bg-muted text-muted-foreground"}`}
+            >
+              {online ? <RefreshCw className="size-3" /> : <WifiOff className="size-3" />}
+              {online ? `Sync ${pending}` : `Offline${pending ? ` · ${pending}` : ""}`}
+            </button>
+          )}
         </header>
 
         {latest && (

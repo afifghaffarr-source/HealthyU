@@ -4,8 +4,10 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { logWorkout, recentWorkouts, deleteWorkout } from "@/lib/workouts.functions";
 import { BottomNav } from "@/components/bottom-nav";
-import { Activity, Trash2 } from "lucide-react";
+import { Activity, Trash2, WifiOff, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
+import { enqueue } from "@/lib/offline-queue";
+import { useOfflineQueue } from "@/hooks/use-offline-queue";
 
 export const Route = createFileRoute("/_authenticated/workout")({
   component: WorkoutPage,
@@ -25,6 +27,7 @@ function WorkoutPage() {
   const list = useServerFn(recentWorkouts);
   const log = useServerFn(logWorkout);
   const del = useServerFn(deleteWorkout);
+  const { online, pending, sync } = useOfflineQueue();
 
   const { data: sessions = [] } = useQuery({
     queryKey: ["workouts"],
@@ -38,19 +41,27 @@ function WorkoutPage() {
   const [intensity, setIntensity] = useState<"low" | "medium" | "high">("medium");
 
   const logMut = useMutation({
-    mutationFn: () =>
-      log({
-        data: {
-          type,
-          name: name || TYPES.find((t) => t.id === type)!.label,
-          duration_min: duration,
-          calories_burned: calories,
-          intensity,
-        },
-      }),
-    onSuccess: () => {
+    mutationFn: async () => {
+      const payload = {
+        type,
+        name: name || TYPES.find((t) => t.id === type)!.label,
+        duration_min: duration,
+        calories_burned: calories,
+        intensity,
+      };
+      if (!navigator.onLine) {
+        await enqueue("workout", payload);
+        return { offline: true as const };
+      }
+      return log({ data: payload });
+    },
+    onSuccess: (res) => {
       qc.invalidateQueries({ queryKey: ["workouts"] });
-      toast.success("Latihan dicatat");
+      toast.success(
+        res && "offline" in res && res.offline
+          ? "Latihan disimpan offline. Akan sync otomatis."
+          : "Latihan dicatat",
+      );
       setName("");
     },
     onError: (e) => toast.error(e instanceof Error ? e.message : "Gagal"),
@@ -75,6 +86,15 @@ function WorkoutPage() {
             <h1 className="text-2xl font-bold">Latihan</h1>
             <p className="text-xs text-muted-foreground">{sessions.length} sesi · {totalMin} menit · {totalCal} kcal</p>
           </div>
+          {(!online || pending > 0) && (
+            <button
+              onClick={() => sync()}
+              className={`ml-auto inline-flex items-center gap-1 text-[11px] font-semibold px-2.5 py-1.5 rounded-full ${online ? "bg-amber-100 text-amber-700" : "bg-muted text-muted-foreground"}`}
+            >
+              {online ? <RefreshCw className="size-3" /> : <WifiOff className="size-3" />}
+              {online ? `Sync ${pending}` : `Offline${pending ? ` · ${pending}` : ""}`}
+            </button>
+          )}
         </header>
 
         <section className="bg-card p-4 rounded-3xl outline-1 outline-black/5 space-y-3 animate-fade-up">

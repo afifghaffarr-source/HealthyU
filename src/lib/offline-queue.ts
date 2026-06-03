@@ -1,7 +1,7 @@
 // Simple IndexedDB queue for offline-first logging.
 // Items dequeue when navigator.onLine and the sync function succeeds.
 
-type QueueKind = "water" | "weight" | "meal";
+type QueueKind = "water" | "weight" | "meal" | "mood" | "vitals" | "workout";
 type QueueItem = { id?: number; kind: QueueKind; payload: unknown; created_at: number };
 
 const DB_NAME = "sehatify-offline";
