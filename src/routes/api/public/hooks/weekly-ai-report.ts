@@ -44,11 +44,11 @@ export const Route = createFileRoute("/api/public/hooks/weekly-ai-report")({
         let failed = 0;
         for (const uid of targets) {
           try {
-            const reportId = await runWeeklyReportForUser(uid, 7);
+            const { reportId, highlight } = await runWeeklyReportForUser(uid, 7);
             await supabaseAdmin
               .from("weekly_report_runs")
               .insert({ user_id: uid, report_id: reportId });
-            await sendWeeklyReportPush(uid);
+            await sendWeeklyReportPush(uid, highlight);
             processed++;
           } catch (e) {
             failed++;
