@@ -4,7 +4,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { getChatHistory, sendChatMessage } from "@/lib/chat.functions";
 import { BottomNav } from "@/components/bottom-nav";
-import { ArrowLeft, Send, Sparkles, ImagePlus, X, Mic, MicOff, Volume2, VolumeX, Utensils, Timer, Flame, Droplet } from "lucide-react";
+import { ArrowLeft, Send, Sparkles, ImagePlus, X, Mic, MicOff, Volume2, VolumeX, Utensils, Timer, Flame, ChefHat } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/chat")({
@@ -20,9 +20,9 @@ const SUGGESTIONS = [
 
 const QUICK_ACTIONS = [
   { label: "Log makanan", icon: Utensils, to: "/food" as const },
+  { label: "Rekomendasi AI", icon: ChefHat, to: "/recommendations" as const },
   { label: "Mulai puasa", icon: Timer, to: "/fasting" as const },
   { label: "Budget kalori", icon: Flame, prompt: "Berapa sisa budget kalori saya hari ini? Berikan rekomendasi makanan." },
-  { label: "Cek hidrasi", icon: Droplet, prompt: "Cek progres minum air saya hari ini, apa rekomendasinya?" },
 ];
 
 function ChatPage() {
