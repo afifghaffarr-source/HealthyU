@@ -23,6 +23,7 @@ import {
   GROUP_BONUS_BADGE_TICK_MS,
 } from "@/lib/constants";
 import { useMiniFocusTrap } from "@/hooks/useMiniFocusTrap";
+import { useAnnounce } from "@/components/live-announcer";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   component: Dashboard,
@@ -31,6 +32,7 @@ export const Route = createFileRoute("/_authenticated/dashboard")({
 function Dashboard() {
   const navigate = useNavigate();
   const qc = useQueryClient();
+  const announce = useAnnounce();
   const fetchProfile = useServerFn(getProfile);
   const fetchMeals = useServerFn(todaysMeals);
   const fetchFast = useServerFn(currentFast);
@@ -132,14 +134,11 @@ function Dashboard() {
   );
   useEffect(() => {
     if (!restoredFromBreakdown) return;
-    // Announce via CustomEvent untuk aria-live region (lebih reliable
-    // dari title attribute yang muncul hanya saat hover mouse).
-    badgeBtnRef.current?.dispatchEvent(
-      new CustomEvent("focus-restored", { bubbles: true }),
-    );
+    // Announce via global LiveAnnouncer (centralized aria-live region).
+    announce("Popover ditutup, fokus dikembalikan ke badge klaim baru");
     const t = window.setTimeout(() => setRestoredFromBreakdown(false), 1500);
     return () => window.clearTimeout(t);
-  }, [restoredFromBreakdown]);
+  }, [restoredFromBreakdown, announce]);
   useEffect(() => {
     if (Object.keys(newClaims).length === 0) return;
     const id = window.setInterval(() => setNowTick(Date.now()), GROUP_BONUS_BADGE_TICK_MS);
@@ -487,9 +486,6 @@ function Dashboard() {
                 const entries = Object.entries(newClaims);
                 return (
                   <div className="ml-auto relative" ref={breakdownRef}>
-                    <span role="status" aria-live="polite" className="sr-only">
-                      {restoredFromBreakdown ? "Popover ditutup, fokus dikembalikan ke badge klaim baru" : ""}
-                    </span>
                     <button
                       ref={badgeBtnRef}
                       onClick={() => setBreakdownOpen((o) => !o)}
