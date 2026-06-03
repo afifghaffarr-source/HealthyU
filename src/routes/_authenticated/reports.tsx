@@ -76,6 +76,21 @@ function ReportsPage() {
       qc.invalidateQueries({ queryKey: ["profile-last-seen-report"] });
     })();
   }, [focus, latestId, lastSeenId, qc]);
+
+  // Realtime: refresh history when a new ai_reports row is inserted
+  useEffect(() => {
+    const ch = supabase
+      .channel("ai-reports-archive")
+      .on(
+        "postgres_changes",
+        { event: "INSERT", schema: "public", table: "ai_reports" },
+        () => qc.invalidateQueries({ queryKey: ["ai-reports"] }),
+      )
+      .subscribe();
+    return () => {
+      void supabase.removeChannel(ch);
+    };
+  }, [qc]);
   const aiMut = useMutation({
     mutationFn: () => aiFn({ data: { days: 7 } }),
     onSuccess: () => qc.invalidateQueries({ queryKey: ["ai-reports"] }),
