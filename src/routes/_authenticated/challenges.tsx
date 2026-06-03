@@ -236,7 +236,7 @@ function ChallengesPage() {
                 <Medal className="size-3" />
                 {openLb === c.id ? "Sembunyikan leaderboard" : "Lihat leaderboard"}
               </button>
-              {openLb === c.id && <Leaderboard challengeId={c.id} />}
+              {openLb === c.id && <Leaderboard challengeId={c.id} initialGroup={focusChallenge === c.id ? focusGroup : undefined} />}
               {joined && <GroupInviter challengeId={c.id} />}
               {joined && <BonusClaimer challengeId={c.id} />}
             </article>
