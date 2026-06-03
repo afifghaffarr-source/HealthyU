@@ -4,7 +4,14 @@ import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { getProfile } from "@/lib/profile.functions";
 import { BottomNav } from "@/components/bottom-nav";
-import { ArrowLeft, MapPin } from "lucide-react";
+import { ArrowLeft, MapPin, Bell, BellOff } from "lucide-react";
+import { toast } from "sonner";
+import {
+  loadPrayerPrefs,
+  savePrayerPrefs,
+  syncPrayerReminders,
+  type PrayerPrefs,
+} from "@/lib/reminders-store";
 
 export const Route = createFileRoute("/_authenticated/prayer")({
   component: PrayerPage,
@@ -42,6 +49,45 @@ function PrayerPage() {
   const nextIdx = findNext(prayers);
   const countdown = useCountdown(nextIdx !== -1 ? prayers[nextIdx]?.time : undefined);
 
+  const [prefs, setPrefs] = useState<PrayerPrefs>(() => loadPrayerPrefs());
+  const [permission, setPermission] = useState<NotificationPermission>("default");
+
+  useEffect(() => {
+    if (typeof window !== "undefined" && "Notification" in window) {
+      setPermission(Notification.permission);
+    }
+  }, []);
+
+  // Re-sync stored reminders whenever times or prefs change.
+  useEffect(() => {
+    if (!times) return;
+    syncPrayerReminders(times, prefs);
+  }, [times, prefs]);
+
+  const requestPermAndEnable = async () => {
+    if (!("Notification" in window)) {
+      toast.error("Browser tidak mendukung notifikasi");
+      return;
+    }
+    let p = Notification.permission;
+    if (p === "default") p = await Notification.requestPermission();
+    setPermission(p);
+    if (p !== "granted") {
+      toast.error("Izin notifikasi ditolak");
+      return;
+    }
+    const next = { ...prefs, enabled: !prefs.enabled };
+    setPrefs(next);
+    savePrayerPrefs(next);
+    toast.success(next.enabled ? "Notifikasi sholat aktif" : "Notifikasi sholat dimatikan");
+  };
+
+  const togglePref = (key: keyof PrayerPrefs) => {
+    const next = { ...prefs, [key]: !prefs[key] };
+    setPrefs(next);
+    savePrayerPrefs(next);
+  };
+
   return (
     <main className="min-h-screen bg-background pb-28">
       <div className="max-w-md mx-auto px-5 pt-8 space-y-5">
@@ -61,6 +107,49 @@ function PrayerPage() {
 
         {times && (
           <>
+            <section className="bg-card p-4 rounded-2xl outline-1 outline-black/5 space-y-3 animate-fade-up">
+              <button
+                onClick={requestPermAndEnable}
+                className={`w-full flex items-center justify-center gap-2 font-semibold py-3 rounded-xl text-sm ${
+                  prefs.enabled && permission === "granted"
+                    ? "bg-mint text-sage-deep"
+                    : "bg-primary text-primary-foreground"
+                }`}
+              >
+                {prefs.enabled && permission === "granted" ? (
+                  <><Bell className="size-4" /> Notifikasi sholat aktif</>
+                ) : (
+                  <><BellOff className="size-4" /> Aktifkan notifikasi sholat</>
+                )}
+              </button>
+              {prefs.enabled && permission === "granted" && (
+                <div className="grid grid-cols-2 gap-2 pt-1">
+                  {([
+                    ["sahur", "Sahur (-20m)"],
+                    ["fajr", "Subuh"],
+                    ["dhuhr", "Dzuhur"],
+                    ["asr", "Ashar"],
+                    ["maghrib", "Maghrib"],
+                    ["iftar", "Berbuka"],
+                    ["isha", "Isya"],
+                  ] as Array<[keyof PrayerPrefs, string]>).map(([k, label]) => (
+                    <label key={k} className="flex items-center gap-2 bg-muted/50 rounded-xl px-3 py-2 text-xs cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={!!prefs[k]}
+                        onChange={() => togglePref(k)}
+                        className="accent-primary"
+                      />
+                      <span>{label}</span>
+                    </label>
+                  ))}
+                </div>
+              )}
+              <p className="text-[11px] text-muted-foreground text-center">
+                Notifikasi berjalan saat app/tab terbuka.
+              </p>
+            </section>
+
             {nextIdx !== -1 && (
               <section className="bg-gradient-to-br from-sage to-sage-deep p-6 rounded-3xl text-primary-foreground animate-fade-up">
                 <p className="text-xs uppercase tracking-widest opacity-80 font-bold mb-1">Sholat berikutnya</p>
