@@ -1980,6 +1980,204 @@ export type Database = {
         }
         Relationships: []
       }
+      notification_preferences: {
+        Row: {
+          achievement_enabled: boolean
+          challenge_enabled: boolean
+          created_at: string
+          exercise_reminder_enabled: boolean
+          exercise_time: string | null
+          fasting_iftar_enabled: boolean
+          fasting_sahur_enabled: boolean
+          health_alert_enabled: boolean
+          id: string
+          marketing_enabled: boolean
+          meal_breakfast_time: string | null
+          meal_dinner_time: string | null
+          meal_lunch_time: string | null
+          meal_reminder_enabled: boolean
+          prayer_minutes_before: number | null
+          prayer_reminder_enabled: boolean
+          social_enabled: boolean
+          system_enabled: boolean
+          updated_at: string
+          user_id: string
+          water_end_time: string | null
+          water_interval_min: number | null
+          water_reminder_enabled: boolean
+          water_start_time: string | null
+          weekly_report_day: number | null
+          weekly_report_enabled: boolean
+        }
+        Insert: {
+          achievement_enabled?: boolean
+          challenge_enabled?: boolean
+          created_at?: string
+          exercise_reminder_enabled?: boolean
+          exercise_time?: string | null
+          fasting_iftar_enabled?: boolean
+          fasting_sahur_enabled?: boolean
+          health_alert_enabled?: boolean
+          id?: string
+          marketing_enabled?: boolean
+          meal_breakfast_time?: string | null
+          meal_dinner_time?: string | null
+          meal_lunch_time?: string | null
+          meal_reminder_enabled?: boolean
+          prayer_minutes_before?: number | null
+          prayer_reminder_enabled?: boolean
+          social_enabled?: boolean
+          system_enabled?: boolean
+          updated_at?: string
+          user_id: string
+          water_end_time?: string | null
+          water_interval_min?: number | null
+          water_reminder_enabled?: boolean
+          water_start_time?: string | null
+          weekly_report_day?: number | null
+          weekly_report_enabled?: boolean
+        }
+        Update: {
+          achievement_enabled?: boolean
+          challenge_enabled?: boolean
+          created_at?: string
+          exercise_reminder_enabled?: boolean
+          exercise_time?: string | null
+          fasting_iftar_enabled?: boolean
+          fasting_sahur_enabled?: boolean
+          health_alert_enabled?: boolean
+          id?: string
+          marketing_enabled?: boolean
+          meal_breakfast_time?: string | null
+          meal_dinner_time?: string | null
+          meal_lunch_time?: string | null
+          meal_reminder_enabled?: boolean
+          prayer_minutes_before?: number | null
+          prayer_reminder_enabled?: boolean
+          social_enabled?: boolean
+          system_enabled?: boolean
+          updated_at?: string
+          user_id?: string
+          water_end_time?: string | null
+          water_interval_min?: number | null
+          water_reminder_enabled?: boolean
+          water_start_time?: string | null
+          weekly_report_day?: number | null
+          weekly_report_enabled?: boolean
+        }
+        Relationships: []
+      }
+      notifications: {
+        Row: {
+          body: string | null
+          created_at: string
+          data: Json | null
+          delivery_channel: string | null
+          expires_at: string | null
+          id: string
+          image_url: string | null
+          is_read: boolean
+          is_sent: boolean
+          notification_type: string
+          read_at: string | null
+          sent_at: string | null
+          title: string
+          user_id: string
+        }
+        Insert: {
+          body?: string | null
+          created_at?: string
+          data?: Json | null
+          delivery_channel?: string | null
+          expires_at?: string | null
+          id?: string
+          image_url?: string | null
+          is_read?: boolean
+          is_sent?: boolean
+          notification_type: string
+          read_at?: string | null
+          sent_at?: string | null
+          title: string
+          user_id: string
+        }
+        Update: {
+          body?: string | null
+          created_at?: string
+          data?: Json | null
+          delivery_channel?: string | null
+          expires_at?: string | null
+          id?: string
+          image_url?: string | null
+          is_read?: boolean
+          is_sent?: boolean
+          notification_type?: string
+          read_at?: string | null
+          sent_at?: string | null
+          title?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      prayer_times: {
+        Row: {
+          ashar: string | null
+          city: string
+          created_at: string
+          dhuha: string | null
+          dzuhur: string | null
+          id: string
+          imsak: string | null
+          isya: string | null
+          latitude: number | null
+          longitude: number | null
+          maghrib: string | null
+          prayer_date: string
+          province: string | null
+          qibla_direction: number | null
+          source: string | null
+          subuh: string | null
+          terbit: string | null
+        }
+        Insert: {
+          ashar?: string | null
+          city: string
+          created_at?: string
+          dhuha?: string | null
+          dzuhur?: string | null
+          id?: string
+          imsak?: string | null
+          isya?: string | null
+          latitude?: number | null
+          longitude?: number | null
+          maghrib?: string | null
+          prayer_date: string
+          province?: string | null
+          qibla_direction?: number | null
+          source?: string | null
+          subuh?: string | null
+          terbit?: string | null
+        }
+        Update: {
+          ashar?: string | null
+          city?: string
+          created_at?: string
+          dhuha?: string | null
+          dzuhur?: string | null
+          id?: string
+          imsak?: string | null
+          isya?: string | null
+          latitude?: number | null
+          longitude?: number | null
+          maghrib?: string | null
+          prayer_date?: string
+          province?: string | null
+          qibla_direction?: number | null
+          source?: string | null
+          subuh?: string | null
+          terbit?: string | null
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           activity_level: string | null
