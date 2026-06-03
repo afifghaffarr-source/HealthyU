@@ -18,11 +18,11 @@ const SUGGESTIONS = [
   "Sahur sehat untuk Ramadhan",
 ];
 
-const QUICK_ACTIONS: { label: string; icon: any; to: string; prompt?: string }[] = [
-  { label: "Log makanan", icon: Utensils, to: "/food" },
-  { label: "Mulai puasa", icon: Timer, to: "/fasting" },
-  { label: "Budget kalori", icon: Flame, to: "", prompt: "Berapa sisa budget kalori saya hari ini? Berikan rekomendasi makanan." },
-  { label: "Cek hidrasi", icon: Droplet, to: "", prompt: "Cek progres minum air saya hari ini, apa rekomendasinya?" },
+const QUICK_ACTIONS = [
+  { label: "Log makanan", icon: Utensils, to: "/food" as const },
+  { label: "Mulai puasa", icon: Timer, to: "/fasting" as const },
+  { label: "Budget kalori", icon: Flame, prompt: "Berapa sisa budget kalori saya hari ini? Berikan rekomendasi makanan." },
+  { label: "Cek hidrasi", icon: Droplet, prompt: "Cek progres minum air saya hari ini, apa rekomendasinya?" },
 ];
 
 function ChatPage() {
@@ -191,10 +191,10 @@ function ChatPage() {
                 {a.label}
               </span>
             );
-            return a.to ? (
+            return "to" in a ? (
               <Link key={a.label} to={a.to}>{content}</Link>
             ) : (
-              <button key={a.label} onClick={() => a.prompt && handleSend(a.prompt)} disabled={mutation.isPending}>
+              <button key={a.label} onClick={() => handleSend(a.prompt)} disabled={mutation.isPending}>
                 {content}
               </button>
             );
