@@ -2118,6 +2118,54 @@ export type Database = {
         }
         Relationships: []
       }
+      payment_history: {
+        Row: {
+          amount_idr: number
+          created_at: string
+          external_order_id: string | null
+          external_payment_id: string | null
+          id: string
+          metadata: Json | null
+          paid_at: string | null
+          payment_gateway: string | null
+          payment_method: string | null
+          status: string
+          subscription_id: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          amount_idr: number
+          created_at?: string
+          external_order_id?: string | null
+          external_payment_id?: string | null
+          id?: string
+          metadata?: Json | null
+          paid_at?: string | null
+          payment_gateway?: string | null
+          payment_method?: string | null
+          status?: string
+          subscription_id?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          amount_idr?: number
+          created_at?: string
+          external_order_id?: string | null
+          external_payment_id?: string | null
+          id?: string
+          metadata?: Json | null
+          paid_at?: string | null
+          payment_gateway?: string | null
+          payment_method?: string | null
+          status?: string
+          subscription_id?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       prayer_times: {
         Row: {
           ashar: string | null
@@ -2624,6 +2672,63 @@ export type Database = {
         }
         Relationships: []
       }
+      subscription_plans: {
+        Row: {
+          ai_chat_daily_limit: number | null
+          billing_period: string
+          created_at: string
+          description: string | null
+          export_limit: number | null
+          features: Json | null
+          food_scan_daily_limit: number | null
+          id: string
+          is_active: boolean
+          is_visible: boolean
+          name: string
+          name_en: string | null
+          plan_code: string
+          price_idr: number
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          ai_chat_daily_limit?: number | null
+          billing_period?: string
+          created_at?: string
+          description?: string | null
+          export_limit?: number | null
+          features?: Json | null
+          food_scan_daily_limit?: number | null
+          id?: string
+          is_active?: boolean
+          is_visible?: boolean
+          name: string
+          name_en?: string | null
+          plan_code: string
+          price_idr?: number
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          ai_chat_daily_limit?: number | null
+          billing_period?: string
+          created_at?: string
+          description?: string | null
+          export_limit?: number | null
+          features?: Json | null
+          food_scan_daily_limit?: number | null
+          id?: string
+          is_active?: boolean
+          is_visible?: boolean
+          name?: string
+          name_en?: string | null
+          plan_code?: string
+          price_idr?: number
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       user_achievements: {
         Row: {
           achievement_id: string
@@ -2796,6 +2901,62 @@ export type Database = {
           xp?: number
         }
         Relationships: []
+      }
+      user_subscriptions: {
+        Row: {
+          auto_renew: boolean
+          cancellation_reason: string | null
+          cancelled_at: string | null
+          created_at: string
+          expires_at: string | null
+          id: string
+          payment_id: string | null
+          payment_method: string | null
+          plan_id: string
+          started_at: string
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          auto_renew?: boolean
+          cancellation_reason?: string | null
+          cancelled_at?: string | null
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          payment_id?: string | null
+          payment_method?: string | null
+          plan_id: string
+          started_at?: string
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          auto_renew?: boolean
+          cancellation_reason?: string | null
+          cancelled_at?: string | null
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          payment_id?: string | null
+          payment_method?: string | null
+          plan_id?: string
+          started_at?: string
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_subscriptions_plan_id_fkey"
+            columns: ["plan_id"]
+            isOneToOne: false
+            referencedRelation: "subscription_plans"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       vitals_logs: {
         Row: {
