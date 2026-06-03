@@ -4,7 +4,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { weeklyReport, weeklyAiAnalysis, listAiReports } from "@/lib/reports.functions";
 import { BottomNav } from "@/components/bottom-nav";
 import { ArrowLeft, Download, FileText, Sparkles, Loader2, Share2 } from "lucide-react";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
@@ -28,6 +28,7 @@ function ReportsPage() {
   const aiFn = useServerFn(weeklyAiAnalysis);
   const listFn = useServerFn(listAiReports);
   const qc = useQueryClient();
+  const [rangeWeeks, setRangeWeeks] = useState<number>(0); // 0 = semua
   const { data } = useQuery({
     queryKey: ["report", 7],
     queryFn: () => fetchFn({ data: { days: 7 } }),
@@ -306,10 +307,28 @@ function ReportsPage() {
 
         {history.length > 0 && (
           <section className="space-y-2 animate-fade-up">
-            <h2 className="text-xs font-bold uppercase tracking-wider text-muted-foreground px-1">
-              Riwayat Laporan AI
-            </h2>
-            {history.map((r, idx) => {
+            <div className="flex items-center justify-between gap-2 px-1">
+              <h2 className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                Riwayat Laporan AI
+              </h2>
+              <select
+                value={rangeWeeks}
+                onChange={(e) => setRangeWeeks(Number(e.target.value))}
+                className="text-[11px] bg-card outline-1 outline-black/10 rounded-lg px-2 py-1"
+              >
+                <option value={0}>Semua</option>
+                <option value={4}>4 minggu</option>
+                <option value={12}>12 minggu</option>
+                <option value={26}>26 minggu</option>
+              </select>
+            </div>
+            {history
+              .filter((r) => {
+                if (rangeWeeks === 0) return true;
+                const cutoff = Date.now() - rangeWeeks * 7 * 86400000;
+                return new Date(r.created_at).getTime() >= cutoff;
+              })
+              .map((r, idx) => {
               const text = Array.isArray(r.recommendations) ? String(r.recommendations[0] ?? "") : "";
               return (
                 <details
