@@ -44,8 +44,15 @@ import {
   PDF_LINK_FONT_SIZE,
   PDF_DIVIDER_LINE_WIDTH,
   PDF_SECTION_DIVIDER_OFFSET,
+  PDF_LINK_BOUND_Y_OFFSET,
+  PDF_TOC_INDENT_X,
+  PDF_TOC_PAGE_LABEL_X,
+  PDF_TOC_ROW_BOUND_W,
+  PDF_TOC_ROW_BOUND_H,
+  PDF_AUTOTABLE_START_Y,
 } from "@/lib/constants";
 import { useTranslation } from "@/lib/i18n";
+import { useAnnounce } from "@/components/live-announcer";
 
 export const Route = createFileRoute("/_authenticated/reports")({
   validateSearch: zodValidator(
@@ -62,6 +69,7 @@ function ReportsPage() {
   const { focus } = Route.useSearch();
   const navigate = useNavigate();
   const { t } = useTranslation();
+  const announce = useAnnounce();
   useEffect(() => {
     if (focus !== "latest") return;
     const t = setTimeout(() => {
@@ -150,6 +158,11 @@ function ReportsPage() {
       const latest = qc.getQueryData<Array<{ id: string }>>(["ai-reports"])?.[0]?.id ?? null;
       if (latest) {
         setManualFlashId(latest);
+        const row = qc.getQueryData<Array<{ id: string; report_period_start?: string | null; report_period_end?: string | null }>>(["ai-reports"])?.[0];
+        const periode = row?.report_period_start && row?.report_period_end
+          ? `${row.report_period_start} → ${row.report_period_end}`
+          : "terbaru";
+        announce(`Laporan ${periode} baru di-generate`);
         window.setTimeout(() => setManualFlashId((cur) => (cur === latest ? null : cur)), 3000);
       }
     },
@@ -278,10 +291,16 @@ function ReportsPage() {
         doc.setFontSize(PDF_BODY_FONT_SIZE);
         tocY = PDF_TOC_CONTINUED_TOP_Y;
       }
-      doc.text(`${idx + 1}. ${periode}`, 40, tocY);
-      doc.text(`hal. ${page}`, 510, tocY, { align: "right" });
+      doc.text(`${idx + 1}. ${periode}`, PDF_TOC_INDENT_X, tocY);
+      doc.text(`hal. ${page}`, PDF_TOC_PAGE_LABEL_X, tocY, { align: "right" });
       // Make the whole TOC row clickable → jumps to that report's body page.
-      doc.link(40, tocY - 10, 515, 14, { pageNumber: page });
+      doc.link(
+        PDF_TOC_INDENT_X,
+        tocY - PDF_LINK_BOUND_Y_OFFSET,
+        PDF_TOC_ROW_BOUND_W,
+        PDF_TOC_ROW_BOUND_H,
+        { pageNumber: page },
+      );
       tocY += PDF_TOC_ROW_HEIGHT;
     });
     filtered.forEach((r, bodyIdx) => {
@@ -318,7 +337,7 @@ function ReportsPage() {
       // Back-link to TOC (page 1) in the top-right corner.
       doc.setTextColor(PDF_LINK_RGB[0], PDF_LINK_RGB[1], PDF_LINK_RGB[2]);
       doc.setFontSize(PDF_LINK_FONT_SIZE);
-      const linkLabel = `hal. ${currentPage} \u2190 Daftar Isi`;
+      const linkLabel = t("pdf.backLink", { page: currentPage });
       doc.text(linkLabel, PDF_LINK_RIGHT_X, PDF_LINK_BASELINE_Y, { align: "right" });
       // Underline manually (jsPDF text has no built-in underline style).
       const linkW = doc.getTextWidth(linkLabel);
@@ -327,7 +346,7 @@ function ReportsPage() {
       doc.line(PDF_LINK_RIGHT_X - linkW, PDF_LINK_BASELINE_Y + PDF_LINK_UNDERLINE_OFFSET, PDF_LINK_RIGHT_X, PDF_LINK_BASELINE_Y + PDF_LINK_UNDERLINE_OFFSET);
       doc.link(
         PDF_LINK_RIGHT_X - linkW - PDF_LINK_BOUND_OFFSET,
-        PDF_LINK_BASELINE_Y - 10,
+        PDF_LINK_BASELINE_Y - PDF_LINK_BOUND_Y_OFFSET,
         linkW + PDF_LINK_BOUND_OFFSET * 2,
         PDF_LINK_BOUND_HEIGHT,
         { pageNumber: 1 },
@@ -351,7 +370,7 @@ function ReportsPage() {
         title: "Navigasi",
         bounds: {
           x: PDF_LINK_RIGHT_X - linkW - PDF_LINK_BOUND_OFFSET,
-          y: PDF_LINK_BASELINE_Y - 10,
+          y: PDF_LINK_BASELINE_Y - PDF_LINK_BOUND_Y_OFFSET,
           w: linkW + PDF_LINK_BOUND_OFFSET * 2,
           h: PDF_LINK_BOUND_HEIGHT,
         },
@@ -416,7 +435,7 @@ function ReportsPage() {
     doc.setTextColor(0);
 
     autoTable(doc, {
-      startY: 90,
+      startY: PDF_AUTOTABLE_START_Y,
       head: [["Metrik", "Nilai"]],
       body: [
         ["Total kalori masuk", `${Math.round(summary.totals.cals)} kcal`],
