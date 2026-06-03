@@ -515,6 +515,16 @@ function Dashboard() {
                         </ul>
                         <div className="flex gap-1.5 mt-2 pt-2 border-t border-border/60">
                           <button
+                            autoFocus
+                            onKeyDown={(e) => {
+                              if (e.key === "Tab" && e.shiftKey) {
+                                e.preventDefault();
+                                (
+                                  e.currentTarget
+                                    .nextElementSibling as HTMLButtonElement | null
+                                )?.focus();
+                              }
+                            }}
                             onClick={() => {
                               setNewClaims({});
                               setBreakdownOpen(false);
@@ -524,6 +534,15 @@ function Dashboard() {
                             Reset
                           </button>
                           <button
+                            onKeyDown={(e) => {
+                              if (e.key === "Tab" && !e.shiftKey) {
+                                e.preventDefault();
+                                (
+                                  e.currentTarget
+                                    .previousElementSibling as HTMLButtonElement | null
+                                )?.focus();
+                              }
+                            }}
                             onClick={() => {
                               setBreakdownOpen(false);
                               navigate({ to: "/challenges" });
