@@ -14,3 +14,6 @@ export const TRENDING_COUNTER_PULSE_MS = 1500;
 
 /** Durasi flash "+N" pada badge growth resep (ms). */
 export const TRENDING_GROWTH_FLASH_MS = 2500;
+
+/** Durasi ring highlight kartu challenge setelah scroll otomatis (ms). */
+export const CHALLENGE_HIGHLIGHT_MS = 2000;
