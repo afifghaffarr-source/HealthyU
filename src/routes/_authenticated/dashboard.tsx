@@ -6,10 +6,11 @@ import { getProfile } from "@/lib/profile.functions";
 import { todaysMeals } from "@/lib/meals.functions";
 import { currentFast } from "@/lib/fasting.functions";
 import { todaysWater, logWater } from "@/lib/water.functions";
+import { getGameSummary } from "@/lib/gamification.functions";
 import { BottomNav } from "@/components/bottom-nav";
 import { CalorieRing } from "@/components/calorie-ring";
 import { formatDuration, fastingStage } from "@/lib/health";
-import { Droplet, Plus, Sparkles, ArrowRight } from "lucide-react";
+import { Droplet, Plus, Sparkles, ArrowRight, Flame, Trophy } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
@@ -24,11 +25,13 @@ function Dashboard() {
   const fetchFast = useServerFn(currentFast);
   const fetchWater = useServerFn(todaysWater);
   const logWaterFn = useServerFn(logWater);
+  const fetchGame = useServerFn(getGameSummary);
 
   const { data: profile, isLoading: pLoad } = useQuery({ queryKey: ["profile"], queryFn: () => fetchProfile() });
   const { data: meals = [] } = useQuery({ queryKey: ["meals", "today"], queryFn: () => fetchMeals() });
   const { data: fast } = useQuery({ queryKey: ["fast", "current"], queryFn: () => fetchFast(), refetchInterval: 30000 });
   const { data: waterMl = 0 } = useQuery({ queryKey: ["water", "today"], queryFn: () => fetchWater() });
+  const { data: game } = useQuery({ queryKey: ["game", "summary"], queryFn: () => fetchGame() });
 
   useEffect(() => {
     if (!pLoad && profile && !profile.onboarded) {
@@ -38,9 +41,12 @@ function Dashboard() {
 
   const waterMutation = useMutation({
     mutationFn: (ml: number) => logWaterFn({ data: { amount_ml: ml } }),
-    onSuccess: () => {
+    onSuccess: (res) => {
       qc.invalidateQueries({ queryKey: ["water", "today"] });
+      qc.invalidateQueries({ queryKey: ["game", "summary"] });
       toast.success("+250ml dicatat");
+      const newlyUnlocked = res?.game?.newlyUnlocked ?? [];
+      newlyUnlocked.forEach((a) => toast.success(`${a.icon} ${a.title} terbuka!`));
     },
   });
 
@@ -168,6 +174,23 @@ function Dashboard() {
             </div>
             <ArrowRight className="size-5" />
           </div>
+        </Link>
+
+        {/* Gamification */}
+        <Link
+          to="/achievements"
+          className="bg-card p-4 rounded-3xl outline-1 outline-black/5 shadow-sm flex items-center gap-3 animate-fade-up"
+        >
+          <div className="size-12 rounded-2xl bg-orange-100 grid place-items-center">
+            <Flame className="size-5 text-coral" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-[10px] font-bold uppercase text-muted-foreground tracking-wider">Level {game?.stats?.level ?? 1} · {game?.stats?.xp ?? 0} XP</p>
+            <p className="font-semibold text-sm">
+              Streak {game?.stats?.current_streak ?? 0} hari
+            </p>
+          </div>
+          <Trophy className="size-5 text-primary" />
         </Link>
 
         {/* Today's meals */}

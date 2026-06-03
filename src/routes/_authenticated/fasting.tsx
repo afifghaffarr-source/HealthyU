@@ -38,7 +38,11 @@ function FastingPage() {
     mutationFn: (id: string) => stopFn({ data: { id } }),
     onSuccess: (r) => {
       qc.invalidateQueries({ queryKey: ["fast"] });
+      qc.invalidateQueries({ queryKey: ["game", "summary"] });
       toast.success(r.completed ? "Selamat! Puasa tercapai 🎉" : "Puasa dihentikan");
+      (r?.game?.newlyUnlocked ?? []).forEach((a) =>
+        toast.success(`${a.icon} ${a.title} terbuka!`),
+      );
     },
   });
 

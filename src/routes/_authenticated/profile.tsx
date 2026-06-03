@@ -5,7 +5,7 @@ import { getProfile } from "@/lib/profile.functions";
 import { BottomNav } from "@/components/bottom-nav";
 import { supabase } from "@/integrations/supabase/client";
 import { calcAge, calcBMI, bmiCategory, calcBMR, calcTDEE, type ActivityLevel } from "@/lib/health";
-import { ArrowLeft, LogOut, Settings } from "lucide-react";
+import { ArrowLeft, LogOut, Settings, Trophy } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/profile")({
   component: ProfilePage,
@@ -65,6 +65,10 @@ function ProfilePage() {
 
         <Link to="/onboarding" className="flex items-center justify-center gap-2 bg-card outline-1 outline-black/10 font-semibold py-4 rounded-2xl">
           <Settings className="size-4" /> Edit profil
+        </Link>
+
+        <Link to="/achievements" className="flex items-center justify-center gap-2 bg-card outline-1 outline-black/10 font-semibold py-4 rounded-2xl">
+          <Trophy className="size-4" /> Pencapaian & badge
         </Link>
 
         <button

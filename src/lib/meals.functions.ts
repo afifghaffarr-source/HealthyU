@@ -2,6 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { todayRange } from "./health";
+import { recordActivityFor } from "./gamification.functions";
 
 export const searchFoods = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
@@ -37,7 +38,8 @@ export const logMeal = createServerFn({ method: "POST" })
     const { supabase, userId } = context;
     const { error } = await supabase.from("meal_logs").insert({ ...data, user_id: userId });
     if (error) throw new Error(error.message);
-    return { ok: true };
+    const game = await recordActivityFor(supabase, userId, "meal_logged");
+    return { ok: true, game };
   });
 
 export const deleteMeal = createServerFn({ method: "POST" })
