@@ -61,6 +61,7 @@ import { Route as AuthenticatedScanMenuRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedScanHistoryRouteImport } from './routes/_authenticated/scan.history'
 import { Route as AuthenticatedScanBarcodeRouteImport } from './routes/_authenticated/scan.barcode'
 import { Route as AuthenticatedReportsNutritionRouteImport } from './routes/_authenticated/reports.nutrition'
+import { Route as AuthenticatedReportsMoodRouteImport } from './routes/_authenticated/reports.mood'
 import { Route as AuthenticatedReportsGalleryRouteImport } from './routes/_authenticated/reports.gallery'
 import { Route as AuthenticatedReportsExportRouteImport } from './routes/_authenticated/reports.export'
 import { Route as AuthenticatedReportsCompareRouteImport } from './routes/_authenticated/reports.compare'
@@ -352,6 +353,12 @@ const AuthenticatedReportsNutritionRoute =
     path: '/nutrition',
     getParentRoute: () => AuthenticatedReportsRoute,
   } as any)
+const AuthenticatedReportsMoodRoute =
+  AuthenticatedReportsMoodRouteImport.update({
+    id: '/mood',
+    path: '/mood',
+    getParentRoute: () => AuthenticatedReportsRoute,
+  } as any)
 const AuthenticatedReportsGalleryRoute =
   AuthenticatedReportsGalleryRouteImport.update({
     id: '/gallery',
@@ -521,6 +528,7 @@ export interface FileRoutesByFullPath {
   '/reports/compare': typeof AuthenticatedReportsCompareRoute
   '/reports/export': typeof AuthenticatedReportsExportRoute
   '/reports/gallery': typeof AuthenticatedReportsGalleryRoute
+  '/reports/mood': typeof AuthenticatedReportsMoodRoute
   '/reports/nutrition': typeof AuthenticatedReportsNutritionRoute
   '/scan/barcode': typeof AuthenticatedScanBarcodeRoute
   '/scan/history': typeof AuthenticatedScanHistoryRoute
@@ -593,6 +601,7 @@ export interface FileRoutesByTo {
   '/reports/compare': typeof AuthenticatedReportsCompareRoute
   '/reports/export': typeof AuthenticatedReportsExportRoute
   '/reports/gallery': typeof AuthenticatedReportsGalleryRoute
+  '/reports/mood': typeof AuthenticatedReportsMoodRoute
   '/reports/nutrition': typeof AuthenticatedReportsNutritionRoute
   '/scan/barcode': typeof AuthenticatedScanBarcodeRoute
   '/scan/history': typeof AuthenticatedScanHistoryRoute
@@ -667,6 +676,7 @@ export interface FileRoutesById {
   '/_authenticated/reports/compare': typeof AuthenticatedReportsCompareRoute
   '/_authenticated/reports/export': typeof AuthenticatedReportsExportRoute
   '/_authenticated/reports/gallery': typeof AuthenticatedReportsGalleryRoute
+  '/_authenticated/reports/mood': typeof AuthenticatedReportsMoodRoute
   '/_authenticated/reports/nutrition': typeof AuthenticatedReportsNutritionRoute
   '/_authenticated/scan/barcode': typeof AuthenticatedScanBarcodeRoute
   '/_authenticated/scan/history': typeof AuthenticatedScanHistoryRoute
@@ -741,6 +751,7 @@ export interface FileRouteTypes {
     | '/reports/compare'
     | '/reports/export'
     | '/reports/gallery'
+    | '/reports/mood'
     | '/reports/nutrition'
     | '/scan/barcode'
     | '/scan/history'
@@ -813,6 +824,7 @@ export interface FileRouteTypes {
     | '/reports/compare'
     | '/reports/export'
     | '/reports/gallery'
+    | '/reports/mood'
     | '/reports/nutrition'
     | '/scan/barcode'
     | '/scan/history'
@@ -886,6 +898,7 @@ export interface FileRouteTypes {
     | '/_authenticated/reports/compare'
     | '/_authenticated/reports/export'
     | '/_authenticated/reports/gallery'
+    | '/_authenticated/reports/mood'
     | '/_authenticated/reports/nutrition'
     | '/_authenticated/scan/barcode'
     | '/_authenticated/scan/history'
@@ -1281,6 +1294,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedReportsNutritionRouteImport
       parentRoute: typeof AuthenticatedReportsRoute
     }
+    '/_authenticated/reports/mood': {
+      id: '/_authenticated/reports/mood'
+      path: '/mood'
+      fullPath: '/reports/mood'
+      preLoaderRoute: typeof AuthenticatedReportsMoodRouteImport
+      parentRoute: typeof AuthenticatedReportsRoute
+    }
     '/_authenticated/reports/gallery': {
       id: '/_authenticated/reports/gallery'
       path: '/gallery'
@@ -1503,6 +1523,7 @@ interface AuthenticatedReportsRouteChildren {
   AuthenticatedReportsCompareRoute: typeof AuthenticatedReportsCompareRoute
   AuthenticatedReportsExportRoute: typeof AuthenticatedReportsExportRoute
   AuthenticatedReportsGalleryRoute: typeof AuthenticatedReportsGalleryRoute
+  AuthenticatedReportsMoodRoute: typeof AuthenticatedReportsMoodRoute
   AuthenticatedReportsNutritionRoute: typeof AuthenticatedReportsNutritionRoute
 }
 
@@ -1510,6 +1531,7 @@ const AuthenticatedReportsRouteChildren: AuthenticatedReportsRouteChildren = {
   AuthenticatedReportsCompareRoute: AuthenticatedReportsCompareRoute,
   AuthenticatedReportsExportRoute: AuthenticatedReportsExportRoute,
   AuthenticatedReportsGalleryRoute: AuthenticatedReportsGalleryRoute,
+  AuthenticatedReportsMoodRoute: AuthenticatedReportsMoodRoute,
   AuthenticatedReportsNutritionRoute: AuthenticatedReportsNutritionRoute,
 }
 
