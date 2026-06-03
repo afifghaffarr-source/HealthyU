@@ -69,6 +69,7 @@ import { Route as AuthenticatedScanBarcodeRouteImport } from './routes/_authenti
 import { Route as AuthenticatedRestaurantsNearbyRouteImport } from './routes/_authenticated/restaurants.nearby'
 import { Route as AuthenticatedReportsWorkoutMatchRouteImport } from './routes/_authenticated/reports.workout-match'
 import { Route as AuthenticatedReportsWeeklyRouteImport } from './routes/_authenticated/reports.weekly'
+import { Route as AuthenticatedReportsSleepScoreRouteImport } from './routes/_authenticated/reports.sleep-score'
 import { Route as AuthenticatedReportsSleepMealRouteImport } from './routes/_authenticated/reports.sleep-meal'
 import { Route as AuthenticatedReportsNutritionRouteImport } from './routes/_authenticated/reports.nutrition'
 import { Route as AuthenticatedReportsMoodRouteImport } from './routes/_authenticated/reports.mood'
@@ -412,6 +413,12 @@ const AuthenticatedReportsWeeklyRoute =
     path: '/weekly',
     getParentRoute: () => AuthenticatedReportsRoute,
   } as any)
+const AuthenticatedReportsSleepScoreRoute =
+  AuthenticatedReportsSleepScoreRouteImport.update({
+    id: '/sleep-score',
+    path: '/sleep-score',
+    getParentRoute: () => AuthenticatedReportsRoute,
+  } as any)
 const AuthenticatedReportsSleepMealRoute =
   AuthenticatedReportsSleepMealRouteImport.update({
     id: '/sleep-meal',
@@ -652,6 +659,7 @@ export interface FileRoutesByFullPath {
   '/reports/mood': typeof AuthenticatedReportsMoodRoute
   '/reports/nutrition': typeof AuthenticatedReportsNutritionRoute
   '/reports/sleep-meal': typeof AuthenticatedReportsSleepMealRoute
+  '/reports/sleep-score': typeof AuthenticatedReportsSleepScoreRoute
   '/reports/weekly': typeof AuthenticatedReportsWeeklyRoute
   '/reports/workout-match': typeof AuthenticatedReportsWorkoutMatchRoute
   '/restaurants/nearby': typeof AuthenticatedRestaurantsNearbyRoute
@@ -742,6 +750,7 @@ export interface FileRoutesByTo {
   '/reports/mood': typeof AuthenticatedReportsMoodRoute
   '/reports/nutrition': typeof AuthenticatedReportsNutritionRoute
   '/reports/sleep-meal': typeof AuthenticatedReportsSleepMealRoute
+  '/reports/sleep-score': typeof AuthenticatedReportsSleepScoreRoute
   '/reports/weekly': typeof AuthenticatedReportsWeeklyRoute
   '/reports/workout-match': typeof AuthenticatedReportsWorkoutMatchRoute
   '/restaurants/nearby': typeof AuthenticatedRestaurantsNearbyRoute
@@ -834,6 +843,7 @@ export interface FileRoutesById {
   '/_authenticated/reports/mood': typeof AuthenticatedReportsMoodRoute
   '/_authenticated/reports/nutrition': typeof AuthenticatedReportsNutritionRoute
   '/_authenticated/reports/sleep-meal': typeof AuthenticatedReportsSleepMealRoute
+  '/_authenticated/reports/sleep-score': typeof AuthenticatedReportsSleepScoreRoute
   '/_authenticated/reports/weekly': typeof AuthenticatedReportsWeeklyRoute
   '/_authenticated/reports/workout-match': typeof AuthenticatedReportsWorkoutMatchRoute
   '/_authenticated/restaurants/nearby': typeof AuthenticatedRestaurantsNearbyRoute
@@ -926,6 +936,7 @@ export interface FileRouteTypes {
     | '/reports/mood'
     | '/reports/nutrition'
     | '/reports/sleep-meal'
+    | '/reports/sleep-score'
     | '/reports/weekly'
     | '/reports/workout-match'
     | '/restaurants/nearby'
@@ -1016,6 +1027,7 @@ export interface FileRouteTypes {
     | '/reports/mood'
     | '/reports/nutrition'
     | '/reports/sleep-meal'
+    | '/reports/sleep-score'
     | '/reports/weekly'
     | '/reports/workout-match'
     | '/restaurants/nearby'
@@ -1107,6 +1119,7 @@ export interface FileRouteTypes {
     | '/_authenticated/reports/mood'
     | '/_authenticated/reports/nutrition'
     | '/_authenticated/reports/sleep-meal'
+    | '/_authenticated/reports/sleep-score'
     | '/_authenticated/reports/weekly'
     | '/_authenticated/reports/workout-match'
     | '/_authenticated/restaurants/nearby'
@@ -1563,6 +1576,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedReportsWeeklyRouteImport
       parentRoute: typeof AuthenticatedReportsRoute
     }
+    '/_authenticated/reports/sleep-score': {
+      id: '/_authenticated/reports/sleep-score'
+      path: '/sleep-score'
+      fullPath: '/reports/sleep-score'
+      preLoaderRoute: typeof AuthenticatedReportsSleepScoreRouteImport
+      parentRoute: typeof AuthenticatedReportsRoute
+    }
     '/_authenticated/reports/sleep-meal': {
       id: '/_authenticated/reports/sleep-meal'
       path: '/sleep-meal'
@@ -1900,6 +1920,7 @@ interface AuthenticatedReportsRouteChildren {
   AuthenticatedReportsMoodRoute: typeof AuthenticatedReportsMoodRoute
   AuthenticatedReportsNutritionRoute: typeof AuthenticatedReportsNutritionRoute
   AuthenticatedReportsSleepMealRoute: typeof AuthenticatedReportsSleepMealRoute
+  AuthenticatedReportsSleepScoreRoute: typeof AuthenticatedReportsSleepScoreRoute
   AuthenticatedReportsWeeklyRoute: typeof AuthenticatedReportsWeeklyRoute
   AuthenticatedReportsWorkoutMatchRoute: typeof AuthenticatedReportsWorkoutMatchRoute
 }
@@ -1912,6 +1933,7 @@ const AuthenticatedReportsRouteChildren: AuthenticatedReportsRouteChildren = {
   AuthenticatedReportsMoodRoute: AuthenticatedReportsMoodRoute,
   AuthenticatedReportsNutritionRoute: AuthenticatedReportsNutritionRoute,
   AuthenticatedReportsSleepMealRoute: AuthenticatedReportsSleepMealRoute,
+  AuthenticatedReportsSleepScoreRoute: AuthenticatedReportsSleepScoreRoute,
   AuthenticatedReportsWeeklyRoute: AuthenticatedReportsWeeklyRoute,
   AuthenticatedReportsWorkoutMatchRoute: AuthenticatedReportsWorkoutMatchRoute,
 }
