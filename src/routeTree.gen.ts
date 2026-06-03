@@ -13,9 +13,11 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedWorkoutRouteImport } from './routes/_authenticated/workout'
+import { Route as AuthenticatedSleepRouteImport } from './routes/_authenticated/sleep'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
 import { Route as AuthenticatedPrayerRouteImport } from './routes/_authenticated/prayer'
 import { Route as AuthenticatedOnboardingRouteImport } from './routes/_authenticated/onboarding'
+import { Route as AuthenticatedMealplanRouteImport } from './routes/_authenticated/mealplan'
 import { Route as AuthenticatedFoodRouteImport } from './routes/_authenticated/food'
 import { Route as AuthenticatedFastingRouteImport } from './routes/_authenticated/fasting'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
@@ -41,6 +43,11 @@ const AuthenticatedWorkoutRoute = AuthenticatedWorkoutRouteImport.update({
   path: '/workout',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedSleepRoute = AuthenticatedSleepRouteImport.update({
+  id: '/sleep',
+  path: '/sleep',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedProfileRoute = AuthenticatedProfileRouteImport.update({
   id: '/profile',
   path: '/profile',
@@ -54,6 +61,11 @@ const AuthenticatedPrayerRoute = AuthenticatedPrayerRouteImport.update({
 const AuthenticatedOnboardingRoute = AuthenticatedOnboardingRouteImport.update({
   id: '/onboarding',
   path: '/onboarding',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedMealplanRoute = AuthenticatedMealplanRouteImport.update({
+  id: '/mealplan',
+  path: '/mealplan',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedFoodRoute = AuthenticatedFoodRouteImport.update({
@@ -91,9 +103,11 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/fasting': typeof AuthenticatedFastingRoute
   '/food': typeof AuthenticatedFoodRoute
+  '/mealplan': typeof AuthenticatedMealplanRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/prayer': typeof AuthenticatedPrayerRoute
   '/profile': typeof AuthenticatedProfileRoute
+  '/sleep': typeof AuthenticatedSleepRoute
   '/workout': typeof AuthenticatedWorkoutRoute
 }
 export interface FileRoutesByTo {
@@ -104,9 +118,11 @@ export interface FileRoutesByTo {
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/fasting': typeof AuthenticatedFastingRoute
   '/food': typeof AuthenticatedFoodRoute
+  '/mealplan': typeof AuthenticatedMealplanRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/prayer': typeof AuthenticatedPrayerRoute
   '/profile': typeof AuthenticatedProfileRoute
+  '/sleep': typeof AuthenticatedSleepRoute
   '/workout': typeof AuthenticatedWorkoutRoute
 }
 export interface FileRoutesById {
@@ -119,9 +135,11 @@ export interface FileRoutesById {
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/fasting': typeof AuthenticatedFastingRoute
   '/_authenticated/food': typeof AuthenticatedFoodRoute
+  '/_authenticated/mealplan': typeof AuthenticatedMealplanRoute
   '/_authenticated/onboarding': typeof AuthenticatedOnboardingRoute
   '/_authenticated/prayer': typeof AuthenticatedPrayerRoute
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
+  '/_authenticated/sleep': typeof AuthenticatedSleepRoute
   '/_authenticated/workout': typeof AuthenticatedWorkoutRoute
 }
 export interface FileRouteTypes {
@@ -134,9 +152,11 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/fasting'
     | '/food'
+    | '/mealplan'
     | '/onboarding'
     | '/prayer'
     | '/profile'
+    | '/sleep'
     | '/workout'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -147,9 +167,11 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/fasting'
     | '/food'
+    | '/mealplan'
     | '/onboarding'
     | '/prayer'
     | '/profile'
+    | '/sleep'
     | '/workout'
   id:
     | '__root__'
@@ -161,9 +183,11 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard'
     | '/_authenticated/fasting'
     | '/_authenticated/food'
+    | '/_authenticated/mealplan'
     | '/_authenticated/onboarding'
     | '/_authenticated/prayer'
     | '/_authenticated/profile'
+    | '/_authenticated/sleep'
     | '/_authenticated/workout'
   fileRoutesById: FileRoutesById
 }
@@ -203,6 +227,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedWorkoutRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/sleep': {
+      id: '/_authenticated/sleep'
+      path: '/sleep'
+      fullPath: '/sleep'
+      preLoaderRoute: typeof AuthenticatedSleepRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/profile': {
       id: '/_authenticated/profile'
       path: '/profile'
@@ -222,6 +253,13 @@ declare module '@tanstack/react-router' {
       path: '/onboarding'
       fullPath: '/onboarding'
       preLoaderRoute: typeof AuthenticatedOnboardingRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/mealplan': {
+      id: '/_authenticated/mealplan'
+      path: '/mealplan'
+      fullPath: '/mealplan'
+      preLoaderRoute: typeof AuthenticatedMealplanRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/food': {
@@ -268,9 +306,11 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedFastingRoute: typeof AuthenticatedFastingRoute
   AuthenticatedFoodRoute: typeof AuthenticatedFoodRoute
+  AuthenticatedMealplanRoute: typeof AuthenticatedMealplanRoute
   AuthenticatedOnboardingRoute: typeof AuthenticatedOnboardingRoute
   AuthenticatedPrayerRoute: typeof AuthenticatedPrayerRoute
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
+  AuthenticatedSleepRoute: typeof AuthenticatedSleepRoute
   AuthenticatedWorkoutRoute: typeof AuthenticatedWorkoutRoute
 }
 
@@ -280,9 +320,11 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedFastingRoute: AuthenticatedFastingRoute,
   AuthenticatedFoodRoute: AuthenticatedFoodRoute,
+  AuthenticatedMealplanRoute: AuthenticatedMealplanRoute,
   AuthenticatedOnboardingRoute: AuthenticatedOnboardingRoute,
   AuthenticatedPrayerRoute: AuthenticatedPrayerRoute,
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,
+  AuthenticatedSleepRoute: AuthenticatedSleepRoute,
   AuthenticatedWorkoutRoute: AuthenticatedWorkoutRoute,
 }
 
@@ -297,3 +339,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
