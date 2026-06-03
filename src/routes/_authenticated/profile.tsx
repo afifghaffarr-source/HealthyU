@@ -29,6 +29,7 @@ import {
   Download,
   UsersRound,
   Sparkles,
+  AlertTriangle,
 } from "lucide-react";
 import { useTheme } from "@/components/theme-provider";
 
@@ -267,6 +268,13 @@ function ProfilePage() {
           >
             <Activity className="size-5 text-emerald-600" />
             <span className="text-sm font-semibold">Import Apple/Samsung</span>
+          </Link>
+          <Link
+            to="/offline-queue"
+            className="bg-card p-4 rounded-2xl outline-1 outline-black/10 flex flex-col items-start gap-2"
+          >
+            <AlertTriangle className="size-5 text-amber-600" />
+            <span className="text-sm font-semibold">Sync Gagal</span>
           </Link>
         </section>
 
