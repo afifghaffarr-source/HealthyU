@@ -4,7 +4,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { getChatHistory, sendChatMessage } from "@/lib/chat.functions";
 import { BottomNav } from "@/components/bottom-nav";
-import { ArrowLeft, Send, Sparkles } from "lucide-react";
+import { ArrowLeft, Send, Sparkles, ImagePlus, X } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/chat")({
@@ -25,11 +25,17 @@ function ChatPage() {
   const { data: messages = [] } = useQuery({ queryKey: ["chat"], queryFn: () => fetchHist() });
 
   const [input, setInput] = useState("");
+  const [imageData, setImageData] = useState<{ base64: string; mime: string; preview: string } | null>(null);
+  const fileRef = useRef<HTMLInputElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const mutation = useMutation({
-    mutationFn: (message: string) => send({ data: { message } }),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["chat"] }),
+    mutationFn: (payload: { message: string; imageBase64?: string; imageMime?: string }) =>
+      send({ data: payload }),
+    onSuccess: () => {
+      setImageData(null);
+      qc.invalidateQueries({ queryKey: ["chat"] });
+    },
     onError: (e) => toast.error(e instanceof Error ? e.message : "Gagal kirim"),
   });
 
@@ -39,9 +45,26 @@ function ChatPage() {
 
   const handleSend = (text?: string) => {
     const msg = (text ?? input).trim();
-    if (!msg) return;
+    if (!msg && !imageData) return;
     setInput("");
-    mutation.mutate(msg);
+    mutation.mutate({
+      message: msg || "Tolong analisis foto ini.",
+      imageBase64: imageData?.base64,
+      imageMime: imageData?.mime,
+    });
+  };
+
+  const handleFile = async (file: File) => {
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error("Ukuran foto maks 5MB");
+      return;
+    }
+    const buf = await file.arrayBuffer();
+    const bytes = new Uint8Array(buf);
+    let binary = "";
+    for (let i = 0; i < bytes.length; i++) binary += String.fromCharCode(bytes[i]);
+    const base64 = btoa(binary);
+    setImageData({ base64, mime: file.type || "image/jpeg", preview: URL.createObjectURL(file) });
   };
 
   return (
@@ -108,18 +131,50 @@ function ChatPage() {
 
       <div className="fixed bottom-24 left-0 right-0 z-30">
         <div className="max-w-md mx-auto px-4">
+          {imageData && (
+            <div className="mb-2 bg-card rounded-2xl outline-1 outline-black/10 p-2 flex items-center gap-2 shadow-lg">
+              <img src={imageData.preview} alt="preview" className="size-12 rounded-xl object-cover" />
+              <span className="text-xs text-muted-foreground flex-1">Foto siap dikirim</span>
+              <button
+                onClick={() => setImageData(null)}
+                className="size-7 grid place-items-center rounded-lg hover:bg-secondary/50"
+              >
+                <X className="size-3.5" />
+              </button>
+            </div>
+          )}
           <div className="bg-card rounded-3xl outline-1 outline-black/10 shadow-lg p-2 flex items-center gap-2">
+            <input
+              ref={fileRef}
+              type="file"
+              accept="image/*"
+              capture="environment"
+              hidden
+              onChange={(e) => {
+                const f = e.target.files?.[0];
+                if (f) handleFile(f);
+                e.target.value = "";
+              }}
+            />
+            <button
+              onClick={() => fileRef.current?.click()}
+              disabled={mutation.isPending}
+              className="size-10 grid place-items-center rounded-2xl text-muted-foreground hover:bg-secondary/50 disabled:opacity-40"
+              aria-label="Lampirkan foto"
+            >
+              <ImagePlus className="size-4" />
+            </button>
             <input
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && handleSend()}
-              placeholder="Tanya Dr. Healthy..."
+              placeholder={imageData ? "Tambah pertanyaan (opsional)..." : "Tanya Dr. Healthy..."}
               disabled={mutation.isPending}
               className="flex-1 bg-transparent px-3 py-2 text-sm focus:outline-none disabled:opacity-50"
             />
             <button
               onClick={() => handleSend()}
-              disabled={mutation.isPending || !input.trim()}
+              disabled={mutation.isPending || (!input.trim() && !imageData)}
               className="size-10 bg-primary text-primary-foreground rounded-2xl grid place-items-center disabled:opacity-40"
             >
               <Send className="size-4" />
