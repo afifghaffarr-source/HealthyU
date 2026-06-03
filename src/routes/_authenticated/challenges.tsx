@@ -386,3 +386,58 @@ function LeaderboardList({
     </ol>
   );
 }
+
+function BonusClaimer({ challengeId }: { challengeId: string }) {
+  const qc = useQueryClient();
+  const fetchGroups = useServerFn(listChallengeGroups);
+  const fetchClaimed = useServerFn(listGroupBonusStatus);
+  const claimFn = useServerFn(claimGroupChallengeBonus);
+  const { data: groups = [] } = useQuery({
+    queryKey: ["challenge-groups", challengeId],
+    queryFn: () => fetchGroups({ data: { challenge_id: challengeId } }),
+  });
+  const { data: claimedIds = [] } = useQuery({
+    queryKey: ["bonus-claimed", challengeId],
+    queryFn: () => fetchClaimed({ data: { challenge_id: challengeId } }),
+  });
+  const claimedSet = new Set(claimedIds);
+  const claimM = useMutation({
+    mutationFn: (group_id: string) =>
+      claimFn({ data: { group_id, challenge_id: challengeId } }),
+    onSuccess: (r, group_id) => {
+      if (r.ok) {
+        toast.success(`+${r.coins_awarded} 🪙 bonus grup!`);
+        qc.invalidateQueries({ queryKey: ["bonus-claimed", challengeId] });
+      } else if (r.reason === "not_all_completed") {
+        toast.error(`Belum semua selesai (${r.completed}/${r.total})`);
+      } else if (r.reason === "already_claimed") {
+        toast.info("Sudah pernah klaim");
+      } else {
+        toast.error(`Gagal: ${r.reason ?? "unknown"}`);
+      }
+      void group_id;
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+  if (groups.length === 0) return null;
+  return (
+    <div className="mt-2 space-y-1.5">
+      {groups.map((g) => {
+        const done = claimedSet.has(g.id);
+        return (
+          <button
+            key={g.id}
+            onClick={() => !done && claimM.mutate(g.id)}
+            disabled={done || claimM.isPending}
+            className={`w-full text-[11px] font-semibold rounded-xl py-1.5 px-2 inline-flex items-center justify-center gap-1 ${
+              done ? "bg-muted text-muted-foreground" : "bg-amber-100 text-amber-800"
+            }`}
+          >
+            <Gift className="size-3" />
+            {done ? `Bonus "${g.name}" terklaim` : `Klaim bonus grup "${g.name}"`}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
