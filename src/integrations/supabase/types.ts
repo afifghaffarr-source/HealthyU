@@ -2006,6 +2006,33 @@ export type Database = {
         }
         Relationships: []
       }
+      friend_invites: {
+        Row: {
+          created_at: string
+          id: string
+          inviter_id: string
+          token: string
+          used_at: string | null
+          used_by: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          inviter_id: string
+          token: string
+          used_at?: string | null
+          used_by?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          inviter_id?: string
+          token?: string
+          used_at?: string | null
+          used_by?: string | null
+        }
+        Relationships: []
+      }
       gacha_pulls: {
         Row: {
           cost_coins: number
@@ -3978,6 +4005,30 @@ export type Database = {
         }
         Relationships: []
       }
+      theme_preferences: {
+        Row: {
+          mode: string
+          sunset_lat: number | null
+          sunset_lon: number | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          mode?: string
+          sunset_lat?: number | null
+          sunset_lon?: number | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          mode?: string
+          sunset_lat?: number | null
+          sunset_lon?: number | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_achievements: {
         Row: {
           achievement_id: string
@@ -4391,6 +4442,33 @@ export type Database = {
           logged_at?: string
           note?: string | null
           systolic?: number | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      voice_transcripts: {
+        Row: {
+          created_at: string
+          id: string
+          metadata: Json | null
+          source: string
+          transcript: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          metadata?: Json | null
+          source: string
+          transcript: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          metadata?: Json | null
+          source?: string
+          transcript?: string
           user_id?: string
         }
         Relationships: []
