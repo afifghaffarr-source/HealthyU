@@ -9,6 +9,7 @@
 // | TRENDING_GROWTH_FLASH_MS       | Durasi flash "+N" pada badge growth resep.                |
 // | CHALLENGE_HIGHLIGHT_MS         | Durasi ring highlight kartu challenge (auto-scroll).      |
 // | CHALLENGE_HIGHLIGHT_FADE_MS    | Lama fade-out ring di akhir CHALLENGE_HIGHLIGHT_MS.       |
+// | CHALLENGE_HIGHLIGHT_FADE_OPACITY | Opacity kartu di akhir fade ring highlight (0..1).      |
 //
 // CONVENTION: setiap konstanta tunable WAJIB ditambahkan ke tabel di atas
 // (nama + 1 baris efek). Reviewer boleh menolak PR yang menambah konstanta
@@ -42,3 +43,7 @@ export const CHALLENGE_HIGHLIGHT_MS = 2000;
 /** Lama fade-out ring di akhir CHALLENGE_HIGHLIGHT_MS (ms). */
 // eslint-disable-next-line no-restricted-syntax -- listed in header table
 export const CHALLENGE_HIGHLIGHT_FADE_MS = 500;
+
+/** Opacity kartu challenge di akhir fade ring (0..1). */
+// eslint-disable-next-line no-restricted-syntax -- listed in header table
+export const CHALLENGE_HIGHLIGHT_FADE_OPACITY = 0.9;

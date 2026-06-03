@@ -241,8 +241,9 @@ function ReportsPage() {
       doc.link(40, tocY - 10, 515, 14, { pageNumber: page });
       tocY += 16;
     });
-    filtered.forEach((r) => {
+    filtered.forEach((r, bodyIdx) => {
       doc.addPage();
+      const currentPage = tocPages + bodyIdx + 1;
       const text = Array.isArray(r.recommendations) ? String(r.recommendations[0] ?? "") : "";
       doc.setFont("helvetica", "bold");
       doc.setFontSize(18);
@@ -266,7 +267,7 @@ function ReportsPage() {
       // Back-link to TOC (page 1) in the top-right corner.
       doc.setTextColor(80, 80, 200);
       doc.setFontSize(9);
-      const linkLabel = "\u2190 Daftar Isi";
+      const linkLabel = `hal. ${currentPage} \u2190 Daftar Isi`;
       doc.text(linkLabel, 555, 40, { align: "right" });
       // Underline manually (jsPDF text has no built-in underline style).
       const linkW = doc.getTextWidth(linkLabel);
