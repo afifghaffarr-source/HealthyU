@@ -47,8 +47,22 @@ function RecipesPage() {
       window.localStorage.setItem("recipes:trendingOnly", trendingOnly ? "1" : "0");
   }, [trendingOnly]);
   const [pulseTrending, setPulseTrending] = useState(false);
+  const [pulseCounter, setPulseCounter] = useState(false);
   const [flashIds, setFlashIds] = useState<Record<string, number>>({});
   const prevGrowth = useRef<Record<string, number>>({});
+  const prevTrendingCount = useRef<number | null>(null);
+
+  const trendingCount = all.filter((r) => Number(r.weekly_growth ?? 0) > 0).length;
+  useEffect(() => {
+    const prev = prevTrendingCount.current;
+    prevTrendingCount.current = trendingCount;
+    if (prev === null) return;
+    if (trendingCount > prev) {
+      setPulseCounter(true);
+      const t = window.setTimeout(() => setPulseCounter(false), 1500);
+      return () => window.clearTimeout(t);
+    }
+  }, [trendingCount]);
 
   // Realtime re-sort while in trending mode
   useEffect(() => {
@@ -216,19 +230,19 @@ function RecipesPage() {
             }`}
           >
             <TrendingUp className="size-3" /> Trending
-            {(() => {
-              const n = all.filter((r) => Number(r.weekly_growth ?? 0) > 0).length;
-              if (n === 0) return null;
-              return (
-                <span
-                  className={`ml-0.5 text-[9px] font-bold tabular-nums rounded-full px-1.5 py-px ${
-                    sort === "trending" ? "bg-white/25 text-white" : "bg-orange-100 text-orange-700"
-                  }`}
-                >
-                  {n}
-                </span>
-              );
-            })()}
+            {trendingCount > 0 && (
+              <span
+                className={`ml-0.5 text-[9px] font-bold tabular-nums rounded-full px-1.5 py-px transition-colors ${
+                  pulseCounter
+                    ? "bg-orange-300 text-orange-900 animate-pulse"
+                    : sort === "trending"
+                      ? "bg-white/25 text-white"
+                      : "bg-orange-100 text-orange-700"
+                }`}
+              >
+                {trendingCount}
+              </span>
+            )}
             {pulseTrending && (
               <span className="absolute -top-0.5 -right-0.5 flex size-2">
                 <span className="absolute inline-flex size-full rounded-full bg-orange-400 opacity-75 animate-ping" />
