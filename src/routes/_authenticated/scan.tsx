@@ -3,10 +3,10 @@ import { useRef, useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { TopAppBar } from "@/components/healthyu/top-app-bar";
-import { Camera, Loader2, Sparkles, X, Check } from "lucide-react";
+import { Camera, Loader2, Sparkles, X, Check, Pencil } from "lucide-react";
 import { toast } from "sonner";
 import { BottomNav } from "@/components/bottom-nav";
-import { recognizeFood } from "@/lib/foodScan.functions";
+import { recognizeFood, submitScanCorrection } from "@/lib/foodScan.functions";
 import { logMeal } from "@/lib/meals.functions";
 
 export const Route = createFileRoute("/_authenticated/scan")({
@@ -48,15 +48,21 @@ function ScanPage() {
   const fileRef = useRef<HTMLInputElement>(null);
   const scan = useServerFn(recognizeFood);
   const log = useServerFn(logMeal);
+  const correct = useServerFn(submitScanCorrection);
 
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [items, setItems] = useState<Item[]>([]);
+  const [originals, setOriginals] = useState<Item[]>([]);
+  const [scanId, setScanId] = useState<string | null>(null);
+  const [editIdx, setEditIdx] = useState<number | null>(null);
   const [mealType, setMealType] = useState<(typeof MEAL_TYPES)[number]["v"]>(pickDefaultMealType());
 
   const scanMut = useMutation({
     mutationFn: async (dataUrl: string) => scan({ data: { image_data_url: dataUrl } }),
     onSuccess: (res) => {
       setItems(res.items);
+      setOriginals(res.items.map((i) => ({ ...i })));
+      setScanId(res.scan_id);
       if (res.items.length === 0) toast.error("Tidak ada makanan terdeteksi");
       else toast.success(`${res.items.length} makanan dikenali`);
     },
@@ -64,8 +70,22 @@ function ScanPage() {
   });
 
   const logMut = useMutation({
-    mutationFn: (it: Item) =>
-      log({
+    mutationFn: async (payload: { it: Item; idx: number }) => {
+      const { it, idx } = payload;
+      const orig = originals[idx];
+      const changed =
+        orig &&
+        (orig.name !== it.name ||
+          Math.round(orig.calories) !== Math.round(it.calories) ||
+          Math.round(orig.portion_g ?? 0) !== Math.round(it.portion_g ?? 0) ||
+          Math.round(orig.protein_g) !== Math.round(it.protein_g) ||
+          Math.round(orig.carbs_g) !== Math.round(it.carbs_g) ||
+          Math.round(orig.fat_g) !== Math.round(it.fat_g));
+      if (changed) {
+        // fire-and-forget audit
+        correct({ data: { scan_id: scanId, original: orig, corrected: it } }).catch(() => {});
+      }
+      return log({
         data: {
           food_item_id: it.matched_food_id ?? null,
           custom_name: it.matched_food_id ? null : it.name,
@@ -76,13 +96,20 @@ function ScanPage() {
           carbs_g: Math.round(it.carbs_g),
           fat_g: Math.round(it.fat_g),
         },
-      }),
-    onSuccess: (_res, it) => {
-      toast.success(`${it.name} dicatat`);
-      setItems((prev) => prev.filter((x) => x !== it));
+      });
+    },
+    onSuccess: (_res, payload) => {
+      toast.success(`${payload.it.name} dicatat`);
+      setItems((prev) => prev.filter((_, i) => i !== payload.idx));
+      setOriginals((prev) => prev.filter((_, i) => i !== payload.idx));
+      if (editIdx === payload.idx) setEditIdx(null);
     },
     onError: (e: Error) => toast.error(e.message),
   });
+
+  function updateItem(idx: number, patch: Partial<Item>) {
+    setItems((prev) => prev.map((it, i) => (i === idx ? { ...it, ...patch } : it)));
+  }
 
   async function handleFile(file: File) {
     try {
@@ -98,6 +125,9 @@ function ScanPage() {
   function reset() {
     setImageUrl(null);
     setItems([]);
+    setOriginals([]);
+    setScanId(null);
+    setEditIdx(null);
     if (fileRef.current) fileRef.current.value = "";
   }
 
