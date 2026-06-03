@@ -5,7 +5,12 @@ import { useEffect } from "react";
 import { toast } from "sonner";
 import { ArrowLeft, Activity, RefreshCw, Plug, Unplug, Loader2 } from "lucide-react";
 import { BottomNav } from "@/components/bottom-nav";
-import { startGoogleFit, getWearableStatus, syncGoogleFit, disconnectGoogleFit } from "@/lib/google-fit.functions";
+import {
+  startGoogleFit,
+  getWearableStatus,
+  syncGoogleFit,
+  disconnectGoogleFit,
+} from "@/lib/google-fit.functions";
 
 export const Route = createFileRoute("/_authenticated/wearable")({
   component: WearablePage,
@@ -38,7 +43,9 @@ function WearablePage() {
 
   const connectMut = useMutation({
     mutationFn: () => startFn({ data: { origin: window.location.origin } }),
-    onSuccess: (r) => { window.location.href = r.url; },
+    onSuccess: (r) => {
+      window.location.href = r.url;
+    },
     onError: (e) => toast.error(e instanceof Error ? e.message : "Gagal mulai OAuth"),
   });
 
@@ -63,7 +70,10 @@ function WearablePage() {
     <main className="min-h-screen bg-background pb-28">
       <div className="max-w-md mx-auto px-5 pt-8 space-y-5">
         <header className="flex items-center gap-3">
-          <Link to="/profile" className="size-10 bg-card rounded-2xl outline-1 outline-black/10 grid place-items-center">
+          <Link
+            to="/profile"
+            className="size-10 bg-card rounded-2xl outline-1 outline-black/10 grid place-items-center"
+          >
             <ArrowLeft className="size-4" />
           </Link>
           <div>
@@ -80,7 +90,11 @@ function WearablePage() {
             <div className="flex-1">
               <p className="font-bold">Google Fit</p>
               <p className="text-xs text-muted-foreground">
-                {isLoading ? "Memuat..." : data?.connected ? `Terhubung${data.last_sync_at ? " · " + new Date(data.last_sync_at).toLocaleString("id-ID") : ""}` : "Belum terhubung"}
+                {isLoading
+                  ? "Memuat..."
+                  : data?.connected
+                    ? `Terhubung${data.last_sync_at ? " · " + new Date(data.last_sync_at).toLocaleString("id-ID") : ""}`
+                    : "Belum terhubung"}
               </p>
             </div>
           </div>
@@ -91,7 +105,11 @@ function WearablePage() {
               disabled={connectMut.isPending}
               className="w-full flex items-center justify-center gap-2 bg-primary text-primary-foreground font-semibold py-3 rounded-2xl disabled:opacity-60"
             >
-              {connectMut.isPending ? <Loader2 className="size-4 animate-spin" /> : <Plug className="size-4" />}
+              {connectMut.isPending ? (
+                <Loader2 className="size-4 animate-spin" />
+              ) : (
+                <Plug className="size-4" />
+              )}
               Hubungkan Google Fit
             </button>
           ) : (
@@ -101,7 +119,11 @@ function WearablePage() {
                 disabled={syncMut.isPending}
                 className="flex items-center justify-center gap-2 bg-primary text-primary-foreground font-semibold py-3 rounded-2xl disabled:opacity-60"
               >
-                {syncMut.isPending ? <Loader2 className="size-4 animate-spin" /> : <RefreshCw className="size-4" />}
+                {syncMut.isPending ? (
+                  <Loader2 className="size-4 animate-spin" />
+                ) : (
+                  <RefreshCw className="size-4" />
+                )}
                 Sinkron sekarang
               </button>
               <button
@@ -116,11 +138,19 @@ function WearablePage() {
 
         {data?.connected && data.recent_steps && data.recent_steps.length > 0 && (
           <section className="bg-card p-5 rounded-3xl outline-1 outline-black/5">
-            <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-3">Langkah 7 hari</p>
+            <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-3">
+              Langkah 7 hari
+            </p>
             <ul className="space-y-2">
               {data.recent_steps.map((s) => (
                 <li key={s.day} className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">{new Date(s.day).toLocaleDateString("id-ID", { weekday: "long", day: "numeric", month: "short" })}</span>
+                  <span className="text-muted-foreground">
+                    {new Date(s.day).toLocaleDateString("id-ID", {
+                      weekday: "long",
+                      day: "numeric",
+                      month: "short",
+                    })}
+                  </span>
                   <span className="font-bold tabular-nums">{s.steps.toLocaleString("id-ID")}</span>
                 </li>
               ))}
@@ -129,7 +159,8 @@ function WearablePage() {
         )}
 
         <p className="text-xs text-muted-foreground leading-relaxed">
-          Data yang disinkron: jumlah langkah harian, rata-rata detak jantung harian (tersimpan ke catatan vital). Pastikan aplikasi Google Fit di HP kamu aktif.
+          Data yang disinkron: jumlah langkah harian, rata-rata detak jantung harian
+          (tersimpan ke catatan vital). Pastikan aplikasi Google Fit di HP kamu aktif.
         </p>
       </div>
       <BottomNav />
