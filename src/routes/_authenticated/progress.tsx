@@ -5,8 +5,9 @@ import { useServerFn } from "@tanstack/react-start";
 import { listProgress, addProgress, deleteProgress } from "@/lib/progress.functions";
 import { supabase } from "@/integrations/supabase/client";
 import { BottomNav } from "@/components/bottom-nav";
-import { ArrowLeft, Camera, Trash2, Loader2 } from "lucide-react";
+import { ArrowLeft, Camera, Trash2, Loader2, Film } from "lucide-react";
 import { toast } from "sonner";
+import { generateTimelapse } from "@/lib/timelapse";
 
 export const Route = createFileRoute("/_authenticated/progress")({
   component: ProgressPage,
@@ -114,6 +115,14 @@ function ProgressPage() {
           </button>
         </section>
 
+        {photos.length >= 2 && (
+          <TimelapseButton
+            photos={photos
+              .filter((p): p is typeof p & { signed_url: string } => Boolean(p.signed_url))
+              .map((p) => ({ url: p.signed_url!, taken_at: p.taken_at }))}
+          />
+        )}
+
         <section className="grid grid-cols-2 gap-3">
           {photos.map((p) => (
             <div key={p.id} className="bg-card rounded-2xl outline-1 outline-black/5 overflow-hidden relative group">
@@ -144,5 +153,56 @@ function ProgressPage() {
       </div>
       <BottomNav />
     </main>
+  );
+}
+
+function TimelapseButton({ photos }: { photos: { url: string; taken_at: string }[] }) {
+  const [busy, setBusy] = useState(false);
+  const [video, setVideo] = useState<{ url: string; ext: string } | null>(null);
+
+  const run = async () => {
+    setBusy(true);
+    setVideo(null);
+    try {
+      const r = await generateTimelapse(photos, { frameMs: 600 });
+      setVideo({ url: r.url, ext: r.ext });
+      toast.success("Time-lapse siap!");
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Gagal membuat time-lapse");
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  return (
+    <section className="bg-card p-5 rounded-3xl outline-1 outline-black/5 space-y-3">
+      <div className="flex items-center gap-2">
+        <Film className="size-4 text-coral" />
+        <h2 className="font-semibold text-sm">Time-lapse Transformasi</h2>
+      </div>
+      <p className="text-xs text-muted-foreground">
+        Gabungkan {photos.length} foto progres jadi video pendek.
+      </p>
+      <button
+        onClick={run}
+        disabled={busy}
+        className="w-full bg-coral text-white font-semibold py-3 rounded-2xl flex items-center justify-center gap-2 disabled:opacity-50"
+      >
+        {busy ? <Loader2 className="size-4 animate-spin" /> : <Film className="size-4" />}
+        {busy ? "Merender..." : "Buat Time-lapse"}
+      </button>
+      {video && (
+        <div className="space-y-2">
+          <video src={video.url} controls autoPlay loop className="w-full rounded-2xl" />
+          <a
+            href={video.url}
+            download={`timelapse-${Date.now()}.${video.ext}`}
+            className="block w-full text-center bg-card outline-1 outline-black/10 font-semibold py-3 rounded-2xl text-sm"
+          >
+            Unduh video
+          </a>
+        </div>
+      )}
+    </section>
   );
 }

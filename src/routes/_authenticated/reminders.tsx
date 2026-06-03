@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { BottomNav } from "@/components/bottom-nav";
+import { PushNotifications } from "@/components/push-notifications";
 import {
   ArrowLeft,
   Bell,
@@ -127,6 +128,8 @@ function RemindersPage() {
             <Plus className="size-4" />
           </button>
         </header>
+
+        <PushNotifications />
 
         {permission !== "granted" ? (
           <button
