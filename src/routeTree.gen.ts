@@ -52,11 +52,13 @@ import { Route as AuthenticatedBackupRouteImport } from './routes/_authenticated
 import { Route as AuthenticatedArticlesRouteImport } from './routes/_authenticated/articles'
 import { Route as AuthenticatedAchievementsRouteImport } from './routes/_authenticated/achievements'
 import { Route as ApiChatStreamRouteImport } from './routes/api/chat.stream'
+import { Route as AuthenticatedScanVoiceRouteImport } from './routes/_authenticated/scan.voice'
 import { Route as AuthenticatedScanRecipeRouteImport } from './routes/_authenticated/scan.recipe'
 import { Route as AuthenticatedScanMenuRouteImport } from './routes/_authenticated/scan.menu'
 import { Route as AuthenticatedScanHistoryRouteImport } from './routes/_authenticated/scan.history'
 import { Route as AuthenticatedScanBarcodeRouteImport } from './routes/_authenticated/scan.barcode'
 import { Route as AuthenticatedReportsNutritionRouteImport } from './routes/_authenticated/reports.nutrition'
+import { Route as AuthenticatedReportsGalleryRouteImport } from './routes/_authenticated/reports.gallery'
 import { Route as AuthenticatedRecipesSavedRouteImport } from './routes/_authenticated/recipes.saved'
 import { Route as AuthenticatedRecipesRecommendationsRouteImport } from './routes/_authenticated/recipes.recommendations'
 import { Route as AuthenticatedRecipesIdRouteImport } from './routes/_authenticated/recipes.$id'
@@ -290,6 +292,11 @@ const ApiChatStreamRoute = ApiChatStreamRouteImport.update({
   path: '/api/chat/stream',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedScanVoiceRoute = AuthenticatedScanVoiceRouteImport.update({
+  id: '/voice',
+  path: '/voice',
+  getParentRoute: () => AuthenticatedScanRoute,
+} as any)
 const AuthenticatedScanRecipeRoute = AuthenticatedScanRecipeRouteImport.update({
   id: '/recipe',
   path: '/recipe',
@@ -316,6 +323,12 @@ const AuthenticatedReportsNutritionRoute =
   AuthenticatedReportsNutritionRouteImport.update({
     id: '/nutrition',
     path: '/nutrition',
+    getParentRoute: () => AuthenticatedReportsRoute,
+  } as any)
+const AuthenticatedReportsGalleryRoute =
+  AuthenticatedReportsGalleryRouteImport.update({
+    id: '/gallery',
+    path: '/gallery',
     getParentRoute: () => AuthenticatedReportsRoute,
   } as any)
 const AuthenticatedRecipesSavedRoute =
@@ -425,11 +438,13 @@ export interface FileRoutesByFullPath {
   '/recipes/$id': typeof AuthenticatedRecipesIdRoute
   '/recipes/recommendations': typeof AuthenticatedRecipesRecommendationsRoute
   '/recipes/saved': typeof AuthenticatedRecipesSavedRoute
+  '/reports/gallery': typeof AuthenticatedReportsGalleryRoute
   '/reports/nutrition': typeof AuthenticatedReportsNutritionRoute
   '/scan/barcode': typeof AuthenticatedScanBarcodeRoute
   '/scan/history': typeof AuthenticatedScanHistoryRoute
   '/scan/menu': typeof AuthenticatedScanMenuRoute
   '/scan/recipe': typeof AuthenticatedScanRecipeRoute
+  '/scan/voice': typeof AuthenticatedScanVoiceRoute
   '/api/chat/stream': typeof ApiChatStreamRoute
   '/api/public/hooks/daily-coach': typeof ApiPublicHooksDailyCoachRoute
   '/api/public/hooks/notification-scheduler': typeof ApiPublicHooksNotificationSchedulerRoute
@@ -484,11 +499,13 @@ export interface FileRoutesByTo {
   '/recipes/$id': typeof AuthenticatedRecipesIdRoute
   '/recipes/recommendations': typeof AuthenticatedRecipesRecommendationsRoute
   '/recipes/saved': typeof AuthenticatedRecipesSavedRoute
+  '/reports/gallery': typeof AuthenticatedReportsGalleryRoute
   '/reports/nutrition': typeof AuthenticatedReportsNutritionRoute
   '/scan/barcode': typeof AuthenticatedScanBarcodeRoute
   '/scan/history': typeof AuthenticatedScanHistoryRoute
   '/scan/menu': typeof AuthenticatedScanMenuRoute
   '/scan/recipe': typeof AuthenticatedScanRecipeRoute
+  '/scan/voice': typeof AuthenticatedScanVoiceRoute
   '/api/chat/stream': typeof ApiChatStreamRoute
   '/api/public/hooks/daily-coach': typeof ApiPublicHooksDailyCoachRoute
   '/api/public/hooks/notification-scheduler': typeof ApiPublicHooksNotificationSchedulerRoute
@@ -545,11 +562,13 @@ export interface FileRoutesById {
   '/_authenticated/recipes/$id': typeof AuthenticatedRecipesIdRoute
   '/_authenticated/recipes/recommendations': typeof AuthenticatedRecipesRecommendationsRoute
   '/_authenticated/recipes/saved': typeof AuthenticatedRecipesSavedRoute
+  '/_authenticated/reports/gallery': typeof AuthenticatedReportsGalleryRoute
   '/_authenticated/reports/nutrition': typeof AuthenticatedReportsNutritionRoute
   '/_authenticated/scan/barcode': typeof AuthenticatedScanBarcodeRoute
   '/_authenticated/scan/history': typeof AuthenticatedScanHistoryRoute
   '/_authenticated/scan/menu': typeof AuthenticatedScanMenuRoute
   '/_authenticated/scan/recipe': typeof AuthenticatedScanRecipeRoute
+  '/_authenticated/scan/voice': typeof AuthenticatedScanVoiceRoute
   '/api/chat/stream': typeof ApiChatStreamRoute
   '/api/public/hooks/daily-coach': typeof ApiPublicHooksDailyCoachRoute
   '/api/public/hooks/notification-scheduler': typeof ApiPublicHooksNotificationSchedulerRoute
@@ -606,11 +625,13 @@ export interface FileRouteTypes {
     | '/recipes/$id'
     | '/recipes/recommendations'
     | '/recipes/saved'
+    | '/reports/gallery'
     | '/reports/nutrition'
     | '/scan/barcode'
     | '/scan/history'
     | '/scan/menu'
     | '/scan/recipe'
+    | '/scan/voice'
     | '/api/chat/stream'
     | '/api/public/hooks/daily-coach'
     | '/api/public/hooks/notification-scheduler'
@@ -665,11 +686,13 @@ export interface FileRouteTypes {
     | '/recipes/$id'
     | '/recipes/recommendations'
     | '/recipes/saved'
+    | '/reports/gallery'
     | '/reports/nutrition'
     | '/scan/barcode'
     | '/scan/history'
     | '/scan/menu'
     | '/scan/recipe'
+    | '/scan/voice'
     | '/api/chat/stream'
     | '/api/public/hooks/daily-coach'
     | '/api/public/hooks/notification-scheduler'
@@ -725,11 +748,13 @@ export interface FileRouteTypes {
     | '/_authenticated/recipes/$id'
     | '/_authenticated/recipes/recommendations'
     | '/_authenticated/recipes/saved'
+    | '/_authenticated/reports/gallery'
     | '/_authenticated/reports/nutrition'
     | '/_authenticated/scan/barcode'
     | '/_authenticated/scan/history'
     | '/_authenticated/scan/menu'
     | '/_authenticated/scan/recipe'
+    | '/_authenticated/scan/voice'
     | '/api/chat/stream'
     | '/api/public/hooks/daily-coach'
     | '/api/public/hooks/notification-scheduler'
@@ -1053,6 +1078,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiChatStreamRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/scan/voice': {
+      id: '/_authenticated/scan/voice'
+      path: '/voice'
+      fullPath: '/scan/voice'
+      preLoaderRoute: typeof AuthenticatedScanVoiceRouteImport
+      parentRoute: typeof AuthenticatedScanRoute
+    }
     '/_authenticated/scan/recipe': {
       id: '/_authenticated/scan/recipe'
       path: '/recipe'
@@ -1086,6 +1118,13 @@ declare module '@tanstack/react-router' {
       path: '/nutrition'
       fullPath: '/reports/nutrition'
       preLoaderRoute: typeof AuthenticatedReportsNutritionRouteImport
+      parentRoute: typeof AuthenticatedReportsRoute
+    }
+    '/_authenticated/reports/gallery': {
+      id: '/_authenticated/reports/gallery'
+      path: '/gallery'
+      fullPath: '/reports/gallery'
+      preLoaderRoute: typeof AuthenticatedReportsGalleryRouteImport
       parentRoute: typeof AuthenticatedReportsRoute
     }
     '/_authenticated/recipes/saved': {
@@ -1191,10 +1230,12 @@ const AuthenticatedRecipesRouteWithChildren =
   AuthenticatedRecipesRoute._addFileChildren(AuthenticatedRecipesRouteChildren)
 
 interface AuthenticatedReportsRouteChildren {
+  AuthenticatedReportsGalleryRoute: typeof AuthenticatedReportsGalleryRoute
   AuthenticatedReportsNutritionRoute: typeof AuthenticatedReportsNutritionRoute
 }
 
 const AuthenticatedReportsRouteChildren: AuthenticatedReportsRouteChildren = {
+  AuthenticatedReportsGalleryRoute: AuthenticatedReportsGalleryRoute,
   AuthenticatedReportsNutritionRoute: AuthenticatedReportsNutritionRoute,
 }
 
@@ -1206,6 +1247,7 @@ interface AuthenticatedScanRouteChildren {
   AuthenticatedScanHistoryRoute: typeof AuthenticatedScanHistoryRoute
   AuthenticatedScanMenuRoute: typeof AuthenticatedScanMenuRoute
   AuthenticatedScanRecipeRoute: typeof AuthenticatedScanRecipeRoute
+  AuthenticatedScanVoiceRoute: typeof AuthenticatedScanVoiceRoute
 }
 
 const AuthenticatedScanRouteChildren: AuthenticatedScanRouteChildren = {
@@ -1213,6 +1255,7 @@ const AuthenticatedScanRouteChildren: AuthenticatedScanRouteChildren = {
   AuthenticatedScanHistoryRoute: AuthenticatedScanHistoryRoute,
   AuthenticatedScanMenuRoute: AuthenticatedScanMenuRoute,
   AuthenticatedScanRecipeRoute: AuthenticatedScanRecipeRoute,
+  AuthenticatedScanVoiceRoute: AuthenticatedScanVoiceRoute,
 }
 
 const AuthenticatedScanRouteWithChildren =
