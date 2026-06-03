@@ -88,7 +88,12 @@ function ChallengesPage() {
   );
   const [openLb, setOpenLb] = useState<string | null>(null);
   const [streakAutoChallenge, setStreakAutoChallenge] = useState<string | null>(null);
+  const [highlightId, setHighlightId] = useState<string | null>(null);
   const articleRefs = useRef<Record<string, HTMLElement | null>>({});
+  const flashHighlight = (id: string) => {
+    setHighlightId(id);
+    window.setTimeout(() => setHighlightId((cur) => (cur === id ? null : cur)), 2000);
+  };
 
   useEffect(() => {
     if (!focusChallenge) return;
@@ -108,7 +113,10 @@ function ChallengesPage() {
     const scrollToFirstUnjoined = () => {
       const joinedIds = new Set(parts.map((p) => p.challenge_id));
       const target = (data?.challenges ?? []).find((c) => !joinedIds.has(c.id));
-      if (target) articleRefs.current[target.id]?.scrollIntoView({ behavior: "smooth", block: "start" });
+      if (target) {
+        articleRefs.current[target.id]?.scrollIntoView({ behavior: "smooth", block: "start" });
+        flashHighlight(target.id);
+      }
     };
     if (parts.length === 0) {
       toast.info("Belum ada streak — gabung challenge dulu", {
