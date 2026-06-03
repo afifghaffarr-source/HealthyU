@@ -34,6 +34,7 @@ const ScanInput = z.object({
     .string()
     .startsWith("data:image/")
     .max(8_000_000, "Image too large (max ~6MB)"),
+  use_pro: z.boolean().optional(),
 });
 
 type ScanItem = {
@@ -57,6 +58,7 @@ export const recognizeFood = createServerFn({ method: "POST" })
     const startedAt = Date.now();
     const apiKey = process.env.LOVABLE_API_KEY;
     if (!apiKey) throw new Error("AI service not configured");
+    const model = data.use_pro ? "google/gemini-2.5-pro" : "google/gemini-2.5-flash";
 
     const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -65,7 +67,7 @@ export const recognizeFood = createServerFn({ method: "POST" })
         Authorization: `Bearer ${apiKey}`,
       },
       body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
+        model,
         messages: [
           { role: "system", content: SYSTEM },
           {
@@ -152,7 +154,7 @@ export const recognizeFood = createServerFn({ method: "POST" })
           total_protein: totalP,
           total_carbs: totalC,
           total_fat: totalF,
-          model_version: "gemini-2.5-flash",
+          model_version: model.split("/")[1] ?? model,
           processing_time_ms: Date.now() - startedAt,
           avg_confidence: avgConf,
         })

@@ -37,6 +37,7 @@ import { Route as AuthenticatedMoodRouteImport } from './routes/_authenticated/m
 import { Route as AuthenticatedMedicationsRouteImport } from './routes/_authenticated/medications'
 import { Route as AuthenticatedMealplanRouteImport } from './routes/_authenticated/mealplan'
 import { Route as AuthenticatedLeaderboardRouteImport } from './routes/_authenticated/leaderboard'
+import { Route as AuthenticatedInsightsRouteImport } from './routes/_authenticated/insights'
 import { Route as AuthenticatedHealthImportRouteImport } from './routes/_authenticated/health-import'
 import { Route as AuthenticatedGroupsRouteImport } from './routes/_authenticated/groups'
 import { Route as AuthenticatedFoodsRouteImport } from './routes/_authenticated/foods'
@@ -51,8 +52,10 @@ import { Route as AuthenticatedBackupRouteImport } from './routes/_authenticated
 import { Route as AuthenticatedArticlesRouteImport } from './routes/_authenticated/articles'
 import { Route as AuthenticatedAchievementsRouteImport } from './routes/_authenticated/achievements'
 import { Route as ApiChatStreamRouteImport } from './routes/api/chat.stream'
+import { Route as AuthenticatedScanHistoryRouteImport } from './routes/_authenticated/scan.history'
 import { Route as AuthenticatedRecipesSavedRouteImport } from './routes/_authenticated/recipes.saved'
 import { Route as AuthenticatedRecipesIdRouteImport } from './routes/_authenticated/recipes.$id'
+import { Route as AuthenticatedProfileScanStatsRouteImport } from './routes/_authenticated/profile.scan-stats'
 import { Route as ApiWearableGoogleFitCallbackRouteImport } from './routes/api/wearable.google-fit.callback'
 import { Route as ApiPublicHooksWeeklyAiReportRouteImport } from './routes/api/public/hooks/weekly-ai-report'
 import { Route as ApiPublicHooksRecipesTrendingSnapshotRouteImport } from './routes/api/public/hooks/recipes-trending-snapshot'
@@ -204,6 +207,11 @@ const AuthenticatedLeaderboardRoute =
     path: '/leaderboard',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedInsightsRoute = AuthenticatedInsightsRouteImport.update({
+  id: '/insights',
+  path: '/insights',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedHealthImportRoute =
   AuthenticatedHealthImportRouteImport.update({
     id: '/health-import',
@@ -276,6 +284,12 @@ const ApiChatStreamRoute = ApiChatStreamRouteImport.update({
   path: '/api/chat/stream',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedScanHistoryRoute =
+  AuthenticatedScanHistoryRouteImport.update({
+    id: '/history',
+    path: '/history',
+    getParentRoute: () => AuthenticatedScanRoute,
+  } as any)
 const AuthenticatedRecipesSavedRoute =
   AuthenticatedRecipesSavedRouteImport.update({
     id: '/saved',
@@ -287,6 +301,12 @@ const AuthenticatedRecipesIdRoute = AuthenticatedRecipesIdRouteImport.update({
   path: '/$id',
   getParentRoute: () => AuthenticatedRecipesRoute,
 } as any)
+const AuthenticatedProfileScanStatsRoute =
+  AuthenticatedProfileScanStatsRouteImport.update({
+    id: '/scan-stats',
+    path: '/scan-stats',
+    getParentRoute: () => AuthenticatedProfileRoute,
+  } as any)
 const ApiWearableGoogleFitCallbackRoute =
   ApiWearableGoogleFitCallbackRouteImport.update({
     id: '/api/wearable/google-fit/callback',
@@ -334,6 +354,7 @@ export interface FileRoutesByFullPath {
   '/foods': typeof AuthenticatedFoodsRoute
   '/groups': typeof AuthenticatedGroupsRoute
   '/health-import': typeof AuthenticatedHealthImportRoute
+  '/insights': typeof AuthenticatedInsightsRoute
   '/leaderboard': typeof AuthenticatedLeaderboardRoute
   '/mealplan': typeof AuthenticatedMealplanRoute
   '/medications': typeof AuthenticatedMedicationsRoute
@@ -343,7 +364,7 @@ export interface FileRoutesByFullPath {
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/pet': typeof AuthenticatedPetRoute
   '/prayer': typeof AuthenticatedPrayerRoute
-  '/profile': typeof AuthenticatedProfileRoute
+  '/profile': typeof AuthenticatedProfileRouteWithChildren
   '/progress': typeof AuthenticatedProgressRoute
   '/recipes': typeof AuthenticatedRecipesRouteWithChildren
   '/recommendations': typeof AuthenticatedRecommendationsRoute
@@ -351,7 +372,7 @@ export interface FileRoutesByFullPath {
   '/reminders': typeof AuthenticatedRemindersRoute
   '/reports': typeof AuthenticatedReportsRoute
   '/rewards': typeof AuthenticatedRewardsRoute
-  '/scan': typeof AuthenticatedScanRoute
+  '/scan': typeof AuthenticatedScanRouteWithChildren
   '/sleep': typeof AuthenticatedSleepRoute
   '/subscription': typeof AuthenticatedSubscriptionRoute
   '/vitals': typeof AuthenticatedVitalsRoute
@@ -359,8 +380,10 @@ export interface FileRoutesByFullPath {
   '/wearable': typeof AuthenticatedWearableRoute
   '/weight': typeof AuthenticatedWeightRoute
   '/workout': typeof AuthenticatedWorkoutRoute
+  '/profile/scan-stats': typeof AuthenticatedProfileScanStatsRoute
   '/recipes/$id': typeof AuthenticatedRecipesIdRoute
   '/recipes/saved': typeof AuthenticatedRecipesSavedRoute
+  '/scan/history': typeof AuthenticatedScanHistoryRoute
   '/api/chat/stream': typeof ApiChatStreamRoute
   '/api/public/hooks/daily-coach': typeof ApiPublicHooksDailyCoachRoute
   '/api/public/hooks/notification-scheduler': typeof ApiPublicHooksNotificationSchedulerRoute
@@ -384,6 +407,7 @@ export interface FileRoutesByTo {
   '/foods': typeof AuthenticatedFoodsRoute
   '/groups': typeof AuthenticatedGroupsRoute
   '/health-import': typeof AuthenticatedHealthImportRoute
+  '/insights': typeof AuthenticatedInsightsRoute
   '/leaderboard': typeof AuthenticatedLeaderboardRoute
   '/mealplan': typeof AuthenticatedMealplanRoute
   '/medications': typeof AuthenticatedMedicationsRoute
@@ -393,7 +417,7 @@ export interface FileRoutesByTo {
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/pet': typeof AuthenticatedPetRoute
   '/prayer': typeof AuthenticatedPrayerRoute
-  '/profile': typeof AuthenticatedProfileRoute
+  '/profile': typeof AuthenticatedProfileRouteWithChildren
   '/progress': typeof AuthenticatedProgressRoute
   '/recipes': typeof AuthenticatedRecipesRouteWithChildren
   '/recommendations': typeof AuthenticatedRecommendationsRoute
@@ -401,7 +425,7 @@ export interface FileRoutesByTo {
   '/reminders': typeof AuthenticatedRemindersRoute
   '/reports': typeof AuthenticatedReportsRoute
   '/rewards': typeof AuthenticatedRewardsRoute
-  '/scan': typeof AuthenticatedScanRoute
+  '/scan': typeof AuthenticatedScanRouteWithChildren
   '/sleep': typeof AuthenticatedSleepRoute
   '/subscription': typeof AuthenticatedSubscriptionRoute
   '/vitals': typeof AuthenticatedVitalsRoute
@@ -409,8 +433,10 @@ export interface FileRoutesByTo {
   '/wearable': typeof AuthenticatedWearableRoute
   '/weight': typeof AuthenticatedWeightRoute
   '/workout': typeof AuthenticatedWorkoutRoute
+  '/profile/scan-stats': typeof AuthenticatedProfileScanStatsRoute
   '/recipes/$id': typeof AuthenticatedRecipesIdRoute
   '/recipes/saved': typeof AuthenticatedRecipesSavedRoute
+  '/scan/history': typeof AuthenticatedScanHistoryRoute
   '/api/chat/stream': typeof ApiChatStreamRoute
   '/api/public/hooks/daily-coach': typeof ApiPublicHooksDailyCoachRoute
   '/api/public/hooks/notification-scheduler': typeof ApiPublicHooksNotificationSchedulerRoute
@@ -436,6 +462,7 @@ export interface FileRoutesById {
   '/_authenticated/foods': typeof AuthenticatedFoodsRoute
   '/_authenticated/groups': typeof AuthenticatedGroupsRoute
   '/_authenticated/health-import': typeof AuthenticatedHealthImportRoute
+  '/_authenticated/insights': typeof AuthenticatedInsightsRoute
   '/_authenticated/leaderboard': typeof AuthenticatedLeaderboardRoute
   '/_authenticated/mealplan': typeof AuthenticatedMealplanRoute
   '/_authenticated/medications': typeof AuthenticatedMedicationsRoute
@@ -445,7 +472,7 @@ export interface FileRoutesById {
   '/_authenticated/onboarding': typeof AuthenticatedOnboardingRoute
   '/_authenticated/pet': typeof AuthenticatedPetRoute
   '/_authenticated/prayer': typeof AuthenticatedPrayerRoute
-  '/_authenticated/profile': typeof AuthenticatedProfileRoute
+  '/_authenticated/profile': typeof AuthenticatedProfileRouteWithChildren
   '/_authenticated/progress': typeof AuthenticatedProgressRoute
   '/_authenticated/recipes': typeof AuthenticatedRecipesRouteWithChildren
   '/_authenticated/recommendations': typeof AuthenticatedRecommendationsRoute
@@ -453,7 +480,7 @@ export interface FileRoutesById {
   '/_authenticated/reminders': typeof AuthenticatedRemindersRoute
   '/_authenticated/reports': typeof AuthenticatedReportsRoute
   '/_authenticated/rewards': typeof AuthenticatedRewardsRoute
-  '/_authenticated/scan': typeof AuthenticatedScanRoute
+  '/_authenticated/scan': typeof AuthenticatedScanRouteWithChildren
   '/_authenticated/sleep': typeof AuthenticatedSleepRoute
   '/_authenticated/subscription': typeof AuthenticatedSubscriptionRoute
   '/_authenticated/vitals': typeof AuthenticatedVitalsRoute
@@ -461,8 +488,10 @@ export interface FileRoutesById {
   '/_authenticated/wearable': typeof AuthenticatedWearableRoute
   '/_authenticated/weight': typeof AuthenticatedWeightRoute
   '/_authenticated/workout': typeof AuthenticatedWorkoutRoute
+  '/_authenticated/profile/scan-stats': typeof AuthenticatedProfileScanStatsRoute
   '/_authenticated/recipes/$id': typeof AuthenticatedRecipesIdRoute
   '/_authenticated/recipes/saved': typeof AuthenticatedRecipesSavedRoute
+  '/_authenticated/scan/history': typeof AuthenticatedScanHistoryRoute
   '/api/chat/stream': typeof ApiChatStreamRoute
   '/api/public/hooks/daily-coach': typeof ApiPublicHooksDailyCoachRoute
   '/api/public/hooks/notification-scheduler': typeof ApiPublicHooksNotificationSchedulerRoute
@@ -488,6 +517,7 @@ export interface FileRouteTypes {
     | '/foods'
     | '/groups'
     | '/health-import'
+    | '/insights'
     | '/leaderboard'
     | '/mealplan'
     | '/medications'
@@ -513,8 +543,10 @@ export interface FileRouteTypes {
     | '/wearable'
     | '/weight'
     | '/workout'
+    | '/profile/scan-stats'
     | '/recipes/$id'
     | '/recipes/saved'
+    | '/scan/history'
     | '/api/chat/stream'
     | '/api/public/hooks/daily-coach'
     | '/api/public/hooks/notification-scheduler'
@@ -538,6 +570,7 @@ export interface FileRouteTypes {
     | '/foods'
     | '/groups'
     | '/health-import'
+    | '/insights'
     | '/leaderboard'
     | '/mealplan'
     | '/medications'
@@ -563,8 +596,10 @@ export interface FileRouteTypes {
     | '/wearable'
     | '/weight'
     | '/workout'
+    | '/profile/scan-stats'
     | '/recipes/$id'
     | '/recipes/saved'
+    | '/scan/history'
     | '/api/chat/stream'
     | '/api/public/hooks/daily-coach'
     | '/api/public/hooks/notification-scheduler'
@@ -589,6 +624,7 @@ export interface FileRouteTypes {
     | '/_authenticated/foods'
     | '/_authenticated/groups'
     | '/_authenticated/health-import'
+    | '/_authenticated/insights'
     | '/_authenticated/leaderboard'
     | '/_authenticated/mealplan'
     | '/_authenticated/medications'
@@ -614,8 +650,10 @@ export interface FileRouteTypes {
     | '/_authenticated/wearable'
     | '/_authenticated/weight'
     | '/_authenticated/workout'
+    | '/_authenticated/profile/scan-stats'
     | '/_authenticated/recipes/$id'
     | '/_authenticated/recipes/saved'
+    | '/_authenticated/scan/history'
     | '/api/chat/stream'
     | '/api/public/hooks/daily-coach'
     | '/api/public/hooks/notification-scheduler'
@@ -834,6 +872,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedLeaderboardRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/insights': {
+      id: '/_authenticated/insights'
+      path: '/insights'
+      fullPath: '/insights'
+      preLoaderRoute: typeof AuthenticatedInsightsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/health-import': {
       id: '/_authenticated/health-import'
       path: '/health-import'
@@ -932,6 +977,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiChatStreamRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/scan/history': {
+      id: '/_authenticated/scan/history'
+      path: '/history'
+      fullPath: '/scan/history'
+      preLoaderRoute: typeof AuthenticatedScanHistoryRouteImport
+      parentRoute: typeof AuthenticatedScanRoute
+    }
     '/_authenticated/recipes/saved': {
       id: '/_authenticated/recipes/saved'
       path: '/saved'
@@ -945,6 +997,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/recipes/$id'
       preLoaderRoute: typeof AuthenticatedRecipesIdRouteImport
       parentRoute: typeof AuthenticatedRecipesRoute
+    }
+    '/_authenticated/profile/scan-stats': {
+      id: '/_authenticated/profile/scan-stats'
+      path: '/scan-stats'
+      fullPath: '/profile/scan-stats'
+      preLoaderRoute: typeof AuthenticatedProfileScanStatsRouteImport
+      parentRoute: typeof AuthenticatedProfileRoute
     }
     '/api/wearable/google-fit/callback': {
       id: '/api/wearable/google-fit/callback'
@@ -984,6 +1043,17 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface AuthenticatedProfileRouteChildren {
+  AuthenticatedProfileScanStatsRoute: typeof AuthenticatedProfileScanStatsRoute
+}
+
+const AuthenticatedProfileRouteChildren: AuthenticatedProfileRouteChildren = {
+  AuthenticatedProfileScanStatsRoute: AuthenticatedProfileScanStatsRoute,
+}
+
+const AuthenticatedProfileRouteWithChildren =
+  AuthenticatedProfileRoute._addFileChildren(AuthenticatedProfileRouteChildren)
+
 interface AuthenticatedRecipesRouteChildren {
   AuthenticatedRecipesIdRoute: typeof AuthenticatedRecipesIdRoute
   AuthenticatedRecipesSavedRoute: typeof AuthenticatedRecipesSavedRoute
@@ -996,6 +1066,17 @@ const AuthenticatedRecipesRouteChildren: AuthenticatedRecipesRouteChildren = {
 
 const AuthenticatedRecipesRouteWithChildren =
   AuthenticatedRecipesRoute._addFileChildren(AuthenticatedRecipesRouteChildren)
+
+interface AuthenticatedScanRouteChildren {
+  AuthenticatedScanHistoryRoute: typeof AuthenticatedScanHistoryRoute
+}
+
+const AuthenticatedScanRouteChildren: AuthenticatedScanRouteChildren = {
+  AuthenticatedScanHistoryRoute: AuthenticatedScanHistoryRoute,
+}
+
+const AuthenticatedScanRouteWithChildren =
+  AuthenticatedScanRoute._addFileChildren(AuthenticatedScanRouteChildren)
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAchievementsRoute: typeof AuthenticatedAchievementsRoute
@@ -1011,6 +1092,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedFoodsRoute: typeof AuthenticatedFoodsRoute
   AuthenticatedGroupsRoute: typeof AuthenticatedGroupsRoute
   AuthenticatedHealthImportRoute: typeof AuthenticatedHealthImportRoute
+  AuthenticatedInsightsRoute: typeof AuthenticatedInsightsRoute
   AuthenticatedLeaderboardRoute: typeof AuthenticatedLeaderboardRoute
   AuthenticatedMealplanRoute: typeof AuthenticatedMealplanRoute
   AuthenticatedMedicationsRoute: typeof AuthenticatedMedicationsRoute
@@ -1020,7 +1102,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedOnboardingRoute: typeof AuthenticatedOnboardingRoute
   AuthenticatedPetRoute: typeof AuthenticatedPetRoute
   AuthenticatedPrayerRoute: typeof AuthenticatedPrayerRoute
-  AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
+  AuthenticatedProfileRoute: typeof AuthenticatedProfileRouteWithChildren
   AuthenticatedProgressRoute: typeof AuthenticatedProgressRoute
   AuthenticatedRecipesRoute: typeof AuthenticatedRecipesRouteWithChildren
   AuthenticatedRecommendationsRoute: typeof AuthenticatedRecommendationsRoute
@@ -1028,7 +1110,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedRemindersRoute: typeof AuthenticatedRemindersRoute
   AuthenticatedReportsRoute: typeof AuthenticatedReportsRoute
   AuthenticatedRewardsRoute: typeof AuthenticatedRewardsRoute
-  AuthenticatedScanRoute: typeof AuthenticatedScanRoute
+  AuthenticatedScanRoute: typeof AuthenticatedScanRouteWithChildren
   AuthenticatedSleepRoute: typeof AuthenticatedSleepRoute
   AuthenticatedSubscriptionRoute: typeof AuthenticatedSubscriptionRoute
   AuthenticatedVitalsRoute: typeof AuthenticatedVitalsRoute
@@ -1052,6 +1134,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedFoodsRoute: AuthenticatedFoodsRoute,
   AuthenticatedGroupsRoute: AuthenticatedGroupsRoute,
   AuthenticatedHealthImportRoute: AuthenticatedHealthImportRoute,
+  AuthenticatedInsightsRoute: AuthenticatedInsightsRoute,
   AuthenticatedLeaderboardRoute: AuthenticatedLeaderboardRoute,
   AuthenticatedMealplanRoute: AuthenticatedMealplanRoute,
   AuthenticatedMedicationsRoute: AuthenticatedMedicationsRoute,
@@ -1061,7 +1144,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedOnboardingRoute: AuthenticatedOnboardingRoute,
   AuthenticatedPetRoute: AuthenticatedPetRoute,
   AuthenticatedPrayerRoute: AuthenticatedPrayerRoute,
-  AuthenticatedProfileRoute: AuthenticatedProfileRoute,
+  AuthenticatedProfileRoute: AuthenticatedProfileRouteWithChildren,
   AuthenticatedProgressRoute: AuthenticatedProgressRoute,
   AuthenticatedRecipesRoute: AuthenticatedRecipesRouteWithChildren,
   AuthenticatedRecommendationsRoute: AuthenticatedRecommendationsRoute,
@@ -1069,7 +1152,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedRemindersRoute: AuthenticatedRemindersRoute,
   AuthenticatedReportsRoute: AuthenticatedReportsRoute,
   AuthenticatedRewardsRoute: AuthenticatedRewardsRoute,
-  AuthenticatedScanRoute: AuthenticatedScanRoute,
+  AuthenticatedScanRoute: AuthenticatedScanRouteWithChildren,
   AuthenticatedSleepRoute: AuthenticatedSleepRoute,
   AuthenticatedSubscriptionRoute: AuthenticatedSubscriptionRoute,
   AuthenticatedVitalsRoute: AuthenticatedVitalsRoute,

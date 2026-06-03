@@ -1,9 +1,9 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useRef, useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { TopAppBar } from "@/components/healthyu/top-app-bar";
-import { Camera, Loader2, Sparkles, X, Check, Pencil } from "lucide-react";
+import { Camera, Loader2, Sparkles, X, Check, Pencil, History, Zap } from "lucide-react";
 import { toast } from "sonner";
 import { BottomNav } from "@/components/bottom-nav";
 import { recognizeFood, submitScanCorrection } from "@/lib/foodScan.functions";
@@ -55,10 +55,11 @@ function ScanPage() {
   const [originals, setOriginals] = useState<Item[]>([]);
   const [scanId, setScanId] = useState<string | null>(null);
   const [editIdx, setEditIdx] = useState<number | null>(null);
+  const [usePro, setUsePro] = useState(false);
   const [mealType, setMealType] = useState<(typeof MEAL_TYPES)[number]["v"]>(pickDefaultMealType());
 
   const scanMut = useMutation({
-    mutationFn: async (dataUrl: string) => scan({ data: { image_data_url: dataUrl } }),
+    mutationFn: async (dataUrl: string) => scan({ data: { image_data_url: dataUrl, use_pro: usePro } }),
     onSuccess: (res) => {
       setItems(res.items);
       setOriginals(res.items.map((i) => ({ ...i })));
@@ -138,11 +139,33 @@ function ScanPage() {
           title="Scan Makanan"
           showBack
           action={
-            <span className="inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-primary">
-              <Sparkles className="size-3" /> AI
-            </span>
+            <Link
+              to="/scan/history"
+              className="inline-flex items-center gap-1 text-xs text-primary"
+              aria-label="Riwayat scan"
+            >
+              <History className="size-4" />
+            </Link>
           }
         />
+        <div className="flex items-center justify-between rounded-2xl bg-card border px-3 py-2">
+          <div className="flex items-center gap-2 text-xs">
+            <Sparkles className="size-3.5 text-primary" />
+            <span>Mode AI: <b>{usePro ? "Pro (akurat)" : "Flash (cepat)"}</b></span>
+          </div>
+          <button
+            type="button"
+            onClick={() => setUsePro((v) => !v)}
+            className="text-xs px-2 py-1 rounded-lg bg-primary/10 text-primary font-medium inline-flex items-center gap-1"
+          >
+            <Zap className="size-3" /> {usePro ? "Pakai Flash" : "Pakai Pro"}
+          </button>
+        </div>
+        {!imageUrl && (
+          <div className="text-[11px] text-muted-foreground bg-muted/40 rounded-xl p-2">
+            💡 Tip: sertakan referensi (sendok, garpu, atau tangan) di foto agar estimasi porsi lebih akurat.
+          </div>
+        )}
         <input
           ref={fileRef}
           type="file"
@@ -215,6 +238,13 @@ function ScanPage() {
             {items.length > 0 && (
               <div className="space-y-2">
                 <p className="text-xs font-semibold text-muted-foreground">Terdeteksi</p>
+                <button
+                  onClick={() => items.forEach((it, idx) => logMut.mutate({ it, idx }))}
+                  disabled={logMut.isPending}
+                  className="w-full py-2 rounded-xl bg-primary/10 text-primary font-semibold text-xs disabled:opacity-50"
+                >
+                  Catat semua ({items.length})
+                </button>
                 {items.map((it, i) => {
                   const editing = editIdx === i;
                   return (
