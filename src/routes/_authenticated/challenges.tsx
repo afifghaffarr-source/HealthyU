@@ -63,6 +63,7 @@ function ChallengesPage() {
   const partsByCh = new Map(
     (data?.participations ?? []).map((p) => [p.challenge_id, p] as const),
   );
+  const [openLb, setOpenLb] = useState<string | null>(null);
 
   return (
     <div className="min-h-screen pb-32">
@@ -196,6 +197,15 @@ function ChallengesPage() {
                   </>
                 )}
               </div>
+
+              <button
+                onClick={() => setOpenLb(openLb === c.id ? null : c.id)}
+                className="mt-3 w-full text-[11px] font-semibold text-primary inline-flex items-center justify-center gap-1"
+              >
+                <Medal className="size-3" />
+                {openLb === c.id ? "Sembunyikan leaderboard" : "Lihat leaderboard"}
+              </button>
+              {openLb === c.id && <Leaderboard challengeId={c.id} />}
             </article>
           );
         })}
@@ -203,5 +213,40 @@ function ChallengesPage() {
 
       <BottomNav />
     </div>
+  );
+}
+
+function Leaderboard({ challengeId }: { challengeId: string }) {
+  const fetchLb = useServerFn(getChallengeLeaderboard);
+  const { data: rows = [], isLoading } = useQuery({
+    queryKey: ["challenge-lb", challengeId],
+    queryFn: () => fetchLb({ data: { challenge_id: challengeId } }),
+  });
+  if (isLoading) return <p className="text-xs text-muted-foreground text-center mt-2">Memuat…</p>;
+  if (rows.length === 0) return <p className="text-xs text-muted-foreground text-center mt-2">Belum ada peserta.</p>;
+  return (
+    <ol className="mt-3 space-y-1.5">
+      {rows.map((r) => (
+        <li
+          key={r.user_id}
+          className={`flex items-center gap-2 px-2.5 py-1.5 rounded-xl text-xs ${
+            r.is_me ? "bg-primary/10 outline-1 outline-primary/30" : "bg-muted/40"
+          }`}
+        >
+          <span className="w-5 text-center font-bold tabular-nums">
+            {r.rank === 1 ? "🥇" : r.rank === 2 ? "🥈" : r.rank === 3 ? "🥉" : r.rank}
+          </span>
+          <span className="flex-1 truncate font-semibold">
+            {r.full_name}
+            {r.is_me && <span className="ml-1 text-[10px] text-primary">(kamu)</span>}
+          </span>
+          <span className="inline-flex items-center gap-1 text-muted-foreground">
+            <Flame className="size-3 text-orange-500" />
+            {r.streak}
+          </span>
+          <span className="tabular-nums text-muted-foreground">H{r.current_day}</span>
+        </li>
+      ))}
+    </ol>
   );
 }
