@@ -52,6 +52,14 @@ function Dashboard() {
     },
   });
 
+  const moodMutation = useMutation({
+    mutationFn: (mood: number) => addMoodFn({ data: { mood } }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["mood"] });
+      toast.success("Mood tercatat");
+    },
+  });
+
   const totals = meals.reduce(
     (acc, m) => ({
       cal: acc.cal + Number(m.calories || 0),
