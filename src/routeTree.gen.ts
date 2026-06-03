@@ -24,6 +24,7 @@ import { Route as AuthenticatedMealplanRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedFoodRouteImport } from './routes/_authenticated/food'
 import { Route as AuthenticatedFastingRouteImport } from './routes/_authenticated/fasting'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as AuthenticatedCommunityRouteImport } from './routes/_authenticated/community'
 import { Route as AuthenticatedChatRouteImport } from './routes/_authenticated/chat'
 import { Route as AuthenticatedAchievementsRouteImport } from './routes/_authenticated/achievements'
 
@@ -102,6 +103,11 @@ const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedCommunityRoute = AuthenticatedCommunityRouteImport.update({
+  id: '/community',
+  path: '/community',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedChatRoute = AuthenticatedChatRouteImport.update({
   id: '/chat',
   path: '/chat',
@@ -119,6 +125,7 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/achievements': typeof AuthenticatedAchievementsRoute
   '/chat': typeof AuthenticatedChatRoute
+  '/community': typeof AuthenticatedCommunityRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/fasting': typeof AuthenticatedFastingRoute
   '/food': typeof AuthenticatedFoodRoute
@@ -137,6 +144,7 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/achievements': typeof AuthenticatedAchievementsRoute
   '/chat': typeof AuthenticatedChatRoute
+  '/community': typeof AuthenticatedCommunityRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/fasting': typeof AuthenticatedFastingRoute
   '/food': typeof AuthenticatedFoodRoute
@@ -157,6 +165,7 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/_authenticated/achievements': typeof AuthenticatedAchievementsRoute
   '/_authenticated/chat': typeof AuthenticatedChatRoute
+  '/_authenticated/community': typeof AuthenticatedCommunityRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/fasting': typeof AuthenticatedFastingRoute
   '/_authenticated/food': typeof AuthenticatedFoodRoute
@@ -177,6 +186,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/achievements'
     | '/chat'
+    | '/community'
     | '/dashboard'
     | '/fasting'
     | '/food'
@@ -195,6 +205,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/achievements'
     | '/chat'
+    | '/community'
     | '/dashboard'
     | '/fasting'
     | '/food'
@@ -214,6 +225,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/_authenticated/achievements'
     | '/_authenticated/chat'
+    | '/_authenticated/community'
     | '/_authenticated/dashboard'
     | '/_authenticated/fasting'
     | '/_authenticated/food'
@@ -341,6 +353,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/community': {
+      id: '/_authenticated/community'
+      path: '/community'
+      fullPath: '/community'
+      preLoaderRoute: typeof AuthenticatedCommunityRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/chat': {
       id: '/_authenticated/chat'
       path: '/chat'
@@ -361,6 +380,7 @@ declare module '@tanstack/react-router' {
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAchievementsRoute: typeof AuthenticatedAchievementsRoute
   AuthenticatedChatRoute: typeof AuthenticatedChatRoute
+  AuthenticatedCommunityRoute: typeof AuthenticatedCommunityRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedFastingRoute: typeof AuthenticatedFastingRoute
   AuthenticatedFoodRoute: typeof AuthenticatedFoodRoute
@@ -378,6 +398,7 @@ interface AuthenticatedRouteRouteChildren {
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAchievementsRoute: AuthenticatedAchievementsRoute,
   AuthenticatedChatRoute: AuthenticatedChatRoute,
+  AuthenticatedCommunityRoute: AuthenticatedCommunityRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedFastingRoute: AuthenticatedFastingRoute,
   AuthenticatedFoodRoute: AuthenticatedFoodRoute,

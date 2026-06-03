@@ -14,6 +14,7 @@ import { reportLovableError } from "../lib/lovable-error-reporting";
 import { Toaster } from "@/components/ui/sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
+import { ThemeProvider } from "@/components/theme-provider";
 
 function NotFoundComponent() {
   return (
@@ -88,12 +89,18 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { name: "twitter:site", content: "@Lovable" },
+      { name: "theme-color", content: "#6B8E5A" },
+      { name: "apple-mobile-web-app-capable", content: "yes" },
+      { name: "apple-mobile-web-app-status-bar-style", content: "default" },
+      { name: "apple-mobile-web-app-title", content: "HealthyU" },
     ],
     links: [
       {
         rel: "stylesheet",
         href: appCss,
       },
+      { rel: "manifest", href: "/manifest.json" },
+      { rel: "apple-touch-icon", href: "/icon-192.svg" },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
       {
@@ -127,9 +134,11 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <AuthListener />
-      <Outlet />
-      <Toaster position="top-center" />
+      <ThemeProvider>
+        <AuthListener />
+        <Outlet />
+        <Toaster position="top-center" />
+      </ThemeProvider>
     </QueryClientProvider>
   );
 }
