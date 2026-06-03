@@ -6,7 +6,8 @@ import { searchFoods, logMeal, todaysMeals, deleteMeal, logMealWithItems } from 
 import { parseMealFromVoice } from "@/lib/ai-extras.functions";
 import { getAchievementToastPrefix } from "@/lib/achievement-icons";
 import { BottomNav } from "@/components/bottom-nav";
-import { ArrowLeft, Search, Trash2, Mic, MicOff, Loader2, WifiOff, RefreshCw, Plus, Minus, ShoppingBasket } from "lucide-react";
+import { ArrowLeft, Search, Trash2, Mic, MicOff, Loader2, WifiOff, RefreshCw, Plus, Minus, ShoppingBasket, Sparkles, X } from "lucide-react";
+import { getFoodAlternatives } from "@/lib/foodAlternatives.functions";
 import { toast } from "sonner";
 import { enqueue } from "@/lib/offline-queue";
 import { useOfflineQueue } from "@/hooks/use-offline-queue";
@@ -44,6 +45,13 @@ function FoodPage() {
     fat_g: number;
   };
   const [basket, setBasket] = useState<BasketItem[]>([]);
+  const [altFor, setAltFor] = useState<{ id: string; name: string } | null>(null);
+  const altFn = useServerFn(getFoodAlternatives);
+  const { data: alts = [], isLoading: altLoading } = useQuery({
+    queryKey: ["food-alternatives", altFor?.id],
+    queryFn: () => altFn({ data: { food_id: altFor!.id } }),
+    enabled: !!altFor,
+  });
 
   const addToBasket = (f: {
     id: string;
@@ -256,6 +264,14 @@ function FoodPage() {
                 <p className="text-[11px] text-muted-foreground">{Math.round(Number(f.calories))} kcal · {f.serving_size}{f.serving_unit}</p>
               </div>
               <button
+                onClick={() => setAltFor({ id: f.id, name: f.name })}
+                className="size-9 rounded-full bg-mint/60 text-emerald-700 grid place-items-center hover:bg-mint"
+                aria-label="Lihat pengganti sehat"
+                title="Saran pengganti sehat"
+              >
+                <Sparkles className="size-4" />
+              </button>
+              <button
                 onClick={() => addToBasket(f)}
                 className="size-9 rounded-full bg-primary/10 text-primary grid place-items-center hover:bg-primary/20"
                 aria-label="Tambah ke keranjang"
@@ -338,6 +354,59 @@ function FoodPage() {
           </section>
         )}
       </div>
+      {altFor && (
+        <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/50" onClick={() => setAltFor(null)}>
+          <div className="w-full max-w-md bg-card rounded-t-3xl p-5 max-h-[80vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between mb-3">
+              <h2 className="font-bold text-base flex items-center gap-2">
+                <Sparkles className="size-4 text-emerald-600" />
+                Pengganti sehat
+              </h2>
+              <button onClick={() => setAltFor(null)} className="p-1 rounded-full hover:bg-muted">
+                <X className="size-5" />
+              </button>
+            </div>
+            <p className="text-xs text-muted-foreground mb-3">Alternatif untuk <span className="font-semibold">{altFor.name}</span></p>
+            {altLoading && <p className="text-sm text-muted-foreground text-center py-6">Memuat…</p>}
+            {!altLoading && alts.length === 0 && (
+              <p className="text-sm text-muted-foreground text-center py-6">Belum ada saran pengganti untuk makanan ini.</p>
+            )}
+            <div className="space-y-2">
+              {alts.map((a) => (
+                <div key={a.id} className="bg-muted/40 rounded-2xl p-3 flex items-center gap-3">
+                  <div className="size-10 rounded-xl bg-mint grid place-items-center text-base">🥗</div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-semibold truncate">{a.name}</p>
+                    <p className="text-[11px] text-muted-foreground">
+                      {Math.round(Number(a.calories))} kcal · P{Math.round(Number(a.protein_g ?? 0))} K{Math.round(Number(a.carbs_g ?? 0))} L{Math.round(Number(a.fat_g ?? 0))}
+                    </p>
+                    {a.reason && <p className="text-[10px] text-emerald-700 mt-0.5 line-clamp-2">{a.reason}</p>}
+                  </div>
+                  <button
+                    onClick={() => {
+                      addToBasket({
+                        id: a.id,
+                        name: a.name,
+                        serving_unit: a.serving_unit,
+                        calories: a.calories,
+                        protein_g: a.protein_g,
+                        carbs_g: a.carbs_g,
+                        fat_g: a.fat_g,
+                      });
+                      setAltFor(null);
+                      toast.success(`${a.name} ditambah ke keranjang`);
+                    }}
+                    className="size-9 rounded-full bg-primary/10 text-primary grid place-items-center"
+                    aria-label="Tambah ke keranjang"
+                  >
+                    <Plus className="size-4" />
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
       <BottomNav />
     </main>
   );
