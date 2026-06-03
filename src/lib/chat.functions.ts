@@ -288,3 +288,95 @@ Gunakan data di atas untuk personalisasi jawaban. Sebut angka konkret saat relev
 
     return { reply, emergency: isEmergency };
   });
+
+export const weeklyHealthReport = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { supabase, userId } = context;
+    const apiKey = process.env.LOVABLE_API_KEY;
+    if (!apiKey) throw new Error("AI service not configured");
+
+    const weekStart = new Date(); weekStart.setDate(weekStart.getDate() - 6); weekStart.setHours(0,0,0,0);
+
+    const [
+      { data: profile },
+      { data: meals },
+      { data: workouts },
+      { data: water },
+      { data: fasting },
+      { data: weight },
+      { data: mood },
+      { data: sleep },
+    ] = await Promise.all([
+      supabase.from("profiles").select("full_name, weight_kg, target_weight_kg, daily_calorie_target").eq("id", userId).maybeSingle(),
+      supabase.from("meal_logs").select("calories, protein_g, logged_at").eq("user_id", userId).gte("logged_at", weekStart.toISOString()),
+      supabase.from("workout_sessions").select("name, duration_min, calories_burned, performed_at").eq("user_id", userId).gte("performed_at", weekStart.toISOString()),
+      supabase.from("water_logs").select("amount_ml, logged_at").eq("user_id", userId).gte("logged_at", weekStart.toISOString()),
+      supabase.from("fasting_sessions").select("completed").eq("user_id", userId).gte("start_time", weekStart.toISOString()),
+      supabase.from("weight_logs").select("weight_kg, logged_at").eq("user_id", userId).gte("logged_at", weekStart.toISOString()).order("logged_at", { ascending: true }),
+      supabase.from("mood_logs").select("mood").eq("user_id", userId).gte("logged_at", weekStart.toISOString()),
+      supabase.from("sleep_logs").select("sleep_start, sleep_end").eq("user_id", userId).gte("sleep_end", weekStart.toISOString()),
+    ]);
+
+    const calByDay: Record<string, number> = {};
+    (meals ?? []).forEach((m) => { const k = String(m.logged_at).slice(0,10); calByDay[k] = (calByDay[k]??0) + Number(m.calories??0); });
+    const days = Object.keys(calByDay);
+    const avgCal = days.length ? Math.round(days.reduce((s,k)=>s+calByDay[k],0)/days.length) : 0;
+    const avgProtein = (meals ?? []).length ? Math.round((meals ?? []).reduce((s,m)=>s+Number(m.protein_g??0),0)/Math.max(days.length,1)) : 0;
+    const workoutDays = new Set((workouts ?? []).map((w)=>String(w.performed_at).slice(0,10))).size;
+    const totalBurn = (workouts ?? []).reduce((s,w)=>s+Number(w.calories_burned??0),0);
+    const waterByDay: Record<string, number> = {};
+    (water ?? []).forEach((w) => { const k = String(w.logged_at).slice(0,10); waterByDay[k] = (waterByDay[k]??0) + Number(w.amount_ml??0); });
+    const avgWater = Object.keys(waterByDay).length ? Math.round(Object.values(waterByDay).reduce((a,b)=>a+b,0)/Object.keys(waterByDay).length) : 0;
+    const fastingSuccess = (fasting ?? []).filter((f)=>f.completed).length;
+    const fastingTotal = (fasting ?? []).length;
+    const wFirst = weight?.[0]?.weight_kg ? Number(weight[0].weight_kg) : null;
+    const wLast = weight && weight.length ? Number(weight[weight.length-1].weight_kg) : null;
+    const weightDelta = wFirst != null && wLast != null ? wLast - wFirst : null;
+    const moodAvg = (mood ?? []).length ? ((mood ?? []).reduce((s,m)=>s+Number(m.mood),0)/(mood ?? []).length) : null;
+    const sleepHours = (sleep ?? []).map((s) => (new Date(s.sleep_end).getTime() - new Date(s.sleep_start).getTime())/3600000);
+    const avgSleep = sleepHours.length ? (sleepHours.reduce((a,b)=>a+b,0)/sleepHours.length) : null;
+
+    const data = {
+      nama: profile?.full_name ?? "Sahabat",
+      target_kalori: profile?.daily_calorie_target ?? null,
+      target_bb: profile?.target_weight_kg ?? null,
+      bb_sekarang: profile?.weight_kg ?? null,
+      avg_kalori: avgCal,
+      avg_protein_g: avgProtein,
+      hari_olahraga: workoutDays,
+      kalori_terbakar_total: totalBurn,
+      avg_air_ml: avgWater,
+      puasa: `${fastingSuccess}/${fastingTotal}`,
+      delta_bb_kg: weightDelta,
+      mood_avg: moodAvg,
+      avg_tidur_jam: avgSleep,
+    };
+
+    const prompt = `Buat Laporan Kesehatan Mingguan dalam Bahasa Indonesia untuk user berikut. Gunakan format markdown dengan heading, bullet, dan emoji. Berikan: (1) Ringkasan metrik dengan check ✅ / warning ⚠️, (2) Analisis singkat, (3) 3 rekomendasi actionable, (4) Prediksi progress jika pola berlanjut. Hindari diagnosis medis. Data:\n\n${JSON.stringify(data, null, 2)}`;
+
+    const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${apiKey}` },
+      body: JSON.stringify({
+        model: "google/gemini-2.5-flash",
+        messages: [
+          { role: "system", content: SYSTEM_PROMPT },
+          { role: "user", content: prompt },
+        ],
+      }),
+    });
+    if (res.status === 429) throw new Error("Terlalu banyak permintaan. Coba lagi sebentar.");
+    if (res.status === 402) throw new Error("Kredit AI habis. Silakan top up.");
+    if (!res.ok) throw new Error(`AI error: ${res.status}`);
+    const json = await res.json();
+    const report: string = json?.choices?.[0]?.message?.content ?? "Belum bisa membuat laporan.";
+
+    await supabase.from("chat_messages").insert({
+      user_id: userId,
+      role: "assistant",
+      content: `📊 **Laporan Kesehatan Mingguan**\n\n${report}`,
+    });
+
+    return { report, data };
+  });
