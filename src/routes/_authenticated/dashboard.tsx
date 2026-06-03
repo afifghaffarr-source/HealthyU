@@ -7,6 +7,7 @@ import { todaysMeals } from "@/lib/meals.functions";
 import { currentFast } from "@/lib/fasting.functions";
 import { todaysWater, logWater } from "@/lib/water.functions";
 import { getGameSummary } from "@/lib/gamification.functions";
+import { myGroupChallengeSummary } from "@/lib/groupChallengeSummary.functions";
 import { addMood } from "@/lib/mood.functions";
 import { getAchievementToastPrefix } from "@/lib/achievement-icons";
 import { BottomNav } from "@/components/bottom-nav";
@@ -29,12 +30,17 @@ function Dashboard() {
   const logWaterFn = useServerFn(logWater);
   const fetchGame = useServerFn(getGameSummary);
   const addMoodFn = useServerFn(addMood);
+  const fetchGroupChallenges = useServerFn(myGroupChallengeSummary);
 
   const { data: profile, isLoading: pLoad } = useQuery({ queryKey: ["profile"], queryFn: () => fetchProfile() });
   const { data: meals = [] } = useQuery({ queryKey: ["meals", "today"], queryFn: () => fetchMeals() });
   const { data: fast } = useQuery({ queryKey: ["fast", "current"], queryFn: () => fetchFast(), refetchInterval: 30000 });
   const { data: waterMl = 0 } = useQuery({ queryKey: ["water", "today"], queryFn: () => fetchWater() });
   const { data: game } = useQuery({ queryKey: ["game", "summary"], queryFn: () => fetchGame() });
+  const { data: groupSummary = [] } = useQuery({
+    queryKey: ["group-challenge-summary"],
+    queryFn: () => fetchGroupChallenges(),
+  });
 
   useEffect(() => {
     if (!pLoad && profile && !profile.onboarded) {
