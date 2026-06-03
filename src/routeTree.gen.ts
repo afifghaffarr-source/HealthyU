@@ -61,6 +61,7 @@ import { Route as AuthenticatedRecipesSavedRouteImport } from './routes/_authent
 import { Route as AuthenticatedRecipesRecommendationsRouteImport } from './routes/_authenticated/recipes.recommendations'
 import { Route as AuthenticatedRecipesIdRouteImport } from './routes/_authenticated/recipes.$id'
 import { Route as AuthenticatedProfileScanStatsRouteImport } from './routes/_authenticated/profile.scan-stats'
+import { Route as AuthenticatedProfilePrivacyRouteImport } from './routes/_authenticated/profile.privacy'
 import { Route as ApiWearableGoogleFitCallbackRouteImport } from './routes/api/wearable.google-fit.callback'
 import { Route as ApiPublicHooksWeeklyAiReportRouteImport } from './routes/api/public/hooks/weekly-ai-report'
 import { Route as ApiPublicHooksRecipesTrendingSnapshotRouteImport } from './routes/api/public/hooks/recipes-trending-snapshot'
@@ -340,6 +341,12 @@ const AuthenticatedProfileScanStatsRoute =
     path: '/scan-stats',
     getParentRoute: () => AuthenticatedProfileRoute,
   } as any)
+const AuthenticatedProfilePrivacyRoute =
+  AuthenticatedProfilePrivacyRouteImport.update({
+    id: '/privacy',
+    path: '/privacy',
+    getParentRoute: () => AuthenticatedProfileRoute,
+  } as any)
 const ApiWearableGoogleFitCallbackRoute =
   ApiWearableGoogleFitCallbackRouteImport.update({
     id: '/api/wearable/google-fit/callback',
@@ -413,6 +420,7 @@ export interface FileRoutesByFullPath {
   '/wearable': typeof AuthenticatedWearableRoute
   '/weight': typeof AuthenticatedWeightRoute
   '/workout': typeof AuthenticatedWorkoutRoute
+  '/profile/privacy': typeof AuthenticatedProfilePrivacyRoute
   '/profile/scan-stats': typeof AuthenticatedProfileScanStatsRoute
   '/recipes/$id': typeof AuthenticatedRecipesIdRoute
   '/recipes/recommendations': typeof AuthenticatedRecipesRecommendationsRoute
@@ -471,6 +479,7 @@ export interface FileRoutesByTo {
   '/wearable': typeof AuthenticatedWearableRoute
   '/weight': typeof AuthenticatedWeightRoute
   '/workout': typeof AuthenticatedWorkoutRoute
+  '/profile/privacy': typeof AuthenticatedProfilePrivacyRoute
   '/profile/scan-stats': typeof AuthenticatedProfileScanStatsRoute
   '/recipes/$id': typeof AuthenticatedRecipesIdRoute
   '/recipes/recommendations': typeof AuthenticatedRecipesRecommendationsRoute
@@ -531,6 +540,7 @@ export interface FileRoutesById {
   '/_authenticated/wearable': typeof AuthenticatedWearableRoute
   '/_authenticated/weight': typeof AuthenticatedWeightRoute
   '/_authenticated/workout': typeof AuthenticatedWorkoutRoute
+  '/_authenticated/profile/privacy': typeof AuthenticatedProfilePrivacyRoute
   '/_authenticated/profile/scan-stats': typeof AuthenticatedProfileScanStatsRoute
   '/_authenticated/recipes/$id': typeof AuthenticatedRecipesIdRoute
   '/_authenticated/recipes/recommendations': typeof AuthenticatedRecipesRecommendationsRoute
@@ -591,6 +601,7 @@ export interface FileRouteTypes {
     | '/wearable'
     | '/weight'
     | '/workout'
+    | '/profile/privacy'
     | '/profile/scan-stats'
     | '/recipes/$id'
     | '/recipes/recommendations'
@@ -649,6 +660,7 @@ export interface FileRouteTypes {
     | '/wearable'
     | '/weight'
     | '/workout'
+    | '/profile/privacy'
     | '/profile/scan-stats'
     | '/recipes/$id'
     | '/recipes/recommendations'
@@ -708,6 +720,7 @@ export interface FileRouteTypes {
     | '/_authenticated/wearable'
     | '/_authenticated/weight'
     | '/_authenticated/workout'
+    | '/_authenticated/profile/privacy'
     | '/_authenticated/profile/scan-stats'
     | '/_authenticated/recipes/$id'
     | '/_authenticated/recipes/recommendations'
@@ -1103,6 +1116,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedProfileScanStatsRouteImport
       parentRoute: typeof AuthenticatedProfileRoute
     }
+    '/_authenticated/profile/privacy': {
+      id: '/_authenticated/profile/privacy'
+      path: '/privacy'
+      fullPath: '/profile/privacy'
+      preLoaderRoute: typeof AuthenticatedProfilePrivacyRouteImport
+      parentRoute: typeof AuthenticatedProfileRoute
+    }
     '/api/wearable/google-fit/callback': {
       id: '/api/wearable/google-fit/callback'
       path: '/api/wearable/google-fit/callback'
@@ -1142,10 +1162,12 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedProfileRouteChildren {
+  AuthenticatedProfilePrivacyRoute: typeof AuthenticatedProfilePrivacyRoute
   AuthenticatedProfileScanStatsRoute: typeof AuthenticatedProfileScanStatsRoute
 }
 
 const AuthenticatedProfileRouteChildren: AuthenticatedProfileRouteChildren = {
+  AuthenticatedProfilePrivacyRoute: AuthenticatedProfilePrivacyRoute,
   AuthenticatedProfileScanStatsRoute: AuthenticatedProfileScanStatsRoute,
 }
 
