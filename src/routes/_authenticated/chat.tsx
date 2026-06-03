@@ -277,8 +277,8 @@ function ChatPage() {
                 {a.label}
               </span>
             );
-            return "to" in a ? (
-              <Link key={a.label} to={a.to}>{content}</Link>
+            return "to" in a && a.to ? (
+              <Link key={a.label} to={a.to as "/dashboard"}>{content}</Link>
             ) : (
               <button key={a.label} onClick={() => handleSend(a.prompt)} disabled={mutation.isPending}>
                 {content}
