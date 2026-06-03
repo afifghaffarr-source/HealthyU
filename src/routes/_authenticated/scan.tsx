@@ -2,7 +2,8 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useRef, useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { ArrowLeft, Camera, Loader2, Sparkles, X, Check } from "lucide-react";
+import { TopAppBar } from "@/components/healthyu/top-app-bar";
+import { Camera, Loader2, Sparkles, X, Check } from "lucide-react";
 import { toast } from "sonner";
 import { BottomNav } from "@/components/bottom-nav";
 import { recognizeFood } from "@/lib/foodScan.functions";
@@ -102,19 +103,16 @@ function ScanPage() {
 
   return (
     <div className="min-h-dvh bg-background pb-28">
-      <header className="sticky top-0 z-30 bg-background/85 backdrop-blur-xl border-b border-border/50">
-        <div className="max-w-md mx-auto px-4 py-3 flex items-center gap-3">
-          <Link to="/dashboard" className="p-2 -ml-2 rounded-full hover:bg-muted">
-            <ArrowLeft className="size-5" />
-          </Link>
-          <h1 className="font-semibold text-lg">Scan Makanan</h1>
-          <span className="ml-auto inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-primary">
-            <Sparkles className="size-3" /> AI
-          </span>
-        </div>
-      </header>
-
-      <main className="max-w-md mx-auto px-4 pt-4 space-y-4">
+      <main className="max-w-md mx-auto px-4 pt-2 space-y-4">
+        <TopAppBar
+          title="Scan Makanan"
+          showBack
+          action={
+            <span className="inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-primary">
+              <Sparkles className="size-3" /> AI
+            </span>
+          }
+        />
         <input
           ref={fileRef}
           type="file"

@@ -6,7 +6,8 @@ import { getRecipe } from "@/lib/recipes.functions";
 import { getRecipeRating, rateRecipe } from "@/lib/recipeRatings.functions";
 import { isRecipeBookmarked, toggleRecipeBookmark } from "@/lib/recipeBookmarks.functions";
 import { BottomNav } from "@/components/bottom-nav";
-import { ArrowLeft, Clock, Flame, Users, Star, Bookmark } from "lucide-react";
+import { TopAppBar } from "@/components/healthyu/top-app-bar";
+import { Clock, Flame, Users, Star, Bookmark } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/recipes/$id")({
@@ -58,21 +59,21 @@ function RecipeDetail() {
 
   return (
     <main className="min-h-screen bg-background pb-28">
-      <div className="max-w-md mx-auto px-5 pt-8 space-y-5">
-        <header className="flex items-center gap-3">
-          <Link to="/recipes" className="size-10 bg-card rounded-2xl outline-1 outline-black/10 grid place-items-center">
-            <ArrowLeft className="size-4" />
-          </Link>
-          <h1 className="text-xl font-bold flex-1 truncate">{r?.title ?? "Resep"}</h1>
-          <button
-            onClick={() => bmM.mutate()}
-            disabled={bmM.isPending}
-            className="size-10 bg-card rounded-2xl outline-1 outline-black/10 grid place-items-center"
-            aria-label={bm?.bookmarked ? "Hapus bookmark" : "Simpan resep"}
-          >
-            <Bookmark className={`size-4 ${bm?.bookmarked ? "fill-primary text-primary" : ""}`} />
-          </button>
-        </header>
+      <div className="max-w-md mx-auto px-5 pt-2 space-y-5">
+        <TopAppBar
+          title={r?.title ?? "Resep"}
+          showBack
+          action={
+            <button
+              onClick={() => bmM.mutate()}
+              disabled={bmM.isPending}
+              className="size-10 bg-card rounded-2xl outline-1 outline-black/10 grid place-items-center"
+              aria-label={bm?.bookmarked ? "Hapus bookmark" : "Simpan resep"}
+            >
+              <Bookmark className={`size-4 ${bm?.bookmarked ? "fill-primary text-primary" : ""}`} />
+            </button>
+          }
+        />
 
         {isLoading && <p className="text-sm text-muted-foreground">Memuat...</p>}
         {r && (
