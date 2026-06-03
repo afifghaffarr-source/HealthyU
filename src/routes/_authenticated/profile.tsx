@@ -5,7 +5,7 @@ import { getProfile } from "@/lib/profile.functions";
 import { BottomNav } from "@/components/bottom-nav";
 import { supabase } from "@/integrations/supabase/client";
 import { calcAge, calcBMI, bmiCategory, calcBMR, calcTDEE, type ActivityLevel } from "@/lib/health";
-import { ArrowLeft, LogOut, Settings, Trophy, Moon, Calendar, Pill, MoonStar, BarChart3, Bell, Users, Sun, Medal, Camera, ChefHat, Smile, Droplet, Scale, HeartPulse } from "lucide-react";
+import { ArrowLeft, LogOut, Settings, Trophy, Moon, Calendar, Pill, MoonStar, BarChart3, Bell, Users, Sun, Medal, Camera, ChefHat, Smile, Droplet, Scale, HeartPulse, Activity } from "lucide-react";
 import { useTheme } from "@/components/theme-provider";
 
 export const Route = createFileRoute("/_authenticated/profile")({
