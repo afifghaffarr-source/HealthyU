@@ -3,10 +3,10 @@ import { useRef, useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { TopAppBar } from "@/components/healthyu/top-app-bar";
-import { Camera, Loader2, Sparkles, X, Check } from "lucide-react";
+import { Camera, Loader2, Sparkles, X, Check, Pencil } from "lucide-react";
 import { toast } from "sonner";
 import { BottomNav } from "@/components/bottom-nav";
-import { recognizeFood } from "@/lib/foodScan.functions";
+import { recognizeFood, submitScanCorrection } from "@/lib/foodScan.functions";
 import { logMeal } from "@/lib/meals.functions";
 
 export const Route = createFileRoute("/_authenticated/scan")({
@@ -48,15 +48,21 @@ function ScanPage() {
   const fileRef = useRef<HTMLInputElement>(null);
   const scan = useServerFn(recognizeFood);
   const log = useServerFn(logMeal);
+  const correct = useServerFn(submitScanCorrection);
 
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [items, setItems] = useState<Item[]>([]);
+  const [originals, setOriginals] = useState<Item[]>([]);
+  const [scanId, setScanId] = useState<string | null>(null);
+  const [editIdx, setEditIdx] = useState<number | null>(null);
   const [mealType, setMealType] = useState<(typeof MEAL_TYPES)[number]["v"]>(pickDefaultMealType());
 
   const scanMut = useMutation({
     mutationFn: async (dataUrl: string) => scan({ data: { image_data_url: dataUrl } }),
     onSuccess: (res) => {
       setItems(res.items);
+      setOriginals(res.items.map((i) => ({ ...i })));
+      setScanId(res.scan_id);
       if (res.items.length === 0) toast.error("Tidak ada makanan terdeteksi");
       else toast.success(`${res.items.length} makanan dikenali`);
     },
@@ -64,8 +70,22 @@ function ScanPage() {
   });
 
   const logMut = useMutation({
-    mutationFn: (it: Item) =>
-      log({
+    mutationFn: async (payload: { it: Item; idx: number }) => {
+      const { it, idx } = payload;
+      const orig = originals[idx];
+      const changed =
+        orig &&
+        (orig.name !== it.name ||
+          Math.round(orig.calories) !== Math.round(it.calories) ||
+          Math.round(orig.portion_g ?? 0) !== Math.round(it.portion_g ?? 0) ||
+          Math.round(orig.protein_g) !== Math.round(it.protein_g) ||
+          Math.round(orig.carbs_g) !== Math.round(it.carbs_g) ||
+          Math.round(orig.fat_g) !== Math.round(it.fat_g));
+      if (changed) {
+        // fire-and-forget audit
+        correct({ data: { scan_id: scanId, original: orig, corrected: it } }).catch(() => {});
+      }
+      return log({
         data: {
           food_item_id: it.matched_food_id ?? null,
           custom_name: it.matched_food_id ? null : it.name,
@@ -76,13 +96,20 @@ function ScanPage() {
           carbs_g: Math.round(it.carbs_g),
           fat_g: Math.round(it.fat_g),
         },
-      }),
-    onSuccess: (_res, it) => {
-      toast.success(`${it.name} dicatat`);
-      setItems((prev) => prev.filter((x) => x !== it));
+      });
+    },
+    onSuccess: (_res, payload) => {
+      toast.success(`${payload.it.name} dicatat`);
+      setItems((prev) => prev.filter((_, i) => i !== payload.idx));
+      setOriginals((prev) => prev.filter((_, i) => i !== payload.idx));
+      if (editIdx === payload.idx) setEditIdx(null);
     },
     onError: (e: Error) => toast.error(e.message),
   });
+
+  function updateItem(idx: number, patch: Partial<Item>) {
+    setItems((prev) => prev.map((it, i) => (i === idx ? { ...it, ...patch } : it)));
+  }
 
   async function handleFile(file: File) {
     try {
@@ -98,6 +125,9 @@ function ScanPage() {
   function reset() {
     setImageUrl(null);
     setItems([]);
+    setOriginals([]);
+    setScanId(null);
+    setEditIdx(null);
     if (fileRef.current) fileRef.current.value = "";
   }
 
@@ -185,41 +215,94 @@ function ScanPage() {
             {items.length > 0 && (
               <div className="space-y-2">
                 <p className="text-xs font-semibold text-muted-foreground">Terdeteksi</p>
-                {items.map((it, i) => (
-                  <div
-                    key={i}
-                    className="p-3 rounded-2xl bg-card border border-border/50 flex items-start gap-3"
-                  >
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2">
-                        <p className="font-semibold text-sm truncate">{it.name}</p>
-                        <span className="text-[10px] px-1.5 py-0.5 rounded bg-muted text-muted-foreground">
-                          {Math.round((it.confidence ?? 0) * 100)}%
-                        </span>
+                {items.map((it, i) => {
+                  const editing = editIdx === i;
+                  return (
+                    <div
+                      key={i}
+                      className="p-3 rounded-2xl bg-card border border-border/50 space-y-2"
+                    >
+                      <div className="flex items-start gap-3">
+                        <div className="flex-1 min-w-0">
+                          {editing ? (
+                            <input
+                              value={it.name}
+                              onChange={(e) => updateItem(i, { name: e.target.value })}
+                              className="w-full text-sm font-semibold bg-muted/60 rounded-lg px-2 py-1 outline-none focus:bg-background border border-transparent focus:border-primary"
+                            />
+                          ) : (
+                            <div className="flex items-center gap-2">
+                              <p className="font-semibold text-sm truncate">{it.name}</p>
+                              <span className="text-[10px] px-1.5 py-0.5 rounded bg-muted text-muted-foreground">
+                                {Math.round((it.confidence ?? 0) * 100)}%
+                              </span>
+                            </div>
+                          )}
+                          {!editing && (
+                            <p className="text-xs text-muted-foreground mt-0.5">
+                              {it.portion_g ? `~${it.portion_g}g` : it.portion_ml ? `~${it.portion_ml}ml` : ""}
+                              {" · "}P {Math.round(it.protein_g)}g · K {Math.round(it.carbs_g)}g · L {Math.round(it.fat_g)}g
+                            </p>
+                          )}
+                          {it.matched_food_id && !editing && (
+                            <p className="text-[10px] text-primary mt-0.5">✓ ada di database</p>
+                          )}
+                        </div>
+                        <div className="text-right shrink-0">
+                          <p className="font-bold text-primary text-sm">{Math.round(it.calories)}</p>
+                          <p className="text-[10px] text-muted-foreground">kkal</p>
+                        </div>
+                        <button
+                          onClick={() => setEditIdx(editing ? null : i)}
+                          className="self-center size-8 rounded-lg bg-muted/60 grid place-items-center text-muted-foreground hover:text-foreground"
+                          aria-label={editing ? "Tutup edit" : "Edit"}
+                        >
+                          <Pencil className="size-3.5" />
+                        </button>
+                        <button
+                          onClick={() => logMut.mutate({ it, idx: i })}
+                          disabled={logMut.isPending}
+                          className="self-center size-9 rounded-xl bg-primary text-primary-foreground grid place-items-center disabled:opacity-50"
+                          aria-label="Catat"
+                        >
+                          <Check className="size-4" />
+                        </button>
                       </div>
-                      <p className="text-xs text-muted-foreground">
-                        {it.portion_g ? `~${it.portion_g}g` : it.portion_ml ? `~${it.portion_ml}ml` : ""}
-                        {" · "}
-                        P {Math.round(it.protein_g)}g · K {Math.round(it.carbs_g)}g · L {Math.round(it.fat_g)}g
-                      </p>
-                      {it.matched_food_id && (
-                        <p className="text-[10px] text-primary mt-0.5">✓ ada di database</p>
+                      {editing && (
+                        <div className="grid grid-cols-2 gap-2 pt-1">
+                          <EditField
+                            label="Porsi (g)"
+                            value={it.portion_g ?? 0}
+                            onChange={(v) => updateItem(i, { portion_g: v })}
+                          />
+                          <EditField
+                            label="Kalori"
+                            value={Math.round(it.calories)}
+                            onChange={(v) => updateItem(i, { calories: v })}
+                          />
+                          <EditField
+                            label="Protein (g)"
+                            value={Math.round(it.protein_g)}
+                            onChange={(v) => updateItem(i, { protein_g: v })}
+                          />
+                          <EditField
+                            label="Karbo (g)"
+                            value={Math.round(it.carbs_g)}
+                            onChange={(v) => updateItem(i, { carbs_g: v })}
+                          />
+                          <EditField
+                            label="Lemak (g)"
+                            value={Math.round(it.fat_g)}
+                            onChange={(v) => updateItem(i, { fat_g: v })}
+                          />
+                          <div className="col-span-2 text-[10px] text-muted-foreground pt-0.5">
+                            Koreksimu akan dikirim ke audit AI untuk perbaikan ke depan.
+                          </div>
+                        </div>
                       )}
                     </div>
-                    <div className="text-right shrink-0">
-                      <p className="font-bold text-primary text-sm">{Math.round(it.calories)}</p>
-                      <p className="text-[10px] text-muted-foreground">kkal</p>
-                    </div>
-                    <button
-                      onClick={() => logMut.mutate(it)}
-                      disabled={logMut.isPending}
-                      className="self-center size-9 rounded-xl bg-primary text-primary-foreground grid place-items-center disabled:opacity-50"
-                      aria-label="Catat"
-                    >
-                      <Check className="size-4" />
-                    </button>
-                  </div>
-                ))}
+                  );
+                })}
                 <button
                   onClick={() => navigate({ to: "/dashboard" })}
                   className="w-full py-2 text-xs font-semibold text-primary"
@@ -243,5 +326,28 @@ function ScanPage() {
 
       <BottomNav />
     </div>
+  );
+}
+
+function EditField({
+  label,
+  value,
+  onChange,
+}: {
+  label: string;
+  value: number;
+  onChange: (v: number) => void;
+}) {
+  return (
+    <label className="block">
+      <span className="block text-[10px] uppercase tracking-wider text-muted-foreground mb-0.5">{label}</span>
+      <input
+        type="number"
+        inputMode="numeric"
+        value={value}
+        onChange={(e) => onChange(Number(e.target.value) || 0)}
+        className="w-full text-sm bg-muted/60 rounded-lg px-2 py-1.5 outline-none focus:bg-background border border-transparent focus:border-primary"
+      />
+    </label>
   );
 }

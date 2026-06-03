@@ -1479,6 +1479,44 @@ export type Database = {
         }
         Relationships: []
       }
+      food_scan_corrections: {
+        Row: {
+          corrected: Json
+          created_at: string
+          id: string
+          note: string | null
+          original: Json
+          scan_id: string | null
+          user_id: string
+        }
+        Insert: {
+          corrected: Json
+          created_at?: string
+          id?: string
+          note?: string | null
+          original: Json
+          scan_id?: string | null
+          user_id: string
+        }
+        Update: {
+          corrected?: Json
+          created_at?: string
+          id?: string
+          note?: string | null
+          original?: Json
+          scan_id?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "food_scan_corrections_scan_id_fkey"
+            columns: ["scan_id"]
+            isOneToOne: false
+            referencedRelation: "food_scans"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       food_scans: {
         Row: {
           avg_confidence: number | null

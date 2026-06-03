@@ -53,7 +53,8 @@ type ScanItem = {
 export const recognizeFood = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) => ScanInput.parse(input))
-  .handler(async ({ data, context }): Promise<{ items: ScanItem[] }> => {
+  .handler(async ({ data, context }): Promise<{ scan_id: string | null; items: ScanItem[] }> => {
+    const startedAt = Date.now();
     const apiKey = process.env.LOVABLE_API_KEY;
     if (!apiKey) throw new Error("AI service not configured");
 
@@ -106,7 +107,7 @@ export const recognizeFood = createServerFn({ method: "POST" })
     const items = Array.isArray(parsed.items) ? parsed.items : [];
 
     // Try matching each item against existing food_items by name (ILIKE)
-    const { supabase } = context;
+    const { supabase, userId } = context;
     const enriched: ScanItem[] = await Promise.all(
       items.slice(0, 8).map(async (it) => {
         const term = (it.name || "").trim().slice(0, 60);
@@ -132,5 +133,58 @@ export const recognizeFood = createServerFn({ method: "POST" })
       }),
     );
 
-    return { items: enriched };
+    // Persist scan for audit + correction trail
+    let scan_id: string | null = null;
+    try {
+      const totalCal = enriched.reduce((s, i) => s + (i.calories || 0), 0);
+      const totalP = enriched.reduce((s, i) => s + (i.protein_g || 0), 0);
+      const totalC = enriched.reduce((s, i) => s + (i.carbs_g || 0), 0);
+      const totalF = enriched.reduce((s, i) => s + (i.fat_g || 0), 0);
+      const avgConf = enriched.length
+        ? enriched.reduce((s, i) => s + (i.confidence || 0), 0) / enriched.length
+        : 0;
+      const { data: row } = await supabase
+        .from("food_scans")
+        .insert({
+          user_id: userId,
+          detected_foods: JSON.parse(JSON.stringify(enriched)),
+          total_calories: totalCal,
+          total_protein: totalP,
+          total_carbs: totalC,
+          total_fat: totalF,
+          model_version: "gemini-2.5-flash",
+          processing_time_ms: Date.now() - startedAt,
+          avg_confidence: avgConf,
+        })
+        .select("id")
+        .single();
+      scan_id = row?.id ?? null;
+    } catch {
+      /* non-blocking */
+    }
+
+    return { scan_id, items: enriched };
+  });
+
+const CorrectionInput = z.object({
+  scan_id: z.string().uuid().nullable(),
+  original: z.unknown(),
+  corrected: z.unknown(),
+  note: z.string().max(500).optional(),
+});
+
+export const submitScanCorrection = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => CorrectionInput.parse(input))
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    const { error } = await supabase.from("food_scan_corrections").insert({
+      user_id: userId,
+      scan_id: data.scan_id,
+      original: data.original as never,
+      corrected: data.corrected as never,
+      note: data.note ?? null,
+    });
+    if (error) throw new Error(error.message);
+    return { ok: true };
   });
