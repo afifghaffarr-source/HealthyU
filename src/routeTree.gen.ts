@@ -40,6 +40,7 @@ import { Route as AuthenticatedMedicationsRouteImport } from './routes/_authenti
 import { Route as AuthenticatedMealplanRouteImport } from './routes/_authenticated/mealplan'
 import { Route as AuthenticatedLeaderboardRouteImport } from './routes/_authenticated/leaderboard'
 import { Route as AuthenticatedInsightsRouteImport } from './routes/_authenticated/insights'
+import { Route as AuthenticatedHeatmapRouteImport } from './routes/_authenticated/heatmap'
 import { Route as AuthenticatedHealthImportRouteImport } from './routes/_authenticated/health-import'
 import { Route as AuthenticatedGroupsRouteImport } from './routes/_authenticated/groups'
 import { Route as AuthenticatedFoodsRouteImport } from './routes/_authenticated/foods'
@@ -249,6 +250,11 @@ const AuthenticatedLeaderboardRoute =
 const AuthenticatedInsightsRoute = AuthenticatedInsightsRouteImport.update({
   id: '/insights',
   path: '/insights',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedHeatmapRoute = AuthenticatedHeatmapRouteImport.update({
+  id: '/heatmap',
+  path: '/heatmap',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedHealthImportRoute =
@@ -543,6 +549,7 @@ export interface FileRoutesByFullPath {
   '/foods': typeof AuthenticatedFoodsRoute
   '/groups': typeof AuthenticatedGroupsRouteWithChildren
   '/health-import': typeof AuthenticatedHealthImportRoute
+  '/heatmap': typeof AuthenticatedHeatmapRoute
   '/insights': typeof AuthenticatedInsightsRoute
   '/leaderboard': typeof AuthenticatedLeaderboardRoute
   '/mealplan': typeof AuthenticatedMealplanRouteWithChildren
@@ -624,6 +631,7 @@ export interface FileRoutesByTo {
   '/foods': typeof AuthenticatedFoodsRoute
   '/groups': typeof AuthenticatedGroupsRouteWithChildren
   '/health-import': typeof AuthenticatedHealthImportRoute
+  '/heatmap': typeof AuthenticatedHeatmapRoute
   '/insights': typeof AuthenticatedInsightsRoute
   '/leaderboard': typeof AuthenticatedLeaderboardRoute
   '/mealplan': typeof AuthenticatedMealplanRouteWithChildren
@@ -707,6 +715,7 @@ export interface FileRoutesById {
   '/_authenticated/foods': typeof AuthenticatedFoodsRoute
   '/_authenticated/groups': typeof AuthenticatedGroupsRouteWithChildren
   '/_authenticated/health-import': typeof AuthenticatedHealthImportRoute
+  '/_authenticated/heatmap': typeof AuthenticatedHeatmapRoute
   '/_authenticated/insights': typeof AuthenticatedInsightsRoute
   '/_authenticated/leaderboard': typeof AuthenticatedLeaderboardRoute
   '/_authenticated/mealplan': typeof AuthenticatedMealplanRouteWithChildren
@@ -790,6 +799,7 @@ export interface FileRouteTypes {
     | '/foods'
     | '/groups'
     | '/health-import'
+    | '/heatmap'
     | '/insights'
     | '/leaderboard'
     | '/mealplan'
@@ -871,6 +881,7 @@ export interface FileRouteTypes {
     | '/foods'
     | '/groups'
     | '/health-import'
+    | '/heatmap'
     | '/insights'
     | '/leaderboard'
     | '/mealplan'
@@ -953,6 +964,7 @@ export interface FileRouteTypes {
     | '/_authenticated/foods'
     | '/_authenticated/groups'
     | '/_authenticated/health-import'
+    | '/_authenticated/heatmap'
     | '/_authenticated/insights'
     | '/_authenticated/leaderboard'
     | '/_authenticated/mealplan'
@@ -1245,6 +1257,13 @@ declare module '@tanstack/react-router' {
       path: '/insights'
       fullPath: '/insights'
       preLoaderRoute: typeof AuthenticatedInsightsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/heatmap': {
+      id: '/_authenticated/heatmap'
+      path: '/heatmap'
+      fullPath: '/heatmap'
+      preLoaderRoute: typeof AuthenticatedHeatmapRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/health-import': {
@@ -1761,6 +1780,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedFoodsRoute: typeof AuthenticatedFoodsRoute
   AuthenticatedGroupsRoute: typeof AuthenticatedGroupsRouteWithChildren
   AuthenticatedHealthImportRoute: typeof AuthenticatedHealthImportRoute
+  AuthenticatedHeatmapRoute: typeof AuthenticatedHeatmapRoute
   AuthenticatedInsightsRoute: typeof AuthenticatedInsightsRoute
   AuthenticatedLeaderboardRoute: typeof AuthenticatedLeaderboardRoute
   AuthenticatedMealplanRoute: typeof AuthenticatedMealplanRouteWithChildren
@@ -1809,6 +1829,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedFoodsRoute: AuthenticatedFoodsRoute,
   AuthenticatedGroupsRoute: AuthenticatedGroupsRouteWithChildren,
   AuthenticatedHealthImportRoute: AuthenticatedHealthImportRoute,
+  AuthenticatedHeatmapRoute: AuthenticatedHeatmapRoute,
   AuthenticatedInsightsRoute: AuthenticatedInsightsRoute,
   AuthenticatedLeaderboardRoute: AuthenticatedLeaderboardRoute,
   AuthenticatedMealplanRoute: AuthenticatedMealplanRouteWithChildren,
