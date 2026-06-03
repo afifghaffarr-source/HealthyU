@@ -120,15 +120,6 @@ function CommunityPage() {
                   )}
                 </div>
                 <p className="text-sm whitespace-pre-wrap leading-relaxed">{p.content}</p>
-                <button
-                  onClick={() => likeMut.mutate(p.id)}
-                  className={`mt-3 flex items-center gap-1.5 text-xs font-semibold ${
-                    p.liked_by_me ? "text-coral" : "text-muted-foreground"
-                  }`}
-                >
-                  <Heart className={`size-4 ${p.liked_by_me ? "fill-coral" : ""}`} />
-                  {p.like_count}
-                </button>
                 <div className="flex gap-4 mt-3 items-center">
                   <button
                     onClick={() => likeMut.mutate(p.id)}
