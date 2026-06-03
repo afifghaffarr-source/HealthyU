@@ -1621,6 +1621,36 @@ export type Database = {
         }
         Relationships: []
       }
+      group_challenge_bonuses: {
+        Row: {
+          challenge_id: string
+          coins_awarded: number
+          created_at: string
+          group_id: string
+          id: string
+          redemption_id: string | null
+          user_id: string
+        }
+        Insert: {
+          challenge_id: string
+          coins_awarded?: number
+          created_at?: string
+          group_id: string
+          id?: string
+          redemption_id?: string | null
+          user_id: string
+        }
+        Update: {
+          challenge_id?: string
+          coins_awarded?: number
+          created_at?: string
+          group_id?: string
+          id?: string
+          redemption_id?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       group_challenges: {
         Row: {
           challenge_id: string
@@ -3862,6 +3892,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      claim_group_challenge_bonus: {
+        Args: { p_challenge_id: string; p_group_id: string }
+        Returns: Json
+      }
       is_group_member: {
         Args: { _group_id: string; _user_id: string }
         Returns: boolean
