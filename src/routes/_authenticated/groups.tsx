@@ -219,6 +219,25 @@ function GroupCard({
             >
               <Copy className="size-4" />
             </button>
+            <button
+              onClick={async () => {
+                const url = `${window.location.origin}/groups?invite=${group.invite_code}`;
+                const text = `Gabung grup "${group.name}" di SehatKu! Kode: ${group.invite_code}`;
+                const nav = navigator as Navigator & { share?: (d: { title?: string; text?: string; url?: string }) => Promise<void> };
+                if (nav.share) {
+                  try {
+                    await nav.share({ title: group.name, text, url });
+                    return;
+                  } catch { /* user cancelled */ }
+                }
+                navigator.clipboard.writeText(url);
+                toast.success("Link undangan disalin");
+              }}
+              className="size-9 rounded-xl bg-primary text-primary-foreground grid place-items-center"
+              aria-label="Bagikan link"
+            >
+              <Share2 className="size-4" />
+            </button>
           </div>
 
           {isLoading && (
