@@ -98,12 +98,18 @@ const LS_KEY = "i18n:locale";
 export function I18nProvider({ children }: { children: ReactNode }) {
   const [locale, setLocaleState] = useState<Locale>(() => {
     if (typeof window === "undefined") return defaultLocale;
-    const saved = window.localStorage.getItem(LS_KEY);
-    return saved && saved in bundles ? (saved as Locale) : defaultLocale;
+    try {
+      const saved = window.localStorage.getItem(LS_KEY);
+      return saved && saved in bundles ? (saved as Locale) : defaultLocale;
+    } catch {
+      return defaultLocale;
+    }
   });
   const setLocale = useCallback((l: Locale) => {
     setLocaleState(l);
-    if (typeof window !== "undefined") window.localStorage.setItem(LS_KEY, l);
+    if (typeof window !== "undefined") {
+      try { window.localStorage.setItem(LS_KEY, l); } catch { /* SSR / privacy mode */ }
+    }
   }, []);
   useEffect(() => {
     if (typeof document !== "undefined") document.documentElement.lang = locale;
