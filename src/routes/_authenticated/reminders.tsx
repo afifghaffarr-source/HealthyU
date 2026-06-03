@@ -13,6 +13,7 @@ import {
   Sparkles,
   Plus,
   Trash2,
+  MoonStar,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -35,6 +36,7 @@ const CATEGORY_META: Record<ReminderCategory, { icon: typeof Bell; label: string
   sleep: { icon: Moon, label: "Tidur" },
   medication: { icon: Pill, label: "Obat" },
   fasting: { icon: Timer, label: "Puasa" },
+  prayer: { icon: MoonStar, label: "Sholat" },
   custom: { icon: Sparkles, label: "Lain" },
 };
 
