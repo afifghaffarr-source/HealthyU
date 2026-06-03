@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useQuery, useMutation } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { weeklyReport, weeklyAiAnalysis } from "@/lib/reports.functions";
+import { weeklyReport, weeklyAiAnalysis, listAiReports } from "@/lib/reports.functions";
 import { BottomNav } from "@/components/bottom-nav";
 import { ArrowLeft, Download, FileText, Sparkles, Loader2, Share2 } from "lucide-react";
 import { useMemo } from "react";
@@ -20,12 +20,19 @@ function dayKey(d: string | Date) {
 function ReportsPage() {
   const fetchFn = useServerFn(weeklyReport);
   const aiFn = useServerFn(weeklyAiAnalysis);
+  const listFn = useServerFn(listAiReports);
+  const qc = useQueryClient();
   const { data } = useQuery({
     queryKey: ["report", 7],
     queryFn: () => fetchFn({ data: { days: 7 } }),
   });
+  const { data: history = [] } = useQuery({
+    queryKey: ["ai-reports"],
+    queryFn: () => listFn(),
+  });
   const aiMut = useMutation({
     mutationFn: () => aiFn({ data: { days: 7 } }),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["ai-reports"] }),
     onError: (e) => toast.error(e instanceof Error ? e.message : "Gagal generate"),
   });
 
