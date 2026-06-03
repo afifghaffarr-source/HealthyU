@@ -1621,6 +1621,30 @@ export type Database = {
         }
         Relationships: []
       }
+      group_challenges: {
+        Row: {
+          challenge_id: string
+          created_at: string
+          created_by: string
+          group_id: string
+          id: string
+        }
+        Insert: {
+          challenge_id: string
+          created_at?: string
+          created_by: string
+          group_id: string
+          id?: string
+        }
+        Update: {
+          challenge_id?: string
+          created_at?: string
+          created_by?: string
+          group_id?: string
+          id?: string
+        }
+        Relationships: []
+      }
       group_members: {
         Row: {
           group_id: string
