@@ -10,6 +10,7 @@ export default defineConfig({
     coverage: {
       provider: "v8",
       reporter: ["text", "json-summary"],
+      include: ["src/hooks/**", "src/lib/**", "src/components/live-announcer.tsx"],
       thresholds: { lines: 70, functions: 70 },
     },
   },
