@@ -6,10 +6,11 @@ import { getProfile } from "@/lib/profile.functions";
 import { todaysMeals } from "@/lib/meals.functions";
 import { currentFast } from "@/lib/fasting.functions";
 import { todaysWater, logWater } from "@/lib/water.functions";
+import { getGameSummary } from "@/lib/gamification.functions";
 import { BottomNav } from "@/components/bottom-nav";
 import { CalorieRing } from "@/components/calorie-ring";
 import { formatDuration, fastingStage } from "@/lib/health";
-import { Droplet, Plus, Sparkles, ArrowRight } from "lucide-react";
+import { Droplet, Plus, Sparkles, ArrowRight, Flame, Trophy } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
@@ -24,11 +25,13 @@ function Dashboard() {
   const fetchFast = useServerFn(currentFast);
   const fetchWater = useServerFn(todaysWater);
   const logWaterFn = useServerFn(logWater);
+  const fetchGame = useServerFn(getGameSummary);
 
   const { data: profile, isLoading: pLoad } = useQuery({ queryKey: ["profile"], queryFn: () => fetchProfile() });
   const { data: meals = [] } = useQuery({ queryKey: ["meals", "today"], queryFn: () => fetchMeals() });
   const { data: fast } = useQuery({ queryKey: ["fast", "current"], queryFn: () => fetchFast(), refetchInterval: 30000 });
   const { data: waterMl = 0 } = useQuery({ queryKey: ["water", "today"], queryFn: () => fetchWater() });
+  const { data: game } = useQuery({ queryKey: ["game", "summary"], queryFn: () => fetchGame() });
 
   useEffect(() => {
     if (!pLoad && profile && !profile.onboarded) {
@@ -38,9 +41,12 @@ function Dashboard() {
 
   const waterMutation = useMutation({
     mutationFn: (ml: number) => logWaterFn({ data: { amount_ml: ml } }),
-    onSuccess: () => {
+    onSuccess: (res) => {
       qc.invalidateQueries({ queryKey: ["water", "today"] });
+      qc.invalidateQueries({ queryKey: ["game", "summary"] });
       toast.success("+250ml dicatat");
+      const newlyUnlocked = res?.game?.newlyUnlocked ?? [];
+      newlyUnlocked.forEach((a) => toast.success(`${a.icon} ${a.title} terbuka!`));
     },
   });
 
