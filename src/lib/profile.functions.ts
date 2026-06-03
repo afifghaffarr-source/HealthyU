@@ -12,7 +12,24 @@ export const getProfile = createServerFn({ method: "GET" })
       .eq("id", userId)
       .maybeSingle();
     if (error) throw new Error(error.message);
-    return data;
+
+    if (data) return data;
+
+    const now = new Date().toISOString();
+    const { error: upsertError } = await supabase.from("profiles").upsert({
+      id: userId,
+      updated_at: now,
+    });
+    if (upsertError) throw new Error(upsertError.message);
+
+    const { data: created, error: refetchError } = await supabase
+      .from("profiles")
+      .select("*")
+      .eq("id", userId)
+      .maybeSingle();
+    if (refetchError) throw new Error(refetchError.message);
+
+    return created;
   });
 
 const UpdateSchema = z.object({
@@ -39,8 +56,7 @@ export const updateProfile = createServerFn({ method: "POST" })
     const { supabase, userId } = context;
     const { error } = await supabase
       .from("profiles")
-      .update({ ...data, updated_at: new Date().toISOString() })
-      .eq("id", userId);
+      .upsert({ id: userId, ...data, updated_at: new Date().toISOString() });
     if (error) throw new Error(error.message);
     return { ok: true };
   });
