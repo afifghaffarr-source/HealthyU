@@ -25,6 +25,7 @@ import {
   listGroupBonusStatus,
   listGroupBonusClaimers,
 } from "@/lib/groupChallengeBonus.functions";
+import { groupChallengePendingMembers } from "@/lib/groupChallengePending.functions";
 
 const challengesSearchSchema = z.object({
   group: fallback(z.string().uuid().optional(), undefined),
@@ -351,23 +352,13 @@ function GroupInviter({ challengeId, initialOpen }: { challengeId: string; initi
             </p>
           )}
           {groups.map((g) => (
-            <div
+            <GroupInviteRow
               key={g.id}
-              className="flex items-center justify-between gap-2 px-2.5 py-1.5 rounded-xl bg-muted/40 text-xs"
-            >
-              <span className="truncate font-semibold">{g.name}</span>
-              {g.joined ? (
-                <span className="text-[10px] text-primary font-semibold">Aktif</span>
-              ) : (
-                <button
-                  onClick={() => inviteM.mutate(g.id)}
-                  disabled={inviteM.isPending}
-                  className="text-[10px] font-semibold text-primary disabled:opacity-50"
-                >
-                  Undang
-                </button>
-              )}
-            </div>
+              group={g}
+              challengeId={challengeId}
+              onInvite={() => inviteM.mutate(g.id)}
+              inviting={inviteM.isPending}
+            />
           ))}
         </div>
       )}
