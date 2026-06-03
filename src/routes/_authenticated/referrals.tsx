@@ -1,9 +1,10 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
+import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { getReferralInfo, applyReferralCode } from "@/lib/referrals.functions";
 import { BottomNav } from "@/components/bottom-nav";
-import { ArrowLeft, Copy, Share2, Gift, Users } from "lucide-react";
+import { Copy, Share2, Gift, Users } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -52,13 +53,8 @@ function ReferralsPage() {
 
   return (
     <main className="min-h-screen bg-background pb-28">
-      <div className="max-w-md mx-auto px-5 pt-8 space-y-5">
-        <header className="flex items-center gap-3">
-          <Link to="/profile" className="size-10 bg-card rounded-2xl outline-1 outline-black/10 grid place-items-center">
-            <ArrowLeft className="size-4" />
-          </Link>
-          <h1 className="text-2xl font-bold">Ajak Teman</h1>
-        </header>
+      <div className="max-w-md mx-auto px-5 pt-2 space-y-5">
+        <TopAppBar title="Ajak Teman" showBack />
 
         <section className="bg-gradient-to-br from-sage to-sage-deep text-primary-foreground p-6 rounded-[2rem] animate-fade-up">
           <p className="text-xs uppercase tracking-widest text-white/70 font-bold">Kode Kamu</p>

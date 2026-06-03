@@ -1,8 +1,9 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
+import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { useMutation } from "@tanstack/react-query";
-import { ArrowLeft, Upload, Apple, Smartphone, Loader2, CheckCircle2 } from "lucide-react";
+import { Upload, Apple, Smartphone, Loader2, CheckCircle2 } from "lucide-react";
 import { BottomNav } from "@/components/bottom-nav";
 import { importHealthData } from "@/lib/health-import.functions";
 import { toast } from "sonner";
@@ -53,16 +54,8 @@ function HealthImportPage() {
 
   return (
     <main className="min-h-screen bg-background pb-28">
-      <div className="max-w-md mx-auto px-5 pt-8 space-y-5">
-        <header className="flex items-center gap-3">
-          <Link to="/profile" className="size-10 bg-card rounded-2xl outline-1 outline-black/10 grid place-items-center">
-            <ArrowLeft className="size-4" />
-          </Link>
-          <div>
-            <h1 className="text-2xl font-bold">Import Kesehatan</h1>
-            <p className="text-xs text-muted-foreground">Apple Health / Samsung Health</p>
-          </div>
-        </header>
+      <div className="max-w-md mx-auto px-5 pt-2 space-y-5">
+        <TopAppBar title="Import Kesehatan" subtitle="Apple Health / Samsung Health" showBack />
 
         <section className="bg-card rounded-2xl p-4 outline-1 outline-black/10 text-xs text-muted-foreground space-y-2">
           <p className="font-semibold text-foreground">Cara ekspor data:</p>

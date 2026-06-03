@@ -1,10 +1,11 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
+import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { getGameSummary, levelFromXp, xpForLevel } from "@/lib/gamification.functions";
 import { AchievementIcon } from "@/lib/achievement-icons";
 import { BottomNav } from "@/components/bottom-nav";
-import { ArrowLeft, Flame, Trophy, Star } from "lucide-react";
+import { Flame, Trophy, Star } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/achievements")({
   component: AchievementsPage,
@@ -27,13 +28,8 @@ function AchievementsPage() {
 
   return (
     <main className="min-h-screen bg-background pb-28">
-      <div className="max-w-md mx-auto px-5 pt-8 space-y-5">
-        <header className="flex items-center gap-3">
-          <Link to="/profile" className="size-10 bg-card rounded-2xl outline-1 outline-black/10 grid place-items-center">
-            <ArrowLeft className="size-4" />
-          </Link>
-          <h1 className="text-2xl font-bold">Pencapaian</h1>
-        </header>
+      <div className="max-w-md mx-auto px-5 pt-2 space-y-5">
+        <TopAppBar title="Pencapaian" showBack />
 
         <section className="bg-gradient-to-br from-sage to-sage-deep p-5 rounded-3xl text-primary-foreground animate-fade-up">
           <div className="flex items-center gap-4">
