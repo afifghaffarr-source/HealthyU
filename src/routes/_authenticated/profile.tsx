@@ -5,7 +5,7 @@ import { getProfile } from "@/lib/profile.functions";
 import { BottomNav } from "@/components/bottom-nav";
 import { supabase } from "@/integrations/supabase/client";
 import { calcAge, calcBMI, bmiCategory, calcBMR, calcTDEE, type ActivityLevel } from "@/lib/health";
-import { ArrowLeft, LogOut, Settings, Trophy, Moon, Calendar, Pill, MoonStar, BarChart3, Bell, Users, Sun } from "lucide-react";
+import { ArrowLeft, LogOut, Settings, Trophy, Moon, Calendar, Pill, MoonStar, BarChart3, Bell, Users, Sun, Medal, Camera, ChefHat } from "lucide-react";
 import { useTheme } from "@/components/theme-provider";
 
 export const Route = createFileRoute("/_authenticated/profile")({
@@ -77,6 +77,18 @@ function ProfilePage() {
           <Link to="/community" className="bg-card p-4 rounded-2xl outline-1 outline-black/10 flex flex-col items-start gap-2">
             <Users className="size-5 text-primary" />
             <span className="text-sm font-semibold">Komunitas</span>
+          </Link>
+          <Link to="/leaderboard" className="bg-card p-4 rounded-2xl outline-1 outline-black/10 flex flex-col items-start gap-2">
+            <Medal className="size-5 text-yellow-500" />
+            <span className="text-sm font-semibold">Leaderboard</span>
+          </Link>
+          <Link to="/progress" className="bg-card p-4 rounded-2xl outline-1 outline-black/10 flex flex-col items-start gap-2">
+            <Camera className="size-5 text-coral" />
+            <span className="text-sm font-semibold">Foto Progres</span>
+          </Link>
+          <Link to="/recipes" className="bg-card p-4 rounded-2xl outline-1 outline-black/10 flex flex-col items-start gap-2">
+            <ChefHat className="size-5 text-sage-deep" />
+            <span className="text-sm font-semibold">Resep Sehat</span>
           </Link>
           <button
             onClick={toggle}
