@@ -202,7 +202,7 @@ function ChallengesPage() {
               ref={(el) => { articleRefs.current[c.id] = el; }}
               className={
                 highlightId === c.id
-                  ? `rounded-3xl bg-card outline-1 outline-black/5 p-4 shadow-sm ring-4 ring-primary/40 transition-[opacity,box-shadow] ease-[cubic-bezier(0.34,1.56,0.64,1)] motion-reduce:transition-none ${
+                  ? `rounded-3xl bg-card outline-1 outline-black/5 p-4 shadow-sm ring-4 ring-primary/40 transition-[opacity,box-shadow] ease-[cubic-bezier(0.34,1.56,0.64,1)] motion-reduce:transition-none motion-reduce:!ring-primary/60 motion-reduce:!opacity-100 ${
                       highlightFading ? "ring-primary/0" : "animate-pulse motion-reduce:animate-none"
                     }`
                   : "rounded-3xl bg-card outline-1 outline-black/5 p-4 shadow-sm"
