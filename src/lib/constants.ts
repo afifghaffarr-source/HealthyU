@@ -41,6 +41,11 @@
 // | PDF_TOC_PAGE_BREAK_Y           | Y treshold tocY sebelum addPage() di TOC (pt).           |
 // | PDF_TOC_CONTINUED_TOP_Y        | Y start tocY di halaman TOC lanjutan (pt).               |
 // | PDF_FOOTER_DIVIDER_OFFSET      | Offset Y divider tipis di atas footer (pt).              |
+// | PDF_LINK_BOUND_OFFSET          | Padding kiri+kanan bounding box klik link PDF (pt).      |
+// | PDF_LINK_BOUND_HEIGHT          | Tinggi bounding box klik link PDF (pt).                  |
+// | PDF_LINK_FONT_SIZE             | Font size back-link "Daftar Isi" di TOC (pt).            |
+// | PDF_DIVIDER_LINE_WIDTH         | Ketebalan garis divider PDF (pt, setLineWidth).          |
+// | PDF_SECTION_DIVIDER_OFFSET     | Offset Y divider section header dari baseline (pt).      |
 //
 // CONVENTION: setiap konstanta tunable WAJIB ditambahkan ke tabel di atas
 // (nama + 1 baris efek). Reviewer boleh menolak PR yang menambah konstanta
