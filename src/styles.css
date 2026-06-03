@@ -89,6 +89,9 @@
   --border: oklch(0.92 0.01 90);
   --input: oklch(0.92 0.01 90);
   --ring: var(--sage);
+  /* --ring-strong: WCAG AA non-text contrast ≥ 4.5:1 vs --card (#fff)
+     untuk reduced-motion ring highlight tetap kelihatan tanpa animasi.
+     Reviewer: ukur ulang jika mengubah oklch atau --card. */
   --ring-strong: oklch(0.55 0.14 138);
   --chart-1: oklch(0.646 0.222 41.116);
   --chart-2: oklch(0.6 0.118 184.704);
