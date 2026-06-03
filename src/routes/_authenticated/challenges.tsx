@@ -1,9 +1,11 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { ArrowLeft, Trophy, Flame, Users, Calendar, Check, Medal, UserPlus, Gift } from "lucide-react";
 import { toast } from "sonner";
+import { z } from "zod";
+import { fallback, zodValidator } from "@tanstack/zod-adapter";
 import { BottomNav } from "@/components/bottom-nav";
 import {
   listChallenges,
@@ -20,14 +22,22 @@ import {
 import {
   claimGroupChallengeBonus,
   listGroupBonusStatus,
+  listGroupBonusClaimers,
 } from "@/lib/groupChallengeBonus.functions";
 
+const challengesSearchSchema = z.object({
+  group: fallback(z.string().uuid().optional(), undefined),
+  challenge: fallback(z.string().uuid().optional(), undefined),
+});
+
 export const Route = createFileRoute("/_authenticated/challenges")({
+  validateSearch: zodValidator(challengesSearchSchema),
   component: ChallengesPage,
 });
 
 function ChallengesPage() {
   const qc = useQueryClient();
+  const { group: focusGroup, challenge: focusChallenge } = Route.useSearch();
   const fetchAll = useServerFn(listChallenges);
   const joinFn = useServerFn(joinChallenge);
   const logFn = useServerFn(logChallengeDay);
@@ -73,6 +83,17 @@ function ChallengesPage() {
     (data?.participations ?? []).map((p) => [p.challenge_id, p] as const),
   );
   const [openLb, setOpenLb] = useState<string | null>(null);
+  const articleRefs = useRef<Record<string, HTMLElement | null>>({});
+
+  useEffect(() => {
+    if (!focusChallenge) return;
+    setOpenLb(focusChallenge);
+    const t = setTimeout(() => {
+      const el = articleRefs.current[focusChallenge];
+      el?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 250);
+    return () => clearTimeout(t);
+  }, [focusChallenge]);
 
   return (
     <div className="min-h-screen pb-32">
@@ -110,6 +131,7 @@ function ChallengesPage() {
           return (
             <article
               key={c.id}
+              ref={(el) => { articleRefs.current[c.id] = el; }}
               className="rounded-3xl bg-card outline-1 outline-black/5 p-4 shadow-sm"
             >
               <div className="flex items-start justify-between gap-3">
@@ -214,7 +236,7 @@ function ChallengesPage() {
                 <Medal className="size-3" />
                 {openLb === c.id ? "Sembunyikan leaderboard" : "Lihat leaderboard"}
               </button>
-              {openLb === c.id && <Leaderboard challengeId={c.id} />}
+              {openLb === c.id && <Leaderboard challengeId={c.id} initialGroup={focusChallenge === c.id ? focusGroup : undefined} />}
               {joined && <GroupInviter challengeId={c.id} />}
               {joined && <BonusClaimer challengeId={c.id} />}
             </article>
@@ -227,10 +249,10 @@ function ChallengesPage() {
   );
 }
 
-function Leaderboard({ challengeId }: { challengeId: string }) {
+function Leaderboard({ challengeId, initialGroup }: { challengeId: string; initialGroup?: string }) {
   const fetchLb = useServerFn(getChallengeLeaderboard);
   const fetchGroups = useServerFn(listChallengeGroups);
-  const [mode, setMode] = useState<"all" | "friends" | string>("all");
+  const [mode, setMode] = useState<"all" | "friends" | string>(initialGroup ?? "all");
   const { data: groups = [] } = useQuery({
     queryKey: ["challenge-groups", challengeId],
     queryFn: () => fetchGroups({ data: { challenge_id: challengeId } }),
@@ -408,6 +430,7 @@ function BonusClaimer({ challengeId }: { challengeId: string }) {
       if (r.ok) {
         toast.success(`+${r.coins_awarded} 🪙 bonus grup!`);
         qc.invalidateQueries({ queryKey: ["bonus-claimed", challengeId] });
+        qc.invalidateQueries({ queryKey: ["bonus-claimers"] });
       } else if (r.reason === "not_all_completed") {
         toast.error(`Belum semua selesai (${r.completed}/${r.total})`);
       } else if (r.reason === "already_claimed") {
@@ -425,19 +448,52 @@ function BonusClaimer({ challengeId }: { challengeId: string }) {
       {groups.map((g) => {
         const done = claimedSet.has(g.id);
         return (
-          <button
-            key={g.id}
-            onClick={() => !done && claimM.mutate(g.id)}
-            disabled={done || claimM.isPending}
-            className={`w-full text-[11px] font-semibold rounded-xl py-1.5 px-2 inline-flex items-center justify-center gap-1 ${
-              done ? "bg-muted text-muted-foreground" : "bg-amber-100 text-amber-800"
-            }`}
-          >
-            <Gift className="size-3" />
-            {done ? `Bonus "${g.name}" terklaim` : `Klaim bonus grup "${g.name}"`}
-          </button>
+          <div key={g.id} className="space-y-1">
+            <button
+              onClick={() => !done && claimM.mutate(g.id)}
+              disabled={done || claimM.isPending}
+              className={`w-full text-[11px] font-semibold rounded-xl py-1.5 px-2 inline-flex items-center justify-center gap-1 ${
+                done ? "bg-muted text-muted-foreground" : "bg-amber-100 text-amber-800"
+              }`}
+            >
+              <Gift className="size-3" />
+              {done ? `Bonus "${g.name}" terklaim` : `Klaim bonus grup "${g.name}"`}
+            </button>
+            <BonusClaimers groupId={g.id} challengeId={challengeId} groupName={g.name} />
+          </div>
         );
       })}
+    </div>
+  );
+}
+
+function BonusClaimers({
+  groupId,
+  challengeId,
+  groupName,
+}: {
+  groupId: string;
+  challengeId: string;
+  groupName: string;
+}) {
+  const fetchClaimers = useServerFn(listGroupBonusClaimers);
+  const { data: claimers = [] } = useQuery({
+    queryKey: ["bonus-claimers", groupId, challengeId],
+    queryFn: () => fetchClaimers({ data: { group_id: groupId, challenge_id: challengeId } }),
+  });
+  if (claimers.length === 0) return null;
+  return (
+    <div className="flex flex-wrap items-center gap-1 px-1">
+      <span className="text-[10px] text-muted-foreground">Sudah klaim di {groupName}:</span>
+      {claimers.map((c) => (
+        <span
+          key={c.user_id}
+          title={`+${c.coins} 🪙`}
+          className="inline-flex items-center gap-0.5 text-[10px] font-semibold bg-amber-50 text-amber-700 rounded-full px-1.5 py-0.5"
+        >
+          🪙 {c.name.split(" ")[0]}
+        </span>
+      ))}
     </div>
   );
 }

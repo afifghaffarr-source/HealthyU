@@ -8,7 +8,9 @@ type PushSub = { endpoint: string; p256dh: string; auth: string };
  * Run the weekly AI analysis for a single user (server-side, admin client).
  * Inserts an ai_reports row and returns the report id.
  */
-export async function runWeeklyReportForUser(userId: string, days = 7): Promise<string | null> {
+export type WeeklyRunResult = { reportId: string | null; highlight: string };
+
+export async function runWeeklyReportForUser(userId: string, days = 7): Promise<WeeklyRunResult> {
   const apiKey = process.env.LOVABLE_API_KEY;
   if (!apiKey) throw new Error("LOVABLE_API_KEY missing");
   const since = new Date(Date.now() - days * 86400000).toISOString();
@@ -46,6 +48,14 @@ export async function runWeeklyReportForUser(userId: string, days = 7): Promise<
     group_challenges: groupChallenges,
   };
 
+  // Build a 1-line highlight for the push body
+  const highlightParts: string[] = [];
+  if (summary.avg_sleep_hours > 0) highlightParts.push(`Tidur ${summary.avg_sleep_hours}j`);
+  if (summary.workout_sessions > 0) highlightParts.push(`${summary.workout_sessions}x olahraga`);
+  const topGroup = groupChallenges.find((g) => g.rank > 0);
+  if (topGroup) highlightParts.push(`rank #${topGroup.rank} di ${topGroup.group}`);
+  const highlight = highlightParts.slice(0, 3).join(" · ") || "Lihat insight lengkap minggu ini";
+
   const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
     method: "POST",
     headers: { "Content-Type": "application/json", Authorization: `Bearer ${apiKey}` },
@@ -80,10 +90,10 @@ export async function runWeeklyReportForUser(userId: string, days = 7): Promise<
     .select("id")
     .maybeSingle();
 
-  return saved?.id ?? null;
+  return { reportId: saved?.id ?? null, highlight };
 }
 
-export async function sendWeeklyReportPush(userId: string) {
+export async function sendWeeklyReportPush(userId: string, highlight?: string) {
   const { data: subs } = await supabaseAdmin
     .from("push_subscriptions")
     .select("endpoint, p256dh, auth")
@@ -92,7 +102,7 @@ export async function sendWeeklyReportPush(userId: string) {
     try {
       await sendWebPushTo(s as PushSub, {
         title: "Laporan mingguanmu siap 📊",
-        body: "Buka untuk lihat insight AI minggu ini",
+        body: highlight ?? "Buka untuk lihat insight AI minggu ini",
         url: "/reports",
         tag: "weekly-report",
       });

@@ -5,7 +5,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { listRecipes } from "@/lib/recipes.functions";
 import { generateRecipeFromIngredients, type GeneratedRecipe } from "@/lib/ai-extras.functions";
 import { BottomNav } from "@/components/bottom-nav";
-import { ArrowLeft, Clock, Flame, Search, Sparkles, Loader2, X, Star, Bookmark } from "lucide-react";
+import { ArrowLeft, Clock, Flame, Search, Sparkles, Loader2, X, Star, Bookmark, TrendingUp } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/recipes")({
@@ -20,7 +20,7 @@ const CATS = [
   { id: "snack", label: "Snack" },
 ] as const;
 
-type SortMode = "title" | "rating" | "popular";
+type SortMode = "title" | "rating" | "popular" | "trending";
 
 function RecipesPage() {
   const fetchList = useServerFn(listRecipes);
@@ -50,6 +50,7 @@ function RecipesPage() {
     .sort((a, b) => {
       if (sort === "rating") return Number(b.avg_rating ?? 0) - Number(a.avg_rating ?? 0);
       if (sort === "popular") return Number(b.bookmark_count ?? 0) - Number(a.bookmark_count ?? 0);
+      if (sort === "trending") return Number(b.weekly_growth ?? 0) - Number(a.weekly_growth ?? 0);
       return a.title.localeCompare(b.title);
     });
 
@@ -141,6 +142,14 @@ function RecipesPage() {
             }`}
           >
             <Bookmark className="size-3" /> Terpopuler
+          </button>
+          <button
+            onClick={() => setSort(sort === "trending" ? "title" : "trending")}
+            className={`px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap inline-flex items-center gap-1 ${
+              sort === "trending" ? "bg-orange-500 text-white" : "bg-card outline-1 outline-black/10"
+            }`}
+          >
+            <TrendingUp className="size-3" /> Trending
           </button>
         </div>
 

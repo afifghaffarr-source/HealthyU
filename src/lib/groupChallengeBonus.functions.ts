@@ -51,3 +51,31 @@ export const listGroupBonusStatus = createServerFn({ method: "GET" })
       .eq("user_id", userId);
     return (claimed ?? []).map((c) => c.group_id);
   });
+
+export const listGroupBonusClaimers = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((i: unknown) =>
+    z.object({ group_id: z.string().uuid(), challenge_id: z.string().uuid() }).parse(i),
+  )
+  .handler(async ({ data, context }) => {
+    const { supabase } = context;
+    const { data: rows } = await supabase
+      .from("group_challenge_bonuses")
+      .select("user_id, coins_awarded, created_at")
+      .eq("group_id", data.group_id)
+      .eq("challenge_id", data.challenge_id)
+      .order("created_at", { ascending: true });
+    const ids = (rows ?? []).map((r) => r.user_id);
+    if (ids.length === 0) return [];
+    const { data: profs } = await supabase
+      .from("profiles")
+      .select("id, full_name")
+      .in("id", ids);
+    const nameMap = new Map((profs ?? []).map((p) => [p.id, p.full_name ?? "Anggota"]));
+    return (rows ?? []).map((r) => ({
+      user_id: r.user_id,
+      name: nameMap.get(r.user_id) ?? "Anggota",
+      coins: r.coins_awarded,
+      at: r.created_at,
+    }));
+  });
