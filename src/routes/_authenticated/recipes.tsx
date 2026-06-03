@@ -30,8 +30,22 @@ function RecipesPage() {
   const { data: all = [] } = useQuery({ queryKey: ["recipes"], queryFn: () => fetchList() });
   const [cat, setCat] = useState<(typeof CATS)[number]["id"]>("all");
   const [q, setQ] = useState("");
-  const [sort, setSort] = useState<SortMode>("title");
-  const [trendingOnly, setTrendingOnly] = useState(false);
+  const [sort, setSort] = useState<SortMode>(() => {
+    if (typeof window === "undefined") return "title";
+    const v = window.localStorage.getItem("recipes:sort");
+    return v === "rating" || v === "popular" || v === "trending" || v === "title" ? v : "title";
+  });
+  const [trendingOnly, setTrendingOnly] = useState<boolean>(() => {
+    if (typeof window === "undefined") return false;
+    return window.localStorage.getItem("recipes:trendingOnly") === "1";
+  });
+  useEffect(() => {
+    if (typeof window !== "undefined") window.localStorage.setItem("recipes:sort", sort);
+  }, [sort]);
+  useEffect(() => {
+    if (typeof window !== "undefined")
+      window.localStorage.setItem("recipes:trendingOnly", trendingOnly ? "1" : "0");
+  }, [trendingOnly]);
   const [pulseTrending, setPulseTrending] = useState(false);
   const [flashIds, setFlashIds] = useState<Record<string, number>>({});
   const prevGrowth = useRef<Record<string, number>>({});
