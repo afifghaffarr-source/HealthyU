@@ -37,6 +37,7 @@ import { Route as AuthenticatedMoodRouteImport } from './routes/_authenticated/m
 import { Route as AuthenticatedMedicationsRouteImport } from './routes/_authenticated/medications'
 import { Route as AuthenticatedMealplanRouteImport } from './routes/_authenticated/mealplan'
 import { Route as AuthenticatedLeaderboardRouteImport } from './routes/_authenticated/leaderboard'
+import { Route as AuthenticatedInsightsRouteImport } from './routes/_authenticated/insights'
 import { Route as AuthenticatedHealthImportRouteImport } from './routes/_authenticated/health-import'
 import { Route as AuthenticatedGroupsRouteImport } from './routes/_authenticated/groups'
 import { Route as AuthenticatedFoodsRouteImport } from './routes/_authenticated/foods'
@@ -206,6 +207,11 @@ const AuthenticatedLeaderboardRoute =
     path: '/leaderboard',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedInsightsRoute = AuthenticatedInsightsRouteImport.update({
+  id: '/insights',
+  path: '/insights',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedHealthImportRoute =
   AuthenticatedHealthImportRouteImport.update({
     id: '/health-import',
@@ -348,6 +354,7 @@ export interface FileRoutesByFullPath {
   '/foods': typeof AuthenticatedFoodsRoute
   '/groups': typeof AuthenticatedGroupsRoute
   '/health-import': typeof AuthenticatedHealthImportRoute
+  '/insights': typeof AuthenticatedInsightsRoute
   '/leaderboard': typeof AuthenticatedLeaderboardRoute
   '/mealplan': typeof AuthenticatedMealplanRoute
   '/medications': typeof AuthenticatedMedicationsRoute
@@ -400,6 +407,7 @@ export interface FileRoutesByTo {
   '/foods': typeof AuthenticatedFoodsRoute
   '/groups': typeof AuthenticatedGroupsRoute
   '/health-import': typeof AuthenticatedHealthImportRoute
+  '/insights': typeof AuthenticatedInsightsRoute
   '/leaderboard': typeof AuthenticatedLeaderboardRoute
   '/mealplan': typeof AuthenticatedMealplanRoute
   '/medications': typeof AuthenticatedMedicationsRoute
@@ -454,6 +462,7 @@ export interface FileRoutesById {
   '/_authenticated/foods': typeof AuthenticatedFoodsRoute
   '/_authenticated/groups': typeof AuthenticatedGroupsRoute
   '/_authenticated/health-import': typeof AuthenticatedHealthImportRoute
+  '/_authenticated/insights': typeof AuthenticatedInsightsRoute
   '/_authenticated/leaderboard': typeof AuthenticatedLeaderboardRoute
   '/_authenticated/mealplan': typeof AuthenticatedMealplanRoute
   '/_authenticated/medications': typeof AuthenticatedMedicationsRoute
@@ -508,6 +517,7 @@ export interface FileRouteTypes {
     | '/foods'
     | '/groups'
     | '/health-import'
+    | '/insights'
     | '/leaderboard'
     | '/mealplan'
     | '/medications'
@@ -560,6 +570,7 @@ export interface FileRouteTypes {
     | '/foods'
     | '/groups'
     | '/health-import'
+    | '/insights'
     | '/leaderboard'
     | '/mealplan'
     | '/medications'
@@ -613,6 +624,7 @@ export interface FileRouteTypes {
     | '/_authenticated/foods'
     | '/_authenticated/groups'
     | '/_authenticated/health-import'
+    | '/_authenticated/insights'
     | '/_authenticated/leaderboard'
     | '/_authenticated/mealplan'
     | '/_authenticated/medications'
@@ -860,6 +872,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedLeaderboardRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/insights': {
+      id: '/_authenticated/insights'
+      path: '/insights'
+      fullPath: '/insights'
+      preLoaderRoute: typeof AuthenticatedInsightsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/health-import': {
       id: '/_authenticated/health-import'
       path: '/health-import'
@@ -1073,6 +1092,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedFoodsRoute: typeof AuthenticatedFoodsRoute
   AuthenticatedGroupsRoute: typeof AuthenticatedGroupsRoute
   AuthenticatedHealthImportRoute: typeof AuthenticatedHealthImportRoute
+  AuthenticatedInsightsRoute: typeof AuthenticatedInsightsRoute
   AuthenticatedLeaderboardRoute: typeof AuthenticatedLeaderboardRoute
   AuthenticatedMealplanRoute: typeof AuthenticatedMealplanRoute
   AuthenticatedMedicationsRoute: typeof AuthenticatedMedicationsRoute
@@ -1114,6 +1134,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedFoodsRoute: AuthenticatedFoodsRoute,
   AuthenticatedGroupsRoute: AuthenticatedGroupsRoute,
   AuthenticatedHealthImportRoute: AuthenticatedHealthImportRoute,
+  AuthenticatedInsightsRoute: AuthenticatedInsightsRoute,
   AuthenticatedLeaderboardRoute: AuthenticatedLeaderboardRoute,
   AuthenticatedMealplanRoute: AuthenticatedMealplanRoute,
   AuthenticatedMedicationsRoute: AuthenticatedMedicationsRoute,
