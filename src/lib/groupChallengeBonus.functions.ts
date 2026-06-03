@@ -35,5 +35,5 @@ export const listGroupBonusStatus = createServerFn({ method: "GET" })
       .select("group_id, coins_awarded")
       .eq("challenge_id", data.challenge_id)
       .eq("user_id", userId);
-    return new Set((claimed ?? []).map((c) => c.group_id));
+    return (claimed ?? []).map((c) => c.group_id);
   });
