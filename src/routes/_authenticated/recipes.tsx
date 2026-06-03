@@ -143,6 +143,14 @@ function RecipesPage() {
           >
             <Bookmark className="size-3" /> Terpopuler
           </button>
+          <button
+            onClick={() => setSort(sort === "trending" ? "title" : "trending")}
+            className={`px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap inline-flex items-center gap-1 ${
+              sort === "trending" ? "bg-orange-500 text-white" : "bg-card outline-1 outline-black/10"
+            }`}
+          >
+            <TrendingUp className="size-3" /> Trending
+          </button>
         </div>
 
         <section className="space-y-3">
