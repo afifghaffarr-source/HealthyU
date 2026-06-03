@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { getProfile, updateProfile } from "@/lib/profile.functions";
@@ -69,6 +69,26 @@ function Onboarding() {
     allergies: [] as string[],
     health_conditions: [] as string[],
   });
+
+  useEffect(() => {
+    if (!profile) return;
+    setForm((current) => ({
+      ...current,
+      full_name: profile.full_name ?? current.full_name,
+      gender: profile.gender === "female" ? "female" : current.gender,
+      birth_date: profile.birth_date ?? current.birth_date,
+      height_cm: profile.height_cm ? Number(profile.height_cm) : current.height_cm,
+      weight_kg: profile.weight_kg ? Number(profile.weight_kg) : current.weight_kg,
+      target_weight_kg: profile.target_weight_kg ? Number(profile.target_weight_kg) : current.target_weight_kg,
+      activity_level: (profile.activity_level as ActivityLevel | null) ?? current.activity_level,
+      dietary_preference: profile.dietary_preference ?? current.dietary_preference,
+      city: profile.city ?? current.city,
+      allergies: Array.isArray(profile.allergies) ? profile.allergies : current.allergies,
+      health_conditions: Array.isArray(profile.health_conditions)
+        ? profile.health_conditions
+        : current.health_conditions,
+    }));
+  }, [profile]);
 
   const mutation = useMutation({
     mutationFn: (payload: Record<string, unknown>) => updateFn({ data: payload }),
