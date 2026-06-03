@@ -285,6 +285,8 @@ function ReportsPage() {
             bounds: { x: number; y: number; w: number; h: number };
             contents: string;
             open?: boolean;
+            name?: string;
+            flags?: string[];
           }) => void;
         }
       ).createAnnotation({
@@ -293,6 +295,9 @@ function ReportsPage() {
         bounds: { x: 555 - linkW - 4, y: 30, w: linkW + 8, h: 16 },
         contents: `Halaman ${currentPage} dari ${tocPages + filtered.length}`,
         open: false,
+        // Sembunyikan ikon sticky-note default; hanya tooltip hover yang aktif.
+        name: "NoIcon",
+        flags: ["hidden", "noview"],
       });
       doc.setDrawColor(0);
       doc.setTextColor(0);
