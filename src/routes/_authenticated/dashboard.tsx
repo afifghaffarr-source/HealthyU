@@ -7,10 +7,11 @@ import { todaysMeals } from "@/lib/meals.functions";
 import { currentFast } from "@/lib/fasting.functions";
 import { todaysWater, logWater } from "@/lib/water.functions";
 import { getGameSummary } from "@/lib/gamification.functions";
+import { addMood } from "@/lib/mood.functions";
 import { BottomNav } from "@/components/bottom-nav";
 import { CalorieRing } from "@/components/calorie-ring";
 import { formatDuration, fastingStage } from "@/lib/health";
-import { Droplet, Plus, Sparkles, ArrowRight, Flame, Trophy, Camera } from "lucide-react";
+import { Droplet, Plus, Sparkles, ArrowRight, Flame, Trophy, Camera, Smile } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
@@ -26,6 +27,7 @@ function Dashboard() {
   const fetchWater = useServerFn(todaysWater);
   const logWaterFn = useServerFn(logWater);
   const fetchGame = useServerFn(getGameSummary);
+  const addMoodFn = useServerFn(addMood);
 
   const { data: profile, isLoading: pLoad } = useQuery({ queryKey: ["profile"], queryFn: () => fetchProfile() });
   const { data: meals = [] } = useQuery({ queryKey: ["meals", "today"], queryFn: () => fetchMeals() });
