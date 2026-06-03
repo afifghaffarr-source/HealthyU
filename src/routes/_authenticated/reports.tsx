@@ -192,6 +192,40 @@ function ReportsPage() {
     URL.revokeObjectURL(url);
   };
 
+  const exportAllArchivePdf = () => {
+    const filtered = history.filter((r) => {
+      if (rangeWeeks === 0) return true;
+      const cutoff = Date.now() - rangeWeeks * 7 * 86400000;
+      return new Date(r.created_at).getTime() >= cutoff;
+    });
+    if (filtered.length === 0) return;
+    const doc = new jsPDF({ unit: "pt", format: "a4" });
+    filtered.forEach((r, idx) => {
+      if (idx > 0) doc.addPage();
+      const text = Array.isArray(r.recommendations) ? String(r.recommendations[0] ?? "") : "";
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(18);
+      doc.text("Laporan HealthyU", 40, 50);
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(10);
+      doc.setTextColor(120);
+      const periode =
+        r.report_period_start && r.report_period_end
+          ? `Periode: ${r.report_period_start} → ${r.report_period_end}`
+          : `Dibuat: ${new Date(r.created_at).toLocaleDateString("id-ID")}`;
+      doc.text(periode, 40, 68);
+      doc.setTextColor(0);
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(12);
+      doc.text("Analisis AI", 40, 100);
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(10);
+      const lines = doc.splitTextToSize(text || "(kosong)", 515);
+      doc.text(lines, 40, 118);
+    });
+    doc.save(`laporan-healthyu-arsip-${new Date().toISOString().slice(0, 10)}.pdf`);
+  };
+
   const exportPdf = () => {
     if (!data || !summary) return;
     const doc = new jsPDF({ unit: "pt", format: "a4" });
