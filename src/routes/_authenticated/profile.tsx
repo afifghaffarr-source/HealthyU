@@ -355,7 +355,6 @@ function Stat({ label, value, sub }: { label: string; value: string; sub?: strin
       </p>
       <p className="text-xl font-bold tabular-nums mt-1">{value}</p>
       {sub && <p className="text-[10px] text-muted-foreground mt-0.5">{sub}</p>}
-      {sub && <p className="text-[10px] text-muted-foreground">{sub}</p>}
     </div>
   );
 }
@@ -367,4 +366,21 @@ function Row({ label, value }: { label: string; value: string }) {
       <span className="text-sm font-semibold capitalize">{value}</span>
     </div>
   );
+}
+
+function activityScore(level: string | null | undefined): number {
+  switch (level) {
+    case "very_active": return 100;
+    case "active": return 85;
+    case "moderate": return 70;
+    case "light": return 55;
+    case "sedentary": return 35;
+    default: return 50;
+  }
+}
+
+function weightTargetScore(weight: number, target: number): number {
+  if (!weight || !target) return 50;
+  const diff = Math.abs(weight - target);
+  return Math.max(0, Math.round(100 - diff * 4));
 }
