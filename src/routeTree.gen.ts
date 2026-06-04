@@ -14,6 +14,7 @@ import { Route as KalkulatorRouteImport } from './routes/kalkulator'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as KalkulatorSlugRouteImport } from './routes/kalkulator.$slug'
 import { Route as AuthenticatedWorkoutRouteImport } from './routes/_authenticated/workout'
 import { Route as AuthenticatedWeightRouteImport } from './routes/_authenticated/weight'
 import { Route as AuthenticatedWearableRouteImport } from './routes/_authenticated/wearable'
@@ -174,6 +175,11 @@ const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const KalkulatorSlugRoute = KalkulatorSlugRouteImport.update({
+  id: '/$slug',
+  path: '/$slug',
+  getParentRoute: () => KalkulatorRoute,
 } as any)
 const AuthenticatedWorkoutRoute = AuthenticatedWorkoutRouteImport.update({
   id: '/workout',
@@ -933,7 +939,7 @@ const AuthenticatedGroupsIdLeaderboardRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
-  '/kalkulator': typeof KalkulatorRoute
+  '/kalkulator': typeof KalkulatorRouteWithChildren
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/achievements': typeof AuthenticatedAchievementsRoute
   '/alarms': typeof AuthenticatedAlarmsRoute
@@ -989,6 +995,7 @@ export interface FileRoutesByFullPath {
   '/wearable': typeof AuthenticatedWearableRoute
   '/weight': typeof AuthenticatedWeightRouteWithChildren
   '/workout': typeof AuthenticatedWorkoutRouteWithChildren
+  '/kalkulator/$slug': typeof KalkulatorSlugRoute
   '/articles/$id': typeof AuthenticatedArticlesIdRoute
   '/bonus/auto-claim': typeof AuthenticatedBonusAutoClaimRoute
   '/calendar/google': typeof AuthenticatedCalendarGoogleRoute
@@ -1075,7 +1082,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
-  '/kalkulator': typeof KalkulatorRoute
+  '/kalkulator': typeof KalkulatorRouteWithChildren
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/achievements': typeof AuthenticatedAchievementsRoute
   '/alarms': typeof AuthenticatedAlarmsRoute
@@ -1131,6 +1138,7 @@ export interface FileRoutesByTo {
   '/wearable': typeof AuthenticatedWearableRoute
   '/weight': typeof AuthenticatedWeightRouteWithChildren
   '/workout': typeof AuthenticatedWorkoutRouteWithChildren
+  '/kalkulator/$slug': typeof KalkulatorSlugRoute
   '/articles/$id': typeof AuthenticatedArticlesIdRoute
   '/bonus/auto-claim': typeof AuthenticatedBonusAutoClaimRoute
   '/calendar/google': typeof AuthenticatedCalendarGoogleRoute
@@ -1219,7 +1227,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
-  '/kalkulator': typeof KalkulatorRoute
+  '/kalkulator': typeof KalkulatorRouteWithChildren
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/_authenticated/achievements': typeof AuthenticatedAchievementsRoute
   '/_authenticated/alarms': typeof AuthenticatedAlarmsRoute
@@ -1275,6 +1283,7 @@ export interface FileRoutesById {
   '/_authenticated/wearable': typeof AuthenticatedWearableRoute
   '/_authenticated/weight': typeof AuthenticatedWeightRouteWithChildren
   '/_authenticated/workout': typeof AuthenticatedWorkoutRouteWithChildren
+  '/kalkulator/$slug': typeof KalkulatorSlugRoute
   '/_authenticated/articles/$id': typeof AuthenticatedArticlesIdRoute
   '/_authenticated/bonus/auto-claim': typeof AuthenticatedBonusAutoClaimRoute
   '/_authenticated/calendar/google': typeof AuthenticatedCalendarGoogleRoute
@@ -1419,6 +1428,7 @@ export interface FileRouteTypes {
     | '/wearable'
     | '/weight'
     | '/workout'
+    | '/kalkulator/$slug'
     | '/articles/$id'
     | '/bonus/auto-claim'
     | '/calendar/google'
@@ -1561,6 +1571,7 @@ export interface FileRouteTypes {
     | '/wearable'
     | '/weight'
     | '/workout'
+    | '/kalkulator/$slug'
     | '/articles/$id'
     | '/bonus/auto-claim'
     | '/calendar/google'
@@ -1704,6 +1715,7 @@ export interface FileRouteTypes {
     | '/_authenticated/wearable'
     | '/_authenticated/weight'
     | '/_authenticated/workout'
+    | '/kalkulator/$slug'
     | '/_authenticated/articles/$id'
     | '/_authenticated/bonus/auto-claim'
     | '/_authenticated/calendar/google'
@@ -1792,7 +1804,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
-  KalkulatorRoute: typeof KalkulatorRoute
+  KalkulatorRoute: typeof KalkulatorRouteWithChildren
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   ApiChatStreamRoute: typeof ApiChatStreamRoute
   ApiPublicHooksDailyCoachRoute: typeof ApiPublicHooksDailyCoachRoute
@@ -1839,6 +1851,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/kalkulator/$slug': {
+      id: '/kalkulator/$slug'
+      path: '/$slug'
+      fullPath: '/kalkulator/$slug'
+      preLoaderRoute: typeof KalkulatorSlugRouteImport
+      parentRoute: typeof KalkulatorRoute
     }
     '/_authenticated/workout': {
       id: '/_authenticated/workout'
@@ -3280,11 +3299,23 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
 const AuthenticatedRouteRouteWithChildren =
   AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
 
+interface KalkulatorRouteChildren {
+  KalkulatorSlugRoute: typeof KalkulatorSlugRoute
+}
+
+const KalkulatorRouteChildren: KalkulatorRouteChildren = {
+  KalkulatorSlugRoute: KalkulatorSlugRoute,
+}
+
+const KalkulatorRouteWithChildren = KalkulatorRoute._addFileChildren(
+  KalkulatorRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
-  KalkulatorRoute: KalkulatorRoute,
+  KalkulatorRoute: KalkulatorRouteWithChildren,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   ApiChatStreamRoute: ApiChatStreamRoute,
   ApiPublicHooksDailyCoachRoute: ApiPublicHooksDailyCoachRoute,
