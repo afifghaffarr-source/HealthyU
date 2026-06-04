@@ -12,3 +12,7 @@ export { PullIndicator } from "./pull-indicator";
 export { Coachmark } from "./coachmark";
 export { CardSkeleton, ListSkeleton, StatSkeleton } from "./skeletons";
 export { SearchChips } from "./search-chips";
+export { NutritionPieChart } from "./nutrition-pie-chart";
+export type { MacroSlice } from "./nutrition-pie-chart";
+export { HealthScoreCard } from "./health-score-card";
+export type { HealthScoreFactor } from "./health-score-card";
