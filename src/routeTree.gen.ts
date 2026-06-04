@@ -107,6 +107,7 @@ import { Route as AuthenticatedPushAlarmRouteImport } from './routes/_authentica
 import { Route as AuthenticatedProfileScanStatsRouteImport } from './routes/_authenticated/profile.scan-stats'
 import { Route as AuthenticatedProfilePrivacyRouteImport } from './routes/_authenticated/profile.privacy'
 import { Route as AuthenticatedPodcastWeeklyRouteImport } from './routes/_authenticated/podcast.weekly'
+import { Route as AuthenticatedPetSvgRouteImport } from './routes/_authenticated/pet.svg'
 import { Route as AuthenticatedPetShopRouteImport } from './routes/_authenticated/pet.shop'
 import { Route as AuthenticatedPetEvolutionRouteImport } from './routes/_authenticated/pet.evolution'
 import { Route as AuthenticatedOnboardingAiRouteImport } from './routes/_authenticated/onboarding.ai'
@@ -667,6 +668,11 @@ const AuthenticatedPodcastWeeklyRoute =
     path: '/podcast/weekly',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedPetSvgRoute = AuthenticatedPetSvgRouteImport.update({
+  id: '/svg',
+  path: '/svg',
+  getParentRoute: () => AuthenticatedPetRoute,
+} as any)
 const AuthenticatedPetShopRoute = AuthenticatedPetShopRouteImport.update({
   id: '/shop',
   path: '/shop',
@@ -935,6 +941,7 @@ export interface FileRoutesByFullPath {
   '/onboarding/ai': typeof AuthenticatedOnboardingAiRoute
   '/pet/evolution': typeof AuthenticatedPetEvolutionRoute
   '/pet/shop': typeof AuthenticatedPetShopRoute
+  '/pet/svg': typeof AuthenticatedPetSvgRoute
   '/podcast/weekly': typeof AuthenticatedPodcastWeeklyRoute
   '/profile/privacy': typeof AuthenticatedProfilePrivacyRoute
   '/profile/scan-stats': typeof AuthenticatedProfileScanStatsRoute
@@ -1066,6 +1073,7 @@ export interface FileRoutesByTo {
   '/onboarding/ai': typeof AuthenticatedOnboardingAiRoute
   '/pet/evolution': typeof AuthenticatedPetEvolutionRoute
   '/pet/shop': typeof AuthenticatedPetShopRoute
+  '/pet/svg': typeof AuthenticatedPetSvgRoute
   '/podcast/weekly': typeof AuthenticatedPodcastWeeklyRoute
   '/profile/privacy': typeof AuthenticatedProfilePrivacyRoute
   '/profile/scan-stats': typeof AuthenticatedProfileScanStatsRoute
@@ -1199,6 +1207,7 @@ export interface FileRoutesById {
   '/_authenticated/onboarding/ai': typeof AuthenticatedOnboardingAiRoute
   '/_authenticated/pet/evolution': typeof AuthenticatedPetEvolutionRoute
   '/_authenticated/pet/shop': typeof AuthenticatedPetShopRoute
+  '/_authenticated/pet/svg': typeof AuthenticatedPetSvgRoute
   '/_authenticated/podcast/weekly': typeof AuthenticatedPodcastWeeklyRoute
   '/_authenticated/profile/privacy': typeof AuthenticatedProfilePrivacyRoute
   '/_authenticated/profile/scan-stats': typeof AuthenticatedProfileScanStatsRoute
@@ -1332,6 +1341,7 @@ export interface FileRouteTypes {
     | '/onboarding/ai'
     | '/pet/evolution'
     | '/pet/shop'
+    | '/pet/svg'
     | '/podcast/weekly'
     | '/profile/privacy'
     | '/profile/scan-stats'
@@ -1463,6 +1473,7 @@ export interface FileRouteTypes {
     | '/onboarding/ai'
     | '/pet/evolution'
     | '/pet/shop'
+    | '/pet/svg'
     | '/podcast/weekly'
     | '/profile/privacy'
     | '/profile/scan-stats'
@@ -1595,6 +1606,7 @@ export interface FileRouteTypes {
     | '/_authenticated/onboarding/ai'
     | '/_authenticated/pet/evolution'
     | '/_authenticated/pet/shop'
+    | '/_authenticated/pet/svg'
     | '/_authenticated/podcast/weekly'
     | '/_authenticated/profile/privacy'
     | '/_authenticated/profile/scan-stats'
@@ -2349,6 +2361,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedPodcastWeeklyRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/pet/svg': {
+      id: '/_authenticated/pet/svg'
+      path: '/svg'
+      fullPath: '/pet/svg'
+      preLoaderRoute: typeof AuthenticatedPetSvgRouteImport
+      parentRoute: typeof AuthenticatedPetRoute
+    }
     '/_authenticated/pet/shop': {
       id: '/_authenticated/pet/shop'
       path: '/shop'
@@ -2709,11 +2728,13 @@ const AuthenticatedOnboardingRouteWithChildren =
 interface AuthenticatedPetRouteChildren {
   AuthenticatedPetEvolutionRoute: typeof AuthenticatedPetEvolutionRoute
   AuthenticatedPetShopRoute: typeof AuthenticatedPetShopRoute
+  AuthenticatedPetSvgRoute: typeof AuthenticatedPetSvgRoute
 }
 
 const AuthenticatedPetRouteChildren: AuthenticatedPetRouteChildren = {
   AuthenticatedPetEvolutionRoute: AuthenticatedPetEvolutionRoute,
   AuthenticatedPetShopRoute: AuthenticatedPetShopRoute,
+  AuthenticatedPetSvgRoute: AuthenticatedPetSvgRoute,
 }
 
 const AuthenticatedPetRouteWithChildren =
