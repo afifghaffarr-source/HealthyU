@@ -19,7 +19,8 @@ import { StreakRing } from "@/components/healthyu/streak-ring";
 import { CoinPill } from "@/components/healthyu/coin-pill";
 import { usePullToRefresh } from "@/hooks/use-pull-to-refresh";
 import { formatDuration, fastingStage } from "@/lib/health";
-import { Droplet, Plus, Sparkles, ArrowRight, Flame, Trophy, Camera, Smile } from "lucide-react";
+import { Droplet, Plus, Sparkles, ArrowRight, Flame, Trophy, Camera, Smile, Gift, Snowflake } from "lucide-react";
+import { claimDailyLoginBonus } from "@/lib/scanBatch9.functions";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import {
@@ -52,6 +53,24 @@ function Dashboard() {
   const addMoodFn = useServerFn(addMood);
   const fetchGroupChallenges = useServerFn(myGroupChallengeSummary);
   const fetchUnlinked = useServerFn(myUnlinkedJoinedChallenges);
+  const claimBonusFn = useServerFn(claimDailyLoginBonus);
+  const [bonusClaimed, setBonusClaimed] = useState<boolean>(() => {
+    if (typeof window === "undefined") return false;
+    return window.localStorage.getItem("dailyBonusClaimed") === new Date().toDateString();
+  });
+  const [freezeOpen, setFreezeOpen] = useState(false);
+  const [freezeUsed, setFreezeUsed] = useState(false);
+  const claimBonusMut = useMutation({
+    mutationFn: () => claimBonusFn({ data: undefined as never }),
+    onSuccess: (r) => {
+      const b = r.bonus as { coins?: number; streak?: number } | undefined;
+      window.localStorage.setItem("dailyBonusClaimed", new Date().toDateString());
+      setBonusClaimed(true);
+      qc.invalidateQueries({ queryKey: ["profile"] });
+      toast.success(r.alreadyClaimed ? "Sudah klaim hari ini" : `+${b?.coins ?? 0} koin! Streak ${b?.streak ?? 0}`);
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
 
   const { data: profile, isLoading: pLoad } = useQuery({ queryKey: ["profile"], queryFn: () => fetchProfile() });
   const { data: meals = [] } = useQuery({ queryKey: ["meals", "today"], queryFn: () => fetchMeals() });
@@ -308,6 +327,23 @@ function Dashboard() {
             </Link>
           </div>
         </header>
+
+        {!bonusClaimed && (
+          <button
+            onClick={() => claimBonusMut.mutate()}
+            disabled={claimBonusMut.isPending}
+            className="w-full flex items-center gap-3 p-4 rounded-3xl bg-gradient-to-r from-amber-400/20 to-orange-500/20 outline-1 outline-amber-500/30 text-left animate-fade-up"
+          >
+            <div className="size-11 rounded-2xl bg-amber-100 grid place-items-center">
+              <Gift className="size-5 text-amber-600" />
+            </div>
+            <div className="flex-1">
+              <p className="text-sm font-bold">Klaim bonus harian</p>
+              <p className="text-xs text-muted-foreground">Tap untuk dapat koin & jaga streakmu</p>
+            </div>
+            <ArrowRight className="size-4 text-muted-foreground" />
+          </button>
+        )}
 
         <Coachmark
           flagKey="dashboard-v1"
