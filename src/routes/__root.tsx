@@ -21,6 +21,8 @@ import { LiveAnnouncerProvider } from "@/components/live-announcer";
 import { I18nProvider } from "@/lib/i18n";
 import { DesktopSidebar } from "@/components/healthyu/desktop-sidebar";
 import { GlobalErrorBoundary } from "@/components/healthyu/global-error-boundary";
+import { CommandPalette } from "@/components/healthyu/command-palette";
+import { QuickActionFab } from "@/components/healthyu/quick-action-fab";
 
 function NotFoundComponent() {
   return (
@@ -152,6 +154,8 @@ function RootComponent() {
             </GlobalErrorBoundary>
           </div>
           <InstallPrompt />
+          <CommandPalette />
+          <QuickActionFab />
           <Toaster position="top-center" />
           </LiveAnnouncerProvider>
         </I18nProvider>
