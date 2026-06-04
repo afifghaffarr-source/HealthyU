@@ -359,6 +359,20 @@ function Dashboard() {
           description="Geser ke bawah untuk refresh, ketuk kartu untuk catat aktivitas, dan kunjungi Profil untuk personalisasi."
         />
 
+        {dailyTip && (
+          <div className="bg-card p-4 rounded-3xl outline-1 outline-black/5 shadow-sm flex items-start gap-3 animate-fade-up">
+            <div className="size-10 rounded-2xl bg-amber-100 grid place-items-center shrink-0">
+              <Lightbulb className="size-5 text-amber-600" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-[10px] font-bold uppercase text-muted-foreground tracking-wider">
+                Tip hari ini · {dailyTip.category}
+              </p>
+              <p className="text-sm font-medium mt-0.5">{dailyTip.tip}</p>
+            </div>
+          </div>
+        )}
+
         {/* Top row: Calorie + Fasting */}
         <div className="grid grid-cols-2 gap-3 animate-fade-up">
           <div className="bg-card p-4 rounded-3xl outline-1 outline-black/5 shadow-sm flex flex-col items-center justify-center">
