@@ -7,6 +7,8 @@ import { cacheKey, getCached, setCached } from "@/lib/aiCache.server";
 import { enforceAiBudget, logAiUsage } from "@/lib/aiBudget.server";
 import { checkRateLimit, RATE_LIMITS } from "@/lib/rateLimit.server";
 import { chatMessageSchema } from "@/lib/validation";
+import { checkChatSafety } from "@/lib/chatSafety";
+import { moderateImage } from "@/lib/imageModeration.server";
 
 export const Route = createFileRoute("/api/chat/stream")({
   server: {
@@ -51,9 +53,56 @@ export const Route = createFileRoute("/api/chat/stream")({
           return new Response("Invalid request payload", { status: 400 });
         }
 
+        // Image moderation: block unsafe uploads before persisting/sending to AI.
+        if (body.imageBase64) {
+          const mod = await moderateImage(body.imageBase64, body.imageMime ?? "image/jpeg");
+          if (mod.blocked) {
+            await supabase.rpc("log_audit_event", {
+              _action: "chat.image.blocked",
+              _entity: "chat",
+              _meta: { label: mod.label, confidence: mod.confidence } as never,
+            });
+            return new Response(
+              JSON.stringify({ error: "image_blocked", label: mod.label, reason: mod.reason ?? "Unsafe content" }),
+              { status: 400, headers: { "Content-Type": "application/json" } },
+            );
+          }
+        }
+
         await persistUserMessage(supabase, userId, body.message, body.imageBase64);
-        const decision = classifyMessage(body.message, !!body.imageBase64);
+
+        // Chatbot safety guard — bypass AI for crisis / dangerous content.
+        const safety = checkChatSafety(body.message);
         const encoder = new TextEncoder();
+        if (safety.kind === "crisis" || safety.kind === "blocked") {
+          await supabase.from("chat_messages").insert({
+            user_id: userId, role: "assistant", content: safety.response,
+          });
+          await supabase.rpc("log_audit_event", {
+            _action: safety.kind === "crisis" ? "chat.safety.crisis" : "chat.safety.blocked",
+            _entity: "chat",
+          });
+          await logAiUsage({ userId, feature: "chat", tier: 0 as never, cacheHit: false });
+          const reply = safety.response;
+          const stream = new ReadableStream({
+            start(controller) {
+              controller.enqueue(encoder.encode(`event: meta\ndata: ${JSON.stringify({ emergency: safety.kind === "crisis", tier: 0, cached: false, safety: safety.kind })}\n\n`));
+              controller.enqueue(encoder.encode(`data: ${JSON.stringify({ delta: reply })}\n\n`));
+              controller.enqueue(encoder.encode(`event: done\ndata: {}\n\n`));
+              controller.close();
+            },
+          });
+          return new Response(stream, {
+            headers: {
+              "Content-Type": "text/event-stream",
+              "Cache-Control": "no-cache, no-transform",
+              "X-Accel-Buffering": "no",
+            },
+          });
+        }
+
+        const decision = classifyMessage(body.message, !!body.imageBase64);
+        const safetyDisclaimer = safety.kind === "disclaimer" ? safety.response : "";
 
         // TIER 1 — local rule-based answer, no AI call.
         if (decision.tier === 1 && decision.localAnswer) {
@@ -190,6 +239,10 @@ export const Route = createFileRoute("/api/chat/stream")({
                 }
               }
               if (fullText) {
+                if (safetyDisclaimer) {
+                  fullText += safetyDisclaimer;
+                  controller.enqueue(encoder.encode(`data: ${JSON.stringify({ delta: safetyDisclaimer })}\n\n`));
+                }
                 await supabase.from("chat_messages").insert({
                   user_id: userId, role: "assistant", content: fullText,
                 });

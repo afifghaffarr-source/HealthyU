@@ -580,6 +580,27 @@ export type Database = {
         }
         Relationships: []
       }
+      blocked_users: {
+        Row: {
+          blocked_id: string
+          blocker_id: string
+          created_at: string
+          id: string
+        }
+        Insert: {
+          blocked_id: string
+          blocker_id: string
+          created_at?: string
+          id?: string
+        }
+        Update: {
+          blocked_id?: string
+          blocker_id?: string
+          created_at?: string
+          id?: string
+        }
+        Relationships: []
+      }
       body_metrics: {
         Row: {
           bicep_left_cm: number | null
@@ -1305,6 +1326,45 @@ export type Database = {
           user_id?: string
           video_url?: string | null
           views_count?: number
+        }
+        Relationships: []
+      }
+      content_reports: {
+        Row: {
+          content_id: string
+          content_type: string
+          created_at: string
+          details: string | null
+          id: string
+          reason: string
+          reporter_id: string
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string
+        }
+        Insert: {
+          content_id: string
+          content_type: string
+          created_at?: string
+          details?: string | null
+          id?: string
+          reason: string
+          reporter_id: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+        }
+        Update: {
+          content_id?: string
+          content_type?: string
+          created_at?: string
+          details?: string | null
+          id?: string
+          reason?: string
+          reporter_id?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
         }
         Relationships: []
       }
@@ -3079,6 +3139,42 @@ export type Database = {
         }
         Relationships: []
       }
+      moderation_actions: {
+        Row: {
+          action: string
+          content_id: string | null
+          content_type: string | null
+          created_at: string
+          expires_at: string | null
+          id: string
+          moderator_id: string | null
+          reason: string
+          target_user_id: string
+        }
+        Insert: {
+          action: string
+          content_id?: string | null
+          content_type?: string | null
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          moderator_id?: string | null
+          reason: string
+          target_user_id: string
+        }
+        Update: {
+          action?: string
+          content_id?: string | null
+          content_type?: string | null
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          moderator_id?: string | null
+          reason?: string
+          target_user_id?: string
+        }
+        Relationships: []
+      }
       mood_logs: {
         Row: {
           anxiety_level: number | null
@@ -3511,6 +3607,7 @@ export type Database = {
         Row: {
           activity_level: string | null
           allergies: string[] | null
+          allow_dm: boolean
           avatar_url: string | null
           birth_date: string | null
           blood_type: string | null
@@ -3558,6 +3655,10 @@ export type Database = {
           scan_audit_opt_in: boolean
           scan_streak_current: number
           scan_streak_longest: number
+          show_meals: boolean
+          show_progress_photos: boolean
+          show_weight: boolean
+          show_workouts: boolean
           streak_days: number
           streak_freeze_used_at: string | null
           target_weight_kg: number | null
@@ -3571,6 +3672,7 @@ export type Database = {
         Insert: {
           activity_level?: string | null
           allergies?: string[] | null
+          allow_dm?: boolean
           avatar_url?: string | null
           birth_date?: string | null
           blood_type?: string | null
@@ -3618,6 +3720,10 @@ export type Database = {
           scan_audit_opt_in?: boolean
           scan_streak_current?: number
           scan_streak_longest?: number
+          show_meals?: boolean
+          show_progress_photos?: boolean
+          show_weight?: boolean
+          show_workouts?: boolean
           streak_days?: number
           streak_freeze_used_at?: string | null
           target_weight_kg?: number | null
@@ -3631,6 +3737,7 @@ export type Database = {
         Update: {
           activity_level?: string | null
           allergies?: string[] | null
+          allow_dm?: boolean
           avatar_url?: string | null
           birth_date?: string | null
           blood_type?: string | null
@@ -3678,6 +3785,10 @@ export type Database = {
           scan_audit_opt_in?: boolean
           scan_streak_current?: number
           scan_streak_longest?: number
+          show_meals?: boolean
+          show_progress_photos?: boolean
+          show_weight?: boolean
+          show_workouts?: boolean
           streak_days?: number
           streak_freeze_used_at?: string | null
           target_weight_kg?: number | null
@@ -5543,6 +5654,7 @@ export type Database = {
     }
     Functions: {
       _get_field_key: { Args: never; Returns: string }
+      block_user: { Args: { _target: string }; Returns: string }
       check_rate_limit: {
         Args: {
           _bucket: string
@@ -5601,11 +5713,21 @@ export type Database = {
         }
         Returns: undefined
       }
+      report_content: {
+        Args: {
+          _content_id: string
+          _content_type: string
+          _details?: string
+          _reason: string
+        }
+        Returns: string
+      }
       request_account_deletion: { Args: { _reason?: string }; Returns: string }
       save_sensitive_note: {
         Args: { _category?: string; _note: string; _title: string }
         Returns: string
       }
+      unblock_user: { Args: { _target: string }; Returns: boolean }
       update_sensitive_note: {
         Args: { _category?: string; _id: string; _note: string; _title: string }
         Returns: boolean
