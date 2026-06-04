@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { BookOpen, Bookmark, BookmarkCheck, Clock } from "lucide-react";
+import { useMemo, useState } from "react";
 import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { EmptyState } from "@/components/healthyu/empty-state";
 import { ListSkeleton } from "@/components/healthyu/skeletons";
@@ -36,17 +37,42 @@ function ArticlesPage() {
   const articles = data?.articles ?? [];
   const bookmarks = new Set(data?.bookmarks ?? []);
 
+  const categories = useMemo(() => {
+    const set = new Set<string>();
+    articles.forEach((a) => a.category && set.add(a.category));
+    return Array.from(set);
+  }, [articles]);
+
+  const [filter, setFilter] = useState<string>("all");
+  const visible = filter === "all"
+    ? articles
+    : filter === "bookmark"
+      ? articles.filter((a) => bookmarks.has(a.id))
+      : articles.filter((a) => a.category === filter);
+
   return (
     <div className="min-h-screen pb-32">
       <div className="max-w-md mx-auto px-4">
         <TopAppBar title="Artikel Kesehatan" showBack />
       </div>
       <main className="max-w-md mx-auto px-4 pt-4 space-y-3">
+        {!isLoading && (articles.length > 0) && (
+          <div className="flex gap-2 overflow-x-auto no-scrollbar -mx-1 px-1 pb-1">
+            <Chip active={filter === "all"} onClick={() => setFilter("all")}>Semua</Chip>
+            <Chip active={filter === "bookmark"} onClick={() => setFilter("bookmark")}>★ Disimpan</Chip>
+            {categories.map((c) => (
+              <Chip key={c} active={filter === c} onClick={() => setFilter(c)}>{c}</Chip>
+            ))}
+          </div>
+        )}
         {isLoading && <ListSkeleton count={3} />}
         {!isLoading && articles.length === 0 && (
           <EmptyState icon={BookOpen} title="Belum ada artikel" description="Artikel kesehatan baru akan muncul di sini." />
         )}
-        {articles.map((a) => {
+        {!isLoading && articles.length > 0 && visible.length === 0 && (
+          <EmptyState icon={BookOpen} title="Tidak ada hasil" description="Coba pilih kategori lain." />
+        )}
+        {visible.map((a) => {
           const marked = bookmarks.has(a.id);
           return (
             <article key={a.id} className="rounded-3xl bg-card outline-1 outline-black/5 overflow-hidden shadow-sm">
@@ -57,7 +83,9 @@ function ArticlesPage() {
                 <div className="flex items-start justify-between gap-2">
                   <div className="min-w-0">
                     <p className="text-[10px] uppercase tracking-wide text-muted-foreground">{a.category}</p>
-                    <h2 className="font-semibold leading-tight mt-0.5">{a.title}</h2>
+                    <Link to="/articles/$id" params={{ id: a.id }} className="font-semibold leading-tight mt-0.5 hover:text-primary block">
+                      {a.title}
+                    </Link>
                   </div>
                   <button
                     onClick={() => bookmarkM.mutate(a.id)}
@@ -84,5 +112,18 @@ function ArticlesPage() {
       </main>
       <BottomNav />
     </div>
+  );
+}
+
+function Chip({ active, onClick, children }: { active: boolean; onClick: () => void; children: React.ReactNode }) {
+  return (
+    <button
+      onClick={onClick}
+      className={`px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition ${
+        active ? "bg-primary text-primary-foreground shadow" : "bg-card border text-muted-foreground"
+      }`}
+    >
+      {children}
+    </button>
   );
 }
