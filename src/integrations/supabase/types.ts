@@ -227,6 +227,51 @@ export type Database = {
         }
         Relationships: []
       }
+      ai_usage_logs: {
+        Row: {
+          cache_hit: boolean
+          completion_tokens: number | null
+          cost_usd: number | null
+          created_at: string
+          feature: string
+          id: string
+          model: string | null
+          prompt_tokens: number | null
+          tier: number | null
+          total_tokens: number | null
+          user_id: string | null
+          was_downgraded: boolean
+        }
+        Insert: {
+          cache_hit?: boolean
+          completion_tokens?: number | null
+          cost_usd?: number | null
+          created_at?: string
+          feature: string
+          id?: string
+          model?: string | null
+          prompt_tokens?: number | null
+          tier?: number | null
+          total_tokens?: number | null
+          user_id?: string | null
+          was_downgraded?: boolean
+        }
+        Update: {
+          cache_hit?: boolean
+          completion_tokens?: number | null
+          cost_usd?: number | null
+          created_at?: string
+          feature?: string
+          id?: string
+          model?: string | null
+          prompt_tokens?: number | null
+          tier?: number | null
+          total_tokens?: number | null
+          user_id?: string | null
+          was_downgraded?: boolean
+        }
+        Relationships: []
+      }
       ai_weekly_reports: {
         Row: {
           content: string
@@ -5349,7 +5394,17 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      ai_cost_daily: {
+        Row: {
+          cache_hits: number | null
+          calls: number | null
+          cost_usd: number | null
+          day: string | null
+          tokens: number | null
+          user_id: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       claim_group_challenge_bonus: {
