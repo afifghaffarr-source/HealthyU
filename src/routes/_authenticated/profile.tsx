@@ -354,6 +354,7 @@ function Stat({ label, value, sub }: { label: string; value: string; sub?: strin
         {label}
       </p>
       <p className="text-xl font-bold tabular-nums mt-1">{value}</p>
+      {sub && <p className="text-[10px] text-muted-foreground mt-0.5">{sub}</p>}
       {sub && <p className="text-[10px] text-muted-foreground">{sub}</p>}
     </div>
   );
