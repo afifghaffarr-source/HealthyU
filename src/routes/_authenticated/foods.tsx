@@ -9,6 +9,9 @@ import { useRecentSearch } from "@/hooks/use-recent-search";
 import { BottomNav } from "@/components/bottom-nav";
 import { browseFoods, getFoodDetail, getFoodFacets } from "@/lib/foodDb.functions";
 import { ListSkeleton } from "@/components/healthyu/skeletons";
+import { PullIndicator } from "@/components/healthyu/pull-indicator";
+import { usePullToRefresh } from "@/hooks/use-pull-to-refresh";
+import { useQueryClient } from "@tanstack/react-query";
 
 export const Route = createFileRoute("/_authenticated/foods")({
   component: FoodsPage,
@@ -18,6 +21,11 @@ function FoodsPage() {
   const browse = useServerFn(browseFoods);
   const facets = useServerFn(getFoodFacets);
   const detail = useServerFn(getFoodDetail);
+  const qc = useQueryClient();
+  const { pulling, refreshing } = usePullToRefresh(async () => {
+    await qc.invalidateQueries({ queryKey: ["food-db"] });
+    await qc.invalidateQueries({ queryKey: ["food-facets"] });
+  });
 
   const [q, setQ] = useState("");
   const recent = useRecentSearch("foods");
@@ -73,6 +81,7 @@ function FoodsPage() {
 
   return (
     <div className="min-h-dvh bg-background pb-28">
+      <PullIndicator pulling={pulling} refreshing={refreshing} />
       <div className="max-w-md mx-auto px-4">
         <TopAppBar title="Database Makanan" showBack />
       </div>
