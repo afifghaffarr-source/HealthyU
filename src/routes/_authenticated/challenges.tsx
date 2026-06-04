@@ -186,9 +186,11 @@ function ChallengesPage() {
 
       <main className="max-w-md mx-auto px-4 pt-4 space-y-3">
         {isLoading && <ListSkeleton count={3} />}
-        {!isLoading && parts.some((p) => (p as any).status !== "completed") && (() => {
-          const active = parts.filter((p) => (p as any).status !== "completed");
-          const top = active.sort((a, b) => (b.streak ?? 0) - (a.streak ?? 0))[0];
+        {!isLoading && (() => {
+          const allParts = data?.participations ?? [];
+          const active = allParts.filter((p) => (p as { status?: string }).status !== "completed");
+          if (active.length === 0) return null;
+          const top = active.slice().sort((a, b) => (b.streak ?? 0) - (a.streak ?? 0))[0];
           const ch = challenges.find((c) => c.id === top?.challenge_id);
           if (!ch) return null;
           return (
