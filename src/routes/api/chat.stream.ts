@@ -4,6 +4,7 @@ import type { Database } from "@/integrations/supabase/types";
 import { buildChatPayload, persistUserMessage } from "@/lib/chat.functions";
 import { classifyMessage, buildCompactProfile } from "@/lib/aiRouter.server";
 import { cacheKey, getCached, setCached } from "@/lib/aiCache.server";
+import { enforceAiBudget, logAiUsage } from "@/lib/aiBudget.server";
 
 export const Route = createFileRoute("/api/chat/stream")({
   server: {
@@ -49,6 +50,7 @@ export const Route = createFileRoute("/api/chat/stream")({
             user_id: userId, role: "assistant", content: decision.localAnswer,
           });
           const local = decision.localAnswer;
+          await logAiUsage({ userId, feature: "chat", tier: 1, cacheHit: false });
           const stream = new ReadableStream({
             start(controller) {
               controller.enqueue(encoder.encode(`event: meta\ndata: ${JSON.stringify({ emergency: false, tier: 1, cached: false })}\n\n`));
@@ -83,6 +85,7 @@ export const Route = createFileRoute("/api/chat/stream")({
           await supabase.from("chat_messages").insert({
             user_id: userId, role: "assistant", content: cached,
           });
+          await logAiUsage({ userId, feature: "chat", tier: decision.tier, model: decision.model, cacheHit: true });
           const stream = new ReadableStream({
             start(controller) {
               controller.enqueue(encoder.encode(`event: meta\ndata: ${JSON.stringify({ emergency: false, tier: decision.tier, cached: true })}\n\n`));
@@ -100,6 +103,29 @@ export const Route = createFileRoute("/api/chat/stream")({
           });
         }
 
+        // Budget gate: only enforced for actual AI calls (tier 2/3 + image).
+        const { data: prof } = await supabase
+          .from("profiles")
+          .select("subscription_tier")
+          .eq("id", userId)
+          .maybeSingle();
+        const isPremium = ((prof?.subscription_tier as string | null) ?? "free").toLowerCase() !== "free";
+        const budget = await enforceAiBudget(userId, isPremium);
+        if (!budget.allowed) {
+          return new Response(
+            JSON.stringify({
+              error: "ai_budget_exceeded",
+              reason: budget.reason,
+              retryAfterSec: budget.retryAfterSec,
+            }),
+            { status: 429, headers: { "Content-Type": "application/json" } },
+          );
+        }
+        // Auto-downgrade to cheaper model when near limit.
+        let effectiveModel = decision.model;
+        const downgraded = budget.shouldDowngrade && decision.tier === 3;
+        if (downgraded) effectiveModel = "google/gemini-2.5-flash";
+
         const { messages, isEmergency } = await buildChatPayload(
           supabase, userId, body.message, body.imageBase64, body.imageMime,
         );
@@ -108,7 +134,7 @@ export const Route = createFileRoute("/api/chat/stream")({
           method: "POST",
           headers: { "Content-Type": "application/json", Authorization: `Bearer ${apiKey}` },
           body: JSON.stringify({
-            model: decision.model,
+            model: effectiveModel,
             messages,
             stream: true,
             ...(decision.maxTokens ? { max_tokens: decision.maxTokens } : {}),
@@ -161,7 +187,7 @@ export const Route = createFileRoute("/api/chat/stream")({
                     await setCached({
                       key,
                       response: fullText,
-                      model: decision.model,
+                      model: effectiveModel,
                       tier: decision.tier,
                       isPersonal: decision.tier === 3,
                     });
@@ -169,6 +195,19 @@ export const Route = createFileRoute("/api/chat/stream")({
                     console.error("ai cache write fail", (e as Error).message);
                   }
                 }
+                // Rough token estimate when upstream doesn't return usage.
+                const promptTokens = Math.ceil(JSON.stringify(messages).length / 4);
+                const completionTokens = Math.ceil(fullText.length / 4);
+                await logAiUsage({
+                  userId,
+                  feature: body.imageBase64 ? "chat_image" : "chat",
+                  tier: decision.tier,
+                  model: effectiveModel,
+                  promptTokens,
+                  completionTokens,
+                  cacheHit: false,
+                  wasDowngraded: downgraded,
+                });
               }
               controller.enqueue(encoder.encode(`event: done\ndata: {}\n\n`));
             } catch (err) {
