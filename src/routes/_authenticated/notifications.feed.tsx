@@ -4,7 +4,9 @@ import { useServerFn } from "@tanstack/react-start";
 import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { BottomNav } from "@/components/bottom-nav";
 import { listNotifications, markNotifRead } from "@/lib/scanBatch8.functions";
-import { Bell } from "lucide-react";
+import { Bell, BellOff } from "lucide-react";
+import { EmptyState } from "@/components/healthyu/empty-state";
+import { ListSkeleton } from "@/components/healthyu/skeletons";
 
 export const Route = createFileRoute("/_authenticated/notifications/feed")({ component: Page });
 
@@ -12,7 +14,7 @@ function Page() {
   const qc = useQueryClient();
   const listFn = useServerFn(listNotifications);
   const readFn = useServerFn(markNotifRead);
-  const { data } = useQuery({ queryKey: ["notif-feed"], queryFn: () => listFn({ data: undefined as any }) });
+  const { data, isLoading } = useQuery({ queryKey: ["notif-feed"], queryFn: () => listFn({ data: undefined as any }) });
   const mut = useMutation({
     mutationFn: (id: string) => readFn({ data: { id } }),
     onSuccess: () => qc.invalidateQueries({ queryKey: ["notif-feed"] }),
@@ -21,6 +23,7 @@ function Page() {
     <div className="min-h-dvh pb-24 bg-background">
       <TopAppBar title="Notifikasi" showBack />
       <main className="max-w-md mx-auto px-4 pt-4 space-y-2">
+        {isLoading && <ListSkeleton count={4} />}
         {(data?.items ?? []).map((n: any) => (
           <Link
             key={n.id}
@@ -37,7 +40,9 @@ function Page() {
             </div>
           </Link>
         ))}
-        {(data?.items ?? []).length === 0 && <p className="text-sm text-muted-foreground text-center py-8">Belum ada notifikasi</p>}
+        {!isLoading && (data?.items ?? []).length === 0 && (
+          <EmptyState icon={BellOff} title="Belum ada notifikasi" description="Notifikasi baru akan muncul di sini." />
+        )}
       </main>
       <BottomNav />
     </div>
