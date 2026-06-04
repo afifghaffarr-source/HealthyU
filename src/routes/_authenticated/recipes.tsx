@@ -11,6 +11,8 @@ import {
 import { generateRecipeFromIngredients, type GeneratedRecipe } from "@/lib/ai-extras.functions";
 import { BottomNav } from "@/components/bottom-nav";
 import { TopAppBar } from "@/components/healthyu/top-app-bar";
+import { PullIndicator } from "@/components/healthyu/pull-indicator";
+import { usePullToRefresh } from "@/hooks/use-pull-to-refresh";
 import { Clock, Flame, Search, Sparkles, Loader2, X, Star, Bookmark, TrendingUp } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -33,6 +35,9 @@ function RecipesPage() {
   const fetchList = useServerFn(listRecipes);
   const genRecipe = useServerFn(generateRecipeFromIngredients);
   const qc = useQueryClient();
+  const { pulling, refreshing } = usePullToRefresh(async () => {
+    await qc.invalidateQueries({ queryKey: ["recipes"] });
+  });
   const { data: all = [] } = useQuery({ queryKey: ["recipes"], queryFn: () => fetchList() });
   const [cat, setCat] = useState<(typeof CATS)[number]["id"]>("all");
   const [q, setQ] = useState("");
@@ -191,6 +196,7 @@ function RecipesPage() {
 
   return (
     <main className="min-h-screen bg-background pb-28">
+      <PullIndicator pulling={pulling} refreshing={refreshing} />
       <div className="max-w-md mx-auto px-5 pt-2 space-y-5">
         <TopAppBar
           title="Resep Sehat"

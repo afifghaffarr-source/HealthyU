@@ -9,6 +9,10 @@ import { BottomNav } from "@/components/bottom-nav";
 import { Camera, Trash2, Loader2, Film } from "lucide-react";
 import { toast } from "sonner";
 import { generateTimelapse } from "@/lib/timelapse";
+import { RadialBarChart, RadialBar, PolarAngleAxis, ResponsiveContainer } from "recharts";
+import { getProfile } from "@/lib/profile.functions";
+import { todaysMeals } from "@/lib/meals.functions";
+import { todaysWater } from "@/lib/water.functions";
 
 export const Route = createFileRoute("/_authenticated/progress")({
   component: ProgressPage,
@@ -20,6 +24,20 @@ function ProgressPage() {
   const add = useServerFn(addProgress);
   const del = useServerFn(deleteProgress);
   const { data: photos = [] } = useQuery({ queryKey: ["progress"], queryFn: () => fetchList() });
+  const fetchProfile = useServerFn(getProfile);
+  const fetchMeals = useServerFn(todaysMeals);
+  const fetchWater = useServerFn(todaysWater);
+  const { data: profile } = useQuery({ queryKey: ["profile"], queryFn: () => fetchProfile() });
+  const { data: meals = [] } = useQuery({ queryKey: ["meals", "today"], queryFn: () => fetchMeals() });
+  const { data: waterMl = 0 } = useQuery({ queryKey: ["water", "today"], queryFn: () => fetchWater() });
+  const cal = meals.reduce((a, m) => a + Number(m.calories || 0), 0);
+  const calTarget = profile?.daily_calorie_target ?? 2000;
+  const waterTarget = 2500;
+  const goalData = [
+    { name: "Kalori", value: Math.min(100, (cal / calTarget) * 100), fill: "hsl(var(--primary))" },
+    { name: "Air", value: Math.min(100, (waterMl / waterTarget) * 100), fill: "#0ea5e9" },
+    { name: "Foto", value: photos.length > 0 ? 100 : 0, fill: "#f97316" },
+  ];
 
   const [weight, setWeight] = useState("");
   const [notes, setNotes] = useState("");
@@ -66,6 +84,27 @@ function ProgressPage() {
     <main className="min-h-screen bg-background pb-28">
       <div className="max-w-md mx-auto px-5 pt-2 space-y-5">
         <TopAppBar title="Foto Progres" subtitle="Pantau perubahan kamu" showBack />
+
+        <section className="bg-card p-4 rounded-3xl outline-1 outline-black/5">
+          <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-2">Goal Harian</p>
+          <div className="h-44">
+            <ResponsiveContainer width="100%" height="100%">
+              <RadialBarChart innerRadius="30%" outerRadius="100%" data={goalData} startAngle={90} endAngle={-270}>
+                <PolarAngleAxis type="number" domain={[0, 100]} tick={false} />
+                <RadialBar background dataKey="value" cornerRadius={8} />
+              </RadialBarChart>
+            </ResponsiveContainer>
+          </div>
+          <div className="grid grid-cols-3 gap-2 text-center text-[10px] mt-1">
+            {goalData.map((g) => (
+              <div key={g.name}>
+                <div className="size-2 rounded-full mx-auto mb-1" style={{ background: g.fill }} />
+                <p className="font-semibold">{g.name}</p>
+                <p className="text-muted-foreground tabular-nums">{Math.round(g.value)}%</p>
+              </div>
+            ))}
+          </div>
+        </section>
 
         <section className="bg-card p-5 rounded-3xl outline-1 outline-black/5 space-y-3">
           <div className="grid grid-cols-2 gap-3">
