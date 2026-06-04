@@ -127,7 +127,7 @@ export const Route = createFileRoute("/api/chat/stream")({
         if (downgraded) effectiveModel = "google/gemini-2.5-flash";
 
         const { messages, isEmergency } = await buildChatPayload(
-          supabase, userId, body.message, body.imageBase64, body.imageMime,
+          supabase, userId, body.message, body.imageBase64, body.imageMime, decision.tier,
         );
 
         const upstream = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
