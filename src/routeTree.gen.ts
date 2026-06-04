@@ -120,6 +120,7 @@ import { Route as AuthenticatedMoodVoiceRouteImport } from './routes/_authentica
 import { Route as AuthenticatedMoodHeatmapRouteImport } from './routes/_authenticated/mood.heatmap'
 import { Route as AuthenticatedMealplanGroceryRouteImport } from './routes/_authenticated/mealplan.grocery'
 import { Route as AuthenticatedMealplanBudgetRouteImport } from './routes/_authenticated/mealplan.budget'
+import { Route as AuthenticatedMealDetailIdRouteImport } from './routes/_authenticated/meal-detail.$id'
 import { Route as AuthenticatedLeaderboardWeeklyRouteImport } from './routes/_authenticated/leaderboard.weekly'
 import { Route as AuthenticatedHydrationGroupRouteImport } from './routes/_authenticated/hydration.group'
 import { Route as AuthenticatedHabitsStackRouteImport } from './routes/_authenticated/habits.stack'
@@ -748,6 +749,12 @@ const AuthenticatedMealplanBudgetRoute =
     path: '/budget',
     getParentRoute: () => AuthenticatedMealplanRoute,
   } as any)
+const AuthenticatedMealDetailIdRoute =
+  AuthenticatedMealDetailIdRouteImport.update({
+    id: '/meal-detail/$id',
+    path: '/meal-detail/$id',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedLeaderboardWeeklyRoute =
   AuthenticatedLeaderboardWeeklyRouteImport.update({
     id: '/weekly',
@@ -968,6 +975,7 @@ export interface FileRoutesByFullPath {
   '/habits/stack': typeof AuthenticatedHabitsStackRoute
   '/hydration/group': typeof AuthenticatedHydrationGroupRoute
   '/leaderboard/weekly': typeof AuthenticatedLeaderboardWeeklyRoute
+  '/meal-detail/$id': typeof AuthenticatedMealDetailIdRoute
   '/mealplan/budget': typeof AuthenticatedMealplanBudgetRoute
   '/mealplan/grocery': typeof AuthenticatedMealplanGroceryRoute
   '/mood/heatmap': typeof AuthenticatedMoodHeatmapRoute
@@ -1105,6 +1113,7 @@ export interface FileRoutesByTo {
   '/habits/stack': typeof AuthenticatedHabitsStackRoute
   '/hydration/group': typeof AuthenticatedHydrationGroupRoute
   '/leaderboard/weekly': typeof AuthenticatedLeaderboardWeeklyRoute
+  '/meal-detail/$id': typeof AuthenticatedMealDetailIdRoute
   '/mealplan/budget': typeof AuthenticatedMealplanBudgetRoute
   '/mealplan/grocery': typeof AuthenticatedMealplanGroceryRoute
   '/mood/heatmap': typeof AuthenticatedMoodHeatmapRoute
@@ -1244,6 +1253,7 @@ export interface FileRoutesById {
   '/_authenticated/habits/stack': typeof AuthenticatedHabitsStackRoute
   '/_authenticated/hydration/group': typeof AuthenticatedHydrationGroupRoute
   '/_authenticated/leaderboard/weekly': typeof AuthenticatedLeaderboardWeeklyRoute
+  '/_authenticated/meal-detail/$id': typeof AuthenticatedMealDetailIdRoute
   '/_authenticated/mealplan/budget': typeof AuthenticatedMealplanBudgetRoute
   '/_authenticated/mealplan/grocery': typeof AuthenticatedMealplanGroceryRoute
   '/_authenticated/mood/heatmap': typeof AuthenticatedMoodHeatmapRoute
@@ -1383,6 +1393,7 @@ export interface FileRouteTypes {
     | '/habits/stack'
     | '/hydration/group'
     | '/leaderboard/weekly'
+    | '/meal-detail/$id'
     | '/mealplan/budget'
     | '/mealplan/grocery'
     | '/mood/heatmap'
@@ -1520,6 +1531,7 @@ export interface FileRouteTypes {
     | '/habits/stack'
     | '/hydration/group'
     | '/leaderboard/weekly'
+    | '/meal-detail/$id'
     | '/mealplan/budget'
     | '/mealplan/grocery'
     | '/mood/heatmap'
@@ -1658,6 +1670,7 @@ export interface FileRouteTypes {
     | '/_authenticated/habits/stack'
     | '/_authenticated/hydration/group'
     | '/_authenticated/leaderboard/weekly'
+    | '/_authenticated/meal-detail/$id'
     | '/_authenticated/mealplan/budget'
     | '/_authenticated/mealplan/grocery'
     | '/_authenticated/mood/heatmap'
@@ -2516,6 +2529,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedMealplanBudgetRouteImport
       parentRoute: typeof AuthenticatedMealplanRoute
     }
+    '/_authenticated/meal-detail/$id': {
+      id: '/_authenticated/meal-detail/$id'
+      path: '/meal-detail/$id'
+      fullPath: '/meal-detail/$id'
+      preLoaderRoute: typeof AuthenticatedMealDetailIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/leaderboard/weekly': {
       id: '/_authenticated/leaderboard/weekly'
       path: '/weekly'
@@ -3087,6 +3107,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedGrocerySmartRoute: typeof AuthenticatedGrocerySmartRoute
   AuthenticatedHabitsStackRoute: typeof AuthenticatedHabitsStackRoute
   AuthenticatedHydrationGroupRoute: typeof AuthenticatedHydrationGroupRoute
+  AuthenticatedMealDetailIdRoute: typeof AuthenticatedMealDetailIdRoute
   AuthenticatedPodcastWeeklyRoute: typeof AuthenticatedPodcastWeeklyRoute
   AuthenticatedPushAlarmRoute: typeof AuthenticatedPushAlarmRoute
   AuthenticatedQuizDailyRoute: typeof AuthenticatedQuizDailyRoute
@@ -3161,6 +3182,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedGrocerySmartRoute: AuthenticatedGrocerySmartRoute,
   AuthenticatedHabitsStackRoute: AuthenticatedHabitsStackRoute,
   AuthenticatedHydrationGroupRoute: AuthenticatedHydrationGroupRoute,
+  AuthenticatedMealDetailIdRoute: AuthenticatedMealDetailIdRoute,
   AuthenticatedPodcastWeeklyRoute: AuthenticatedPodcastWeeklyRoute,
   AuthenticatedPushAlarmRoute: AuthenticatedPushAlarmRoute,
   AuthenticatedQuizDailyRoute: AuthenticatedQuizDailyRoute,
