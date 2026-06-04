@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
+import { Route as KaloriRouteImport } from './routes/kalori'
 import { Route as KalkulatorRouteImport } from './routes/kalkulator'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
@@ -156,6 +157,11 @@ import { Route as AuthenticatedGroupsIdLeaderboardRouteImport } from './routes/_
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
   path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const KaloriRoute = KaloriRouteImport.update({
+  id: '/kalori',
+  path: '/kalori',
   getParentRoute: () => rootRouteImport,
 } as any)
 const KalkulatorRoute = KalkulatorRouteImport.update({
@@ -946,6 +952,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/kalkulator': typeof KalkulatorRouteWithChildren
+  '/kalori': typeof KaloriRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/achievements': typeof AuthenticatedAchievementsRoute
   '/alarms': typeof AuthenticatedAlarmsRoute
@@ -1089,6 +1096,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/kalori': typeof KaloriRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/achievements': typeof AuthenticatedAchievementsRoute
   '/alarms': typeof AuthenticatedAlarmsRoute
@@ -1235,6 +1243,7 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
   '/kalkulator': typeof KalkulatorRouteWithChildren
+  '/kalori': typeof KaloriRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/_authenticated/achievements': typeof AuthenticatedAchievementsRoute
   '/_authenticated/alarms': typeof AuthenticatedAlarmsRoute
@@ -1381,6 +1390,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/kalkulator'
+    | '/kalori'
     | '/sitemap.xml'
     | '/achievements'
     | '/alarms'
@@ -1524,6 +1534,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/auth'
+    | '/kalori'
     | '/sitemap.xml'
     | '/achievements'
     | '/alarms'
@@ -1669,6 +1680,7 @@ export interface FileRouteTypes {
     | '/_authenticated'
     | '/auth'
     | '/kalkulator'
+    | '/kalori'
     | '/sitemap.xml'
     | '/_authenticated/achievements'
     | '/_authenticated/alarms'
@@ -1815,6 +1827,7 @@ export interface RootRouteChildren {
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
   KalkulatorRoute: typeof KalkulatorRouteWithChildren
+  KaloriRoute: typeof KaloriRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   ApiChatStreamRoute: typeof ApiChatStreamRoute
   ApiPublicHooksDailyCoachRoute: typeof ApiPublicHooksDailyCoachRoute
@@ -1832,6 +1845,13 @@ declare module '@tanstack/react-router' {
       path: '/sitemap.xml'
       fullPath: '/sitemap.xml'
       preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/kalori': {
+      id: '/kalori'
+      path: '/kalori'
+      fullPath: '/kalori'
+      preLoaderRoute: typeof KaloriRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/kalkulator': {
@@ -3335,6 +3355,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
   KalkulatorRoute: KalkulatorRouteWithChildren,
+  KaloriRoute: KaloriRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   ApiChatStreamRoute: ApiChatStreamRoute,
   ApiPublicHooksDailyCoachRoute: ApiPublicHooksDailyCoachRoute,
