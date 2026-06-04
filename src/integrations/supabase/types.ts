@@ -1478,6 +1478,36 @@ export type Database = {
         }
         Relationships: []
       }
+      daily_content_schedule: {
+        Row: {
+          content_id: string
+          content_type: string
+          created_at: string
+          id: string
+          position: number
+          schedule_date: string
+          theme: string | null
+        }
+        Insert: {
+          content_id: string
+          content_type: string
+          created_at?: string
+          id?: string
+          position?: number
+          schedule_date: string
+          theme?: string | null
+        }
+        Update: {
+          content_id?: string
+          content_type?: string
+          created_at?: string
+          id?: string
+          position?: number
+          schedule_date?: string
+          theme?: string | null
+        }
+        Relationships: []
+      }
       daily_login_bonuses: {
         Row: {
           bonus_date: string
