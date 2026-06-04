@@ -28,13 +28,15 @@ export function BottomNav() {
   return (
     <>
       {(!online || pending > 0) && (
-        <div className="fixed bottom-24 left-1/2 -translate-x-1/2 z-40 shadow-lg rounded-full">
+        <div className="fixed bottom-24 left-1/2 -translate-x-1/2 z-40 shadow-lg rounded-full lg:bottom-6 lg:left-28">
           <SyncPill online={online} pending={pending} onSync={() => sync()} />
         </div>
       )}
+
+      {/* Mobile bottom bar */}
       <nav
         aria-label="Navigasi utama"
-        className="fixed bottom-4 left-4 right-4 z-40 h-16 bg-card/90 backdrop-blur-xl rounded-3xl outline-1 outline-black/5 shadow-lg shadow-black/5 flex items-center justify-around px-2 max-w-md mx-auto"
+        className="fixed bottom-4 left-4 right-4 z-40 h-16 bg-card/90 backdrop-blur-xl rounded-3xl outline-1 outline-black/5 shadow-lg shadow-black/5 flex items-center justify-around px-2 max-w-md mx-auto lg:hidden"
       >
         {items.map(({ to, label, icon: Icon }) => (
           <Link
@@ -57,6 +59,7 @@ export function BottomNav() {
           </Link>
         ))}
       </nav>
+
     </>
   );
 }
