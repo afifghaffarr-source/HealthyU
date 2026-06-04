@@ -4,6 +4,7 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@/integrations/supabase/types";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { todayRange, calcAge, calcBMI, calcBMR, calcTDEE, bmiCategory, type ActivityLevel } from "./health";
+import { buildCompactProfile, compactTodayBlock } from "./aiRouter.server";
 
 const SYSTEM_PROMPT = `Anda adalah "Dr. HealthyU" (panggilan: Dok/Dr), AI health assistant di aplikasi HealthyU.
 
@@ -100,6 +101,7 @@ export async function buildChatPayload(
   message: string,
   imageBase64?: string,
   imageMime?: string,
+  tier: 1 | 2 | 3 = 3,
 ): Promise<{ messages: unknown[]; isEmergency: boolean }> {
     const { start, end } = todayRange();
     const weekStart = new Date(); weekStart.setDate(weekStart.getDate() - 6); weekStart.setHours(0,0,0,0);
@@ -251,8 +253,33 @@ Gunakan data di atas untuk personalisasi jawaban. Sebut angka konkret saat relev
         ]
       : message;
 
+    // Tier 1/2 → compressed context to save ~70% prompt tokens. Tier 3 keeps
+    // the full verbose context for complex reasoning / image analysis.
+    let systemContent: string;
+    if (tier <= 2 && !imageBase64) {
+      const compact = await buildCompactProfile(supabase, userId);
+      const todayLine = compactTodayBlock({
+        cal: totalCal,
+        calTarget,
+        burn: totalBurn,
+        water: totalWater,
+        fastingActive: !!(f && !f.end_time),
+        sleepH: s ? (new Date(s.sleep_end).getTime() - new Date(s.sleep_start).getTime()) / 3600000 : null,
+        workoutDone: (workouts ?? []).length > 0,
+      });
+      const brevity =
+        "\n\nGAYA JAWAB: ringkas, maksimal 3 kalimat atau 5 bullet. Sebut angka konkret dari konteks. Hindari basa-basi.";
+      systemContent =
+        SYSTEM_PROMPT +
+        `\n\n=== PROFIL (ringkas) ===\n${compact.block}\n\n=== HARI INI ===\n${todayLine}` +
+        brevity +
+        emergencyNote;
+    } else {
+      systemContent = SYSTEM_PROMPT + contextBlock + emergencyNote;
+    }
+
     const messages = [
-      { role: "system", content: SYSTEM_PROMPT + contextBlock + emergencyNote },
+      { role: "system", content: systemContent },
       ...recent.map((m, i) =>
         i === lastIdx && imageBase64
           ? { role: m.role, content: userParts }
