@@ -1317,6 +1317,45 @@ export type Database = {
         }
         Relationships: []
       }
+      daily_tips_pool: {
+        Row: {
+          category: string
+          created_at: string
+          id: string
+          lang: string
+          max_age: number | null
+          min_age: number | null
+          target_conditions: string[]
+          target_tags: string[]
+          tip: string
+          weight: number
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          id?: string
+          lang?: string
+          max_age?: number | null
+          min_age?: number | null
+          target_conditions?: string[]
+          target_tags?: string[]
+          tip: string
+          weight?: number
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          id?: string
+          lang?: string
+          max_age?: number | null
+          min_age?: number | null
+          target_conditions?: string[]
+          target_tags?: string[]
+          tip?: string
+          weight?: number
+        }
+        Relationships: []
+      }
       doctor_referrals: {
         Row: {
           created_at: string
@@ -2663,6 +2702,39 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      meal_plan_templates: {
+        Row: {
+          avoid_allergens: string[]
+          created_at: string
+          diet_tags: string[]
+          id: string
+          lang: string
+          meals: Json
+          name: string
+          target_calories: number
+        }
+        Insert: {
+          avoid_allergens?: string[]
+          created_at?: string
+          diet_tags?: string[]
+          id?: string
+          lang?: string
+          meals: Json
+          name: string
+          target_calories: number
+        }
+        Update: {
+          avoid_allergens?: string[]
+          created_at?: string
+          diet_tags?: string[]
+          id?: string
+          lang?: string
+          meals?: Json
+          name?: string
+          target_calories?: number
+        }
+        Relationships: []
       }
       meal_plans: {
         Row: {
