@@ -19,7 +19,8 @@ import { StreakRing } from "@/components/healthyu/streak-ring";
 import { CoinPill } from "@/components/healthyu/coin-pill";
 import { usePullToRefresh } from "@/hooks/use-pull-to-refresh";
 import { formatDuration, fastingStage } from "@/lib/health";
-import { Droplet, Plus, Sparkles, ArrowRight, Flame, Trophy, Camera, Smile } from "lucide-react";
+import { Droplet, Plus, Sparkles, ArrowRight, Flame, Trophy, Camera, Smile, Gift, Snowflake } from "lucide-react";
+import { claimDailyLoginBonus } from "@/lib/scanBatch9.functions";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import {
@@ -52,6 +53,24 @@ function Dashboard() {
   const addMoodFn = useServerFn(addMood);
   const fetchGroupChallenges = useServerFn(myGroupChallengeSummary);
   const fetchUnlinked = useServerFn(myUnlinkedJoinedChallenges);
+  const claimBonusFn = useServerFn(claimDailyLoginBonus);
+  const [bonusClaimed, setBonusClaimed] = useState<boolean>(() => {
+    if (typeof window === "undefined") return false;
+    return window.localStorage.getItem("dailyBonusClaimed") === new Date().toDateString();
+  });
+  const [freezeOpen, setFreezeOpen] = useState(false);
+  const [freezeUsed, setFreezeUsed] = useState(false);
+  const claimBonusMut = useMutation({
+    mutationFn: () => claimBonusFn({ data: undefined as never }),
+    onSuccess: (r) => {
+      const b = r.bonus as { coins?: number; streak?: number } | undefined;
+      window.localStorage.setItem("dailyBonusClaimed", new Date().toDateString());
+      setBonusClaimed(true);
+      qc.invalidateQueries({ queryKey: ["profile"] });
+      toast.success(r.alreadyClaimed ? "Sudah klaim hari ini" : `+${b?.coins ?? 0} koin! Streak ${b?.streak ?? 0}`);
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
 
   const { data: profile, isLoading: pLoad } = useQuery({ queryKey: ["profile"], queryFn: () => fetchProfile() });
   const { data: meals = [] } = useQuery({ queryKey: ["meals", "today"], queryFn: () => fetchMeals() });
@@ -309,6 +328,23 @@ function Dashboard() {
           </div>
         </header>
 
+        {!bonusClaimed && (
+          <button
+            onClick={() => claimBonusMut.mutate()}
+            disabled={claimBonusMut.isPending}
+            className="w-full flex items-center gap-3 p-4 rounded-3xl bg-gradient-to-r from-amber-400/20 to-orange-500/20 outline-1 outline-amber-500/30 text-left animate-fade-up"
+          >
+            <div className="size-11 rounded-2xl bg-amber-100 grid place-items-center">
+              <Gift className="size-5 text-amber-600" />
+            </div>
+            <div className="flex-1">
+              <p className="text-sm font-bold">Klaim bonus harian</p>
+              <p className="text-xs text-muted-foreground">Tap untuk dapat koin & jaga streakmu</p>
+            </div>
+            <ArrowRight className="size-4 text-muted-foreground" />
+          </button>
+        )}
+
         <Coachmark
           flagKey="dashboard-v1"
           title="Selamat datang di Healthy U"
@@ -471,19 +507,58 @@ function Dashboard() {
         </Link>
 
         {/* Gamification */}
-        <Link
-          to="/achievements"
-          className="bg-card p-4 rounded-3xl outline-1 outline-black/5 shadow-sm flex items-center gap-3 animate-fade-up"
-        >
-          <StreakRing days={game?.stats?.current_streak ?? 0} goal={30} size={64} />
-          <div className="flex-1 min-w-0">
-            <p className="text-[10px] font-bold uppercase text-muted-foreground tracking-wider">Level {game?.stats?.level ?? 1} · {game?.stats?.xp ?? 0} XP</p>
-            <p className="font-semibold text-sm">
-              Streak {game?.stats?.current_streak ?? 0} hari
-            </p>
+        <div className="bg-card p-4 rounded-3xl outline-1 outline-black/5 shadow-sm flex items-center gap-3 animate-fade-up">
+          <Link to="/achievements" className="flex items-center gap-3 flex-1 min-w-0">
+            <StreakRing days={game?.stats?.current_streak ?? 0} goal={30} size={64} />
+            <div className="flex-1 min-w-0">
+              <p className="text-[10px] font-bold uppercase text-muted-foreground tracking-wider">Level {game?.stats?.level ?? 1} · {game?.stats?.xp ?? 0} XP</p>
+              <p className="font-semibold text-sm">Streak {game?.stats?.current_streak ?? 0} hari</p>
+            </div>
+            <Trophy className="size-5 text-primary" />
+          </Link>
+          <button
+            onClick={() => setFreezeOpen(true)}
+            aria-label="Streak freeze"
+            className="size-10 rounded-xl bg-sky-100 grid place-items-center"
+          >
+            <Snowflake className="size-5 text-sky-600" />
+          </button>
+        </div>
+
+        {freezeOpen && (
+          <div
+            className="fixed inset-0 z-50 bg-black/50 grid place-items-center p-4"
+            onClick={() => setFreezeOpen(false)}
+          >
+            <div
+              className="bg-card rounded-3xl p-6 max-w-sm w-full text-center space-y-3"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="text-6xl">🧊</div>
+              <h3 className="font-bold text-lg">Streak Freeze</h3>
+              <p className="text-sm text-muted-foreground">
+                Lupa log hari ini? Gunakan 1 freeze untuk menyelamatkan streakmu.
+              </p>
+              <button
+                onClick={() => {
+                  setFreezeUsed(true);
+                  toast.success("Freeze digunakan untuk hari ini");
+                  setTimeout(() => setFreezeOpen(false), 600);
+                }}
+                disabled={freezeUsed}
+                className="w-full rounded-xl bg-primary text-primary-foreground py-2.5 text-sm font-semibold disabled:opacity-50"
+              >
+                {freezeUsed ? "✓ Freeze Digunakan" : "Gunakan 1 Freeze"}
+              </button>
+              <button
+                onClick={() => setFreezeOpen(false)}
+                className="w-full text-xs text-muted-foreground"
+              >
+                Tutup
+              </button>
+            </div>
           </div>
-          <Trophy className="size-5 text-primary" />
-        </Link>
+        )}
 
         {groupSummary.length > 0 && (
           <div className="block bg-card p-4 rounded-3xl outline-1 outline-black/5 shadow-sm animate-fade-up">

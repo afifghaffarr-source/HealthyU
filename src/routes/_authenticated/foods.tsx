@@ -8,6 +8,7 @@ import { SearchChips } from "@/components/healthyu/search-chips";
 import { useRecentSearch } from "@/hooks/use-recent-search";
 import { BottomNav } from "@/components/bottom-nav";
 import { browseFoods, getFoodDetail, getFoodFacets } from "@/lib/foodDb.functions";
+import { ListSkeleton } from "@/components/healthyu/skeletons";
 
 export const Route = createFileRoute("/_authenticated/foods")({
   component: FoodsPage,
@@ -149,6 +150,7 @@ function FoodsPage() {
         </div>
 
         <ul className="space-y-2">
+          {isFetching && foods.length === 0 && <ListSkeleton count={5} />}
           {foods.map((f) => (
             <li key={f.id}>
               <button
