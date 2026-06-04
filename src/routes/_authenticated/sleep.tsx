@@ -7,6 +7,7 @@ import { BottomNav } from "@/components/bottom-nav";
 import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { Moon, Trash2 } from "lucide-react";
 import { toast } from "sonner";
+import { AreaChart, Area, XAxis, Tooltip, ResponsiveContainer } from "recharts";
 
 export const Route = createFileRoute("/_authenticated/sleep")({
   component: SleepPage,
@@ -72,6 +73,14 @@ function SleepPage() {
   const avgHours = last7.length ? totalHours / last7.length : 0;
   const avgQuality = last7.length ? last7.reduce((s, l) => s + l.quality, 0) / last7.length : 0;
 
+  const chartData = [...last7]
+    .sort((a, b) => new Date(a.sleep_end).getTime() - new Date(b.sleep_end).getTime())
+    .map((l) => ({
+      day: new Date(l.sleep_end).toLocaleDateString("id-ID", { weekday: "short" }),
+      hours: Number(((new Date(l.sleep_end).getTime() - new Date(l.sleep_start).getTime()) / 3600000).toFixed(1)),
+      score: l.quality * 20,
+    }));
+
   return (
     <main className="min-h-screen bg-background pb-28">
       <div className="max-w-md mx-auto px-5 pt-2 space-y-5">
@@ -87,6 +96,30 @@ function SleepPage() {
             <p className="text-2xl font-bold tabular-nums">{avgQuality.toFixed(1)}<span className="text-sm">/5</span></p>
           </div>
         </section>
+
+        {chartData.length > 0 && (
+          <section className="bg-card p-4 rounded-3xl outline-1 outline-black/5 animate-fade-up">
+            <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-2">Tren 7 hari</p>
+            <div className="h-32">
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={chartData} margin={{ top: 4, right: 4, left: 0, bottom: 0 }}>
+                  <defs>
+                    <linearGradient id="sleepG" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="#6366f1" stopOpacity={0.6} />
+                      <stop offset="100%" stopColor="#6366f1" stopOpacity={0.05} />
+                    </linearGradient>
+                  </defs>
+                  <XAxis dataKey="day" tick={{ fontSize: 10 }} axisLine={false} tickLine={false} />
+                  <Tooltip
+                    contentStyle={{ borderRadius: 12, fontSize: 12, border: "none", boxShadow: "0 4px 14px rgba(0,0,0,0.1)" }}
+                    formatter={(v: number, n: string) => (n === "hours" ? [`${v}j`, "Durasi"] : [v, "Skor"])}
+                  />
+                  <Area type="monotone" dataKey="hours" stroke="#6366f1" strokeWidth={2} fill="url(#sleepG)" />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
+          </section>
+        )}
 
         <section className="bg-card p-4 rounded-3xl outline-1 outline-black/5 space-y-3 animate-fade-up">
           <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Catat tidur</p>

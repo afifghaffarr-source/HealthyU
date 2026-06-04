@@ -2,6 +2,9 @@ import { Link } from "@tanstack/react-router";
 import { Home, Camera, Database, Timer, Activity, User } from "lucide-react";
 import { useOfflineQueue } from "@/hooks/use-offline-queue";
 import { SyncPill } from "@/components/healthyu/sync-pill";
+import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
+import { listNotifications } from "@/lib/scanBatch8.functions";
 
 const items = [
   { to: "/dashboard", label: "Beranda", icon: Home },
@@ -14,6 +17,14 @@ const items = [
 
 export function BottomNav() {
   const { online, pending, sync } = useOfflineQueue();
+  const fetchNotifs = useServerFn(listNotifications);
+  const { data: notif } = useQuery({
+    queryKey: ["notifications", "feed"],
+    queryFn: () => fetchNotifs(),
+    refetchInterval: 60000,
+    staleTime: 30000,
+  });
+  const unread = (notif?.items ?? []).filter((n: { read?: boolean }) => !n.read).length;
   return (
     <>
       {(!online || pending > 0) && (
@@ -33,8 +44,13 @@ export function BottomNav() {
             className="flex flex-col items-center gap-0.5 px-3 py-2 rounded-2xl text-muted-foreground transition-all duration-200 motion-safe:active:scale-90"
             activeProps={{ className: "text-primary [&_.nav-dot]:opacity-100 [&_.nav-icon-wrap]:bg-primary/12" }}
           >
-            <span className="nav-icon-wrap inline-flex size-8 items-center justify-center rounded-full transition-colors">
+            <span className="nav-icon-wrap relative inline-flex size-8 items-center justify-center rounded-full transition-colors">
               <Icon className="size-5" strokeWidth={2.2} />
+              {to === "/profile" && unread > 0 && (
+                <span className="absolute -top-0.5 -right-0.5 min-w-[16px] h-4 px-1 rounded-full bg-destructive text-destructive-foreground text-[9px] font-bold grid place-items-center shadow">
+                  {unread > 99 ? "99+" : unread}
+                </span>
+              )}
             </span>
             <span className="text-[10px] font-semibold">{label}</span>
             <span className="nav-dot size-1 rounded-full bg-primary opacity-0 transition-opacity" />
