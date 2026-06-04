@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import {
   Sparkles,
@@ -17,6 +17,12 @@ import {
   Zap,
   Heart,
   Camera,
+  X,
+  Send,
+  Crown,
+  Users,
+  Activity,
+  Baby,
 } from "lucide-react";
 
 export const Route = createFileRoute("/")({
@@ -82,17 +88,177 @@ const FAQ = [
   { q: "Aman untuk data saya?", a: "Data kamu dienkripsi dan tidak pernah dijual. Kamu pegang kontrol penuh." },
 ];
 
+const COMPARE = [
+  { f: "Database makanan Indonesia", us: true, mfp: "Terbatas", fitbit: false },
+  { f: "Puasa Ramadhan & 16:8", us: true, mfp: false, fitbit: "Sebagian" },
+  { f: "Jadwal sholat & kiblat", us: true, mfp: false, fitbit: false },
+  { f: "AI coach Bahasa Indonesia", us: true, mfp: false, fitbit: false },
+  { f: "Scan makanan AI", us: true, mfp: "Premium", fitbit: false },
+  { f: "Gratis selamanya", us: true, mfp: false, fitbit: false },
+];
+
+const AUDIENCES = [
+  { icon: Moon, t: "Muslim", d: "Puasa & jadwal sholat terintegrasi." },
+  { icon: Activity, t: "Atlet", d: "Makro presisi & meal-timing." },
+  { icon: Heart, t: "Diabetisi", d: "Lacak gula darah & GI makanan." },
+  { icon: Baby, t: "Ibu hamil", d: "Nutrisi trimester & vitamin penting." },
+];
+
+const RECIPES = [
+  { name: "Nasi Bakar Ayam Suwir", kcal: 420, time: "25m" },
+  { name: "Gado-Gado Light", kcal: 310, time: "15m" },
+  { name: "Soto Ayam Bening", kcal: 280, time: "30m" },
+  { name: "Tumis Tahu Telur", kcal: 350, time: "12m" },
+];
+
+function useCountUp(target: number, run: boolean, duration = 1400) {
+  const [val, setVal] = useState(0);
+  useEffect(() => {
+    if (!run) return;
+    const start = performance.now();
+    let raf = 0;
+    const tick = (now: number) => {
+      const p = Math.min(1, (now - start) / duration);
+      const eased = 1 - Math.pow(1 - p, 3);
+      setVal(Math.round(target * eased));
+      if (p < 1) raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [target, run, duration]);
+  return val;
+}
+
+function StatsCounter({ value, suffix }: { value: number; suffix: string }) {
+  const ref = useRef<HTMLSpanElement>(null);
+  const [vis, setVis] = useState(false);
+  useEffect(() => {
+    if (!ref.current) return;
+    const io = new IntersectionObserver(([e]) => e.isIntersecting && setVis(true), { threshold: 0.4 });
+    io.observe(ref.current);
+    return () => io.disconnect();
+  }, []);
+  const v = useCountUp(value, vis);
+  return <span ref={ref}>{v.toLocaleString("id-ID")}{suffix}</span>;
+}
+
+function BeforeAfter() {
+  const [pos, setPos] = useState(50);
+  return (
+    <div className="relative aspect-[16/9] rounded-3xl overflow-hidden border border-white/15 shadow-xl select-none">
+      <div className="absolute inset-0 bg-gradient-to-br from-rose-200 to-rose-400 grid place-items-center text-rose-900 font-bold text-2xl">SEBELUM · 78 kg</div>
+      <div className="absolute inset-0 bg-gradient-to-br from-primary to-accent grid place-items-center text-primary-foreground font-bold text-2xl" style={{ clipPath: `inset(0 0 0 ${pos}%)` }}>SESUDAH · 65 kg</div>
+      <input type="range" min={0} max={100} value={pos} onChange={(e) => setPos(+e.target.value)} className="absolute inset-x-0 bottom-3 mx-auto w-3/4 accent-white" aria-label="Slider sebelum sesudah" />
+      <div className="absolute top-0 bottom-8 w-0.5 bg-white shadow-lg pointer-events-none" style={{ left: `${pos}%` }} />
+    </div>
+  );
+}
+
+function BmrQuiz() {
+  const [g, setG] = useState<"m" | "f">("m");
+  const [age, setAge] = useState(25);
+  const [w, setW] = useState(65);
+  const [h, setH] = useState(170);
+  const bmr = Math.round(g === "m" ? 10 * w + 6.25 * h - 5 * age + 5 : 10 * w + 6.25 * h - 5 * age - 161);
+  return (
+    <div className="glass rounded-3xl p-6 border border-primary/20">
+      <div className="flex items-center gap-2 mb-4">
+        <Sparkles className="size-4 text-primary" />
+        <h3 className="font-bold" style={{ fontFamily: "var(--font-display)" }}>Hitung BMR-mu (gratis, 5 detik)</h3>
+      </div>
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+        <label className="flex flex-col gap-1">Gender
+          <select value={g} onChange={(e) => setG(e.target.value as "m" | "f")} className="bg-card border border-white/15 rounded-lg px-2 py-1.5">
+            <option value="m">Pria</option><option value="f">Wanita</option>
+          </select>
+        </label>
+        <label className="flex flex-col gap-1">Umur
+          <input type="number" value={age} onChange={(e) => setAge(+e.target.value)} className="bg-card border border-white/15 rounded-lg px-2 py-1.5" />
+        </label>
+        <label className="flex flex-col gap-1">Berat (kg)
+          <input type="number" value={w} onChange={(e) => setW(+e.target.value)} className="bg-card border border-white/15 rounded-lg px-2 py-1.5" />
+        </label>
+        <label className="flex flex-col gap-1">Tinggi (cm)
+          <input type="number" value={h} onChange={(e) => setH(+e.target.value)} className="bg-card border border-white/15 rounded-lg px-2 py-1.5" />
+        </label>
+      </div>
+      <div className="mt-4 flex items-center justify-between bg-gradient-to-r from-primary/15 to-accent/15 rounded-2xl px-4 py-3">
+        <div>
+          <p className="text-xs text-muted-foreground">Kebutuhan basal harian</p>
+          <p className="text-2xl font-bold" style={{ fontFamily: "var(--font-display)" }}>{bmr.toLocaleString("id-ID")} <span className="text-sm font-normal text-muted-foreground">kkal</span></p>
+        </div>
+        <Link to="/auth" className="bg-primary text-primary-foreground font-semibold text-xs px-3 py-2 rounded-xl">Lihat meal plan</Link>
+      </div>
+    </div>
+  );
+}
+
+function FloatingChat() {
+  const [open, setOpen] = useState(false);
+  return (
+    <>
+      <button onClick={() => setOpen((v) => !v)} aria-label="Buka Dr. Healthy" className="fixed bottom-5 right-5 z-40 size-14 rounded-full bg-gradient-to-br from-primary to-accent text-primary-foreground shadow-xl shadow-primary/40 grid place-items-center hover:scale-105 transition-transform">
+        {open ? <X className="size-5" /> : <MessageCircle className="size-6" />}
+        {!open && <span className="absolute -top-1 -right-1 size-3 rounded-full bg-amber-400 animate-pulse" />}
+      </button>
+      {open && (
+        <div className="fixed bottom-24 right-5 z-40 w-[90vw] max-w-sm glass rounded-2xl border border-white/20 shadow-2xl p-4 animate-fade-up">
+          <div className="flex items-center gap-2 pb-3 border-b border-white/10">
+            <span className="size-8 rounded-full bg-gradient-to-br from-primary to-accent grid place-items-center text-primary-foreground"><Sparkles className="size-4" /></span>
+            <div><p className="font-bold text-sm">Dr. Healthy</p><p className="text-[10px] text-muted-foreground">AI · biasanya membalas instan</p></div>
+          </div>
+          <div className="py-3 text-sm space-y-2">
+            <p className="bg-muted/60 rounded-2xl rounded-tl-sm px-3 py-2 inline-block">Halo! Aku bisa bantu hitung kalori, susun meal plan, & jawab pertanyaan diet. Daftar dulu yuk?</p>
+          </div>
+          <Link to="/auth" className="block text-center bg-primary text-primary-foreground font-semibold text-xs py-2.5 rounded-xl">Mulai chat (gratis)</Link>
+        </div>
+      )}
+    </>
+  );
+}
+
 function Index() {
   const [hasSession, setHasSession] = useState<boolean | null>(null);
+  const [showStickyCta, setShowStickyCta] = useState(false);
+  const [confetti, setConfetti] = useState(false);
+  const [email, setEmail] = useState("");
+  const [subscribed, setSubscribed] = useState(false);
+
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => setHasSession(!!data.session));
+  }, []);
+
+  useEffect(() => {
+    const onScroll = () => setShowStickyCta(window.scrollY > 600);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
   const ctaPrimary = hasSession ? "/dashboard" : "/auth";
   const ctaPrimaryLabel = hasSession ? "Buka Dashboard" : "Mulai gratis sekarang";
 
+  const fireConfetti = () => {
+    if (typeof window === "undefined") return;
+    if (sessionStorage.getItem("hu_confetti")) return;
+    sessionStorage.setItem("hu_confetti", "1");
+    setConfetti(true);
+    setTimeout(() => setConfetti(false), 1600);
+  };
+
   return (
     <main className="min-h-screen bg-background text-foreground relative overflow-x-clip">
+      {confetti && (
+        <div aria-hidden className="pointer-events-none fixed inset-0 z-50 overflow-hidden">
+          {Array.from({ length: 60 }).map((_, i) => (
+            <span key={i} className="absolute top-0 size-2 rounded-sm animate-confetti" style={{
+              left: `${Math.random() * 100}%`,
+              background: ["#16a34a","#0ea5e9","#f59e0b","#ec4899","#a855f7"][i % 5],
+              animationDelay: `${Math.random() * 0.4}s`,
+              transform: `rotate(${Math.random() * 360}deg)`,
+            }} />
+          ))}
+        </div>
+      )}
       {/* Animated gradient mesh background */}
       <div aria-hidden className="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
         <div className="absolute -top-32 -left-32 size-[480px] rounded-full bg-primary/25 blur-3xl animate-blob" />
@@ -154,6 +320,7 @@ function Index() {
           <div className="flex flex-col sm:flex-row gap-3 pt-2">
             <Link
               to={ctaPrimary}
+              onClick={fireConfetti}
               className="group relative overflow-hidden text-center bg-gradient-to-r from-primary to-primary-dark text-primary-foreground font-semibold py-4 px-6 rounded-2xl shadow-xl shadow-primary/30 hover:shadow-2xl hover:shadow-primary/40 hover:-translate-y-0.5 transition-all"
             >
               <span className="relative z-10 inline-flex items-center gap-2 justify-center">
@@ -272,14 +439,14 @@ function Index() {
       {/* Stats strip */}
       <section className="max-w-6xl mx-auto px-5 md:px-8 py-10 grid grid-cols-2 md:grid-cols-4 gap-3">
         {[
-          { v: "10K+", l: "Pengguna aktif", i: Heart },
-          { v: "5.000+", l: "Menu Indonesia", i: Utensils },
-          { v: "98%", l: "Akurasi scan AI", i: Camera },
-          { v: "24/7", l: "Dr. Healthy siap", i: MessageCircle },
-        ].map(({ v, l, i: Icon }) => (
+          { n: 10000, s: "+", l: "Pengguna aktif", i: Heart },
+          { n: 5000, s: "+", l: "Menu Indonesia", i: Utensils },
+          { n: 98, s: "%", l: "Akurasi scan AI", i: Camera },
+          { n: 24, s: "/7", l: "Dr. Healthy siap", i: MessageCircle },
+        ].map(({ n, s, l, i: Icon }) => (
           <div key={l} className="glass rounded-2xl p-4 border border-white/15 text-center">
             <Icon className="size-5 text-primary mx-auto mb-2" />
-            <p className="text-2xl font-bold" style={{ fontFamily: "var(--font-display)" }}>{v}</p>
+            <p className="text-2xl font-bold" style={{ fontFamily: "var(--font-display)" }}><StatsCounter value={n} suffix={s} /></p>
             <p className="text-xs text-muted-foreground">{l}</p>
           </div>
         ))}
@@ -392,6 +559,138 @@ function Index() {
         </div>
       </section>
 
+      {/* Comparison table */}
+      <section className="max-w-5xl mx-auto px-5 md:px-8 py-16">
+        <div className="text-center max-w-2xl mx-auto mb-8">
+          <h2 className="text-3xl md:text-4xl font-bold tracking-tight" style={{ fontFamily: "var(--font-display)" }}>HealthyU vs <span className="text-muted-foreground">yang lain</span></h2>
+          <p className="text-muted-foreground mt-2 text-sm">Kenapa ribuan orang Indonesia pindah ke HealthyU.</p>
+        </div>
+        <div className="glass rounded-2xl border border-white/15 overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead className="bg-card/60">
+              <tr className="text-left">
+                <th className="p-4 font-semibold">Fitur</th>
+                <th className="p-4 font-semibold text-primary">HealthyU</th>
+                <th className="p-4 font-semibold text-muted-foreground">MyFitnessPal</th>
+                <th className="p-4 font-semibold text-muted-foreground">Fitbit</th>
+              </tr>
+            </thead>
+            <tbody>
+              {COMPARE.map((r) => (
+                <tr key={r.f} className="border-t border-white/10">
+                  <td className="p-4 font-medium">{r.f}</td>
+                  {[r.us, r.mfp, r.fitbit].map((v, i) => (
+                    <td key={i} className="p-4">
+                      {v === true ? <Check className="size-4 text-primary" /> : v === false ? <span className="text-muted-foreground">—</span> : <span className="text-xs text-muted-foreground">{v}</span>}
+                    </td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      {/* Untuk siapa */}
+      <section className="max-w-6xl mx-auto px-5 md:px-8 py-16">
+        <div className="text-center max-w-2xl mx-auto mb-8">
+          <h2 className="text-3xl md:text-4xl font-bold tracking-tight" style={{ fontFamily: "var(--font-display)" }}>Dibuat untuk <span className="text-primary">semua orang</span></h2>
+        </div>
+        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
+          {AUDIENCES.map(({ icon: Icon, t, d }) => (
+            <div key={t} className="glass rounded-2xl p-5 border border-white/15 hover:border-primary/30 hover:-translate-y-1 transition-all">
+              <div className="size-10 rounded-xl bg-gradient-to-br from-primary/15 to-accent/15 grid place-items-center mb-3 text-primary"><Icon className="size-5" /></div>
+              <h3 className="font-bold text-sm mb-1" style={{ fontFamily: "var(--font-display)" }}>{t}</h3>
+              <p className="text-xs text-muted-foreground">{d}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* BMR Quiz */}
+      <section className="max-w-3xl mx-auto px-5 md:px-8 py-16">
+        <BmrQuiz />
+      </section>
+
+      {/* Resep populer */}
+      <section className="max-w-6xl mx-auto px-5 md:px-8 py-16">
+        <div className="flex items-end justify-between mb-6">
+          <div>
+            <h2 className="text-3xl md:text-4xl font-bold tracking-tight" style={{ fontFamily: "var(--font-display)" }}>Resep populer minggu ini</h2>
+            <p className="text-muted-foreground text-sm mt-1">Diuji dapur lokal, ramah kalori.</p>
+          </div>
+          <Link to={ctaPrimary} className="hidden sm:inline text-sm font-semibold text-primary">Lihat semua →</Link>
+        </div>
+        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
+          {RECIPES.map((r, i) => (
+            <article key={r.name} className="glass rounded-2xl border border-white/15 overflow-hidden hover:-translate-y-1 transition-all">
+              <div className="aspect-[4/3]" style={{ background: `linear-gradient(135deg, hsl(${i * 70} 70% 70%), hsl(${i * 70 + 40} 70% 55%))` }} />
+              <div className="p-4">
+                <h3 className="font-bold text-sm mb-1" style={{ fontFamily: "var(--font-display)" }}>{r.name}</h3>
+                <p className="text-xs text-muted-foreground flex items-center gap-3"><span className="inline-flex items-center gap-1"><Flame className="size-3 text-amber-500" />{r.kcal} kkal</span><span className="inline-flex items-center gap-1"><Timer className="size-3" />{r.time}</span></p>
+              </div>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      {/* Before / After */}
+      <section className="max-w-4xl mx-auto px-5 md:px-8 py-16">
+        <div className="text-center max-w-2xl mx-auto mb-8">
+          <h2 className="text-3xl md:text-4xl font-bold tracking-tight" style={{ fontFamily: "var(--font-display)" }}>Hasil nyata, <span className="text-primary">geser & lihat</span></h2>
+          <p className="text-muted-foreground mt-2 text-sm">Transformasi user HealthyU dalam 12 minggu.</p>
+        </div>
+        <BeforeAfter />
+      </section>
+
+      {/* Pricing teaser */}
+      <section className="max-w-5xl mx-auto px-5 md:px-8 py-16">
+        <div className="grid md:grid-cols-2 gap-4">
+          <div className="glass rounded-3xl p-7 border border-primary/30">
+            <span className="inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-primary bg-primary/10 px-2 py-1 rounded-full">Gratis</span>
+            <h3 className="text-2xl font-bold mt-3" style={{ fontFamily: "var(--font-display)" }}>Rp 0 <span className="text-sm font-normal text-muted-foreground">/ selamanya</span></h3>
+            <ul className="text-sm space-y-2 mt-4 text-muted-foreground">
+              {["Scan makanan AI","Meal plan personal","Puasa & jadwal sholat","Dr. Healthy chatbot"].map((x) => <li key={x} className="flex items-center gap-2"><Check className="size-4 text-primary" />{x}</li>)}
+            </ul>
+            <Link to={ctaPrimary} className="mt-5 block text-center bg-primary text-primary-foreground font-semibold py-3 rounded-xl">Mulai gratis</Link>
+          </div>
+          <div className="relative overflow-hidden bg-gradient-to-br from-primary via-primary-dark to-accent text-primary-foreground rounded-3xl p-7 shadow-xl">
+            <span className="inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider bg-white/20 px-2 py-1 rounded-full"><Crown className="size-3" /> Premium (segera)</span>
+            <h3 className="text-2xl font-bold mt-3" style={{ fontFamily: "var(--font-display)" }}>Rp 29rb <span className="text-sm font-normal opacity-80">/ bulan</span></h3>
+            <ul className="text-sm space-y-2 mt-4 opacity-95">
+              {["Konsultasi nutritionist real","Resep premium tanpa batas","Export laporan PDF","Sinkron Apple/Google Fit"].map((x) => <li key={x} className="flex items-center gap-2"><Check className="size-4" />{x}</li>)}
+            </ul>
+            <button className="mt-5 w-full text-center bg-white text-primary font-semibold py-3 rounded-xl">Notify saya</button>
+          </div>
+        </div>
+      </section>
+
+      {/* Newsletter */}
+      <section className="max-w-3xl mx-auto px-5 md:px-8 py-16">
+        <div className="glass rounded-3xl p-7 border border-white/15 text-center">
+          <h3 className="text-2xl font-bold" style={{ fontFamily: "var(--font-display)" }}>Dapat <span className="text-primary">ebook Meal Plan 7 hari</span> gratis</h3>
+          <p className="text-sm text-muted-foreground mt-2">Masukkan email — kirim PDF langsung ke inbox.</p>
+          {subscribed ? (
+            <p className="mt-4 text-primary font-semibold inline-flex items-center gap-2"><Check className="size-4" /> Cek inbox kamu ya!</p>
+          ) : (
+            <form onSubmit={(e) => { e.preventDefault(); if (email) setSubscribed(true); }} className="mt-4 flex flex-col sm:flex-row gap-2 max-w-md mx-auto">
+              <input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="nama@email.com" className="flex-1 bg-card border border-white/15 rounded-xl px-4 py-3 text-sm" />
+              <button className="bg-primary text-primary-foreground font-semibold px-5 py-3 rounded-xl inline-flex items-center justify-center gap-2"><Send className="size-4" /> Kirim</button>
+            </form>
+          )}
+        </div>
+      </section>
+
+      {/* Featured in */}
+      <section className="max-w-5xl mx-auto px-5 md:px-8 py-10">
+        <p className="text-center text-xs uppercase tracking-wider text-muted-foreground font-semibold mb-4 inline-flex items-center gap-2 justify-center w-full"><Users className="size-3.5" /> Featured in</p>
+        <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-3 opacity-70">
+          {["Kompas","Detik","Tempo","Tirto","CNN Indonesia","IDN Times"].map((m) => (
+            <span key={m} className="font-bold tracking-tight text-muted-foreground" style={{ fontFamily: "var(--font-display)" }}>{m}</span>
+          ))}
+        </div>
+      </section>
+
       {/* Final CTA */}
       <section className="max-w-3xl mx-auto px-5 md:px-8 py-16 md:py-24 text-center">
         <div className="relative overflow-hidden bg-gradient-to-br from-primary via-primary-dark to-accent text-primary-foreground rounded-3xl p-10 md:p-14 space-y-5 shadow-2xl shadow-primary/30">
@@ -404,7 +703,7 @@ function Index() {
             Gratis selamanya. Tanpa kartu kredit. Hasil terlihat dalam 7 hari pertama.
           </p>
           <div className="relative flex flex-col sm:flex-row gap-3 justify-center pt-2">
-            <Link to={ctaPrimary} className="group inline-flex items-center justify-center gap-2 bg-white text-primary font-semibold py-4 px-6 rounded-2xl shadow-xl hover:-translate-y-0.5 transition-transform">
+            <Link to={ctaPrimary} onClick={fireConfetti} className="group inline-flex items-center justify-center gap-2 bg-white text-primary font-semibold py-4 px-6 rounded-2xl shadow-xl hover:-translate-y-0.5 transition-transform">
               {ctaPrimaryLabel}
               <ArrowRight className="size-4 group-hover:translate-x-1 transition-transform" />
             </Link>
@@ -426,6 +725,18 @@ function Index() {
           </div>
         </div>
       </footer>
+
+      {/* Sticky CTA bar */}
+      <div className={`fixed left-1/2 -translate-x-1/2 bottom-4 z-40 transition-all ${showStickyCta ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6 pointer-events-none"}`}>
+        <div className="glass border border-white/20 shadow-2xl rounded-full pl-4 pr-1 py-1 flex items-center gap-3">
+          <span className="text-xs font-semibold hidden sm:inline">Siap memulai? Gratis selamanya.</span>
+          <Link to={ctaPrimary} onClick={fireConfetti} className="bg-gradient-to-r from-primary to-primary-dark text-primary-foreground text-xs font-bold px-4 py-2 rounded-full inline-flex items-center gap-1.5">
+            {hasSession ? "Dashboard" : "Mulai"} <ArrowRight className="size-3.5" />
+          </Link>
+        </div>
+      </div>
+
+      <FloatingChat />
     </main>
   );
 }
