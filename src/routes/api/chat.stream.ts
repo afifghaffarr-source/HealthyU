@@ -8,6 +8,7 @@ import { enforceAiBudget, logAiUsage } from "@/lib/aiBudget.server";
 import { checkRateLimit, RATE_LIMITS } from "@/lib/rateLimit.server";
 import { chatMessageSchema } from "@/lib/validation";
 import { checkChatSafety } from "@/lib/chatSafety";
+import { moderateImage } from "@/lib/imageModeration.server";
 
 export const Route = createFileRoute("/api/chat/stream")({
   server: {
@@ -50,6 +51,22 @@ export const Route = createFileRoute("/api/chat/stream")({
           body = chatMessageSchema.parse(raw);
         } catch {
           return new Response("Invalid request payload", { status: 400 });
+        }
+
+        // Image moderation: block unsafe uploads before persisting/sending to AI.
+        if (body.imageBase64) {
+          const mod = await moderateImage(body.imageBase64, body.imageMime ?? "image/jpeg");
+          if (mod.blocked) {
+            await supabase.rpc("log_audit_event", {
+              _action: "chat.image.blocked",
+              _entity: "chat",
+              _meta: { label: mod.label, confidence: mod.confidence } as never,
+            });
+            return new Response(
+              JSON.stringify({ error: "image_blocked", label: mod.label, reason: mod.reason ?? "Unsafe content" }),
+              { status: 400, headers: { "Content-Type": "application/json" } },
+            );
+          }
         }
 
         await persistUserMessage(supabase, userId, body.message, body.imageBase64);
