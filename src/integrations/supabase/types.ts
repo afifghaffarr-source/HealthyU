@@ -4387,6 +4387,102 @@ export type Database = {
         }
         Relationships: []
       }
+      seo_diet_guides: {
+        Row: {
+          cons: string[] | null
+          created_at: string
+          description: string | null
+          id: string
+          name: string
+          pros: string[] | null
+          published: boolean
+          sample_day: string | null
+          short_description: string | null
+          slug: string
+          tags: string[] | null
+          updated_at: string
+          who_for: string | null
+        }
+        Insert: {
+          cons?: string[] | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          name: string
+          pros?: string[] | null
+          published?: boolean
+          sample_day?: string | null
+          short_description?: string | null
+          slug: string
+          tags?: string[] | null
+          updated_at?: string
+          who_for?: string | null
+        }
+        Update: {
+          cons?: string[] | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          name?: string
+          pros?: string[] | null
+          published?: boolean
+          sample_day?: string | null
+          short_description?: string | null
+          slug?: string
+          tags?: string[] | null
+          updated_at?: string
+          who_for?: string | null
+        }
+        Relationships: []
+      }
+      seo_exercises: {
+        Row: {
+          category: string | null
+          created_at: string
+          description: string | null
+          difficulty: string | null
+          equipment: string | null
+          id: string
+          met: number
+          muscle_groups: string[] | null
+          name: string
+          published: boolean
+          slug: string
+          tags: string[] | null
+          updated_at: string
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string
+          description?: string | null
+          difficulty?: string | null
+          equipment?: string | null
+          id?: string
+          met: number
+          muscle_groups?: string[] | null
+          name: string
+          published?: boolean
+          slug: string
+          tags?: string[] | null
+          updated_at?: string
+        }
+        Update: {
+          category?: string | null
+          created_at?: string
+          description?: string | null
+          difficulty?: string | null
+          equipment?: string | null
+          id?: string
+          met?: number
+          muscle_groups?: string[] | null
+          name?: string
+          published?: boolean
+          slug?: string
+          tags?: string[] | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       seo_foods: {
         Row: {
           calories: number

@@ -10,12 +10,21 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
+import { Route as OlahragaRouteImport } from './routes/olahraga'
+import { Route as KaloriRouteImport } from './routes/kalori'
 import { Route as KalkulatorRouteImport } from './routes/kalkulator'
+import { Route as DietRouteImport } from './routes/diet'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as OlahragaIndexRouteImport } from './routes/olahraga.index'
+import { Route as KaloriIndexRouteImport } from './routes/kalori.index'
 import { Route as KalkulatorIndexRouteImport } from './routes/kalkulator.index'
+import { Route as DietIndexRouteImport } from './routes/diet.index'
+import { Route as OlahragaSlugRouteImport } from './routes/olahraga.$slug'
+import { Route as KaloriSlugRouteImport } from './routes/kalori.$slug'
 import { Route as KalkulatorSlugRouteImport } from './routes/kalkulator.$slug'
+import { Route as DietSlugRouteImport } from './routes/diet.$slug'
 import { Route as AuthenticatedWorkoutRouteImport } from './routes/_authenticated/workout'
 import { Route as AuthenticatedWeightRouteImport } from './routes/_authenticated/weight'
 import { Route as AuthenticatedWearableRouteImport } from './routes/_authenticated/wearable'
@@ -158,9 +167,24 @@ const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   path: '/sitemap.xml',
   getParentRoute: () => rootRouteImport,
 } as any)
+const OlahragaRoute = OlahragaRouteImport.update({
+  id: '/olahraga',
+  path: '/olahraga',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const KaloriRoute = KaloriRouteImport.update({
+  id: '/kalori',
+  path: '/kalori',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const KalkulatorRoute = KalkulatorRouteImport.update({
   id: '/kalkulator',
   path: '/kalkulator',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DietRoute = DietRouteImport.update({
+  id: '/diet',
+  path: '/diet',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthRoute = AuthRouteImport.update({
@@ -177,15 +201,45 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const OlahragaIndexRoute = OlahragaIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => OlahragaRoute,
+} as any)
+const KaloriIndexRoute = KaloriIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => KaloriRoute,
+} as any)
 const KalkulatorIndexRoute = KalkulatorIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => KalkulatorRoute,
 } as any)
+const DietIndexRoute = DietIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => DietRoute,
+} as any)
+const OlahragaSlugRoute = OlahragaSlugRouteImport.update({
+  id: '/$slug',
+  path: '/$slug',
+  getParentRoute: () => OlahragaRoute,
+} as any)
+const KaloriSlugRoute = KaloriSlugRouteImport.update({
+  id: '/$slug',
+  path: '/$slug',
+  getParentRoute: () => KaloriRoute,
+} as any)
 const KalkulatorSlugRoute = KalkulatorSlugRouteImport.update({
   id: '/$slug',
   path: '/$slug',
   getParentRoute: () => KalkulatorRoute,
+} as any)
+const DietSlugRoute = DietSlugRouteImport.update({
+  id: '/$slug',
+  path: '/$slug',
+  getParentRoute: () => DietRoute,
 } as any)
 const AuthenticatedWorkoutRoute = AuthenticatedWorkoutRouteImport.update({
   id: '/workout',
@@ -945,7 +999,10 @@ const AuthenticatedGroupsIdLeaderboardRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/diet': typeof DietRouteWithChildren
   '/kalkulator': typeof KalkulatorRouteWithChildren
+  '/kalori': typeof KaloriRouteWithChildren
+  '/olahraga': typeof OlahragaRouteWithChildren
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/achievements': typeof AuthenticatedAchievementsRoute
   '/alarms': typeof AuthenticatedAlarmsRoute
@@ -1001,8 +1058,14 @@ export interface FileRoutesByFullPath {
   '/wearable': typeof AuthenticatedWearableRoute
   '/weight': typeof AuthenticatedWeightRouteWithChildren
   '/workout': typeof AuthenticatedWorkoutRouteWithChildren
+  '/diet/$slug': typeof DietSlugRoute
   '/kalkulator/$slug': typeof KalkulatorSlugRoute
+  '/kalori/$slug': typeof KaloriSlugRoute
+  '/olahraga/$slug': typeof OlahragaSlugRoute
+  '/diet/': typeof DietIndexRoute
   '/kalkulator/': typeof KalkulatorIndexRoute
+  '/kalori/': typeof KaloriIndexRoute
+  '/olahraga/': typeof OlahragaIndexRoute
   '/articles/$id': typeof AuthenticatedArticlesIdRoute
   '/bonus/auto-claim': typeof AuthenticatedBonusAutoClaimRoute
   '/calendar/google': typeof AuthenticatedCalendarGoogleRoute
@@ -1144,8 +1207,14 @@ export interface FileRoutesByTo {
   '/wearable': typeof AuthenticatedWearableRoute
   '/weight': typeof AuthenticatedWeightRouteWithChildren
   '/workout': typeof AuthenticatedWorkoutRouteWithChildren
+  '/diet/$slug': typeof DietSlugRoute
   '/kalkulator/$slug': typeof KalkulatorSlugRoute
+  '/kalori/$slug': typeof KaloriSlugRoute
+  '/olahraga/$slug': typeof OlahragaSlugRoute
+  '/diet': typeof DietIndexRoute
   '/kalkulator': typeof KalkulatorIndexRoute
+  '/kalori': typeof KaloriIndexRoute
+  '/olahraga': typeof OlahragaIndexRoute
   '/articles/$id': typeof AuthenticatedArticlesIdRoute
   '/bonus/auto-claim': typeof AuthenticatedBonusAutoClaimRoute
   '/calendar/google': typeof AuthenticatedCalendarGoogleRoute
@@ -1234,7 +1303,10 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
+  '/diet': typeof DietRouteWithChildren
   '/kalkulator': typeof KalkulatorRouteWithChildren
+  '/kalori': typeof KaloriRouteWithChildren
+  '/olahraga': typeof OlahragaRouteWithChildren
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/_authenticated/achievements': typeof AuthenticatedAchievementsRoute
   '/_authenticated/alarms': typeof AuthenticatedAlarmsRoute
@@ -1290,8 +1362,14 @@ export interface FileRoutesById {
   '/_authenticated/wearable': typeof AuthenticatedWearableRoute
   '/_authenticated/weight': typeof AuthenticatedWeightRouteWithChildren
   '/_authenticated/workout': typeof AuthenticatedWorkoutRouteWithChildren
+  '/diet/$slug': typeof DietSlugRoute
   '/kalkulator/$slug': typeof KalkulatorSlugRoute
+  '/kalori/$slug': typeof KaloriSlugRoute
+  '/olahraga/$slug': typeof OlahragaSlugRoute
+  '/diet/': typeof DietIndexRoute
   '/kalkulator/': typeof KalkulatorIndexRoute
+  '/kalori/': typeof KaloriIndexRoute
+  '/olahraga/': typeof OlahragaIndexRoute
   '/_authenticated/articles/$id': typeof AuthenticatedArticlesIdRoute
   '/_authenticated/bonus/auto-claim': typeof AuthenticatedBonusAutoClaimRoute
   '/_authenticated/calendar/google': typeof AuthenticatedCalendarGoogleRoute
@@ -1380,7 +1458,10 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/auth'
+    | '/diet'
     | '/kalkulator'
+    | '/kalori'
+    | '/olahraga'
     | '/sitemap.xml'
     | '/achievements'
     | '/alarms'
@@ -1436,8 +1517,14 @@ export interface FileRouteTypes {
     | '/wearable'
     | '/weight'
     | '/workout'
+    | '/diet/$slug'
     | '/kalkulator/$slug'
+    | '/kalori/$slug'
+    | '/olahraga/$slug'
+    | '/diet/'
     | '/kalkulator/'
+    | '/kalori/'
+    | '/olahraga/'
     | '/articles/$id'
     | '/bonus/auto-claim'
     | '/calendar/google'
@@ -1579,8 +1666,14 @@ export interface FileRouteTypes {
     | '/wearable'
     | '/weight'
     | '/workout'
+    | '/diet/$slug'
     | '/kalkulator/$slug'
+    | '/kalori/$slug'
+    | '/olahraga/$slug'
+    | '/diet'
     | '/kalkulator'
+    | '/kalori'
+    | '/olahraga'
     | '/articles/$id'
     | '/bonus/auto-claim'
     | '/calendar/google'
@@ -1668,7 +1761,10 @@ export interface FileRouteTypes {
     | '/'
     | '/_authenticated'
     | '/auth'
+    | '/diet'
     | '/kalkulator'
+    | '/kalori'
+    | '/olahraga'
     | '/sitemap.xml'
     | '/_authenticated/achievements'
     | '/_authenticated/alarms'
@@ -1724,8 +1820,14 @@ export interface FileRouteTypes {
     | '/_authenticated/wearable'
     | '/_authenticated/weight'
     | '/_authenticated/workout'
+    | '/diet/$slug'
     | '/kalkulator/$slug'
+    | '/kalori/$slug'
+    | '/olahraga/$slug'
+    | '/diet/'
     | '/kalkulator/'
+    | '/kalori/'
+    | '/olahraga/'
     | '/_authenticated/articles/$id'
     | '/_authenticated/bonus/auto-claim'
     | '/_authenticated/calendar/google'
@@ -1814,7 +1916,10 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
+  DietRoute: typeof DietRouteWithChildren
   KalkulatorRoute: typeof KalkulatorRouteWithChildren
+  KaloriRoute: typeof KaloriRouteWithChildren
+  OlahragaRoute: typeof OlahragaRouteWithChildren
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   ApiChatStreamRoute: typeof ApiChatStreamRoute
   ApiPublicHooksDailyCoachRoute: typeof ApiPublicHooksDailyCoachRoute
@@ -1834,11 +1939,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SitemapDotxmlRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/olahraga': {
+      id: '/olahraga'
+      path: '/olahraga'
+      fullPath: '/olahraga'
+      preLoaderRoute: typeof OlahragaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/kalori': {
+      id: '/kalori'
+      path: '/kalori'
+      fullPath: '/kalori'
+      preLoaderRoute: typeof KaloriRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/kalkulator': {
       id: '/kalkulator'
       path: '/kalkulator'
       fullPath: '/kalkulator'
       preLoaderRoute: typeof KalkulatorRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/diet': {
+      id: '/diet'
+      path: '/diet'
+      fullPath: '/diet'
+      preLoaderRoute: typeof DietRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth': {
@@ -1862,6 +1988,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/olahraga/': {
+      id: '/olahraga/'
+      path: '/'
+      fullPath: '/olahraga/'
+      preLoaderRoute: typeof OlahragaIndexRouteImport
+      parentRoute: typeof OlahragaRoute
+    }
+    '/kalori/': {
+      id: '/kalori/'
+      path: '/'
+      fullPath: '/kalori/'
+      preLoaderRoute: typeof KaloriIndexRouteImport
+      parentRoute: typeof KaloriRoute
+    }
     '/kalkulator/': {
       id: '/kalkulator/'
       path: '/'
@@ -1869,12 +2009,40 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof KalkulatorIndexRouteImport
       parentRoute: typeof KalkulatorRoute
     }
+    '/diet/': {
+      id: '/diet/'
+      path: '/'
+      fullPath: '/diet/'
+      preLoaderRoute: typeof DietIndexRouteImport
+      parentRoute: typeof DietRoute
+    }
+    '/olahraga/$slug': {
+      id: '/olahraga/$slug'
+      path: '/$slug'
+      fullPath: '/olahraga/$slug'
+      preLoaderRoute: typeof OlahragaSlugRouteImport
+      parentRoute: typeof OlahragaRoute
+    }
+    '/kalori/$slug': {
+      id: '/kalori/$slug'
+      path: '/$slug'
+      fullPath: '/kalori/$slug'
+      preLoaderRoute: typeof KaloriSlugRouteImport
+      parentRoute: typeof KaloriRoute
+    }
     '/kalkulator/$slug': {
       id: '/kalkulator/$slug'
       path: '/$slug'
       fullPath: '/kalkulator/$slug'
       preLoaderRoute: typeof KalkulatorSlugRouteImport
       parentRoute: typeof KalkulatorRoute
+    }
+    '/diet/$slug': {
+      id: '/diet/$slug'
+      path: '/$slug'
+      fullPath: '/diet/$slug'
+      preLoaderRoute: typeof DietSlugRouteImport
+      parentRoute: typeof DietRoute
     }
     '/_authenticated/workout': {
       id: '/_authenticated/workout'
@@ -3316,6 +3484,18 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
 const AuthenticatedRouteRouteWithChildren =
   AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
 
+interface DietRouteChildren {
+  DietSlugRoute: typeof DietSlugRoute
+  DietIndexRoute: typeof DietIndexRoute
+}
+
+const DietRouteChildren: DietRouteChildren = {
+  DietSlugRoute: DietSlugRoute,
+  DietIndexRoute: DietIndexRoute,
+}
+
+const DietRouteWithChildren = DietRoute._addFileChildren(DietRouteChildren)
+
 interface KalkulatorRouteChildren {
   KalkulatorSlugRoute: typeof KalkulatorSlugRoute
   KalkulatorIndexRoute: typeof KalkulatorIndexRoute
@@ -3330,11 +3510,41 @@ const KalkulatorRouteWithChildren = KalkulatorRoute._addFileChildren(
   KalkulatorRouteChildren,
 )
 
+interface KaloriRouteChildren {
+  KaloriSlugRoute: typeof KaloriSlugRoute
+  KaloriIndexRoute: typeof KaloriIndexRoute
+}
+
+const KaloriRouteChildren: KaloriRouteChildren = {
+  KaloriSlugRoute: KaloriSlugRoute,
+  KaloriIndexRoute: KaloriIndexRoute,
+}
+
+const KaloriRouteWithChildren =
+  KaloriRoute._addFileChildren(KaloriRouteChildren)
+
+interface OlahragaRouteChildren {
+  OlahragaSlugRoute: typeof OlahragaSlugRoute
+  OlahragaIndexRoute: typeof OlahragaIndexRoute
+}
+
+const OlahragaRouteChildren: OlahragaRouteChildren = {
+  OlahragaSlugRoute: OlahragaSlugRoute,
+  OlahragaIndexRoute: OlahragaIndexRoute,
+}
+
+const OlahragaRouteWithChildren = OlahragaRoute._addFileChildren(
+  OlahragaRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
+  DietRoute: DietRouteWithChildren,
   KalkulatorRoute: KalkulatorRouteWithChildren,
+  KaloriRoute: KaloriRouteWithChildren,
+  OlahragaRoute: OlahragaRouteWithChildren,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   ApiChatStreamRoute: ApiChatStreamRoute,
   ApiPublicHooksDailyCoachRoute: ApiPublicHooksDailyCoachRoute,
