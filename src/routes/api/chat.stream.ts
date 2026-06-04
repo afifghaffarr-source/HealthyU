@@ -5,6 +5,8 @@ import { buildChatPayload, persistUserMessage } from "@/lib/chat.functions";
 import { classifyMessage, buildCompactProfile } from "@/lib/aiRouter.server";
 import { cacheKey, getCached, setCached } from "@/lib/aiCache.server";
 import { enforceAiBudget, logAiUsage } from "@/lib/aiBudget.server";
+import { checkRateLimit, RATE_LIMITS } from "@/lib/rateLimit.server";
+import { chatMessageSchema } from "@/lib/validation";
 
 export const Route = createFileRoute("/api/chat/stream")({
   server: {
@@ -30,14 +32,23 @@ export const Route = createFileRoute("/api/chat/stream")({
         }
         const userId = claims.claims.sub;
 
+        // Rate limit per user
+        const allowed = await checkRateLimit(
+          supabase,
+          RATE_LIMITS.chat.bucket,
+          RATE_LIMITS.chat.max,
+          RATE_LIMITS.chat.windowSec,
+        );
+        if (!allowed) {
+          return new Response("Rate limit exceeded. Coba lagi sebentar.", { status: 429 });
+        }
+
         let body: { message: string; imageBase64?: string; imageMime?: string };
         try {
-          body = await request.json();
+          const raw = await request.json();
+          body = chatMessageSchema.parse(raw);
         } catch {
-          return new Response("Bad request", { status: 400 });
-        }
-        if (!body.message || body.message.length > 2000) {
-          return new Response("Invalid message", { status: 400 });
+          return new Response("Invalid request payload", { status: 400 });
         }
 
         await persistUserMessage(supabase, userId, body.message, body.imageBase64);
