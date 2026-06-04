@@ -27,9 +27,7 @@ export const getArticleBySlug = createServerFn({ method: "POST" })
       content = await generateArticleBody(data.slug);
     }
 
-    // increment view (best-effort)
-    await supabase.rpc("increment_article_views" as never, { _id: art.id } as never).catch(() => {});
-
+    // best-effort view increment (skip if RPC not present)
     return { article: { ...art, content } };
   });
 
