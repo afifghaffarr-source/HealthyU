@@ -6,9 +6,7 @@ import {
   Utensils,
   Timer,
   Moon,
-  Activity,
   ChefHat,
-  Bell,
   MessageCircle,
   Star,
   Check,
@@ -19,7 +17,6 @@ import {
   Zap,
   Heart,
   Camera,
-  BarChart3,
 } from "lucide-react";
 
 export const Route = createFileRoute("/")({
