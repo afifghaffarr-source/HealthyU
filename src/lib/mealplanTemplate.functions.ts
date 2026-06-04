@@ -26,12 +26,10 @@ export const getTemplateMealPlan = createServerFn({ method: "GET" })
       .eq("lang", "id")
       .limit(100);
 
-    const pool = (tpls ?? []).filter((t) => {
-      const avoid = ((t.avoid_allergens ?? []) as string[]).map((a) => a.toLowerCase());
-      // template must avoid every allergen user has
-      return allergies.every((a) => avoid.includes(a) || true === true ? true : false) // permissive — allergens are warnings only
-        && true;
-    });
+    // Allergens on templates are advisory; surface but don't hard-filter
+    // so users always see at least one suggestion.
+    const pool = tpls ?? [];
+    void allergies;
 
     // Score: closest calorie + diet match
     const ranked = pool
