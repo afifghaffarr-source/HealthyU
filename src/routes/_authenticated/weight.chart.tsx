@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { LineChart, Line, XAxis, YAxis, ResponsiveContainer, Tooltip, ReferenceLine } from "recharts";
+import { AreaChart, Area, XAxis, YAxis, ResponsiveContainer, Tooltip, ReferenceLine } from "recharts";
 import { supabase } from "@/integrations/supabase/client";
 import { useServerFn } from "@tanstack/react-start";
 import { getWeightGoal } from "@/lib/scanBatch9.functions";
@@ -26,13 +26,19 @@ function Page() {
       <main className="max-w-md mx-auto px-4 pt-4 space-y-3">
         <div className="rounded-xl border bg-card p-3 h-64">
           <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={logs ?? []}>
+            <AreaChart data={logs ?? []}>
+              <defs>
+                <linearGradient id="wg" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="hsl(var(--primary))" stopOpacity={0.4} />
+                  <stop offset="100%" stopColor="hsl(var(--primary))" stopOpacity={0} />
+                </linearGradient>
+              </defs>
               <XAxis dataKey="date" fontSize={10} />
               <YAxis fontSize={10} domain={["auto", "auto"]} />
               <Tooltip />
-              <Line type="monotone" dataKey="kg" stroke="hsl(var(--primary))" strokeWidth={2} dot={false} />
+              <Area type="monotone" dataKey="kg" stroke="hsl(var(--primary))" strokeWidth={2} fill="url(#wg)" />
               {target && <ReferenceLine y={target} stroke="hsl(var(--destructive))" strokeDasharray="3 3" label="Target" />}
-            </LineChart>
+            </AreaChart>
           </ResponsiveContainer>
         </div>
         {goal?.prediction && (

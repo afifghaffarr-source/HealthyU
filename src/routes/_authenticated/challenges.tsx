@@ -186,6 +186,27 @@ function ChallengesPage() {
 
       <main className="max-w-md mx-auto px-4 pt-4 space-y-3">
         {isLoading && <ListSkeleton count={3} />}
+        {!isLoading && (() => {
+          const allParts = data?.participations ?? [];
+          const active = allParts.filter((p) => (p as { status?: string }).status !== "completed");
+          if (active.length === 0) return null;
+          const top = active.slice().sort((a, b) => (b.streak ?? 0) - (a.streak ?? 0))[0];
+          const ch = challenges.find((c) => c.id === top?.challenge_id);
+          if (!ch) return null;
+          return (
+            <button
+              onClick={() => articleRefs.current[ch.id]?.scrollIntoView({ behavior: "smooth", block: "center" })}
+              className="sticky top-2 z-20 w-full bg-gradient-to-r from-primary to-accent text-primary-foreground rounded-2xl px-4 py-3 shadow-lg shadow-primary/20 flex items-center gap-3 animate-fade-up"
+            >
+              <Trophy className="size-5 shrink-0" />
+              <div className="flex-1 text-left">
+                <p className="text-[10px] font-bold uppercase tracking-wider opacity-80">Lanjutkan tantangan</p>
+                <p className="text-sm font-semibold truncate">{ch.title} · streak {top.streak ?? 0}</p>
+              </div>
+              <span className="text-xs font-bold bg-white/20 px-2 py-1 rounded-full">Hari {(top.current_day ?? 0) + 1}</span>
+            </button>
+          );
+        })()}
         {!isLoading && challenges.length === 0 && (
           <EmptyState icon={Trophy} title="Belum ada challenge" description="Challenge baru akan dirilis berkala." />
         )}
