@@ -5,6 +5,7 @@ import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { BottomNav } from "@/components/bottom-nav";
 import { getGroupScanLeaderboard } from "@/lib/scanSocial.functions";
 import { Flame, Trophy } from "lucide-react";
+import { LineChart, Line, XAxis, Tooltip, ResponsiveContainer } from "recharts";
 
 export const Route = createFileRoute("/_authenticated/groups/$id/leaderboard")({
   component: Page,
@@ -21,6 +22,20 @@ function Page() {
     <div className="min-h-dvh pb-24 bg-background">
       <TopAppBar title="Scan Leaderboard" showBack />
       <main className="max-w-md mx-auto px-4 pt-4 space-y-2">
+        {data?.rows && data.rows.length > 0 && (
+          <div className="rounded-2xl bg-card border p-3">
+            <p className="text-xs font-semibold text-muted-foreground mb-2">Scan 7 hari · top {Math.min(5, data.rows.length)}</p>
+            <div className="h-32">
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={data.rows.slice(0, 5).map((r) => ({ name: r.name.slice(0, 8), scans: r.scans }))}>
+                  <XAxis dataKey="name" tick={{ fontSize: 10 }} />
+                  <Tooltip />
+                  <Line type="monotone" dataKey="scans" stroke="hsl(var(--primary))" strokeWidth={2} dot={{ r: 3 }} />
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+        )}
         {data?.rows.map((r, i) => (
           <div key={r.userId} className="flex items-center gap-3 rounded-2xl bg-card border p-3">
             <div className="size-9 rounded-full bg-primary/10 grid place-items-center text-sm font-bold">
