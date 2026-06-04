@@ -16,6 +16,21 @@ export async function runWeeklyReportForUser(userId: string, days = 7): Promise<
   if (!apiKey) throw new Error("LOVABLE_API_KEY missing");
   const since = new Date(Date.now() - days * 86400000).toISOString();
 
+  // Early skip: inactive users — no AI call needed, save cost.
+  const [actMeals, actWater, actWorkout] = await Promise.all([
+    supabaseAdmin.from("meal_logs").select("id", { count: "exact", head: true }).eq("user_id", userId).gte("logged_at", since),
+    supabaseAdmin.from("water_logs").select("id", { count: "exact", head: true }).eq("user_id", userId).gte("logged_at", since),
+    supabaseAdmin.from("workout_sessions").select("id", { count: "exact", head: true }).eq("user_id", userId).gte("performed_at", since),
+  ]);
+  const activity = (actMeals.count ?? 0) + (actWater.count ?? 0) + (actWorkout.count ?? 0);
+  if (activity < 3) {
+    return {
+      reportId: null,
+      highlight: "Belum cukup data minggu ini — coba catat makan/minum/olahraga.",
+      longestStreak: 0,
+    };
+  }
+
   const [profileRes, meals, water, workouts, sleep, fasting, statsRes] = await Promise.all([
     supabaseAdmin.from("profiles").select("full_name, daily_calorie_target, health_conditions, allergies").eq("id", userId).maybeSingle(),
     supabaseAdmin.from("meal_logs").select("calories, protein_g, carbs_g, fat_g").eq("user_id", userId).gte("logged_at", since),
