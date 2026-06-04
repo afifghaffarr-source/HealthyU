@@ -15,10 +15,16 @@ export const evolvePet = createServerFn({ method: "POST" })
   .handler(async ({ context }) => {
     const { supabase, userId } = context;
     const { data: prof } = await supabase
-      .from("profiles").select("scan_streak_current").eq("id", userId).maybeSingle();
+      .from("profiles")
+      .select("scan_streak_current")
+      .eq("id", userId)
+      .maybeSingle();
     const stage = computeStage(prof?.scan_streak_current ?? 0);
     const { data: pet } = await supabase
-      .from("virtual_pets").select("id, pet_stage").eq("user_id", userId).maybeSingle();
+      .from("virtual_pets")
+      .select("id, pet_stage")
+      .eq("user_id", userId)
+      .maybeSingle();
     if (pet && pet.pet_stage !== stage) {
       await supabase.from("virtual_pets").update({ pet_stage: stage }).eq("id", pet.id);
     }
@@ -29,12 +35,13 @@ export const evolvePet = createServerFn({ method: "POST" })
 export const commentOnStory = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: { storyId: string; body: string }) =>
-    z.object({ storyId: z.string().uuid(), body: z.string().min(1).max(500) }).parse(d)
+    z.object({ storyId: z.string().uuid(), body: z.string().min(1).max(500) }).parse(d),
   )
   .handler(async ({ context, data }) => {
     const { supabase, userId } = context;
     const { error } = await supabase
-      .from("story_comments").insert({ story_id: data.storyId, user_id: userId, body: data.body });
+      .from("story_comments")
+      .insert({ story_id: data.storyId, user_id: userId, body: data.body });
     if (error) throw error;
     return { ok: true };
   });
@@ -58,9 +65,17 @@ export const toggleStoryLike = createServerFn({ method: "POST" })
   .handler(async ({ context, data }) => {
     const { supabase, userId } = context;
     const { data: existing } = await supabase
-      .from("story_likes").select("user_id").eq("story_id", data.storyId).eq("user_id", userId).maybeSingle();
+      .from("story_likes")
+      .select("user_id")
+      .eq("story_id", data.storyId)
+      .eq("user_id", userId)
+      .maybeSingle();
     if (existing) {
-      await supabase.from("story_likes").delete().eq("story_id", data.storyId).eq("user_id", userId);
+      await supabase
+        .from("story_likes")
+        .delete()
+        .eq("story_id", data.storyId)
+        .eq("user_id", userId);
       return { liked: false };
     }
     await supabase.from("story_likes").insert({ story_id: data.storyId, user_id: userId });
@@ -87,11 +102,19 @@ export const getPublicProfile = createServerFn({ method: "POST" })
       .order("unlocked_at", { ascending: false })
       .limit(12);
     const { count: followers } = await supabase
-      .from("user_follows").select("*", { count: "exact", head: true }).eq("following_id", data.userId);
+      .from("user_follows")
+      .select("*", { count: "exact", head: true })
+      .eq("following_id", data.userId);
     const { count: following } = await supabase
-      .from("user_follows").select("*", { count: "exact", head: true }).eq("follower_id", data.userId);
+      .from("user_follows")
+      .select("*", { count: "exact", head: true })
+      .eq("follower_id", data.userId);
     const { data: isFollowing } = await supabase
-      .from("user_follows").select("id").eq("follower_id", userId).eq("following_id", data.userId).maybeSingle();
+      .from("user_follows")
+      .select("id")
+      .eq("follower_id", userId)
+      .eq("following_id", data.userId)
+      .maybeSingle();
     return {
       profile: prof,
       achievements: achievements ?? [],
@@ -108,9 +131,15 @@ export const moodMealCorrelation = createServerFn({ method: "POST" })
     const { supabase, userId } = context;
     const since = new Date(Date.now() - 30 * 86400000).toISOString().slice(0, 10);
     const { data: moods } = await supabase
-      .from("mood_logs").select("log_date, mood").eq("user_id", userId).gte("log_date", since);
+      .from("mood_logs")
+      .select("log_date, mood")
+      .eq("user_id", userId)
+      .gte("log_date", since);
     const { data: meals } = await supabase
-      .from("meal_logs").select("log_date, calories, sugar_g").eq("user_id", userId).gte("log_date", since);
+      .from("meal_logs")
+      .select("log_date, calories, sugar_g")
+      .eq("user_id", userId)
+      .gte("log_date", since);
     const byDate = new Map<string, { kcal: number; sugar: number }>();
     for (const m of meals ?? []) {
       if (!m.log_date) continue;
@@ -137,9 +166,15 @@ export const hydrationMealPairing = createServerFn({ method: "POST" })
     const { supabase, userId } = context;
     const today = new Date().toISOString().slice(0, 10);
     const { data: water } = await supabase
-      .from("water_logs").select("amount_ml").eq("user_id", userId).gte("log_date", today);
+      .from("water_logs")
+      .select("amount_ml")
+      .eq("user_id", userId)
+      .gte("log_date", today);
     const { data: meals } = await supabase
-      .from("meal_logs").select("calories").eq("user_id", userId).gte("log_date", today);
+      .from("meal_logs")
+      .select("calories")
+      .eq("user_id", userId)
+      .gte("log_date", today);
     const totalMl = (water ?? []).reduce((s, w) => s + Number(w.amount_ml ?? 0), 0);
     const totalKcal = (meals ?? []).reduce((s, m) => s + Number(m.calories ?? 0), 0);
     // recommendation: ~30ml per kcal/100
@@ -156,11 +191,15 @@ export const checkStreakAtRisk = createServerFn({ method: "POST" })
     const { data: prof } = await supabase
       .from("profiles")
       .select("last_scan_date, scan_streak_current, health_coins, streak_freeze_used_at")
-      .eq("id", userId).maybeSingle();
+      .eq("id", userId)
+      .maybeSingle();
     if (!prof) return { atRisk: false };
     const last = prof.last_scan_date;
     const yesterday = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
-    const atRisk = last === yesterday && (prof.scan_streak_current ?? 0) >= 3 && prof.streak_freeze_used_at !== today;
+    const atRisk =
+      last === yesterday &&
+      (prof.scan_streak_current ?? 0) >= 3 &&
+      prof.streak_freeze_used_at !== today;
     return {
       atRisk,
       streak: prof.scan_streak_current ?? 0,
@@ -172,7 +211,7 @@ export const checkStreakAtRisk = createServerFn({ method: "POST" })
 export const estimateGroceryCost = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: { items: string[] }) =>
-    z.object({ items: z.array(z.string().min(1).max(100)).min(1).max(50) }).parse(d)
+    z.object({ items: z.array(z.string().min(1).max(100)).min(1).max(50) }).parse(d),
   )
   .handler(async ({ data }) => {
     const apiKey = process.env.LOVABLE_API_KEY;
@@ -196,13 +235,21 @@ export const estimateGroceryCost = createServerFn({ method: "POST" })
     const text = json.choices?.[0]?.message?.content ?? "[]";
     const m = text.match(/\[[\s\S]*\]/);
     let estimates: Array<{ item: string; estimatedIdr: number; note?: string }> = [];
-    try { estimates = m ? JSON.parse(m[0]) : []; } catch {}
+    try {
+      estimates = m ? JSON.parse(m[0]) : [];
+    } catch {}
     const totalIdr = estimates.reduce((s, e) => s + Number(e.estimatedIdr || 0), 0);
     return { estimates, totalIdr };
   });
 
 // ============ Currency convert (multi-currency) ============
-const RATES: Record<string, number> = { IDR: 1, USD: 1 / 15800, MYR: 1 / 3500, SGD: 1 / 11800, EUR: 1 / 17000 };
+const RATES: Record<string, number> = {
+  IDR: 1,
+  USD: 1 / 15800,
+  MYR: 1 / 3500,
+  SGD: 1 / 11800,
+  EUR: 1 / 17000,
+};
 export function convertIdr(amountIdr: number, code: string): number {
   const r = RATES[code] ?? 1;
   return Math.round(amountIdr * r * 100) / 100;
@@ -212,12 +259,15 @@ export function convertIdr(amountIdr: number, code: string): number {
 export const createFamilyPlan = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: { name?: string }) =>
-    z.object({ name: z.string().min(1).max(80).optional() }).parse(d)
+    z.object({ name: z.string().min(1).max(80).optional() }).parse(d),
   )
   .handler(async ({ context, data }) => {
     const { supabase, userId } = context;
     const { data: plan, error } = await supabase
-      .from("family_plans").insert({ owner_id: userId, name: data.name ?? "Keluarga" }).select().single();
+      .from("family_plans")
+      .insert({ owner_id: userId, name: data.name ?? "Keluarga" })
+      .select()
+      .single();
     if (error) throw error;
     await supabase.from("family_plan_members").insert({ plan_id: plan.id, user_id: userId });
     return { plan };
@@ -228,7 +278,8 @@ export const listMyFamily = createServerFn({ method: "POST" })
   .handler(async ({ context }) => {
     const { supabase, userId } = context;
     const { data: memberships } = await supabase
-      .from("family_plan_members").select("plan_id, family_plans(id, name, owner_id)")
+      .from("family_plan_members")
+      .select("plan_id, family_plans(id, name, owner_id)")
       .eq("user_id", userId);
     return { plans: memberships ?? [] };
   });

@@ -82,8 +82,20 @@ function ProfilePage() {
 
         {bmi && (
           <section className="grid grid-cols-3 gap-3 animate-fade-up">
-            <HealthCard label="BMI" value={bmi.toString()} trend={cat?.label} tone="green" icon={Scale} />
-            <HealthCard label="BMR" value={bmr ?? "-"} unit="kcal" tone="orange" icon={HeartPulse} />
+            <HealthCard
+              label="BMI"
+              value={bmi.toString()}
+              trend={cat?.label}
+              tone="green"
+              icon={Scale}
+            />
+            <HealthCard
+              label="BMR"
+              value={bmr ?? "-"}
+              unit="kcal"
+              tone="orange"
+              icon={HeartPulse}
+            />
             <HealthCard label="TDEE" value={tdee ?? "-"} unit="kcal" tone="blue" icon={Activity} />
           </section>
         )}
@@ -92,9 +104,15 @@ function ProfilePage() {
           <HealthScoreCard
             className="animate-fade-up"
             factors={[
-              { label: "BMI", value: bmi >= 18.5 && bmi <= 24.9 ? 100 : Math.max(0, 100 - Math.abs(bmi - 22) * 8) },
+              {
+                label: "BMI",
+                value: bmi >= 18.5 && bmi <= 24.9 ? 100 : Math.max(0, 100 - Math.abs(bmi - 22) * 8),
+              },
               { label: "Aktivitas", value: activityScore(p?.activity_level) },
-              { label: "Target berat", value: weightTargetScore(Number(p?.weight_kg), Number(p?.target_weight_kg)) },
+              {
+                label: "Target berat",
+                value: weightTargetScore(Number(p?.weight_kg), Number(p?.target_weight_kg)),
+              },
               { label: "Kalori harian", value: p?.daily_calorie_target ? 80 : 40 },
             ]}
           />
@@ -130,28 +148,52 @@ function ProfilePage() {
         </Link>
 
         <div className="grid grid-cols-2 gap-2">
-          <Link to="/profile/scan-stats" className="text-center text-xs bg-card outline-1 outline-black/10 py-3 rounded-2xl">
+          <Link
+            to="/profile/scan-stats"
+            className="text-center text-xs bg-card outline-1 outline-black/10 py-3 rounded-2xl"
+          >
             📊 Statistik Scan AI
           </Link>
-          <Link to="/profile/privacy" className="text-center text-xs bg-card outline-1 outline-black/10 py-3 rounded-2xl">
+          <Link
+            to="/profile/privacy"
+            className="text-center text-xs bg-card outline-1 outline-black/10 py-3 rounded-2xl"
+          >
             🔒 Privasi
           </Link>
-          <Link to="/insights" className="text-center text-xs bg-card outline-1 outline-black/10 py-3 rounded-2xl">
+          <Link
+            to="/insights"
+            className="text-center text-xs bg-card outline-1 outline-black/10 py-3 rounded-2xl"
+          >
             ✨ Insight AI
           </Link>
-          <Link to="/recipes/recommendations" className="text-center text-xs bg-card outline-1 outline-black/10 py-3 rounded-2xl">
+          <Link
+            to="/recipes/recommendations"
+            className="text-center text-xs bg-card outline-1 outline-black/10 py-3 rounded-2xl"
+          >
             🍽️ Rekomendasi Resep
           </Link>
-          <Link to="/reports/nutrition" className="text-center text-xs bg-card outline-1 outline-black/10 py-3 rounded-2xl">
+          <Link
+            to="/reports/nutrition"
+            className="text-center text-xs bg-card outline-1 outline-black/10 py-3 rounded-2xl"
+          >
             📈 Tren Nutrisi
           </Link>
-          <Link to="/scan/barcode" className="text-center text-xs bg-card outline-1 outline-black/10 py-3 rounded-2xl">
+          <Link
+            to="/scan/barcode"
+            className="text-center text-xs bg-card outline-1 outline-black/10 py-3 rounded-2xl"
+          >
             🏷️ Scan Barcode
           </Link>
-          <Link to="/scan/menu" className="text-center text-xs bg-card outline-1 outline-black/10 py-3 rounded-2xl">
+          <Link
+            to="/scan/menu"
+            className="text-center text-xs bg-card outline-1 outline-black/10 py-3 rounded-2xl"
+          >
             📋 Scan Menu
           </Link>
-          <Link to="/scan/recipe" className="text-center text-xs bg-card outline-1 outline-black/10 py-3 rounded-2xl">
+          <Link
+            to="/scan/recipe"
+            className="text-center text-xs bg-card outline-1 outline-black/10 py-3 rounded-2xl"
+          >
             📖 Scan Resep
           </Link>
         </div>
@@ -370,12 +412,18 @@ function Row({ label, value }: { label: string; value: string }) {
 
 function activityScore(level: string | null | undefined): number {
   switch (level) {
-    case "very_active": return 100;
-    case "active": return 85;
-    case "moderate": return 70;
-    case "light": return 55;
-    case "sedentary": return 35;
-    default: return 50;
+    case "very_active":
+      return 100;
+    case "active":
+      return 85;
+    case "moderate":
+      return 70;
+    case "light":
+      return 55;
+    case "sedentary":
+      return 35;
+    default:
+      return 50;
   }
 }
 

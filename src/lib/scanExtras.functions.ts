@@ -36,7 +36,11 @@ export const parseRecipeImage = createServerFn({ method: "POST" })
       data.image_data_url,
     );
     try {
-      return JSON.parse(raw) as { title?: string; ingredients?: { name: string; qty?: string; unit?: string }[]; steps?: string[] };
+      return JSON.parse(raw) as {
+        title?: string;
+        ingredients?: { name: string; qty?: string; unit?: string }[];
+        steps?: string[];
+      };
     } catch {
       return { title: "", ingredients: [], steps: [] };
     }
@@ -51,7 +55,9 @@ export const parseMenuImage = createServerFn({ method: "POST" })
       data.image_data_url,
     );
     try {
-      return JSON.parse(raw) as { items?: { name: string; price?: number; description?: string; est_calories?: number }[] };
+      return JSON.parse(raw) as {
+        items?: { name: string; price?: number; description?: string; est_calories?: number }[];
+      };
     } catch {
       return { items: [] };
     }
@@ -124,15 +130,17 @@ export const setAuditOptIn = createServerFn({ method: "POST" })
 export const relogMeal = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) =>
-    z.object({
-      name: z.string().min(1).max(200),
-      calories: z.number().min(0).max(5000),
-      protein_g: z.number().min(0).max(500).optional(),
-      carbs_g: z.number().min(0).max(1000).optional(),
-      fat_g: z.number().min(0).max(500).optional(),
-      meal_type: z.enum(["breakfast", "lunch", "dinner", "snack"]),
-      portion_g: z.number().min(0).max(5000).optional(),
-    }).parse(input),
+    z
+      .object({
+        name: z.string().min(1).max(200),
+        calories: z.number().min(0).max(5000),
+        protein_g: z.number().min(0).max(500).optional(),
+        carbs_g: z.number().min(0).max(1000).optional(),
+        fat_g: z.number().min(0).max(500).optional(),
+        meal_type: z.enum(["breakfast", "lunch", "dinner", "snack"]),
+        portion_g: z.number().min(0).max(5000).optional(),
+      })
+      .parse(input),
   )
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
@@ -156,7 +164,15 @@ export const relogMeal = createServerFn({ method: "POST" })
 export const lookupBarcode = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) =>
-    z.object({ barcode: z.string().min(6).max(20).regex(/^[0-9]+$/) }).parse(input),
+    z
+      .object({
+        barcode: z
+          .string()
+          .min(6)
+          .max(20)
+          .regex(/^[0-9]+$/),
+      })
+      .parse(input),
   )
   .handler(async ({ data }) => {
     const res = await fetch(`https://world.openfoodfacts.org/api/v2/product/${data.barcode}.json`);
@@ -166,7 +182,12 @@ export const lookupBarcode = createServerFn({ method: "POST" })
       product?: {
         product_name?: string;
         brands?: string;
-        nutriments?: { "energy-kcal_100g"?: number; proteins_100g?: number; carbohydrates_100g?: number; fat_100g?: number };
+        nutriments?: {
+          "energy-kcal_100g"?: number;
+          proteins_100g?: number;
+          carbohydrates_100g?: number;
+          fat_100g?: number;
+        };
         image_front_small_url?: string;
       };
     };

@@ -53,7 +53,11 @@ export const importHealthData = createServerFn({ method: "POST" })
         if (existing) {
           await supabase
             .from("daily_steps")
-            .update({ steps: Math.max(Number(existing.steps), r.steps), source: data.source, updated_at: new Date().toISOString() })
+            .update({
+              steps: Math.max(Number(existing.steps), r.steps),
+              source: data.source,
+              updated_at: new Date().toISOString(),
+            })
             .eq("id", existing.id);
         } else {
           await supabase.from("daily_steps").insert(r);

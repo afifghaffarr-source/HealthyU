@@ -21,11 +21,24 @@ const PET_EMOJI: Record<string, string> = {
   fox: "🦊",
 };
 
-function Stat({ icon, label, value, color }: { icon: React.ReactNode; label: string; value: number; color: string }) {
+function Stat({
+  icon,
+  label,
+  value,
+  color,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  value: number;
+  color: string;
+}) {
   return (
     <div className="space-y-1">
       <div className="flex items-center justify-between text-xs">
-        <span className="inline-flex items-center gap-1 text-muted-foreground">{icon}{label}</span>
+        <span className="inline-flex items-center gap-1 text-muted-foreground">
+          {icon}
+          {label}
+        </span>
         <span className="font-semibold">{value}</span>
       </div>
       <div className="h-2 rounded-full bg-muted overflow-hidden">
@@ -49,7 +62,10 @@ function PetPage() {
 
   const adoptM = useMutation({
     mutationFn: () => adoptFn({ data: { pet_name: name.trim(), pet_type: type } }),
-    onSuccess: () => { toast.success("Pet diadopsi!"); invalidate(); },
+    onSuccess: () => {
+      toast.success("Pet diadopsi!");
+      invalidate();
+    },
     onError: (e: Error) => toast.error(e.message),
   });
 
@@ -71,7 +87,9 @@ function PetPage() {
         {!isLoading && !pet && (
           <div className="rounded-3xl bg-card outline-1 outline-black/5 p-5 space-y-4">
             <h2 className="font-semibold">Adopsi pet kamu</h2>
-            <p className="text-xs text-muted-foreground">Pet akan tumbuh seiring kebiasaan sehatmu.</p>
+            <p className="text-xs text-muted-foreground">
+              Pet akan tumbuh seiring kebiasaan sehatmu.
+            </p>
             <input
               value={name}
               onChange={(e) => setName(e.target.value)}
@@ -129,15 +147,53 @@ function PetPage() {
               })()}
             </div>
             <div className="rounded-3xl bg-card outline-1 outline-black/5 p-5 space-y-3">
-              <Stat icon={<Heart className="size-3 text-rose-500" />} label="Health" value={pet.health_stat} color="bg-rose-500" />
-              <Stat icon={<Smile className="size-3 text-amber-500" />} label="Happiness" value={pet.happiness_stat} color="bg-amber-500" />
-              <Stat icon={<Zap className="size-3 text-sky-500" />} label="Energy" value={pet.energy_stat} color="bg-sky-500" />
-              <Stat icon={<Drumstick className="size-3 text-orange-600" />} label="Hunger" value={pet.hunger_stat} color="bg-orange-600" />
+              <Stat
+                icon={<Heart className="size-3 text-rose-500" />}
+                label="Health"
+                value={pet.health_stat}
+                color="bg-rose-500"
+              />
+              <Stat
+                icon={<Smile className="size-3 text-amber-500" />}
+                label="Happiness"
+                value={pet.happiness_stat}
+                color="bg-amber-500"
+              />
+              <Stat
+                icon={<Zap className="size-3 text-sky-500" />}
+                label="Energy"
+                value={pet.energy_stat}
+                color="bg-sky-500"
+              />
+              <Stat
+                icon={<Drumstick className="size-3 text-orange-600" />}
+                label="Hunger"
+                value={pet.hunger_stat}
+                color="bg-orange-600"
+              />
             </div>
             <div className="grid grid-cols-3 gap-2">
-              <button onClick={() => actM.mutate("feed")} disabled={actM.isPending} className="h-12 rounded-2xl bg-primary text-primary-foreground text-sm font-semibold disabled:opacity-50">Beri makan</button>
-              <button onClick={() => actM.mutate("play")} disabled={actM.isPending} className="h-12 rounded-2xl bg-amber-500 text-white text-sm font-semibold disabled:opacity-50">Main</button>
-              <button onClick={() => actM.mutate("rest")} disabled={actM.isPending} className="h-12 rounded-2xl bg-sky-500 text-white text-sm font-semibold disabled:opacity-50">Istirahat</button>
+              <button
+                onClick={() => actM.mutate("feed")}
+                disabled={actM.isPending}
+                className="h-12 rounded-2xl bg-primary text-primary-foreground text-sm font-semibold disabled:opacity-50"
+              >
+                Beri makan
+              </button>
+              <button
+                onClick={() => actM.mutate("play")}
+                disabled={actM.isPending}
+                className="h-12 rounded-2xl bg-amber-500 text-white text-sm font-semibold disabled:opacity-50"
+              >
+                Main
+              </button>
+              <button
+                onClick={() => actM.mutate("rest")}
+                disabled={actM.isPending}
+                className="h-12 rounded-2xl bg-sky-500 text-white text-sm font-semibold disabled:opacity-50"
+              >
+                Istirahat
+              </button>
             </div>
           </>
         )}

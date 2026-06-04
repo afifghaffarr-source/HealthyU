@@ -11,14 +11,8 @@ export const myUnlinkedJoinedChallenges = createServerFn({ method: "GET" })
   .handler(async ({ context }) => {
     const { supabase, userId } = context;
     const [{ data: parts }, { data: memberships }] = await Promise.all([
-      supabase
-        .from("challenge_participants")
-        .select("challenge_id, status")
-        .eq("user_id", userId),
-      supabase
-        .from("friend_group_members")
-        .select("group_id")
-        .eq("user_id", userId),
+      supabase.from("challenge_participants").select("challenge_id, status").eq("user_id", userId),
+      supabase.from("friend_group_members").select("group_id").eq("user_id", userId),
     ]);
     const joinedIds = Array.from(
       new Set(
@@ -50,13 +44,14 @@ export const myUnlinkedJoinedChallenges = createServerFn({ method: "GET" })
       .from("friend_group_members")
       .select("user_id")
       .in("group_id", myGroupIds);
-    const uniqueMemberIds = Array.from(
-      new Set((groupMembers ?? []).map((m) => m.user_id)),
-    );
+    const uniqueMemberIds = Array.from(new Set((groupMembers ?? []).map((m) => m.user_id)));
     const { data: joined } = await supabase
       .from("challenge_participants")
       .select("user_id, challenge_id")
-      .in("user_id", uniqueMemberIds.length ? uniqueMemberIds : ["00000000-0000-0000-0000-000000000000"])
+      .in(
+        "user_id",
+        uniqueMemberIds.length ? uniqueMemberIds : ["00000000-0000-0000-0000-000000000000"],
+      )
       .in("challenge_id", unlinked);
     const joinedByChallenge = new Map<string, Set<string>>();
     for (const j of joined ?? []) {
@@ -67,9 +62,7 @@ export const myUnlinkedJoinedChallenges = createServerFn({ method: "GET" })
     const allPendingIds = Array.from(
       new Set(
         ch.flatMap((c) =>
-          uniqueMemberIds.filter(
-            (uid) => uid !== userId && !(joinedByChallenge.get(c.id)?.has(uid)),
-          ),
+          uniqueMemberIds.filter((uid) => uid !== userId && !joinedByChallenge.get(c.id)?.has(uid)),
         ),
       ),
     );
@@ -79,7 +72,7 @@ export const myUnlinkedJoinedChallenges = createServerFn({ method: "GET" })
     const profMap = new Map((profs ?? []).map((p) => [p.id, p]));
     return ch.map((c) => {
       const pendingIds = uniqueMemberIds.filter(
-        (uid) => uid !== userId && !(joinedByChallenge.get(c.id)?.has(uid)),
+        (uid) => uid !== userId && !joinedByChallenge.get(c.id)?.has(uid),
       );
       const preview_members = pendingIds.slice(0, 3).map((uid) => {
         const p = profMap.get(uid);

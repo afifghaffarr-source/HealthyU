@@ -12,11 +12,31 @@ export const weeklyReport = createServerFn({ method: "GET" })
     const since = new Date(Date.now() - data.days * 86400000).toISOString();
 
     const [meals, water, workouts, sleep, fasting] = await Promise.all([
-      supabase.from("meal_logs").select("logged_at, calories, protein_g, carbs_g, fat_g, meal_type").eq("user_id", userId).gte("logged_at", since),
-      supabase.from("water_logs").select("logged_at, amount_ml").eq("user_id", userId).gte("logged_at", since),
-      supabase.from("workout_sessions").select("performed_at, name, duration_min, calories_burned, type").eq("user_id", userId).gte("performed_at", since),
-      supabase.from("sleep_logs").select("sleep_start, sleep_end, quality").eq("user_id", userId).gte("sleep_end", since),
-      supabase.from("fasting_sessions").select("start_time, end_time, target_hours, completed, protocol").eq("user_id", userId).gte("start_time", since),
+      supabase
+        .from("meal_logs")
+        .select("logged_at, calories, protein_g, carbs_g, fat_g, meal_type")
+        .eq("user_id", userId)
+        .gte("logged_at", since),
+      supabase
+        .from("water_logs")
+        .select("logged_at, amount_ml")
+        .eq("user_id", userId)
+        .gte("logged_at", since),
+      supabase
+        .from("workout_sessions")
+        .select("performed_at, name, duration_min, calories_burned, type")
+        .eq("user_id", userId)
+        .gte("performed_at", since),
+      supabase
+        .from("sleep_logs")
+        .select("sleep_start, sleep_end, quality")
+        .eq("user_id", userId)
+        .gte("sleep_end", since),
+      supabase
+        .from("fasting_sessions")
+        .select("start_time, end_time, target_hours, completed, protocol")
+        .eq("user_id", userId)
+        .gte("start_time", since),
     ]);
 
     return {
@@ -40,12 +60,38 @@ export const weeklyAiAnalysis = createServerFn({ method: "POST" })
     const since = new Date(Date.now() - data.days * 86400000).toISOString();
 
     const [profileRes, meals, water, workouts, sleep, fasting] = await Promise.all([
-      supabase.from("profiles").select("full_name, birth_date, gender, height_cm, weight_kg, activity_level, daily_calorie_target, health_conditions, allergies").eq("id", userId).maybeSingle(),
-      supabase.from("meal_logs").select("logged_at, calories, protein_g, carbs_g, fat_g, meal_type").eq("user_id", userId).gte("logged_at", since),
-      supabase.from("water_logs").select("logged_at, amount_ml").eq("user_id", userId).gte("logged_at", since),
-      supabase.from("workout_sessions").select("performed_at, duration_min, calories_burned, type").eq("user_id", userId).gte("performed_at", since),
-      supabase.from("sleep_logs").select("sleep_start, sleep_end, quality").eq("user_id", userId).gte("sleep_end", since),
-      supabase.from("fasting_sessions").select("start_time, end_time, target_hours, completed, protocol").eq("user_id", userId).gte("start_time", since),
+      supabase
+        .from("profiles")
+        .select(
+          "full_name, birth_date, gender, height_cm, weight_kg, activity_level, daily_calorie_target, health_conditions, allergies",
+        )
+        .eq("id", userId)
+        .maybeSingle(),
+      supabase
+        .from("meal_logs")
+        .select("logged_at, calories, protein_g, carbs_g, fat_g, meal_type")
+        .eq("user_id", userId)
+        .gte("logged_at", since),
+      supabase
+        .from("water_logs")
+        .select("logged_at, amount_ml")
+        .eq("user_id", userId)
+        .gte("logged_at", since),
+      supabase
+        .from("workout_sessions")
+        .select("performed_at, duration_min, calories_burned, type")
+        .eq("user_id", userId)
+        .gte("performed_at", since),
+      supabase
+        .from("sleep_logs")
+        .select("sleep_start, sleep_end, quality")
+        .eq("user_id", userId)
+        .gte("sleep_end", since),
+      supabase
+        .from("fasting_sessions")
+        .select("start_time, end_time, target_hours, completed, protocol")
+        .eq("user_id", userId)
+        .gte("start_time", since),
     ]);
 
     // Group challenge progress & leaderboard rank in each shared group
@@ -58,7 +104,10 @@ export const weeklyAiAnalysis = createServerFn({ method: "POST" })
     const totalFat = (meals.data ?? []).reduce((s, m) => s + Number(m.fat_g || 0), 0);
     const totalWater = (water.data ?? []).reduce((s, w) => s + (w.amount_ml || 0), 0);
     const totalBurn = (workouts.data ?? []).reduce((s, w) => s + (w.calories_burned || 0), 0);
-    const sleepHours = (sleep.data ?? []).reduce((s, x) => s + (new Date(x.sleep_end).getTime() - new Date(x.sleep_start).getTime()) / 3600000, 0);
+    const sleepHours = (sleep.data ?? []).reduce(
+      (s, x) => s + (new Date(x.sleep_end).getTime() - new Date(x.sleep_start).getTime()) / 3600000,
+      0,
+    );
     const fastingDone = (fasting.data ?? []).filter((f) => f.completed).length;
     const d = data.days;
 
@@ -90,7 +139,10 @@ export const weeklyAiAnalysis = createServerFn({ method: "POST" })
             role: "system",
             content: `Kamu adalah Dr. HealthyU, AI health coach. Buat laporan analisis mingguan dalam Bahasa Indonesia berdasarkan data user. Format markdown ringkas dengan section:\n## 📊 Ringkasan\n## ✅ Yang Berjalan Baik\n## ⚠️ Area Perlu Perbaikan\n## 🔗 Korelasi & Insight\n(hubungkan tidur dengan kalori/olahraga, puasa dengan pola makan, hidrasi dengan aktivitas)\n## 👥 Progress Challenge Grup\n(jika field group_challenges tidak kosong: sebutkan rank user di tiap grup, streak, dan beri dorongan; lewati section ini jika kosong)\n## 🎯 Rekomendasi Minggu Depan\n(3-5 action items konkret)\n\nJangan diagnosis medis. Selalu beri disclaimer jika ada metrik di luar normal.`,
           },
-          { role: "user", content: `Data ${d} hari terakhir:\n${JSON.stringify(summary, null, 2)}` },
+          {
+            role: "user",
+            content: `Data ${d} hari terakhir:\n${JSON.stringify(summary, null, 2)}`,
+          },
         ],
       }),
     });
@@ -125,7 +177,9 @@ export const listAiReports = createServerFn({ method: "GET" })
     const { supabase, userId } = context;
     const { data, error } = await supabase
       .from("ai_reports")
-      .select("id, report_type, report_period_start, report_period_end, summary, recommendations, created_at, is_read")
+      .select(
+        "id, report_type, report_period_start, report_period_end, summary, recommendations, created_at, is_read",
+      )
       .eq("user_id", userId)
       .order("created_at", { ascending: false })
       .limit(10);

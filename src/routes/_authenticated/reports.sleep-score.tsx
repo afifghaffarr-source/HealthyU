@@ -9,9 +9,14 @@ export const Route = createFileRoute("/_authenticated/reports/sleep-score")({ co
 
 function Page() {
   const fn = useServerFn(getSleepScore);
-  const { data } = useQuery({ queryKey: ["sleep-score"], queryFn: () => fn({ data: undefined as any }) });
+  const { data } = useQuery({
+    queryKey: ["sleep-score"],
+    queryFn: () => fn({ data: undefined as any }),
+  });
   const rows = data?.rows ?? [];
-  const avg = rows.length ? Math.round(rows.reduce((s: number, r: any) => s + r.score, 0) / rows.length) : 0;
+  const avg = rows.length
+    ? Math.round(rows.reduce((s: number, r: any) => s + r.score, 0) / rows.length)
+    : 0;
   return (
     <div className="min-h-dvh pb-24 bg-background">
       <TopAppBar title="Skor Tidur" showBack />
@@ -22,7 +27,10 @@ function Page() {
         </div>
         <div className="space-y-2">
           {rows.map((r: any) => (
-            <div key={r.date} className="flex items-center justify-between p-3 rounded-xl bg-card border">
+            <div
+              key={r.date}
+              className="flex items-center justify-between p-3 rounded-xl bg-card border"
+            >
               <span className="text-sm">{r.date}</span>
               <div className="flex items-center gap-2">
                 <div className="w-24 h-2 bg-muted rounded-full overflow-hidden">

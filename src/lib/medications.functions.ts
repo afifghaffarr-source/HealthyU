@@ -6,7 +6,10 @@ const MedSchema = z.object({
   name: z.string().min(1).max(80),
   dose: z.string().max(40).nullable().optional(),
   frequency: z.enum(["daily", "weekly", "as_needed"]).default("daily"),
-  times: z.array(z.string().regex(/^\d{2}:\d{2}$/)).max(8).default([]),
+  times: z
+    .array(z.string().regex(/^\d{2}:\d{2}$/))
+    .max(8)
+    .default([]),
   notes: z.string().max(300).nullable().optional(),
 });
 
@@ -36,9 +39,7 @@ export const addMedication = createServerFn({ method: "POST" })
   .inputValidator((i: unknown) => MedSchema.parse(i))
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
-    const { error } = await supabase
-      .from("medications")
-      .insert({ ...data, user_id: userId });
+    const { error } = await supabase.from("medications").insert({ ...data, user_id: userId });
     if (error) throw new Error(error.message);
     return { ok: true };
   });

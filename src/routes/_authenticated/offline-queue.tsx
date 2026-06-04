@@ -108,7 +108,7 @@ function OfflineQueuePage() {
           </div>
           {dead.length === 0 ? (
             <p className="text-sm text-muted-foreground bg-card p-4 rounded-2xl outline-1 outline-black/5">
-              Tidak ada item gagal. 
+              Tidak ada item gagal.
             </p>
           ) : (
             dead.map((it) => (

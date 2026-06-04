@@ -58,11 +58,7 @@ export async function challengeTotp(factorId: string) {
   return data.id;
 }
 
-export async function verifyTotpChallenge(
-  factorId: string,
-  challengeId: string,
-  code: string,
-) {
+export async function verifyTotpChallenge(factorId: string, challengeId: string, code: string) {
   const { data, error } = await supabase.auth.mfa.verify({
     factorId,
     challengeId,

@@ -31,7 +31,10 @@ function Page() {
               <div className="font-medium text-sm">{s.type}</div>
               <div className="text-xs text-muted-foreground">untuk bakar kalori hari ini</div>
             </div>
-            <div className="text-lg font-bold">{s.minutes}<span className="text-xs"> mnt</span></div>
+            <div className="text-lg font-bold">
+              {s.minutes}
+              <span className="text-xs"> mnt</span>
+            </div>
           </div>
         ))}
       </main>

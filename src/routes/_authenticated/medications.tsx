@@ -68,9 +68,9 @@ function MedsPage() {
     logs.some((l) => l.medication_id === medId && l.scheduled_time === time);
 
   // Today schedule
-  const totalSlots = meds.reduce((a, m) => a + ((m.times ?? []).length), 0);
+  const totalSlots = meds.reduce((a, m) => a + (m.times ?? []).length, 0);
   const doneSlots = meds.reduce(
-    (a, m) => a + ((m.times ?? []).filter((t: string) => isTaken(m.id, t)).length),
+    (a, m) => a + (m.times ?? []).filter((t: string) => isTaken(m.id, t)).length,
     0,
   );
   const pct = totalSlots ? Math.round((doneSlots / totalSlots) * 100) : 0;
@@ -110,7 +110,9 @@ function MedsPage() {
               <div className="inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider bg-white/20 px-2 py-1 rounded-full">
                 <Pill className="size-3" /> Hari ini
               </div>
-              <span className="text-xs font-bold tabular-nums">{doneSlots}/{totalSlots} dosis</span>
+              <span className="text-xs font-bold tabular-nums">
+                {doneSlots}/{totalSlots} dosis
+              </span>
             </div>
             <div className="mt-3 flex items-end gap-2">
               <span className="text-5xl font-black leading-none tabular-nums">{pct}</span>
@@ -121,7 +123,8 @@ function MedsPage() {
             </div>
             {next && (
               <p className="mt-3 text-xs opacity-90 inline-flex items-center gap-1">
-                <Clock className="size-3" /> Berikutnya: <b className="font-semibold">{next.med.name}</b> · {next.time}
+                <Clock className="size-3" /> Berikutnya:{" "}
+                <b className="font-semibold">{next.med.name}</b> · {next.time}
               </p>
             )}
           </section>
@@ -140,7 +143,10 @@ function MedsPage() {
           </div>
         ) : (
           meds.map((m) => (
-            <section key={m.id} className="bg-card p-4 rounded-3xl outline-1 outline-black/5 animate-fade-up">
+            <section
+              key={m.id}
+              className="bg-card p-4 rounded-3xl outline-1 outline-black/5 animate-fade-up"
+            >
               <div className="flex items-start gap-3 mb-3">
                 <div className="size-11 rounded-2xl bg-pink-100 grid place-items-center">
                   <Pill className="size-5 text-pink-600" />
@@ -149,7 +155,10 @@ function MedsPage() {
                   <p className="font-bold">{m.name}</p>
                   {m.dose && <p className="text-xs text-muted-foreground">{m.dose}</p>}
                 </div>
-                <button onClick={() => delMut.mutate(m.id)} className="text-muted-foreground hover:text-destructive p-1">
+                <button
+                  onClick={() => delMut.mutate(m.id)}
+                  className="text-muted-foreground hover:text-destructive p-1"
+                >
                   <Trash2 className="size-4" />
                 </button>
               </div>
@@ -159,10 +168,14 @@ function MedsPage() {
                   return (
                     <button
                       key={t}
-                      onClick={() => !taken && markMut.mutate({ medication_id: m.id, scheduled_time: t })}
+                      onClick={() =>
+                        !taken && markMut.mutate({ medication_id: m.id, scheduled_time: t })
+                      }
                       disabled={taken}
                       className={`px-3 py-2 rounded-2xl text-xs font-semibold inline-flex items-center gap-1.5 ${
-                        taken ? "bg-mint text-sage-deep" : "bg-background outline-1 outline-black/10"
+                        taken
+                          ? "bg-mint text-sage-deep"
+                          : "bg-background outline-1 outline-black/10"
                       }`}
                     >
                       {taken && <Check className="size-3.5" />} {t}
@@ -189,7 +202,9 @@ function MedsPage() {
           >
             <div className="flex justify-between items-center">
               <h3 className="font-bold">Tambah obat / vitamin</h3>
-              <button onClick={() => setAdding(false)}><X className="size-5" /></button>
+              <button onClick={() => setAdding(false)}>
+                <X className="size-5" />
+              </button>
             </div>
             <input
               value={name}
@@ -207,7 +222,10 @@ function MedsPage() {
               <p className="text-[10px] font-bold uppercase text-muted-foreground mb-2">Jadwal</p>
               <div className="flex flex-wrap gap-2">
                 {times.map((t, i) => (
-                  <div key={i} className="inline-flex items-center gap-1 bg-card outline-1 outline-black/10 rounded-2xl px-2 py-1">
+                  <div
+                    key={i}
+                    className="inline-flex items-center gap-1 bg-card outline-1 outline-black/10 rounded-2xl px-2 py-1"
+                  >
                     <input
                       type="time"
                       value={t}

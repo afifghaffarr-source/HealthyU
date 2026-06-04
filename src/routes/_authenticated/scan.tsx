@@ -65,7 +65,8 @@ function ScanPage() {
   const [mealType, setMealType] = useState<(typeof MEAL_TYPES)[number]["v"]>(pickDefaultMealType());
 
   const scanMut = useMutation({
-    mutationFn: async (dataUrl: string) => scan({ data: { image_data_url: dataUrl, use_pro: usePro } }),
+    mutationFn: async (dataUrl: string) =>
+      scan({ data: { image_data_url: dataUrl, use_pro: usePro } }),
     onSuccess: (res) => {
       setItems(res.items);
       setOriginals(res.items.map((i) => ({ ...i })));
@@ -182,7 +183,9 @@ function ScanPage() {
         <div className="flex items-center justify-between rounded-2xl bg-card border px-3 py-2">
           <div className="flex items-center gap-2 text-xs">
             <Sparkles className="size-3.5 text-primary" />
-            <span>Mode AI: <b>{usePro ? "Pro (akurat)" : "Flash (cepat)"}</b></span>
+            <span>
+              Mode AI: <b>{usePro ? "Pro (akurat)" : "Flash (cepat)"}</b>
+            </span>
           </div>
           <button
             type="button"
@@ -194,7 +197,8 @@ function ScanPage() {
         </div>
         {!imageUrl && (
           <div className="text-[11px] text-muted-foreground bg-muted/40 rounded-xl p-2">
-            💡 Tip: sertakan referensi (sendok, garpu, atau tangan) di foto agar estimasi porsi lebih akurat.
+            💡 Tip: sertakan referensi (sendok, garpu, atau tangan) di foto agar estimasi porsi
+            lebih akurat.
           </div>
         )}
         <input
@@ -301,8 +305,13 @@ function ScanPage() {
                           )}
                           {!editing && (
                             <p className="text-xs text-muted-foreground mt-0.5">
-                              {it.portion_g ? `~${it.portion_g}g` : it.portion_ml ? `~${it.portion_ml}ml` : ""}
-                              {" · "}P {Math.round(it.protein_g)}g · K {Math.round(it.carbs_g)}g · L {Math.round(it.fat_g)}g
+                              {it.portion_g
+                                ? `~${it.portion_g}g`
+                                : it.portion_ml
+                                  ? `~${it.portion_ml}ml`
+                                  : ""}
+                              {" · "}P {Math.round(it.protein_g)}g · K {Math.round(it.carbs_g)}g · L{" "}
+                              {Math.round(it.fat_g)}g
                             </p>
                           )}
                           {it.matched_food_id && !editing && (
@@ -310,7 +319,9 @@ function ScanPage() {
                           )}
                         </div>
                         <div className="text-right shrink-0">
-                          <p className="font-bold text-primary text-sm">{Math.round(it.calories)}</p>
+                          <p className="font-bold text-primary text-sm">
+                            {Math.round(it.calories)}
+                          </p>
                           <p className="text-[10px] text-muted-foreground">kkal</p>
                         </div>
                         <button
@@ -422,7 +433,9 @@ function EditField({
 }) {
   return (
     <label className="block">
-      <span className="block text-[10px] uppercase tracking-wider text-muted-foreground mb-0.5">{label}</span>
+      <span className="block text-[10px] uppercase tracking-wider text-muted-foreground mb-0.5">
+        {label}
+      </span>
       <input
         type="number"
         inputMode="numeric"

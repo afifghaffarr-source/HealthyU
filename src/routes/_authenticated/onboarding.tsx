@@ -79,7 +79,9 @@ function Onboarding() {
       birth_date: profile.birth_date ?? current.birth_date,
       height_cm: profile.height_cm ? Number(profile.height_cm) : current.height_cm,
       weight_kg: profile.weight_kg ? Number(profile.weight_kg) : current.weight_kg,
-      target_weight_kg: profile.target_weight_kg ? Number(profile.target_weight_kg) : current.target_weight_kg,
+      target_weight_kg: profile.target_weight_kg
+        ? Number(profile.target_weight_kg)
+        : current.target_weight_kg,
       activity_level: (profile.activity_level as ActivityLevel | null) ?? current.activity_level,
       dietary_preference: profile.dietary_preference ?? current.dietary_preference,
       city: profile.city ?? current.city,
@@ -109,9 +111,7 @@ function Onboarding() {
     });
     const tdee = calcTDEE(bmr, form.activity_level);
     const target =
-      goal === "lose" ? Math.max(1200, tdee - 400)
-      : goal === "gain" ? tdee + 300
-      : tdee;
+      goal === "lose" ? Math.max(1200, tdee - 400) : goal === "gain" ? tdee + 300 : tdee;
     mutation.mutate({ ...form, daily_calorie_target: target, onboarded: true });
   };
 
@@ -125,7 +125,10 @@ function Onboarding() {
     <main className="min-h-screen bg-background px-6 py-10 max-w-md mx-auto">
       <div className="flex gap-1.5 mb-8">
         {Array.from({ length: TOTAL_STEPS }, (_, idx) => idx + 1).map((i) => (
-          <div key={i} className={`h-1.5 flex-1 rounded-full ${i <= step ? "bg-primary" : "bg-mint"}`} />
+          <div
+            key={i}
+            className={`h-1.5 flex-1 rounded-full ${i <= step ? "bg-primary" : "bg-mint"}`}
+          />
         ))}
       </div>
 
@@ -145,11 +148,15 @@ function Onboarding() {
             <button
               onClick={() => setForm({ ...form, gender: "male" })}
               className={`py-4 rounded-2xl font-semibold transition ${form.gender === "male" ? "bg-primary text-primary-foreground" : "bg-card outline-1 outline-black/10"}`}
-            >Pria</button>
+            >
+              Pria
+            </button>
             <button
               onClick={() => setForm({ ...form, gender: "female" })}
               className={`py-4 rounded-2xl font-semibold transition ${form.gender === "female" ? "bg-primary text-primary-foreground" : "bg-card outline-1 outline-black/10"}`}
-            >Wanita</button>
+            >
+              Wanita
+            </button>
           </div>
           <label className="block">
             <span className="text-sm font-medium">Tanggal lahir</span>
@@ -160,7 +167,10 @@ function Onboarding() {
               className="mt-1.5 w-full bg-card outline-1 outline-black/10 rounded-2xl px-4 py-3.5"
             />
           </label>
-          <button onClick={() => setStep(2)} className="w-full bg-primary text-primary-foreground font-semibold py-4 rounded-2xl">
+          <button
+            onClick={() => setStep(2)}
+            className="w-full bg-primary text-primary-foreground font-semibold py-4 rounded-2xl"
+          >
             Lanjut
           </button>
         </section>
@@ -170,14 +180,44 @@ function Onboarding() {
         <section className="space-y-5 animate-fade-up">
           <div>
             <h1 className="text-2xl font-bold mb-1">Tubuhmu sekarang</h1>
-            <p className="text-muted-foreground text-sm">Untuk menghitung kebutuhan kalori harian.</p>
+            <p className="text-muted-foreground text-sm">
+              Untuk menghitung kebutuhan kalori harian.
+            </p>
           </div>
-          <NumberField label="Tinggi (cm)" value={form.height_cm} onChange={(v) => setForm({ ...form, height_cm: v })} min={120} max={220} />
-          <NumberField label="Berat saat ini (kg)" value={form.weight_kg} onChange={(v) => setForm({ ...form, weight_kg: v })} min={30} max={200} />
-          <NumberField label="Target berat (kg)" value={form.target_weight_kg} onChange={(v) => setForm({ ...form, target_weight_kg: v })} min={30} max={200} />
+          <NumberField
+            label="Tinggi (cm)"
+            value={form.height_cm}
+            onChange={(v) => setForm({ ...form, height_cm: v })}
+            min={120}
+            max={220}
+          />
+          <NumberField
+            label="Berat saat ini (kg)"
+            value={form.weight_kg}
+            onChange={(v) => setForm({ ...form, weight_kg: v })}
+            min={30}
+            max={200}
+          />
+          <NumberField
+            label="Target berat (kg)"
+            value={form.target_weight_kg}
+            onChange={(v) => setForm({ ...form, target_weight_kg: v })}
+            min={30}
+            max={200}
+          />
           <div className="grid grid-cols-2 gap-3 pt-4">
-            <button onClick={() => setStep(1)} className="bg-card outline-1 outline-black/10 font-semibold py-4 rounded-2xl">Kembali</button>
-            <button onClick={() => setStep(3)} className="bg-primary text-primary-foreground font-semibold py-4 rounded-2xl">Lanjut</button>
+            <button
+              onClick={() => setStep(1)}
+              className="bg-card outline-1 outline-black/10 font-semibold py-4 rounded-2xl"
+            >
+              Kembali
+            </button>
+            <button
+              onClick={() => setStep(3)}
+              className="bg-primary text-primary-foreground font-semibold py-4 rounded-2xl"
+            >
+              Lanjut
+            </button>
           </div>
         </section>
       )}
@@ -189,24 +229,40 @@ function Onboarding() {
             <p className="text-muted-foreground text-sm">Kami sesuaikan target kalori harian.</p>
           </div>
           <div className="space-y-2">
-            {([
-              ["lose", "Turun berat", "Defisit ~400 kkal"],
-              ["maintain", "Pertahankan", "Sesuai TDEE"],
-              ["gain", "Naik berat / massa", "Surplus ~300 kkal"],
-            ] as const).map(([k, title, sub]) => (
+            {(
+              [
+                ["lose", "Turun berat", "Defisit ~400 kkal"],
+                ["maintain", "Pertahankan", "Sesuai TDEE"],
+                ["gain", "Naik berat / massa", "Surplus ~300 kkal"],
+              ] as const
+            ).map(([k, title, sub]) => (
               <button
                 key={k}
                 onClick={() => setGoal(k)}
                 className={`w-full text-left p-4 rounded-2xl transition ${goal === k ? "bg-primary text-primary-foreground" : "bg-card outline-1 outline-black/10"}`}
               >
                 <div className="text-sm font-semibold">{title}</div>
-                <div className={`text-xs mt-0.5 ${goal === k ? "text-primary-foreground/80" : "text-muted-foreground"}`}>{sub}</div>
+                <div
+                  className={`text-xs mt-0.5 ${goal === k ? "text-primary-foreground/80" : "text-muted-foreground"}`}
+                >
+                  {sub}
+                </div>
               </button>
             ))}
           </div>
           <div className="grid grid-cols-2 gap-3 pt-4">
-            <button onClick={() => setStep(2)} className="bg-card outline-1 outline-black/10 font-semibold py-4 rounded-2xl">Kembali</button>
-            <button onClick={() => setStep(4)} className="bg-primary text-primary-foreground font-semibold py-4 rounded-2xl">Lanjut</button>
+            <button
+              onClick={() => setStep(2)}
+              className="bg-card outline-1 outline-black/10 font-semibold py-4 rounded-2xl"
+            >
+              Kembali
+            </button>
+            <button
+              onClick={() => setStep(4)}
+              className="bg-primary text-primary-foreground font-semibold py-4 rounded-2xl"
+            >
+              Lanjut
+            </button>
           </div>
         </section>
       )}
@@ -218,13 +274,15 @@ function Onboarding() {
             <p className="text-muted-foreground text-sm">Seberapa aktif kamu setiap hari?</p>
           </div>
           <div className="space-y-2">
-            {([
-              ["sedentary", "Tidak aktif (kerja meja, jarang olahraga)"],
-              ["light", "Ringan (olahraga 1-3x/minggu)"],
-              ["moderate", "Sedang (olahraga 3-5x/minggu)"],
-              ["active", "Aktif (olahraga 6-7x/minggu)"],
-              ["very_active", "Sangat aktif (atlet, kerja fisik)"],
-            ] as const).map(([k, label]) => (
+            {(
+              [
+                ["sedentary", "Tidak aktif (kerja meja, jarang olahraga)"],
+                ["light", "Ringan (olahraga 1-3x/minggu)"],
+                ["moderate", "Sedang (olahraga 3-5x/minggu)"],
+                ["active", "Aktif (olahraga 6-7x/minggu)"],
+                ["very_active", "Sangat aktif (atlet, kerja fisik)"],
+              ] as const
+            ).map(([k, label]) => (
               <button
                 key={k}
                 onClick={() => setForm({ ...form, activity_level: k })}
@@ -259,8 +317,18 @@ function Onboarding() {
             className="w-full bg-card outline-1 outline-black/10 rounded-2xl px-4 py-3.5"
           />
           <div className="grid grid-cols-2 gap-3 pt-4">
-            <button onClick={() => setStep(3)} className="bg-card outline-1 outline-black/10 font-semibold py-4 rounded-2xl">Kembali</button>
-            <button onClick={() => setStep(5)} className="bg-primary text-primary-foreground font-semibold py-4 rounded-2xl">Lanjut</button>
+            <button
+              onClick={() => setStep(3)}
+              className="bg-card outline-1 outline-black/10 font-semibold py-4 rounded-2xl"
+            >
+              Kembali
+            </button>
+            <button
+              onClick={() => setStep(5)}
+              className="bg-primary text-primary-foreground font-semibold py-4 rounded-2xl"
+            >
+              Lanjut
+            </button>
           </div>
         </section>
       )}
@@ -269,7 +337,9 @@ function Onboarding() {
         <section className="space-y-5 animate-fade-up">
           <div>
             <h1 className="text-2xl font-bold mb-1">Kondisi & alergi</h1>
-            <p className="text-muted-foreground text-sm">AI akan menyesuaikan rekomendasi makanan.</p>
+            <p className="text-muted-foreground text-sm">
+              AI akan menyesuaikan rekomendasi makanan.
+            </p>
           </div>
           <div>
             <p className="text-sm font-medium mb-2">Kondisi kesehatan</p>
@@ -281,7 +351,9 @@ function Onboarding() {
                     key={c}
                     onClick={() => toggleIn("health_conditions", c)}
                     className={`px-3 py-2 rounded-xl text-xs font-semibold transition inline-flex items-center gap-1 ${
-                      active ? "bg-primary text-primary-foreground" : "bg-card outline-1 outline-black/10"
+                      active
+                        ? "bg-primary text-primary-foreground"
+                        : "bg-card outline-1 outline-black/10"
                     }`}
                   >
                     {active ? <Check className="size-3" /> : null}
@@ -301,7 +373,9 @@ function Onboarding() {
                     key={a}
                     onClick={() => toggleIn("allergies", a)}
                     className={`px-3 py-2 rounded-xl text-xs font-semibold transition inline-flex items-center gap-1 ${
-                      active ? "bg-primary text-primary-foreground" : "bg-card outline-1 outline-black/10"
+                      active
+                        ? "bg-primary text-primary-foreground"
+                        : "bg-card outline-1 outline-black/10"
                     }`}
                   >
                     {active ? <Check className="size-3" /> : null}
@@ -312,8 +386,17 @@ function Onboarding() {
             </div>
           </div>
           <div className="grid grid-cols-2 gap-3 pt-4">
-            <button onClick={() => setStep(4)} className="bg-card outline-1 outline-black/10 font-semibold py-4 rounded-2xl">Kembali</button>
-            <button onClick={finish} disabled={mutation.isPending} className="bg-primary text-primary-foreground font-semibold py-4 rounded-2xl disabled:opacity-60">
+            <button
+              onClick={() => setStep(4)}
+              className="bg-card outline-1 outline-black/10 font-semibold py-4 rounded-2xl"
+            >
+              Kembali
+            </button>
+            <button
+              onClick={finish}
+              disabled={mutation.isPending}
+              className="bg-primary text-primary-foreground font-semibold py-4 rounded-2xl disabled:opacity-60"
+            >
               {mutation.isPending ? "Menyimpan..." : "Mulai"}
             </button>
           </div>
@@ -323,7 +406,19 @@ function Onboarding() {
   );
 }
 
-function NumberField({ label, value, onChange, min, max }: { label: string; value: number; onChange: (v: number) => void; min: number; max: number }) {
+function NumberField({
+  label,
+  value,
+  onChange,
+  min,
+  max,
+}: {
+  label: string;
+  value: number;
+  onChange: (v: number) => void;
+  min: number;
+  max: number;
+}) {
   return (
     <label className="block">
       <span className="text-sm font-medium">{label}</span>

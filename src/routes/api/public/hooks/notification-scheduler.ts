@@ -73,7 +73,12 @@ export const Route = createFileRoute("/api/public/hooks/notification-scheduler")
             if (nowMin >= start && nowMin <= end) {
               const diff = nowMin - start;
               if (diff % interval <= WINDOW) {
-                toSend.push({ title: "Minum Air 💧", body: "Waktunya hidrasi", url: "/water", tag: "water" });
+                toSend.push({
+                  title: "Minum Air 💧",
+                  body: "Waktunya hidrasi",
+                  url: "/water",
+                  tag: "water",
+                });
               }
             }
           }
@@ -81,7 +86,12 @@ export const Route = createFileRoute("/api/public/hooks/notification-scheduler")
           if (p.exercise_reminder_enabled) {
             const m = minutesFromHHMM(p.exercise_time);
             if (m !== null && Math.abs(m - nowMin) <= WINDOW) {
-              toSend.push({ title: "Saatnya Olahraga 🏃", body: "Yuk gerak sebentar", url: "/workout", tag: "exercise" });
+              toSend.push({
+                title: "Saatnya Olahraga 🏃",
+                body: "Yuk gerak sebentar",
+                url: "/workout",
+                tag: "exercise",
+              });
             }
           }
 

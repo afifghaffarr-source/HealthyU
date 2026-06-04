@@ -6,9 +6,7 @@ import { recordActivityFor } from "./gamification.functions";
 
 export const searchFoods = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: unknown) =>
-    z.object({ q: z.string().max(80).default("") }).parse(input),
-  )
+  .inputValidator((input: unknown) => z.object({ q: z.string().max(80).default("") }).parse(input))
   .handler(async ({ data, context }) => {
     const { supabase } = context;
     let query = supabase.from("food_items").select("*").limit(30);
@@ -47,7 +45,11 @@ export const deleteMeal = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) => z.object({ id: z.string().uuid() }).parse(input))
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
-    const { error } = await supabase.from("meal_logs").delete().eq("id", data.id).eq("user_id", userId);
+    const { error } = await supabase
+      .from("meal_logs")
+      .delete()
+      .eq("id", data.id)
+      .eq("user_id", userId);
     if (error) throw new Error(error.message);
     return { ok: true };
   });
@@ -93,7 +95,10 @@ export const logMealWithItems = createServerFn({ method: "POST" })
         protein_g: Math.round(totals.protein_g * 10) / 10,
         carbs_g: Math.round(totals.carbs_g * 10) / 10,
         fat_g: Math.round(totals.fat_g * 10) / 10,
-        custom_name: data.items.map((i) => i.food_name).join(", ").slice(0, 100),
+        custom_name: data.items
+          .map((i) => i.food_name)
+          .join(", ")
+          .slice(0, 100),
         notes: data.notes ?? null,
         source: "multi",
       })

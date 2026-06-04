@@ -52,13 +52,17 @@ function Page() {
             <div>
               <div className="text-sm font-semibold mb-1">Bahan</div>
               <ul className="list-disc pl-4 text-sm space-y-0.5">
-                {(r.ingredients ?? []).map((x: string, i: number) => <li key={i}>{x}</li>)}
+                {(r.ingredients ?? []).map((x: string, i: number) => (
+                  <li key={i}>{x}</li>
+                ))}
               </ul>
             </div>
             <div>
               <div className="text-sm font-semibold mb-1">Langkah</div>
               <ol className="list-decimal pl-4 text-sm space-y-0.5">
-                {(r.instructions ?? []).map((x: string, i: number) => <li key={i}>{x}</li>)}
+                {(r.instructions ?? []).map((x: string, i: number) => (
+                  <li key={i}>{x}</li>
+                ))}
               </ol>
             </div>
             {r.notes && <p className="text-xs text-muted-foreground italic">{r.notes}</p>}

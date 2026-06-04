@@ -11,7 +11,12 @@ function Page() {
       <main className="max-w-md mx-auto px-4 pt-4 space-y-3">
         <div className="rounded-xl border bg-card p-4">
           <p className="text-sm mb-3">Sinkronkan jadwal workout & meal kamu ke Google Calendar.</p>
-          <button onClick={() => window.alert("OAuth Google Calendar akan dikonfigurasi (perlu CLIENT_ID)")} className="w-full rounded-lg bg-primary text-primary-foreground py-2 text-sm">
+          <button
+            onClick={() =>
+              window.alert("OAuth Google Calendar akan dikonfigurasi (perlu CLIENT_ID)")
+            }
+            className="w-full rounded-lg bg-primary text-primary-foreground py-2 text-sm"
+          >
             Connect Google Calendar
           </button>
         </div>

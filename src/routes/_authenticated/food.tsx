@@ -2,13 +2,35 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { searchFoods, logMeal, todaysMeals, deleteMeal, logMealWithItems } from "@/lib/meals.functions";
+import {
+  searchFoods,
+  logMeal,
+  todaysMeals,
+  deleteMeal,
+  logMealWithItems,
+} from "@/lib/meals.functions";
 import { parseMealFromVoice } from "@/lib/ai-extras.functions";
 import { getAchievementToastPrefix } from "@/lib/achievement-icons";
 import { BottomNav } from "@/components/bottom-nav";
-import { Search, Trash2, Mic, MicOff, Loader2, WifiOff, RefreshCw, Plus, Minus, ShoppingBasket, Sparkles, X } from "lucide-react";
+import {
+  Search,
+  Trash2,
+  Mic,
+  MicOff,
+  Loader2,
+  WifiOff,
+  RefreshCw,
+  Plus,
+  Minus,
+  ShoppingBasket,
+  Sparkles,
+  X,
+} from "lucide-react";
 import { TopAppBar } from "@/components/healthyu/top-app-bar";
-import { getFoodAlternatives, regenerateAlternativeReasons } from "@/lib/foodAlternatives.functions";
+import {
+  getFoodAlternatives,
+  regenerateAlternativeReasons,
+} from "@/lib/foodAlternatives.functions";
 import { toast } from "sonner";
 import { enqueue } from "@/lib/offline-queue";
 import { useOfflineQueue } from "@/hooks/use-offline-queue";
@@ -89,8 +111,11 @@ function FoodPage() {
   };
   const updateQty = (k: string, delta: number) =>
     setBasket((prev) =>
-      prev
-        .map((b) => (b.key === k ? { ...b, serving_qty: Math.max(0.1, Math.round((b.serving_qty + delta) * 10) / 10) } : b))
+      prev.map((b) =>
+        b.key === k
+          ? { ...b, serving_qty: Math.max(0.1, Math.round((b.serving_qty + delta) * 10) / 10) }
+          : b,
+      ),
     );
   const removeFromBasket = (k: string) => setBasket((prev) => prev.filter((b) => b.key !== k));
 
@@ -124,8 +149,14 @@ function FoodPage() {
     onError: (e) => toast.error(e instanceof Error ? e.message : "Gagal"),
   });
 
-  const { data: foods = [] } = useQuery({ queryKey: ["foods", q], queryFn: () => search({ data: { q } }) });
-  const { data: meals = [] } = useQuery({ queryKey: ["meals", "today"], queryFn: () => fetchMeals() });
+  const { data: foods = [] } = useQuery({
+    queryKey: ["foods", q],
+    queryFn: () => search({ data: { q } }),
+  });
+  const { data: meals = [] } = useQuery({
+    queryKey: ["meals", "today"],
+    queryFn: () => fetchMeals(),
+  });
 
   type LogPayload = {
     food_item_id: string | null;
@@ -167,7 +198,18 @@ function FoodPage() {
   });
 
   const handleVoice = () => {
-    type SR = { new (): { lang: string; continuous: boolean; interimResults: boolean; start: () => void; stop: () => void; onresult: (e: { results: ArrayLike<ArrayLike<{ transcript: string }>> }) => void; onerror: (e: { error: string }) => void; onend: () => void } };
+    type SR = {
+      new (): {
+        lang: string;
+        continuous: boolean;
+        interimResults: boolean;
+        start: () => void;
+        stop: () => void;
+        onresult: (e: { results: ArrayLike<ArrayLike<{ transcript: string }>> }) => void;
+        onerror: (e: { error: string }) => void;
+        onend: () => void;
+      };
+    };
     const w = window as unknown as { SpeechRecognition?: SR; webkitSpeechRecognition?: SR };
     const SRClass = w.SpeechRecognition ?? w.webkitSpeechRecognition;
     if (!SRClass) {
@@ -217,15 +259,17 @@ function FoodPage() {
           title="Catat makanan"
           subtitle="Cari, scan, atau bicarakan"
           showBack
-          action={(!online || pending > 0) ? (
-            <button
-              onClick={() => sync()}
-              className={`inline-flex items-center gap-1 text-[11px] font-semibold px-2.5 py-1.5 rounded-full ${online ? "bg-amber-100 text-amber-700" : "bg-muted text-muted-foreground"}`}
-            >
-              {online ? <RefreshCw className="size-3" /> : <WifiOff className="size-3" />}
-              {online ? `Sync ${pending}` : `Offline${pending ? ` · ${pending}` : ""}`}
-            </button>
-          ) : undefined}
+          action={
+            !online || pending > 0 ? (
+              <button
+                onClick={() => sync()}
+                className={`inline-flex items-center gap-1 text-[11px] font-semibold px-2.5 py-1.5 rounded-full ${online ? "bg-amber-100 text-amber-700" : "bg-muted text-muted-foreground"}`}
+              >
+                {online ? <RefreshCw className="size-3" /> : <WifiOff className="size-3" />}
+                {online ? `Sync ${pending}` : `Offline${pending ? ` · ${pending}` : ""}`}
+              </button>
+            ) : undefined
+          }
         />
 
         <div className="flex gap-2 overflow-x-auto no-scrollbar -mx-5 px-5">
@@ -255,7 +299,13 @@ function FoodPage() {
             title="Catat dengan suara"
             className={`absolute right-2 top-1/2 -translate-y-1/2 size-9 rounded-xl grid place-items-center transition ${listening ? "bg-destructive text-destructive-foreground animate-pulse" : "bg-primary text-primary-foreground"}`}
           >
-            {parsing ? <Loader2 className="size-4 animate-spin" /> : listening ? <MicOff className="size-4" /> : <Mic className="size-4" />}
+            {parsing ? (
+              <Loader2 className="size-4 animate-spin" />
+            ) : listening ? (
+              <MicOff className="size-4" />
+            ) : (
+              <Mic className="size-4" />
+            )}
           </button>
         </div>
         {(listening || parsing) && (
@@ -266,11 +316,17 @@ function FoodPage() {
 
         <section className="space-y-2">
           {foods.map((f) => (
-            <div key={f.id} className="w-full text-left bg-card p-3 rounded-2xl outline-1 outline-black/5 flex items-center gap-3">
+            <div
+              key={f.id}
+              className="w-full text-left bg-card p-3 rounded-2xl outline-1 outline-black/5 flex items-center gap-3"
+            >
               <div className="size-12 rounded-xl bg-mint grid place-items-center text-lg">🍽️</div>
               <div className="flex-1 min-w-0">
                 <p className="font-semibold text-sm truncate">{f.name}</p>
-                <p className="text-[11px] text-muted-foreground">{Math.round(Number(f.calories))} kcal · {f.serving_size}{f.serving_unit}</p>
+                <p className="text-[11px] text-muted-foreground">
+                  {Math.round(Number(f.calories))} kcal · {f.serving_size}
+                  {f.serving_unit}
+                </p>
               </div>
               <button
                 onClick={() => setAltFor({ id: f.id, name: f.name })}
@@ -313,21 +369,44 @@ function FoodPage() {
             <div className="flex items-center gap-2">
               <ShoppingBasket className="size-4 text-primary" />
               <h2 className="font-bold text-sm">Keranjang ({basket.length})</h2>
-              <span className="ml-auto text-sm font-bold tabular-nums">{Math.round(basketTotals.calories)} kcal</span>
+              <span className="ml-auto text-sm font-bold tabular-nums">
+                {Math.round(basketTotals.calories)} kcal
+              </span>
             </div>
             <div className="space-y-2">
               {basket.map((b) => (
-                <div key={b.key} className="flex items-center gap-2 bg-muted/40 rounded-xl px-3 py-2">
+                <div
+                  key={b.key}
+                  className="flex items-center gap-2 bg-muted/40 rounded-xl px-3 py-2"
+                >
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-semibold truncate">{b.food_name}</p>
                     <p className="text-[11px] text-muted-foreground tabular-nums">
-                      {Math.round(b.calories * b.serving_qty)} kcal · P{(b.protein_g * b.serving_qty).toFixed(0)} K{(b.carbs_g * b.serving_qty).toFixed(0)} L{(b.fat_g * b.serving_qty).toFixed(0)}
+                      {Math.round(b.calories * b.serving_qty)} kcal · P
+                      {(b.protein_g * b.serving_qty).toFixed(0)} K
+                      {(b.carbs_g * b.serving_qty).toFixed(0)} L
+                      {(b.fat_g * b.serving_qty).toFixed(0)}
                     </p>
                   </div>
-                  <button onClick={() => updateQty(b.key, -0.5)} className="size-7 rounded-full bg-background grid place-items-center"><Minus className="size-3" /></button>
-                  <span className="w-8 text-center text-xs font-bold tabular-nums">{b.serving_qty}x</span>
-                  <button onClick={() => updateQty(b.key, 0.5)} className="size-7 rounded-full bg-background grid place-items-center"><Plus className="size-3" /></button>
-                  <button onClick={() => removeFromBasket(b.key)} className="text-muted-foreground hover:text-destructive">
+                  <button
+                    onClick={() => updateQty(b.key, -0.5)}
+                    className="size-7 rounded-full bg-background grid place-items-center"
+                  >
+                    <Minus className="size-3" />
+                  </button>
+                  <span className="w-8 text-center text-xs font-bold tabular-nums">
+                    {b.serving_qty}x
+                  </span>
+                  <button
+                    onClick={() => updateQty(b.key, 0.5)}
+                    className="size-7 rounded-full bg-background grid place-items-center"
+                  >
+                    <Plus className="size-3" />
+                  </button>
+                  <button
+                    onClick={() => removeFromBasket(b.key)}
+                    className="text-muted-foreground hover:text-destructive"
+                  >
                     <Trash2 className="size-3.5" />
                   </button>
                 </div>
@@ -348,13 +427,25 @@ function FoodPage() {
             <h2 className="font-bold mb-3">Tercatat hari ini</h2>
             <div className="space-y-2">
               {meals.map((m) => (
-                <div key={m.id} className="bg-card p-3 rounded-2xl outline-1 outline-black/5 flex items-center gap-3">
+                <div
+                  key={m.id}
+                  className="bg-card p-3 rounded-2xl outline-1 outline-black/5 flex items-center gap-3"
+                >
                   <div className="flex-1 min-w-0">
-                    <p className="text-[10px] font-bold uppercase text-coral tracking-wider">{labelMeal(m.meal_type as MealType)}</p>
-                    <p className="font-semibold text-sm truncate">{(m.food_item as { name?: string } | null)?.name ?? m.custom_name}</p>
+                    <p className="text-[10px] font-bold uppercase text-coral tracking-wider">
+                      {labelMeal(m.meal_type as MealType)}
+                    </p>
+                    <p className="font-semibold text-sm truncate">
+                      {(m.food_item as { name?: string } | null)?.name ?? m.custom_name}
+                    </p>
                   </div>
-                  <p className="text-sm font-bold tabular-nums">{Math.round(Number(m.calories))} kcal</p>
-                  <button onClick={() => delMutation.mutate(m.id)} className="text-muted-foreground hover:text-destructive">
+                  <p className="text-sm font-bold tabular-nums">
+                    {Math.round(Number(m.calories))} kcal
+                  </p>
+                  <button
+                    onClick={() => delMutation.mutate(m.id)}
+                    className="text-muted-foreground hover:text-destructive"
+                  >
                     <Trash2 className="size-4" />
                   </button>
                 </div>
@@ -364,8 +455,14 @@ function FoodPage() {
         )}
       </div>
       {altFor && (
-        <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/50" onClick={() => setAltFor(null)}>
-          <div className="w-full max-w-md bg-card rounded-t-3xl p-5 max-h-[80vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+        <div
+          className="fixed inset-0 z-50 flex items-end justify-center bg-black/50"
+          onClick={() => setAltFor(null)}
+        >
+          <div
+            className="w-full max-w-md bg-card rounded-t-3xl p-5 max-h-[80vh] overflow-y-auto"
+            onClick={(e) => e.stopPropagation()}
+          >
             <div className="flex items-center justify-between mb-3">
               <h2 className="font-bold text-base flex items-center gap-2">
                 <Sparkles className="size-4 text-emerald-600" />
@@ -375,29 +472,45 @@ function FoodPage() {
                 <X className="size-5" />
               </button>
             </div>
-            <p className="text-xs text-muted-foreground mb-3">Alternatif untuk <span className="font-semibold">{altFor.name}</span></p>
+            <p className="text-xs text-muted-foreground mb-3">
+              Alternatif untuk <span className="font-semibold">{altFor.name}</span>
+            </p>
             <button
               onClick={() => regenM.mutate()}
               disabled={regenM.isPending || alts.length === 0}
               className="w-full mb-3 inline-flex items-center justify-center gap-2 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white text-xs font-semibold py-2 rounded-xl disabled:opacity-50"
             >
-              {regenM.isPending ? <Loader2 className="size-3 animate-spin" /> : <Sparkles className="size-3" />}
+              {regenM.isPending ? (
+                <Loader2 className="size-3 animate-spin" />
+              ) : (
+                <Sparkles className="size-3" />
+              )}
               {regenM.isPending ? "AI menulis penjelasan…" : "Perbaiki penjelasan dengan AI"}
             </button>
-            {altLoading && <p className="text-sm text-muted-foreground text-center py-6">Memuat…</p>}
+            {altLoading && (
+              <p className="text-sm text-muted-foreground text-center py-6">Memuat…</p>
+            )}
             {!altLoading && alts.length === 0 && (
-              <p className="text-sm text-muted-foreground text-center py-6">Belum ada saran pengganti untuk makanan ini.</p>
+              <p className="text-sm text-muted-foreground text-center py-6">
+                Belum ada saran pengganti untuk makanan ini.
+              </p>
             )}
             <div className="space-y-2">
               {alts.map((a) => (
                 <div key={a.id} className="bg-muted/40 rounded-2xl p-3 flex items-center gap-3">
-                  <div className="size-10 rounded-xl bg-mint grid place-items-center text-base">🥗</div>
+                  <div className="size-10 rounded-xl bg-mint grid place-items-center text-base">
+                    🥗
+                  </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-semibold truncate">{a.name}</p>
                     <p className="text-[11px] text-muted-foreground">
-                      {Math.round(Number(a.calories))} kcal · P{Math.round(Number(a.protein_g ?? 0))} K{Math.round(Number(a.carbs_g ?? 0))} L{Math.round(Number(a.fat_g ?? 0))}
+                      {Math.round(Number(a.calories))} kcal · P
+                      {Math.round(Number(a.protein_g ?? 0))} K{Math.round(Number(a.carbs_g ?? 0))} L
+                      {Math.round(Number(a.fat_g ?? 0))}
                     </p>
-                    {a.reason && <p className="text-[10px] text-emerald-700 mt-0.5 line-clamp-2">{a.reason}</p>}
+                    {a.reason && (
+                      <p className="text-[10px] text-emerald-700 mt-0.5 line-clamp-2">{a.reason}</p>
+                    )}
                   </div>
                   <button
                     onClick={() => {

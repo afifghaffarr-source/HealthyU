@@ -6,12 +6,14 @@ import { supabaseAdmin } from "@/integrations/supabase/client.server";
 export const getChallengeLeaderboard = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .inputValidator((i: unknown) =>
-    z.object({
-      challenge_id: z.string().uuid(),
-      limit: z.number().int().min(1).max(50).optional(),
-      friends_only: z.boolean().optional(),
-      group_id: z.string().uuid().optional(),
-    }).parse(i),
+    z
+      .object({
+        challenge_id: z.string().uuid(),
+        limit: z.number().int().min(1).max(50).optional(),
+        friends_only: z.boolean().optional(),
+        group_id: z.string().uuid().optional(),
+      })
+      .parse(i),
   )
   .handler(async ({ data, context }) => {
     const { userId, supabase } = context;

@@ -50,18 +50,27 @@ async function tx<T>(
 
 export async function enqueue(kind: QueueKind, payload: unknown): Promise<void> {
   await tx(STORE, "readwrite", (s) => {
-    s.add({ kind, payload, created_at: Date.now(), attempts: 0, next_attempt_at: 0 } satisfies QueueItem);
+    s.add({
+      kind,
+      payload,
+      created_at: Date.now(),
+      attempts: 0,
+      next_attempt_at: 0,
+    } satisfies QueueItem);
   });
   window.dispatchEvent(new CustomEvent("offline-queue:changed"));
 }
 
 export async function listAll(): Promise<QueueItem[]> {
-  return tx(STORE, "readonly", (s) =>
-    new Promise<QueueItem[]>((resolve, reject) => {
-      const req = s.getAll();
-      req.onsuccess = () => resolve((req.result ?? []) as QueueItem[]);
-      req.onerror = () => reject(req.error);
-    }),
+  return tx(
+    STORE,
+    "readonly",
+    (s) =>
+      new Promise<QueueItem[]>((resolve, reject) => {
+        const req = s.getAll();
+        req.onsuccess = () => resolve((req.result ?? []) as QueueItem[]);
+        req.onerror = () => reject(req.error);
+      }),
   );
 }
 
@@ -73,12 +82,15 @@ export async function remove(id: number): Promise<void> {
 }
 
 export async function count(): Promise<number> {
-  return tx(STORE, "readonly", (s) =>
-    new Promise<number>((resolve, reject) => {
-      const req = s.count();
-      req.onsuccess = () => resolve(req.result);
-      req.onerror = () => reject(req.error);
-    }),
+  return tx(
+    STORE,
+    "readonly",
+    (s) =>
+      new Promise<number>((resolve, reject) => {
+        const req = s.count();
+        req.onsuccess = () => resolve(req.result);
+        req.onerror = () => reject(req.error);
+      }),
   );
 }
 
@@ -100,12 +112,15 @@ async function deadAdd(item: QueueItem): Promise<void> {
 }
 
 export async function listDead(): Promise<QueueItem[]> {
-  return tx(DEAD_STORE, "readonly", (s) =>
-    new Promise<QueueItem[]>((resolve, reject) => {
-      const req = s.getAll();
-      req.onsuccess = () => resolve((req.result ?? []) as QueueItem[]);
-      req.onerror = () => reject(req.error);
-    }),
+  return tx(
+    DEAD_STORE,
+    "readonly",
+    (s) =>
+      new Promise<QueueItem[]>((resolve, reject) => {
+        const req = s.getAll();
+        req.onsuccess = () => resolve((req.result ?? []) as QueueItem[]);
+        req.onerror = () => reject(req.error);
+      }),
   );
 }
 
@@ -137,7 +152,9 @@ const MAX_ATTEMPTS = 6;
 const BASE_DELAY_MS = 2_000;
 
 /** Drains the queue with exponential backoff per item. */
-export async function flush(syncers: Record<QueueKind, Syncer>): Promise<{ synced: number; failed: number }> {
+export async function flush(
+  syncers: Record<QueueKind, Syncer>,
+): Promise<{ synced: number; failed: number }> {
   if (!navigator.onLine) return { synced: 0, failed: 0 };
   const items = await listAll();
   const now = Date.now();

@@ -8,10 +8,7 @@ export const getRecipeRating = createServerFn({ method: "GET" })
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
     const [agg, mine] = await Promise.all([
-      supabase
-        .from("recipe_ratings")
-        .select("rating")
-        .eq("recipe_id", data.recipe_id),
+      supabase.from("recipe_ratings").select("rating").eq("recipe_id", data.recipe_id),
       supabase
         .from("recipe_ratings")
         .select("rating, review")

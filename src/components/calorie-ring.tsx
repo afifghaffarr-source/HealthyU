@@ -27,7 +27,11 @@ export function CalorieRing({ consumed, target, size = 180, macros }: Props) {
   return (
     <div className="flex flex-col items-center gap-2">
       <div className="relative" style={{ width: size, height: size }}>
-        <svg viewBox="0 0 120 120" className="-rotate-90 size-full" aria-label={`${Math.round(consumed)} dari ${target} kkal`}>
+        <svg
+          viewBox="0 0 120 120"
+          className="-rotate-90 size-full"
+          aria-label={`${Math.round(consumed)} dari ${target} kkal`}
+        >
           <circle cx="60" cy="60" r={r} fill="none" stroke="var(--mint)" strokeWidth="10" />
           <circle
             cx="60"
@@ -43,27 +47,74 @@ export function CalorieRing({ consumed, target, size = 180, macros }: Props) {
           />
           {macroTotal > 0 && (
             <g>
-              <circle cx="60" cy="60" r={rInner} fill="none" stroke="var(--muted)" strokeWidth="6" opacity="0.35" />
-              <circle cx="60" cy="60" r={rInner} fill="none" stroke="var(--chart-protein)" strokeWidth="6"
-                strokeDasharray={`${segP} ${cInner - segP}`} strokeDashoffset={0} />
-              <circle cx="60" cy="60" r={rInner} fill="none" stroke="var(--chart-carbs)" strokeWidth="6"
-                strokeDasharray={`${segC} ${cInner - segC}`} strokeDashoffset={-segP} />
-              <circle cx="60" cy="60" r={rInner} fill="none" stroke="var(--chart-fat)" strokeWidth="6"
-                strokeDasharray={`${segF} ${cInner - segF}`} strokeDashoffset={-(segP + segC)} />
+              <circle
+                cx="60"
+                cy="60"
+                r={rInner}
+                fill="none"
+                stroke="var(--muted)"
+                strokeWidth="6"
+                opacity="0.35"
+              />
+              <circle
+                cx="60"
+                cy="60"
+                r={rInner}
+                fill="none"
+                stroke="var(--chart-protein)"
+                strokeWidth="6"
+                strokeDasharray={`${segP} ${cInner - segP}`}
+                strokeDashoffset={0}
+              />
+              <circle
+                cx="60"
+                cy="60"
+                r={rInner}
+                fill="none"
+                stroke="var(--chart-carbs)"
+                strokeWidth="6"
+                strokeDasharray={`${segC} ${cInner - segC}`}
+                strokeDashoffset={-segP}
+              />
+              <circle
+                cx="60"
+                cy="60"
+                r={rInner}
+                fill="none"
+                stroke="var(--chart-fat)"
+                strokeWidth="6"
+                strokeDasharray={`${segF} ${cInner - segF}`}
+                strokeDashoffset={-(segP + segC)}
+              />
             </g>
           )}
         </svg>
         <div className="absolute inset-0 flex flex-col items-center justify-center leading-none text-center px-2">
-          <span className={`${isCompact ? "text-xl" : "text-3xl"} font-bold tabular-nums`}>{Math.round(remaining)}</span>
-          <span className="text-[9px] text-muted-foreground uppercase tracking-wider mt-0.5">kcal sisa</span>
+          <span className={`${isCompact ? "text-xl" : "text-3xl"} font-bold tabular-nums`}>
+            {Math.round(remaining)}
+          </span>
+          <span className="text-[9px] text-muted-foreground uppercase tracking-wider mt-0.5">
+            kcal sisa
+          </span>
         </div>
       </div>
-      <p className="text-[10px] text-muted-foreground tabular-nums">{Math.round(consumed)} / {target} kkal</p>
+      <p className="text-[10px] text-muted-foreground tabular-nums">
+        {Math.round(consumed)} / {target} kkal
+      </p>
       {macroTotal > 0 && (
         <div className="flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-[10px]">
-          <span className="inline-flex items-center gap-1"><span className="size-2 rounded-full" style={{ background: "var(--chart-protein)" }} />Protein</span>
-          <span className="inline-flex items-center gap-1"><span className="size-2 rounded-full" style={{ background: "var(--chart-carbs)" }} />Karbo</span>
-          <span className="inline-flex items-center gap-1"><span className="size-2 rounded-full" style={{ background: "var(--chart-fat)" }} />Lemak</span>
+          <span className="inline-flex items-center gap-1">
+            <span className="size-2 rounded-full" style={{ background: "var(--chart-protein)" }} />
+            Protein
+          </span>
+          <span className="inline-flex items-center gap-1">
+            <span className="size-2 rounded-full" style={{ background: "var(--chart-carbs)" }} />
+            Karbo
+          </span>
+          <span className="inline-flex items-center gap-1">
+            <span className="size-2 rounded-full" style={{ background: "var(--chart-fat)" }} />
+            Lemak
+          </span>
         </div>
       )}
     </div>

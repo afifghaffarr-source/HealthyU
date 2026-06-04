@@ -8,10 +8,7 @@ type PushSub = { endpoint: string; p256dh: string; auth: string };
  * (via group_challenges) and that the joining user belongs to.
  * Respects notification_preferences.challenge_enabled.
  */
-export async function broadcastGroupChallengeJoin(args: {
-  userId: string;
-  challengeId: string;
-}) {
+export async function broadcastGroupChallengeJoin(args: { userId: string; challengeId: string }) {
   const { userId, challengeId } = args;
 
   // 1. Groups the user is in
@@ -110,9 +107,7 @@ export async function broadcastGroupBonusClaim(args: {
     .from("friend_group_members")
     .select("user_id")
     .eq("group_id", groupId);
-  const otherIds = (members ?? [])
-    .map((m) => m.user_id)
-    .filter((id) => id !== userId);
+  const otherIds = (members ?? []).map((m) => m.user_id).filter((id) => id !== userId);
   if (otherIds.length === 0) return { sent: 0 };
 
   const { data: prefs } = await supabaseAdmin

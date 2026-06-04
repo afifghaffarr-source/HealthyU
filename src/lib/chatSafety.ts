@@ -13,28 +13,56 @@ export type SafetyResult =
 
 const CRISIS = [
   // Indonesian
-  "bunuh diri", "ingin mati", "mau mati", "akhiri hidup", "mengakhiri hidup",
-  "menyakiti diri", "melukai diri", "potong nadi", "overdosis",
+  "bunuh diri",
+  "ingin mati",
+  "mau mati",
+  "akhiri hidup",
+  "mengakhiri hidup",
+  "menyakiti diri",
+  "melukai diri",
+  "potong nadi",
+  "overdosis",
   // English
-  "kill myself", "suicide", "end my life", "self harm", "self-harm",
-  "cut myself", "hang myself",
+  "kill myself",
+  "suicide",
+  "end my life",
+  "self harm",
+  "self-harm",
+  "cut myself",
+  "hang myself",
 ];
 
 const DIAGNOSIS = [
-  "saya sakit apa", "diagnosa saya", "diagnosis saya", "apakah saya kanker",
-  "apakah saya diabetes", "apakah saya hamil",
-  "do i have", "diagnose me", "am i sick with",
+  "saya sakit apa",
+  "diagnosa saya",
+  "diagnosis saya",
+  "apakah saya kanker",
+  "apakah saya diabetes",
+  "apakah saya hamil",
+  "do i have",
+  "diagnose me",
+  "am i sick with",
 ];
 
 const PRESCRIPTION = [
-  "berapa dosis", "dosis obat", "resep obat", "obat apa untuk",
-  "what dose", "prescribe", "prescription for",
+  "berapa dosis",
+  "dosis obat",
+  "resep obat",
+  "obat apa untuk",
+  "what dose",
+  "prescribe",
+  "prescription for",
 ];
 
 const DANGEROUS = [
-  "puasa ekstrim", "tidak makan seminggu", "tidak makan 7 hari",
-  "muntah setelah makan", "memuntahkan makanan",
-  "starve myself", "purge after eating", "extreme fasting",
+  "puasa ekstrim",
+  "tidak makan seminggu",
+  "tidak makan 7 hari",
+  "muntah setelah makan",
+  "memuntahkan makanan",
+  "starve myself",
+  "purge after eating",
+  "extreme fasting",
 ];
 
 const CRISIS_REPLY =

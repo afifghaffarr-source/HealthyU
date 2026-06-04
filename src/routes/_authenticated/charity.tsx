@@ -25,12 +25,32 @@ function Page() {
     <div className="min-h-dvh pb-24 bg-background">
       <TopAppBar title="Donasi Coin" showBack />
       <main className="max-w-md mx-auto px-4 pt-4 space-y-4">
-        <div className="text-center py-4"><Heart className="size-12 text-red-500 mx-auto" /></div>
-        <select value={charity} onChange={(e) => setCharity(e.target.value)} className="w-full px-3 py-2 rounded-xl border bg-card">
-          {CHARITIES.map((c) => <option key={c} value={c}>{c}</option>)}
+        <div className="text-center py-4">
+          <Heart className="size-12 text-red-500 mx-auto" />
+        </div>
+        <select
+          value={charity}
+          onChange={(e) => setCharity(e.target.value)}
+          className="w-full px-3 py-2 rounded-xl border bg-card"
+        >
+          {CHARITIES.map((c) => (
+            <option key={c} value={c}>
+              {c}
+            </option>
+          ))}
         </select>
-        <input type="number" min={10} value={coins} onChange={(e) => setCoins(Number(e.target.value))} className="w-full px-3 py-2 rounded-xl border bg-card" />
-        <button onClick={() => mut.mutate()} disabled={mut.isPending} className="w-full rounded-xl bg-primary text-primary-foreground py-2.5 font-medium">
+        <input
+          type="number"
+          min={10}
+          value={coins}
+          onChange={(e) => setCoins(Number(e.target.value))}
+          className="w-full px-3 py-2 rounded-xl border bg-card"
+        />
+        <button
+          onClick={() => mut.mutate()}
+          disabled={mut.isPending}
+          className="w-full rounded-xl bg-primary text-primary-foreground py-2.5 font-medium"
+        >
           Donasi {coins} Coin
         </button>
       </main>

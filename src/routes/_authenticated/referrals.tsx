@@ -60,13 +60,20 @@ function ReferralsPage() {
           <p className="text-xs uppercase tracking-widest text-white/70 font-bold">Kode Kamu</p>
           <p className="text-4xl font-bold tabular-nums tracking-wider my-3">{code || "—"}</p>
           <p className="text-sm text-white/80 mb-5">
-            Bagikan kode ini. Setiap teman yang gabung kamu dapat <b>100 koin</b>, mereka dapat <b>50 koin</b>.
+            Bagikan kode ini. Setiap teman yang gabung kamu dapat <b>100 koin</b>, mereka dapat{" "}
+            <b>50 koin</b>.
           </p>
           <div className="grid grid-cols-2 gap-2">
-            <button onClick={copyCode} className="bg-white/15 backdrop-blur py-3 rounded-2xl font-semibold flex items-center justify-center gap-2">
+            <button
+              onClick={copyCode}
+              className="bg-white/15 backdrop-blur py-3 rounded-2xl font-semibold flex items-center justify-center gap-2"
+            >
               <Copy className="size-4" /> Salin
             </button>
-            <button onClick={share} className="bg-white text-sage-deep py-3 rounded-2xl font-semibold flex items-center justify-center gap-2">
+            <button
+              onClick={share}
+              className="bg-white text-sage-deep py-3 rounded-2xl font-semibold flex items-center justify-center gap-2"
+            >
               <Share2 className="size-4" /> Bagikan
             </button>
           </div>
@@ -74,13 +81,19 @@ function ReferralsPage() {
 
         <section className="grid grid-cols-3 gap-3 animate-fade-up">
           <Stat icon={<Users className="size-4" />} label="Diajak" value={`${data?.total ?? 0}`} />
-          <Stat icon={<Gift className="size-4" />} label="Selesai" value={`${data?.completed ?? 0}`} />
+          <Stat
+            icon={<Gift className="size-4" />}
+            label="Selesai"
+            value={`${data?.completed ?? 0}`}
+          />
           <Stat icon={<Gift className="size-4" />} label="Koin" value={`${data?.earned ?? 0}`} />
         </section>
 
         <section className="bg-card p-5 rounded-3xl outline-1 outline-black/5 space-y-3 animate-fade-up">
           <p className="font-bold">Punya kode dari teman?</p>
-          <p className="text-xs text-muted-foreground">Masukkan sekali saja, dapat 50 koin bonus.</p>
+          <p className="text-xs text-muted-foreground">
+            Masukkan sekali saja, dapat 50 koin bonus.
+          </p>
           <div className="flex gap-2">
             <input
               value={input}
@@ -100,14 +113,21 @@ function ReferralsPage() {
 
         {(data?.referrals.length ?? 0) > 0 && (
           <section className="space-y-2 animate-fade-up">
-            <h2 className="text-xs font-bold uppercase tracking-wider text-muted-foreground px-1">Riwayat</h2>
+            <h2 className="text-xs font-bold uppercase tracking-wider text-muted-foreground px-1">
+              Riwayat
+            </h2>
             {data!.referrals.map((r) => (
-              <div key={r.id} className="bg-card p-3 rounded-2xl outline-1 outline-black/5 flex items-center justify-between text-sm">
+              <div
+                key={r.id}
+                className="bg-card p-3 rounded-2xl outline-1 outline-black/5 flex items-center justify-between text-sm"
+              >
                 <span className="text-muted-foreground">
                   {new Date(r.created_at).toLocaleDateString("id-ID")}
                 </span>
                 <span className="font-semibold capitalize">{r.status}</span>
-                <span className="text-primary font-bold tabular-nums">+{r.referrer_reward_coins}</span>
+                <span className="text-primary font-bold tabular-nums">
+                  +{r.referrer_reward_coins}
+                </span>
               </div>
             ))}
           </section>

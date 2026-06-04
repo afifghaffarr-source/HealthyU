@@ -41,7 +41,11 @@ export const exportMyData = createServerFn({ method: "GET" })
       if (!error) dump[table] = data ?? [];
       else dump[table] = { error: error.message };
     }
-    await supabase.rpc("log_audit_event", { _action: "pdp.export", _entity: "user", _entity_id: userId });
+    await supabase.rpc("log_audit_event", {
+      _action: "pdp.export",
+      _entity: "user",
+      _entity_id: userId,
+    });
     return dump as Record<string, any>;
   });
 

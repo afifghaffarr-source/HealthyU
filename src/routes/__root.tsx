@@ -90,10 +90,16 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { title: "HealthyU — Sahabat Sehat Berbasis AI" },
-      { name: "description", content: "Diet, puasa, dan kesehatan holistik berbasis AI untuk Indonesia." },
+      {
+        name: "description",
+        content: "Diet, puasa, dan kesehatan holistik berbasis AI untuk Indonesia.",
+      },
       { name: "author", content: "HealthyU" },
       { property: "og:title", content: "HealthyU — Sahabat Sehat Berbasis AI" },
-      { property: "og:description", content: "Diet, puasa, dan kesehatan holistik berbasis AI untuk Indonesia." },
+      {
+        property: "og:description",
+        content: "Diet, puasa, dan kesehatan holistik berbasis AI untuk Indonesia.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { name: "twitter:site", content: "@Lovable" },
@@ -144,19 +150,19 @@ function RootComponent() {
       <ThemeProvider>
         <I18nProvider>
           <LiveAnnouncerProvider>
-          <ManifestLinkManager />
-          <AuthListener />
-          <ReminderScheduler />
-          <DesktopSidebar />
-          <div className="lg:pl-64">
-            <GlobalErrorBoundary>
-              <Outlet />
-            </GlobalErrorBoundary>
-          </div>
-          <InstallPrompt />
-          <CommandPalette />
-          <QuickActionFab />
-          <Toaster position="top-center" />
+            <ManifestLinkManager />
+            <AuthListener />
+            <ReminderScheduler />
+            <DesktopSidebar />
+            <div className="lg:pl-64">
+              <GlobalErrorBoundary>
+                <Outlet />
+              </GlobalErrorBoundary>
+            </div>
+            <InstallPrompt />
+            <CommandPalette />
+            <QuickActionFab />
+            <Toaster position="top-center" />
           </LiveAnnouncerProvider>
         </I18nProvider>
       </ThemeProvider>
@@ -168,7 +174,9 @@ function AuthListener() {
   const router = useRouter();
   const queryClient = useQueryClient();
   useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(() => {
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange(() => {
       router.invalidate();
       queryClient.invalidateQueries();
     });

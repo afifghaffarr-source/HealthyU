@@ -21,8 +21,17 @@ function Page() {
     <div className="min-h-dvh pb-24 bg-background">
       <TopAppBar title="Import Resep dari URL" showBack />
       <main className="max-w-md mx-auto px-4 pt-4 space-y-3">
-        <input value={url} onChange={(e) => setUrl(e.target.value)} placeholder="https://..." className="w-full px-3 py-2 rounded-lg border bg-background" />
-        <button onClick={() => mut.mutate()} disabled={!url || mut.isPending} className="w-full rounded-lg bg-primary text-primary-foreground py-2 text-sm">
+        <input
+          value={url}
+          onChange={(e) => setUrl(e.target.value)}
+          placeholder="https://..."
+          className="w-full px-3 py-2 rounded-lg border bg-background"
+        />
+        <button
+          onClick={() => mut.mutate()}
+          disabled={!url || mut.isPending}
+          className="w-full rounded-lg bg-primary text-primary-foreground py-2 text-sm"
+        >
           {mut.isPending ? "Mengambil..." : "Import"}
         </button>
         {mut.data?.parsed && (

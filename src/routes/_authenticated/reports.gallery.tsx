@@ -31,19 +31,35 @@ function Page() {
         <div className="grid grid-cols-3 gap-1.5">
           {data.items.map((it) => {
             const foods = (it.detected_foods as Detected[] | null) ?? [];
-            const label = foods.map((f) => f?.name).filter(Boolean).slice(0, 2).join(", ");
+            const label = foods
+              .map((f) => f?.name)
+              .filter(Boolean)
+              .slice(0, 2)
+              .join(", ");
             return (
-              <div key={it.id} className="relative aspect-square rounded-xl overflow-hidden bg-muted group">
+              <div
+                key={it.id}
+                className="relative aspect-square rounded-xl overflow-hidden bg-muted group"
+              >
                 {it.url ? (
-                  <img src={it.url} alt={label || "scan"} className="w-full h-full object-cover" loading="lazy" />
+                  <img
+                    src={it.url}
+                    alt={label || "scan"}
+                    className="w-full h-full object-cover"
+                    loading="lazy"
+                  />
                 ) : (
                   <div className="w-full h-full grid place-items-center text-muted-foreground">
                     <ImageOff className="size-5" />
                   </div>
                 )}
                 <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent p-1.5">
-                  <div className="text-[10px] text-white font-semibold truncate">{label || "—"}</div>
-                  <div className="text-[9px] text-white/80">{Math.round(it.total_calories)} kkal</div>
+                  <div className="text-[10px] text-white font-semibold truncate">
+                    {label || "—"}
+                  </div>
+                  <div className="text-[9px] text-white/80">
+                    {Math.round(it.total_calories)} kkal
+                  </div>
                 </div>
               </div>
             );

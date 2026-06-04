@@ -9,7 +9,14 @@ interface Props {
   variant?: "recent" | "suggestion";
 }
 
-export function SearchChips({ label, items, onPick, onRemove, onClear, variant = "recent" }: Props) {
+export function SearchChips({
+  label,
+  items,
+  onPick,
+  onRemove,
+  onClear,
+  variant = "recent",
+}: Props) {
   if (!items.length) return null;
   return (
     <div className="space-y-1.5">

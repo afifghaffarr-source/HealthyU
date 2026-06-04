@@ -14,7 +14,10 @@ function Page() {
   const qc = useQueryClient();
   const listFn = useServerFn(listNotifications);
   const readFn = useServerFn(markNotifRead);
-  const { data, isLoading } = useQuery({ queryKey: ["notif-feed"], queryFn: () => listFn({ data: undefined as any }) });
+  const { data, isLoading } = useQuery({
+    queryKey: ["notif-feed"],
+    queryFn: () => listFn({ data: undefined as any }),
+  });
   const mut = useMutation({
     mutationFn: (id: string) => readFn({ data: { id } }),
     onSuccess: () => qc.invalidateQueries({ queryKey: ["notif-feed"] }),
@@ -41,7 +44,11 @@ function Page() {
           </Link>
         ))}
         {!isLoading && (data?.items ?? []).length === 0 && (
-          <EmptyState icon={BellOff} title="Belum ada notifikasi" description="Notifikasi baru akan muncul di sini." />
+          <EmptyState
+            icon={BellOff}
+            title="Belum ada notifikasi"
+            description="Notifikasi baru akan muncul di sini."
+          />
         )}
       </main>
       <BottomNav />

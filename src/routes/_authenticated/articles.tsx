@@ -47,11 +47,12 @@ function ArticlesPage() {
   }, [articles]);
 
   const [filter, setFilter] = useState<string>("all");
-  const visible = filter === "all"
-    ? articles
-    : filter === "bookmark"
-      ? articles.filter((a) => bookmarks.has(a.id))
-      : articles.filter((a) => a.category === filter);
+  const visible =
+    filter === "all"
+      ? articles
+      : filter === "bookmark"
+        ? articles.filter((a) => bookmarks.has(a.id))
+        : articles.filter((a) => a.category === filter);
 
   return (
     <div className="min-h-screen pb-32">
@@ -59,34 +60,65 @@ function ArticlesPage() {
         <TopAppBar title="Artikel Kesehatan" showBack />
       </div>
       <main className="max-w-md mx-auto px-4 pt-4 space-y-3">
-        {!isLoading && (articles.length > 0) && (
+        {!isLoading && articles.length > 0 && (
           <div className="flex gap-2 overflow-x-auto no-scrollbar -mx-1 px-1 pb-1">
-            <Chip active={filter === "all"} onClick={() => setFilter("all")} count={articles.length}>Semua</Chip>
-            <Chip active={filter === "bookmark"} onClick={() => setFilter("bookmark")} count={bookmarks.size}>★ Disimpan</Chip>
+            <Chip
+              active={filter === "all"}
+              onClick={() => setFilter("all")}
+              count={articles.length}
+            >
+              Semua
+            </Chip>
+            <Chip
+              active={filter === "bookmark"}
+              onClick={() => setFilter("bookmark")}
+              count={bookmarks.size}
+            >
+              ★ Disimpan
+            </Chip>
             {categories.map(([c, n]) => (
-              <Chip key={c} active={filter === c} onClick={() => setFilter(c)} count={n}>{c}</Chip>
+              <Chip key={c} active={filter === c} onClick={() => setFilter(c)} count={n}>
+                {c}
+              </Chip>
             ))}
           </div>
         )}
         {isLoading && <ListSkeleton count={3} />}
         {!isLoading && articles.length === 0 && (
-          <EmptyState icon={BookOpen} title="Belum ada artikel" description="Artikel kesehatan baru akan muncul di sini." />
+          <EmptyState
+            icon={BookOpen}
+            title="Belum ada artikel"
+            description="Artikel kesehatan baru akan muncul di sini."
+          />
         )}
         {!isLoading && articles.length > 0 && visible.length === 0 && (
-          <EmptyState icon={BookOpen} title="Tidak ada hasil" description="Coba pilih kategori lain." />
+          <EmptyState
+            icon={BookOpen}
+            title="Tidak ada hasil"
+            description="Coba pilih kategori lain."
+          />
         )}
         {visible.map((a) => {
           const marked = bookmarks.has(a.id);
           return (
-            <article key={a.id} className="rounded-3xl bg-card outline-1 outline-black/5 overflow-hidden shadow-sm">
+            <article
+              key={a.id}
+              className="rounded-3xl bg-card outline-1 outline-black/5 overflow-hidden shadow-sm"
+            >
               {a.image_url && (
                 <LazyImage src={a.image_url} alt={a.title} className="w-full h-36 object-cover" />
               )}
               <div className="p-4">
                 <div className="flex items-start justify-between gap-2">
                   <div className="min-w-0">
-                    <p className="text-[10px] uppercase tracking-wide text-muted-foreground">{a.category}</p>
-                    <Link to="/articles/$id" params={{ id: a.id }} className="font-semibold leading-tight mt-0.5 hover:text-primary block">
+                    <p className="text-[10px] uppercase tracking-wide text-muted-foreground">
+                      {a.category}
+                    </p>
+                    <Link
+                      to="/articles/$id"
+                      params={{ id: a.id }}
+                      className="font-semibold leading-tight mt-0.5 hover:text-primary block"
+                    >
                       {a.title}
                     </Link>
                   </div>
@@ -95,10 +127,16 @@ function ArticlesPage() {
                     className="size-9 inline-flex items-center justify-center rounded-full bg-muted shrink-0"
                     aria-label="Bookmark"
                   >
-                    {marked ? <BookmarkCheck className="size-4 text-primary" /> : <Bookmark className="size-4" />}
+                    {marked ? (
+                      <BookmarkCheck className="size-4 text-primary" />
+                    ) : (
+                      <Bookmark className="size-4" />
+                    )}
                   </button>
                 </div>
-                {a.excerpt && <p className="text-xs text-muted-foreground mt-2 line-clamp-3">{a.excerpt}</p>}
+                {a.excerpt && (
+                  <p className="text-xs text-muted-foreground mt-2 line-clamp-3">{a.excerpt}</p>
+                )}
                 <div className="flex gap-3 text-[11px] text-muted-foreground mt-3">
                   {a.reading_time_minutes && (
                     <span className="inline-flex items-center gap-1">
@@ -118,17 +156,31 @@ function ArticlesPage() {
   );
 }
 
-function Chip({ active, onClick, children, count }: { active: boolean; onClick: () => void; children: React.ReactNode; count?: number }) {
+function Chip({
+  active,
+  onClick,
+  children,
+  count,
+}: {
+  active: boolean;
+  onClick: () => void;
+  children: React.ReactNode;
+  count?: number;
+}) {
   return (
     <button
       onClick={onClick}
       className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition ${
-        active ? "bg-primary text-primary-foreground shadow" : "bg-card border text-muted-foreground"
+        active
+          ? "bg-primary text-primary-foreground shadow"
+          : "bg-card border text-muted-foreground"
       }`}
     >
       {children}
       {typeof count === "number" && (
-        <span className={`text-[10px] px-1.5 py-0.5 rounded-full ${active ? "bg-white/25" : "bg-muted"}`}>
+        <span
+          className={`text-[10px] px-1.5 py-0.5 rounded-full ${active ? "bg-white/25" : "bg-muted"}`}
+        >
           {count}
         </span>
       )}

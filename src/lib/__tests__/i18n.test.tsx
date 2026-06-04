@@ -36,11 +36,9 @@ describe("I18nProvider", () => {
   });
 
   it("defaults to 'id' when localStorage.getItem throws (SSR-safe)", () => {
-    const spy = vi
-      .spyOn(window.localStorage.__proto__, "getItem")
-      .mockImplementation(() => {
-        throw new Error("no storage");
-      });
+    const spy = vi.spyOn(window.localStorage.__proto__, "getItem").mockImplementation(() => {
+      throw new Error("no storage");
+    });
     function DefaultProbe() {
       const { t } = useTranslation();
       return <span data-testid="msg">{t("pdf.footer.pageLabel")}</span>;

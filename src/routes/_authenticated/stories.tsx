@@ -47,14 +47,22 @@ function Page() {
             disabled={mut.isPending || !caption.trim()}
             className="rounded-xl bg-primary text-primary-foreground px-3 py-2"
           >
-            {mut.isPending ? <Loader2 className="size-4 animate-spin" /> : <Plus className="size-4" />}
+            {mut.isPending ? (
+              <Loader2 className="size-4 animate-spin" />
+            ) : (
+              <Plus className="size-4" />
+            )}
           </button>
         </div>
         {isLoading && <p className="text-sm text-muted-foreground">Memuat…</p>}
         {data?.stories?.map((s: any) => (
           <div key={s.id} className="rounded-2xl bg-card border p-3 space-y-1">
             <div className="text-xs text-muted-foreground">
-              {s.profiles?.full_name ?? "User"} · {new Date(s.created_at).toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" })}
+              {s.profiles?.full_name ?? "User"} ·{" "}
+              {new Date(s.created_at).toLocaleTimeString("id-ID", {
+                hour: "2-digit",
+                minute: "2-digit",
+              })}
             </div>
             {s.image_url && <img src={s.image_url} alt="" className="rounded-xl w-full" />}
             {s.caption && <p className="text-sm">{s.caption}</p>}

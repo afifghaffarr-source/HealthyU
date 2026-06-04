@@ -16,7 +16,8 @@ function Page() {
   const recRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<Blob[]>([]);
   const mut = useMutation({
-    mutationFn: (b64: string) => fn({ data: { audioBase64: b64, mimeType: "audio/webm", source: "mood" } }),
+    mutationFn: (b64: string) =>
+      fn({ data: { audioBase64: b64, mimeType: "audio/webm", source: "mood" } }),
     onSuccess: () => toast.success("Transkripsi selesai"),
     onError: (e: Error) => toast.error(e.message),
   });
@@ -36,15 +37,23 @@ function Page() {
     recRef.current = mr;
     setRec(true);
   };
-  const stop = () => { recRef.current?.stop(); setRec(false); };
+  const stop = () => {
+    recRef.current?.stop();
+    setRec(false);
+  };
   return (
     <div className="min-h-dvh pb-24 bg-background">
       <TopAppBar title="Mood Voice" showBack />
       <main className="max-w-md mx-auto px-4 pt-8 space-y-6 text-center">
-        <button onClick={rec ? stop : start} className={`size-32 mx-auto rounded-full inline-flex items-center justify-center ${rec ? "bg-red-500" : "bg-primary"} text-white`}>
+        <button
+          onClick={rec ? stop : start}
+          className={`size-32 mx-auto rounded-full inline-flex items-center justify-center ${rec ? "bg-red-500" : "bg-primary"} text-white`}
+        >
           {rec ? <Square className="size-12" /> : <Mic className="size-12" />}
         </button>
-        <p className="text-sm text-muted-foreground">{rec ? "Merekam… tap untuk berhenti" : "Tap untuk mulai rekam"}</p>
+        <p className="text-sm text-muted-foreground">
+          {rec ? "Merekam… tap untuk berhenti" : "Tap untuk mulai rekam"}
+        </p>
         {mut.data && (
           <div className="rounded-2xl bg-card border p-4 text-left text-sm">
             <b>Transkrip:</b>

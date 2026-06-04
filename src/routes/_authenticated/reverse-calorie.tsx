@@ -38,7 +38,12 @@ function Page() {
             disabled={mut.isPending}
             className="w-full rounded-xl bg-primary text-primary-foreground py-2.5 font-medium inline-flex items-center justify-center gap-2"
           >
-            {mut.isPending ? <Loader2 className="size-4 animate-spin" /> : <Search className="size-4" />} Cari
+            {mut.isPending ? (
+              <Loader2 className="size-4 animate-spin" />
+            ) : (
+              <Search className="size-4" />
+            )}{" "}
+            Cari
           </button>
         </div>
         {mut.data?.suggestions?.map((s: any, i: number) => (

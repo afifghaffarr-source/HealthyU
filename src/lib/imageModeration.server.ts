@@ -6,13 +6,7 @@
  * Call BEFORE storing user-uploaded images (chat attachments, progress photos, scan photos).
  */
 
-export type ModerationLabel =
-  | "safe"
-  | "nudity"
-  | "violence"
-  | "spam"
-  | "medical_graphic"
-  | "other";
+export type ModerationLabel = "safe" | "nudity" | "violence" | "spam" | "medical_graphic" | "other";
 
 export interface ModerationResult {
   label: ModerationLabel;
@@ -22,7 +16,7 @@ export interface ModerationResult {
 }
 
 const SYSTEM_PROMPT =
-  'You are an image safety classifier. Classify the image into exactly one label: ' +
+  "You are an image safety classifier. Classify the image into exactly one label: " +
   '"safe", "nudity", "violence", "spam", "medical_graphic", or "other". ' +
   'Reply ONLY with compact JSON: {"label":"...","confidence":0-1,"reason":"short"}. ' +
   'Treat exposed genitalia/sexual content as "nudity". Medical wound close-ups are "medical_graphic". ' +

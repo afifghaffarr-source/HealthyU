@@ -9,12 +9,7 @@ import { supabaseAdmin } from "@/integrations/supabase/client.server";
  * Auth: Supabase anon key in `apikey` header (per pg_cron pattern).
  */
 
-const THEMES = [
-  "Diet Foundation",
-  "Nutrition Deep Dive",
-  "Puasa & Ramadan",
-  "Mental & Recovery",
-];
+const THEMES = ["Diet Foundation", "Nutrition Deep Dive", "Puasa & Ramadan", "Mental & Recovery"];
 
 function pick<T>(arr: T[], seed: number): T | undefined {
   if (arr.length === 0) return undefined;
@@ -25,8 +20,7 @@ export const Route = createFileRoute("/api/public/hooks/daily-content")({
   server: {
     handlers: {
       POST: async ({ request }) => {
-        const apiKey =
-          request.headers.get("apikey") ?? request.headers.get("x-apikey");
+        const apiKey = request.headers.get("apikey") ?? request.headers.get("x-apikey");
         const expected = process.env.SUPABASE_PUBLISHABLE_KEY;
         if (!expected || apiKey !== expected) {
           return new Response("Unauthorized", { status: 401 });
@@ -94,9 +88,7 @@ export const Route = createFileRoute("/api/public/hooks/daily-content")({
         if (rows.length === 0) {
           return Response.json({ ok: true, scheduled: 0, date });
         }
-        const { error } = await supabaseAdmin
-          .from("daily_content_schedule")
-          .insert(rows);
+        const { error } = await supabaseAdmin.from("daily_content_schedule").insert(rows);
         if (error) {
           console.error("[daily-content] insert", error);
           return new Response(error.message, { status: 500 });

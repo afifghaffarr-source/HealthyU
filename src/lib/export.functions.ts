@@ -1,7 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
-
 const USER_TABLES = [
   "meal_logs",
   "meal_plans",
@@ -37,10 +36,7 @@ export const exportAllData = createServerFn({ method: "GET" })
     tables.profiles = profile ?? [];
 
     for (const t of USER_TABLES) {
-      const { data, error } = await supabase
-        .from(t)
-        .select("*")
-        .eq("user_id", userId);
+      const { data, error } = await supabase.from(t).select("*").eq("user_id", userId);
       if (error) throw new Error(`${t}: ${error.message}`);
       tables[t] = data ?? [];
     }

@@ -17,9 +17,7 @@ export const logSleep = createServerFn({ method: "POST" })
     if (new Date(data.sleep_end) <= new Date(data.sleep_start)) {
       throw new Error("Waktu bangun harus setelah waktu tidur");
     }
-    const { error } = await supabase
-      .from("sleep_logs")
-      .insert({ ...data, user_id: userId });
+    const { error } = await supabase.from("sleep_logs").insert({ ...data, user_id: userId });
     if (error) throw new Error(error.message);
     return { ok: true };
   });

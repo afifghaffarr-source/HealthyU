@@ -19,7 +19,9 @@ export const browseFoods = createServerFn({ method: "GET" })
     const { supabase } = context;
     let query = supabase
       .from("food_items")
-      .select("id,name,name_en,category,subcategory,region,calories,protein_g,carbs_g,fat_g,fiber_g,serving_size,serving_unit,allergens,tags,popularity_score")
+      .select(
+        "id,name,name_en,category,subcategory,region,calories,protein_g,carbs_g,fat_g,fiber_g,serving_size,serving_unit,allergens,tags,popularity_score",
+      )
       .order("popularity_score", { ascending: false })
       .limit(60);
 

@@ -37,9 +37,7 @@ export const addPlan = createServerFn({ method: "POST" })
   .inputValidator((i: unknown) => PlanSchema.parse(i))
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
-    const { error } = await supabase
-      .from("meal_plans")
-      .insert({ ...data, user_id: userId });
+    const { error } = await supabase.from("meal_plans").insert({ ...data, user_id: userId });
     if (error) throw new Error(error.message);
     return { ok: true };
   });

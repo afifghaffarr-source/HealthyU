@@ -74,20 +74,24 @@ function ChallengesPage() {
     onSuccess: (r, challenge_id) => {
       toast.success(r.already ? "Sudah bergabung" : "Bergabung challenge!");
       const ch = (data?.challenges ?? []).find((c) => c.id === challenge_id);
-      announce(r.already ? `Sudah bergabung challenge ${ch?.title ?? ""}` : `Bergabung challenge ${ch?.title ?? ""}`);
+      announce(
+        r.already
+          ? `Sudah bergabung challenge ${ch?.title ?? ""}`
+          : `Bergabung challenge ${ch?.title ?? ""}`,
+      );
       invalidate();
     },
     onError: (e: Error) => toast.error(e.message),
   });
 
   const logM = useMutation({
-    mutationFn: (p: { participant_id: string; day_number: number }) =>
-      logFn({ data: p }),
+    mutationFn: (p: { participant_id: string; day_number: number }) => logFn({ data: p }),
     onSuccess: (r) => {
       toast.success(`Hari ${r.day} tercatat · streak ${r.streak}`);
       announce(`Hari ${r.day} tercatat, streak ${r.streak}`);
       import("@/lib/confetti").then((m) => {
-        const intense = (r as { completed?: boolean }).completed === true || (r.streak && r.streak % 7 === 0);
+        const intense =
+          (r as { completed?: boolean }).completed === true || (r.streak && r.streak % 7 === 0);
         m.celebrate({ intense: Boolean(intense) });
       });
       invalidate();
@@ -106,9 +110,7 @@ function ChallengesPage() {
   });
 
   const challenges = data?.challenges ?? [];
-  const partsByCh = new Map(
-    (data?.participations ?? []).map((p) => [p.challenge_id, p] as const),
-  );
+  const partsByCh = new Map((data?.participations ?? []).map((p) => [p.challenge_id, p] as const));
   const [openLb, setOpenLb] = useState<string | null>(null);
   const [streakAutoChallenge, setStreakAutoChallenge] = useState<string | null>(null);
   const [highlightId, setHighlightId] = useState<string | null>(null);
@@ -190,29 +192,47 @@ function ChallengesPage() {
 
       <main className="max-w-md mx-auto px-4 pt-4 space-y-3">
         {isLoading && <ListSkeleton count={3} />}
-        {!isLoading && (() => {
-          const allParts = data?.participations ?? [];
-          const active = allParts.filter((p) => (p as { status?: string }).status !== "completed");
-          if (active.length === 0) return null;
-          const top = active.slice().sort((a, b) => (b.streak ?? 0) - (a.streak ?? 0))[0];
-          const ch = challenges.find((c) => c.id === top?.challenge_id);
-          if (!ch) return null;
-          return (
-            <button
-              onClick={() => articleRefs.current[ch.id]?.scrollIntoView({ behavior: "smooth", block: "center" })}
-              className="sticky top-2 z-20 w-full bg-gradient-to-r from-primary to-accent text-primary-foreground rounded-2xl px-4 py-3 shadow-lg shadow-primary/20 flex items-center gap-3 animate-fade-up"
-            >
-              <Trophy className="size-5 shrink-0" />
-              <div className="flex-1 text-left">
-                <p className="text-[10px] font-bold uppercase tracking-wider opacity-80">Lanjutkan tantangan</p>
-                <p className="text-sm font-semibold truncate">{ch.title} · streak {top.streak ?? 0}</p>
-              </div>
-              <span className="text-xs font-bold bg-white/20 px-2 py-1 rounded-full">Hari {(top.current_day ?? 0) + 1}</span>
-            </button>
-          );
-        })()}
+        {!isLoading &&
+          (() => {
+            const allParts = data?.participations ?? [];
+            const active = allParts.filter(
+              (p) => (p as { status?: string }).status !== "completed",
+            );
+            if (active.length === 0) return null;
+            const top = active.slice().sort((a, b) => (b.streak ?? 0) - (a.streak ?? 0))[0];
+            const ch = challenges.find((c) => c.id === top?.challenge_id);
+            if (!ch) return null;
+            return (
+              <button
+                onClick={() =>
+                  articleRefs.current[ch.id]?.scrollIntoView({
+                    behavior: "smooth",
+                    block: "center",
+                  })
+                }
+                className="sticky top-2 z-20 w-full bg-gradient-to-r from-primary to-accent text-primary-foreground rounded-2xl px-4 py-3 shadow-lg shadow-primary/20 flex items-center gap-3 animate-fade-up"
+              >
+                <Trophy className="size-5 shrink-0" />
+                <div className="flex-1 text-left">
+                  <p className="text-[10px] font-bold uppercase tracking-wider opacity-80">
+                    Lanjutkan tantangan
+                  </p>
+                  <p className="text-sm font-semibold truncate">
+                    {ch.title} · streak {top.streak ?? 0}
+                  </p>
+                </div>
+                <span className="text-xs font-bold bg-white/20 px-2 py-1 rounded-full">
+                  Hari {(top.current_day ?? 0) + 1}
+                </span>
+              </button>
+            );
+          })()}
         {!isLoading && challenges.length === 0 && (
-          <EmptyState icon={Trophy} title="Belum ada challenge" description="Challenge baru akan dirilis berkala." />
+          <EmptyState
+            icon={Trophy}
+            title="Belum ada challenge"
+            description="Challenge baru akan dirilis berkala."
+          />
         )}
         {challenges.map((c) => {
           const part = partsByCh.get(c.id);
@@ -221,11 +241,15 @@ function ChallengesPage() {
           return (
             <article
               key={c.id}
-              ref={(el) => { articleRefs.current[c.id] = el; }}
+              ref={(el) => {
+                articleRefs.current[c.id] = el;
+              }}
               className={
                 highlightId === c.id
                   ? `rounded-3xl bg-card outline-1 outline-black/5 p-4 shadow-sm ring-4 ring-primary/40 transition-[opacity,box-shadow] ease-[cubic-bezier(0.34,1.56,0.64,1)] motion-reduce:transition-none motion-reduce:!ring-[var(--ring-strong)] motion-reduce:!opacity-100 ${
-                      highlightFading ? "ring-primary/0" : "animate-pulse motion-reduce:animate-none"
+                      highlightFading
+                        ? "ring-primary/0"
+                        : "animate-pulse motion-reduce:animate-none"
                     }`
                   : "rounded-3xl bg-card outline-1 outline-black/5 p-4 shadow-sm"
               }
@@ -235,18 +259,14 @@ function ChallengesPage() {
                       transitionDuration: prefersReducedMotion
                         ? "0ms"
                         : `${CHALLENGE_HIGHLIGHT_TRANSITION_MS}ms`,
-                      ...(highlightFading
-                        ? { opacity: CHALLENGE_HIGHLIGHT_FADE_OPACITY }
-                        : null),
+                      ...(highlightFading ? { opacity: CHALLENGE_HIGHLIGHT_FADE_OPACITY } : null),
                     }
                   : undefined
               }
             >
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
-                  <h2 className="font-semibold leading-tight truncate">
-                    {c.title}
-                  </h2>
+                  <h2 className="font-semibold leading-tight truncate">{c.title}</h2>
                   {c.description && (
                     <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
                       {c.description}
@@ -271,18 +291,12 @@ function ChallengesPage() {
                   <Users className="size-3" />
                   {c.current_participants ?? 0}
                 </span>
-                {c.difficulty && (
-                  <span className="capitalize">{c.difficulty}</span>
-                )}
+                {c.difficulty && <span className="capitalize">{c.difficulty}</span>}
                 {(c.xp_reward ?? 0) > 0 && (
-                  <span className="text-primary font-semibold">
-                    +{c.xp_reward} XP
-                  </span>
+                  <span className="text-primary font-semibold">+{c.xp_reward} XP</span>
                 )}
                 {(c.coin_reward ?? 0) > 0 && (
-                  <span className="text-amber-600 font-semibold">
-                    +{c.coin_reward} 🪙
-                  </span>
+                  <span className="text-amber-600 font-semibold">+{c.coin_reward} 🪙</span>
                 )}
               </div>
 
@@ -351,12 +365,7 @@ function ChallengesPage() {
                   autoSelectFirstGroup={streakAutoChallenge === c.id}
                 />
               )}
-              {joined && (
-                <GroupInviter
-                  challengeId={c.id}
-                  initialOpen={focusChallenge === c.id}
-                />
-              )}
+              {joined && <GroupInviter challengeId={c.id} initialOpen={focusChallenge === c.id} />}
               {joined && <BonusClaimer challengeId={c.id} initialOpen={focusChallenge === c.id} />}
             </article>
           );
@@ -437,7 +446,13 @@ function Leaderboard({
   );
 }
 
-function GroupInviter({ challengeId, initialOpen }: { challengeId: string; initialOpen?: boolean }) {
+function GroupInviter({
+  challengeId,
+  initialOpen,
+}: {
+  challengeId: string;
+  initialOpen?: boolean;
+}) {
   const qc = useQueryClient();
   const navigate = useNavigate();
   const fetchGroups = useServerFn(listMyGroupsForChallenge);
@@ -526,7 +541,8 @@ function LeaderboardList({
   isLoading: boolean;
 }) {
   if (isLoading) return <p className="text-xs text-muted-foreground text-center mt-2">Memuat…</p>;
-  if (rows.length === 0) return <p className="text-xs text-muted-foreground text-center mt-2">Belum ada peserta.</p>;
+  if (rows.length === 0)
+    return <p className="text-xs text-muted-foreground text-center mt-2">Belum ada peserta.</p>;
   return (
     <ol className="space-y-1.5">
       {rows.map((r) => (
@@ -614,7 +630,13 @@ function GroupInviteRow({
   );
 }
 
-function BonusClaimer({ challengeId, initialOpen }: { challengeId: string; initialOpen?: boolean }) {
+function BonusClaimer({
+  challengeId,
+  initialOpen,
+}: {
+  challengeId: string;
+  initialOpen?: boolean;
+}) {
   const qc = useQueryClient();
   const [open, setOpen] = useState(initialOpen ?? true);
   const triggerRef = useRef<HTMLButtonElement | null>(null);
@@ -662,8 +684,7 @@ function BonusClaimer({ challengeId, initialOpen }: { challengeId: string; initi
   }, [challengeId, groups, qc]);
   const claimedSet = new Set(claimedIds);
   const claimM = useMutation({
-    mutationFn: (group_id: string) =>
-      claimFn({ data: { group_id, challenge_id: challengeId } }),
+    mutationFn: (group_id: string) => claimFn({ data: { group_id, challenge_id: challengeId } }),
     onSuccess: (r, group_id) => {
       if (r.ok) {
         toast.success(`+${r.coins_awarded} 🪙 bonus grup!`);
@@ -692,24 +713,25 @@ function BonusClaimer({ challengeId, initialOpen }: { challengeId: string; initi
         <Gift className="size-3" />
         {open ? "Tutup klaim bonus" : "Klaim bonus grup"}
       </button>
-      {open && groups.map((g) => {
-        const done = claimedSet.has(g.id);
-        return (
-          <div key={g.id} className="space-y-1">
-            <button
-              onClick={() => !done && claimM.mutate(g.id)}
-              disabled={done || claimM.isPending}
-              className={`w-full text-[11px] font-semibold rounded-xl py-1.5 px-2 inline-flex items-center justify-center gap-1 ${
-                done ? "bg-muted text-muted-foreground" : "bg-amber-100 text-amber-800"
-              }`}
-            >
-              <Gift className="size-3" />
-              {done ? `Bonus "${g.name}" terklaim` : `Klaim bonus grup "${g.name}"`}
-            </button>
-            <BonusClaimers groupId={g.id} challengeId={challengeId} groupName={g.name} />
-          </div>
-        );
-      })}
+      {open &&
+        groups.map((g) => {
+          const done = claimedSet.has(g.id);
+          return (
+            <div key={g.id} className="space-y-1">
+              <button
+                onClick={() => !done && claimM.mutate(g.id)}
+                disabled={done || claimM.isPending}
+                className={`w-full text-[11px] font-semibold rounded-xl py-1.5 px-2 inline-flex items-center justify-center gap-1 ${
+                  done ? "bg-muted text-muted-foreground" : "bg-amber-100 text-amber-800"
+                }`}
+              >
+                <Gift className="size-3" />
+                {done ? `Bonus "${g.name}" terklaim` : `Klaim bonus grup "${g.name}"`}
+              </button>
+              <BonusClaimers groupId={g.id} challengeId={challengeId} groupName={g.name} />
+            </div>
+          );
+        })}
     </div>
   );
 }

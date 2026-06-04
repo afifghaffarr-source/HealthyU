@@ -16,9 +16,7 @@ export const logWorkout = createServerFn({ method: "POST" })
   .inputValidator((i: unknown) => LogSchema.parse(i))
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
-    const { error } = await supabase
-      .from("workout_sessions")
-      .insert({ ...data, user_id: userId });
+    const { error } = await supabase.from("workout_sessions").insert({ ...data, user_id: userId });
     if (error) throw new Error(error.message);
     return { ok: true };
   });

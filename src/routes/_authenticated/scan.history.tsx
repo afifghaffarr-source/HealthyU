@@ -17,25 +17,36 @@ export const Route = createFileRoute("/_authenticated/scan/history")({
   notFoundComponent: () => <div className="p-4">Tidak ditemukan</div>,
 });
 
-type ScanItem = { name?: string; calories?: number; protein_g?: number; carbs_g?: number; fat_g?: number; portion_g?: number };
+type ScanItem = {
+  name?: string;
+  calories?: number;
+  protein_g?: number;
+  carbs_g?: number;
+  fat_g?: number;
+  portion_g?: number;
+};
 
 function Page() {
   const { data } = useSuspenseQuery(opts);
   const qc = useQueryClient();
   const relog = useServerFn(relogMeal);
   const relogMut = useMutation({
-    mutationFn: (it: ScanItem) => relog({
-      data: {
-        name: it.name ?? "Makanan",
-        calories: Number(it.calories ?? 0),
-        protein_g: Number(it.protein_g ?? 0),
-        carbs_g: Number(it.carbs_g ?? 0),
-        fat_g: Number(it.fat_g ?? 0),
-        meal_type: "snack",
-        portion_g: Number(it.portion_g ?? 0) || undefined,
-      },
-    }),
-    onSuccess: () => { toast.success("Dicatat ulang"); qc.invalidateQueries({ queryKey: ["scan-history"] }); },
+    mutationFn: (it: ScanItem) =>
+      relog({
+        data: {
+          name: it.name ?? "Makanan",
+          calories: Number(it.calories ?? 0),
+          protein_g: Number(it.protein_g ?? 0),
+          carbs_g: Number(it.carbs_g ?? 0),
+          fat_g: Number(it.fat_g ?? 0),
+          meal_type: "snack",
+          portion_g: Number(it.portion_g ?? 0) || undefined,
+        },
+      }),
+    onSuccess: () => {
+      toast.success("Dicatat ulang");
+      qc.invalidateQueries({ queryKey: ["scan-history"] });
+    },
     onError: (e: Error) => toast.error(e.message),
   });
   return (
@@ -50,7 +61,11 @@ function Page() {
         )}
         {data.scans.map((s) => {
           const items = (s.detected_foods as ScanItem[] | null) ?? [];
-          const names = items.map((i) => i?.name).filter(Boolean).slice(0, 3).join(", ");
+          const names = items
+            .map((i) => i?.name)
+            .filter(Boolean)
+            .slice(0, 3)
+            .join(", ");
           return (
             <div key={s.id} className="rounded-2xl bg-card border p-3">
               <div className="flex justify-between gap-2">
@@ -62,7 +77,9 @@ function Page() {
                   </div>
                 </div>
                 <div className="text-right">
-                  <div className="font-semibold">{Math.round(Number(s.total_calories ?? 0))} kkal</div>
+                  <div className="font-semibold">
+                    {Math.round(Number(s.total_calories ?? 0))} kkal
+                  </div>
                   {s.was_logged && <div className="text-xs text-success">✓ tercatat</div>}
                 </div>
               </div>

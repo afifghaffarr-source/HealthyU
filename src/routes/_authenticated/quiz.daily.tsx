@@ -14,8 +14,14 @@ function Page() {
   const quizFn = useServerFn(getDailyQuiz);
   const ansFn = useServerFn(answerDailyQuiz);
   const quoteFn = useServerFn(getDailyQuote);
-  const { data, isLoading } = useQuery({ queryKey: ["daily-quiz"], queryFn: () => quizFn({ data: undefined as any }) });
-  const { data: quote } = useQuery({ queryKey: ["daily-quote"], queryFn: () => quoteFn({ data: undefined as any }) });
+  const { data, isLoading } = useQuery({
+    queryKey: ["daily-quiz"],
+    queryFn: () => quizFn({ data: undefined as any }),
+  });
+  const { data: quote } = useQuery({
+    queryKey: ["daily-quote"],
+    queryFn: () => quoteFn({ data: undefined as any }),
+  });
   const mut = useMutation({
     mutationFn: (i: number) => ansFn({ data: { quizId: (data?.quiz as any).id, answer: i } }),
     onSuccess: (r) => {
@@ -31,14 +37,18 @@ function Page() {
       <main className="max-w-md mx-auto px-4 pt-4 space-y-4">
         {quote?.quote && (
           <div className="rounded-2xl bg-gradient-to-br from-accent/30 to-accent/10 p-4 border">
-            <div className="flex items-center gap-2 text-xs text-muted-foreground mb-1"><Sparkles className="size-3" /> Quote Hari Ini</div>
+            <div className="flex items-center gap-2 text-xs text-muted-foreground mb-1">
+              <Sparkles className="size-3" /> Quote Hari Ini
+            </div>
             <p className="text-sm italic">"{quote.quote.quote}"</p>
           </div>
         )}
         {isLoading && <Loader2 className="size-4 animate-spin" />}
         {q && (
           <div className="rounded-2xl bg-card border p-5 space-y-3">
-            <div className="flex items-center gap-2 text-primary text-xs uppercase font-semibold"><Brain className="size-4" /> Pertanyaan</div>
+            <div className="flex items-center gap-2 text-primary text-xs uppercase font-semibold">
+              <Brain className="size-4" /> Pertanyaan
+            </div>
             <h3 className="font-bold">{q.question}</h3>
             <div className="space-y-2">
               {(q.options as string[]).map((opt, i) => {
@@ -51,7 +61,11 @@ function Page() {
                     disabled={answered || mut.isPending}
                     onClick={() => mut.mutate(i)}
                     className={`w-full text-left px-4 py-2.5 rounded-xl border ${
-                      answered && isCorrect ? "bg-green-500/10 border-green-500" : isUser ? "bg-red-500/10 border-red-500" : "bg-background"
+                      answered && isCorrect
+                        ? "bg-green-500/10 border-green-500"
+                        : isUser
+                          ? "bg-red-500/10 border-red-500"
+                          : "bg-background"
                     } disabled:opacity-70`}
                   >
                     {opt}

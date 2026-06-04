@@ -66,7 +66,11 @@ function CoachPage() {
               className="size-9 rounded-full bg-muted grid place-items-center disabled:opacity-50"
               aria-label="Refresh"
             >
-              {mut.isPending ? <Loader2 className="size-4 animate-spin" /> : <RefreshCw className="size-4" />}
+              {mut.isPending ? (
+                <Loader2 className="size-4 animate-spin" />
+              ) : (
+                <RefreshCw className="size-4" />
+              )}
             </button>
           }
         />
@@ -74,9 +78,7 @@ function CoachPage() {
         {mut.isPending && !data && (
           <div className="bg-card p-8 rounded-3xl outline-1 outline-black/5 text-center space-y-3">
             <Loader2 className="size-8 animate-spin mx-auto text-primary" />
-            <p className="text-sm text-muted-foreground">
-              AI sedang menganalisis data Anda...
-            </p>
+            <p className="text-sm text-muted-foreground">AI sedang menganalisis data Anda...</p>
           </div>
         )}
 

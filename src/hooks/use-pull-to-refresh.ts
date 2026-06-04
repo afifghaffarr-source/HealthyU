@@ -20,7 +20,9 @@ export function usePullToRefresh(onRefresh: () => Promise<unknown> | unknown) {
     const onTouchEnd = async () => {
       if (pulling >= 60 && !refreshing) {
         setRefreshing(true);
-        try { await onRefresh(); } finally {
+        try {
+          await onRefresh();
+        } finally {
           setRefreshing(false);
         }
       }

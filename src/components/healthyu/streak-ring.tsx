@@ -1,16 +1,37 @@
 import { Flame } from "lucide-react";
 
-export function StreakRing({ days, goal = 30, size = 96 }: { days: number; goal?: number; size?: number }) {
+export function StreakRing({
+  days,
+  goal = 30,
+  size = 96,
+}: {
+  days: number;
+  goal?: number;
+  size?: number;
+}) {
   const pct = Math.min(1, days / goal);
   const r = size / 2 - 8;
   const c = 2 * Math.PI * r;
   return (
-    <div className="relative inline-flex items-center justify-center" style={{ width: size, height: size }}>
+    <div
+      className="relative inline-flex items-center justify-center"
+      style={{ width: size, height: size }}
+    >
       <svg width={size} height={size} className="-rotate-90">
-        <circle cx={size / 2} cy={size / 2} r={r} strokeWidth={6} className="stroke-muted fill-none" />
         <circle
-          cx={size / 2} cy={size / 2} r={r} strokeWidth={6}
-          strokeLinecap="round" fill="none"
+          cx={size / 2}
+          cy={size / 2}
+          r={r}
+          strokeWidth={6}
+          className="stroke-muted fill-none"
+        />
+        <circle
+          cx={size / 2}
+          cy={size / 2}
+          r={r}
+          strokeWidth={6}
+          strokeLinecap="round"
+          fill="none"
           stroke="url(#streak-grad)"
           strokeDasharray={c}
           strokeDashoffset={c * (1 - pct)}

@@ -12,7 +12,11 @@ const getPrivacy = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     const { supabase, userId } = context;
-    const { data } = await supabase.from("profiles").select("scan_audit_opt_in").eq("id", userId).maybeSingle();
+    const { data } = await supabase
+      .from("profiles")
+      .select("scan_audit_opt_in")
+      .eq("id", userId)
+      .maybeSingle();
     return { auditOptIn: data?.scan_audit_opt_in ?? true };
   });
 
@@ -31,7 +35,10 @@ function Page() {
   const fn = useServerFn(setAuditOptIn);
   const m = useMutation({
     mutationFn: (enabled: boolean) => fn({ data: { enabled } }),
-    onSuccess: () => { toast.success("Tersimpan"); qc.invalidateQueries({ queryKey: ["privacy"] }); },
+    onSuccess: () => {
+      toast.success("Tersimpan");
+      qc.invalidateQueries({ queryKey: ["privacy"] });
+    },
     onError: (e: Error) => toast.error(e.message),
   });
   return (
@@ -51,7 +58,9 @@ function Page() {
             className={`shrink-0 w-12 h-7 rounded-full relative transition ${data.auditOptIn ? "bg-primary" : "bg-muted"}`}
             aria-label="Toggle audit"
           >
-            <span className={`absolute top-0.5 size-6 rounded-full bg-white transition ${data.auditOptIn ? "left-[22px]" : "left-0.5"}`} />
+            <span
+              className={`absolute top-0.5 size-6 rounded-full bg-white transition ${data.auditOptIn ? "left-[22px]" : "left-0.5"}`}
+            />
           </button>
         </div>
       </div>

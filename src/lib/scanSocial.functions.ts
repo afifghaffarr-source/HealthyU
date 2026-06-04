@@ -38,7 +38,13 @@ export const getGroupScanLeaderboard = createServerFn({ method: "POST" })
       .from("friend_group_members")
       .select("user_id, profiles(full_name, avatar_url, scan_streak_current)")
       .eq("group_id", data.groupId);
-    const rows: Array<{ userId: string; name: string; avatar: string | null; streak: number; scans: number }> = [];
+    const rows: Array<{
+      userId: string;
+      name: string;
+      avatar: string | null;
+      streak: number;
+      scans: number;
+    }> = [];
     for (const m of members ?? []) {
       const { count } = await supabase
         .from("food_scans")
@@ -62,7 +68,7 @@ export const getGroupScanLeaderboard = createServerFn({ method: "POST" })
 export const reverseCalorie = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: { targetCalories: number }) =>
-    z.object({ targetCalories: z.number().min(50).max(3000) }).parse(d)
+    z.object({ targetCalories: z.number().min(50).max(3000) }).parse(d),
   )
   .handler(async ({ data }) => {
     const apiKey = process.env.LOVABLE_API_KEY;
@@ -87,7 +93,9 @@ export const reverseCalorie = createServerFn({ method: "POST" })
     const text = json.choices?.[0]?.message?.content ?? "[]";
     const m = text.match(/\[[\s\S]*\]/);
     let suggestions: any[] = [];
-    try { suggestions = m ? JSON.parse(m[0]) : []; } catch {}
+    try {
+      suggestions = m ? JSON.parse(m[0]) : [];
+    } catch {}
     return { suggestions };
   });
 
@@ -124,8 +132,15 @@ export const getDailyChallenge = createServerFn({ method: "POST" })
     const json = await res.json();
     const text = json.choices?.[0]?.message?.content ?? "{}";
     const m = text.match(/\{[\s\S]*\}/);
-    let parsed: any = { title: "Minum 8 gelas air", description: "Hidrasi penuh", goal_type: "water_ml", goal_value: 2000 };
-    try { if (m) parsed = JSON.parse(m[0]); } catch {}
+    let parsed: any = {
+      title: "Minum 8 gelas air",
+      description: "Hidrasi penuh",
+      goal_type: "water_ml",
+      goal_value: 2000,
+    };
+    try {
+      if (m) parsed = JSON.parse(m[0]);
+    } catch {}
     const { data: created } = await supabase
       .from("ai_daily_challenges")
       .insert({
@@ -146,9 +161,20 @@ export const completeDailyChallenge = createServerFn({ method: "POST" })
   .inputValidator((d: { id: string }) => z.object({ id: z.string().uuid() }).parse(d))
   .handler(async ({ context, data }) => {
     const { supabase, userId } = context;
-    await supabase.from("ai_daily_challenges").update({ completed: true }).eq("id", data.id).eq("user_id", userId);
-    const { data: prof } = await supabase.from("profiles").select("health_coins").eq("id", userId).maybeSingle();
-    await supabase.from("profiles").update({ health_coins: (prof?.health_coins ?? 0) + 10 }).eq("id", userId);
+    await supabase
+      .from("ai_daily_challenges")
+      .update({ completed: true })
+      .eq("id", data.id)
+      .eq("user_id", userId);
+    const { data: prof } = await supabase
+      .from("profiles")
+      .select("health_coins")
+      .eq("id", userId)
+      .maybeSingle();
+    await supabase
+      .from("profiles")
+      .update({ health_coins: (prof?.health_coins ?? 0) + 10 })
+      .eq("id", userId);
     return { ok: true, coinsAwarded: 10 };
   });
 
@@ -156,7 +182,7 @@ export const completeDailyChallenge = createServerFn({ method: "POST" })
 export const remixRecipe = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: { recipeId: string; substitute: string }) =>
-    z.object({ recipeId: z.string().uuid(), substitute: z.string().min(1).max(200) }).parse(d)
+    z.object({ recipeId: z.string().uuid(), substitute: z.string().min(1).max(200) }).parse(d),
   )
   .handler(async ({ context, data }) => {
     const { supabase } = context;
@@ -190,7 +216,9 @@ export const remixRecipe = createServerFn({ method: "POST" })
     const text = json.choices?.[0]?.message?.content ?? "{}";
     const m = text.match(/\{[\s\S]*\}/);
     let remix: any = null;
-    try { if (m) remix = JSON.parse(m[0]); } catch {}
+    try {
+      if (m) remix = JSON.parse(m[0]);
+    } catch {}
     return { remix };
   });
 
@@ -198,7 +226,7 @@ export const remixRecipe = createServerFn({ method: "POST" })
 export const getGroceryFromPlan = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: { mealPlanId: string }) =>
-    z.object({ mealPlanId: z.string().uuid() }).parse(d)
+    z.object({ mealPlanId: z.string().uuid() }).parse(d),
   )
   .handler(async ({ context, data }) => {
     const { supabase } = context;
@@ -228,7 +256,7 @@ export const getGroceryFromPlan = createServerFn({ method: "POST" })
 export const doctorChat = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: { message: string }) =>
-    z.object({ message: z.string().min(1).max(2000) }).parse(d)
+    z.object({ message: z.string().min(1).max(2000) }).parse(d),
   )
   .handler(async ({ context, data }) => {
     const { supabase, userId } = context;
@@ -298,11 +326,13 @@ export const unfollowUser = createServerFn({ method: "POST" })
 export const createMealStory = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: { caption?: string; imageUrl?: string; mealLogId?: string }) =>
-    z.object({
-      caption: z.string().max(280).optional(),
-      imageUrl: z.string().url().optional(),
-      mealLogId: z.string().uuid().optional(),
-    }).parse(d)
+    z
+      .object({
+        caption: z.string().max(280).optional(),
+        imageUrl: z.string().url().optional(),
+        mealLogId: z.string().uuid().optional(),
+      })
+      .parse(d),
   )
   .handler(async ({ context, data }) => {
     const { supabase, userId } = context;
@@ -326,7 +356,9 @@ export const listStoriesFeed = createServerFn({ method: "POST" })
     const { supabase } = context;
     const { data } = await supabase
       .from("meal_stories")
-      .select("id, user_id, caption, image_url, created_at, expires_at, profiles!inner(full_name, avatar_url)")
+      .select(
+        "id, user_id, caption, image_url, created_at, expires_at, profiles!inner(full_name, avatar_url)",
+      )
       .gt("expires_at", new Date().toISOString())
       .order("created_at", { ascending: false })
       .limit(50);

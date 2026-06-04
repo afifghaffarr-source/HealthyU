@@ -7,10 +7,24 @@ import { getPrayerTimes } from "@/lib/prayerTimes.functions";
 import { Sunrise, Sun, Sunset, Moon, CloudMoon, MapPin } from "lucide-react";
 
 const ICONS: Record<string, typeof Sunrise> = {
-  Fajr: Sunrise, Sunrise: Sunrise, Dhuhr: Sun, Asr: Sun, Maghrib: Sunset, Isha: Moon, Imsak: CloudMoon, Midnight: Moon,
+  Fajr: Sunrise,
+  Sunrise: Sunrise,
+  Dhuhr: Sun,
+  Asr: Sun,
+  Maghrib: Sunset,
+  Isha: Moon,
+  Imsak: CloudMoon,
+  Midnight: Moon,
 };
 const SHOW = ["Fajr", "Sunrise", "Dhuhr", "Asr", "Maghrib", "Isha"];
-const LABELS: Record<string, string> = { Fajr: "Subuh", Sunrise: "Terbit", Dhuhr: "Dzuhur", Asr: "Ashar", Maghrib: "Maghrib", Isha: "Isya" };
+const LABELS: Record<string, string> = {
+  Fajr: "Subuh",
+  Sunrise: "Terbit",
+  Dhuhr: "Dzuhur",
+  Asr: "Ashar",
+  Maghrib: "Maghrib",
+  Isha: "Isya",
+};
 
 function toMinutes(hhmm: string) {
   const [h, m] = hhmm.split(":").map(Number);
@@ -48,7 +62,9 @@ function AladhanPage() {
     navigator.geolocation.getCurrentPosition(
       async (pos) => {
         try {
-          const r = await fetchTimes({ data: { lat: pos.coords.latitude, lng: pos.coords.longitude } });
+          const r = await fetchTimes({
+            data: { lat: pos.coords.latitude, lng: pos.coords.longitude },
+          });
           if (r.ok) setTimings(r.timings);
           else setErr(r.error);
         } catch (e) {
@@ -57,12 +73,17 @@ function AladhanPage() {
           setLoading(false);
         }
       },
-      (e) => { setErr(e.message); setLoading(false); },
+      (e) => {
+        setErr(e.message);
+        setLoading(false);
+      },
     );
   }, [fetchTimes]);
 
   const nowMin = now.getHours() * 60 + now.getMinutes();
-  const filtered = timings ? SHOW.map((k) => [k, timings[k]?.slice(0, 5)] as const).filter(([, v]) => !!v) : [];
+  const filtered = timings
+    ? SHOW.map((k) => [k, timings[k]?.slice(0, 5)] as const).filter(([, v]) => !!v)
+    : [];
   const upcoming = filtered.find(([, v]) => toMinutes(v) > nowMin);
   const next = upcoming ?? filtered[0];
 
@@ -81,8 +102,12 @@ function AladhanPage() {
             <p className="text-xs uppercase tracking-wider opacity-80">Sholat berikutnya</p>
             <div className="flex items-end justify-between mt-1">
               <div>
-                <p className="text-3xl font-bold" style={{ fontFamily: "var(--font-display)" }}>{LABELS[next[0]] ?? next[0]}</p>
-                <p className="text-sm opacity-90">{fmtRemaining(toMinutes(next[1]) - nowMin)} lagi</p>
+                <p className="text-3xl font-bold" style={{ fontFamily: "var(--font-display)" }}>
+                  {LABELS[next[0]] ?? next[0]}
+                </p>
+                <p className="text-sm opacity-90">
+                  {fmtRemaining(toMinutes(next[1]) - nowMin)} lagi
+                </p>
               </div>
               <p className="text-2xl font-mono tabular-nums">{next[1]}</p>
             </div>
@@ -93,11 +118,20 @@ function AladhanPage() {
           const isNext = next?.[0] === k;
           const passed = toMinutes(v) <= nowMin;
           return (
-            <div key={k} className={`flex items-center justify-between rounded-2xl p-4 border transition ${
-              isNext ? "bg-primary/10 border-primary/40" : passed ? "bg-card border-border/40 opacity-60" : "bg-card border-border/40"
-            }`}>
+            <div
+              key={k}
+              className={`flex items-center justify-between rounded-2xl p-4 border transition ${
+                isNext
+                  ? "bg-primary/10 border-primary/40"
+                  : passed
+                    ? "bg-card border-border/40 opacity-60"
+                    : "bg-card border-border/40"
+              }`}
+            >
               <div className="flex items-center gap-3">
-                <span className={`size-9 grid place-items-center rounded-xl ${isNext ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"}`}>
+                <span
+                  className={`size-9 grid place-items-center rounded-xl ${isNext ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"}`}
+                >
                   <Icon className="size-4" />
                 </span>
                 <span className="font-semibold">{LABELS[k] ?? k}</span>

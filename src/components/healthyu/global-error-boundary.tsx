@@ -1,8 +1,12 @@
 import { Component, type ReactNode } from "react";
 import { reportLovableError } from "@/lib/lovable-error-reporting";
 
-interface Props { children: ReactNode }
-interface State { error: Error | null }
+interface Props {
+  children: ReactNode;
+}
+interface State {
+  error: Error | null;
+}
 
 export class GlobalErrorBoundary extends Component<Props, State> {
   state: State = { error: null };

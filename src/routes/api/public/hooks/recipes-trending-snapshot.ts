@@ -14,14 +14,15 @@ export const Route = createFileRoute("/api/public/hooks/recipes-trending-snapsho
         if (!apiKey || !expected || apiKey !== expected) {
           return new Response("Unauthorized", { status: 401 });
         }
-        const { data: recipes } = await supabaseAdmin
-          .from("recipes")
-          .select("id, save_count");
+        const { data: recipes } = await supabaseAdmin.from("recipes").select("id, save_count");
         let updated = 0;
         for (const r of recipes ?? []) {
           const { error: uerr } = await supabaseAdmin
             .from("recipes")
-            .update({ save_count_snapshot: r.save_count ?? 0, snapshot_at: new Date().toISOString() })
+            .update({
+              save_count_snapshot: r.save_count ?? 0,
+              snapshot_at: new Date().toISOString(),
+            })
             .eq("id", r.id);
           if (!uerr) updated++;
         }

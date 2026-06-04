@@ -19,7 +19,14 @@ export const Route = createFileRoute("/_authenticated/prayer")({
   component: PrayerPage,
 });
 
-type Times = { Fajr: string; Dhuhr: string; Asr: string; Maghrib: string; Isha: string; Sunrise: string };
+type Times = {
+  Fajr: string;
+  Dhuhr: string;
+  Asr: string;
+  Maghrib: string;
+  Isha: string;
+  Sunrise: string;
+};
 
 function PrayerPage() {
   const fetchProfile = useServerFn(getProfile);
@@ -31,7 +38,9 @@ function PrayerPage() {
     queryFn: async () => {
       const today = new Date();
       const d = `${String(today.getDate()).padStart(2, "0")}-${String(today.getMonth() + 1).padStart(2, "0")}-${today.getFullYear()}`;
-      const res = await fetch(`https://api.aladhan.com/v1/timingsByCity/${d}?city=${encodeURIComponent(city)}&country=Indonesia&method=20`);
+      const res = await fetch(
+        `https://api.aladhan.com/v1/timingsByCity/${d}?city=${encodeURIComponent(city)}&country=Indonesia&method=20`,
+      );
       const json = await res.json();
       return json?.data?.timings as Times;
     },
@@ -125,23 +134,32 @@ function PrayerPage() {
                 }`}
               >
                 {prefs.enabled && permission === "granted" ? (
-                  <><Bell className="size-4" /> Notifikasi sholat aktif</>
+                  <>
+                    <Bell className="size-4" /> Notifikasi sholat aktif
+                  </>
                 ) : (
-                  <><BellOff className="size-4" /> Aktifkan notifikasi sholat</>
+                  <>
+                    <BellOff className="size-4" /> Aktifkan notifikasi sholat
+                  </>
                 )}
               </button>
               {prefs.enabled && permission === "granted" && (
                 <div className="grid grid-cols-2 gap-2 pt-1">
-                  {([
-                    ["sahur", "Sahur (-20m)"],
-                    ["fajr", "Subuh"],
-                    ["dhuhr", "Dzuhur"],
-                    ["asr", "Ashar"],
-                    ["maghrib", "Maghrib"],
-                    ["iftar", "Berbuka"],
-                    ["isha", "Isya"],
-                  ] as Array<[keyof PrayerPrefs, string]>).map(([k, label]) => (
-                    <label key={k} className="flex items-center gap-2 bg-muted/50 rounded-xl px-3 py-2 text-xs cursor-pointer">
+                  {(
+                    [
+                      ["sahur", "Sahur (-20m)"],
+                      ["fajr", "Subuh"],
+                      ["dhuhr", "Dzuhur"],
+                      ["asr", "Ashar"],
+                      ["maghrib", "Maghrib"],
+                      ["iftar", "Berbuka"],
+                      ["isha", "Isya"],
+                    ] as Array<[keyof PrayerPrefs, string]>
+                  ).map(([k, label]) => (
+                    <label
+                      key={k}
+                      className="flex items-center gap-2 bg-muted/50 rounded-xl px-3 py-2 text-xs cursor-pointer"
+                    >
                       <input
                         type="checkbox"
                         checked={!!prefs[k]}
@@ -160,23 +178,27 @@ function PrayerPage() {
 
             {nextIdx !== -1 && (
               <section className="bg-gradient-to-br from-sage to-sage-deep p-6 rounded-3xl text-primary-foreground animate-fade-up">
-                <p className="text-xs uppercase tracking-widest opacity-80 font-bold mb-1">Sholat berikutnya</p>
+                <p className="text-xs uppercase tracking-widest opacity-80 font-bold mb-1">
+                  Sholat berikutnya
+                </p>
                 <p className="text-3xl font-bold">{prayers[nextIdx].name}</p>
                 <p className="text-2xl tabular-nums mt-1">{prayers[nextIdx].time}</p>
-                {countdown && (
-                  <p className="text-sm mt-2 opacity-90">⏳ {countdown} lagi</p>
-                )}
+                {countdown && <p className="text-sm mt-2 opacity-90">⏳ {countdown} lagi</p>}
               </section>
             )}
 
             {times && (
               <section className="grid grid-cols-2 gap-3 animate-fade-up">
                 <div className="bg-card p-4 rounded-2xl outline-1 outline-black/5">
-                  <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Imsak</p>
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                    Imsak
+                  </p>
                   <p className="text-lg font-bold tabular-nums">{shiftMinutes(times.Fajr, -10)}</p>
                 </div>
                 <div className="bg-card p-4 rounded-2xl outline-1 outline-black/5">
-                  <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Terbit</p>
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                    Terbit
+                  </p>
                   <p className="text-lg font-bold tabular-nums">{times.Sunrise}</p>
                 </div>
               </section>
@@ -184,8 +206,13 @@ function PrayerPage() {
 
             <section className="bg-card rounded-3xl outline-1 outline-black/5 divide-y divide-border overflow-hidden animate-fade-up">
               {prayers.map((p, i) => (
-                <div key={p.name} className={`flex justify-between items-center px-5 py-4 ${i === nextIdx ? "bg-secondary/50" : ""}`}>
-                  <span className={`font-semibold ${i === nextIdx ? "text-primary" : ""}`}>{p.name}</span>
+                <div
+                  key={p.name}
+                  className={`flex justify-between items-center px-5 py-4 ${i === nextIdx ? "bg-secondary/50" : ""}`}
+                >
+                  <span className={`font-semibold ${i === nextIdx ? "text-primary" : ""}`}>
+                    {p.name}
+                  </span>
                   <span className="tabular-nums font-bold">{p.time}</span>
                 </div>
               ))}

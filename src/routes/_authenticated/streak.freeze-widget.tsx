@@ -14,7 +14,11 @@ function Page() {
         <div className="rounded-2xl border bg-card p-6 text-center space-y-3">
           <div className="text-6xl">🧊</div>
           <p className="text-sm">Lupa log hari ini? Gunakan freeze untuk menyelamatkan streakmu.</p>
-          <button onClick={() => setUsed(true)} disabled={used} className="w-full rounded-lg bg-primary text-primary-foreground py-2 text-sm">
+          <button
+            onClick={() => setUsed(true)}
+            disabled={used}
+            className="w-full rounded-lg bg-primary text-primary-foreground py-2 text-sm"
+          >
             {used ? "✓ Freeze Digunakan" : "Gunakan 1 Freeze"}
           </button>
         </div>

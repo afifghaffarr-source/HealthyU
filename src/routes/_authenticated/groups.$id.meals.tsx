@@ -52,7 +52,9 @@ function Page() {
               </p>
             </div>
             <div className="text-right">
-              <p className="text-sm font-bold text-primary">{Math.round(Number(m.calories ?? 0))}</p>
+              <p className="text-sm font-bold text-primary">
+                {Math.round(Number(m.calories ?? 0))}
+              </p>
               <p className="text-[10px] text-muted-foreground">kkal</p>
             </div>
           </div>

@@ -23,7 +23,9 @@ function Page() {
   const copyMut = useMutation({
     mutationFn: () => copyFn({ data: {} }),
     onSuccess: (r) => {
-      toast.success(r.inserted ? `${r.inserted} meal disalin dari kemarin` : "Tidak ada meal kemarin");
+      toast.success(
+        r.inserted ? `${r.inserted} meal disalin dari kemarin` : "Tidak ada meal kemarin",
+      );
       qc.invalidateQueries({ queryKey: ["daily-insights"] });
     },
     onError: (e: Error) => toast.error(e.message),
@@ -74,7 +76,9 @@ function Page() {
             <ul className="space-y-2">
               {data.tips.map((t, i) => (
                 <li key={i} className="flex gap-3 bg-muted/40 rounded-2xl p-3">
-                  <span className="shrink-0 size-6 rounded-full bg-primary text-primary-foreground grid place-items-center text-[11px] font-bold">{i + 1}</span>
+                  <span className="shrink-0 size-6 rounded-full bg-primary text-primary-foreground grid place-items-center text-[11px] font-bold">
+                    {i + 1}
+                  </span>
                   <span className="text-sm leading-relaxed">{t}</span>
                 </li>
               ))}

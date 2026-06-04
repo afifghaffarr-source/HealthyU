@@ -28,11 +28,20 @@ function Page() {
         )}
         <div className="grid grid-cols-2 gap-3">
           {data.recipes.map((r) => (
-            <Link key={r.id} to="/recipes/$id" params={{ id: r.id }} className="rounded-2xl bg-card border overflow-hidden">
-              {r.image_url && <img src={r.image_url} alt="" className="w-full aspect-square object-cover" />}
+            <Link
+              key={r.id}
+              to="/recipes/$id"
+              params={{ id: r.id }}
+              className="rounded-2xl bg-card border overflow-hidden"
+            >
+              {r.image_url && (
+                <img src={r.image_url} alt="" className="w-full aspect-square object-cover" />
+              )}
               <div className="p-2">
                 <div className="text-xs font-medium line-clamp-2">{r.title}</div>
-                <div className="text-[10px] text-muted-foreground mt-1">{Math.round(Number(r.calories ?? 0))} kkal · {r.prep_min ?? "-"}m</div>
+                <div className="text-[10px] text-muted-foreground mt-1">
+                  {Math.round(Number(r.calories ?? 0))} kkal · {r.prep_min ?? "-"}m
+                </div>
               </div>
             </Link>
           ))}

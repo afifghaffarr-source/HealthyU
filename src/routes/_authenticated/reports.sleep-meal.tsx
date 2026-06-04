@@ -27,11 +27,15 @@ function Page() {
             <div className="flex items-center justify-between text-xs mb-1">
               <span>{p.date}</span>
               <span className="inline-flex items-center gap-1">
-                <Moon className="size-3" /> {p.sleepHours.toFixed(1)}j · {Math.round(p.calories)} kkal
+                <Moon className="size-3" /> {p.sleepHours.toFixed(1)}j · {Math.round(p.calories)}{" "}
+                kkal
               </span>
             </div>
             <div className="h-1.5 bg-muted rounded-full overflow-hidden">
-              <div className="h-full bg-primary" style={{ width: `${(p.calories / max) * 100}%` }} />
+              <div
+                className="h-full bg-primary"
+                style={{ width: `${(p.calories / max) * 100}%` }}
+              />
             </div>
           </div>
         ))}

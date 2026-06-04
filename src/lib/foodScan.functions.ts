@@ -30,10 +30,7 @@ Aturan:
 - Jika foto tidak menunjukkan makanan, balas {"items": []}.`;
 
 const ScanInput = z.object({
-  image_data_url: z
-    .string()
-    .startsWith("data:image/")
-    .max(8_000_000, "Image too large (max ~6MB)"),
+  image_data_url: z.string().startsWith("data:image/").max(8_000_000, "Image too large (max ~6MB)"),
   use_pro: z.boolean().optional(),
 });
 
@@ -73,7 +70,10 @@ export const recognizeFood = createServerFn({ method: "POST" })
           {
             role: "user",
             content: [
-              { type: "text", text: "Kenali makanan di foto ini dan kembalikan JSON sesuai schema." },
+              {
+                type: "text",
+                text: "Kenali makanan di foto ini dan kembalikan JSON sesuai schema.",
+              },
               { type: "image_url", image_url: { url: data.image_data_url } },
             ],
           },

@@ -22,7 +22,10 @@ function RecipeDetail() {
   const rateFn = useServerFn(rateRecipe);
   const checkBm = useServerFn(isRecipeBookmarked);
   const toggleBm = useServerFn(toggleRecipeBookmark);
-  const { data: r, isLoading } = useQuery({ queryKey: ["recipe", id], queryFn: () => fetch({ data: { id } }) });
+  const { data: r, isLoading } = useQuery({
+    queryKey: ["recipe", id],
+    queryFn: () => fetch({ data: { id } }),
+  });
   const { data: rating } = useQuery({
     queryKey: ["recipe", id, "rating"],
     queryFn: () => fetchRating({ data: { recipe_id: id } }),
@@ -49,7 +52,8 @@ function RecipeDetail() {
   }, [rating?.myRating, rating?.myReview]);
 
   const rateM = useMutation({
-    mutationFn: () => rateFn({ data: { recipe_id: id, rating: stars, review: review.trim() || undefined } }),
+    mutationFn: () =>
+      rateFn({ data: { recipe_id: id, rating: stars, review: review.trim() || undefined } }),
     onSuccess: () => {
       toast.success("Rating tersimpan");
       qc.invalidateQueries({ queryKey: ["recipe", id, "rating"] });
@@ -109,7 +113,9 @@ function RecipeDetail() {
               <ol className="space-y-2.5 text-sm">
                 {(r.instructions ?? []).map((it: string, i: number) => (
                   <li key={i} className="flex gap-3">
-                    <span className="size-6 shrink-0 bg-primary text-primary-foreground rounded-full grid place-items-center text-xs font-bold">{i + 1}</span>
+                    <span className="size-6 shrink-0 bg-primary text-primary-foreground rounded-full grid place-items-center text-xs font-bold">
+                      {i + 1}
+                    </span>
                     <span className="pt-0.5">{it}</span>
                   </li>
                 ))}

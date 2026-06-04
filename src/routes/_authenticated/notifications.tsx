@@ -97,7 +97,9 @@ function NotificationsPage() {
                   type="number"
                   min={0}
                   max={60}
-                  defaultValue={Number((p as Record<string, unknown>)["prayer_minutes_before"] ?? 10)}
+                  defaultValue={Number(
+                    (p as Record<string, unknown>)["prayer_minutes_before"] ?? 10,
+                  )}
                   onBlur={(e) => save.mutate({ prayer_minutes_before: Number(e.target.value) })}
                   className="bg-secondary/40 rounded-lg px-2 py-1 text-sm w-20 text-right"
                 />
@@ -124,7 +126,9 @@ function NotificationsPage() {
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <section className="space-y-2 animate-fade-up">
-      <h2 className="text-xs font-bold uppercase tracking-wider text-muted-foreground px-1">{title}</h2>
+      <h2 className="text-xs font-bold uppercase tracking-wider text-muted-foreground px-1">
+        {title}
+      </h2>
       <div className="space-y-2">{children}</div>
     </section>
   );

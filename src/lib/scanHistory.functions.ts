@@ -8,7 +8,9 @@ export const listScanHistory = createServerFn({ method: "GET" })
     const { supabase, userId } = context;
     const { data, error } = await supabase
       .from("food_scans")
-      .select("id, detected_foods, total_calories, avg_confidence, model_version, was_logged, created_at")
+      .select(
+        "id, detected_foods, total_calories, avg_confidence, model_version, was_logged, created_at",
+      )
       .eq("user_id", userId)
       .order("created_at", { ascending: false })
       .limit(50);
@@ -43,7 +45,9 @@ export const getScanStats = createServerFn({ method: "GET" })
 export const copyYesterdayMeals = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) =>
-    z.object({ meal_type: z.enum(["breakfast", "lunch", "dinner", "snack"]).optional() }).parse(input),
+    z
+      .object({ meal_type: z.enum(["breakfast", "lunch", "dinner", "snack"]).optional() })
+      .parse(input),
   )
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;

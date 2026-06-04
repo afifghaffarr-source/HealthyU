@@ -73,7 +73,7 @@ export const checkScanLimit = createServerFn({ method: "GET" })
       .eq("status", "active")
       .maybeSingle();
     const isPro = !!sub;
-    const limit = isPro ? 9999 : prof?.daily_scan_limit ?? 10;
+    const limit = isPro ? 9999 : (prof?.daily_scan_limit ?? 10);
     const used = count ?? 0;
     return { used, limit, remaining: Math.max(0, limit - used), isPro };
   });
@@ -81,9 +81,7 @@ export const checkScanLimit = createServerFn({ method: "GET" })
 // ============ 4: AI meal coach ============
 export const mealCoachChat = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((i: unknown) =>
-    z.object({ message: z.string().min(1).max(1000) }).parse(i),
-  )
+  .inputValidator((i: unknown) => z.object({ message: z.string().min(1).max(1000) }).parse(i))
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
     const apiKey = process.env.LOVABLE_API_KEY;
@@ -142,7 +140,9 @@ export const compareWeeks = createServerFn({ method: "GET" })
       .eq("user_id", userId)
       .gte("log_date", fmt(startLast));
     const agg = (from: string, to: string) => {
-      const f = (data ?? []).filter((r) => (r.log_date as string) >= from && (r.log_date as string) <= to);
+      const f = (data ?? []).filter(
+        (r) => (r.log_date as string) >= from && (r.log_date as string) <= to,
+      );
       return f.reduce(
         (a, r) => ({
           cal: a.cal + Number(r.calories ?? 0),
@@ -174,7 +174,15 @@ export const exportMealsCsv = createServerFn({ method: "GET" })
     const header = "date,meal,name,calories,protein,carbs,fat";
     const escape = (s: unknown) => `"${String(s ?? "").replace(/"/g, '""')}"`;
     const rows = (data ?? []).map((r) =>
-      [r.log_date, r.meal_type, escape(r.custom_name), r.calories, r.protein_g, r.carbs_g, r.fat_g].join(","),
+      [
+        r.log_date,
+        r.meal_type,
+        escape(r.custom_name),
+        r.calories,
+        r.protein_g,
+        r.carbs_g,
+        r.fat_g,
+      ].join(","),
     );
     return { csv: [header, ...rows].join("\n"), count: rows.length };
   });
@@ -183,7 +191,9 @@ export const exportMealsCsv = createServerFn({ method: "GET" })
 export const classifyMealTags = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((i: unknown) =>
-    z.object({ name: z.string().min(1).max(200), translate_to: z.string().length(2).optional() }).parse(i),
+    z
+      .object({ name: z.string().min(1).max(200), translate_to: z.string().length(2).optional() })
+      .parse(i),
   )
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
@@ -256,7 +266,9 @@ export const groupMealFeed = createServerFn({ method: "POST" })
       .select("id, full_name, avatar_url")
       .in("id", ids);
     const byUser: Record<string, { name: string; avatar: string | null }> = {};
-    (profs ?? []).forEach((p) => (byUser[p.id] = { name: p.full_name ?? "", avatar: p.avatar_url ?? null }));
+    (profs ?? []).forEach(
+      (p) => (byUser[p.id] = { name: p.full_name ?? "", avatar: p.avatar_url ?? null }),
+    );
     return {
       meals: (meals ?? []).map((m) => ({
         ...m,
@@ -267,7 +279,18 @@ export const groupMealFeed = createServerFn({ method: "POST" })
   });
 
 // ============ 19: barcode batch lookup ============
-const BarcodeBatch = z.object({ barcodes: z.array(z.string().regex(/^[0-9]+$/).min(6).max(20)).min(1).max(20) });
+const BarcodeBatch = z.object({
+  barcodes: z
+    .array(
+      z
+        .string()
+        .regex(/^[0-9]+$/)
+        .min(6)
+        .max(20),
+    )
+    .min(1)
+    .max(20),
+});
 export const barcodeBatchLookup = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((i: unknown) => BarcodeBatch.parse(i))

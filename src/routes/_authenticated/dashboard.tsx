@@ -20,7 +20,18 @@ import { StreakRing } from "@/components/healthyu/streak-ring";
 import { CoinPill } from "@/components/healthyu/coin-pill";
 import { usePullToRefresh } from "@/hooks/use-pull-to-refresh";
 import { formatDuration, fastingStage } from "@/lib/health";
-import { Droplet, Plus, Sparkles, ArrowRight, Flame, Trophy, Camera, Smile, Gift, Snowflake } from "lucide-react";
+import {
+  Droplet,
+  Plus,
+  Sparkles,
+  ArrowRight,
+  Flame,
+  Trophy,
+  Camera,
+  Smile,
+  Gift,
+  Snowflake,
+} from "lucide-react";
 import { Lightbulb } from "lucide-react";
 import { claimDailyLoginBonus } from "@/lib/scanBatch9.functions";
 import { toast } from "sonner";
@@ -70,20 +81,37 @@ function Dashboard() {
       window.localStorage.setItem("dailyBonusClaimed", new Date().toDateString());
       setBonusClaimed(true);
       qc.invalidateQueries({ queryKey: ["profile"] });
-      toast.success(r.alreadyClaimed ? "Sudah klaim hari ini" : `+${b?.coins ?? 0} koin! Streak ${b?.streak ?? 0}`);
+      toast.success(
+        r.alreadyClaimed
+          ? "Sudah klaim hari ini"
+          : `+${b?.coins ?? 0} koin! Streak ${b?.streak ?? 0}`,
+      );
     },
     onError: (e: Error) => toast.error(e.message),
   });
 
-  const { data: profile, isLoading: pLoad } = useQuery({ queryKey: ["profile"], queryFn: () => fetchProfile() });
+  const { data: profile, isLoading: pLoad } = useQuery({
+    queryKey: ["profile"],
+    queryFn: () => fetchProfile(),
+  });
   const { data: dailyTip } = useQuery({
     queryKey: ["daily-tip", new Date().toISOString().slice(0, 10)],
     queryFn: () => fetchDailyTip(),
     staleTime: 1000 * 60 * 60 * 6,
   });
-  const { data: meals = [] } = useQuery({ queryKey: ["meals", "today"], queryFn: () => fetchMeals() });
-  const { data: fast } = useQuery({ queryKey: ["fast", "current"], queryFn: () => fetchFast(), refetchInterval: 30000 });
-  const { data: waterMl = 0 } = useQuery({ queryKey: ["water", "today"], queryFn: () => fetchWater() });
+  const { data: meals = [] } = useQuery({
+    queryKey: ["meals", "today"],
+    queryFn: () => fetchMeals(),
+  });
+  const { data: fast } = useQuery({
+    queryKey: ["fast", "current"],
+    queryFn: () => fetchFast(),
+    refetchInterval: 30000,
+  });
+  const { data: waterMl = 0 } = useQuery({
+    queryKey: ["water", "today"],
+    queryFn: () => fetchWater(),
+  });
   const { data: game } = useQuery({ queryKey: ["game", "summary"], queryFn: () => fetchGame() });
   const { data: groupSummary = [] } = useQuery({
     queryKey: ["group-challenge-summary"],
@@ -246,14 +274,10 @@ function Dashboard() {
           qc.invalidateQueries({ queryKey: ["unlinked-joined-challenges"] });
         },
       )
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "coin_redemptions" },
-        () => {
-          qc.invalidateQueries({ queryKey: ["group-challenge-summary"] });
-          qc.invalidateQueries({ queryKey: ["unlinked-joined-challenges"] });
-        },
-      )
+      .on("postgres_changes", { event: "*", schema: "public", table: "coin_redemptions" }, () => {
+        qc.invalidateQueries({ queryKey: ["group-challenge-summary"] });
+        qc.invalidateQueries({ queryKey: ["unlinked-joined-challenges"] });
+      })
       .subscribe();
     return () => {
       if (flushTimer) clearTimeout(flushTimer);
@@ -275,7 +299,9 @@ function Dashboard() {
       toast.success("+250ml dicatat");
       announce("250 mililiter air tercatat");
       const newlyUnlocked = res?.game?.newlyUnlocked ?? [];
-      newlyUnlocked.forEach((a) => toast.success(`${getAchievementToastPrefix(a.icon)} ${a.title} terbuka!`));
+      newlyUnlocked.forEach((a) =>
+        toast.success(`${getAchievementToastPrefix(a.icon)} ${a.title} terbuka!`),
+      );
     },
   });
 
@@ -325,12 +351,19 @@ function Dashboard() {
       <div className="max-w-md mx-auto px-5 pt-8 space-y-5">
         <header className="flex justify-between items-start animate-fade-up">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-wider text-primary/70 mb-1">{greeting}</p>
-            <h1 className="text-2xl font-bold">Halo, {profile?.full_name?.split(" ")[0] ?? "Sahabat"}!</h1>
+            <p className="text-xs font-semibold uppercase tracking-wider text-primary/70 mb-1">
+              {greeting}
+            </p>
+            <h1 className="text-2xl font-bold">
+              Halo, {profile?.full_name?.split(" ")[0] ?? "Sahabat"}!
+            </h1>
           </div>
           <div className="flex items-center gap-2">
             <CoinPill />
-            <Link to="/profile" className="size-11 rounded-full bg-card outline-1 outline-black/10 grid place-items-center font-bold text-primary">
+            <Link
+              to="/profile"
+              className="size-11 rounded-full bg-card outline-1 outline-black/10 grid place-items-center font-bold text-primary"
+            >
               {(profile?.full_name ?? "U").slice(0, 1).toUpperCase()}
             </Link>
           </div>
@@ -382,22 +415,36 @@ function Dashboard() {
               size={128}
               macros={{ protein: totals.p, carbs: totals.c, fat: totals.f }}
             />
-            <p className="text-xs font-semibold mt-2" style={{ fontFamily: "var(--font-display)" }}>Nutrisi hari ini</p>
+            <p className="text-xs font-semibold mt-2" style={{ fontFamily: "var(--font-display)" }}>
+              Nutrisi hari ini
+            </p>
           </div>
-          <Link to="/fasting" className="bg-card p-4 rounded-3xl outline-1 outline-black/5 shadow-sm flex flex-col justify-between">
-            <p className="text-[10px] font-bold uppercase text-muted-foreground tracking-wider">Puasa</p>
+          <Link
+            to="/fasting"
+            className="bg-card p-4 rounded-3xl outline-1 outline-black/5 shadow-sm flex flex-col justify-between"
+          >
+            <p className="text-[10px] font-bold uppercase text-muted-foreground tracking-wider">
+              Puasa
+            </p>
             {fast ? (
               <>
                 <p className="text-2xl font-bold tabular-nums">{formatDuration(fastMs)}</p>
                 <div className="h-1.5 w-full bg-mint rounded-full overflow-hidden mt-2">
-                  <div className="h-full bg-coral transition-all" style={{ width: `${fastPct}%` }} />
+                  <div
+                    className="h-full bg-coral transition-all"
+                    style={{ width: `${fastPct}%` }}
+                  />
                 </div>
-                <p className="text-[10px] text-muted-foreground mt-1.5 truncate">{fastingStage(fastHrs)}</p>
+                <p className="text-[10px] text-muted-foreground mt-1.5 truncate">
+                  {fastingStage(fastHrs)}
+                </p>
               </>
             ) : (
               <>
                 <p className="text-base font-semibold">Mulai puasa</p>
-                <p className="text-[11px] text-muted-foreground mt-1">16:8, OMAD, Ramadhan & lainnya</p>
+                <p className="text-[11px] text-muted-foreground mt-1">
+                  16:8, OMAD, Ramadhan & lainnya
+                </p>
                 <p className="text-xs font-semibold text-primary mt-2 inline-flex items-center gap-1">
                   Pilih protokol <ArrowRight className="size-3" />
                 </p>
@@ -414,8 +461,13 @@ function Dashboard() {
             { label: "Lemak", value: totals.f, color: "bg-charcoal" },
           ].map((m) => (
             <div key={m.label}>
-              <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wide">{m.label}</p>
-              <p className="text-lg font-bold tabular-nums">{Math.round(m.value)}<span className="text-xs font-medium text-muted-foreground">g</span></p>
+              <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wide">
+                {m.label}
+              </p>
+              <p className="text-lg font-bold tabular-nums">
+                {Math.round(m.value)}
+                <span className="text-xs font-medium text-muted-foreground">g</span>
+              </p>
               <div className={`h-1 w-8 rounded-full mt-1 ${m.color}`} />
             </div>
           ))}
@@ -432,7 +484,10 @@ function Dashboard() {
           <div className="flex-1">
             <p className="text-xs font-bold uppercase text-muted-foreground tracking-wider">Air</p>
             <p className="text-lg font-bold tabular-nums">
-              {(waterMl / 1000).toFixed(1)}L <span className="text-xs text-muted-foreground font-medium">/ {waterTarget / 1000}L</span>
+              {(waterMl / 1000).toFixed(1)}L{" "}
+              <span className="text-xs text-muted-foreground font-medium">
+                / {waterTarget / 1000}L
+              </span>
             </p>
           </div>
           <button
@@ -458,7 +513,9 @@ function Dashboard() {
             <Smile className="size-5 text-amber-600" />
           </div>
           <div className="flex-1">
-            <p className="text-xs font-bold uppercase text-muted-foreground tracking-wider">Mood hari ini</p>
+            <p className="text-xs font-bold uppercase text-muted-foreground tracking-wider">
+              Mood hari ini
+            </p>
             <div className="flex gap-1 mt-1">
               {[1, 2, 3, 4, 5].map((m) => (
                 <button
@@ -505,7 +562,9 @@ function Dashboard() {
           </div>
           <div className="flex-1">
             <p className="font-bold text-sm">Rekomendasi Meal Plan AI</p>
-            <p className="text-[11px] text-muted-foreground">Personal sesuai sisa kalori & profil</p>
+            <p className="text-[11px] text-muted-foreground">
+              Personal sesuai sisa kalori & profil
+            </p>
           </div>
           <ArrowRight className="size-5 text-muted-foreground" />
         </Link>
@@ -533,8 +592,12 @@ function Dashboard() {
           <Link to="/achievements" className="flex items-center gap-3 flex-1 min-w-0">
             <StreakRing days={game?.stats?.current_streak ?? 0} goal={30} size={64} />
             <div className="flex-1 min-w-0">
-              <p className="text-[10px] font-bold uppercase text-muted-foreground tracking-wider">Level {game?.stats?.level ?? 1} · {game?.stats?.xp ?? 0} XP</p>
-              <p className="font-semibold text-sm">Streak {game?.stats?.current_streak ?? 0} hari</p>
+              <p className="text-[10px] font-bold uppercase text-muted-foreground tracking-wider">
+                Level {game?.stats?.level ?? 1} · {game?.stats?.xp ?? 0} XP
+              </p>
+              <p className="font-semibold text-sm">
+                Streak {game?.stats?.current_streak ?? 0} hari
+              </p>
             </div>
             <Trophy className="size-5 text-primary" />
           </Link>
@@ -594,10 +657,7 @@ function Dashboard() {
                   .map((gid) => claimsTsRef.current[gid])
                   .filter((v): v is number => typeof v === "number");
                 const latestTs = tsValues.length > 0 ? Math.max(...tsValues) : nowTick;
-                const remaining = Math.max(
-                  0,
-                  GROUP_BONUS_BADGE_TTL_MS - (nowTick - latestTs),
-                );
+                const remaining = Math.max(0, GROUP_BONUS_BADGE_TTL_MS - (nowTick - latestTs));
                 const pct = Math.round((remaining / GROUP_BONUS_BADGE_TTL_MS) * 100);
                 const breakdown = Object.entries(newClaims)
                   .map(([gid, n]) => {
@@ -704,30 +764,36 @@ function Dashboard() {
                   <div className="min-w-0 flex-1">
                     <p className="font-semibold truncate inline-flex items-center gap-1.5">
                       <span className="truncate">{g.challenge}</span>
-                      {(newClaims[g.group_id] ?? 0) > 0 && (() => {
-                        const ts = claimsTsRef.current[g.group_id] ?? nowTick;
-                        const remaining = Math.max(
-                          0,
-                          GROUP_BONUS_BADGE_TTL_MS - (nowTick - ts),
-                        );
-                        const pct = Math.round((remaining / GROUP_BONUS_BADGE_TTL_MS) * 100);
-                        return (
-                          <span className="relative shrink-0 text-[9px] font-bold uppercase bg-amber-100 text-amber-800 rounded-full pl-1.5 pr-1.5 pt-0.5 pb-1 overflow-hidden">
-                            +{newClaims[g.group_id]} klaim baru
-                            <span
-                              aria-hidden
-                              className="absolute left-0 bottom-0 h-0.5 bg-amber-500/70 transition-[width] duration-1000 ease-linear"
-                              style={{ width: `${pct}%` }}
-                            />
-                          </span>
-                        );
-                      })()}
+                      {(newClaims[g.group_id] ?? 0) > 0 &&
+                        (() => {
+                          const ts = claimsTsRef.current[g.group_id] ?? nowTick;
+                          const remaining = Math.max(0, GROUP_BONUS_BADGE_TTL_MS - (nowTick - ts));
+                          const pct = Math.round((remaining / GROUP_BONUS_BADGE_TTL_MS) * 100);
+                          return (
+                            <span className="relative shrink-0 text-[9px] font-bold uppercase bg-amber-100 text-amber-800 rounded-full pl-1.5 pr-1.5 pt-0.5 pb-1 overflow-hidden">
+                              +{newClaims[g.group_id]} klaim baru
+                              <span
+                                aria-hidden
+                                className="absolute left-0 bottom-0 h-0.5 bg-amber-500/70 transition-[width] duration-1000 ease-linear"
+                                style={{ width: `${pct}%` }}
+                              />
+                            </span>
+                          );
+                        })()}
                     </p>
                     <p className="text-[10px] text-muted-foreground truncate">{g.group}</p>
                   </div>
                   <div className="text-right shrink-0 ml-2">
-                    <p className="font-bold">#{g.rank || "-"}<span className="text-muted-foreground font-normal">/{g.total_participants}</span></p>
-                    <p className="text-[10px] text-muted-foreground">Hari {g.my_day}{g.duration_days ? `/${g.duration_days}` : ""}</p>
+                    <p className="font-bold">
+                      #{g.rank || "-"}
+                      <span className="text-muted-foreground font-normal">
+                        /{g.total_participants}
+                      </span>
+                    </p>
+                    <p className="text-[10px] text-muted-foreground">
+                      Hari {g.my_day}
+                      {g.duration_days ? `/${g.duration_days}` : ""}
+                    </p>
                   </div>
                 </Link>
               ))}
@@ -766,7 +832,11 @@ function Dashboard() {
                               className="size-5 rounded-full bg-primary/15 outline-2 outline-card grid place-items-center text-[9px] font-bold text-primary overflow-hidden"
                             >
                               {m.avatar_url ? (
-                                <img src={m.avatar_url} alt={m.name} className="size-full object-cover" />
+                                <img
+                                  src={m.avatar_url}
+                                  alt={m.name}
+                                  className="size-full object-cover"
+                                />
                               ) : (
                                 (m.name ?? "?").slice(0, 1).toUpperCase()
                               )}
@@ -794,25 +864,44 @@ function Dashboard() {
         <section className="animate-fade-up">
           <div className="flex justify-between items-center mb-3">
             <h2 className="font-bold">Makan hari ini</h2>
-            <Link to="/food" className="text-xs font-semibold text-primary">+ Tambah</Link>
+            <Link to="/food" className="text-xs font-semibold text-primary">
+              + Tambah
+            </Link>
           </div>
           {meals.length === 0 ? (
             <div className="bg-card p-6 rounded-3xl outline-1 outline-black/5 text-center">
               <p className="text-sm text-muted-foreground mb-3">Belum ada catatan hari ini</p>
-              <Link to="/food" className="inline-block bg-primary text-primary-foreground text-sm font-semibold px-4 py-2 rounded-xl">
+              <Link
+                to="/food"
+                className="inline-block bg-primary text-primary-foreground text-sm font-semibold px-4 py-2 rounded-xl"
+              >
                 Catat makanan
               </Link>
             </div>
           ) : (
             <div className="space-y-2">
               {meals.map((m) => (
-                <div key={m.id} className="bg-card p-3 rounded-2xl outline-1 outline-black/5 flex items-center gap-3">
-                  <div className="size-12 rounded-xl bg-mint grid place-items-center text-lg">🍽️</div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-[10px] font-bold uppercase text-coral tracking-wider">{m.meal_type}</p>
-                    <p className="font-semibold text-sm truncate">{(m.food_item as { name?: string } | null)?.name ?? m.custom_name ?? "Makanan"}</p>
+                <div
+                  key={m.id}
+                  className="bg-card p-3 rounded-2xl outline-1 outline-black/5 flex items-center gap-3"
+                >
+                  <div className="size-12 rounded-xl bg-mint grid place-items-center text-lg">
+                    🍽️
                   </div>
-                  <p className="text-sm font-bold tabular-nums">{Math.round(Number(m.calories))}<span className="text-[10px] text-muted-foreground"> kcal</span></p>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-[10px] font-bold uppercase text-coral tracking-wider">
+                      {m.meal_type}
+                    </p>
+                    <p className="font-semibold text-sm truncate">
+                      {(m.food_item as { name?: string } | null)?.name ??
+                        m.custom_name ??
+                        "Makanan"}
+                    </p>
+                  </div>
+                  <p className="text-sm font-bold tabular-nums">
+                    {Math.round(Number(m.calories))}
+                    <span className="text-[10px] text-muted-foreground"> kcal</span>
+                  </p>
                 </div>
               ))}
             </div>

@@ -9,7 +9,10 @@ export const Route = createFileRoute("/_authenticated/leaderboard/weekly")({ com
 
 function Page() {
   const fn = useServerFn(getWeeklyLeaderboard);
-  const { data } = useQuery({ queryKey: ["lb-week"], queryFn: () => fn({ data: undefined as never }) });
+  const { data } = useQuery({
+    queryKey: ["lb-week"],
+    queryFn: () => fn({ data: undefined as never }),
+  });
   return (
     <div className="min-h-dvh pb-24 bg-background">
       <TopAppBar title="Leaderboard Mingguan" showBack />
@@ -17,7 +20,9 @@ function Page() {
         <p className="text-xs text-muted-foreground">Minggu: {data?.week}</p>
         {(data?.rows ?? []).map((r, i) => (
           <div key={r.user_id} className="flex justify-between rounded-xl border bg-card p-3">
-            <span>#{i + 1} {r.user_id.slice(0, 8)}</span>
+            <span>
+              #{i + 1} {r.user_id.slice(0, 8)}
+            </span>
             <span className="font-semibold">{r.score}</span>
           </div>
         ))}

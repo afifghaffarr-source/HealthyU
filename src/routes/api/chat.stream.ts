@@ -63,7 +63,11 @@ export const Route = createFileRoute("/api/chat/stream")({
               _meta: { label: mod.label, confidence: mod.confidence } as never,
             });
             return new Response(
-              JSON.stringify({ error: "image_blocked", label: mod.label, reason: mod.reason ?? "Unsafe content" }),
+              JSON.stringify({
+                error: "image_blocked",
+                label: mod.label,
+                reason: mod.reason ?? "Unsafe content",
+              }),
               { status: 400, headers: { "Content-Type": "application/json" } },
             );
           }
@@ -76,7 +80,9 @@ export const Route = createFileRoute("/api/chat/stream")({
         const encoder = new TextEncoder();
         if (safety.kind === "crisis" || safety.kind === "blocked") {
           await supabase.from("chat_messages").insert({
-            user_id: userId, role: "assistant", content: safety.response,
+            user_id: userId,
+            role: "assistant",
+            content: safety.response,
           });
           await supabase.rpc("log_audit_event", {
             _action: safety.kind === "crisis" ? "chat.safety.crisis" : "chat.safety.blocked",
@@ -86,7 +92,11 @@ export const Route = createFileRoute("/api/chat/stream")({
           const reply = safety.response;
           const stream = new ReadableStream({
             start(controller) {
-              controller.enqueue(encoder.encode(`event: meta\ndata: ${JSON.stringify({ emergency: safety.kind === "crisis", tier: 0, cached: false, safety: safety.kind })}\n\n`));
+              controller.enqueue(
+                encoder.encode(
+                  `event: meta\ndata: ${JSON.stringify({ emergency: safety.kind === "crisis", tier: 0, cached: false, safety: safety.kind })}\n\n`,
+                ),
+              );
               controller.enqueue(encoder.encode(`data: ${JSON.stringify({ delta: reply })}\n\n`));
               controller.enqueue(encoder.encode(`event: done\ndata: {}\n\n`));
               controller.close();
@@ -107,13 +117,19 @@ export const Route = createFileRoute("/api/chat/stream")({
         // TIER 1 — local rule-based answer, no AI call.
         if (decision.tier === 1 && decision.localAnswer) {
           await supabase.from("chat_messages").insert({
-            user_id: userId, role: "assistant", content: decision.localAnswer,
+            user_id: userId,
+            role: "assistant",
+            content: decision.localAnswer,
           });
           const local = decision.localAnswer;
           await logAiUsage({ userId, feature: "chat", tier: 1, cacheHit: false });
           const stream = new ReadableStream({
             start(controller) {
-              controller.enqueue(encoder.encode(`event: meta\ndata: ${JSON.stringify({ emergency: false, tier: 1, cached: false })}\n\n`));
+              controller.enqueue(
+                encoder.encode(
+                  `event: meta\ndata: ${JSON.stringify({ emergency: false, tier: 1, cached: false })}\n\n`,
+                ),
+              );
               controller.enqueue(encoder.encode(`data: ${JSON.stringify({ delta: local })}\n\n`));
               controller.enqueue(encoder.encode(`event: done\ndata: {}\n\n`));
               controller.close();
@@ -143,12 +159,24 @@ export const Route = createFileRoute("/api/chat/stream")({
         const cached = key ? await getCached(key) : null;
         if (cached) {
           await supabase.from("chat_messages").insert({
-            user_id: userId, role: "assistant", content: cached,
+            user_id: userId,
+            role: "assistant",
+            content: cached,
           });
-          await logAiUsage({ userId, feature: "chat", tier: decision.tier, model: decision.model, cacheHit: true });
+          await logAiUsage({
+            userId,
+            feature: "chat",
+            tier: decision.tier,
+            model: decision.model,
+            cacheHit: true,
+          });
           const stream = new ReadableStream({
             start(controller) {
-              controller.enqueue(encoder.encode(`event: meta\ndata: ${JSON.stringify({ emergency: false, tier: decision.tier, cached: true })}\n\n`));
+              controller.enqueue(
+                encoder.encode(
+                  `event: meta\ndata: ${JSON.stringify({ emergency: false, tier: decision.tier, cached: true })}\n\n`,
+                ),
+              );
               controller.enqueue(encoder.encode(`data: ${JSON.stringify({ delta: cached })}\n\n`));
               controller.enqueue(encoder.encode(`event: done\ndata: {}\n\n`));
               controller.close();
@@ -169,7 +197,8 @@ export const Route = createFileRoute("/api/chat/stream")({
           .select("premium_status")
           .eq("id", userId)
           .maybeSingle();
-        const isPremium = ((prof?.premium_status as string | null) ?? "free").toLowerCase() === "active";
+        const isPremium =
+          ((prof?.premium_status as string | null) ?? "free").toLowerCase() === "active";
         const budget = await enforceAiBudget(userId, isPremium);
         if (!budget.allowed) {
           return new Response(
@@ -187,7 +216,12 @@ export const Route = createFileRoute("/api/chat/stream")({
         if (downgraded) effectiveModel = "google/gemini-2.5-flash";
 
         const { messages, isEmergency } = await buildChatPayload(
-          supabase, userId, body.message, body.imageBase64, body.imageMime, decision.tier,
+          supabase,
+          userId,
+          body.message,
+          body.imageBase64,
+          body.imageMime,
+          decision.tier,
         );
 
         const upstream = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
@@ -214,7 +248,11 @@ export const Route = createFileRoute("/api/chat/stream")({
         const stream = new ReadableStream({
           async start(controller) {
             // Prefix with emergency flag header (line-prefixed JSON meta)
-            controller.enqueue(encoder.encode(`event: meta\ndata: ${JSON.stringify({ emergency: isEmergency, tier: decision.tier, cached: false })}\n\n`));
+            controller.enqueue(
+              encoder.encode(
+                `event: meta\ndata: ${JSON.stringify({ emergency: isEmergency, tier: decision.tier, cached: false })}\n\n`,
+              ),
+            );
             const reader = upstream.body!.getReader();
             try {
               while (true) {
@@ -235,16 +273,22 @@ export const Route = createFileRoute("/api/chat/stream")({
                       fullText += delta;
                       controller.enqueue(encoder.encode(`data: ${JSON.stringify({ delta })}\n\n`));
                     }
-                  } catch { /* ignore parse errors */ }
+                  } catch {
+                    /* ignore parse errors */
+                  }
                 }
               }
               if (fullText) {
                 if (safetyDisclaimer) {
                   fullText += safetyDisclaimer;
-                  controller.enqueue(encoder.encode(`data: ${JSON.stringify({ delta: safetyDisclaimer })}\n\n`));
+                  controller.enqueue(
+                    encoder.encode(`data: ${JSON.stringify({ delta: safetyDisclaimer })}\n\n`),
+                  );
                 }
                 await supabase.from("chat_messages").insert({
-                  user_id: userId, role: "assistant", content: fullText,
+                  user_id: userId,
+                  role: "assistant",
+                  content: fullText,
                 });
                 if (key) {
                   try {
@@ -275,7 +319,11 @@ export const Route = createFileRoute("/api/chat/stream")({
               }
               controller.enqueue(encoder.encode(`event: done\ndata: {}\n\n`));
             } catch (err) {
-              controller.enqueue(encoder.encode(`event: error\ndata: ${JSON.stringify({ message: String(err) })}\n\n`));
+              controller.enqueue(
+                encoder.encode(
+                  `event: error\ndata: ${JSON.stringify({ message: String(err) })}\n\n`,
+                ),
+              );
             } finally {
               controller.close();
             }

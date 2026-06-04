@@ -1,7 +1,10 @@
 import { useEffect, useState } from "react";
 import { Download, X } from "lucide-react";
 
-type BIPEvent = Event & { prompt: () => Promise<void>; userChoice: Promise<{ outcome: "accepted" | "dismissed" }> };
+type BIPEvent = Event & {
+  prompt: () => Promise<void>;
+  userChoice: Promise<{ outcome: "accepted" | "dismissed" }>;
+};
 
 const DISMISS_KEY = "healthyu-install-dismissed";
 
@@ -11,7 +14,8 @@ export function InstallPrompt() {
 
   useEffect(() => {
     if (typeof window === "undefined") return;
-    const isStandalone = window.matchMedia("(display-mode: standalone)").matches ||
+    const isStandalone =
+      window.matchMedia("(display-mode: standalone)").matches ||
       // @ts-expect-error iOS Safari
       window.navigator.standalone === true;
     if (isStandalone) return;
@@ -50,10 +54,17 @@ export function InstallPrompt() {
         <p className="text-sm font-semibold">Install HealthyU</p>
         <p className="text-xs text-muted-foreground">Akses cepat dari home screen.</p>
       </div>
-      <button onClick={install} className="text-xs font-semibold bg-primary text-primary-foreground px-3 py-2 rounded-xl">
+      <button
+        onClick={install}
+        className="text-xs font-semibold bg-primary text-primary-foreground px-3 py-2 rounded-xl"
+      >
         Install
       </button>
-      <button onClick={dismiss} aria-label="Tutup" className="size-8 grid place-items-center text-muted-foreground">
+      <button
+        onClick={dismiss}
+        aria-label="Tutup"
+        className="size-8 grid place-items-center text-muted-foreground"
+      >
         <X className="size-4" />
       </button>
     </div>

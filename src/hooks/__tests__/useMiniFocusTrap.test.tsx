@@ -44,7 +44,13 @@ describe("useMiniFocusTrap", () => {
 
   it("Escape calls onEscape", () => {
     let escaped = 0;
-    render(<Harness onEscape={() => { escaped += 1; }} />);
+    render(
+      <Harness
+        onEscape={() => {
+          escaped += 1;
+        }}
+      />,
+    );
     fireEvent.keyDown(document, { key: "Escape" });
     expect(escaped).toBe(1);
   });

@@ -13,11 +13,17 @@ function Page() {
   const qc = useQueryClient();
   const getFn = useServerFn(getThemePref);
   const setFn = useServerFn(upsertThemePref);
-  const { data } = useQuery({ queryKey: ["theme-pref"], queryFn: () => getFn({ data: undefined as never }) });
+  const { data } = useQuery({
+    queryKey: ["theme-pref"],
+    queryFn: () => getFn({ data: undefined as never }),
+  });
   const mode = ((data?.pref as any)?.mode ?? "auto") as "auto" | "light" | "dark";
   const mut = useMutation({
     mutationFn: (m: "auto" | "light" | "dark") => setFn({ data: { mode: m } }),
-    onSuccess: () => { toast.success("Tersimpan"); qc.invalidateQueries({ queryKey: ["theme-pref"] }); },
+    onSuccess: () => {
+      toast.success("Tersimpan");
+      qc.invalidateQueries({ queryKey: ["theme-pref"] });
+    },
   });
   useEffect(() => {
     if (mode === "auto") {
@@ -32,9 +38,19 @@ function Page() {
       <TopAppBar title="Tema" showBack />
       <main className="max-w-md mx-auto px-4 pt-4 space-y-3">
         {(["auto", "light", "dark"] as const).map((m) => (
-          <button key={m} onClick={() => mut.mutate(m)} className={`w-full rounded-xl p-4 text-left border ${mode === m ? "bg-primary text-primary-foreground" : "bg-card"}`}>
+          <button
+            key={m}
+            onClick={() => mut.mutate(m)}
+            className={`w-full rounded-xl p-4 text-left border ${mode === m ? "bg-primary text-primary-foreground" : "bg-card"}`}
+          >
             <div className="font-medium capitalize">{m === "auto" ? "Auto (matahari)" : m}</div>
-            <div className="text-xs opacity-70">{m === "auto" ? "Gelap saat malam, terang saat siang" : m === "light" ? "Selalu terang" : "Selalu gelap"}</div>
+            <div className="text-xs opacity-70">
+              {m === "auto"
+                ? "Gelap saat malam, terang saat siang"
+                : m === "light"
+                  ? "Selalu terang"
+                  : "Selalu gelap"}
+            </div>
           </button>
         ))}
       </main>

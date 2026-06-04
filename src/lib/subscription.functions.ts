@@ -50,8 +50,7 @@ export const subscribe = createServerFn({ method: "POST" })
       data.billing_period === "lifetime"
         ? null
         : new Date(
-            now.getTime() +
-              (data.billing_period === "yearly" ? 365 : 30) * 86400000,
+            now.getTime() + (data.billing_period === "yearly" ? 365 : 30) * 86400000,
           ).toISOString();
 
     const { error } = await supabase.from("user_subscriptions").insert({
@@ -84,9 +83,6 @@ export const cancelSubscription = createServerFn({ method: "POST" })
       })
       .eq("user_id", userId)
       .eq("status", "active");
-    await supabase
-      .from("profiles")
-      .update({ premium_status: "free" })
-      .eq("id", userId);
+    await supabase.from("profiles").update({ premium_status: "free" }).eq("id", userId);
     return { ok: true };
   });

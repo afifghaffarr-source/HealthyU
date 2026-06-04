@@ -51,9 +51,7 @@ export const listScanGallery = createServerFn({ method: "GET" })
     const paths = rows.map((r) => r.image_url as string).filter(Boolean);
     const signedMap: Record<string, string> = {};
     if (paths.length) {
-      const { data: signed } = await supabase.storage
-        .from(BUCKET)
-        .createSignedUrls(paths, 60 * 60);
+      const { data: signed } = await supabase.storage.from(BUCKET).createSignedUrls(paths, 60 * 60);
       (signed ?? []).forEach((s) => {
         if (s.path && s.signedUrl) signedMap[s.path] = s.signedUrl;
       });
@@ -61,7 +59,7 @@ export const listScanGallery = createServerFn({ method: "GET" })
     return {
       items: rows.map((r) => ({
         id: r.id,
-        url: r.image_url ? signedMap[r.image_url] ?? null : null,
+        url: r.image_url ? (signedMap[r.image_url] ?? null) : null,
         total_calories: Number(r.total_calories ?? 0),
         created_at: r.created_at,
         detected_foods: r.detected_foods,

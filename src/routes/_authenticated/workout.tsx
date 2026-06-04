@@ -83,19 +83,23 @@ function WorkoutPage() {
           title="Latihan"
           subtitle={`${sessions.length} sesi · ${totalMin} menit · ${totalCal} kcal`}
           showBack
-          action={(!online || pending > 0) ? (
-            <button
-              onClick={() => sync()}
-              className={`inline-flex items-center gap-1 text-[11px] font-semibold px-2.5 py-1.5 rounded-full ${online ? "bg-amber-100 text-amber-700" : "bg-muted text-muted-foreground"}`}
-            >
-              {online ? <RefreshCw className="size-3" /> : <WifiOff className="size-3" />}
-              {online ? `Sync ${pending}` : `Offline${pending ? ` · ${pending}` : ""}`}
-            </button>
-          ) : undefined}
+          action={
+            !online || pending > 0 ? (
+              <button
+                onClick={() => sync()}
+                className={`inline-flex items-center gap-1 text-[11px] font-semibold px-2.5 py-1.5 rounded-full ${online ? "bg-amber-100 text-amber-700" : "bg-muted text-muted-foreground"}`}
+              >
+                {online ? <RefreshCw className="size-3" /> : <WifiOff className="size-3" />}
+                {online ? `Sync ${pending}` : `Offline${pending ? ` · ${pending}` : ""}`}
+              </button>
+            ) : undefined
+          }
         />
 
         <section className="bg-card p-4 rounded-3xl outline-1 outline-black/5 space-y-3 animate-fade-up">
-          <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Catat sesi baru</p>
+          <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+            Catat sesi baru
+          </p>
           <div className="grid grid-cols-3 gap-2">
             {TYPES.map((t) => (
               <button
@@ -118,7 +122,9 @@ function WorkoutPage() {
           />
           <div className="grid grid-cols-2 gap-2">
             <label className="flex flex-col gap-1">
-              <span className="text-[10px] font-bold uppercase text-muted-foreground">Durasi (min)</span>
+              <span className="text-[10px] font-bold uppercase text-muted-foreground">
+                Durasi (min)
+              </span>
               <input
                 type="number"
                 value={duration}
@@ -161,10 +167,15 @@ function WorkoutPage() {
         <section className="space-y-2 animate-fade-up">
           <h2 className="text-sm font-bold px-1">Riwayat</h2>
           {sessions.length === 0 ? (
-            <p className="text-sm text-muted-foreground text-center py-6">Belum ada sesi tercatat</p>
+            <p className="text-sm text-muted-foreground text-center py-6">
+              Belum ada sesi tercatat
+            </p>
           ) : (
             sessions.map((w) => (
-              <div key={w.id} className="bg-card p-3 rounded-2xl outline-1 outline-black/5 flex items-center gap-3">
+              <div
+                key={w.id}
+                className="bg-card p-3 rounded-2xl outline-1 outline-black/5 flex items-center gap-3"
+              >
                 <div className="size-12 rounded-xl bg-mint grid place-items-center">
                   <Activity className="size-5 text-sage-deep" />
                 </div>
@@ -172,10 +183,16 @@ function WorkoutPage() {
                   <p className="font-semibold text-sm truncate">{w.name}</p>
                   <p className="text-xs text-muted-foreground">
                     {w.duration_min} min · {w.calories_burned} kcal ·{" "}
-                    {new Date(w.performed_at).toLocaleDateString("id-ID", { day: "numeric", month: "short" })}
+                    {new Date(w.performed_at).toLocaleDateString("id-ID", {
+                      day: "numeric",
+                      month: "short",
+                    })}
                   </p>
                 </div>
-                <button onClick={() => delMut.mutate(w.id)} className="p-2 text-muted-foreground hover:text-destructive">
+                <button
+                  onClick={() => delMut.mutate(w.id)}
+                  className="p-2 text-muted-foreground hover:text-destructive"
+                >
                   <Trash2 className="size-4" />
                 </button>
               </div>

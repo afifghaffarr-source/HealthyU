@@ -79,7 +79,9 @@ function WorkoutPlayer() {
     <div className="min-h-screen pb-28 px-4">
       <TopAppBar title={`Workout #${id}`} subtitle={`${idx + 1}/${playlist.length}`} showBack />
       <div className="mt-6 flex flex-col items-center gap-4">
-        <p className={`text-xs uppercase tracking-wider font-bold px-3 py-1 rounded-full ${phase === "work" ? "bg-primary/15 text-primary" : "bg-accent/15 text-accent"}`}>
+        <p
+          className={`text-xs uppercase tracking-wider font-bold px-3 py-1 rounded-full ${phase === "work" ? "bg-primary/15 text-primary" : "bg-accent/15 text-accent"}`}
+        >
           {phase === "work" ? "Latihan" : "Istirahat"}
         </p>
         <h2 className="text-3xl font-bold">{current.name}</h2>
@@ -87,7 +89,11 @@ function WorkoutPlayer() {
           <svg viewBox="0 0 100 100" className="absolute inset-0 -rotate-90">
             <circle cx="50" cy="50" r="44" fill="none" strokeWidth="6" className="stroke-muted" />
             <circle
-              cx="50" cy="50" r="44" fill="none" strokeWidth="6"
+              cx="50"
+              cy="50"
+              r="44"
+              fill="none"
+              strokeWidth="6"
               className={phase === "work" ? "stroke-primary" : "stroke-accent"}
               strokeLinecap="round"
               strokeDasharray={`${2 * Math.PI * 44}`}
@@ -129,7 +135,9 @@ function WorkoutPlayer() {
         {upNext && (
           <div className="mt-4 w-full max-w-xs rounded-2xl bg-card border p-3 text-center">
             <p className="text-xs text-muted-foreground">Selanjutnya</p>
-            <p className="font-semibold">{upNext.name} · {upNext.work}s</p>
+            <p className="font-semibold">
+              {upNext.name} · {upNext.work}s
+            </p>
           </div>
         )}
       </div>

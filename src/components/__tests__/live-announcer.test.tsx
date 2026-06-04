@@ -4,9 +4,7 @@ import { LiveAnnouncerProvider, useAnnounce } from "../live-announcer";
 
 function Trigger({ message }: { message: string }) {
   const announce = useAnnounce();
-  return (
-    <button onClick={() => announce(message)}>send</button>
-  );
+  return <button onClick={() => announce(message)}>send</button>;
 }
 
 beforeEach(() => vi.useFakeTimers());

@@ -33,7 +33,10 @@ function WaterPage() {
   const delFn = useServerFn(deleteWater);
   const { online, pending, sync } = useOfflineQueue();
 
-  const { data: total = 0 } = useQuery({ queryKey: ["water", "today"], queryFn: () => fetchToday() });
+  const { data: total = 0 } = useQuery({
+    queryKey: ["water", "today"],
+    queryFn: () => fetchToday(),
+  });
   const { data: entries = [] } = useQuery({
     queryKey: ["water", "entries"],
     queryFn: () => fetchEntries(),
@@ -108,10 +111,7 @@ function WaterPage() {
             </div>
           </div>
           <div className="h-3 rounded-full bg-muted overflow-hidden">
-            <div
-              className="h-full bg-primary transition-all"
-              style={{ width: `${pct}%` }}
-            />
+            <div className="h-full bg-primary transition-all" style={{ width: `${pct}%` }} />
           </div>
           <p className="mt-2 text-xs text-muted-foreground">{pct}% dari target</p>
         </section>
