@@ -10,7 +10,7 @@ import {
 } from "@/lib/medications.functions";
 import { BottomNav } from "@/components/bottom-nav";
 import { TopAppBar } from "@/components/healthyu/top-app-bar";
-import { Pill, Check, Trash2, Plus, X } from "lucide-react";
+import { Pill, Check, Trash2, Plus, X, Clock } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/medications")({
@@ -67,6 +67,26 @@ function MedsPage() {
   const isTaken = (medId: string, time: string) =>
     logs.some((l) => l.medication_id === medId && l.scheduled_time === time);
 
+  // Today schedule
+  const totalSlots = meds.reduce((a, m) => a + ((m.times ?? []).length), 0);
+  const doneSlots = meds.reduce(
+    (a, m) => a + ((m.times ?? []).filter((t: string) => isTaken(m.id, t)).length),
+    0,
+  );
+  const pct = totalSlots ? Math.round((doneSlots / totalSlots) * 100) : 0;
+
+  const now = new Date();
+  const nowMin = now.getHours() * 60 + now.getMinutes();
+  const allUpcoming = meds.flatMap((m) =>
+    (m.times ?? []).map((t: string) => {
+      const [h, mm] = t.split(":").map(Number);
+      return { med: m, time: t, mins: h * 60 + mm };
+    }),
+  );
+  const next = allUpcoming
+    .filter((x) => x.mins >= nowMin && !isTaken(x.med.id, x.time))
+    .sort((a, b) => a.mins - b.mins)[0];
+
   return (
     <main className="min-h-screen bg-background pb-28">
       <div className="max-w-md mx-auto px-5 pt-2 space-y-5">
@@ -76,12 +96,36 @@ function MedsPage() {
           action={
             <button
               onClick={() => setAdding(true)}
+              aria-label="Tambah obat"
               className="size-10 bg-primary text-primary-foreground rounded-2xl grid place-items-center"
             >
               <Plus className="size-5" />
             </button>
           }
         />
+
+        {meds.length > 0 && (
+          <section className="rounded-3xl bg-gradient-to-br from-pink-500 via-rose-500 to-fuchsia-600 text-white p-5 outline-1 outline-black/5 animate-fade-up">
+            <div className="flex items-center justify-between">
+              <div className="inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider bg-white/20 px-2 py-1 rounded-full">
+                <Pill className="size-3" /> Hari ini
+              </div>
+              <span className="text-xs font-bold tabular-nums">{doneSlots}/{totalSlots} dosis</span>
+            </div>
+            <div className="mt-3 flex items-end gap-2">
+              <span className="text-5xl font-black leading-none tabular-nums">{pct}</span>
+              <span className="pb-1 text-sm opacity-80">%</span>
+            </div>
+            <div className="mt-3 h-2 bg-white/20 rounded-full overflow-hidden">
+              <div className="h-full bg-white transition-all" style={{ width: `${pct}%` }} />
+            </div>
+            {next && (
+              <p className="mt-3 text-xs opacity-90 inline-flex items-center gap-1">
+                <Clock className="size-3" /> Berikutnya: <b className="font-semibold">{next.med.name}</b> · {next.time}
+              </p>
+            )}
+          </section>
+        )}
 
         {meds.length === 0 ? (
           <div className="bg-card p-6 rounded-3xl outline-1 outline-black/5 text-center animate-fade-up">
