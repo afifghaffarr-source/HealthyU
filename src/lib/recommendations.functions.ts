@@ -2,137 +2,226 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
-const Input = z.object({
-  meal_types: z.array(z.enum(["breakfast", "lunch", "dinner", "snack"])).default(["breakfast", "lunch", "dinner", "snack"]),
-  notes: z.string().max(300).optional(),
-});
-
-export const generateMealPlan = createServerFn({ method: "POST" })
+/**
+ * Lightweight content personalization: score published articles & recipes
+ * against user profile (goals, conditions, dietary_preference, BMI). No AI
+ * call — pure ranking on already-loaded rows.
+ */
+export const getRecommendedContent = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((i: unknown) => Input.parse(i ?? {}))
-  .handler(async ({ data, context }) => {
+  .handler(async ({ context }) => {
     const { supabase, userId } = context;
-    const apiKey = process.env.LOVABLE_API_KEY;
-    if (!apiKey) throw new Error("AI tidak tersedia");
 
-    const today = new Date();
-    const start = new Date(today); start.setHours(0, 0, 0, 0);
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("dietary_preference, health_conditions, bmi_category, daily_calorie_target")
+      .eq("id", userId)
+      .maybeSingle();
 
-    const [profileRes, todayMeals, foodsRes] = await Promise.all([
-      supabase.from("profiles").select("full_name, gender, birth_date, height_cm, weight_kg, target_weight_kg, activity_level, daily_calorie_target, dietary_preference, allergies, health_conditions").eq("id", userId).maybeSingle(),
-      supabase.from("meal_logs").select("calories, protein_g, carbs_g, fat_g").eq("user_id", userId).gte("logged_at", start.toISOString()),
-      supabase.from("food_items").select("id, name, category, calories, protein_g, carbs_g, fat_g, serving_size, serving_unit, allergens, tags").eq("is_indonesian", true).order("popularity_score", { ascending: false }).limit(120),
+    const conds = (profile?.health_conditions ?? []).map((c) => c.toLowerCase());
+    const diet = (profile?.dietary_preference ?? "").toLowerCase();
+    const bmiCat = (profile?.bmi_category ?? "").toLowerCase();
+    const calTarget = profile?.daily_calorie_target ?? 0;
+
+    const [{ data: arts }, { data: recs }, { data: schedule }] = await Promise.all([
+      supabase
+        .from("articles")
+        .select("id, slug, title, excerpt, image_url, category, tags, target_conditions, target_goals, reading_time_minutes, is_featured, published_at")
+        .eq("is_published", true)
+        .is("deleted_at", null)
+        .order("published_at", { ascending: false })
+        .limit(60),
+      supabase
+        .from("recipes")
+        .select("id, slug, title, description, category, calories, tags, is_vegetarian, is_vegan, is_keto_friendly, is_halal, image_url, avg_rating, save_count")
+        .eq("is_published", true)
+        .is("deleted_at", null)
+        .order("save_count", { ascending: false })
+        .limit(60),
+      supabase
+        .from("daily_content_schedule")
+        .select("content_type, content_id, theme")
+        .eq("schedule_date", new Date().toISOString().slice(0, 10)),
     ]);
 
-    const profile = profileRes.data;
-    const allergies = (profile?.allergies ?? []) as string[];
-    const consumedCal = (todayMeals.data ?? []).reduce((s, m) => s + Number(m.calories || 0), 0);
-    const consumedP = (todayMeals.data ?? []).reduce((s, m) => s + Number(m.protein_g || 0), 0);
-    const consumedC = (todayMeals.data ?? []).reduce((s, m) => s + Number(m.carbs_g || 0), 0);
-    const consumedF = (todayMeals.data ?? []).reduce((s, m) => s + Number(m.fat_g || 0), 0);
-    const targetCal = profile?.daily_calorie_target ?? 2000;
-    const remaining = Math.max(200, targetCal - consumedCal);
+    const todayIds = new Set((schedule ?? []).map((s) => s.content_id));
 
-    const lowerAllergies = allergies.map((a) => a.toLowerCase());
-    const safeFoods = (foodsRes.data ?? []).filter((f) => {
-      const al = (f.allergens ?? []) as string[];
-      return !al.some((x) => lowerAllergies.includes(x.toLowerCase()));
-    }).slice(0, 60);
+    function scoreArticle(a: NonNullable<typeof arts>[number]): number {
+      let s = 0;
+      if (todayIds.has(a.id)) s += 50;
+      if (a.is_featured) s += 10;
+      const tags = Array.isArray(a.tags) ? (a.tags as unknown[]).map(String) : [];
+      const targets = Array.isArray(a.target_conditions)
+        ? (a.target_conditions as unknown[]).map(String).map((x) => x.toLowerCase())
+        : [];
+      for (const c of conds) if (targets.includes(c) || tags.some((t) => t.toLowerCase().includes(c))) s += 15;
+      if (bmiCat === "overweight" || bmiCat === "obese") {
+        if (a.category === "diet" || a.category === "fitness") s += 8;
+      }
+      if (bmiCat === "underweight" && a.category === "nutrition") s += 8;
+      if (diet && (tags.map((t) => t.toLowerCase()).includes(diet))) s += 5;
+      return s;
+    }
 
-    const menuStr = safeFoods.map((f) => `${f.id}|${f.name}|${f.calories}kcal|P${f.protein_g}/C${f.carbs_g}/F${f.fat_g}`).join("\n");
+    function scoreRecipe(r: NonNullable<typeof recs>[number]): number {
+      let s = 0;
+      if (todayIds.has(r.id)) s += 50;
+      s += Math.min(20, (r.avg_rating ?? 0) * 4);
+      if (diet === "vegetarian" && r.is_vegetarian) s += 12;
+      if (diet === "vegan" && r.is_vegan) s += 14;
+      if (diet === "keto" && r.is_keto_friendly) s += 14;
+      if (diet === "halal" && r.is_halal) s += 6;
+      if (calTarget > 0 && r.calories > 0) {
+        const portion = calTarget / 3; // ~per meal
+        const diff = Math.abs(r.calories - portion) / portion;
+        if (diff < 0.3) s += 10;
+        else if (diff < 0.5) s += 5;
+      }
+      if (bmiCat === "overweight" || bmiCat === "obese") {
+        if (r.calories > 0 && r.calories < 450) s += 6;
+      }
+      return s;
+    }
 
-    const userPayload = {
-      profile: {
-        gender: profile?.gender,
-        weight_kg: profile?.weight_kg,
-        target_weight_kg: profile?.target_weight_kg,
-        height_cm: profile?.height_cm,
-        activity_level: profile?.activity_level,
-        dietary_preference: profile?.dietary_preference,
-        health_conditions: profile?.health_conditions,
-        allergies,
-      },
-      today_so_far: { calories: Math.round(consumedCal), protein_g: Math.round(consumedP), carbs_g: Math.round(consumedC), fat_g: Math.round(consumedF) },
-      remaining_budget_kcal: Math.round(remaining),
-      requested_meals: data.meal_types,
-      user_notes: data.notes ?? null,
-    };
+    const articles = (arts ?? [])
+      .map((a) => ({ ...a, _score: scoreArticle(a) }))
+      .sort((a, b) => b._score - a._score)
+      .slice(0, 12);
 
-    const schema = {
-      type: "object",
-      properties: {
-        meals: {
-          type: "array",
-          items: {
-            type: "object",
-            properties: {
-              meal_type: { type: "string", enum: ["breakfast", "lunch", "dinner", "snack"] },
-              food_item_id: { type: "string", description: "UUID dari menu di atas, atau null jika custom" },
-              name: { type: "string" },
-              planned_qty: { type: "number" },
-              calories: { type: "number" },
-              protein_g: { type: "number" },
-              carbs_g: { type: "number" },
-              fat_g: { type: "number" },
-              reason: { type: "string", description: "Alasan singkat kenapa cocok" },
-            },
-            required: ["meal_type", "name", "planned_qty", "calories", "reason"],
-          },
-        },
-        summary: { type: "string", description: "Ringkasan singkat strategi hari ini (2-3 kalimat)" },
-      },
-      required: ["meals", "summary"],
-    };
-
-    const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-      method: "POST",
-      headers: { "Content-Type": "application/json", Authorization: `Bearer ${apiKey}` },
-      body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
-        messages: [
-          {
-            role: "system",
-            content: `Kamu adalah AI nutrisi Dr. HealthyU. Buat rekomendasi meal plan harian dari menu Indonesia. Aturan:\n- HINDARI alergen dan sesuaikan dengan kondisi kesehatan user\n- Total kalori semua meals MENDEKATI remaining_budget_kcal (±10%)\n- Distribusi makro seimbang (P:25%, C:50%, F:25%) kecuali user diet khusus\n- Pilih dari menu yang disediakan jika ada (gunakan UUID), atau custom dengan food_item_id=null\n- Beri alasan singkat & praktis dalam Bahasa Indonesia`,
-          },
-          {
-            role: "user",
-            content: `Data user:\n${JSON.stringify(userPayload, null, 2)}\n\nMenu tersedia (id|nama|kcal|P/C/F per ${safeFoods[0]?.serving_size ?? 100}${safeFoods[0]?.serving_unit ?? "g"}):\n${menuStr}`,
-          },
-        ],
-        tools: [{ type: "function", function: { name: "submit_meal_plan", description: "Submit rekomendasi", parameters: schema } }],
-        tool_choice: { type: "function", function: { name: "submit_meal_plan" } },
-      }),
-    });
-
-    if (res.status === 429) throw new Error("Terlalu banyak permintaan. Coba lagi.");
-    if (res.status === 402) throw new Error("Kredit AI habis.");
-    if (!res.ok) throw new Error(`AI error: ${res.status}`);
-    const json = await res.json();
-    const args = json?.choices?.[0]?.message?.tool_calls?.[0]?.function?.arguments;
-    if (!args) throw new Error("AI tidak mengembalikan rekomendasi");
-    const parsed = JSON.parse(args) as { meals: Array<{ meal_type: string; food_item_id?: string | null; name: string; planned_qty: number; calories: number; protein_g?: number; carbs_g?: number; fat_g?: number; reason: string }>; summary: string };
+    const recipes = (recs ?? [])
+      .map((r) => ({ ...r, _score: scoreRecipe(r) }))
+      .sort((a, b) => b._score - a._score)
+      .slice(0, 12);
 
     return {
-      summary: parsed.summary,
-      remaining_budget_kcal: Math.round(remaining),
-      meals: parsed.meals,
+      today_theme: schedule?.[0]?.theme ?? null,
+      articles,
+      recipes,
     };
   });
 
-export const acceptMealPlan = createServerFn({ method: "POST" })
+/* -------------------------------------------------------------------------- */
+/* AI Meal Plan generation (used by /recommendations route)                   */
+/* -------------------------------------------------------------------------- */
+
+type PlanMeal = {
+  meal_type: "breakfast" | "lunch" | "dinner" | "snack";
+  name: string;
+  food_item_id?: string | null;
+  planned_qty?: number;
+  calories: number;
+  protein_g?: number;
+  carbs_g?: number;
+  fat_g?: number;
+  reason: string;
+};
+type PlanResult = {
+  summary: string;
+  remaining_budget_kcal: number;
+  meals: PlanMeal[];
+};
+
+const GenInput = z.object({ notes: z.string().max(500).optional() });
+
+export const generateMealPlan = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((i: unknown) =>
-    z.object({
-      plan_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
-      items: z.array(z.object({
+  .inputValidator((i: unknown) => GenInput.parse(i))
+  .handler(async ({ data, context }): Promise<PlanResult> => {
+    const { supabase, userId } = context;
+    const today = new Date().toISOString().slice(0, 10);
+
+    const [{ data: profile }, { data: planned }] = await Promise.all([
+      supabase
+        .from("profiles")
+        .select("daily_calorie_target, dietary_preference, health_conditions, bmi_category")
+        .eq("id", userId)
+        .maybeSingle(),
+      supabase
+        .from("meal_plans")
+        .select("calories, planned_qty")
+        .eq("user_id", userId)
+        .eq("plan_date", today),
+    ]);
+
+    const target = profile?.daily_calorie_target ?? 2000;
+    const consumed = (planned ?? []).reduce(
+      (s, r) => s + Number(r.calories ?? 0) * Number(r.planned_qty ?? 1),
+      0,
+    );
+    const remaining = Math.max(300, Math.round(target - consumed));
+
+    const apiKey = process.env.LOVABLE_API_KEY;
+    if (!apiKey) throw new Error("LOVABLE_API_KEY missing");
+
+    const system =
+      "Anda ahli gizi HealthyU. Susun rencana 3-4 menu Indonesia untuk sisa hari ini. " +
+      "Output HANYA JSON valid: " +
+      '{"summary":"...","meals":[{"meal_type":"breakfast|lunch|dinner|snack","name":"...","calories":<int>,"protein_g":<num>,"carbs_g":<num>,"fat_g":<num>,"planned_qty":1,"reason":"singkat"}]}. ' +
+      "Total kalori meals harus ≤ budget. Pertimbangkan preferensi diet & kondisi kesehatan.";
+    const user =
+      `Sisa budget kalori: ${remaining} kcal\n` +
+      `Preferensi diet: ${profile?.dietary_preference ?? "tidak ada"}\n` +
+      `Kondisi: ${(profile?.health_conditions ?? []).join(", ") || "tidak ada"}\n` +
+      `Kategori BMI: ${profile?.bmi_category ?? "-"}\n` +
+      (data.notes ? `Catatan user: ${data.notes}\n` : "");
+
+    const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Lovable-API-Key": apiKey,
+        "X-Lovable-AIG-SDK": "fetch",
+      },
+      body: JSON.stringify({
+        model: "google/gemini-2.5-flash",
+        messages: [
+          { role: "system", content: system },
+          { role: "user", content: user },
+        ],
+        max_tokens: 900,
+      }),
+    });
+    if (!res.ok) {
+      const t = await res.text().catch(() => "");
+      throw new Error(`AI gateway ${res.status}: ${t.slice(0, 200)}`);
+    }
+    const json = await res.json();
+    const text: string = json?.choices?.[0]?.message?.content ?? "";
+    const match = text.match(/\{[\s\S]*\}/);
+    if (!match) throw new Error("AI response tidak valid");
+    let parsed: { summary?: string; meals?: PlanMeal[] };
+    try {
+      parsed = JSON.parse(match[0]);
+    } catch {
+      throw new Error("AI response gagal diparse");
+    }
+    const meals = Array.isArray(parsed.meals) ? parsed.meals : [];
+    return {
+      summary: parsed.summary ?? "Rekomendasi siap.",
+      remaining_budget_kcal: remaining,
+      meals,
+    };
+  });
+
+const AcceptInput = z.object({
+  plan_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+  items: z
+    .array(
+      z.object({
         meal_type: z.enum(["breakfast", "lunch", "dinner", "snack"]),
         food_item_id: z.string().uuid().nullable().optional(),
-        custom_name: z.string().max(100).nullable().optional(),
+        custom_name: z.string().max(200).nullable().optional(),
         calories: z.number().min(0).max(5000),
-        planned_qty: z.number().min(0.1).max(20).default(1),
-      })).min(1).max(10),
-    }).parse(i),
-  )
+        planned_qty: z.number().min(0.1).max(20).optional(),
+      }),
+    )
+    .min(1)
+    .max(12),
+});
+
+export const acceptMealPlan = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((i: unknown) => AcceptInput.parse(i))
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
     const rows = data.items.map((it) => ({
@@ -140,9 +229,10 @@ export const acceptMealPlan = createServerFn({ method: "POST" })
       plan_date: data.plan_date,
       meal_type: it.meal_type,
       food_item_id: it.food_item_id ?? null,
-      custom_name: it.food_item_id ? null : (it.custom_name ?? "Custom"),
+      custom_name: it.custom_name ?? null,
       calories: it.calories,
-      planned_qty: it.planned_qty,
+      planned_qty: it.planned_qty ?? 1,
+      plan_type: "ai",
     }));
     const { error } = await supabase.from("meal_plans").insert(rows);
     if (error) throw new Error(error.message);
