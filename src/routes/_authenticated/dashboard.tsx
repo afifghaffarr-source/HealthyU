@@ -15,6 +15,7 @@ import { BottomNav } from "@/components/bottom-nav";
 import { CalorieRing } from "@/components/calorie-ring";
 import { Coachmark } from "@/components/healthyu/coachmark";
 import { PullIndicator } from "@/components/healthyu/pull-indicator";
+import { StreakRing } from "@/components/healthyu/streak-ring";
 import { usePullToRefresh } from "@/hooks/use-pull-to-refresh";
 import { formatDuration, fastingStage } from "@/lib/health";
 import { Droplet, Plus, Sparkles, ArrowRight, Flame, Trophy, Camera, Smile } from "lucide-react";
