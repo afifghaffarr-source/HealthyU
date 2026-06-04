@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
+import { Route as KalkulatorRouteImport } from './routes/kalkulator'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
@@ -153,6 +154,11 @@ import { Route as AuthenticatedGroupsIdLeaderboardRouteImport } from './routes/_
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
   path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const KalkulatorRoute = KalkulatorRouteImport.update({
+  id: '/kalkulator',
+  path: '/kalkulator',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthRoute = AuthRouteImport.update({
@@ -927,6 +933,7 @@ const AuthenticatedGroupsIdLeaderboardRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/kalkulator': typeof KalkulatorRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/achievements': typeof AuthenticatedAchievementsRoute
   '/alarms': typeof AuthenticatedAlarmsRoute
@@ -1068,6 +1075,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/kalkulator': typeof KalkulatorRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/achievements': typeof AuthenticatedAchievementsRoute
   '/alarms': typeof AuthenticatedAlarmsRoute
@@ -1211,6 +1219,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
+  '/kalkulator': typeof KalkulatorRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/_authenticated/achievements': typeof AuthenticatedAchievementsRoute
   '/_authenticated/alarms': typeof AuthenticatedAlarmsRoute
@@ -1354,6 +1363,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/auth'
+    | '/kalkulator'
     | '/sitemap.xml'
     | '/achievements'
     | '/alarms'
@@ -1495,6 +1505,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/auth'
+    | '/kalkulator'
     | '/sitemap.xml'
     | '/achievements'
     | '/alarms'
@@ -1637,6 +1648,7 @@ export interface FileRouteTypes {
     | '/'
     | '/_authenticated'
     | '/auth'
+    | '/kalkulator'
     | '/sitemap.xml'
     | '/_authenticated/achievements'
     | '/_authenticated/alarms'
@@ -1780,6 +1792,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
+  KalkulatorRoute: typeof KalkulatorRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   ApiChatStreamRoute: typeof ApiChatStreamRoute
   ApiPublicHooksDailyCoachRoute: typeof ApiPublicHooksDailyCoachRoute
@@ -1797,6 +1810,13 @@ declare module '@tanstack/react-router' {
       path: '/sitemap.xml'
       fullPath: '/sitemap.xml'
       preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/kalkulator': {
+      id: '/kalkulator'
+      path: '/kalkulator'
+      fullPath: '/kalkulator'
+      preLoaderRoute: typeof KalkulatorRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth': {
@@ -3264,6 +3284,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
+  KalkulatorRoute: KalkulatorRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   ApiChatStreamRoute: ApiChatStreamRoute,
   ApiPublicHooksDailyCoachRoute: ApiPublicHooksDailyCoachRoute,
