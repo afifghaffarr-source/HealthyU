@@ -571,7 +571,7 @@ function Index() {
             Gratis selamanya. Tanpa kartu kredit. Hasil terlihat dalam 7 hari pertama.
           </p>
           <div className="relative flex flex-col sm:flex-row gap-3 justify-center pt-2">
-            <Link to={ctaPrimary} className="group inline-flex items-center justify-center gap-2 bg-white text-primary font-semibold py-4 px-6 rounded-2xl shadow-xl hover:-translate-y-0.5 transition-transform">
+            <Link to={ctaPrimary} onClick={fireConfetti} className="group inline-flex items-center justify-center gap-2 bg-white text-primary font-semibold py-4 px-6 rounded-2xl shadow-xl hover:-translate-y-0.5 transition-transform">
               {ctaPrimaryLabel}
               <ArrowRight className="size-4 group-hover:translate-x-1 transition-transform" />
             </Link>
