@@ -4387,6 +4387,69 @@ export type Database = {
         }
         Relationships: []
       }
+      seo_foods: {
+        Row: {
+          calories: number
+          carbs_g: number
+          category: string
+          created_at: string
+          description: string | null
+          fat_g: number
+          fiber_g: number
+          id: string
+          name: string
+          protein_g: number
+          published: boolean
+          serving_grams: number
+          serving_size: string
+          slug: string
+          sodium_mg: number
+          sugar_g: number
+          tags: string[]
+          updated_at: string
+        }
+        Insert: {
+          calories: number
+          carbs_g?: number
+          category: string
+          created_at?: string
+          description?: string | null
+          fat_g?: number
+          fiber_g?: number
+          id?: string
+          name: string
+          protein_g?: number
+          published?: boolean
+          serving_grams?: number
+          serving_size?: string
+          slug: string
+          sodium_mg?: number
+          sugar_g?: number
+          tags?: string[]
+          updated_at?: string
+        }
+        Update: {
+          calories?: number
+          carbs_g?: number
+          category?: string
+          created_at?: string
+          description?: string | null
+          fat_g?: number
+          fiber_g?: number
+          id?: string
+          name?: string
+          protein_g?: number
+          published?: boolean
+          serving_grams?: number
+          serving_size?: string
+          slug?: string
+          sodium_mg?: number
+          sugar_g?: number
+          tags?: string[]
+          updated_at?: string
+        }
+        Relationships: []
+      }
       sleep_diary: {
         Row: {
           bedtime: string | null
