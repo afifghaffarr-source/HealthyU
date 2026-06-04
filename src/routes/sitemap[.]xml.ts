@@ -22,6 +22,7 @@ const STATIC_ENTRIES: SitemapEntry[] = [
   { path: "/kalori", changefreq: "weekly", priority: "0.9" },
   { path: "/olahraga", changefreq: "weekly", priority: "0.9" },
   { path: "/diet", changefreq: "weekly", priority: "0.9" },
+  { path: "/artikel", changefreq: "daily", priority: "0.9" },
 ];
 
 export const Route = createFileRoute("/sitemap.xml")({
@@ -30,15 +31,17 @@ export const Route = createFileRoute("/sitemap.xml")({
       GET: async () => {
         const today = new Date().toISOString().split("T")[0];
         const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-        const [foods, exercises, diets] = await Promise.all([
+        const [foods, exercises, diets, articles] = await Promise.all([
           supabaseAdmin.from("seo_foods").select("slug").eq("published", true),
           supabaseAdmin.from("seo_exercises").select("slug").eq("published", true),
           supabaseAdmin.from("seo_diet_guides").select("slug").eq("published", true),
+          supabaseAdmin.from("seo_articles").select("slug").eq("published", true),
         ]);
         const dynamic: SitemapEntry[] = [
           ...(foods.data ?? []).map((r) => ({ path: `/kalori/${r.slug}`, changefreq: "monthly" as const, priority: "0.7" })),
           ...(exercises.data ?? []).map((r) => ({ path: `/olahraga/${r.slug}`, changefreq: "monthly" as const, priority: "0.7" })),
           ...(diets.data ?? []).map((r) => ({ path: `/diet/${r.slug}`, changefreq: "monthly" as const, priority: "0.7" })),
+          ...(articles.data ?? []).map((r) => ({ path: `/artikel/${r.slug}`, changefreq: "weekly" as const, priority: "0.8" })),
         ];
         const urls = [...STATIC_ENTRIES, ...dynamic].map((e) =>
           [
