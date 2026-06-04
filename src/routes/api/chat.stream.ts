@@ -222,6 +222,10 @@ export const Route = createFileRoute("/api/chat/stream")({
                 }
               }
               if (fullText) {
+                if (safetyDisclaimer) {
+                  fullText += safetyDisclaimer;
+                  controller.enqueue(encoder.encode(`data: ${JSON.stringify({ delta: safetyDisclaimer })}\n\n`));
+                }
                 await supabase.from("chat_messages").insert({
                   user_id: userId, role: "assistant", content: fullText,
                 });
