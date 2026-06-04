@@ -1,12 +1,13 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { listMood, addMood, deleteMood } from "@/lib/mood.functions";
 import { BottomNav } from "@/components/bottom-nav";
-import { Trash2, Loader2 } from "lucide-react";
+import { Trash2, Loader2, TrendingUp, Smile } from "lucide-react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { SyncPill } from "@/components/healthyu/sync-pill";
+import { EmptyState } from "@/components/healthyu/empty-state";
 import { toast } from "sonner";
 import { enqueue } from "@/lib/offline-queue";
 import { useOfflineQueue } from "@/hooks/use-offline-queue";
@@ -70,6 +71,23 @@ function MoodPage() {
       ? null
       : logs.reduce((a, l) => a + (l.mood as number), 0) / logs.length;
 
+  const last14 = useMemo(() => {
+    const days: { d: string; label: string; v: number | null }[] = [];
+    for (let i = 13; i >= 0; i--) {
+      const dt = new Date();
+      dt.setDate(dt.getDate() - i);
+      const key = dt.toISOString().slice(0, 10);
+      const todays = logs.filter((l) => (l.logged_at as string).slice(0, 10) === key);
+      const v = todays.length ? todays.reduce((a, l) => a + (l.mood as number), 0) / todays.length : null;
+      days.push({ d: key, label: String(dt.getDate()), v });
+    }
+    return days;
+  }, [logs]);
+  const trendAvg = useMemo(() => {
+    const valid = last14.filter((d) => d.v != null) as { v: number }[];
+    return valid.length ? valid.reduce((a, x) => a + x.v, 0) / valid.length : null;
+  }, [last14]);
+
   return (
     <div className="min-h-screen bg-background pb-28">
       <div className="max-w-md mx-auto px-4">
@@ -82,6 +100,37 @@ function MoodPage() {
       </div>
 
       <main className="max-w-md mx-auto px-4 space-y-6">
+        {logs.length > 0 && (
+          <section className="rounded-3xl bg-gradient-to-br from-primary/10 via-card to-accent/10 p-4 outline-1 outline-black/5 animate-fade-up">
+            <div className="flex items-center justify-between mb-3">
+              <div className="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                <TrendingUp className="size-3" /> Tren 14 hari
+              </div>
+              {trendAvg != null && (
+                <span className="text-xs font-semibold tabular-nums">
+                  Avg {trendAvg.toFixed(1)} {MOODS.find((m) => Math.round(trendAvg) === m.v)?.e}
+                </span>
+              )}
+            </div>
+            <div className="flex items-end gap-1 h-20">
+              {last14.map((d, i) => {
+                const h = d.v == null ? 6 : 12 + (d.v / 5) * 56;
+                const color = d.v == null
+                  ? "bg-muted"
+                  : d.v >= 4 ? "bg-emerald-400"
+                  : d.v >= 3 ? "bg-amber-300"
+                  : "bg-rose-400";
+                return (
+                  <div key={d.d} className="flex-1 flex flex-col items-center gap-1" title={`${d.d}: ${d.v?.toFixed(1) ?? "—"}`}>
+                    <div className={`w-full rounded-md ${color} transition-all`} style={{ height: `${h}px` }} />
+                    {i % 2 === 0 && <span className="text-[9px] text-muted-foreground tabular-nums">{d.label}</span>}
+                  </div>
+                );
+              })}
+            </div>
+          </section>
+        )}
+
         <section className="rounded-3xl bg-card p-5 outline-1 outline-black/5">
           <p className="text-sm font-semibold mb-3">Bagaimana perasaanmu?</p>
           <div className="flex justify-between gap-2">
@@ -121,9 +170,13 @@ function MoodPage() {
         <section>
           <h2 className="text-sm font-semibold mb-3">Riwayat</h2>
           {logs.length === 0 ? (
-            <p className="text-sm text-muted-foreground rounded-2xl bg-card p-4 outline-1 outline-black/5">
-              Belum ada catatan mood.
-            </p>
+            <div className="rounded-2xl bg-card outline-1 outline-black/5">
+              <EmptyState
+                icon={Smile}
+                title="Belum ada catatan mood"
+                description="Pilih emoji di atas untuk mencatat perasaanmu hari ini."
+              />
+            </div>
           ) : (
             <ul className="space-y-2">
               {logs.map((l) => {
