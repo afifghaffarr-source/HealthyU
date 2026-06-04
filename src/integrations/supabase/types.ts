@@ -4060,6 +4060,8 @@ export type Database = {
       recipes: {
         Row: {
           avg_rating: number
+          body_generated_at: string | null
+          body_source: string
           calories: number
           carbs_g: number
           category: string
@@ -4102,6 +4104,8 @@ export type Database = {
         }
         Insert: {
           avg_rating?: number
+          body_generated_at?: string | null
+          body_source?: string
           calories?: number
           carbs_g?: number
           category?: string
@@ -4144,6 +4148,8 @@ export type Database = {
         }
         Update: {
           avg_rating?: number
+          body_generated_at?: string | null
+          body_source?: string
           calories?: number
           carbs_g?: number
           category?: string
