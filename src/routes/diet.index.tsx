@@ -28,6 +28,7 @@ export const Route = createFileRoute("/diet/")({
 
 function DietHub() {
   const items = Route.useLoaderData();
+  type Diet = (typeof items)[number];
   return (
     <main className="mx-auto max-w-5xl px-4 py-8">
       <header className="mb-6">
@@ -37,7 +38,7 @@ function DietHub() {
         </p>
       </header>
       <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {items.map((d) => (
+        {items.map((d: Diet) => (
           <li key={d.slug}>
             <Link
               to="/diet/$slug"
