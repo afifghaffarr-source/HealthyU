@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
@@ -149,6 +150,11 @@ import { Route as AuthenticatedProfileFollowersIdRouteImport } from './routes/_a
 import { Route as AuthenticatedGroupsIdMealsRouteImport } from './routes/_authenticated/groups.$id.meals'
 import { Route as AuthenticatedGroupsIdLeaderboardRouteImport } from './routes/_authenticated/groups.$id.leaderboard'
 
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
@@ -921,6 +927,7 @@ const AuthenticatedGroupsIdLeaderboardRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/achievements': typeof AuthenticatedAchievementsRoute
   '/alarms': typeof AuthenticatedAlarmsRoute
   '/articles': typeof AuthenticatedArticlesRouteWithChildren
@@ -1061,6 +1068,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/achievements': typeof AuthenticatedAchievementsRoute
   '/alarms': typeof AuthenticatedAlarmsRoute
   '/articles': typeof AuthenticatedArticlesRouteWithChildren
@@ -1203,6 +1211,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/_authenticated/achievements': typeof AuthenticatedAchievementsRoute
   '/_authenticated/alarms': typeof AuthenticatedAlarmsRoute
   '/_authenticated/articles': typeof AuthenticatedArticlesRouteWithChildren
@@ -1345,6 +1354,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/auth'
+    | '/sitemap.xml'
     | '/achievements'
     | '/alarms'
     | '/articles'
@@ -1485,6 +1495,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/auth'
+    | '/sitemap.xml'
     | '/achievements'
     | '/alarms'
     | '/articles'
@@ -1626,6 +1637,7 @@ export interface FileRouteTypes {
     | '/'
     | '/_authenticated'
     | '/auth'
+    | '/sitemap.xml'
     | '/_authenticated/achievements'
     | '/_authenticated/alarms'
     | '/_authenticated/articles'
@@ -1768,6 +1780,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
+  SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   ApiChatStreamRoute: typeof ApiChatStreamRoute
   ApiPublicHooksDailyCoachRoute: typeof ApiPublicHooksDailyCoachRoute
   ApiPublicHooksDailyContentRoute: typeof ApiPublicHooksDailyContentRoute
@@ -1779,6 +1792,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/auth': {
       id: '/auth'
       path: '/auth'
@@ -3244,6 +3264,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
+  SitemapDotxmlRoute: SitemapDotxmlRoute,
   ApiChatStreamRoute: ApiChatStreamRoute,
   ApiPublicHooksDailyCoachRoute: ApiPublicHooksDailyCoachRoute,
   ApiPublicHooksDailyContentRoute: ApiPublicHooksDailyContentRoute,

@@ -121,6 +121,47 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         href: "https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap",
       },
     ],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@graph": [
+            {
+              "@type": "Organization",
+              "@id": "https://healthyu.id/#organization",
+              name: "HealthyU",
+              url: "https://healthyu.id",
+              logo: "https://healthyu.id/icon-512.svg",
+              description:
+                "Aplikasi diet, puasa, dan kesehatan holistik berbasis AI untuk Indonesia.",
+              sameAs: [],
+            },
+            {
+              "@type": "WebSite",
+              "@id": "https://healthyu.id/#website",
+              url: "https://healthyu.id",
+              name: "HealthyU",
+              inLanguage: "id-ID",
+              publisher: { "@id": "https://healthyu.id/#organization" },
+              potentialAction: {
+                "@type": "SearchAction",
+                target: "https://healthyu.id/cari?q={search_term_string}",
+                "query-input": "required name=search_term_string",
+              },
+            },
+            {
+              "@type": "WebApplication",
+              name: "HealthyU",
+              url: "https://healthyu.id",
+              applicationCategory: "HealthApplication",
+              operatingSystem: "Web, iOS, Android",
+              offers: { "@type": "Offer", price: "0", priceCurrency: "IDR" },
+            },
+          ],
+        }),
+      },
+    ],
   }),
   shellComponent: RootShell,
   component: RootComponent,
