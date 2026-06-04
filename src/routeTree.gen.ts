@@ -14,6 +14,7 @@ import { Route as KalkulatorRouteImport } from './routes/kalkulator'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as KalkulatorIndexRouteImport } from './routes/kalkulator.index'
 import { Route as KalkulatorSlugRouteImport } from './routes/kalkulator.$slug'
 import { Route as AuthenticatedWorkoutRouteImport } from './routes/_authenticated/workout'
 import { Route as AuthenticatedWeightRouteImport } from './routes/_authenticated/weight'
@@ -175,6 +176,11 @@ const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const KalkulatorIndexRoute = KalkulatorIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => KalkulatorRoute,
 } as any)
 const KalkulatorSlugRoute = KalkulatorSlugRouteImport.update({
   id: '/$slug',
@@ -996,6 +1002,7 @@ export interface FileRoutesByFullPath {
   '/weight': typeof AuthenticatedWeightRouteWithChildren
   '/workout': typeof AuthenticatedWorkoutRouteWithChildren
   '/kalkulator/$slug': typeof KalkulatorSlugRoute
+  '/kalkulator/': typeof KalkulatorIndexRoute
   '/articles/$id': typeof AuthenticatedArticlesIdRoute
   '/bonus/auto-claim': typeof AuthenticatedBonusAutoClaimRoute
   '/calendar/google': typeof AuthenticatedCalendarGoogleRoute
@@ -1082,7 +1089,6 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
-  '/kalkulator': typeof KalkulatorRouteWithChildren
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/achievements': typeof AuthenticatedAchievementsRoute
   '/alarms': typeof AuthenticatedAlarmsRoute
@@ -1139,6 +1145,7 @@ export interface FileRoutesByTo {
   '/weight': typeof AuthenticatedWeightRouteWithChildren
   '/workout': typeof AuthenticatedWorkoutRouteWithChildren
   '/kalkulator/$slug': typeof KalkulatorSlugRoute
+  '/kalkulator': typeof KalkulatorIndexRoute
   '/articles/$id': typeof AuthenticatedArticlesIdRoute
   '/bonus/auto-claim': typeof AuthenticatedBonusAutoClaimRoute
   '/calendar/google': typeof AuthenticatedCalendarGoogleRoute
@@ -1284,6 +1291,7 @@ export interface FileRoutesById {
   '/_authenticated/weight': typeof AuthenticatedWeightRouteWithChildren
   '/_authenticated/workout': typeof AuthenticatedWorkoutRouteWithChildren
   '/kalkulator/$slug': typeof KalkulatorSlugRoute
+  '/kalkulator/': typeof KalkulatorIndexRoute
   '/_authenticated/articles/$id': typeof AuthenticatedArticlesIdRoute
   '/_authenticated/bonus/auto-claim': typeof AuthenticatedBonusAutoClaimRoute
   '/_authenticated/calendar/google': typeof AuthenticatedCalendarGoogleRoute
@@ -1429,6 +1437,7 @@ export interface FileRouteTypes {
     | '/weight'
     | '/workout'
     | '/kalkulator/$slug'
+    | '/kalkulator/'
     | '/articles/$id'
     | '/bonus/auto-claim'
     | '/calendar/google'
@@ -1515,7 +1524,6 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/auth'
-    | '/kalkulator'
     | '/sitemap.xml'
     | '/achievements'
     | '/alarms'
@@ -1572,6 +1580,7 @@ export interface FileRouteTypes {
     | '/weight'
     | '/workout'
     | '/kalkulator/$slug'
+    | '/kalkulator'
     | '/articles/$id'
     | '/bonus/auto-claim'
     | '/calendar/google'
@@ -1716,6 +1725,7 @@ export interface FileRouteTypes {
     | '/_authenticated/weight'
     | '/_authenticated/workout'
     | '/kalkulator/$slug'
+    | '/kalkulator/'
     | '/_authenticated/articles/$id'
     | '/_authenticated/bonus/auto-claim'
     | '/_authenticated/calendar/google'
@@ -1851,6 +1861,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/kalkulator/': {
+      id: '/kalkulator/'
+      path: '/'
+      fullPath: '/kalkulator/'
+      preLoaderRoute: typeof KalkulatorIndexRouteImport
+      parentRoute: typeof KalkulatorRoute
     }
     '/kalkulator/$slug': {
       id: '/kalkulator/$slug'
@@ -3301,10 +3318,12 @@ const AuthenticatedRouteRouteWithChildren =
 
 interface KalkulatorRouteChildren {
   KalkulatorSlugRoute: typeof KalkulatorSlugRoute
+  KalkulatorIndexRoute: typeof KalkulatorIndexRoute
 }
 
 const KalkulatorRouteChildren: KalkulatorRouteChildren = {
   KalkulatorSlugRoute: KalkulatorSlugRoute,
+  KalkulatorIndexRoute: KalkulatorIndexRoute,
 }
 
 const KalkulatorRouteWithChildren = KalkulatorRoute._addFileChildren(
