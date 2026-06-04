@@ -38,9 +38,12 @@ function ArticlesPage() {
   const bookmarks = new Set(data?.bookmarks ?? []);
 
   const categories = useMemo(() => {
-    const set = new Set<string>();
-    articles.forEach((a) => a.category && set.add(a.category));
-    return Array.from(set);
+    const map = new Map<string, number>();
+    articles.forEach((a) => {
+      if (!a.category) return;
+      map.set(a.category, (map.get(a.category) ?? 0) + 1);
+    });
+    return Array.from(map.entries());
   }, [articles]);
 
   const [filter, setFilter] = useState<string>("all");
@@ -58,10 +61,10 @@ function ArticlesPage() {
       <main className="max-w-md mx-auto px-4 pt-4 space-y-3">
         {!isLoading && (articles.length > 0) && (
           <div className="flex gap-2 overflow-x-auto no-scrollbar -mx-1 px-1 pb-1">
-            <Chip active={filter === "all"} onClick={() => setFilter("all")}>Semua</Chip>
-            <Chip active={filter === "bookmark"} onClick={() => setFilter("bookmark")}>★ Disimpan</Chip>
-            {categories.map((c) => (
-              <Chip key={c} active={filter === c} onClick={() => setFilter(c)}>{c}</Chip>
+            <Chip active={filter === "all"} onClick={() => setFilter("all")} count={articles.length}>Semua</Chip>
+            <Chip active={filter === "bookmark"} onClick={() => setFilter("bookmark")} count={bookmarks.size}>★ Disimpan</Chip>
+            {categories.map(([c, n]) => (
+              <Chip key={c} active={filter === c} onClick={() => setFilter(c)} count={n}>{c}</Chip>
             ))}
           </div>
         )}
@@ -115,15 +118,20 @@ function ArticlesPage() {
   );
 }
 
-function Chip({ active, onClick, children }: { active: boolean; onClick: () => void; children: React.ReactNode }) {
+function Chip({ active, onClick, children, count }: { active: boolean; onClick: () => void; children: React.ReactNode; count?: number }) {
   return (
     <button
       onClick={onClick}
-      className={`px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition ${
+      className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition ${
         active ? "bg-primary text-primary-foreground shadow" : "bg-card border text-muted-foreground"
       }`}
     >
       {children}
+      {typeof count === "number" && (
+        <span className={`text-[10px] px-1.5 py-0.5 rounded-full ${active ? "bg-white/25" : "bg-muted"}`}>
+          {count}
+        </span>
+      )}
     </button>
   );
 }
