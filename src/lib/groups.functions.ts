@@ -17,7 +17,14 @@ export const listMyGroups = createServerFn({ method: "GET" })
       .eq("user_id", userId);
     if (error) throw new Error(error.message);
     const ids = (memberships ?? []).map((m) => m.group_id);
-    if (!ids.length) return [] as Array<{ id: string; name: string; invite_code: string; owner_id: string; member_count: number }>;
+    if (!ids.length)
+      return [] as Array<{
+        id: string;
+        name: string;
+        invite_code: string;
+        owner_id: string;
+        member_count: number;
+      }>;
     const { data: groups, error: gErr } = await supabase
       .from("friend_groups")
       .select("id, name, invite_code, owner_id")
@@ -64,7 +71,15 @@ export const createGroup = createServerFn({ method: "POST" })
 export const joinGroup = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((i: unknown) =>
-    z.object({ invite_code: z.string().min(4).max(12).regex(/^[A-Z0-9]+$/) }).parse(i),
+    z
+      .object({
+        invite_code: z
+          .string()
+          .min(4)
+          .max(12)
+          .regex(/^[A-Z0-9]+$/),
+      })
+      .parse(i),
   )
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;

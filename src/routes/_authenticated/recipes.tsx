@@ -13,7 +13,17 @@ import { BottomNav } from "@/components/bottom-nav";
 import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { PullIndicator } from "@/components/healthyu/pull-indicator";
 import { usePullToRefresh } from "@/hooks/use-pull-to-refresh";
-import { Clock, Flame, Search, Sparkles, Loader2, X, Star, Bookmark, TrendingUp } from "lucide-react";
+import {
+  Clock,
+  Flame,
+  Search,
+  Sparkles,
+  Loader2,
+  X,
+  Star,
+  Bookmark,
+  TrendingUp,
+} from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -69,10 +79,10 @@ function RecipesPage() {
           if (!raw) return null;
           try {
             const parsed = JSON.parse(raw) as { count: number; ts: number };
-          if (
+            if (
               typeof parsed?.count !== "number" ||
               typeof parsed?.ts !== "number" ||
-            Date.now() - parsed.ts > TRENDING_TTL_DAYS * 86400000
+              Date.now() - parsed.ts > TRENDING_TTL_DAYS * 86400000
             ) {
               window.localStorage.removeItem("recipes:trendingCount");
               return null;
@@ -109,15 +119,11 @@ function RecipesPage() {
     if (sort !== "trending") return;
     const ch = supabase
       .channel("recipes-trending-bookmarks")
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "recipe_bookmarks" },
-        () => {
-          qc.invalidateQueries({ queryKey: ["recipes"] });
-          setPulseTrending(true);
-          window.setTimeout(() => setPulseTrending(false), 3000);
-        },
-      )
+      .on("postgres_changes", { event: "*", schema: "public", table: "recipe_bookmarks" }, () => {
+        qc.invalidateQueries({ queryKey: ["recipes"] });
+        setPulseTrending(true);
+        window.setTimeout(() => setPulseTrending(false), 3000);
+      })
       .subscribe();
     return () => {
       void supabase.removeChannel(ch);
@@ -240,7 +246,9 @@ function RecipesPage() {
               key={c.id}
               onClick={() => setCat(c.id)}
               className={`px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap ${
-                cat === c.id ? "bg-primary text-primary-foreground" : "bg-card outline-1 outline-black/10"
+                cat === c.id
+                  ? "bg-primary text-primary-foreground"
+                  : "bg-card outline-1 outline-black/10"
               }`}
             >
               {c.label}
@@ -249,7 +257,9 @@ function RecipesPage() {
           <button
             onClick={() => setSort(sort === "rating" ? "title" : "rating")}
             className={`px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap inline-flex items-center gap-1 ${
-              sort === "rating" ? "bg-amber-400 text-amber-950" : "bg-card outline-1 outline-black/10"
+              sort === "rating"
+                ? "bg-amber-400 text-amber-950"
+                : "bg-card outline-1 outline-black/10"
             }`}
           >
             <Star className="size-3" /> Top rating
@@ -257,7 +267,9 @@ function RecipesPage() {
           <button
             onClick={() => setSort(sort === "popular" ? "title" : "popular")}
             className={`px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap inline-flex items-center gap-1 ${
-              sort === "popular" ? "bg-primary text-primary-foreground" : "bg-card outline-1 outline-black/10"
+              sort === "popular"
+                ? "bg-primary text-primary-foreground"
+                : "bg-card outline-1 outline-black/10"
             }`}
           >
             <Bookmark className="size-3" /> Terpopuler
@@ -276,7 +288,9 @@ function RecipesPage() {
               setPulseCounter(false);
             }}
             className={`relative px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap inline-flex items-center gap-1 ${
-              sort === "trending" ? "bg-orange-500 text-white" : "bg-card outline-1 outline-black/10"
+              sort === "trending"
+                ? "bg-orange-500 text-white"
+                : "bg-card outline-1 outline-black/10"
             }`}
           >
             <TrendingUp className="size-3" /> Trending
@@ -304,7 +318,9 @@ function RecipesPage() {
             <button
               onClick={() => setTrendingOnly((v) => !v)}
               className={`px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap ${
-                trendingOnly ? "bg-orange-100 text-orange-700 outline-1 outline-orange-300" : "bg-card outline-1 outline-black/10"
+                trendingOnly
+                  ? "bg-orange-100 text-orange-700 outline-1 outline-orange-300"
+                  : "bg-card outline-1 outline-black/10"
               }`}
             >
               Hanya trending
@@ -315,7 +331,9 @@ function RecipesPage() {
         <section className="space-y-3">
           {trending.length > 0 && (
             <div className="space-y-2">
-              <p className="text-xs font-bold uppercase tracking-wider text-orange-600">🔥 Trending minggu ini</p>
+              <p className="text-xs font-bold uppercase tracking-wider text-orange-600">
+                🔥 Trending minggu ini
+              </p>
               <div className="flex gap-3 overflow-x-auto -mx-5 px-5 pb-1">
                 {trending.map((r) => (
                   <Link
@@ -329,8 +347,14 @@ function RecipesPage() {
                       +{r.weekly_growth} bookmark / 7 hari
                     </p>
                     <div className="flex gap-2 mt-2 text-[10px] text-muted-foreground">
-                      <span className="inline-flex items-center gap-1"><Flame className="size-3" />{r.calories}</span>
-                      <span className="inline-flex items-center gap-1"><Clock className="size-3" />{r.prep_min}m</span>
+                      <span className="inline-flex items-center gap-1">
+                        <Flame className="size-3" />
+                        {r.calories}
+                      </span>
+                      <span className="inline-flex items-center gap-1">
+                        <Clock className="size-3" />
+                        {r.prep_min}m
+                      </span>
                     </div>
                   </Link>
                 ))}
@@ -362,11 +386,22 @@ function RecipesPage() {
                   </span>
                 )}
               </div>
-              {r.description && <p className="text-xs text-muted-foreground mt-1 line-clamp-2">{r.description}</p>}
+              {r.description && (
+                <p className="text-xs text-muted-foreground mt-1 line-clamp-2">{r.description}</p>
+              )}
               <div className="flex gap-4 mt-3 text-xs text-muted-foreground">
-                <span className="inline-flex items-center gap-1"><Flame className="size-3" />{r.calories} kcal</span>
-                <span className="inline-flex items-center gap-1"><Clock className="size-3" />{r.prep_min} min</span>
-                <span>P{Math.round(Number(r.protein_g))} K{Math.round(Number(r.carbs_g))} L{Math.round(Number(r.fat_g))}</span>
+                <span className="inline-flex items-center gap-1">
+                  <Flame className="size-3" />
+                  {r.calories} kcal
+                </span>
+                <span className="inline-flex items-center gap-1">
+                  <Clock className="size-3" />
+                  {r.prep_min} min
+                </span>
+                <span>
+                  P{Math.round(Number(r.protein_g))} K{Math.round(Number(r.carbs_g))} L
+                  {Math.round(Number(r.fat_g))}
+                </span>
                 {Number(r.rating_count ?? 0) > 0 && (
                   <span className="inline-flex items-center gap-1 text-amber-600 font-semibold">
                     <Star className="size-3 fill-amber-500 text-amber-500" />
@@ -383,12 +418,17 @@ function RecipesPage() {
               </div>
             </Link>
           ))}
-          {items.length === 0 && <p className="text-center text-sm text-muted-foreground py-6">Tidak ada resep</p>}
+          {items.length === 0 && (
+            <p className="text-center text-sm text-muted-foreground py-6">Tidak ada resep</p>
+          )}
         </section>
       </div>
 
       {aiOpen && (
-        <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/50" onClick={() => setAiOpen(false)}>
+        <div
+          className="fixed inset-0 z-50 flex items-end justify-center bg-black/50"
+          onClick={() => setAiOpen(false)}
+        >
           <div
             className="w-full max-w-md bg-card rounded-t-3xl p-5 max-h-[90vh] overflow-y-auto"
             onClick={(e) => e.stopPropagation()}
@@ -405,7 +445,9 @@ function RecipesPage() {
             {!generated ? (
               <div className="space-y-3">
                 <div>
-                  <label className="text-xs font-semibold text-muted-foreground">Bahan di kulkas</label>
+                  <label className="text-xs font-semibold text-muted-foreground">
+                    Bahan di kulkas
+                  </label>
                   <textarea
                     value={ingredients}
                     onChange={(e) => setIngredients(e.target.value)}
@@ -415,7 +457,9 @@ function RecipesPage() {
                   />
                 </div>
                 <div>
-                  <label className="text-xs font-semibold text-muted-foreground">Preferensi (opsional)</label>
+                  <label className="text-xs font-semibold text-muted-foreground">
+                    Preferensi (opsional)
+                  </label>
                   <input
                     value={prefs}
                     onChange={(e) => setPrefs(e.target.value)}
@@ -428,7 +472,11 @@ function RecipesPage() {
                   onClick={() => genMutation.mutate()}
                   className="w-full bg-primary text-primary-foreground rounded-xl py-3 font-semibold text-sm flex items-center justify-center gap-2 disabled:opacity-50"
                 >
-                  {genMutation.isPending ? <Loader2 className="size-4 animate-spin" /> : <Sparkles className="size-4" />}
+                  {genMutation.isPending ? (
+                    <Loader2 className="size-4 animate-spin" />
+                  ) : (
+                    <Sparkles className="size-4" />
+                  )}
                   {genMutation.isPending ? "Membuat resep..." : "Buat Resep"}
                 </button>
                 <p className="text-[10px] text-muted-foreground text-center">
@@ -448,31 +496,44 @@ function RecipesPage() {
                   <Mini label="Lemak" v={`${generated.fat_g}g`} />
                 </div>
                 <div className="flex gap-4 text-xs text-muted-foreground">
-                  <span className="inline-flex items-center gap-1"><Clock className="size-3" />{generated.prep_min} min</span>
+                  <span className="inline-flex items-center gap-1">
+                    <Clock className="size-3" />
+                    {generated.prep_min} min
+                  </span>
                   <span>{generated.servings} porsi</span>
                 </div>
                 <div>
                   <p className="text-xs font-bold mb-2">Bahan</p>
                   <ul className="text-sm space-y-1 list-disc pl-5">
-                    {generated.ingredients.map((x, i) => <li key={i}>{x}</li>)}
+                    {generated.ingredients.map((x, i) => (
+                      <li key={i}>{x}</li>
+                    ))}
                   </ul>
                 </div>
                 <div>
                   <p className="text-xs font-bold mb-2">Cara membuat</p>
                   <ol className="text-sm space-y-1.5 list-decimal pl-5">
-                    {generated.instructions.map((x, i) => <li key={i}>{x}</li>)}
+                    {generated.instructions.map((x, i) => (
+                      <li key={i}>{x}</li>
+                    ))}
                   </ol>
                 </div>
                 {generated.tips.length > 0 && (
                   <div className="bg-mint/40 rounded-xl p-3">
                     <p className="text-xs font-bold mb-1">💡 Tips sehat</p>
                     <ul className="text-xs space-y-1 list-disc pl-5">
-                      {generated.tips.map((x, i) => <li key={i}>{x}</li>)}
+                      {generated.tips.map((x, i) => (
+                        <li key={i}>{x}</li>
+                      ))}
                     </ul>
                   </div>
                 )}
                 <button
-                  onClick={() => { setGenerated(null); setIngredients(""); setPrefs(""); }}
+                  onClick={() => {
+                    setGenerated(null);
+                    setIngredients("");
+                    setPrefs("");
+                  }}
                   className="w-full bg-muted rounded-xl py-2.5 text-sm font-semibold"
                 >
                   Buat resep lain

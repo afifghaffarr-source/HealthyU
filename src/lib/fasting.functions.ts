@@ -22,10 +22,12 @@ export const currentFast = createServerFn({ method: "GET" })
 export const startFast = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) =>
-    z.object({
-      protocol: z.string().max(20),
-      target_hours: z.number().min(1).max(72),
-    }).parse(input),
+    z
+      .object({
+        protocol: z.string().max(20),
+        target_hours: z.number().min(1).max(72),
+      })
+      .parse(input),
   )
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
@@ -106,8 +108,16 @@ const ScheduleSchema = z.object({
   is_ramadhan_mode: z.boolean().default(false),
   is_active: z.boolean().default(true),
   target_duration_hours: z.number().min(1).max(24).nullable().optional(),
-  eating_window_start: z.string().regex(/^\d{2}:\d{2}(:\d{2})?$/).nullable().optional(),
-  eating_window_end: z.string().regex(/^\d{2}:\d{2}(:\d{2})?$/).nullable().optional(),
+  eating_window_start: z
+    .string()
+    .regex(/^\d{2}:\d{2}(:\d{2})?$/)
+    .nullable()
+    .optional(),
+  eating_window_end: z
+    .string()
+    .regex(/^\d{2}:\d{2}(:\d{2})?$/)
+    .nullable()
+    .optional(),
   enabled_days: z.array(z.number().min(0).max(6)).max(7).default([]),
 });
 

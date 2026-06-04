@@ -20,13 +20,21 @@ function Page() {
     <div className="min-h-dvh pb-24 bg-background">
       <TopAppBar title="Podcast Mingguan" showBack />
       <main className="max-w-md mx-auto px-4 pt-4 space-y-3">
-        <button onClick={() => mut.mutate()} disabled={mut.isPending} className="w-full rounded-lg bg-primary text-primary-foreground py-2 text-sm">
+        <button
+          onClick={() => mut.mutate()}
+          disabled={mut.isPending}
+          className="w-full rounded-lg bg-primary text-primary-foreground py-2 text-sm"
+        >
           {mut.isPending ? "Membuat..." : "Generate Skrip"}
         </button>
         {mut.data?.script && (
           <>
-            <div className="rounded-xl border bg-card p-3 text-sm whitespace-pre-wrap">{mut.data.script}</div>
-            <button onClick={play} className="w-full rounded-lg border py-2 text-sm">▶ Putar Audio (TTS)</button>
+            <div className="rounded-xl border bg-card p-3 text-sm whitespace-pre-wrap">
+              {mut.data.script}
+            </div>
+            <button onClick={play} className="w-full rounded-lg border py-2 text-sm">
+              ▶ Putar Audio (TTS)
+            </button>
           </>
         )}
       </main>

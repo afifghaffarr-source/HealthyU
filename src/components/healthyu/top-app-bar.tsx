@@ -14,10 +14,12 @@ interface Props {
 export function TopAppBar({ title, subtitle, showBack, action, className }: Props) {
   const router = useRouter();
   return (
-    <header className={cn(
-      "sticky top-0 z-30 -mx-4 px-4 py-3 bg-background/85 backdrop-blur-xl border-b border-border/40 flex items-center gap-3",
-      className,
-    )}>
+    <header
+      className={cn(
+        "sticky top-0 z-30 -mx-4 px-4 py-3 bg-background/85 backdrop-blur-xl border-b border-border/40 flex items-center gap-3",
+        className,
+      )}
+    >
       {showBack && (
         <button
           type="button"
@@ -29,7 +31,12 @@ export function TopAppBar({ title, subtitle, showBack, action, className }: Prop
         </button>
       )}
       <div className="min-w-0 flex-1">
-        <h1 className="text-base font-bold leading-tight truncate" style={{ fontFamily: "var(--font-display)" }}>{title}</h1>
+        <h1
+          className="text-base font-bold leading-tight truncate"
+          style={{ fontFamily: "var(--font-display)" }}
+        >
+          {title}
+        </h1>
         {subtitle && <p className="text-xs text-muted-foreground truncate">{subtitle}</p>}
       </div>
       {action && <div className="shrink-0">{action}</div>}

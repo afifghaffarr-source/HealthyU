@@ -31,9 +31,12 @@ export function LiveAnnouncerProvider({ children }: { children: ReactNode }) {
     }, 1500);
   }, []);
 
-  useEffect(() => () => {
-    if (clearTimer.current) clearTimeout(clearTimer.current);
-  }, []);
+  useEffect(
+    () => () => {
+      if (clearTimer.current) clearTimeout(clearTimer.current);
+    },
+    [],
+  );
 
   return (
     <LiveAnnouncerContext.Provider value={announce}>

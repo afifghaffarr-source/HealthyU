@@ -5841,6 +5841,7 @@ export type Database = {
         }
         Returns: undefined
       }
+      redeem_friend_invite: { Args: { _token: string }; Returns: string }
       report_content: {
         Args: {
           _content_id: string

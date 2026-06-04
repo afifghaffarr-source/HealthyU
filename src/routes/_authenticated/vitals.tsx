@@ -62,7 +62,10 @@ function VitalsPage() {
   const { online, pending, sync } = useOfflineQueue();
 
   const { data: logs = [] } = useQuery({ queryKey: ["vitals"], queryFn: () => fetchList() });
-  const { data: bodyLogs = [] } = useQuery({ queryKey: ["body_metrics"], queryFn: () => fetchBody() });
+  const { data: bodyLogs = [] } = useQuery({
+    queryKey: ["body_metrics"],
+    queryFn: () => fetchBody(),
+  });
   const { data: profile } = useQuery({ queryKey: ["profile"], queryFn: () => fetchProfile() });
 
   const [sys, setSys] = useState("");
@@ -74,13 +77,35 @@ function VitalsPage() {
 
   const [bodyOpen, setBodyOpen] = useState(false);
   type BodyField =
-    | "weight_kg" | "body_fat_pct" | "muscle_mass_kg" | "water_pct" | "visceral_fat"
-    | "waist_cm" | "hip_cm" | "chest_cm" | "neck_cm" | "calf_cm"
-    | "bicep_left_cm" | "bicep_right_cm" | "thigh_left_cm" | "thigh_right_cm";
+    | "weight_kg"
+    | "body_fat_pct"
+    | "muscle_mass_kg"
+    | "water_pct"
+    | "visceral_fat"
+    | "waist_cm"
+    | "hip_cm"
+    | "chest_cm"
+    | "neck_cm"
+    | "calf_cm"
+    | "bicep_left_cm"
+    | "bicep_right_cm"
+    | "thigh_left_cm"
+    | "thigh_right_cm";
   const [body, setBody] = useState<Record<BodyField, string>>({
-    weight_kg: "", body_fat_pct: "", muscle_mass_kg: "", water_pct: "", visceral_fat: "",
-    waist_cm: "", hip_cm: "", chest_cm: "", neck_cm: "", calf_cm: "",
-    bicep_left_cm: "", bicep_right_cm: "", thigh_left_cm: "", thigh_right_cm: "",
+    weight_kg: "",
+    body_fat_pct: "",
+    muscle_mass_kg: "",
+    water_pct: "",
+    visceral_fat: "",
+    waist_cm: "",
+    hip_cm: "",
+    chest_cm: "",
+    neck_cm: "",
+    calf_cm: "",
+    bicep_left_cm: "",
+    bicep_right_cm: "",
+    thigh_left_cm: "",
+    thigh_right_cm: "",
   });
   const setBodyVal = (k: BodyField, v: string) => setBody((p) => ({ ...p, [k]: v }));
 
@@ -95,9 +120,20 @@ function VitalsPage() {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["body_metrics"] });
       setBody({
-        weight_kg: "", body_fat_pct: "", muscle_mass_kg: "", water_pct: "", visceral_fat: "",
-        waist_cm: "", hip_cm: "", chest_cm: "", neck_cm: "", calf_cm: "",
-        bicep_left_cm: "", bicep_right_cm: "", thigh_left_cm: "", thigh_right_cm: "",
+        weight_kg: "",
+        body_fat_pct: "",
+        muscle_mass_kg: "",
+        water_pct: "",
+        visceral_fat: "",
+        waist_cm: "",
+        hip_cm: "",
+        chest_cm: "",
+        neck_cm: "",
+        calf_cm: "",
+        bicep_left_cm: "",
+        bicep_right_cm: "",
+        thigh_left_cm: "",
+        thigh_right_cm: "",
       });
       toast.success("Komposisi tubuh tercatat");
     },
@@ -109,9 +145,10 @@ function VitalsPage() {
     onSuccess: () => qc.invalidateQueries({ queryKey: ["body_metrics"] }),
   });
 
-  const whrLatest = bodyLogs[0]?.waist_cm && bodyLogs[0]?.hip_cm
-    ? Number(bodyLogs[0].waist_cm) / Number(bodyLogs[0].hip_cm)
-    : null;
+  const whrLatest =
+    bodyLogs[0]?.waist_cm && bodyLogs[0]?.hip_cm
+      ? Number(bodyLogs[0].waist_cm) / Number(bodyLogs[0].hip_cm)
+      : null;
 
   const addMut = useMutation({
     mutationFn: async () => {
@@ -131,7 +168,11 @@ function VitalsPage() {
     },
     onSuccess: (res) => {
       qc.invalidateQueries({ queryKey: ["vitals"] });
-      setSys(""); setDia(""); setHr(""); setGlu(""); setNote("");
+      setSys("");
+      setDia("");
+      setHr("");
+      setGlu("");
+      setNote("");
       toast.success(
         res && "offline" in res && res.offline
           ? "Vitals disimpan offline. Akan sync otomatis."
@@ -148,7 +189,12 @@ function VitalsPage() {
 
   const latest = logs[0];
   const latestBp = latest ? bpCategory(latest.systolic, latest.diastolic) : null;
-  const latestGlu = latest ? glucoseCategory(latest.glucose_mgdl ? Number(latest.glucose_mgdl) : null, latest.glucose_state) : null;
+  const latestGlu = latest
+    ? glucoseCategory(
+        latest.glucose_mgdl ? Number(latest.glucose_mgdl) : null,
+        latest.glucose_state,
+      )
+    : null;
 
   const recentBp = logs
     .filter((l) => l.systolic && l.diastolic)
@@ -174,17 +220,30 @@ function VitalsPage() {
           if (!weight || !height || !age) return null;
           const bmiVal = calcBmi(weight, height);
           const cat = bmiCategory(bmiVal);
-          const bmrVal = calcBmr({ weightKg: weight, heightCm: height, ageYears: age, gender: profile?.gender });
+          const bmrVal = calcBmr({
+            weightKg: weight,
+            heightCm: height,
+            ageYears: age,
+            gender: profile?.gender,
+          });
           const tdeeVal = calcTdee(bmrVal, activity);
           const waterMl = waterTargetMl(weight, activity);
           const catColor =
-            cat === "normal" ? "text-emerald-600"
-            : cat === "underweight" ? "text-sky-600"
-            : cat === "overweight" ? "text-amber-600" : "text-red-600";
+            cat === "normal"
+              ? "text-emerald-600"
+              : cat === "underweight"
+                ? "text-sky-600"
+                : cat === "overweight"
+                  ? "text-amber-600"
+                  : "text-red-600";
           const catLabel =
-            cat === "normal" ? "Normal"
-            : cat === "underweight" ? "Kurus"
-            : cat === "overweight" ? "Berlebih" : "Obesitas";
+            cat === "normal"
+              ? "Normal"
+              : cat === "underweight"
+                ? "Kurus"
+                : cat === "overweight"
+                  ? "Berlebih"
+                  : "Obesitas";
           return (
             <section className="bg-card p-4 rounded-3xl outline-1 outline-black/5 animate-fade-up">
               <p className="text-[10px] font-bold uppercase text-muted-foreground tracking-wider mb-2">
@@ -222,8 +281,12 @@ function VitalsPage() {
               <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-rose-400 to-coral" />
               <Heart className="size-4 mx-auto text-coral mb-1" />
               <p className="text-[10px] font-bold uppercase text-muted-foreground">Tekanan</p>
-              <p className="text-sm font-bold tabular-nums">{latest.systolic ?? "-"}/{latest.diastolic ?? "-"}</p>
-              {latestBp && <p className={`text-[10px] font-semibold ${latestBp.color}`}>{latestBp.label}</p>}
+              <p className="text-sm font-bold tabular-nums">
+                {latest.systolic ?? "-"}/{latest.diastolic ?? "-"}
+              </p>
+              {latestBp && (
+                <p className={`text-[10px] font-semibold ${latestBp.color}`}>{latestBp.label}</p>
+              )}
             </div>
             <div className="bg-card p-3 rounded-2xl outline-1 outline-black/5 text-center relative overflow-hidden">
               <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-primary to-emerald-400" />
@@ -237,7 +300,9 @@ function VitalsPage() {
               <Droplet className="size-4 mx-auto text-sky-600 mb-1" />
               <p className="text-[10px] font-bold uppercase text-muted-foreground">Gula</p>
               <p className="text-sm font-bold tabular-nums">{latest.glucose_mgdl ?? "-"}</p>
-              {latestGlu && <p className={`text-[10px] font-semibold ${latestGlu.color}`}>{latestGlu.label}</p>}
+              {latestGlu && (
+                <p className={`text-[10px] font-semibold ${latestGlu.color}`}>{latestGlu.label}</p>
+              )}
             </div>
           </section>
         )}
@@ -254,16 +319,45 @@ function VitalsPage() {
               {(() => {
                 const stepX = recentBp.length > 1 ? 280 / (recentBp.length - 1) : 0;
                 const range = Math.max(1, bpMax - bpMin);
-                const sysPts = recentBp.map((r, i) => `${i * stepX},${80 - ((r.systolic - bpMin) / range) * 70 - 5}`).join(" ");
-                const diaPts = recentBp.map((r, i) => `${i * stepX},${80 - ((r.diastolic - bpMin) / range) * 70 - 5}`).join(" ");
+                const sysPts = recentBp
+                  .map((r, i) => `${i * stepX},${80 - ((r.systolic - bpMin) / range) * 70 - 5}`)
+                  .join(" ");
+                const diaPts = recentBp
+                  .map((r, i) => `${i * stepX},${80 - ((r.diastolic - bpMin) / range) * 70 - 5}`)
+                  .join(" ");
                 return (
                   <>
-                    <polyline points={sysPts} fill="none" stroke="hsl(var(--coral, 0 80% 65%))" strokeWidth="2" strokeLinejoin="round" strokeLinecap="round" />
-                    <polyline points={diaPts} fill="none" stroke="hsl(var(--primary))" strokeWidth="2" strokeDasharray="4 3" strokeLinejoin="round" strokeLinecap="round" />
+                    <polyline
+                      points={sysPts}
+                      fill="none"
+                      stroke="hsl(var(--coral, 0 80% 65%))"
+                      strokeWidth="2"
+                      strokeLinejoin="round"
+                      strokeLinecap="round"
+                    />
+                    <polyline
+                      points={diaPts}
+                      fill="none"
+                      stroke="hsl(var(--primary))"
+                      strokeWidth="2"
+                      strokeDasharray="4 3"
+                      strokeLinejoin="round"
+                      strokeLinecap="round"
+                    />
                     {recentBp.map((r, i) => (
                       <g key={r.id}>
-                        <circle cx={i * stepX} cy={80 - ((r.systolic - bpMin) / range) * 70 - 5} r="2.5" className="fill-coral" />
-                        <circle cx={i * stepX} cy={80 - ((r.diastolic - bpMin) / range) * 70 - 5} r="2" className="fill-primary" />
+                        <circle
+                          cx={i * stepX}
+                          cy={80 - ((r.systolic - bpMin) / range) * 70 - 5}
+                          r="2.5"
+                          className="fill-coral"
+                        />
+                        <circle
+                          cx={i * stepX}
+                          cy={80 - ((r.diastolic - bpMin) / range) * 70 - 5}
+                          r="2"
+                          className="fill-primary"
+                        />
                       </g>
                     ))}
                   </>
@@ -271,8 +365,12 @@ function VitalsPage() {
               })()}
             </svg>
             <div className="flex items-center justify-center gap-4 text-[10px] mt-1">
-              <span className="inline-flex items-center gap-1"><span className="size-2 rounded-full bg-coral" /> Sistolik</span>
-              <span className="inline-flex items-center gap-1"><span className="size-2 rounded-full bg-primary" /> Diastolik</span>
+              <span className="inline-flex items-center gap-1">
+                <span className="size-2 rounded-full bg-coral" /> Sistolik
+              </span>
+              <span className="inline-flex items-center gap-1">
+                <span className="size-2 rounded-full bg-primary" /> Diastolik
+              </span>
             </div>
           </section>
         )}
@@ -319,10 +417,16 @@ function VitalsPage() {
             <p className="text-sm text-muted-foreground text-center py-6">Belum ada catatan</p>
           ) : (
             logs.map((l) => (
-              <div key={l.id} className="bg-card p-3 rounded-2xl outline-1 outline-black/5 flex items-center gap-3">
+              <div
+                key={l.id}
+                className="bg-card p-3 rounded-2xl outline-1 outline-black/5 flex items-center gap-3"
+              >
                 <div className="flex-1 min-w-0">
                   <p className="text-[10px] text-muted-foreground">
-                    {new Date(l.logged_at).toLocaleString("id-ID", { dateStyle: "medium", timeStyle: "short" })}
+                    {new Date(l.logged_at).toLocaleString("id-ID", {
+                      dateStyle: "medium",
+                      timeStyle: "short",
+                    })}
                   </p>
                   <p className="text-sm font-semibold">
                     {l.systolic && l.diastolic ? `${l.systolic}/${l.diastolic} mmHg` : ""}
@@ -351,42 +455,120 @@ function VitalsPage() {
             <Ruler className="size-4 text-primary" />
             <h2 className="font-bold text-sm flex-1 text-left">Komposisi Tubuh & Lingkar</h2>
             {whrLatest && (
-              <span className="text-[10px] text-muted-foreground">
-                W/H {whrLatest.toFixed(2)}
-              </span>
+              <span className="text-[10px] text-muted-foreground">W/H {whrLatest.toFixed(2)}</span>
             )}
-            <ChevronDown className={`size-4 text-muted-foreground transition ${bodyOpen ? "rotate-180" : ""}`} />
+            <ChevronDown
+              className={`size-4 text-muted-foreground transition ${bodyOpen ? "rotate-180" : ""}`}
+            />
           </button>
           {bodyOpen && (
             <div className="px-4 pb-4 space-y-3">
-              <p className="text-[11px] text-muted-foreground">Isi yang tersedia, kosongkan jika tidak diukur.</p>
+              <p className="text-[11px] text-muted-foreground">
+                Isi yang tersedia, kosongkan jika tidak diukur.
+              </p>
               <div>
-                <p className="text-[10px] font-bold uppercase text-muted-foreground mb-2">Komposisi</p>
+                <p className="text-[10px] font-bold uppercase text-muted-foreground mb-2">
+                  Komposisi
+                </p>
                 <div className="grid grid-cols-2 gap-2">
-                  <Input label="Berat" value={body.weight_kg} onChange={(v) => setBodyVal("weight_kg", v)} suffix="kg" />
-                  <Input label="Lemak" value={body.body_fat_pct} onChange={(v) => setBodyVal("body_fat_pct", v)} suffix="%" />
-                  <Input label="Otot" value={body.muscle_mass_kg} onChange={(v) => setBodyVal("muscle_mass_kg", v)} suffix="kg" />
-                  <Input label="Air" value={body.water_pct} onChange={(v) => setBodyVal("water_pct", v)} suffix="%" />
-                  <Input label="Visceral fat" value={body.visceral_fat} onChange={(v) => setBodyVal("visceral_fat", v)} suffix="" />
+                  <Input
+                    label="Berat"
+                    value={body.weight_kg}
+                    onChange={(v) => setBodyVal("weight_kg", v)}
+                    suffix="kg"
+                  />
+                  <Input
+                    label="Lemak"
+                    value={body.body_fat_pct}
+                    onChange={(v) => setBodyVal("body_fat_pct", v)}
+                    suffix="%"
+                  />
+                  <Input
+                    label="Otot"
+                    value={body.muscle_mass_kg}
+                    onChange={(v) => setBodyVal("muscle_mass_kg", v)}
+                    suffix="kg"
+                  />
+                  <Input
+                    label="Air"
+                    value={body.water_pct}
+                    onChange={(v) => setBodyVal("water_pct", v)}
+                    suffix="%"
+                  />
+                  <Input
+                    label="Visceral fat"
+                    value={body.visceral_fat}
+                    onChange={(v) => setBodyVal("visceral_fat", v)}
+                    suffix=""
+                  />
                 </div>
               </div>
               <div>
-                <p className="text-[10px] font-bold uppercase text-muted-foreground mb-2">Lingkar tubuh</p>
+                <p className="text-[10px] font-bold uppercase text-muted-foreground mb-2">
+                  Lingkar tubuh
+                </p>
                 <div className="grid grid-cols-2 gap-2">
-                  <Input label="Pinggang" value={body.waist_cm} onChange={(v) => setBodyVal("waist_cm", v)} suffix="cm" />
-                  <Input label="Pinggul" value={body.hip_cm} onChange={(v) => setBodyVal("hip_cm", v)} suffix="cm" />
-                  <Input label="Dada" value={body.chest_cm} onChange={(v) => setBodyVal("chest_cm", v)} suffix="cm" />
-                  <Input label="Leher" value={body.neck_cm} onChange={(v) => setBodyVal("neck_cm", v)} suffix="cm" />
-                  <Input label="Betis" value={body.calf_cm} onChange={(v) => setBodyVal("calf_cm", v)} suffix="cm" />
+                  <Input
+                    label="Pinggang"
+                    value={body.waist_cm}
+                    onChange={(v) => setBodyVal("waist_cm", v)}
+                    suffix="cm"
+                  />
+                  <Input
+                    label="Pinggul"
+                    value={body.hip_cm}
+                    onChange={(v) => setBodyVal("hip_cm", v)}
+                    suffix="cm"
+                  />
+                  <Input
+                    label="Dada"
+                    value={body.chest_cm}
+                    onChange={(v) => setBodyVal("chest_cm", v)}
+                    suffix="cm"
+                  />
+                  <Input
+                    label="Leher"
+                    value={body.neck_cm}
+                    onChange={(v) => setBodyVal("neck_cm", v)}
+                    suffix="cm"
+                  />
+                  <Input
+                    label="Betis"
+                    value={body.calf_cm}
+                    onChange={(v) => setBodyVal("calf_cm", v)}
+                    suffix="cm"
+                  />
                 </div>
               </div>
               <div>
-                <p className="text-[10px] font-bold uppercase text-muted-foreground mb-2">Lengan & paha</p>
+                <p className="text-[10px] font-bold uppercase text-muted-foreground mb-2">
+                  Lengan & paha
+                </p>
                 <div className="grid grid-cols-2 gap-2">
-                  <Input label="Bisep kiri" value={body.bicep_left_cm} onChange={(v) => setBodyVal("bicep_left_cm", v)} suffix="cm" />
-                  <Input label="Bisep kanan" value={body.bicep_right_cm} onChange={(v) => setBodyVal("bicep_right_cm", v)} suffix="cm" />
-                  <Input label="Paha kiri" value={body.thigh_left_cm} onChange={(v) => setBodyVal("thigh_left_cm", v)} suffix="cm" />
-                  <Input label="Paha kanan" value={body.thigh_right_cm} onChange={(v) => setBodyVal("thigh_right_cm", v)} suffix="cm" />
+                  <Input
+                    label="Bisep kiri"
+                    value={body.bicep_left_cm}
+                    onChange={(v) => setBodyVal("bicep_left_cm", v)}
+                    suffix="cm"
+                  />
+                  <Input
+                    label="Bisep kanan"
+                    value={body.bicep_right_cm}
+                    onChange={(v) => setBodyVal("bicep_right_cm", v)}
+                    suffix="cm"
+                  />
+                  <Input
+                    label="Paha kiri"
+                    value={body.thigh_left_cm}
+                    onChange={(v) => setBodyVal("thigh_left_cm", v)}
+                    suffix="cm"
+                  />
+                  <Input
+                    label="Paha kanan"
+                    value={body.thigh_right_cm}
+                    onChange={(v) => setBodyVal("thigh_right_cm", v)}
+                    suffix="cm"
+                  />
                 </div>
               </div>
               <button
@@ -399,12 +581,19 @@ function VitalsPage() {
 
               {bodyLogs.length > 0 && (
                 <div className="pt-2 space-y-2">
-                  <p className="text-[10px] font-bold uppercase text-muted-foreground">Riwayat (30 terakhir)</p>
+                  <p className="text-[10px] font-bold uppercase text-muted-foreground">
+                    Riwayat (30 terakhir)
+                  </p>
                   {bodyLogs.slice(0, 10).map((b) => (
-                    <div key={b.id} className="bg-muted/40 rounded-xl px-3 py-2 flex items-start gap-2 text-xs">
+                    <div
+                      key={b.id}
+                      className="bg-muted/40 rounded-xl px-3 py-2 flex items-start gap-2 text-xs"
+                    >
                       <div className="flex-1 min-w-0">
                         <p className="text-[10px] text-muted-foreground">
-                          {new Date(b.measured_at).toLocaleDateString("id-ID", { dateStyle: "medium" })}
+                          {new Date(b.measured_at).toLocaleDateString("id-ID", {
+                            dateStyle: "medium",
+                          })}
                         </p>
                         <p className="font-semibold tabular-nums">
                           {b.weight_kg ? `${b.weight_kg}kg` : ""}
@@ -413,7 +602,10 @@ function VitalsPage() {
                           {b.hip_cm ? ` · pinggul ${b.hip_cm}cm` : ""}
                         </p>
                       </div>
-                      <button onClick={() => delBodyMut.mutate(b.id)} className="text-muted-foreground hover:text-red-600">
+                      <button
+                        onClick={() => delBodyMut.mutate(b.id)}
+                        className="text-muted-foreground hover:text-red-600"
+                      >
                         <Trash2 className="size-3.5" />
                       </button>
                     </div>
@@ -429,7 +621,17 @@ function VitalsPage() {
   );
 }
 
-function Input({ label, value, onChange, suffix }: { label: string; value: string; onChange: (v: string) => void; suffix: string }) {
+function Input({
+  label,
+  value,
+  onChange,
+  suffix,
+}: {
+  label: string;
+  value: string;
+  onChange: (v: string) => void;
+  suffix: string;
+}) {
   return (
     <label className="block">
       <span className="text-[10px] font-bold uppercase text-muted-foreground">{label}</span>

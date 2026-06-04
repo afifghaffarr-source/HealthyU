@@ -13,10 +13,7 @@ export const listChallenges = createServerFn({ method: "GET" })
         .order("is_featured", { ascending: false })
         .order("start_date", { ascending: false })
         .limit(50),
-      supabase
-        .from("challenge_participants")
-        .select("*")
-        .eq("user_id", userId),
+      supabase.from("challenge_participants").select("*").eq("user_id", userId),
     ]);
     return {
       challenges: ch.data ?? [],

@@ -51,7 +51,9 @@ function Page() {
         return;
       }
       const detector = new Ctor({ formats: ["ean_13", "ean_8", "code_128", "upc_a", "upc_e"] });
-      const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: "environment" },
+      });
       streamRef.current = stream;
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
@@ -72,7 +74,9 @@ function Page() {
               return;
             }
           }
-        } catch {/* skip frame */}
+        } catch {
+          /* skip frame */
+        }
         rafRef.current = requestAnimationFrame(loop);
       };
       rafRef.current = requestAnimationFrame(loop);
@@ -105,13 +109,32 @@ function Page() {
           disabled={supported === false}
           className="w-full rounded-xl bg-primary text-primary-foreground py-2.5 font-medium inline-flex items-center justify-center gap-2 disabled:opacity-50"
         >
-          {scanning ? <><CameraOff className="size-4" /> Stop Scan</> : <><Camera className="size-4" /> Mulai Scan</>}
+          {scanning ? (
+            <>
+              <CameraOff className="size-4" /> Stop Scan
+            </>
+          ) : (
+            <>
+              <Camera className="size-4" /> Mulai Scan
+            </>
+          )}
         </button>
         {supported === false && (
-          <p className="text-xs text-amber-600 text-center">Browser tidak mendukung BarcodeDetector. Gunakan input manual.</p>
+          <p className="text-xs text-amber-600 text-center">
+            Browser tidak mendukung BarcodeDetector. Gunakan input manual.
+          </p>
         )}
-        <input value={code} onChange={(e) => setCode(e.target.value.replace(/\D/g, ""))} placeholder="Atau ketik barcode manual" className="w-full px-3 py-2 rounded-xl border bg-card" />
-        <button onClick={() => mut.mutate()} disabled={code.length < 6 || mut.isPending} className="w-full rounded-xl bg-primary text-primary-foreground py-2.5 font-medium">
+        <input
+          value={code}
+          onChange={(e) => setCode(e.target.value.replace(/\D/g, ""))}
+          placeholder="Atau ketik barcode manual"
+          className="w-full px-3 py-2 rounded-xl border bg-card"
+        />
+        <button
+          onClick={() => mut.mutate()}
+          disabled={code.length < 6 || mut.isPending}
+          className="w-full rounded-xl bg-primary text-primary-foreground py-2.5 font-medium"
+        >
           {mut.isPending ? "Mencari…" : "Cari Produk"}
         </button>
         {p && (

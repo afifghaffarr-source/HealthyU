@@ -18,7 +18,10 @@ function Page() {
       <TopAppBar title="Voice Rooms" showBack />
       <main className="max-w-md mx-auto px-4 pt-4 space-y-2">
         {ROOMS.map((r) => (
-          <div key={r.id} className="rounded-xl border bg-card p-3 flex justify-between items-center">
+          <div
+            key={r.id}
+            className="rounded-xl border bg-card p-3 flex justify-between items-center"
+          >
             <div>
               <p className="font-semibold flex items-center gap-2">
                 <span className="relative inline-flex">
@@ -29,12 +32,19 @@ function Page() {
               </p>
               <p className="text-xs text-muted-foreground">{r.members} aktif</p>
             </div>
-            <button onClick={() => setJoined(joined === r.id ? null : r.id)} className="rounded-lg bg-primary text-primary-foreground px-3 py-1 text-sm">
+            <button
+              onClick={() => setJoined(joined === r.id ? null : r.id)}
+              className="rounded-lg bg-primary text-primary-foreground px-3 py-1 text-sm"
+            >
               {joined === r.id ? "Keluar" : "Join"}
             </button>
           </div>
         ))}
-        {joined && <p className="text-xs text-muted-foreground">WebRTC P2P akan ditambahkan setelah server signaling siap.</p>}
+        {joined && (
+          <p className="text-xs text-muted-foreground">
+            WebRTC P2P akan ditambahkan setelah server signaling siap.
+          </p>
+        )}
       </main>
       <BottomNav />
     </div>

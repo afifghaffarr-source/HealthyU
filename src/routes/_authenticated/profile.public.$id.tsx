@@ -24,7 +24,9 @@ function Page() {
   });
   const followMut = useMutation({
     mutationFn: () =>
-      data?.isFollowing ? unfollowFn({ data: { targetId: id } }) : followFn({ data: { targetId: id } }),
+      data?.isFollowing
+        ? unfollowFn({ data: { targetId: id } })
+        : followFn({ data: { targetId: id } }),
     onSuccess: () => qc.invalidateQueries({ queryKey: ["public-profile", id] }),
     onError: (e: Error) => toast.error(e.message),
   });
@@ -43,7 +45,8 @@ function Page() {
           <div className="flex-1">
             <div className="font-bold">{p.full_name}</div>
             <div className="text-xs text-muted-foreground inline-flex items-center gap-1">
-              <Flame className="size-3 text-orange-500" /> streak {p.scan_streak_current ?? 0} hari · best {p.scan_streak_longest ?? 0}
+              <Flame className="size-3 text-orange-500" /> streak {p.scan_streak_current ?? 0} hari
+              · best {p.scan_streak_longest ?? 0}
             </div>
           </div>
           <button

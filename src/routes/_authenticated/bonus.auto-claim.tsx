@@ -15,7 +15,10 @@ function Page() {
     fn({ data: undefined as never })
       .then((r) => {
         if (r.alreadyClaimed) setRes("Sudah diklaim hari ini");
-        else { setRes(`+${r.bonus?.coins ?? 0} koin (streak ${r.bonus?.streak ?? 0})`); toast.success("Bonus diklaim"); }
+        else {
+          setRes(`+${r.bonus?.coins ?? 0} koin (streak ${r.bonus?.streak ?? 0})`);
+          toast.success("Bonus diklaim");
+        }
       })
       .catch((e: Error) => setRes(e.message));
   }, [fn]);

@@ -71,16 +71,14 @@ export const dailyCoach = createServerFn({ method: "POST" })
     const totalWater = (water.data ?? []).reduce((s, w) => s + (w.amount_ml || 0), 0);
     const totalBurn = (workouts.data ?? []).reduce((s, w) => s + (w.calories_burned || 0), 0);
     const sleepHours = (sleep.data ?? []).reduce(
-      (s, x) =>
-        s + (new Date(x.sleep_end).getTime() - new Date(x.sleep_start).getTime()) / 3600000,
+      (s, x) => s + (new Date(x.sleep_end).getTime() - new Date(x.sleep_start).getTime()) / 3600000,
       0,
     );
     const fastingDone = (fasting.data ?? []).filter((f) => f.completed).length;
     const weightTrend = weight.data ?? [];
     const weightDelta =
       weightTrend.length >= 2
-        ? Number(weightTrend[weightTrend.length - 1].weight_kg) -
-          Number(weightTrend[0].weight_kg)
+        ? Number(weightTrend[weightTrend.length - 1].weight_kg) - Number(weightTrend[0].weight_kg)
         : 0;
 
     const summary = {

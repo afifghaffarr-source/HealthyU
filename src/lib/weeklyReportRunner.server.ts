@@ -9,7 +9,11 @@ type PushSub = { endpoint: string; p256dh: string; auth: string };
  * Inserts an ai_reports row and returns the report id.
  */
 export type WeeklyRunResult = { reportId: string | null; highlight: string; longestStreak: number };
-export type WeeklyPushPayload = { highlight: string; trendingRecipe: string | null; longestStreak: number };
+export type WeeklyPushPayload = {
+  highlight: string;
+  trendingRecipe: string | null;
+  longestStreak: number;
+};
 
 export async function runWeeklyReportForUser(userId: string, days = 7): Promise<WeeklyRunResult> {
   const apiKey = process.env.LOVABLE_API_KEY;
@@ -18,9 +22,21 @@ export async function runWeeklyReportForUser(userId: string, days = 7): Promise<
 
   // Early skip: inactive users — no AI call needed, save cost.
   const [actMeals, actWater, actWorkout] = await Promise.all([
-    supabaseAdmin.from("meal_logs").select("id", { count: "exact", head: true }).eq("user_id", userId).gte("logged_at", since),
-    supabaseAdmin.from("water_logs").select("id", { count: "exact", head: true }).eq("user_id", userId).gte("logged_at", since),
-    supabaseAdmin.from("workout_sessions").select("id", { count: "exact", head: true }).eq("user_id", userId).gte("performed_at", since),
+    supabaseAdmin
+      .from("meal_logs")
+      .select("id", { count: "exact", head: true })
+      .eq("user_id", userId)
+      .gte("logged_at", since),
+    supabaseAdmin
+      .from("water_logs")
+      .select("id", { count: "exact", head: true })
+      .eq("user_id", userId)
+      .gte("logged_at", since),
+    supabaseAdmin
+      .from("workout_sessions")
+      .select("id", { count: "exact", head: true })
+      .eq("user_id", userId)
+      .gte("performed_at", since),
   ]);
   const activity = (actMeals.count ?? 0) + (actWater.count ?? 0) + (actWorkout.count ?? 0);
   if (activity < 3) {
@@ -32,13 +48,41 @@ export async function runWeeklyReportForUser(userId: string, days = 7): Promise<
   }
 
   const [profileRes, meals, water, workouts, sleep, fasting, statsRes] = await Promise.all([
-    supabaseAdmin.from("profiles").select("full_name, daily_calorie_target, health_conditions, allergies").eq("id", userId).maybeSingle(),
-    supabaseAdmin.from("meal_logs").select("calories, protein_g, carbs_g, fat_g").eq("user_id", userId).gte("logged_at", since),
-    supabaseAdmin.from("water_logs").select("amount_ml").eq("user_id", userId).gte("logged_at", since),
-    supabaseAdmin.from("workout_sessions").select("duration_min, calories_burned").eq("user_id", userId).gte("performed_at", since),
-    supabaseAdmin.from("sleep_logs").select("sleep_start, sleep_end").eq("user_id", userId).gte("sleep_end", since),
-    supabaseAdmin.from("fasting_sessions").select("completed").eq("user_id", userId).gte("start_time", since),
-    supabaseAdmin.from("user_stats").select("longest_streak, current_streak").eq("user_id", userId).maybeSingle(),
+    supabaseAdmin
+      .from("profiles")
+      .select("full_name, daily_calorie_target, health_conditions, allergies")
+      .eq("id", userId)
+      .maybeSingle(),
+    supabaseAdmin
+      .from("meal_logs")
+      .select("calories, protein_g, carbs_g, fat_g")
+      .eq("user_id", userId)
+      .gte("logged_at", since),
+    supabaseAdmin
+      .from("water_logs")
+      .select("amount_ml")
+      .eq("user_id", userId)
+      .gte("logged_at", since),
+    supabaseAdmin
+      .from("workout_sessions")
+      .select("duration_min, calories_burned")
+      .eq("user_id", userId)
+      .gte("performed_at", since),
+    supabaseAdmin
+      .from("sleep_logs")
+      .select("sleep_start, sleep_end")
+      .eq("user_id", userId)
+      .gte("sleep_end", since),
+    supabaseAdmin
+      .from("fasting_sessions")
+      .select("completed")
+      .eq("user_id", userId)
+      .gte("start_time", since),
+    supabaseAdmin
+      .from("user_stats")
+      .select("longest_streak, current_streak")
+      .eq("user_id", userId)
+      .maybeSingle(),
   ]);
 
   const groupChallenges = await computeGroupChallengeSummary(userId);
@@ -85,7 +129,10 @@ export async function runWeeklyReportForUser(userId: string, days = 7): Promise<
           role: "system",
           content: `Kamu adalah Dr. HealthyU, AI health coach. Buat laporan analisis mingguan singkat dalam Bahasa Indonesia (markdown, max 350 kata) dengan section: Ringkasan, Yang Berjalan Baik, Area Perbaikan, Progress Challenge Grup (skip jika kosong), Rekomendasi.`,
         },
-        { role: "user", content: `Data ${days} hari terakhir:\n${JSON.stringify(summary, null, 2)}` },
+        {
+          role: "user",
+          content: `Data ${days} hari terakhir:\n${JSON.stringify(summary, null, 2)}`,
+        },
       ],
     }),
   });

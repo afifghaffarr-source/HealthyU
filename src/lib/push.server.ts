@@ -48,13 +48,9 @@ async function importVapidPrivKey(d: string, pubRaw: Uint8Array) {
     y: bufToB64url(y),
     ext: true,
   };
-  return crypto.subtle.importKey(
-    "jwk",
-    jwk,
-    { name: "ECDSA", namedCurve: "P-256" },
-    false,
-    ["sign"],
-  );
+  return crypto.subtle.importKey("jwk", jwk, { name: "ECDSA", namedCurve: "P-256" }, false, [
+    "sign",
+  ]);
 }
 
 async function signJwt(privKey: CryptoKey, header: object, payload: object): Promise<string> {
@@ -71,7 +67,9 @@ async function signJwt(privKey: CryptoKey, header: object, payload: object): Pro
 }
 
 async function hkdf(salt: Uint8Array, ikm: Uint8Array, info: Uint8Array, length: number) {
-  const key = await crypto.subtle.importKey("raw", bs(ikm), { name: "HKDF" }, false, ["deriveBits"]);
+  const key = await crypto.subtle.importKey("raw", bs(ikm), { name: "HKDF" }, false, [
+    "deriveBits",
+  ]);
   return new Uint8Array(
     await crypto.subtle.deriveBits(
       { name: "HKDF", hash: "SHA-256", salt: bs(salt), info: bs(info) },
@@ -98,14 +96,10 @@ async function encryptPayload(
   payload: Uint8Array,
 ): Promise<{ body: Uint8Array }> {
   // 1. Ephemeral ECDH keypair
-  const ephemeral = await crypto.subtle.generateKey(
-    { name: "ECDH", namedCurve: "P-256" },
-    true,
-    ["deriveBits"],
-  );
-  const ephPubRaw = new Uint8Array(
-    await crypto.subtle.exportKey("raw", ephemeral.publicKey),
-  );
+  const ephemeral = await crypto.subtle.generateKey({ name: "ECDH", namedCurve: "P-256" }, true, [
+    "deriveBits",
+  ]);
+  const ephPubRaw = new Uint8Array(await crypto.subtle.exportKey("raw", ephemeral.publicKey));
 
   // 2. Import subscriber pubkey
   const subPub = await crypto.subtle.importKey(
@@ -125,11 +119,7 @@ async function encryptPayload(
   const salt = crypto.getRandomValues(new Uint8Array(16));
 
   // 5. PRK_key from auth + ecdh
-  const keyInfo = concat(
-    new TextEncoder().encode("WebPush: info\0"),
-    subPubRaw,
-    ephPubRaw,
-  );
+  const keyInfo = concat(new TextEncoder().encode("WebPush: info\0"), subPubRaw, ephPubRaw);
   const ikm = await hkdf(subAuth, ecdh, keyInfo, 32);
 
   // 6. Derive CEK and nonce
@@ -163,11 +153,7 @@ export async function sendWebPushTo(
   // VAPID JWT
   const aud = new URL(sub.endpoint).origin;
   const exp = Math.floor(Date.now() / 1000) + 12 * 3600;
-  const jwt = await signJwt(
-    privKey,
-    { typ: "JWT", alg: "ES256" },
-    { aud, exp, sub: subject },
-  );
+  const jwt = await signJwt(privKey, { typ: "JWT", alg: "ES256" }, { aud, exp, sub: subject });
 
   const subPubRaw = b64urlToBuf(sub.p256dh);
   const subAuth = b64urlToBuf(sub.auth);

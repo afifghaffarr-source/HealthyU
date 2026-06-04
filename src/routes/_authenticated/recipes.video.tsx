@@ -68,12 +68,17 @@ function Page() {
               </div>
               <p className="text-2xl font-bold leading-tight">{current.title}</p>
               {current.tip && (
-                <p className="text-xs text-muted-foreground mt-2 max-w-[24ch] mx-auto">{current.tip}</p>
+                <p className="text-xs text-muted-foreground mt-2 max-w-[24ch] mx-auto">
+                  {current.tip}
+                </p>
               )}
             </div>
           </div>
           <div className="absolute bottom-0 inset-x-0 h-1.5 bg-black/10">
-            <div className="h-full bg-primary transition-[width] duration-1000 ease-linear" style={{ width: `${progress * 100}%` }} />
+            <div
+              className="h-full bg-primary transition-[width] duration-1000 ease-linear"
+              style={{ width: `${progress * 100}%` }}
+            />
           </div>
           <div className="absolute top-3 right-3 text-[11px] font-bold tabular-nums bg-background/70 px-2 py-1 rounded-full">
             {String(Math.max(0, current.duration - elapsed)).padStart(2, "0")}s
@@ -81,7 +86,10 @@ function Page() {
         </div>
 
         <div className="flex items-center justify-center gap-3">
-          <button onClick={() => go(idx - 1)} className="size-11 rounded-full bg-card border grid place-items-center">
+          <button
+            onClick={() => go(idx - 1)}
+            className="size-11 rounded-full bg-card border grid place-items-center"
+          >
             <SkipBack className="size-4" />
           </button>
           <button
@@ -90,10 +98,18 @@ function Page() {
           >
             {playing ? <Pause className="size-6" /> : <Play className="size-6 translate-x-0.5" />}
           </button>
-          <button onClick={() => go(idx + 1)} className="size-11 rounded-full bg-card border grid place-items-center">
+          <button
+            onClick={() => go(idx + 1)}
+            className="size-11 rounded-full bg-card border grid place-items-center"
+          >
             <SkipForward className="size-4" />
           </button>
-          <button onClick={() => { setElapsed(0); }} className="size-11 rounded-full bg-card border grid place-items-center">
+          <button
+            onClick={() => {
+              setElapsed(0);
+            }}
+            className="size-11 rounded-full bg-card border grid place-items-center"
+          >
             <RotateCcw className="size-4" />
           </button>
         </div>
@@ -104,12 +120,20 @@ function Page() {
               <button
                 onClick={() => go(i)}
                 className={`w-full flex items-center gap-3 text-left px-3 py-2.5 rounded-2xl transition ${
-                  i === idx ? "bg-primary/10 outline-1 outline-primary/30" : "bg-card outline-1 outline-black/5"
+                  i === idx
+                    ? "bg-primary/10 outline-1 outline-primary/30"
+                    : "bg-card outline-1 outline-black/5"
                 }`}
               >
-                <span className={`size-7 rounded-full grid place-items-center text-xs font-bold ${i === idx ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"}`}>{i + 1}</span>
+                <span
+                  className={`size-7 rounded-full grid place-items-center text-xs font-bold ${i === idx ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"}`}
+                >
+                  {i + 1}
+                </span>
                 <span className="flex-1 text-sm font-medium truncate">{s.title}</span>
-                <span className="text-[11px] text-muted-foreground tabular-nums">{s.duration}s</span>
+                <span className="text-[11px] text-muted-foreground tabular-nums">
+                  {s.duration}s
+                </span>
               </button>
             </li>
           ))}

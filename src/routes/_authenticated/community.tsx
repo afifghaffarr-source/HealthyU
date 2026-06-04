@@ -79,8 +79,19 @@ function CommunityPage() {
 
         <div className="grid grid-cols-3 gap-2">
           <Stat icon={<Users className="size-3.5" />} label="Posts" value={posts.length} />
-          <Stat icon={<Heart className="size-3.5" />} label="Likes" value={posts.reduce((a, p) => a + (p.like_count ?? 0), 0)} />
-          <Stat icon={<Flame className="size-3.5" />} label="Aktif" value={posts.filter((p) => Date.now() - new Date(p.created_at).getTime() < 24 * 3600_000).length} />
+          <Stat
+            icon={<Heart className="size-3.5" />}
+            label="Likes"
+            value={posts.reduce((a, p) => a + (p.like_count ?? 0), 0)}
+          />
+          <Stat
+            icon={<Flame className="size-3.5" />}
+            label="Aktif"
+            value={
+              posts.filter((p) => Date.now() - new Date(p.created_at).getTime() < 24 * 3600_000)
+                .length
+            }
+          />
         </div>
 
         <section className="bg-card p-4 rounded-3xl outline-1 outline-black/5 space-y-3 animate-fade-up">
@@ -97,7 +108,9 @@ function CommunityPage() {
                 key={c.id}
                 onClick={() => setCategory(c.id)}
                 className={`px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap ${
-                  category === c.id ? "bg-primary text-primary-foreground" : "bg-mint text-sage-deep"
+                  category === c.id
+                    ? "bg-primary text-primary-foreground"
+                    : "bg-mint text-sage-deep"
                 }`}
               >
                 {c.label}
@@ -129,13 +142,17 @@ function CommunityPage() {
                 <Flame className="size-3" /> Populer
               </button>
             </div>
-            <span className="text-[11px] text-muted-foreground tabular-nums">{visiblePosts.length} post</span>
+            <span className="text-[11px] text-muted-foreground tabular-nums">
+              {visiblePosts.length} post
+            </span>
           </div>
           <div className="flex gap-2 overflow-x-auto no-scrollbar -mx-1 px-1">
             <button
               onClick={() => setFilter("all")}
               className={`px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap ${
-                filter === "all" ? "bg-primary text-primary-foreground" : "bg-card outline-1 outline-black/10"
+                filter === "all"
+                  ? "bg-primary text-primary-foreground"
+                  : "bg-card outline-1 outline-black/10"
               }`}
             >
               Semua <span className="opacity-70">· {counts.all}</span>
@@ -145,7 +162,9 @@ function CommunityPage() {
                 key={c.id}
                 onClick={() => setFilter(c.id)}
                 className={`px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap ${
-                  filter === c.id ? "bg-primary text-primary-foreground" : "bg-card outline-1 outline-black/10"
+                  filter === c.id
+                    ? "bg-primary text-primary-foreground"
+                    : "bg-card outline-1 outline-black/10"
                 }`}
               >
                 {c.label} <span className="opacity-70">· {counts[c.id] ?? 0}</span>
@@ -153,7 +172,9 @@ function CommunityPage() {
             ))}
           </div>
           {visiblePosts.length === 0 ? (
-            <p className="text-sm text-muted-foreground text-center py-8">Belum ada postingan. Jadilah yang pertama!</p>
+            <p className="text-sm text-muted-foreground text-center py-8">
+              Belum ada postingan. Jadilah yang pertama!
+            </p>
           ) : (
             visiblePosts.map((p) => (
               <article key={p.id} className="bg-card p-4 rounded-3xl outline-1 outline-black/5">
@@ -164,13 +185,21 @@ function CommunityPage() {
                   <div className="flex-1 min-w-0">
                     <p className="font-semibold text-sm truncate">{p.author}</p>
                     <p className="text-[10px] text-muted-foreground">
-                      {new Date(p.created_at).toLocaleString("id-ID", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}
+                      {new Date(p.created_at).toLocaleString("id-ID", {
+                        day: "numeric",
+                        month: "short",
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })}
                       {" · "}
                       <span className="text-primary capitalize">{p.category}</span>
                     </p>
                   </div>
                   {p.is_mine && (
-                    <button onClick={() => delMut.mutate(p.id)} className="p-1.5 text-muted-foreground hover:text-destructive">
+                    <button
+                      onClick={() => delMut.mutate(p.id)}
+                      className="p-1.5 text-muted-foreground hover:text-destructive"
+                    >
                       <Trash2 className="size-4" />
                     </button>
                   )}

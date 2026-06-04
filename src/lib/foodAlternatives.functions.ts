@@ -19,7 +19,9 @@ export const getFoodAlternatives = createServerFn({ method: "GET" })
     if (ids.length === 0) return [];
     const { data: foods } = await supabase
       .from("food_items")
-      .select("id, name, calories, protein_g, carbs_g, fat_g, sugar_g, sodium_mg, fiber_g, health_rating, serving_size, serving_unit")
+      .select(
+        "id, name, calories, protein_g, carbs_g, fat_g, sugar_g, sodium_mg, fiber_g, health_rating, serving_size, serving_unit",
+      )
       .in("id", ids);
     const fmap = new Map((foods ?? []).map((f) => [f.id, f]));
     return (rows ?? [])
@@ -63,7 +65,9 @@ async function callGeminiJSON(messages: Array<{ role: string; content: string }>
 export const regenerateAlternativeReasons = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((i: unknown) =>
-    z.object({ food_id: z.string().uuid(), health_context: z.string().max(200).optional() }).parse(i),
+    z
+      .object({ food_id: z.string().uuid(), health_context: z.string().max(200).optional() })
+      .parse(i),
   )
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
@@ -82,7 +86,9 @@ export const regenerateAlternativeReasons = createServerFn({ method: "POST" })
 
     const { data: source } = await supabase
       .from("food_items")
-      .select("name, calories, sodium_mg, sugar_g, fiber_g, glycemic_index, fat_g, carbs_g, protein_g")
+      .select(
+        "name, calories, sodium_mg, sugar_g, fiber_g, glycemic_index, fat_g, carbs_g, protein_g",
+      )
       .eq("id", data.food_id)
       .maybeSingle();
     if (!source) throw new Error("Makanan tidak ditemukan");
@@ -104,7 +110,17 @@ export const regenerateAlternativeReasons = createServerFn({ method: "POST" })
     const items = alts
       .map((a) => {
         const f = fmap.get(a.alternative_food_id);
-        return f ? { alt_id: a.id, alt_name: f.name, calories: f.calories, sodium_mg: f.sodium_mg, sugar_g: f.sugar_g, fiber_g: f.fiber_g, glycemic_index: f.glycemic_index } : null;
+        return f
+          ? {
+              alt_id: a.id,
+              alt_name: f.name,
+              calories: f.calories,
+              sodium_mg: f.sodium_mg,
+              sugar_g: f.sugar_g,
+              fiber_g: f.fiber_g,
+              glycemic_index: f.glycemic_index,
+            }
+          : null;
       })
       .filter((x): x is NonNullable<typeof x> => x !== null);
 

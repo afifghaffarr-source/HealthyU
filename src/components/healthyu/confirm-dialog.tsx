@@ -45,11 +45,17 @@ export function ConfirmDialog({
         className="w-full max-w-xs bg-card rounded-3xl outline-1 outline-black/5 p-5 space-y-4 shadow-xl"
       >
         <div className="flex items-start gap-3">
-          <div className={`size-10 rounded-2xl grid place-items-center shrink-0 ${destructive ? "bg-destructive/15 text-destructive" : "bg-primary/15 text-primary"}`}>
+          <div
+            className={`size-10 rounded-2xl grid place-items-center shrink-0 ${destructive ? "bg-destructive/15 text-destructive" : "bg-primary/15 text-primary"}`}
+          >
             <AlertTriangle className="size-5" />
           </div>
           <div className="space-y-1 min-w-0">
-            <h2 id="confirm-title" className="font-bold text-sm" style={{ fontFamily: "var(--font-display)" }}>
+            <h2
+              id="confirm-title"
+              className="font-bold text-sm"
+              style={{ fontFamily: "var(--font-display)" }}
+            >
               {title}
             </h2>
             {description && <p className="text-xs text-muted-foreground">{description}</p>}

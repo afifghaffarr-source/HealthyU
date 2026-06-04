@@ -46,9 +46,7 @@ describe("useReducedMotion", () => {
     expect(values.at(-1)).toBe(false);
     act(() => {
       currentMatches = true;
-      listeners.forEach((l) =>
-        l({ matches: true } as MediaQueryListEvent),
-      );
+      listeners.forEach((l) => l({ matches: true } as MediaQueryListEvent));
     });
     expect(values.at(-1)).toBe(true);
   });

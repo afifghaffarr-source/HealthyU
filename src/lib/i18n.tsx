@@ -40,8 +40,8 @@ export type TranslationBundle = Record<TranslationKey, string>;
 
 export const bundles = {
   id: {
-  "pdf.footer.pageLabel": DEFAULT_PDF_FOOTER_PAGE_LABEL,
-  "pdf.footer.brandLabel": DEFAULT_PDF_FOOTER_BRAND_LABEL,
+    "pdf.footer.pageLabel": DEFAULT_PDF_FOOTER_PAGE_LABEL,
+    "pdf.footer.brandLabel": DEFAULT_PDF_FOOTER_BRAND_LABEL,
     "pdf.backLink": "hal. {page} \u2190 Daftar Isi",
     "pdf.toc.continued": "Daftar Isi (lanjutan {n}/{m})",
     "pdf.tooltip.navigation": "Navigasi",
@@ -108,7 +108,11 @@ export function I18nProvider({ children }: { children: ReactNode }) {
   const setLocale = useCallback((l: Locale) => {
     setLocaleState(l);
     if (typeof window !== "undefined") {
-      try { window.localStorage.setItem(LS_KEY, l); } catch { /* SSR / privacy mode */ }
+      try {
+        window.localStorage.setItem(LS_KEY, l);
+      } catch {
+        /* SSR / privacy mode */
+      }
     }
   }, []);
   useEffect(() => {

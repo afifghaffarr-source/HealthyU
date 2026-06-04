@@ -87,17 +87,23 @@ function Page() {
           <video ref={videoRef} className="w-full h-full object-cover" muted playsInline />
         </div>
         {lookMut.isPending && (
-          <div className="text-center text-sm text-muted-foreground"><Loader2 className="size-4 inline animate-spin"/> Mencari produk…</div>
+          <div className="text-center text-sm text-muted-foreground">
+            <Loader2 className="size-4 inline animate-spin" /> Mencari produk…
+          </div>
         )}
         {code && <div className="text-xs text-muted-foreground text-center">Kode: {code}</div>}
         {product?.found && (
           <div className="rounded-2xl bg-card border p-4 space-y-3">
             <div className="flex gap-3">
-              {product.image && <img src={product.image} alt="" className="size-16 rounded-xl object-cover" />}
+              {product.image && (
+                <img src={product.image} alt="" className="size-16 rounded-xl object-cover" />
+              )}
               <div className="min-w-0 flex-1">
                 <div className="font-semibold truncate">{product.name}</div>
                 <div className="text-xs text-muted-foreground truncate">{product.brand}</div>
-                <div className="text-xs mt-1">{Math.round(product.per100g.calories)} kkal / 100g</div>
+                <div className="text-xs mt-1">
+                  {Math.round(product.per100g.calories)} kkal / 100g
+                </div>
               </div>
             </div>
             <div>
@@ -114,7 +120,7 @@ function Page() {
               disabled={logMut.isPending}
               className="w-full py-3 rounded-xl bg-primary text-primary-foreground font-semibold text-sm disabled:opacity-50"
             >
-              Catat {Math.round(product.per100g.calories * grams / 100)} kkal
+              Catat {Math.round((product.per100g.calories * grams) / 100)} kkal
             </button>
           </div>
         )}

@@ -39,10 +39,14 @@ export const listPosts = createServerFn({ method: "GET" })
 export const createPost = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((i: unknown) =>
-    z.object({
-      content: z.string().min(1).max(1000),
-      category: z.enum(["general", "diet", "fasting", "workout", "motivation"]).default("general"),
-    }).parse(i),
+    z
+      .object({
+        content: z.string().min(1).max(1000),
+        category: z
+          .enum(["general", "diet", "fasting", "workout", "motivation"])
+          .default("general"),
+      })
+      .parse(i),
   )
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
@@ -56,7 +60,11 @@ export const deletePost = createServerFn({ method: "POST" })
   .inputValidator((i: unknown) => z.object({ id: z.string().uuid() }).parse(i))
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
-    const { error } = await supabase.from("community_posts").delete().eq("id", data.id).eq("user_id", userId);
+    const { error } = await supabase
+      .from("community_posts")
+      .delete()
+      .eq("id", data.id)
+      .eq("user_id", userId);
     if (error) throw new Error(error.message);
     return { ok: true };
   });

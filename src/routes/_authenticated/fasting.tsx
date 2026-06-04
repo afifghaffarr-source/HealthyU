@@ -23,10 +23,16 @@ function FastingPage() {
 
   const { data: fast } = useQuery({ queryKey: ["fast", "current"], queryFn: () => fetchFast() });
   const fetchHistory = useServerFn(fastHistory);
-  const { data: history = [] } = useQuery({ queryKey: ["fast", "history"], queryFn: () => fetchHistory() });
+  const { data: history = [] } = useQuery({
+    queryKey: ["fast", "history"],
+    queryFn: () => fetchHistory(),
+  });
   const fetchSchedule = useServerFn(getFastingSchedule);
   const saveScheduleFn = useServerFn(saveFastingSchedule);
-  const { data: schedule } = useQuery({ queryKey: ["fast", "schedule"], queryFn: () => fetchSchedule() });
+  const { data: schedule } = useQuery({
+    queryKey: ["fast", "schedule"],
+    queryFn: () => fetchSchedule(),
+  });
   const [ramadhan, setRamadhan] = useState(false);
   const [imsak, setImsak] = useState("04:30");
   const [iftar, setIftar] = useState("18:00");
@@ -94,7 +100,9 @@ function FastingPage() {
           <section className="bg-gradient-to-br from-sage to-sage-deep text-primary-foreground p-8 rounded-[2rem] relative overflow-hidden animate-fade-up">
             <div className="absolute -right-10 -top-10 size-40 bg-white/10 rounded-full blur-2xl" />
             <div className="relative z-10">
-              <p className="text-xs uppercase tracking-widest text-white/70 font-bold mb-2">Protokol {fast.protocol}</p>
+              <p className="text-xs uppercase tracking-widest text-white/70 font-bold mb-2">
+                Protokol {fast.protocol}
+              </p>
               <p className="text-5xl font-bold tabular-nums mb-2">{formatDuration(elapsedMs)}</p>
               <p className="text-sm text-white/80 mb-6">Target: {Number(fast.target_hours)} jam</p>
               <div className="h-2 w-full bg-white/20 rounded-full overflow-hidden mb-3">
@@ -112,7 +120,9 @@ function FastingPage() {
           </section>
         ) : (
           <section className="space-y-3 animate-fade-up">
-            <h2 className="text-sm font-bold uppercase tracking-wider text-muted-foreground">Pilih protokol</h2>
+            <h2 className="text-sm font-bold uppercase tracking-wider text-muted-foreground">
+              Pilih protokol
+            </h2>
             {FASTING_PROTOCOLS.map((p) => (
               <button
                 key={p.id}
@@ -122,7 +132,9 @@ function FastingPage() {
               >
                 <div>
                   <p className="font-bold">{p.label}</p>
-                  <p className="text-xs text-muted-foreground">{p.fast}j puasa · {p.eat}j makan</p>
+                  <p className="text-xs text-muted-foreground">
+                    {p.fast}j puasa · {p.eat}j makan
+                  </p>
                 </div>
                 <span className="text-primary font-bold text-sm">Mulai →</span>
               </button>
@@ -174,19 +186,31 @@ function FastingPage() {
 
         {history.length > 0 && (
           <section className="space-y-2 animate-fade-up">
-            <h2 className="text-sm font-bold uppercase tracking-wider text-muted-foreground">Riwayat</h2>
+            <h2 className="text-sm font-bold uppercase tracking-wider text-muted-foreground">
+              Riwayat
+            </h2>
             {history.map((h) => {
               const dur = h.end_time
                 ? (new Date(h.end_time).getTime() - new Date(h.start_time).getTime()) / 3600000
                 : 0;
-              const date = new Date(h.start_time).toLocaleDateString("id-ID", { day: "2-digit", month: "short" });
+              const date = new Date(h.start_time).toLocaleDateString("id-ID", {
+                day: "2-digit",
+                month: "short",
+              });
               return (
-                <div key={h.id} className="bg-card p-4 rounded-2xl outline-1 outline-black/5 flex items-center gap-3">
-                  <div className={`size-9 rounded-xl grid place-items-center ${h.completed ? "bg-mint text-sage-deep" : "bg-muted text-muted-foreground"}`}>
+                <div
+                  key={h.id}
+                  className="bg-card p-4 rounded-2xl outline-1 outline-black/5 flex items-center gap-3"
+                >
+                  <div
+                    className={`size-9 rounded-xl grid place-items-center ${h.completed ? "bg-mint text-sage-deep" : "bg-muted text-muted-foreground"}`}
+                  >
                     {h.completed ? <Check className="size-4" /> : <X className="size-4" />}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="font-semibold text-sm">{h.protocol} · {date}</p>
+                    <p className="font-semibold text-sm">
+                      {h.protocol} · {date}
+                    </p>
                     <p className="text-xs text-muted-foreground tabular-nums">
                       {dur.toFixed(1)}j / {Number(h.target_hours)}j
                     </p>

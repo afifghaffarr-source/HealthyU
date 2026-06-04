@@ -60,8 +60,8 @@ function HealthImportPage() {
         <section className="bg-card rounded-2xl p-4 outline-1 outline-black/10 text-xs text-muted-foreground space-y-2">
           <p className="font-semibold text-foreground">Cara ekspor data:</p>
           <p>
-            <b>📱 iPhone (Apple Health):</b> Buka Health app → profile pojok kanan atas → "Export All
-            Health Data" → ekstrak ZIP → upload file <code>export.xml</code> di bawah.
+            <b>📱 iPhone (Apple Health):</b> Buka Health app → profile pojok kanan atas → "Export
+            All Health Data" → ekstrak ZIP → upload file <code>export.xml</code> di bawah.
           </p>
           <p>
             <b>📱 Samsung Health:</b> Settings → Download personal data → ekstrak ZIP → upload file
@@ -109,7 +109,11 @@ function HealthImportPage() {
               disabled={mutation.isPending}
               className="w-full bg-primary text-primary-foreground rounded-xl py-3 font-semibold text-sm flex items-center justify-center gap-2 disabled:opacity-50"
             >
-              {mutation.isPending ? <Loader2 className="size-4 animate-spin" /> : <Upload className="size-4" />}
+              {mutation.isPending ? (
+                <Loader2 className="size-4 animate-spin" />
+              ) : (
+                <Upload className="size-4" />
+              )}
               {mutation.isPending ? "Mengimport..." : "Import sekarang"}
             </button>
             <button
@@ -176,7 +180,12 @@ function Mini({ label, v }: { label: string; v: number }) {
 function parseAppleHealthXml(xml: string): Omit<Parsed, "source"> {
   const steps: Record<string, number> = {};
   const weight: { logged_at: string; weight_kg: number }[] = [];
-  const workouts: { performed_at: string; type: string; duration_min: number; calories_burned: number }[] = [];
+  const workouts: {
+    performed_at: string;
+    type: string;
+    duration_min: number;
+    calories_burned: number;
+  }[] = [];
 
   // Steps & weight come from <Record .../>
   const recordRegex = /<Record\b[^>]*\/>/g;
@@ -197,7 +206,10 @@ function parseAppleHealthXml(xml: string): Omit<Parsed, "source"> {
       let val = Number(attr(m, "value"));
       if (!Number.isFinite(val) || !startDate) continue;
       if (unit === "lb") val = val * 0.453592;
-      weight.push({ logged_at: new Date(startDate).toISOString(), weight_kg: Number(val.toFixed(2)) });
+      weight.push({
+        logged_at: new Date(startDate).toISOString(),
+        weight_kg: Number(val.toFixed(2)),
+      });
     }
   }
 
@@ -268,7 +280,12 @@ function parseSamsungCsv(text: string, filename: string): Omit<Parsed, "source">
     const typeCol = col("type") >= 0 ? col("type") : col("exercise");
     const durCol = col("duration");
     const calCol = col("calorie");
-    const out: { performed_at: string; type: string; duration_min: number; calories_burned: number }[] = [];
+    const out: {
+      performed_at: string;
+      type: string;
+      duration_min: number;
+      calories_burned: number;
+    }[] = [];
     for (const r of rows) {
       const t = r[tCol];
       const type = r[typeCol] ?? "Exercise";

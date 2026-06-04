@@ -12,17 +12,7 @@ import {
   getGroupLeaderboard,
 } from "@/lib/groups.functions";
 import { BottomNav } from "@/components/bottom-nav";
-import {
-  Users,
-  Plus,
-  LogIn,
-  Copy,
-  Share2,
-  Trophy,
-  Flame,
-  LogOut,
-  Loader2,
-} from "lucide-react";
+import { Users, Plus, LogIn, Copy, Share2, Trophy, Flame, LogOut, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/groups")({
@@ -212,12 +202,16 @@ function GroupCard({
               onClick={async () => {
                 const url = `${window.location.origin}/groups?invite=${group.invite_code}`;
                 const text = `Gabung grup "${group.name}" di SehatKu! Kode: ${group.invite_code}`;
-                const nav = navigator as Navigator & { share?: (d: { title?: string; text?: string; url?: string }) => Promise<void> };
+                const nav = navigator as Navigator & {
+                  share?: (d: { title?: string; text?: string; url?: string }) => Promise<void>;
+                };
                 if (nav.share) {
                   try {
                     await nav.share({ title: group.name, text, url });
                     return;
-                  } catch { /* user cancelled */ }
+                  } catch {
+                    /* user cancelled */
+                  }
                 }
                 navigator.clipboard.writeText(url);
                 toast.success("Link undangan disalin");

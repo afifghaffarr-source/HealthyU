@@ -8,10 +8,7 @@ export const getMyRoles = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     const { supabase, userId } = context;
-    const { data, error } = await supabase
-      .from("user_roles")
-      .select("role")
-      .eq("user_id", userId);
+    const { data, error } = await supabase.from("user_roles").select("role").eq("user_id", userId);
     if (error) {
       console.error("[roles] fetch error:", error.message);
       return { roles: [] as AppRole[] };

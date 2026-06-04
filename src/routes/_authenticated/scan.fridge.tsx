@@ -13,7 +13,10 @@ function Page() {
   const fn = useServerFn(recipeFromFridge);
   const [preview, setPreview] = useState<string | null>(null);
   const [b64, setB64] = useState("");
-  const mut = useMutation({ mutationFn: () => fn({ data: { imageBase64: b64 } }), onError: (e: Error) => toast.error(e.message) });
+  const mut = useMutation({
+    mutationFn: () => fn({ data: { imageBase64: b64 } }),
+    onError: (e: Error) => toast.error(e.message),
+  });
   const onPick = async (f: File | null) => {
     if (!f) return;
     setPreview(URL.createObjectURL(f));
@@ -25,9 +28,21 @@ function Page() {
     <div className="min-h-dvh pb-24 bg-background">
       <TopAppBar title="Resep dari Kulkas" showBack />
       <main className="max-w-md mx-auto px-4 pt-4 space-y-4">
-        <input type="file" accept="image/*" capture="environment" onChange={(e) => onPick(e.target.files?.[0] ?? null)} className="w-full text-sm" />
+        <input
+          type="file"
+          accept="image/*"
+          capture="environment"
+          onChange={(e) => onPick(e.target.files?.[0] ?? null)}
+          className="w-full text-sm"
+        />
         {preview && <img src={preview} alt="" className="w-full rounded-xl" />}
-        <button onClick={() => mut.mutate()} disabled={!b64 || mut.isPending} className="w-full rounded-xl bg-primary text-primary-foreground py-2.5 font-medium">{mut.isPending ? "AI menganalisis…" : "Cari Resep"}</button>
+        <button
+          onClick={() => mut.mutate()}
+          disabled={!b64 || mut.isPending}
+          className="w-full rounded-xl bg-primary text-primary-foreground py-2.5 font-medium"
+        >
+          {mut.isPending ? "AI menganalisis…" : "Cari Resep"}
+        </button>
         {r?.ingredients && (
           <div className="rounded-2xl bg-card border p-3 text-sm">
             <b>Bahan terdeteksi:</b> {r.ingredients.join(", ")}
@@ -36,7 +51,11 @@ function Page() {
         {(r?.recipes ?? []).map((rec: any, i: number) => (
           <div key={i} className="rounded-2xl bg-card border p-3 text-sm space-y-1">
             <div className="font-semibold">{rec.name}</div>
-            <ol className="list-decimal pl-5 space-y-0.5">{(rec.steps ?? []).map((s: string, j: number) => <li key={j}>{s}</li>)}</ol>
+            <ol className="list-decimal pl-5 space-y-0.5">
+              {(rec.steps ?? []).map((s: string, j: number) => (
+                <li key={j}>{s}</li>
+              ))}
+            </ol>
           </div>
         ))}
       </main>

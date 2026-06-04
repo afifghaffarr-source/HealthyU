@@ -28,9 +28,7 @@ export async function computeGroupChallengeSummary(userId: string) {
     supabaseAdmin.from("friend_group_members").select("group_id, user_id").in("group_id", groupIds),
   ]);
 
-  const allMemberIds = Array.from(
-    new Set((allMembersRes.data ?? []).map((m) => m.user_id)),
-  );
+  const allMemberIds = Array.from(new Set((allMembersRes.data ?? []).map((m) => m.user_id)));
   const { data: parts } = await supabaseAdmin
     .from("challenge_participants")
     .select("user_id, challenge_id, current_day, streak, status")

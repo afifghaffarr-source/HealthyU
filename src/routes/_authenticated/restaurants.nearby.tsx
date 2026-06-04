@@ -18,15 +18,23 @@ function Page() {
   });
   const locate = () => {
     navigator.geolocation.getCurrentPosition((pos) =>
-      mut.mutate({ lat: pos.coords.latitude, lng: pos.coords.longitude })
+      mut.mutate({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
     );
   };
   return (
     <div className="min-h-dvh pb-24 bg-background">
       <TopAppBar title="Restoran Terdekat" showBack />
       <main className="max-w-md mx-auto px-4 pt-4 space-y-3">
-        <button onClick={locate} disabled={mut.isPending} className="w-full rounded-xl bg-primary text-primary-foreground py-2.5 inline-flex items-center justify-center gap-2">
-          {mut.isPending ? <Loader2 className="size-4 animate-spin" /> : <MapPin className="size-4" />}
+        <button
+          onClick={locate}
+          disabled={mut.isPending}
+          className="w-full rounded-xl bg-primary text-primary-foreground py-2.5 inline-flex items-center justify-center gap-2"
+        >
+          {mut.isPending ? (
+            <Loader2 className="size-4 animate-spin" />
+          ) : (
+            <MapPin className="size-4" />
+          )}
           Cari di sekitar saya
         </button>
         {list.map((r) => (
@@ -35,7 +43,11 @@ function Page() {
             <p className="text-xs text-muted-foreground">{r.address}</p>
           </div>
         ))}
-        {list.length === 0 && !mut.isPending && <p className="text-sm text-muted-foreground text-center py-8">Tekan tombol untuk mencari</p>}
+        {list.length === 0 && !mut.isPending && (
+          <p className="text-sm text-muted-foreground text-center py-8">
+            Tekan tombol untuk mencari
+          </p>
+        )}
       </main>
       <BottomNav />
     </div>

@@ -14,7 +14,10 @@ function Page() {
   const qc = useQueryClient();
   const logFn = useServerFn(logMeditation);
   const listFn = useServerFn(listMeditations);
-  const { data } = useQuery({ queryKey: ["meditations"], queryFn: () => listFn({ data: undefined as any }) });
+  const { data } = useQuery({
+    queryKey: ["meditations"],
+    queryFn: () => listFn({ data: undefined as any }),
+  });
   const [target, setTarget] = useState(5);
   const [seconds, setSeconds] = useState(0);
   const [running, setRunning] = useState(false);
@@ -23,11 +26,16 @@ function Page() {
     if (running) {
       ref.current = setInterval(() => setSeconds((s) => s + 1), 1000);
     }
-    return () => { if (ref.current) clearInterval(ref.current); };
+    return () => {
+      if (ref.current) clearInterval(ref.current);
+    };
   }, [running]);
   const mut = useMutation({
     mutationFn: (m: number) => logFn({ data: { durationMin: m } }),
-    onSuccess: () => { toast.success("Sesi tercatat"); qc.invalidateQueries({ queryKey: ["meditations"] }); },
+    onSuccess: () => {
+      toast.success("Sesi tercatat");
+      qc.invalidateQueries({ queryKey: ["meditations"] });
+    },
   });
   const finish = () => {
     setRunning(false);
@@ -43,23 +51,34 @@ function Page() {
       <main className="max-w-md mx-auto px-4 pt-4 space-y-4">
         <div className="rounded-2xl bg-gradient-to-br from-primary/20 to-accent/20 p-6 text-center space-y-4">
           <div className="text-5xl font-bold tabular-nums">
-            {String(Math.floor(seconds / 60)).padStart(2, "0")}:{String(seconds % 60).padStart(2, "0")}
+            {String(Math.floor(seconds / 60)).padStart(2, "0")}:
+            {String(seconds % 60).padStart(2, "0")}
           </div>
           <div className="w-full h-2 bg-muted/50 rounded-full overflow-hidden">
             <div className="h-full bg-primary transition-all" style={{ width: `${pct}%` }} />
           </div>
           <div className="flex gap-2 justify-center">
             {[3, 5, 10, 20].map((m) => (
-              <button key={m} onClick={() => setTarget(m)} className={`px-3 py-1 rounded-lg text-xs ${target === m ? "bg-primary text-primary-foreground" : "border"}`}>
+              <button
+                key={m}
+                onClick={() => setTarget(m)}
+                className={`px-3 py-1 rounded-lg text-xs ${target === m ? "bg-primary text-primary-foreground" : "border"}`}
+              >
                 {m}m
               </button>
             ))}
           </div>
           <div className="flex gap-3 justify-center">
-            <button onClick={() => setRunning((r) => !r)} className="size-14 rounded-full bg-primary text-primary-foreground inline-flex items-center justify-center">
+            <button
+              onClick={() => setRunning((r) => !r)}
+              className="size-14 rounded-full bg-primary text-primary-foreground inline-flex items-center justify-center"
+            >
               {running ? <Pause className="size-6" /> : <Play className="size-6" />}
             </button>
-            <button onClick={finish} className="size-14 rounded-full border inline-flex items-center justify-center">
+            <button
+              onClick={finish}
+              className="size-14 rounded-full border inline-flex items-center justify-center"
+            >
               <RotateCcw className="size-5" />
             </button>
           </div>

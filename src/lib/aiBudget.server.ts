@@ -28,7 +28,9 @@ export function estimateCost(model: string, prompt = 0, completion = 0): number 
 export async function logAiUsage(rec: AiUsageRecord): Promise<void> {
   try {
     const total = (rec.promptTokens ?? 0) + (rec.completionTokens ?? 0);
-    const cost = rec.cacheHit ? 0 : estimateCost(rec.model ?? "", rec.promptTokens, rec.completionTokens);
+    const cost = rec.cacheHit
+      ? 0
+      : estimateCost(rec.model ?? "", rec.promptTokens, rec.completionTokens);
     await supabaseAdmin.from("ai_usage_logs").insert({
       user_id: rec.userId,
       feature: rec.feature,

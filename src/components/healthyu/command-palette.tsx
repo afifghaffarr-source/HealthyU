@@ -57,10 +57,14 @@ export function CommandPalette() {
   const filtered = useMemo(() => {
     const needle = q.trim().toLowerCase();
     if (!needle) return ROUTES.slice(0, 12);
-    return ROUTES.filter((r) => r.label.toLowerCase().includes(needle) || r.to.includes(needle)).slice(0, 20);
+    return ROUTES.filter(
+      (r) => r.label.toLowerCase().includes(needle) || r.to.includes(needle),
+    ).slice(0, 20);
   }, [q]);
 
-  useEffect(() => { setIdx(0); }, [q, open]);
+  useEffect(() => {
+    setIdx(0);
+  }, [q, open]);
 
   if (!open) return null;
 
@@ -71,8 +75,14 @@ export function CommandPalette() {
   };
 
   return (
-    <div className="fixed inset-0 z-[60] bg-black/50 backdrop-blur-sm flex items-start justify-center pt-24 px-4 animate-fade-in" onClick={() => setOpen(false)}>
-      <div className="w-full max-w-lg bg-card border border-border rounded-2xl shadow-2xl overflow-hidden" onClick={(e) => e.stopPropagation()}>
+    <div
+      className="fixed inset-0 z-[60] bg-black/50 backdrop-blur-sm flex items-start justify-center pt-24 px-4 animate-fade-in"
+      onClick={() => setOpen(false)}
+    >
+      <div
+        className="w-full max-w-lg bg-card border border-border rounded-2xl shadow-2xl overflow-hidden"
+        onClick={(e) => e.stopPropagation()}
+      >
         <div className="flex items-center gap-2 px-4 border-b border-border">
           <Search className="size-4 text-muted-foreground" />
           <input
@@ -80,20 +90,32 @@ export function CommandPalette() {
             value={q}
             onChange={(e) => setQ(e.target.value)}
             onKeyDown={(e) => {
-              if (e.key === "ArrowDown") { e.preventDefault(); setIdx((i) => Math.min(i + 1, filtered.length - 1)); }
-              else if (e.key === "ArrowUp") { e.preventDefault(); setIdx((i) => Math.max(i - 1, 0)); }
-              else if (e.key === "Enter" && filtered[idx]) { go(filtered[idx].to); }
+              if (e.key === "ArrowDown") {
+                e.preventDefault();
+                setIdx((i) => Math.min(i + 1, filtered.length - 1));
+              } else if (e.key === "ArrowUp") {
+                e.preventDefault();
+                setIdx((i) => Math.max(i - 1, 0));
+              } else if (e.key === "Enter" && filtered[idx]) {
+                go(filtered[idx].to);
+              }
             }}
             placeholder="Cari halaman… (Esc untuk tutup)"
             className="flex-1 bg-transparent py-3 text-sm outline-none"
           />
-          <button onClick={() => setOpen(false)} aria-label="Tutup" className="p-1 rounded hover:bg-muted">
+          <button
+            onClick={() => setOpen(false)}
+            aria-label="Tutup"
+            className="p-1 rounded hover:bg-muted"
+          >
             <X className="size-4" />
           </button>
         </div>
         <ul className="max-h-80 overflow-y-auto py-1">
           {filtered.length === 0 && (
-            <li className="px-4 py-6 text-sm text-muted-foreground text-center">Tidak ditemukan.</li>
+            <li className="px-4 py-6 text-sm text-muted-foreground text-center">
+              Tidak ditemukan.
+            </li>
           )}
           {filtered.map((r, i) => (
             <li key={r.to}>

@@ -28,8 +28,14 @@ function ProgressPage() {
   const fetchMeals = useServerFn(todaysMeals);
   const fetchWater = useServerFn(todaysWater);
   const { data: profile } = useQuery({ queryKey: ["profile"], queryFn: () => fetchProfile() });
-  const { data: meals = [] } = useQuery({ queryKey: ["meals", "today"], queryFn: () => fetchMeals() });
-  const { data: waterMl = 0 } = useQuery({ queryKey: ["water", "today"], queryFn: () => fetchWater() });
+  const { data: meals = [] } = useQuery({
+    queryKey: ["meals", "today"],
+    queryFn: () => fetchMeals(),
+  });
+  const { data: waterMl = 0 } = useQuery({
+    queryKey: ["water", "today"],
+    queryFn: () => fetchWater(),
+  });
   const cal = meals.reduce((a, m) => a + Number(m.calories || 0), 0);
   const calTarget = profile?.daily_calorie_target ?? 2000;
   const waterTarget = 2500;
@@ -52,7 +58,9 @@ function ProgressPage() {
   const handleUpload = async (file: File) => {
     setUploading(true);
     try {
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
       if (!user) throw new Error("Tidak login");
       const ext = file.name.split(".").pop()?.toLowerCase() || "jpg";
       const path = `${user.id}/${Date.now()}.${ext}`;
@@ -86,10 +94,18 @@ function ProgressPage() {
         <TopAppBar title="Foto Progres" subtitle="Pantau perubahan kamu" showBack />
 
         <section className="bg-card p-4 rounded-3xl outline-1 outline-black/5">
-          <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-2">Goal Harian</p>
+          <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-2">
+            Goal Harian
+          </p>
           <div className="h-44">
             <ResponsiveContainer width="100%" height="100%">
-              <RadialBarChart innerRadius="30%" outerRadius="100%" data={goalData} startAngle={90} endAngle={-270}>
+              <RadialBarChart
+                innerRadius="30%"
+                outerRadius="100%"
+                data={goalData}
+                startAngle={90}
+                endAngle={-270}
+              >
                 <PolarAngleAxis type="number" domain={[0, 100]} tick={false} />
                 <RadialBar background dataKey="value" cornerRadius={8} />
               </RadialBarChart>
@@ -142,7 +158,11 @@ function ProgressPage() {
             disabled={uploading}
             className="w-full bg-primary text-primary-foreground font-semibold py-3 rounded-2xl flex items-center justify-center gap-2 disabled:opacity-50"
           >
-            {uploading ? <Loader2 className="size-4 animate-spin" /> : <Camera className="size-4" />}
+            {uploading ? (
+              <Loader2 className="size-4 animate-spin" />
+            ) : (
+              <Camera className="size-4" />
+            )}
             {uploading ? "Mengunggah..." : "Ambil / Pilih Foto"}
           </button>
         </section>
@@ -157,7 +177,10 @@ function ProgressPage() {
 
         <section className="grid grid-cols-2 gap-3">
           {photos.map((p) => (
-            <div key={p.id} className="bg-card rounded-2xl outline-1 outline-black/5 overflow-hidden relative group">
+            <div
+              key={p.id}
+              className="bg-card rounded-2xl outline-1 outline-black/5 overflow-hidden relative group"
+            >
               {p.signed_url ? (
                 <img src={p.signed_url} alt="" className="w-full aspect-square object-cover" />
               ) : (
@@ -165,9 +188,14 @@ function ProgressPage() {
               )}
               <div className="p-2">
                 <p className="text-xs font-semibold">
-                  {new Date(p.taken_at).toLocaleDateString("id-ID", { day: "numeric", month: "short" })}
+                  {new Date(p.taken_at).toLocaleDateString("id-ID", {
+                    day: "numeric",
+                    month: "short",
+                  })}
                 </p>
-                {p.weight_kg && <p className="text-[10px] text-muted-foreground">{p.weight_kg} kg</p>}
+                {p.weight_kg && (
+                  <p className="text-[10px] text-muted-foreground">{p.weight_kg} kg</p>
+                )}
                 {p.notes && <p className="text-[10px] text-muted-foreground truncate">{p.notes}</p>}
               </div>
               <button

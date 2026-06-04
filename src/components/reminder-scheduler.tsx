@@ -1,5 +1,10 @@
 import { useEffect } from "react";
-import { FIRED_KEY, loadReminders, refreshPrayerRemindersForToday, type Reminder } from "@/lib/reminders-store";
+import {
+  FIRED_KEY,
+  loadReminders,
+  refreshPrayerRemindersForToday,
+  type Reminder,
+} from "@/lib/reminders-store";
 
 function shouldFire(r: Reminder, now: Date, fired: Record<string, string>, todayKey: string) {
   if (!r.enabled) return false;
@@ -24,13 +29,17 @@ export function ReminderScheduler() {
       let fired: Record<string, string> = {};
       try {
         fired = JSON.parse(localStorage.getItem(FIRED_KEY) || "{}");
-      } catch {/* ignore */}
+      } catch {
+        /* ignore */
+      }
       let changed = false;
       for (const r of items) {
         if (shouldFire(r, now, fired, todayKey)) {
           try {
             new Notification("HealthyU", { body: r.label, icon: "/icon-192.svg" });
-          } catch {/* ignore */}
+          } catch {
+            /* ignore */
+          }
           fired[r.id] = todayKey;
           changed = true;
         }

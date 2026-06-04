@@ -3,7 +3,11 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { BottomNav } from "@/components/bottom-nav";
-import { getDailyChallenge, completeDailyChallenge, useStreakFreeze } from "@/lib/scanSocial.functions";
+import {
+  getDailyChallenge,
+  completeDailyChallenge,
+  useStreakFreeze,
+} from "@/lib/scanSocial.functions";
 import { Sparkles, Check, Snowflake, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 

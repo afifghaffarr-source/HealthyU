@@ -25,9 +25,7 @@ export async function cacheKey(args: {
   question: string;
   profileHash: string;
 }): Promise<string> {
-  return sha256Hex(
-    `${args.model}|t${args.tier}|${args.profileHash}|${normalize(args.question)}`,
-  );
+  return sha256Hex(`${args.model}|t${args.tier}|${args.profileHash}|${normalize(args.question)}`);
 }
 
 export async function getCached(key: string): Promise<string | null> {
@@ -49,13 +47,11 @@ export async function setCached(args: {
   isPersonal: boolean;
 }): Promise<void> {
   const expires_at = new Date(Date.now() + ttlMs(args.tier, args.isPersonal)).toISOString();
-  await supabaseAdmin
-    .from("ai_response_cache")
-    .upsert({
-      key: args.key,
-      response: args.response,
-      model: args.model,
-      tier: args.tier,
-      expires_at,
-    });
+  await supabaseAdmin.from("ai_response_cache").upsert({
+    key: args.key,
+    response: args.response,
+    model: args.model,
+    tier: args.tier,
+    expires_at,
+  });
 }

@@ -13,10 +13,16 @@ function Page() {
   const listFn = useServerFn(listPetAccessories);
   const buyFn = useServerFn(buyPetAccessory);
   const eqFn = useServerFn(equipPetAccessory);
-  const { data } = useQuery({ queryKey: ["pet-shop"], queryFn: () => listFn({ data: undefined as any }) });
+  const { data } = useQuery({
+    queryKey: ["pet-shop"],
+    queryFn: () => listFn({ data: undefined as any }),
+  });
   const buy = useMutation({
     mutationFn: (id: string) => buyFn({ data: { accessoryId: id } }),
-    onSuccess: () => { toast.success("Dibeli!"); qc.invalidateQueries({ queryKey: ["pet-shop"] }); },
+    onSuccess: () => {
+      toast.success("Dibeli!");
+      qc.invalidateQueries({ queryKey: ["pet-shop"] });
+    },
     onError: (e: Error) => toast.error(e.message),
   });
   const eq = useMutation({

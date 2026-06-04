@@ -28,7 +28,9 @@ function PetSvgPage() {
           className="w-full max-w-xs"
           aria-label="Tahap evolusi"
         />
-        <p className="text-xs text-muted-foreground">Tahap {stage + 1} / {stages.length}</p>
+        <p className="text-xs text-muted-foreground">
+          Tahap {stage + 1} / {stages.length}
+        </p>
       </div>
       <BottomNav />
     </div>

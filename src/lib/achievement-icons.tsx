@@ -40,14 +40,23 @@ const ICON_MAP: Record<string, { icon: LucideIcon; fallback: string }> = {
 };
 
 function normalizeIconName(icon: string | null | undefined) {
-  return (icon ?? "").trim().toLowerCase().replace(/[\s_]+/g, "-");
+  return (icon ?? "")
+    .trim()
+    .toLowerCase()
+    .replace(/[\s_]+/g, "-");
 }
 
 function isTextIconName(icon: string) {
   return /^[a-z0-9-]+$/i.test(icon);
 }
 
-export function AchievementIcon({ icon, className = "size-5" }: { icon: string | null | undefined; className?: string }) {
+export function AchievementIcon({
+  icon,
+  className = "size-5",
+}: {
+  icon: string | null | undefined;
+  className?: string;
+}) {
   const raw = (icon ?? "").trim();
   const mapped = ICON_MAP[normalizeIconName(raw)];
 
@@ -57,7 +66,11 @@ export function AchievementIcon({ icon, className = "size-5" }: { icon: string |
   }
 
   if (raw && !isTextIconName(raw)) {
-    return <span aria-hidden="true" className="leading-none">{raw}</span>;
+    return (
+      <span aria-hidden="true" className="leading-none">
+        {raw}
+      </span>
+    );
   }
 
   return <Medal className={className} aria-hidden="true" />;

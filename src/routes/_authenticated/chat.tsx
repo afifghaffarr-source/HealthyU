@@ -5,7 +5,22 @@ import { useServerFn } from "@tanstack/react-start";
 import { getChatHistory, clearChatHistory, weeklyHealthReport } from "@/lib/chat.functions";
 import { supabase } from "@/integrations/supabase/client";
 import { BottomNav } from "@/components/bottom-nav";
-import { Send, Sparkles, ImagePlus, X, Mic, MicOff, Volume2, VolumeX, Utensils, Timer, Flame, ChefHat, Trash2, BarChart3 } from "lucide-react";
+import {
+  Send,
+  Sparkles,
+  ImagePlus,
+  X,
+  Mic,
+  MicOff,
+  Volume2,
+  VolumeX,
+  Utensils,
+  Timer,
+  Flame,
+  ChefHat,
+  Trash2,
+  BarChart3,
+} from "lucide-react";
 import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { toast } from "sonner";
 import ReactMarkdown from "react-markdown";
@@ -26,7 +41,11 @@ const QUICK_ACTIONS = [
   { label: "Log makanan", icon: Utensils, to: "/food" as const },
   { label: "Rekomendasi AI", icon: ChefHat, to: "/recommendations" as const },
   { label: "Mulai puasa", icon: Timer, to: "/fasting" as const },
-  { label: "Budget kalori", icon: Flame, prompt: "Berapa sisa budget kalori saya hari ini? Berikan rekomendasi makanan." },
+  {
+    label: "Budget kalori",
+    icon: Flame,
+    prompt: "Berapa sisa budget kalori saya hari ini? Berikan rekomendasi makanan.",
+  },
 ];
 
 function ChatPage() {
@@ -37,7 +56,11 @@ function ChatPage() {
   const { data: messages = [] } = useQuery({ queryKey: ["chat"], queryFn: () => fetchHist() });
 
   const [input, setInput] = useState("");
-  const [imageData, setImageData] = useState<{ base64: string; mime: string; preview: string } | null>(null);
+  const [imageData, setImageData] = useState<{
+    base64: string;
+    mime: string;
+    preview: string;
+  } | null>(null);
   const [streaming, setStreaming] = useState<string | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -45,7 +68,9 @@ function ChatPage() {
   const [ttsOn, setTtsOn] = useState(false);
   const recogRef = useRef<any>(null);
   const lastSpokenRef = useRef<string | null>(null);
-  const sttSupported = typeof window !== "undefined" && !!((window as any).SpeechRecognition || (window as any).webkitSpeechRecognition);
+  const sttSupported =
+    typeof window !== "undefined" &&
+    !!((window as any).SpeechRecognition || (window as any).webkitSpeechRecognition);
   const ttsSupported = typeof window !== "undefined" && "speechSynthesis" in window;
 
   const mutation = useMutation({
@@ -85,7 +110,9 @@ function ChatPage() {
               acc += json.delta;
               setStreaming(acc);
             }
-          } catch { /* ignore */ }
+          } catch {
+            /* ignore */
+          }
         }
       }
       return acc;
@@ -105,7 +132,9 @@ function ChatPage() {
     mutationFn: () => clearFn(),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["chat"] });
-      try { window.speechSynthesis?.cancel(); } catch {}
+      try {
+        window.speechSynthesis?.cancel();
+      } catch {}
       lastSpokenRef.current = null;
       toast.success("Riwayat dihapus");
     },
@@ -145,8 +174,12 @@ function ChatPage() {
 
   useEffect(() => {
     return () => {
-      try { window.speechSynthesis?.cancel(); } catch {}
-      try { recogRef.current?.stop?.(); } catch {}
+      try {
+        window.speechSynthesis?.cancel();
+      } catch {}
+      try {
+        recogRef.current?.stop?.();
+      } catch {}
     };
   }, []);
 
@@ -157,7 +190,9 @@ function ChatPage() {
     }
     setTtsOn((v) => {
       if (v) {
-        try { window.speechSynthesis.cancel(); } catch {}
+        try {
+          window.speechSynthesis.cancel();
+        } catch {}
       }
       return !v;
     });
@@ -169,7 +204,9 @@ function ChatPage() {
       return;
     }
     if (listening) {
-      try { recogRef.current?.stop?.(); } catch {}
+      try {
+        recogRef.current?.stop?.();
+      } catch {}
       return;
     }
     const SR: any = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
@@ -201,7 +238,11 @@ function ChatPage() {
     };
     recogRef.current = r;
     setListening(true);
-    try { r.start(); } catch { setListening(false); }
+    try {
+      r.start();
+    } catch {
+      setListening(false);
+    }
   };
 
   const handleSend = (text?: string) => {
@@ -278,9 +319,15 @@ function ChatPage() {
               </span>
             );
             return "to" in a && a.to ? (
-              <Link key={a.label} to={a.to as "/dashboard"}>{content}</Link>
+              <Link key={a.label} to={a.to as "/dashboard"}>
+                {content}
+              </Link>
             ) : (
-              <button key={a.label} onClick={() => handleSend(a.prompt)} disabled={mutation.isPending}>
+              <button
+                key={a.label}
+                onClick={() => handleSend(a.prompt)}
+                disabled={mutation.isPending}
+              >
                 {content}
               </button>
             );
@@ -290,7 +337,10 @@ function ChatPage() {
           <div className="py-8 space-y-4 animate-fade-up">
             <div className="bg-card p-5 rounded-3xl outline-1 outline-black/5">
               <p className="font-bold mb-1">Selamat datang! 👋</p>
-              <p className="text-sm text-muted-foreground">Saya Dr. Healthy. Tanyakan apa saja seputar nutrisi, diet, puasa, atau gaya hidup sehat.</p>
+              <p className="text-sm text-muted-foreground">
+                Saya Dr. Healthy. Tanyakan apa saja seputar nutrisi, diet, puasa, atau gaya hidup
+                sehat.
+              </p>
             </div>
             <div className="space-y-2">
               {SUGGESTIONS.map((s) => (
@@ -308,12 +358,17 @@ function ChatPage() {
 
         <div className="space-y-3 py-4">
           {messages.map((m) => (
-            <div key={m.id} className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}>
-              <div className={`max-w-[85%] px-4 py-3 rounded-3xl text-sm leading-relaxed ${
-                m.role === "user"
-                  ? "bg-primary text-primary-foreground rounded-br-md whitespace-pre-wrap"
-                  : "bg-card outline-1 outline-black/5 rounded-bl-md prose prose-sm max-w-none prose-p:my-1 prose-headings:my-2 prose-headings:font-bold prose-ul:my-1 prose-ol:my-1 prose-li:my-0 prose-strong:text-foreground prose-code:bg-secondary prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-code:text-xs prose-code:before:content-none prose-code:after:content-none"
-              }`}>
+            <div
+              key={m.id}
+              className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}
+            >
+              <div
+                className={`max-w-[85%] px-4 py-3 rounded-3xl text-sm leading-relaxed ${
+                  m.role === "user"
+                    ? "bg-primary text-primary-foreground rounded-br-md whitespace-pre-wrap"
+                    : "bg-card outline-1 outline-black/5 rounded-bl-md prose prose-sm max-w-none prose-p:my-1 prose-headings:my-2 prose-headings:font-bold prose-ul:my-1 prose-ol:my-1 prose-li:my-0 prose-strong:text-foreground prose-code:bg-secondary prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-code:text-xs prose-code:before:content-none prose-code:after:content-none"
+                }`}
+              >
                 {m.role === "assistant" ? (
                   <ReactMarkdown remarkPlugins={[remarkGfm]}>{m.content}</ReactMarkdown>
                 ) : (
@@ -344,7 +399,11 @@ function ChatPage() {
         <div className="max-w-md mx-auto px-4">
           {imageData && (
             <div className="mb-2 bg-card rounded-2xl outline-1 outline-black/10 p-2 flex items-center gap-2 shadow-lg">
-              <img src={imageData.preview} alt="preview" className="size-12 rounded-xl object-cover" />
+              <img
+                src={imageData.preview}
+                alt="preview"
+                className="size-12 rounded-xl object-cover"
+              />
               <span className="text-xs text-muted-foreground flex-1">Foto siap dikirim</span>
               <button
                 onClick={() => setImageData(null)}
@@ -379,7 +438,13 @@ function ChatPage() {
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && handleSend()}
-              placeholder={listening ? "Mendengarkan..." : imageData ? "Tambah pertanyaan (opsional)..." : "Tanya Dr. Healthy..."}
+              placeholder={
+                listening
+                  ? "Mendengarkan..."
+                  : imageData
+                    ? "Tambah pertanyaan (opsional)..."
+                    : "Tanya Dr. Healthy..."
+              }
               disabled={mutation.isPending}
               className="flex-1 bg-transparent px-3 py-2 text-sm focus:outline-none disabled:opacity-50"
             />
@@ -387,7 +452,9 @@ function ChatPage() {
               onClick={toggleMic}
               disabled={mutation.isPending}
               className={`size-10 grid place-items-center rounded-2xl transition disabled:opacity-40 ${
-                listening ? "bg-destructive text-destructive-foreground animate-pulse" : "text-muted-foreground hover:bg-secondary/50"
+                listening
+                  ? "bg-destructive text-destructive-foreground animate-pulse"
+                  : "text-muted-foreground hover:bg-secondary/50"
               }`}
               aria-label="Voice input"
             >

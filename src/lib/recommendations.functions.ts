@@ -26,14 +26,18 @@ export const getRecommendedContent = createServerFn({ method: "GET" })
     const [{ data: arts }, { data: recs }, { data: schedule }] = await Promise.all([
       supabase
         .from("articles")
-        .select("id, slug, title, excerpt, image_url, category, tags, target_conditions, target_goals, reading_time_minutes, is_featured, published_at")
+        .select(
+          "id, slug, title, excerpt, image_url, category, tags, target_conditions, target_goals, reading_time_minutes, is_featured, published_at",
+        )
         .eq("is_published", true)
         .is("deleted_at", null)
         .order("published_at", { ascending: false })
         .limit(60),
       supabase
         .from("recipes")
-        .select("id, slug, title, description, category, calories, tags, is_vegetarian, is_vegan, is_keto_friendly, is_halal, image_url, avg_rating, save_count")
+        .select(
+          "id, slug, title, description, category, calories, tags, is_vegetarian, is_vegan, is_keto_friendly, is_halal, image_url, avg_rating, save_count",
+        )
         .eq("is_published", true)
         .is("deleted_at", null)
         .order("save_count", { ascending: false })
@@ -54,12 +58,13 @@ export const getRecommendedContent = createServerFn({ method: "GET" })
       const targets = Array.isArray(a.target_conditions)
         ? (a.target_conditions as unknown[]).map(String).map((x) => x.toLowerCase())
         : [];
-      for (const c of conds) if (targets.includes(c) || tags.some((t) => t.toLowerCase().includes(c))) s += 15;
+      for (const c of conds)
+        if (targets.includes(c) || tags.some((t) => t.toLowerCase().includes(c))) s += 15;
       if (bmiCat === "overweight" || bmiCat === "obese") {
         if (a.category === "diet" || a.category === "fitness") s += 8;
       }
       if (bmiCat === "underweight" && a.category === "nutrition") s += 8;
-      if (diet && (tags.map((t) => t.toLowerCase()).includes(diet))) s += 5;
+      if (diet && tags.map((t) => t.toLowerCase()).includes(diet)) s += 5;
       return s;
     }
 

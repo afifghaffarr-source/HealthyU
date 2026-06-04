@@ -3,7 +3,13 @@ import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { generateArticleBody, generateRecipeBody } from "./contentGeneration.server";
 
-const SlugInput = z.object({ slug: z.string().min(1).max(255).regex(/^[a-z0-9-]+$/) });
+const SlugInput = z.object({
+  slug: z
+    .string()
+    .min(1)
+    .max(255)
+    .regex(/^[a-z0-9-]+$/),
+});
 
 export const getArticleBySlug = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
@@ -48,10 +54,7 @@ export const getRecipeBySlug = createServerFn({ method: "POST" })
 
     let ingredients = rec.ingredients ?? [];
     let instructions = rec.instructions ?? [];
-    if (
-      (ingredients.length === 0 || instructions.length === 0) &&
-      rec.body_source === "seed"
-    ) {
+    if ((ingredients.length === 0 || instructions.length === 0) && rec.body_source === "seed") {
       const body = await generateRecipeBody(data.slug);
       if (body) {
         ingredients = body.ingredients;

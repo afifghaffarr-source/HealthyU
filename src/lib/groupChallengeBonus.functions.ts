@@ -39,9 +39,7 @@ export const claimGroupChallengeBonus = createServerFn({ method: "POST" })
 
 export const listGroupBonusStatus = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((i: unknown) =>
-    z.object({ challenge_id: z.string().uuid() }).parse(i),
-  )
+  .inputValidator((i: unknown) => z.object({ challenge_id: z.string().uuid() }).parse(i))
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
     const { data: claimed } = await supabase
@@ -67,10 +65,7 @@ export const listGroupBonusClaimers = createServerFn({ method: "GET" })
       .order("created_at", { ascending: true });
     const ids = (rows ?? []).map((r) => r.user_id);
     if (ids.length === 0) return [];
-    const { data: profs } = await supabase
-      .from("profiles")
-      .select("id, full_name")
-      .in("id", ids);
+    const { data: profs } = await supabase.from("profiles").select("id, full_name").in("id", ids);
     const nameMap = new Map((profs ?? []).map((p) => [p.id, p.full_name ?? "Anggota"]));
     return (rows ?? []).map((r) => ({
       user_id: r.user_id,

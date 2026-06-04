@@ -108,7 +108,7 @@ function ReportsPage() {
         .select("last_seen_report_id")
         .eq("id", uid)
         .maybeSingle();
-      return ((prof as { last_seen_report_id?: string | null } | null)?.last_seen_report_id) ?? null;
+      return (prof as { last_seen_report_id?: string | null } | null)?.last_seen_report_id ?? null;
     },
   });
   const latestId = history[0]?.id ?? null;
@@ -131,21 +131,17 @@ function ReportsPage() {
   useEffect(() => {
     const ch = supabase
       .channel("ai-reports-archive")
-      .on(
-        "postgres_changes",
-        { event: "INSERT", schema: "public", table: "ai_reports" },
-        () => {
-          // Local-only: clear last-seen so the new row gets the "Baru" badge
-          // immediately without waiting for the user to open it.
-          qc.setQueryData(["profile-last-seen-report"], null);
-          qc.invalidateQueries({ queryKey: ["ai-reports"] });
-          // Suppress when the INSERT was caused by the user's own manual
-          // generation (toast would duplicate aiMut's result).
-          if (Date.now() - manualGenAtRef.current > 10000) {
-            toast.success("📄 Laporan minggu baru tersedia");
-          }
-        },
-      )
+      .on("postgres_changes", { event: "INSERT", schema: "public", table: "ai_reports" }, () => {
+        // Local-only: clear last-seen so the new row gets the "Baru" badge
+        // immediately without waiting for the user to open it.
+        qc.setQueryData(["profile-last-seen-report"], null);
+        qc.invalidateQueries({ queryKey: ["ai-reports"] });
+        // Suppress when the INSERT was caused by the user's own manual
+        // generation (toast would duplicate aiMut's result).
+        if (Date.now() - manualGenAtRef.current > 10000) {
+          toast.success("📄 Laporan minggu baru tersedia");
+        }
+      })
       .subscribe();
     return () => {
       void supabase.removeChannel(ch);
@@ -163,10 +159,17 @@ function ReportsPage() {
       const latest = qc.getQueryData<Array<{ id: string }>>(["ai-reports"])?.[0]?.id ?? null;
       if (latest) {
         setManualFlashId(latest);
-        const row = qc.getQueryData<Array<{ id: string; report_period_start?: string | null; report_period_end?: string | null }>>(["ai-reports"])?.[0];
-        const periode = row?.report_period_start && row?.report_period_end
-          ? `${row.report_period_start} → ${row.report_period_end}`
-          : "terbaru";
+        const row = qc.getQueryData<
+          Array<{
+            id: string;
+            report_period_start?: string | null;
+            report_period_end?: string | null;
+          }>
+        >(["ai-reports"])?.[0];
+        const periode =
+          row?.report_period_start && row?.report_period_end
+            ? `${row.report_period_start} → ${row.report_period_end}`
+            : "terbaru";
         announce(`Laporan ${periode} baru di-generate`);
         window.setTimeout(() => setManualFlashId((cur) => (cur === latest ? null : cur)), 3000);
       }
@@ -356,7 +359,12 @@ function ReportsPage() {
       const linkW = doc.getTextWidth(linkLabel);
       doc.setDrawColor(PDF_LINK_RGB[0], PDF_LINK_RGB[1], PDF_LINK_RGB[2]);
       doc.setLineWidth(PDF_DIVIDER_LINE_WIDTH);
-      doc.line(PDF_LINK_RIGHT_X - linkW, PDF_LINK_BASELINE_Y + PDF_LINK_UNDERLINE_OFFSET, PDF_LINK_RIGHT_X, PDF_LINK_BASELINE_Y + PDF_LINK_UNDERLINE_OFFSET);
+      doc.line(
+        PDF_LINK_RIGHT_X - linkW,
+        PDF_LINK_BASELINE_Y + PDF_LINK_UNDERLINE_OFFSET,
+        PDF_LINK_RIGHT_X,
+        PDF_LINK_BASELINE_Y + PDF_LINK_UNDERLINE_OFFSET,
+      );
       doc.link(
         PDF_LINK_RIGHT_X - linkW - PDF_LINK_BOUND_OFFSET,
         PDF_LINK_BASELINE_Y - PDF_LINK_BOUND_Y_OFFSET,
@@ -417,11 +425,7 @@ function ReportsPage() {
         pageRightX,
         PDF_PAGE_FOOTER_Y - PDF_FOOTER_DIVIDER_OFFSET,
       );
-      doc.text(
-        `${t("pdf.footer.brandLabel")} ${exportedAt}`,
-        PDF_MARGIN_X,
-        PDF_PAGE_FOOTER_Y,
-      );
+      doc.text(`${t("pdf.footer.brandLabel")} ${exportedAt}`, PDF_MARGIN_X, PDF_PAGE_FOOTER_Y);
       doc.text(`${t("pdf.footer.pageLabel")} ${p} / ${totalPages}`, pageRightX, PDF_PAGE_FOOTER_Y, {
         align: "right",
       });
@@ -458,18 +462,24 @@ function ReportsPage() {
         ["Latihan", `${summary.workoutCount} sesi`],
         ["Puasa selesai", `${summary.fastingDone} sesi`],
       ],
-      styles: { font: "helvetica", fontSize: PDF_TABLE_FONT_SIZE, cellPadding: PDF_TABLE_CELL_PADDING },
+      styles: {
+        font: "helvetica",
+        fontSize: PDF_TABLE_FONT_SIZE,
+        cellPadding: PDF_TABLE_CELL_PADDING,
+      },
       headStyles: { fillColor: PDF_HEADER_FILL_RGB },
     });
 
     autoTable(doc, {
-      head: [[
-        t("pdf.headers.date"),
-        t("pdf.headers.calIn"),
-        t("pdf.headers.water"),
-        t("pdf.headers.burn"),
-        t("pdf.headers.sleep"),
-      ]],
+      head: [
+        [
+          t("pdf.headers.date"),
+          t("pdf.headers.calIn"),
+          t("pdf.headers.water"),
+          t("pdf.headers.burn"),
+          t("pdf.headers.sleep"),
+        ],
+      ],
       body: summary.byDay.map((d) => [
         new Date(d.day).toLocaleDateString("id-ID", {
           weekday: "short",
@@ -481,7 +491,11 @@ function ReportsPage() {
         d.burn.toString(),
         d.hours.toFixed(1),
       ]),
-      styles: { font: "helvetica", fontSize: PDF_TABLE_FONT_SIZE_SM, cellPadding: PDF_TABLE_CELL_PADDING },
+      styles: {
+        font: "helvetica",
+        fontSize: PDF_TABLE_FONT_SIZE_SM,
+        cellPadding: PDF_TABLE_CELL_PADDING,
+      },
       headStyles: { fillColor: PDF_HEADER_FILL_RGB },
     });
 
@@ -500,7 +514,11 @@ function ReportsPage() {
     doc.save(`laporan-healthyu-${new Date().toISOString().slice(0, 10)}.pdf`);
   };
 
-  const shareWhatsapp = (overrideReport?: { text: string; periodStart?: string; periodEnd?: string }) => {
+  const shareWhatsapp = (overrideReport?: {
+    text: string;
+    periodStart?: string;
+    periodEnd?: string;
+  }) => {
     if (!summary && !overrideReport) return;
     const header = overrideReport
       ? `📊 *Laporan HealthyU* ${overrideReport.periodStart ?? ""} → ${overrideReport.periodEnd ?? ""}`.trim()
@@ -515,7 +533,11 @@ function ReportsPage() {
       ]
         .filter(Boolean)
         .join("\n");
-      window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, "_blank", "noopener,noreferrer");
+      window.open(
+        `https://wa.me/?text=${encodeURIComponent(text)}`,
+        "_blank",
+        "noopener,noreferrer",
+      );
       return;
     }
     const lines = [
@@ -562,14 +584,14 @@ function ReportsPage() {
     doc.setFont("helvetica", "bold");
     doc.setFontSize(PDF_SUBTITLE_FONT_SIZE);
     doc.text("Analisis AI", PDF_MARGIN_X, PDF_BODY_TOP_Y);
-      doc.setDrawColor(PDF_DIVIDER_GRAY_STRONG);
-      doc.setLineWidth(PDF_DIVIDER_LINE_WIDTH);
-      doc.line(
-        PDF_MARGIN_X,
-        PDF_BODY_TOP_Y + PDF_SECTION_DIVIDER_OFFSET,
-        PDF_PAGE_W - PDF_MARGIN_X,
-        PDF_BODY_TOP_Y + PDF_SECTION_DIVIDER_OFFSET,
-      );
+    doc.setDrawColor(PDF_DIVIDER_GRAY_STRONG);
+    doc.setLineWidth(PDF_DIVIDER_LINE_WIDTH);
+    doc.line(
+      PDF_MARGIN_X,
+      PDF_BODY_TOP_Y + PDF_SECTION_DIVIDER_OFFSET,
+      PDF_PAGE_W - PDF_MARGIN_X,
+      PDF_BODY_TOP_Y + PDF_SECTION_DIVIDER_OFFSET,
+    );
     doc.setFont("helvetica", "normal");
     doc.setFontSize(PDF_BODY_FONT_SIZE);
     const lines = doc.splitTextToSize(text || "(kosong)", PDF_PAGE_CONTENT_W);
@@ -582,7 +604,12 @@ function ReportsPage() {
   return (
     <main className="min-h-screen bg-background pb-28">
       <div className="max-w-md mx-auto px-5 pt-2 space-y-5">
-        <TopAppBar title="Laporan 7 Hari" subtitle="Ringkasan kesehatan mingguan" showBack className="print:hidden" />
+        <TopAppBar
+          title="Laporan 7 Hari"
+          subtitle="Ringkasan kesehatan mingguan"
+          showBack
+          className="print:hidden"
+        />
 
         <section className="grid grid-cols-2 gap-3 animate-fade-up">
           <Stat
@@ -685,15 +712,15 @@ function ReportsPage() {
                   <FileText className="size-3" /> Export semua
                 </button>
                 <select
-                value={rangeWeeks}
-                onChange={(e) => setRangeWeeks(Number(e.target.value))}
-                className="text-[11px] bg-card outline-1 outline-black/10 rounded-lg px-2 py-1"
-              >
-                <option value={0}>Semua</option>
-                <option value={4}>4 minggu</option>
-                <option value={12}>12 minggu</option>
-                <option value={26}>26 minggu</option>
-              </select>
+                  value={rangeWeeks}
+                  onChange={(e) => setRangeWeeks(Number(e.target.value))}
+                  className="text-[11px] bg-card outline-1 outline-black/10 rounded-lg px-2 py-1"
+                >
+                  <option value={0}>Semua</option>
+                  <option value={4}>4 minggu</option>
+                  <option value={12}>12 minggu</option>
+                  <option value={26}>26 minggu</option>
+                </select>
               </div>
             </div>
             {history
@@ -703,64 +730,66 @@ function ReportsPage() {
                 return new Date(r.created_at).getTime() >= cutoff;
               })
               .map((r, idx) => {
-              const text = Array.isArray(r.recommendations) ? String(r.recommendations[0] ?? "") : "";
-              const isNew = idx === 0 && latestId === r.id && lastSeenId !== r.id;
-              const isManualFlash = manualFlashId === r.id;
-              return (
-                <details
-                  key={r.id}
-                  open={(focus === "latest" && idx === 0) || isNew}
-                  className={
-                    isManualFlash
-                      ? "bg-card rounded-2xl outline-2 outline-amber-400 p-4 ring-4 ring-amber-200 shadow-md animate-fade-up"
-                      : isNew
-                      ? "bg-card rounded-2xl outline-2 outline-primary p-4 ring-2 ring-primary/20 shadow-md animate-fade-up"
-                      : "bg-card rounded-2xl outline-1 outline-black/5 p-4"
-                  }
-                >
-                  <summary className="cursor-pointer text-sm font-semibold flex items-center justify-between">
-                    <span className="inline-flex items-center gap-2">
-                      {isNew && (
-                        <span className="text-[9px] font-bold uppercase tracking-wider bg-primary text-primary-foreground rounded-full px-2 py-0.5">
-                          Baru
-                        </span>
-                      )}
-                      {r.report_period_start} → {r.report_period_end}
-                    </span>
-                    <span className="text-xs text-muted-foreground">
-                      {new Date(r.created_at).toLocaleDateString("id-ID")}
-                    </span>
-                  </summary>
-                  <p className="mt-3 text-sm whitespace-pre-wrap leading-relaxed">{text}</p>
-                  {isManualFlash && text && (
-                    <div className="mt-3 flex items-center gap-2">
-                      <button
-                        onClick={(e) => {
-                          e.preventDefault();
-                          shareWhatsapp({
-                            text,
-                            periodStart: r.report_period_start ?? undefined,
-                            periodEnd: r.report_period_end ?? undefined,
-                          });
-                        }}
-                        className="inline-flex items-center gap-1.5 bg-[#25D366] text-white text-xs font-semibold px-3 py-1.5 rounded-full"
-                      >
-                        <Share2 className="size-3" /> Share
-                      </button>
-                      <button
-                        onClick={(e) => {
-                          e.preventDefault();
-                          exportArchivePdf(r);
-                        }}
-                        className="inline-flex items-center gap-1.5 bg-card outline-1 outline-black/10 text-xs font-semibold px-3 py-1.5 rounded-full"
-                      >
-                        <FileText className="size-3" /> PDF
-                      </button>
-                    </div>
-                  )}
-                </details>
-              );
-            })}
+                const text = Array.isArray(r.recommendations)
+                  ? String(r.recommendations[0] ?? "")
+                  : "";
+                const isNew = idx === 0 && latestId === r.id && lastSeenId !== r.id;
+                const isManualFlash = manualFlashId === r.id;
+                return (
+                  <details
+                    key={r.id}
+                    open={(focus === "latest" && idx === 0) || isNew}
+                    className={
+                      isManualFlash
+                        ? "bg-card rounded-2xl outline-2 outline-amber-400 p-4 ring-4 ring-amber-200 shadow-md animate-fade-up"
+                        : isNew
+                          ? "bg-card rounded-2xl outline-2 outline-primary p-4 ring-2 ring-primary/20 shadow-md animate-fade-up"
+                          : "bg-card rounded-2xl outline-1 outline-black/5 p-4"
+                    }
+                  >
+                    <summary className="cursor-pointer text-sm font-semibold flex items-center justify-between">
+                      <span className="inline-flex items-center gap-2">
+                        {isNew && (
+                          <span className="text-[9px] font-bold uppercase tracking-wider bg-primary text-primary-foreground rounded-full px-2 py-0.5">
+                            Baru
+                          </span>
+                        )}
+                        {r.report_period_start} → {r.report_period_end}
+                      </span>
+                      <span className="text-xs text-muted-foreground">
+                        {new Date(r.created_at).toLocaleDateString("id-ID")}
+                      </span>
+                    </summary>
+                    <p className="mt-3 text-sm whitespace-pre-wrap leading-relaxed">{text}</p>
+                    {isManualFlash && text && (
+                      <div className="mt-3 flex items-center gap-2">
+                        <button
+                          onClick={(e) => {
+                            e.preventDefault();
+                            shareWhatsapp({
+                              text,
+                              periodStart: r.report_period_start ?? undefined,
+                              periodEnd: r.report_period_end ?? undefined,
+                            });
+                          }}
+                          className="inline-flex items-center gap-1.5 bg-[#25D366] text-white text-xs font-semibold px-3 py-1.5 rounded-full"
+                        >
+                          <Share2 className="size-3" /> Share
+                        </button>
+                        <button
+                          onClick={(e) => {
+                            e.preventDefault();
+                            exportArchivePdf(r);
+                          }}
+                          className="inline-flex items-center gap-1.5 bg-card outline-1 outline-black/10 text-xs font-semibold px-3 py-1.5 rounded-full"
+                        >
+                          <FileText className="size-3" /> PDF
+                        </button>
+                      </div>
+                    )}
+                  </details>
+                );
+              })}
           </section>
         )}
       </div>

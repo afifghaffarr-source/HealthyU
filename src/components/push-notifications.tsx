@@ -23,7 +23,11 @@ export function PushNotifications() {
     let cancelled = false;
     (async () => {
       if (typeof window === "undefined") return;
-      if (!("serviceWorker" in navigator) || !("PushManager" in window) || !("Notification" in window)) {
+      if (
+        !("serviceWorker" in navigator) ||
+        !("PushManager" in window) ||
+        !("Notification" in window)
+      ) {
         if (!cancelled) setStatus("unsupported");
         return;
       }
@@ -137,7 +141,11 @@ export function PushNotifications() {
           disabled={enableMut.isPending || status === "denied"}
           className="w-full bg-primary text-primary-foreground font-semibold py-3 rounded-2xl flex items-center justify-center gap-2 disabled:opacity-50"
         >
-          {enableMut.isPending ? <Loader2 className="size-4 animate-spin" /> : <Bell className="size-4" />}
+          {enableMut.isPending ? (
+            <Loader2 className="size-4 animate-spin" />
+          ) : (
+            <Bell className="size-4" />
+          )}
           Aktifkan notifikasi
         </button>
       ) : (
@@ -147,7 +155,11 @@ export function PushNotifications() {
             disabled={testMut.isPending}
             className="bg-card outline-1 outline-black/10 font-semibold py-3 rounded-2xl text-sm flex items-center justify-center gap-2 disabled:opacity-50"
           >
-            {testMut.isPending ? <Loader2 className="size-4 animate-spin" /> : <Send className="size-4" />}
+            {testMut.isPending ? (
+              <Loader2 className="size-4 animate-spin" />
+            ) : (
+              <Send className="size-4" />
+            )}
             Test
           </button>
           <button

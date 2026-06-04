@@ -9,7 +9,10 @@ export const Route = createFileRoute("/_authenticated/heatmap")({ component: Pag
 
 function Page() {
   const fn = useServerFn(getMealHeatmap);
-  const { data } = useQuery({ queryKey: ["meal-heatmap"], queryFn: () => fn({ data: undefined as any }) });
+  const { data } = useQuery({
+    queryKey: ["meal-heatmap"],
+    queryFn: () => fn({ data: undefined as any }),
+  });
   const counts = data?.counts ?? {};
   const days: Array<{ date: string; n: number }> = [];
   for (let i = 364; i >= 0; i--) {
@@ -27,7 +30,12 @@ function Page() {
               key={d.date}
               title={`${d.date}: ${d.n} meal`}
               className="aspect-square rounded-sm"
-              style={{ backgroundColor: d.n === 0 ? "hsl(var(--muted))" : `oklch(0.7 0.15 145 / ${0.2 + (d.n / max) * 0.8})` }}
+              style={{
+                backgroundColor:
+                  d.n === 0
+                    ? "hsl(var(--muted))"
+                    : `oklch(0.7 0.15 145 / ${0.2 + (d.n / max) * 0.8})`,
+              }}
             />
           ))}
         </div>

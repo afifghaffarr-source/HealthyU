@@ -38,35 +38,52 @@ export function NutritionPieChart({
     <div className={cn("flex items-center gap-4", className)}>
       <div className="relative shrink-0" style={{ width: size, height: size }}>
         <svg viewBox={`0 0 ${size} ${size}`} className="-rotate-90 block">
-          <circle cx={size / 2} cy={size / 2} r={r} fill="none" strokeWidth={thickness} className="stroke-muted" />
-          {total > 0 && data.map((d, i) => {
-            const frac = Math.max(0, d.value) / total;
-            const len = frac * c;
-            const dash = `${len} ${c - len}`;
-            const dashOffset = -offset;
-            offset += len;
-            return (
-              <circle
-                key={`${id}-${i}`}
-                cx={size / 2}
-                cy={size / 2}
-                r={r}
-                fill="none"
-                strokeWidth={thickness}
-                stroke={d.color}
-                strokeDasharray={dash}
-                strokeDashoffset={dashOffset}
-                strokeLinecap="butt"
-              />
-            );
-          })}
+          <circle
+            cx={size / 2}
+            cy={size / 2}
+            r={r}
+            fill="none"
+            strokeWidth={thickness}
+            className="stroke-muted"
+          />
+          {total > 0 &&
+            data.map((d, i) => {
+              const frac = Math.max(0, d.value) / total;
+              const len = frac * c;
+              const dash = `${len} ${c - len}`;
+              const dashOffset = -offset;
+              offset += len;
+              return (
+                <circle
+                  key={`${id}-${i}`}
+                  cx={size / 2}
+                  cy={size / 2}
+                  r={r}
+                  fill="none"
+                  strokeWidth={thickness}
+                  stroke={d.color}
+                  strokeDasharray={dash}
+                  strokeDashoffset={dashOffset}
+                  strokeLinecap="butt"
+                />
+              );
+            })}
         </svg>
         <div className="absolute inset-0 grid place-items-center text-center">
           <div>
             {centerValue != null && (
-              <div className="text-xl font-bold tabular-nums" style={{ fontFamily: "var(--font-display)" }}>{centerValue}</div>
+              <div
+                className="text-xl font-bold tabular-nums"
+                style={{ fontFamily: "var(--font-display)" }}
+              >
+                {centerValue}
+              </div>
             )}
-            {centerLabel && <div className="text-[10px] uppercase tracking-wider text-muted-foreground">{centerLabel}</div>}
+            {centerLabel && (
+              <div className="text-[10px] uppercase tracking-wider text-muted-foreground">
+                {centerLabel}
+              </div>
+            )}
           </div>
         </div>
       </div>

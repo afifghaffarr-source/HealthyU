@@ -16,7 +16,11 @@ export function useOnboardingFlag(key: string) {
   }, [storageKey]);
 
   const dismiss = () => {
-    try { localStorage.setItem(storageKey, "1"); } catch { /* noop */ }
+    try {
+      localStorage.setItem(storageKey, "1");
+    } catch {
+      /* noop */
+    }
     setSeen(true);
   };
 

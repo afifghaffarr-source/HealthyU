@@ -26,7 +26,10 @@ function Page() {
             {data.days.map((d) => (
               <div key={d.date} className="flex-1 flex flex-col items-center gap-1">
                 <div className="text-[10px] tabular-nums">{Math.round(d.cal)}</div>
-                <div className="w-full bg-primary rounded-t" style={{ height: `${(d.cal / max) * 100}%` }} />
+                <div
+                  className="w-full bg-primary rounded-t"
+                  style={{ height: `${(d.cal / max) * 100}%` }}
+                />
                 <div className="text-[10px] text-muted-foreground">{d.date.slice(5)}</div>
               </div>
             ))}
@@ -35,9 +38,14 @@ function Page() {
         <div className="rounded-2xl bg-card border p-4 space-y-2">
           <div className="text-sm font-medium">Makronutrien</div>
           {data.days.map((d) => (
-            <div key={d.date} className="text-xs flex justify-between border-b py-1.5 last:border-0">
+            <div
+              key={d.date}
+              className="text-xs flex justify-between border-b py-1.5 last:border-0"
+            >
               <span className="text-muted-foreground">{d.date}</span>
-              <span>P {Math.round(d.p)}g · K {Math.round(d.c)}g · L {Math.round(d.f)}g</span>
+              <span>
+                P {Math.round(d.p)}g · K {Math.round(d.c)}g · L {Math.round(d.f)}g
+              </span>
             </div>
           ))}
         </div>

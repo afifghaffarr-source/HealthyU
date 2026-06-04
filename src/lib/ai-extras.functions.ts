@@ -17,7 +17,8 @@ async function callGemini(messages: Array<{ role: string; content: string }>) {
   if (!res.ok) {
     const t = await res.text();
     if (res.status === 429) throw new Error("Terlalu banyak permintaan AI. Coba lagi nanti.");
-    if (res.status === 402) throw new Error("Kredit AI habis. Tambah kredit di Lovable AI workspace.");
+    if (res.status === 402)
+      throw new Error("Kredit AI habis. Tambah kredit di Lovable AI workspace.");
     throw new Error(`AI error ${res.status}: ${t.slice(0, 200)}`);
   }
   const json = (await res.json()) as { choices?: Array<{ message?: { content?: string } }> };
@@ -147,7 +148,9 @@ Balas JSON:
       return Number.isFinite(n) ? n : d;
     };
     const mt = String(parsed.meal_type ?? "snack");
-    const meal_type = (["breakfast", "lunch", "dinner", "snack"].includes(mt) ? mt : "snack") as ParsedMeal["meal_type"];
+    const meal_type = (
+      ["breakfast", "lunch", "dinner", "snack"].includes(mt) ? mt : "snack"
+    ) as ParsedMeal["meal_type"];
     return {
       custom_name: String(parsed.custom_name ?? data.transcript.slice(0, 60)),
       meal_type,

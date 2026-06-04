@@ -72,7 +72,10 @@ function VoicePage() {
   });
 
   useEffect(() => {
-    const W = window as unknown as { SpeechRecognition?: new () => SR; webkitSpeechRecognition?: new () => SR };
+    const W = window as unknown as {
+      SpeechRecognition?: new () => SR;
+      webkitSpeechRecognition?: new () => SR;
+    };
     const Ctor = W.SpeechRecognition || W.webkitSpeechRecognition;
     if (!Ctor) {
       setSupported(false);
@@ -127,7 +130,9 @@ function VoicePage() {
             onClick={toggleMic}
             disabled={!supported}
             className={`size-20 mx-auto rounded-full grid place-items-center transition ${
-              listening ? "bg-destructive text-destructive-foreground animate-pulse" : "bg-primary text-primary-foreground"
+              listening
+                ? "bg-destructive text-destructive-foreground animate-pulse"
+                : "bg-primary text-primary-foreground"
             }`}
           >
             {listening ? <MicOff className="size-8" /> : <Mic className="size-8" />}
@@ -164,8 +169,8 @@ function VoicePage() {
                 <div className="flex-1 min-w-0">
                   <p className="font-semibold text-sm truncate">{it.name}</p>
                   <p className="text-xs text-muted-foreground">
-                    {it.portion_g ? `~${it.portion_g}g · ` : ""}
-                    P {Math.round(it.protein_g ?? 0)}g · K {Math.round(it.carbs_g ?? 0)}g · L {Math.round(it.fat_g ?? 0)}g
+                    {it.portion_g ? `~${it.portion_g}g · ` : ""}P {Math.round(it.protein_g ?? 0)}g ·
+                    K {Math.round(it.carbs_g ?? 0)}g · L {Math.round(it.fat_g ?? 0)}g
                   </p>
                 </div>
                 <div className="text-right">

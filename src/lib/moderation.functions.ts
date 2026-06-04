@@ -6,7 +6,15 @@ import { parseInput, uuidSchema } from "@/lib/validation";
 const ReportSchema = z.object({
   contentType: z.enum(["post", "comment", "message", "user", "recipe", "photo"]),
   contentId: z.string().min(1).max(255),
-  reason: z.enum(["spam", "harassment", "self_harm", "nudity", "misinformation", "medical_advice", "other"]),
+  reason: z.enum([
+    "spam",
+    "harassment",
+    "self_harm",
+    "nudity",
+    "misinformation",
+    "medical_advice",
+    "other",
+  ]),
   details: z.string().max(1000).optional(),
 });
 
@@ -77,7 +85,10 @@ export const listPendingReports = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     const { supabase, userId } = context;
-    const { data: isMod } = await supabase.rpc("has_role", { _user_id: userId, _role: "moderator" });
+    const { data: isMod } = await supabase.rpc("has_role", {
+      _user_id: userId,
+      _role: "moderator",
+    });
     const { data: isAdmin } = await supabase.rpc("has_role", { _user_id: userId, _role: "admin" });
     if (!isMod && !isAdmin) throw new Error("Forbidden");
     const { data, error } = await supabase
@@ -102,7 +113,10 @@ export const resolveReport = createServerFn({ method: "POST" })
   .inputValidator((i: unknown) => parseInput(ResolveSchema, i))
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
-    const { data: isMod } = await supabase.rpc("has_role", { _user_id: userId, _role: "moderator" });
+    const { data: isMod } = await supabase.rpc("has_role", {
+      _user_id: userId,
+      _role: "moderator",
+    });
     const { data: isAdmin } = await supabase.rpc("has_role", { _user_id: userId, _role: "admin" });
     if (!isMod && !isAdmin) throw new Error("Forbidden");
 

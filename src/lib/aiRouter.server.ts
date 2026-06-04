@@ -47,10 +47,7 @@ function tryLocalAnswer(text: string): string | null {
   return null;
 }
 
-export function classifyMessage(
-  text: string,
-  hasImage: boolean,
-): RouteDecision {
+export function classifyMessage(text: string, hasImage: boolean): RouteDecision {
   if (hasImage) {
     return { tier: 3, model: "google/gemini-2.5-pro", reason: "image", maxTokens: 800 };
   }
@@ -99,9 +96,7 @@ export async function buildCompactProfile(
     : null;
   const g = (p.gender ?? "?").toString()[0]?.toUpperCase() ?? "?";
   const bmi =
-    p.weight_kg && p.height_cm
-      ? (p.weight_kg / (p.height_cm / 100) ** 2).toFixed(1)
-      : "-";
+    p.weight_kg && p.height_cm ? (p.weight_kg / (p.height_cm / 100) ** 2).toFixed(1) : "-";
   const act = (p.activity_level ?? "mod").toString().slice(0, 3);
   const diet = (p.dietary_preference ?? "-").toString().slice(0, 8);
   const cond = (p.health_conditions ?? []).join(",").slice(0, 60) || "-";

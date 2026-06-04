@@ -48,7 +48,10 @@ function RewardsPage() {
             const canAfford = coins >= r.coin_cost;
             const outOfStock = r.remaining_stock !== null && r.remaining_stock <= 0;
             return (
-              <div key={r.id} className="bg-card p-4 rounded-3xl outline-1 outline-black/5 flex gap-3">
+              <div
+                key={r.id}
+                className="bg-card p-4 rounded-3xl outline-1 outline-black/5 flex gap-3"
+              >
                 <div className="size-16 bg-secondary/40 rounded-2xl grid place-items-center overflow-hidden flex-shrink-0">
                   {r.image_url ? (
                     <img src={r.image_url} alt={r.name} className="size-full object-cover" />
@@ -82,9 +85,14 @@ function RewardsPage() {
 
         {(data?.redemptions.length ?? 0) > 0 && (
           <section className="space-y-2 animate-fade-up">
-            <h2 className="text-xs font-bold uppercase tracking-wider text-muted-foreground px-1">Riwayat Penukaran</h2>
+            <h2 className="text-xs font-bold uppercase tracking-wider text-muted-foreground px-1">
+              Riwayat Penukaran
+            </h2>
             {data!.redemptions.map((r) => (
-              <div key={r.id} className="bg-card p-3 rounded-2xl outline-1 outline-black/5 flex items-center justify-between text-sm">
+              <div
+                key={r.id}
+                className="bg-card p-3 rounded-2xl outline-1 outline-black/5 flex items-center justify-between text-sm"
+              >
                 <span className="text-muted-foreground">
                   {new Date(r.redeemed_at).toLocaleDateString("id-ID")}
                 </span>

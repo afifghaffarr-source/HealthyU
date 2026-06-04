@@ -8,11 +8,36 @@ export const Route = createFileRoute("/_authenticated/onboarding/steps")({
 });
 
 const steps = [
-  { emoji: "👋", title: "Selamat datang", body: "Mari mulai perjalanan sehatmu bersama HealthyU.", grad: "from-primary/25 to-accent/15" },
-  { emoji: "🎯", title: "Tetapkan target", body: "Berat, kalori, dan kebiasaan harian dapat disesuaikan kapan saja.", grad: "from-accent/25 to-primary/15" },
-  { emoji: "🍱", title: "Lacak makanan", body: "Scan barcode, foto, atau cari di database lokal.", grad: "from-secondary/30 to-primary/15" },
-  { emoji: "💪", title: "Aktif & istirahat", body: "Latihan, puasa, tidur, dan air dipantau otomatis.", grad: "from-primary/20 to-secondary/25" },
-  { emoji: "🚀", title: "Siap memulai!", body: "Buka dashboard untuk lihat ringkasan harian.", grad: "from-accent/25 to-secondary/25" },
+  {
+    emoji: "👋",
+    title: "Selamat datang",
+    body: "Mari mulai perjalanan sehatmu bersama HealthyU.",
+    grad: "from-primary/25 to-accent/15",
+  },
+  {
+    emoji: "🎯",
+    title: "Tetapkan target",
+    body: "Berat, kalori, dan kebiasaan harian dapat disesuaikan kapan saja.",
+    grad: "from-accent/25 to-primary/15",
+  },
+  {
+    emoji: "🍱",
+    title: "Lacak makanan",
+    body: "Scan barcode, foto, atau cari di database lokal.",
+    grad: "from-secondary/30 to-primary/15",
+  },
+  {
+    emoji: "💪",
+    title: "Aktif & istirahat",
+    body: "Latihan, puasa, tidur, dan air dipantau otomatis.",
+    grad: "from-primary/20 to-secondary/25",
+  },
+  {
+    emoji: "🚀",
+    title: "Siap memulai!",
+    body: "Buka dashboard untuk lihat ringkasan harian.",
+    grad: "from-accent/25 to-secondary/25",
+  },
 ];
 
 function OnboardingStepsPage() {
@@ -48,19 +73,30 @@ function OnboardingStepsPage() {
           <ChevronLeft className="size-4" />
         </button>
         {i < steps.length - 1 && (
-          <button onClick={finish} className="text-xs font-semibold text-muted-foreground px-3 py-1.5 rounded-full hover:bg-card/50">
+          <button
+            onClick={finish}
+            className="text-xs font-semibold text-muted-foreground px-3 py-1.5 rounded-full hover:bg-card/50"
+          >
             Lewati
           </button>
         )}
       </div>
-      <div key={i} className="flex-1 flex flex-col items-center justify-center text-center gap-4 animate-fade-up">
+      <div
+        key={i}
+        className="flex-1 flex flex-col items-center justify-center text-center gap-4 animate-fade-up"
+      >
         <div className="text-8xl drop-shadow-sm">{s.emoji}</div>
-        <h1 className="text-3xl font-bold" style={{ fontFamily: "var(--font-display)" }}>{s.title}</h1>
+        <h1 className="text-3xl font-bold" style={{ fontFamily: "var(--font-display)" }}>
+          {s.title}
+        </h1>
         <p className="text-muted-foreground max-w-sm">{s.body}</p>
       </div>
       <div className="flex justify-center gap-1.5 mb-6">
         {steps.map((_, idx) => (
-          <span key={idx} className={`h-1.5 rounded-full transition-all ${idx === i ? "w-8 bg-primary" : "w-2 bg-muted-foreground/30"}`} />
+          <span
+            key={idx}
+            className={`h-1.5 rounded-full transition-all ${idx === i ? "w-8 bg-primary" : "w-2 bg-muted-foreground/30"}`}
+          />
         ))}
       </div>
       <button

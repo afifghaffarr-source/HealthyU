@@ -13,12 +13,18 @@ function Page() {
   const qc = useQueryClient();
   const listFn = useServerFn(listSmartAlarms);
   const upsertFn = useServerFn(upsertSmartAlarm);
-  const { data } = useQuery({ queryKey: ["alarms"], queryFn: () => listFn({ data: undefined as never }) });
+  const { data } = useQuery({
+    queryKey: ["alarms"],
+    queryFn: () => listFn({ data: undefined as never }),
+  });
   const [time, setTime] = useState("06:30");
   const [win, setWin] = useState(30);
   const mut = useMutation({
     mutationFn: () => upsertFn({ data: { wakeTime: time, windowMin: win, enabled: true } }),
-    onSuccess: () => { toast.success("Alarm tersimpan"); qc.invalidateQueries({ queryKey: ["alarms"] }); },
+    onSuccess: () => {
+      toast.success("Alarm tersimpan");
+      qc.invalidateQueries({ queryKey: ["alarms"] });
+    },
     onError: (e: Error) => toast.error(e.message),
   });
   return (
@@ -27,10 +33,28 @@ function Page() {
       <main className="max-w-md mx-auto px-4 pt-4 space-y-4">
         <div className="rounded-2xl bg-card border p-4 space-y-2">
           <label className="text-sm">Waktu bangun</label>
-          <input type="time" value={time} onChange={(e) => setTime(e.target.value)} className="w-full px-3 py-2 rounded-lg border bg-background" />
+          <input
+            type="time"
+            value={time}
+            onChange={(e) => setTime(e.target.value)}
+            className="w-full px-3 py-2 rounded-lg border bg-background"
+          />
           <label className="text-sm">Window (menit) — bangun di fase tidur ringan</label>
-          <input type="number" min={5} max={60} value={win} onChange={(e) => setWin(Number(e.target.value))} className="w-full px-3 py-2 rounded-lg border bg-background" />
-          <button onClick={() => mut.mutate()} disabled={mut.isPending} className="w-full rounded-lg bg-primary text-primary-foreground py-2 text-sm">Simpan</button>
+          <input
+            type="number"
+            min={5}
+            max={60}
+            value={win}
+            onChange={(e) => setWin(Number(e.target.value))}
+            className="w-full px-3 py-2 rounded-lg border bg-background"
+          />
+          <button
+            onClick={() => mut.mutate()}
+            disabled={mut.isPending}
+            className="w-full rounded-lg bg-primary text-primary-foreground py-2 text-sm"
+          >
+            Simpan
+          </button>
         </div>
         <div className="space-y-2">
           {(data?.alarms ?? []).map((a: any) => (

@@ -12,7 +12,10 @@ export const Route = createFileRoute("/_authenticated/leaderboard")({
 
 function LeaderboardPage() {
   const fetchLb = useServerFn(listLeaderboard);
-  const { data: rows = [], isLoading } = useQuery({ queryKey: ["leaderboard"], queryFn: () => fetchLb() });
+  const { data: rows = [], isLoading } = useQuery({
+    queryKey: ["leaderboard"],
+    queryFn: () => fetchLb(),
+  });
 
   return (
     <main className="min-h-screen bg-background pb-28">
@@ -31,19 +34,28 @@ function LeaderboardPage() {
             >
               <div
                 className={`size-10 rounded-full grid place-items-center font-bold text-sm ${
-                  r.rank === 1 ? "bg-yellow-400 text-black" :
-                  r.rank === 2 ? "bg-gray-300 text-black" :
-                  r.rank === 3 ? "bg-orange-400 text-black" :
-                  "bg-muted text-muted-foreground"
+                  r.rank === 1
+                    ? "bg-yellow-400 text-black"
+                    : r.rank === 2
+                      ? "bg-gray-300 text-black"
+                      : r.rank === 3
+                        ? "bg-orange-400 text-black"
+                        : "bg-muted text-muted-foreground"
                 }`}
               >
                 {r.rank <= 3 ? <Trophy className="size-4" /> : r.rank}
               </div>
               <div className="flex-1 min-w-0">
-                <p className="font-semibold truncate">{r.name}{r.is_me && " (Kamu)"}</p>
+                <p className="font-semibold truncate">
+                  {r.name}
+                  {r.is_me && " (Kamu)"}
+                </p>
                 <p className="text-xs text-muted-foreground flex items-center gap-2">
                   Lvl {r.level}
-                  <span className="inline-flex items-center gap-0.5"><Flame className="size-3" />{r.current_streak}d</span>
+                  <span className="inline-flex items-center gap-0.5">
+                    <Flame className="size-3" />
+                    {r.current_streak}d
+                  </span>
                 </p>
               </div>
               <div className="text-right">

@@ -50,33 +50,48 @@ export function QuickActionFab() {
 
   return (
     <>
-      {open && <div className="fixed inset-0 z-30 bg-black/30 backdrop-blur-sm animate-fade-in" onClick={() => setOpen(false)} />}
+      {open && (
+        <div
+          className="fixed inset-0 z-30 bg-black/30 backdrop-blur-sm animate-fade-in"
+          onClick={() => setOpen(false)}
+        />
+      )}
       <div className="fixed bottom-24 right-5 z-40 flex flex-col items-end gap-2 lg:bottom-6">
         {open && (
           <button
-            onClick={() => { setOpen(false); setSheetOpen(true); }}
+            onClick={() => {
+              setOpen(false);
+              setSheetOpen(true);
+            }}
             className="flex items-center gap-2 animate-fade-up"
           >
-            <span className="bg-card text-foreground text-xs font-semibold px-3 py-1.5 rounded-full shadow-md border border-border">Log cepat</span>
+            <span className="bg-card text-foreground text-xs font-semibold px-3 py-1.5 rounded-full shadow-md border border-border">
+              Log cepat
+            </span>
             <span className="size-11 rounded-full bg-gradient-to-br from-emerald-500 to-teal-500 text-white grid place-items-center shadow-lg">
               <Zap className="size-5" />
             </span>
           </button>
         )}
-        {open && ACTIONS.map((a, i) => (
-          <Link
-            key={a.to}
-            to={a.to}
-            onClick={() => setOpen(false)}
-            className="flex items-center gap-2 animate-fade-up"
-            style={{ animationDelay: `${i * 40}ms` }}
-          >
-            <span className="bg-card text-foreground text-xs font-semibold px-3 py-1.5 rounded-full shadow-md border border-border">{a.label}</span>
-            <span className={`size-11 rounded-full bg-gradient-to-br ${a.color} text-white grid place-items-center shadow-lg`}>
-              <a.icon className="size-5" />
-            </span>
-          </Link>
-        ))}
+        {open &&
+          ACTIONS.map((a, i) => (
+            <Link
+              key={a.to}
+              to={a.to}
+              onClick={() => setOpen(false)}
+              className="flex items-center gap-2 animate-fade-up"
+              style={{ animationDelay: `${i * 40}ms` }}
+            >
+              <span className="bg-card text-foreground text-xs font-semibold px-3 py-1.5 rounded-full shadow-md border border-border">
+                {a.label}
+              </span>
+              <span
+                className={`size-11 rounded-full bg-gradient-to-br ${a.color} text-white grid place-items-center shadow-lg`}
+              >
+                <a.icon className="size-5" />
+              </span>
+            </Link>
+          ))}
         <button
           onClick={() => setOpen((v) => !v)}
           aria-label={open ? "Tutup aksi cepat" : "Buka aksi cepat"}
@@ -87,7 +102,10 @@ export function QuickActionFab() {
       </div>
 
       {sheetOpen && (
-        <div className="fixed inset-0 z-50 bg-black/50 flex items-end" onClick={() => setSheetOpen(false)}>
+        <div
+          className="fixed inset-0 z-50 bg-black/50 flex items-end"
+          onClick={() => setSheetOpen(false)}
+        >
           <div
             className="w-full bg-card rounded-t-3xl p-5 space-y-3 animate-fade-up max-w-md mx-auto"
             onClick={(e) => e.stopPropagation()}
@@ -115,7 +133,13 @@ export function QuickActionFab() {
                   onClick={() => setMealType(m)}
                   className={`flex-1 text-xs py-2 rounded-lg ${mealType === m ? "bg-primary text-primary-foreground" : "bg-muted"}`}
                 >
-                  {m === "breakfast" ? "Pagi" : m === "lunch" ? "Siang" : m === "dinner" ? "Malam" : "Snack"}
+                  {m === "breakfast"
+                    ? "Pagi"
+                    : m === "lunch"
+                      ? "Siang"
+                      : m === "dinner"
+                        ? "Malam"
+                        : "Snack"}
                 </button>
               ))}
             </div>

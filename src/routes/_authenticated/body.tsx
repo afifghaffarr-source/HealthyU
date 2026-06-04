@@ -27,7 +27,9 @@ function BodyPage() {
             key={id}
             onClick={() => setTab(id)}
             className={`inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-semibold whitespace-nowrap transition ${
-              tab === id ? "bg-primary text-primary-foreground shadow" : "bg-card border text-muted-foreground"
+              tab === id
+                ? "bg-primary text-primary-foreground shadow"
+                : "bg-card border text-muted-foreground"
             }`}
           >
             <Icon className="size-3.5" />
@@ -103,7 +105,10 @@ function Metric({ label, value, unit }: { label: string; value: string; unit?: s
 
 function PageLink({ to, label }: { to: string; label: string }) {
   return (
-    <Link to={to as "/weight"} className="flex items-center justify-between rounded-2xl bg-card border border-border/40 p-4 hover:bg-muted/40 transition">
+    <Link
+      to={to as "/weight"}
+      className="flex items-center justify-between rounded-2xl bg-card border border-border/40 p-4 hover:bg-muted/40 transition"
+    >
       <span className="text-sm font-semibold">{label}</span>
       <ArrowRight className="size-4 text-muted-foreground" />
     </Link>

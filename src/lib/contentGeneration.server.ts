@@ -90,8 +90,7 @@ export async function generateRecipeBody(
     .eq("slug", slug)
     .maybeSingle();
   if (!rec) return null;
-  const hasBody =
-    (rec.ingredients?.length ?? 0) > 0 && (rec.instructions?.length ?? 0) > 0;
+  const hasBody = (rec.ingredients?.length ?? 0) > 0 && (rec.instructions?.length ?? 0) > 0;
   if (hasBody) {
     return { ingredients: rec.ingredients ?? [], instructions: rec.instructions ?? [] };
   }

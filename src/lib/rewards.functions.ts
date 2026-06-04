@@ -9,7 +9,9 @@ export const listRewards = createServerFn({ method: "GET" })
     const [rewardsRes, profileRes, redemptionsRes] = await Promise.all([
       supabase
         .from("coin_rewards")
-        .select("id, name, description, image_url, category, partner_name, coin_cost, remaining_stock, monetary_value_idr")
+        .select(
+          "id, name, description, image_url, category, partner_name, coin_cost, remaining_stock, monetary_value_idr",
+        )
         .eq("is_active", true)
         .order("coin_cost", { ascending: true }),
       supabase.from("profiles").select("health_coins").eq("id", userId).maybeSingle(),

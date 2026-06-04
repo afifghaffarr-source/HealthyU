@@ -30,11 +30,15 @@ export const getDailyQuote = createServerFn({ method: "POST" })
   .handler(async ({ context }) => {
     const { supabase } = context;
     const today = new Date().toISOString().slice(0, 10);
-    const { data: existing } = await supabase.from("daily_quotes").select("*").eq("date", today).maybeSingle();
+    const { data: existing } = await supabase
+      .from("daily_quotes")
+      .select("*")
+      .eq("date", today)
+      .maybeSingle();
     if (existing) return { quote: existing };
     const text = await callAI(
       "Buat 1 quote pendek (max 20 kata) tentang nutrisi/kesehatan dalam Bahasa Indonesia. Hanya teks quote, tanpa tanda kutip.",
-      "Kamu coach nutrisi."
+      "Kamu coach nutrisi.",
     );
     const { data: inserted } = await supabase
       .from("daily_quotes")
@@ -59,13 +63,17 @@ export const getDailyQuiz = createServerFn({ method: "POST" })
     if (existing) return { quiz: existing };
     const raw = await callAI(
       "Buat 1 soal pilihan ganda nutrisi (4 opsi). Format JSON: {question, options:[..4], correct_index}. Bahasa Indonesia. Hanya JSON.",
-      "Kamu pembuat kuis nutrisi."
+      "Kamu pembuat kuis nutrisi.",
     );
     let parsed: any;
     try {
       parsed = JSON.parse(raw.replace(/```json|```/g, "").trim());
     } catch {
-      parsed = { question: "Berapa kalori dalam 1 gram protein?", options: ["2", "4", "7", "9"], correct_index: 1 };
+      parsed = {
+        question: "Berapa kalori dalam 1 gram protein?",
+        options: ["2", "4", "7", "9"],
+        correct_index: 1,
+      };
     }
     const { data: inserted } = await supabase
       .from("nutrition_quizzes")
@@ -84,11 +92,15 @@ export const getDailyQuiz = createServerFn({ method: "POST" })
 export const answerDailyQuiz = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: { quizId: string; answer: number }) =>
-    z.object({ quizId: z.string().uuid(), answer: z.number().int().min(0).max(3) }).parse(d)
+    z.object({ quizId: z.string().uuid(), answer: z.number().int().min(0).max(3) }).parse(d),
   )
   .handler(async ({ context, data }) => {
     const { supabase, userId } = context;
-    const { data: q } = await supabase.from("nutrition_quizzes").select("*").eq("id", data.quizId).maybeSingle();
+    const { data: q } = await supabase
+      .from("nutrition_quizzes")
+      .select("*")
+      .eq("id", data.quizId)
+      .maybeSingle();
     if (!q || q.user_id !== userId) throw new Error("Quiz not found");
     if (q.user_answer !== null) throw new Error("Sudah dijawab");
     const correct = data.answer === q.correct_index;
@@ -98,7 +110,11 @@ export const answerDailyQuiz = createServerFn({ method: "POST" })
       .update({ user_answer: data.answer, is_correct: correct, coins_awarded: coins })
       .eq("id", data.quizId);
     if (coins > 0) {
-      const { data: p } = await supabase.from("profiles").select("health_coins").eq("id", userId).maybeSingle();
+      const { data: p } = await supabase
+        .from("profiles")
+        .select("health_coins")
+        .eq("id", userId)
+        .maybeSingle();
       await supabase
         .from("profiles")
         .update({ health_coins: (p?.health_coins ?? 0) + coins })
@@ -162,7 +178,7 @@ export const estimateBodyComposition = createServerFn({ method: "POST" })
   .handler(async ({ data }) => {
     const text = await callAI(
       `Analisis foto progress ini: ${data.photoUrl}. Estimasi: body fat %, muscle mass tier (low/med/high), posture. JSON only.`,
-      "Kamu fitness analyst."
+      "Kamu fitness analyst.",
     );
     return { analysis: text };
   });
@@ -220,7 +236,11 @@ export const gachaPull = createServerFn({ method: "POST" })
   .handler(async ({ context }) => {
     const { supabase, userId } = context;
     const COST = 20;
-    const { data: p } = await supabase.from("profiles").select("health_coins").eq("id", userId).maybeSingle();
+    const { data: p } = await supabase
+      .from("profiles")
+      .select("health_coins")
+      .eq("id", userId)
+      .maybeSingle();
     if ((p?.health_coins ?? 0) < COST) throw new Error("Coin tidak cukup");
     const total = GACHA_REWARDS.reduce((s, r) => s + r.weight, 0);
     let roll = Math.random() * total;
@@ -249,16 +269,25 @@ export const listPetAccessories = createServerFn({ method: "POST" })
   .handler(async ({ context }) => {
     const { supabase, userId } = context;
     const { data: shop } = await supabase.from("pet_accessories").select("*").order("cost_coins");
-    const { data: owned } = await supabase.from("user_pet_accessories").select("*").eq("user_id", userId);
+    const { data: owned } = await supabase
+      .from("user_pet_accessories")
+      .select("*")
+      .eq("user_id", userId);
     return { shop: shop ?? [], owned: owned ?? [] };
   });
 
 export const buyPetAccessory = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: { accessoryId: string }) => z.object({ accessoryId: z.string().uuid() }).parse(d))
+  .inputValidator((d: { accessoryId: string }) =>
+    z.object({ accessoryId: z.string().uuid() }).parse(d),
+  )
   .handler(async ({ context, data }) => {
     const { supabase, userId } = context;
-    const { data: acc } = await supabase.from("pet_accessories").select("*").eq("id", data.accessoryId).maybeSingle();
+    const { data: acc } = await supabase
+      .from("pet_accessories")
+      .select("*")
+      .eq("id", data.accessoryId)
+      .maybeSingle();
     if (!acc) throw new Error("Aksesori tidak ditemukan");
     const { data: existing } = await supabase
       .from("user_pet_accessories")
@@ -267,7 +296,11 @@ export const buyPetAccessory = createServerFn({ method: "POST" })
       .eq("accessory_id", data.accessoryId)
       .maybeSingle();
     if (existing) throw new Error("Sudah dimiliki");
-    const { data: p } = await supabase.from("profiles").select("health_coins").eq("id", userId).maybeSingle();
+    const { data: p } = await supabase
+      .from("profiles")
+      .select("health_coins")
+      .eq("id", userId)
+      .maybeSingle();
     if ((p?.health_coins ?? 0) < acc.cost_coins) throw new Error("Coin tidak cukup");
     await supabase
       .from("profiles")
@@ -284,7 +317,7 @@ export const buyPetAccessory = createServerFn({ method: "POST" })
 export const equipPetAccessory = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: { id: string; equipped: boolean }) =>
-    z.object({ id: z.string().uuid(), equipped: z.boolean() }).parse(d)
+    z.object({ id: z.string().uuid(), equipped: z.boolean() }).parse(d),
   )
   .handler(async ({ context, data }) => {
     const { supabase, userId } = context;
@@ -301,18 +334,29 @@ export const listHabitStacks = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     const { supabase, userId } = context;
-    const { data } = await supabase.from("habit_stacks").select("*").eq("user_id", userId).order("created_at");
+    const { data } = await supabase
+      .from("habit_stacks")
+      .select("*")
+      .eq("user_id", userId)
+      .order("created_at");
     return { stacks: data ?? [] };
   });
 
 export const createHabitStack = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: { name: string; steps: string[] }) =>
-    z.object({ name: z.string().min(1).max(60), steps: z.array(z.string().min(1).max(80)).min(1).max(10) }).parse(d)
+    z
+      .object({
+        name: z.string().min(1).max(60),
+        steps: z.array(z.string().min(1).max(80)).min(1).max(10),
+      })
+      .parse(d),
   )
   .handler(async ({ context, data }) => {
     const { supabase, userId } = context;
-    await supabase.from("habit_stacks").insert({ user_id: userId, name: data.name, steps: data.steps });
+    await supabase
+      .from("habit_stacks")
+      .insert({ user_id: userId, name: data.name, steps: data.steps });
     return { ok: true };
   });
 
@@ -320,7 +364,7 @@ export const createHabitStack = createServerFn({ method: "POST" })
 export const voteFamilyMeal = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: { planId: string; mealName: string }) =>
-    z.object({ planId: z.string().uuid(), mealName: z.string().min(1).max(80) }).parse(d)
+    z.object({ planId: z.string().uuid(), mealName: z.string().min(1).max(80) }).parse(d),
   )
   .handler(async ({ context, data }) => {
     const { supabase, userId } = context;
@@ -355,11 +399,13 @@ export const getFamilyMealVotes = createServerFn({ method: "POST" })
 // 18. Recipe video preview (AI text description -> use as placeholder)
 export const generateRecipeVideoScript = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: { recipeName: string }) => z.object({ recipeName: z.string().min(1).max(100) }).parse(d))
+  .inputValidator((d: { recipeName: string }) =>
+    z.object({ recipeName: z.string().min(1).max(100) }).parse(d),
+  )
   .handler(async ({ data }) => {
     const script = await callAI(
       `Buat storyboard video pendek (5 scene, masing-masing 1 kalimat) untuk masak ${data.recipeName}. Bahasa Indonesia.`,
-      "Kamu food video director."
+      "Kamu food video director.",
     );
     return { script };
   });
@@ -368,12 +414,12 @@ export const generateRecipeVideoScript = createServerFn({ method: "POST" })
 export const coachInterview = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: { answers: Record<string, string> }) =>
-    z.object({ answers: z.record(z.string(), z.string().max(500)) }).parse(d)
+    z.object({ answers: z.record(z.string(), z.string().max(500)) }).parse(d),
   )
   .handler(async ({ data }) => {
     const summary = await callAI(
       `Berdasarkan jawaban onboarding: ${JSON.stringify(data.answers)}. Buat ringkasan profil & 3 rekomendasi awal. Bahasa Indonesia.`,
-      "Kamu coach holistik."
+      "Kamu coach holistik.",
     );
     return { summary };
   });

@@ -67,9 +67,7 @@ function MoodPage() {
   });
 
   const avg =
-    logs.length === 0
-      ? null
-      : logs.reduce((a, l) => a + (l.mood as number), 0) / logs.length;
+    logs.length === 0 ? null : logs.reduce((a, l) => a + (l.mood as number), 0) / logs.length;
 
   const last14 = useMemo(() => {
     const days: { d: string; label: string; v: number | null }[] = [];
@@ -78,7 +76,9 @@ function MoodPage() {
       dt.setDate(dt.getDate() - i);
       const key = dt.toISOString().slice(0, 10);
       const todays = logs.filter((l) => (l.logged_at as string).slice(0, 10) === key);
-      const v = todays.length ? todays.reduce((a, l) => a + (l.mood as number), 0) / todays.length : null;
+      const v = todays.length
+        ? todays.reduce((a, l) => a + (l.mood as number), 0) / todays.length
+        : null;
       days.push({ d: key, label: String(dt.getDate()), v });
     }
     return days;
@@ -115,15 +115,29 @@ function MoodPage() {
             <div className="flex items-end gap-1 h-20">
               {last14.map((d, i) => {
                 const h = d.v == null ? 6 : 12 + (d.v / 5) * 56;
-                const color = d.v == null
-                  ? "bg-muted"
-                  : d.v >= 4 ? "bg-emerald-400"
-                  : d.v >= 3 ? "bg-amber-300"
-                  : "bg-rose-400";
+                const color =
+                  d.v == null
+                    ? "bg-muted"
+                    : d.v >= 4
+                      ? "bg-emerald-400"
+                      : d.v >= 3
+                        ? "bg-amber-300"
+                        : "bg-rose-400";
                 return (
-                  <div key={d.d} className="flex-1 flex flex-col items-center gap-1" title={`${d.d}: ${d.v?.toFixed(1) ?? "—"}`}>
-                    <div className={`w-full rounded-md ${color} transition-all`} style={{ height: `${h}px` }} />
-                    {i % 2 === 0 && <span className="text-[9px] text-muted-foreground tabular-nums">{d.label}</span>}
+                  <div
+                    key={d.d}
+                    className="flex-1 flex flex-col items-center gap-1"
+                    title={`${d.d}: ${d.v?.toFixed(1) ?? "—"}`}
+                  >
+                    <div
+                      className={`w-full rounded-md ${color} transition-all`}
+                      style={{ height: `${h}px` }}
+                    />
+                    {i % 2 === 0 && (
+                      <span className="text-[9px] text-muted-foreground tabular-nums">
+                        {d.label}
+                      </span>
+                    )}
                   </div>
                 );
               })}
@@ -202,9 +216,7 @@ function MoodPage() {
                         </p>
                       </div>
                       {l.note && (
-                        <p className="text-xs text-muted-foreground mt-0.5 break-words">
-                          {l.note}
-                        </p>
+                        <p className="text-xs text-muted-foreground mt-0.5 break-words">{l.note}</p>
                       )}
                     </div>
                     <button

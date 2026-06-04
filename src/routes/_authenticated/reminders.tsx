@@ -101,7 +101,9 @@ function RemindersPage() {
       toast.success("Notifikasi diaktifkan");
       try {
         new Notification("HealthyU", { body: "Pengingat siap dikirim 🔔", icon: "/icon-192.svg" });
-      } catch {/* ignore */}
+      } catch {
+        /* ignore */
+      }
     } else toast.error("Izin notifikasi ditolak");
   };
 
@@ -123,8 +125,7 @@ function RemindersPage() {
       }),
     );
 
-  const removeItem = (id: string) =>
-    setItems((arr) => arr.filter((i) => i.id !== id));
+  const removeItem = (id: string) => setItems((arr) => arr.filter((i) => i.id !== id));
 
   const addItem = () => {
     if (!newLabel.trim()) {
@@ -171,14 +172,10 @@ function RemindersPage() {
         >
           <div className="flex items-center justify-between">
             <div>
-              <div className="text-[11px] uppercase tracking-wider opacity-80">
-                Pengingat aktif
-              </div>
+              <div className="text-[11px] uppercase tracking-wider opacity-80">Pengingat aktif</div>
               <div className="text-3xl font-bold mt-1">
                 {activeCount}
-                <span className="text-base font-medium opacity-80">
-                  /{items.length}
-                </span>
+                <span className="text-base font-medium opacity-80">/{items.length}</span>
               </div>
             </div>
             <div className="size-12 rounded-2xl bg-white/15 grid place-items-center">
@@ -201,14 +198,10 @@ function RemindersPage() {
                   {next.label} · {next.time}
                 </div>
               </div>
-              <div className="text-xs font-medium opacity-90">
-                {fmtCountdown(next.min)}
-              </div>
+              <div className="text-xs font-medium opacity-90">{fmtCountdown(next.min)}</div>
             </div>
           ) : (
-            <div className="mt-4 text-xs opacity-80">
-              Tidak ada pengingat tersisa hari ini
-            </div>
+            <div className="mt-4 text-xs opacity-80">Tidak ada pengingat tersisa hari ini</div>
           )}
         </section>
 
@@ -226,7 +219,8 @@ function RemindersPage() {
         )}
 
         <p className="text-xs text-muted-foreground px-1">
-          Pengingat berjalan saat aplikasi terbuka. Install sebagai PWA agar tetap aktif di latar belakang.
+          Pengingat berjalan saat aplikasi terbuka. Install sebagai PWA agar tetap aktif di latar
+          belakang.
         </p>
 
         {showAdd ? (
@@ -251,7 +245,9 @@ function RemindersPage() {
                 className="flex-1 bg-muted rounded-xl px-3 py-2.5 text-sm outline-none"
               >
                 {Object.entries(CATEGORY_META).map(([k, v]) => (
-                  <option key={k} value={k}>{v.label}</option>
+                  <option key={k} value={k}>
+                    {v.label}
+                  </option>
                 ))}
               </select>
             </div>
@@ -277,10 +273,17 @@ function RemindersPage() {
             const Meta = CATEGORY_META[it.category] ?? CATEGORY_META.custom;
             const Icon = it.enabled ? Meta.icon : BellOff;
             return (
-              <div key={it.id} className="bg-card p-4 rounded-2xl outline-1 outline-black/5 space-y-3">
+              <div
+                key={it.id}
+                className="bg-card p-4 rounded-2xl outline-1 outline-black/5 space-y-3"
+              >
                 <div className="flex items-center gap-3">
-                  <div className={`size-10 rounded-xl grid place-items-center ${it.enabled ? "bg-mint" : "bg-muted"}`}>
-                    <Icon className={`size-4 ${it.enabled ? "text-sage-deep" : "text-muted-foreground"}`} />
+                  <div
+                    className={`size-10 rounded-xl grid place-items-center ${it.enabled ? "bg-mint" : "bg-muted"}`}
+                  >
+                    <Icon
+                      className={`size-4 ${it.enabled ? "text-sage-deep" : "text-muted-foreground"}`}
+                    />
                   </div>
                   <div className="flex-1 min-w-0">
                     <input
@@ -301,7 +304,9 @@ function RemindersPage() {
                     className={`w-11 h-6 rounded-full transition-colors relative ${it.enabled ? "bg-primary" : "bg-muted"}`}
                     aria-label="Toggle"
                   >
-                    <span className={`absolute top-0.5 size-5 rounded-full bg-white transition-transform ${it.enabled ? "translate-x-5" : "translate-x-0.5"}`} />
+                    <span
+                      className={`absolute top-0.5 size-5 rounded-full bg-white transition-transform ${it.enabled ? "translate-x-5" : "translate-x-0.5"}`}
+                    />
                   </button>
                   <button
                     onClick={() => removeItem(it.id)}
@@ -319,9 +324,7 @@ function RemindersPage() {
                         key={idx}
                         onClick={() => toggleDay(it.id, idx)}
                         className={`size-7 rounded-lg text-[11px] font-semibold transition-colors ${
-                          active
-                            ? "bg-primary/15 text-primary"
-                            : "bg-muted text-muted-foreground"
+                          active ? "bg-primary/15 text-primary" : "bg-muted text-muted-foreground"
                         }`}
                       >
                         {d}

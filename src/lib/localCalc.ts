@@ -94,7 +94,7 @@ export function macros(targetCal: number): { protein_g: number; carbs_g: number;
 export function waterTargetMl(weightKg: number, activity?: ActivityLevel | string): number {
   if (!weightKg) return 2000;
   const base = Math.round(weightKg * 35);
-  const mult = activity ? ACTIVITY_MULT[String(activity).toLowerCase()] ?? 1.2 : 1.2;
+  const mult = activity ? (ACTIVITY_MULT[String(activity).toLowerCase()] ?? 1.2) : 1.2;
   return mult >= 1.55 ? base + 500 : base;
 }
 

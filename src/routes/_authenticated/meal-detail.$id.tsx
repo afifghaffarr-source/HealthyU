@@ -63,11 +63,17 @@ function MealDetailPage() {
           <p className="text-xs text-muted-foreground mt-0.5">~20 menit • Mudah</p>
         </div>
         <div className="flex items-center gap-1 bg-card border rounded-full p-1">
-          <button onClick={() => setServings((s) => Math.max(1, s - 1))} className="size-7 rounded-full grid place-items-center hover:bg-muted">
+          <button
+            onClick={() => setServings((s) => Math.max(1, s - 1))}
+            className="size-7 rounded-full grid place-items-center hover:bg-muted"
+          >
             <Minus className="size-3.5" />
           </button>
           <span className="text-sm font-semibold w-6 text-center">{servings}</span>
-          <button onClick={() => setServings((s) => Math.min(9, s + 1))} className="size-7 rounded-full grid place-items-center hover:bg-muted">
+          <button
+            onClick={() => setServings((s) => Math.min(9, s + 1))}
+            className="size-7 rounded-full grid place-items-center hover:bg-muted"
+          >
             <Plus className="size-3.5" />
           </button>
         </div>
@@ -75,7 +81,10 @@ function MealDetailPage() {
 
       <div className="mt-4 grid grid-cols-3 gap-2">
         {macros.map((s) => (
-          <div key={s.label} className="rounded-2xl bg-card p-3 border border-border/40 text-center">
+          <div
+            key={s.label}
+            className="rounded-2xl bg-card p-3 border border-border/40 text-center"
+          >
             <p className="text-xs text-muted-foreground">{s.label}</p>
             <p className="font-bold text-primary">{s.value}</p>
           </div>
@@ -90,18 +99,24 @@ function MealDetailPage() {
           {ingredients.map((i) => (
             <li key={i.name} className="flex justify-between px-4 py-2.5 text-sm">
               <span>{i.name}</span>
-              <span className="text-muted-foreground">{i.qty * servings} {i.unit}</span>
+              <span className="text-muted-foreground">
+                {i.qty * servings} {i.unit}
+              </span>
             </li>
           ))}
         </ul>
       </section>
 
       <section className="mt-6">
-        <h3 className="text-sm font-bold uppercase tracking-wider text-muted-foreground mb-2">Cara Masak</h3>
+        <h3 className="text-sm font-bold uppercase tracking-wider text-muted-foreground mb-2">
+          Cara Masak
+        </h3>
         <ol className="space-y-2">
           {steps.map((s, i) => (
             <li key={i} className="flex gap-3 rounded-2xl bg-card border p-3 text-sm">
-              <span className="size-6 shrink-0 rounded-full bg-primary text-primary-foreground grid place-items-center text-xs font-bold">{i + 1}</span>
+              <span className="size-6 shrink-0 rounded-full bg-primary text-primary-foreground grid place-items-center text-xs font-bold">
+                {i + 1}
+              </span>
               <span>{s}</span>
             </li>
           ))}

@@ -29,10 +29,10 @@ export async function checkRateLimit(
 
 /** Common pre-configured buckets. Tune as needed. */
 export const RATE_LIMITS = {
-  chat:        { bucket: "chat",        max: 30,  windowSec: 60 },   // 30 msg/min
-  ai_scan:     { bucket: "ai_scan",     max: 20,  windowSec: 3600 }, // 20 scans/hour
-  ai_recipe:   { bucket: "ai_recipe",   max: 30,  windowSec: 3600 },
-  ai_coach:    { bucket: "ai_coach",    max: 20,  windowSec: 3600 },
-  report:      { bucket: "report",      max: 10,  windowSec: 86400 },// 10/day
-  community:   { bucket: "community",   max: 60,  windowSec: 3600 }, // 1/min avg
+  chat: { bucket: "chat", max: 30, windowSec: 60 }, // 30 msg/min
+  ai_scan: { bucket: "ai_scan", max: 20, windowSec: 3600 }, // 20 scans/hour
+  ai_recipe: { bucket: "ai_recipe", max: 30, windowSec: 3600 },
+  ai_coach: { bucket: "ai_coach", max: 20, windowSec: 3600 },
+  report: { bucket: "report", max: 10, windowSec: 86400 }, // 10/day
+  community: { bucket: "community", max: 60, windowSec: 3600 }, // 1/min avg
 } as const;

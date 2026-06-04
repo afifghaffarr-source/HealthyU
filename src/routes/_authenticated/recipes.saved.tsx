@@ -42,10 +42,18 @@ function SavedRecipesPage() {
               className="block bg-card p-4 rounded-2xl outline-1 outline-black/5"
             >
               <h3 className="font-bold">{r.title}</h3>
-              {r.description && <p className="text-xs text-muted-foreground mt-1 line-clamp-2">{r.description}</p>}
+              {r.description && (
+                <p className="text-xs text-muted-foreground mt-1 line-clamp-2">{r.description}</p>
+              )}
               <div className="flex gap-4 mt-3 text-xs text-muted-foreground">
-                <span className="inline-flex items-center gap-1"><Flame className="size-3" />{r.calories} kcal</span>
-                <span className="inline-flex items-center gap-1"><Clock className="size-3" />{r.prep_min} min</span>
+                <span className="inline-flex items-center gap-1">
+                  <Flame className="size-3" />
+                  {r.calories} kcal
+                </span>
+                <span className="inline-flex items-center gap-1">
+                  <Clock className="size-3" />
+                  {r.prep_min} min
+                </span>
                 {Number(r.rating_count ?? 0) > 0 && (
                   <span className="inline-flex items-center gap-1 text-amber-600 font-semibold">
                     <Star className="size-3 fill-amber-500 text-amber-500" />

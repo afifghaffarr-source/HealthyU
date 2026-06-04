@@ -44,7 +44,9 @@ export function BottomNav() {
             to={to}
             aria-label={label}
             className="flex flex-col items-center gap-0.5 px-3 py-2 rounded-2xl text-muted-foreground transition-all duration-200 motion-safe:active:scale-90"
-            activeProps={{ className: "text-primary [&_.nav-dot]:opacity-100 [&_.nav-icon-wrap]:bg-primary/12" }}
+            activeProps={{
+              className: "text-primary [&_.nav-dot]:opacity-100 [&_.nav-icon-wrap]:bg-primary/12",
+            }}
           >
             <span className="nav-icon-wrap relative inline-flex size-8 items-center justify-center rounded-full transition-colors">
               <Icon className="size-5" strokeWidth={2.2} />
@@ -59,7 +61,6 @@ export function BottomNav() {
           </Link>
         ))}
       </nav>
-
     </>
   );
 }

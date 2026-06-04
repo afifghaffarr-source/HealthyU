@@ -59,7 +59,11 @@ function WeightPage() {
   });
 
   const target = profile?.target_weight_kg ? Number(profile.target_weight_kg) : null;
-  const current = logs[0] ? Number(logs[0].weight_kg) : (profile?.weight_kg ? Number(profile.weight_kg) : null);
+  const current = logs[0]
+    ? Number(logs[0].weight_kg)
+    : profile?.weight_kg
+      ? Number(profile.weight_kg)
+      : null;
   const first = logs[logs.length - 1] ? Number(logs[logs.length - 1].weight_kg) : null;
   const delta = current != null && first != null ? current - first : 0;
 
@@ -81,20 +85,43 @@ function WeightPage() {
         <section className="bg-card rounded-3xl p-5 shadow-sm outline-1 outline-black/5">
           <div className="flex items-end justify-between mb-4">
             <div>
-              <p className="text-xs font-bold uppercase text-muted-foreground tracking-wider">Sekarang</p>
+              <p className="text-xs font-bold uppercase text-muted-foreground tracking-wider">
+                Sekarang
+              </p>
               <p className="text-3xl font-bold tabular-nums">
-                {current != null ? current.toFixed(1) : "—"}<span className="text-base text-muted-foreground ml-1">kg</span>
+                {current != null ? current.toFixed(1) : "—"}
+                <span className="text-base text-muted-foreground ml-1">kg</span>
               </p>
             </div>
             <div className="text-right">
-              <p className="text-xs font-bold uppercase text-muted-foreground tracking-wider">Target</p>
-              <p className="text-xl font-bold tabular-nums">{target != null ? target.toFixed(1) : "—"} kg</p>
+              <p className="text-xs font-bold uppercase text-muted-foreground tracking-wider">
+                Target
+              </p>
+              <p className="text-xl font-bold tabular-nums">
+                {target != null ? target.toFixed(1) : "—"} kg
+              </p>
             </div>
           </div>
           <div className="inline-flex items-center gap-1 text-sm font-semibold">
-            {delta < 0 ? <TrendingDown className="size-4 text-emerald-600" /> : delta > 0 ? <TrendingUp className="size-4 text-rose-600" /> : <Minus className="size-4 text-muted-foreground" />}
-            <span className={delta < 0 ? "text-emerald-600" : delta > 0 ? "text-rose-600" : "text-muted-foreground"}>
-              {delta === 0 ? "Tidak berubah" : `${delta > 0 ? "+" : ""}${delta.toFixed(1)} kg sejak awal`}
+            {delta < 0 ? (
+              <TrendingDown className="size-4 text-emerald-600" />
+            ) : delta > 0 ? (
+              <TrendingUp className="size-4 text-rose-600" />
+            ) : (
+              <Minus className="size-4 text-muted-foreground" />
+            )}
+            <span
+              className={
+                delta < 0
+                  ? "text-emerald-600"
+                  : delta > 0
+                    ? "text-rose-600"
+                    : "text-muted-foreground"
+              }
+            >
+              {delta === 0
+                ? "Tidak berubah"
+                : `${delta > 0 ? "+" : ""}${delta.toFixed(1)} kg sejak awal`}
             </span>
           </div>
         </section>
@@ -136,7 +163,11 @@ function WeightPage() {
               {[...logs].reverse().map((l) => {
                 const h = ((Number(l.weight_kg) - min) / range) * 100;
                 return (
-                  <div key={l.id} className="flex-1 bg-primary/30 rounded-t" style={{ height: `${Math.max(h, 4)}%` }} />
+                  <div
+                    key={l.id}
+                    className="flex-1 bg-primary/30 rounded-t"
+                    style={{ height: `${Math.max(h, 4)}%` }}
+                  />
                 );
               })}
             </div>
@@ -156,13 +187,22 @@ function WeightPage() {
               {logs.map((l) => (
                 <li key={l.id} className="flex items-center gap-3 py-2">
                   <div className="flex-1">
-                    <p className="font-semibold tabular-nums">{Number(l.weight_kg).toFixed(1)} kg</p>
+                    <p className="font-semibold tabular-nums">
+                      {Number(l.weight_kg).toFixed(1)} kg
+                    </p>
                     <p className="text-xs text-muted-foreground">
-                      {new Date(l.logged_at).toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric" })}
+                      {new Date(l.logged_at).toLocaleDateString("id-ID", {
+                        day: "numeric",
+                        month: "short",
+                        year: "numeric",
+                      })}
                       {l.note ? ` · ${l.note}` : ""}
                     </p>
                   </div>
-                  <button onClick={() => delMut.mutate(l.id)} className="p-2 text-muted-foreground hover:text-destructive">
+                  <button
+                    onClick={() => delMut.mutate(l.id)}
+                    className="p-2 text-muted-foreground hover:text-destructive"
+                  >
                     <Trash2 className="size-4" />
                   </button>
                 </li>

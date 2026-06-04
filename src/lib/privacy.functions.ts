@@ -18,7 +18,9 @@ export const getPrivacySettings = createServerFn({ method: "GET" })
     const { supabase, userId } = context;
     const { data, error } = await supabase
       .from("profiles")
-      .select("public_profile, show_weight, show_meals, show_progress_photos, show_workouts, allow_dm")
+      .select(
+        "public_profile, show_weight, show_meals, show_progress_photos, show_workouts, allow_dm",
+      )
       .eq("id", userId)
       .maybeSingle();
     if (error) throw new Error(error.message);
@@ -34,7 +36,10 @@ export const updatePrivacySettings = createServerFn({ method: "POST" })
       Object.entries(data).filter(([, v]) => v !== undefined),
     ) as Record<string, boolean>;
     if (Object.keys(patch).length === 0) return { ok: true };
-    const { error } = await supabase.from("profiles").update(patch as never).eq("id", userId);
+    const { error } = await supabase
+      .from("profiles")
+      .update(patch as never)
+      .eq("id", userId);
     if (error) throw new Error(error.message);
     await supabase.rpc("log_audit_event", {
       _action: "privacy.updated",

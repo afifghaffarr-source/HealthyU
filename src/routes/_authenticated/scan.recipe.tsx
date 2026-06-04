@@ -16,7 +16,8 @@ async function fileToDataUrl(file: File, maxSize = 1280): Promise<string> {
   const w = Math.round(bm.width * s);
   const h = Math.round(bm.height * s);
   const c = document.createElement("canvas");
-  c.width = w; c.height = h;
+  c.width = w;
+  c.height = h;
   c.getContext("2d")!.drawImage(bm, 0, 0, w, h);
   return c.toDataURL("image/jpeg", 0.8);
 }
@@ -33,16 +34,35 @@ function Page() {
     <div className="min-h-dvh pb-24 bg-background">
       <TopAppBar title="Scan Resep" showBack />
       <div className="p-4 space-y-3">
-        <input ref={ref} type="file" accept="image/*" capture="environment" hidden onChange={async (e) => {
-          const f = e.target.files?.[0]; if (!f) return;
-          const url = await fileToDataUrl(f); setImg(url); m.mutate(url);
-        }} />
+        <input
+          ref={ref}
+          type="file"
+          accept="image/*"
+          capture="environment"
+          hidden
+          onChange={async (e) => {
+            const f = e.target.files?.[0];
+            if (!f) return;
+            const url = await fileToDataUrl(f);
+            setImg(url);
+            m.mutate(url);
+          }}
+        />
         {!img ? (
-          <button onClick={() => ref.current?.click()} className="w-full py-12 rounded-2xl bg-card border border-dashed flex flex-col items-center gap-2 text-sm text-muted-foreground">
+          <button
+            onClick={() => ref.current?.click()}
+            className="w-full py-12 rounded-2xl bg-card border border-dashed flex flex-col items-center gap-2 text-sm text-muted-foreground"
+          >
             <Camera className="size-8" /> Foto resep
           </button>
-        ) : <img src={img} className="w-full rounded-2xl" alt="resep" />}
-        {m.isPending && <div className="text-center text-sm"><Loader2 className="inline size-4 animate-spin"/> Mengekstrak bahan…</div>}
+        ) : (
+          <img src={img} className="w-full rounded-2xl" alt="resep" />
+        )}
+        {m.isPending && (
+          <div className="text-center text-sm">
+            <Loader2 className="inline size-4 animate-spin" /> Mengekstrak bahan…
+          </div>
+        )}
         {m.data && (
           <div className="space-y-3">
             {m.data.title && <div className="text-lg font-bold">{m.data.title}</div>}
@@ -53,7 +73,9 @@ function Page() {
                   {m.data.ingredients.map((ing, i) => (
                     <li key={i} className="flex justify-between">
                       <span>{ing.name}</span>
-                      <span className="text-muted-foreground">{ing.qty} {ing.unit}</span>
+                      <span className="text-muted-foreground">
+                        {ing.qty} {ing.unit}
+                      </span>
                     </li>
                   ))}
                 </ul>
@@ -63,7 +85,9 @@ function Page() {
               <div className="rounded-2xl bg-card border p-4">
                 <div className="text-sm font-medium mb-2">Langkah</div>
                 <ol className="space-y-1.5 text-sm list-decimal pl-5">
-                  {m.data.steps.map((s, i) => <li key={i}>{s}</li>)}
+                  {m.data.steps.map((s, i) => (
+                    <li key={i}>{s}</li>
+                  ))}
                 </ol>
               </div>
             )}

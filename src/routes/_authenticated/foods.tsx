@@ -110,8 +110,18 @@ function FoodsPage() {
           />
         )}
         <section className="space-y-3">
-          <FacetSelect label="Daerah" value={region} setValue={setRegion} options={facetData?.regions ?? []} />
-          <FacetSelect label="Kategori" value={category} setValue={setCategory} options={facetData?.categories ?? []} />
+          <FacetSelect
+            label="Daerah"
+            value={region}
+            setValue={setRegion}
+            options={facetData?.regions ?? []}
+          />
+          <FacetSelect
+            label="Kategori"
+            value={category}
+            setValue={setCategory}
+            options={facetData?.categories ?? []}
+          />
           <FacetSelect label="Tag" value={tag} setValue={setTag} options={facetData?.tags ?? []} />
 
           <div>
@@ -175,7 +185,10 @@ function FoodsPage() {
                     {(f.tags?.length ?? 0) > 0 && (
                       <div className="flex flex-wrap gap-1 mt-1.5">
                         {f.tags!.slice(0, 3).map((t: string) => (
-                          <span key={t} className="text-[10px] px-1.5 py-0.5 rounded bg-muted text-muted-foreground">
+                          <span
+                            key={t}
+                            className="text-[10px] px-1.5 py-0.5 rounded bg-muted text-muted-foreground"
+                          >
                             {t}
                           </span>
                         ))}
@@ -197,11 +210,7 @@ function FoodsPage() {
       </main>
 
       {selectedId && (
-        <FoodDetailSheet
-          data={selected}
-          loading={!selected}
-          onClose={() => setSelectedId(null)}
-        />
+        <FoodDetailSheet data={selected} loading={!selected} onClose={() => setSelectedId(null)} />
       )}
 
       <BottomNav />
@@ -288,10 +297,15 @@ function FoodDetailSheet({
                   </p>
                 )}
                 {servings.map((s) => (
-                  <div key={s.id} className="flex justify-between text-sm px-3 py-2 rounded-lg bg-muted/50">
+                  <div
+                    key={s.id}
+                    className="flex justify-between text-sm px-3 py-2 rounded-lg bg-muted/50"
+                  >
                     <span className="font-medium">{s.label}</span>
                     <span className="text-muted-foreground">
-                      {s.grams}g · {Math.round((food.calories * Number(s.grams)) / Number(food.serving_size))} kkal
+                      {s.grams}g ·{" "}
+                      {Math.round((food.calories * Number(s.grams)) / Number(food.serving_size))}{" "}
+                      kkal
                     </span>
                   </div>
                 ))}
@@ -303,7 +317,10 @@ function FoodDetailSheet({
                 <p className="text-xs font-semibold text-muted-foreground mb-2">⚠️ Alergen</p>
                 <div className="flex flex-wrap gap-1.5">
                   {food.allergens!.map((a: string) => (
-                    <span key={a} className="text-xs px-2 py-1 rounded-full bg-destructive/10 text-destructive">
+                    <span
+                      key={a}
+                      className="text-xs px-2 py-1 rounded-full bg-destructive/10 text-destructive"
+                    >
                       {a}
                     </span>
                   ))}
@@ -316,7 +333,10 @@ function FoodDetailSheet({
                 <p className="text-xs font-semibold text-muted-foreground mb-2">Tag</p>
                 <div className="flex flex-wrap gap-1.5">
                   {food.tags!.map((t: string) => (
-                    <span key={t} className="text-xs px-2 py-1 rounded-full bg-muted text-muted-foreground">
+                    <span
+                      key={t}
+                      className="text-xs px-2 py-1 rounded-full bg-muted text-muted-foreground"
+                    >
                       {t}
                     </span>
                   ))}

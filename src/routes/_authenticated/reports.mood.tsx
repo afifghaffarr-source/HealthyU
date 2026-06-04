@@ -23,13 +23,20 @@ function Page() {
           Korelasi 30 hari antara mood, kalori, dan gula.
         </p>
         {data?.points.map((p) => (
-          <div key={p.date} className="rounded-xl bg-card border p-3 flex items-center justify-between text-sm">
+          <div
+            key={p.date}
+            className="rounded-xl bg-card border p-3 flex items-center justify-between text-sm"
+          >
             <span className="font-medium">{p.date}</span>
             <span>{"😣😕😐🙂😄"[(p.mood ?? 3) - 1]}</span>
-            <span className="text-xs text-muted-foreground">{Math.round(p.kcal)} kkal · {Math.round(p.sugar)}g gula</span>
+            <span className="text-xs text-muted-foreground">
+              {Math.round(p.kcal)} kkal · {Math.round(p.sugar)}g gula
+            </span>
           </div>
         ))}
-        {data?.points.length === 0 && <p className="text-sm text-muted-foreground text-center py-8">Belum ada data mood</p>}
+        {data?.points.length === 0 && (
+          <p className="text-sm text-muted-foreground text-center py-8">Belum ada data mood</p>
+        )}
       </main>
       <BottomNav />
     </div>

@@ -27,11 +27,13 @@ export const listProgress = createServerFn({ method: "GET" })
 export const addProgress = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((i: unknown) =>
-    z.object({
-      photo_url: z.string().min(1).max(500),
-      weight_kg: z.number().positive().max(500).optional(),
-      notes: z.string().max(500).optional(),
-    }).parse(i),
+    z
+      .object({
+        photo_url: z.string().min(1).max(500),
+        weight_kg: z.number().positive().max(500).optional(),
+        notes: z.string().max(500).optional(),
+      })
+      .parse(i),
   )
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
@@ -42,11 +44,17 @@ export const addProgress = createServerFn({ method: "POST" })
 
 export const deleteProgress = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((i: unknown) => z.object({ id: z.string().uuid(), photo_url: z.string() }).parse(i))
+  .inputValidator((i: unknown) =>
+    z.object({ id: z.string().uuid(), photo_url: z.string() }).parse(i),
+  )
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
     await supabase.storage.from("progress-photos").remove([data.photo_url]);
-    const { error } = await supabase.from("progress_photos").delete().eq("id", data.id).eq("user_id", userId);
+    const { error } = await supabase
+      .from("progress_photos")
+      .delete()
+      .eq("id", data.id)
+      .eq("user_id", userId);
     if (error) throw new Error(error.message);
     return { ok: true };
   });

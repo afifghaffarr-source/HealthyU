@@ -46,7 +46,15 @@ export const getReferralInfo = createServerFn({ method: "GET" })
 export const applyReferralCode = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((i: unknown) =>
-    z.object({ code: z.string().min(4).max(20).regex(/^[A-Z0-9]+$/) }).parse(i),
+    z
+      .object({
+        code: z
+          .string()
+          .min(4)
+          .max(20)
+          .regex(/^[A-Z0-9]+$/),
+      })
+      .parse(i),
   )
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
