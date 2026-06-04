@@ -61,6 +61,7 @@ import { Route as AuthenticatedCoachRouteImport } from './routes/_authenticated/
 import { Route as AuthenticatedChatRouteImport } from './routes/_authenticated/chat'
 import { Route as AuthenticatedCharityRouteImport } from './routes/_authenticated/charity'
 import { Route as AuthenticatedChallengesRouteImport } from './routes/_authenticated/challenges'
+import { Route as AuthenticatedBodyRouteImport } from './routes/_authenticated/body'
 import { Route as AuthenticatedBackupRouteImport } from './routes/_authenticated/backup'
 import { Route as AuthenticatedArticlesRouteImport } from './routes/_authenticated/articles'
 import { Route as AuthenticatedAlarmsRouteImport } from './routes/_authenticated/alarms'
@@ -404,6 +405,11 @@ const AuthenticatedCharityRoute = AuthenticatedCharityRouteImport.update({
 const AuthenticatedChallengesRoute = AuthenticatedChallengesRouteImport.update({
   id: '/challenges',
   path: '/challenges',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedBodyRoute = AuthenticatedBodyRouteImport.update({
+  id: '/body',
+  path: '/body',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedBackupRoute = AuthenticatedBackupRouteImport.update({
@@ -858,6 +864,7 @@ export interface FileRoutesByFullPath {
   '/alarms': typeof AuthenticatedAlarmsRoute
   '/articles': typeof AuthenticatedArticlesRoute
   '/backup': typeof AuthenticatedBackupRoute
+  '/body': typeof AuthenticatedBodyRoute
   '/challenges': typeof AuthenticatedChallengesRouteWithChildren
   '/charity': typeof AuthenticatedCharityRoute
   '/chat': typeof AuthenticatedChatRoute
@@ -988,6 +995,7 @@ export interface FileRoutesByTo {
   '/alarms': typeof AuthenticatedAlarmsRoute
   '/articles': typeof AuthenticatedArticlesRoute
   '/backup': typeof AuthenticatedBackupRoute
+  '/body': typeof AuthenticatedBodyRoute
   '/challenges': typeof AuthenticatedChallengesRouteWithChildren
   '/charity': typeof AuthenticatedCharityRoute
   '/chat': typeof AuthenticatedChatRoute
@@ -1120,6 +1128,7 @@ export interface FileRoutesById {
   '/_authenticated/alarms': typeof AuthenticatedAlarmsRoute
   '/_authenticated/articles': typeof AuthenticatedArticlesRoute
   '/_authenticated/backup': typeof AuthenticatedBackupRoute
+  '/_authenticated/body': typeof AuthenticatedBodyRoute
   '/_authenticated/challenges': typeof AuthenticatedChallengesRouteWithChildren
   '/_authenticated/charity': typeof AuthenticatedCharityRoute
   '/_authenticated/chat': typeof AuthenticatedChatRoute
@@ -1252,6 +1261,7 @@ export interface FileRouteTypes {
     | '/alarms'
     | '/articles'
     | '/backup'
+    | '/body'
     | '/challenges'
     | '/charity'
     | '/chat'
@@ -1382,6 +1392,7 @@ export interface FileRouteTypes {
     | '/alarms'
     | '/articles'
     | '/backup'
+    | '/body'
     | '/challenges'
     | '/charity'
     | '/chat'
@@ -1513,6 +1524,7 @@ export interface FileRouteTypes {
     | '/_authenticated/alarms'
     | '/_authenticated/articles'
     | '/_authenticated/backup'
+    | '/_authenticated/body'
     | '/_authenticated/challenges'
     | '/_authenticated/charity'
     | '/_authenticated/chat'
@@ -2013,6 +2025,13 @@ declare module '@tanstack/react-router' {
       path: '/challenges'
       fullPath: '/challenges'
       preLoaderRoute: typeof AuthenticatedChallengesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/body': {
+      id: '/_authenticated/body'
+      path: '/body'
+      fullPath: '/body'
+      preLoaderRoute: typeof AuthenticatedBodyRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/backup': {
@@ -2862,6 +2881,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAlarmsRoute: typeof AuthenticatedAlarmsRoute
   AuthenticatedArticlesRoute: typeof AuthenticatedArticlesRoute
   AuthenticatedBackupRoute: typeof AuthenticatedBackupRoute
+  AuthenticatedBodyRoute: typeof AuthenticatedBodyRoute
   AuthenticatedChallengesRoute: typeof AuthenticatedChallengesRouteWithChildren
   AuthenticatedCharityRoute: typeof AuthenticatedCharityRoute
   AuthenticatedChatRoute: typeof AuthenticatedChatRoute
@@ -2934,6 +2954,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAlarmsRoute: AuthenticatedAlarmsRoute,
   AuthenticatedArticlesRoute: AuthenticatedArticlesRoute,
   AuthenticatedBackupRoute: AuthenticatedBackupRoute,
+  AuthenticatedBodyRoute: AuthenticatedBodyRoute,
   AuthenticatedChallengesRoute: AuthenticatedChallengesRouteWithChildren,
   AuthenticatedCharityRoute: AuthenticatedCharityRoute,
   AuthenticatedChatRoute: AuthenticatedChatRoute,
