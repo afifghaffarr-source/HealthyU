@@ -107,6 +107,26 @@ function PetPage() {
               <p className="text-xs text-muted-foreground">
                 Lv {pet.evolution_stage} · {pet.evolution_points} EXP
               </p>
+              {(() => {
+                const stage = Number(pet.evolution_stage ?? 1);
+                const exp = Number(pet.evolution_points ?? 0);
+                const nextLv = stage * 100;
+                const prevLv = (stage - 1) * 100;
+                const pct = Math.min(100, Math.max(0, ((exp - prevLv) / (nextLv - prevLv)) * 100));
+                return (
+                  <div className="mt-3">
+                    <div className="h-2 rounded-full bg-background/60 overflow-hidden">
+                      <div
+                        className="h-full bg-gradient-to-r from-amber-400 via-orange-500 to-pink-500 transition-all"
+                        style={{ width: `${pct}%` }}
+                      />
+                    </div>
+                    <p className="text-[10px] text-muted-foreground mt-1">
+                      {Math.max(0, nextLv - exp)} EXP menuju Lv {stage + 1}
+                    </p>
+                  </div>
+                );
+              })()}
             </div>
             <div className="rounded-3xl bg-card outline-1 outline-black/5 p-5 space-y-3">
               <Stat icon={<Heart className="size-3 text-rose-500" />} label="Health" value={pet.health_stat} color="bg-rose-500" />
