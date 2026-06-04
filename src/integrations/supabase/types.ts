@@ -395,6 +395,8 @@ export type Database = {
           author_name: string | null
           author_title: string | null
           author_user_id: string | null
+          body_generated_at: string | null
+          body_source: string
           bookmark_count: number
           category: string
           content: string | null
@@ -433,6 +435,8 @@ export type Database = {
           author_name?: string | null
           author_title?: string | null
           author_user_id?: string | null
+          body_generated_at?: string | null
+          body_source?: string
           bookmark_count?: number
           category: string
           content?: string | null
@@ -471,6 +475,8 @@ export type Database = {
           author_name?: string | null
           author_title?: string | null
           author_user_id?: string | null
+          body_generated_at?: string | null
+          body_source?: string
           bookmark_count?: number
           category?: string
           content?: string | null
@@ -1329,6 +1335,56 @@ export type Database = {
         }
         Relationships: []
       }
+      content_categories: {
+        Row: {
+          created_at: string
+          description: string | null
+          icon: string | null
+          id: string
+          is_active: boolean
+          name_en: string | null
+          name_id: string
+          parent_slug: string | null
+          slug: string
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          icon?: string | null
+          id?: string
+          is_active?: boolean
+          name_en?: string | null
+          name_id: string
+          parent_slug?: string | null
+          slug: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          icon?: string | null
+          id?: string
+          is_active?: boolean
+          name_en?: string | null
+          name_id?: string
+          parent_slug?: string | null
+          slug?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "content_categories_parent_slug_fkey"
+            columns: ["parent_slug"]
+            isOneToOne: false
+            referencedRelation: "content_categories"
+            referencedColumns: ["slug"]
+          },
+        ]
+      }
       content_reports: {
         Row: {
           content_id: string
@@ -1365,6 +1421,36 @@ export type Database = {
           reviewed_at?: string | null
           reviewed_by?: string | null
           status?: string
+        }
+        Relationships: []
+      }
+      content_tags: {
+        Row: {
+          created_at: string
+          id: string
+          is_active: boolean
+          name_en: string | null
+          name_id: string
+          slug: string
+          usage_count: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          name_en?: string | null
+          name_id: string
+          slug: string
+          usage_count?: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          name_en?: string | null
+          name_id?: string
+          slug?: string
+          usage_count?: number
         }
         Relationships: []
       }
@@ -3978,6 +4064,7 @@ export type Database = {
           carbs_g: number
           category: string
           cook_count: number
+          cook_min: number | null
           created_at: string
           cuisine: string | null
           deleted_at: string | null
@@ -4007,6 +4094,7 @@ export type Database = {
           snapshot_at: string | null
           tags: Json | null
           title: string
+          total_min: number | null
           updated_at: string
           user_id: string | null
           video_url: string | null
@@ -4018,6 +4106,7 @@ export type Database = {
           carbs_g?: number
           category?: string
           cook_count?: number
+          cook_min?: number | null
           created_at?: string
           cuisine?: string | null
           deleted_at?: string | null
@@ -4047,6 +4136,7 @@ export type Database = {
           snapshot_at?: string | null
           tags?: Json | null
           title: string
+          total_min?: number | null
           updated_at?: string
           user_id?: string | null
           video_url?: string | null
@@ -4058,6 +4148,7 @@ export type Database = {
           carbs_g?: number
           category?: string
           cook_count?: number
+          cook_min?: number | null
           created_at?: string
           cuisine?: string | null
           deleted_at?: string | null
@@ -4087,6 +4178,7 @@ export type Database = {
           snapshot_at?: string | null
           tags?: Json | null
           title?: string
+          total_min?: number | null
           updated_at?: string
           user_id?: string | null
           video_url?: string | null
