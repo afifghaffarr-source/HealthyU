@@ -86,6 +86,10 @@ function ChallengesPage() {
     onSuccess: (r) => {
       toast.success(`Hari ${r.day} tercatat · streak ${r.streak}`);
       announce(`Hari ${r.day} tercatat, streak ${r.streak}`);
+      import("@/lib/confetti").then((m) => {
+        const intense = (r as { completed?: boolean }).completed === true || (r.streak && r.streak % 7 === 0);
+        m.celebrate({ intense: Boolean(intense) });
+      });
       invalidate();
     },
     onError: (e: Error) => toast.error(e.message),
