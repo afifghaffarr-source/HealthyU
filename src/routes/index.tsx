@@ -320,6 +320,7 @@ function Index() {
           <div className="flex flex-col sm:flex-row gap-3 pt-2">
             <Link
               to={ctaPrimary}
+              onClick={fireConfetti}
               className="group relative overflow-hidden text-center bg-gradient-to-r from-primary to-primary-dark text-primary-foreground font-semibold py-4 px-6 rounded-2xl shadow-xl shadow-primary/30 hover:shadow-2xl hover:shadow-primary/40 hover:-translate-y-0.5 transition-all"
             >
               <span className="relative z-10 inline-flex items-center gap-2 justify-center">
@@ -438,14 +439,14 @@ function Index() {
       {/* Stats strip */}
       <section className="max-w-6xl mx-auto px-5 md:px-8 py-10 grid grid-cols-2 md:grid-cols-4 gap-3">
         {[
-          { v: "10K+", l: "Pengguna aktif", i: Heart },
-          { v: "5.000+", l: "Menu Indonesia", i: Utensils },
-          { v: "98%", l: "Akurasi scan AI", i: Camera },
-          { v: "24/7", l: "Dr. Healthy siap", i: MessageCircle },
-        ].map(({ v, l, i: Icon }) => (
+          { n: 10000, s: "+", l: "Pengguna aktif", i: Heart },
+          { n: 5000, s: "+", l: "Menu Indonesia", i: Utensils },
+          { n: 98, s: "%", l: "Akurasi scan AI", i: Camera },
+          { n: 24, s: "/7", l: "Dr. Healthy siap", i: MessageCircle },
+        ].map(({ n, s, l, i: Icon }) => (
           <div key={l} className="glass rounded-2xl p-4 border border-white/15 text-center">
             <Icon className="size-5 text-primary mx-auto mb-2" />
-            <p className="text-2xl font-bold" style={{ fontFamily: "var(--font-display)" }}>{v}</p>
+            <p className="text-2xl font-bold" style={{ fontFamily: "var(--font-display)" }}><StatsCounter value={n} suffix={s} /></p>
             <p className="text-xs text-muted-foreground">{l}</p>
           </div>
         ))}
