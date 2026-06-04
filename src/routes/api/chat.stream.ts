@@ -106,10 +106,10 @@ export const Route = createFileRoute("/api/chat/stream")({
         // Budget gate: only enforced for actual AI calls (tier 2/3 + image).
         const { data: prof } = await supabase
           .from("profiles")
-          .select("subscription_tier")
+          .select("premium_status")
           .eq("id", userId)
           .maybeSingle();
-        const isPremium = ((prof?.subscription_tier as string | null) ?? "free").toLowerCase() !== "free";
+        const isPremium = ((prof?.premium_status as string | null) ?? "free").toLowerCase() === "active";
         const budget = await enforceAiBudget(userId, isPremium);
         if (!budget.allowed) {
           return new Response(
