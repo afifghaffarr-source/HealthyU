@@ -19,6 +19,8 @@ import { ReminderScheduler } from "@/components/reminder-scheduler";
 import { InstallPrompt } from "@/components/install-prompt";
 import { LiveAnnouncerProvider } from "@/components/live-announcer";
 import { I18nProvider } from "@/lib/i18n";
+import { DesktopSidebar } from "@/components/healthyu/desktop-sidebar";
+import { GlobalErrorBoundary } from "@/components/healthyu/global-error-boundary";
 
 function NotFoundComponent() {
   return (
@@ -143,7 +145,12 @@ function RootComponent() {
           <ManifestLinkManager />
           <AuthListener />
           <ReminderScheduler />
-          <Outlet />
+          <DesktopSidebar />
+          <div className="lg:pl-64">
+            <GlobalErrorBoundary>
+              <Outlet />
+            </GlobalErrorBoundary>
+          </div>
           <InstallPrompt />
           <Toaster position="top-center" />
           </LiveAnnouncerProvider>
