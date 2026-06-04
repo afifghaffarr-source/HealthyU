@@ -17,6 +17,7 @@ import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as KaloriIndexRouteImport } from './routes/kalori.index'
 import { Route as KalkulatorIndexRouteImport } from './routes/kalkulator.index'
+import { Route as KaloriSlugRouteImport } from './routes/kalori.$slug'
 import { Route as KalkulatorSlugRouteImport } from './routes/kalkulator.$slug'
 import { Route as AuthenticatedWorkoutRouteImport } from './routes/_authenticated/workout'
 import { Route as AuthenticatedWeightRouteImport } from './routes/_authenticated/weight'
@@ -193,6 +194,11 @@ const KalkulatorIndexRoute = KalkulatorIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => KalkulatorRoute,
+} as any)
+const KaloriSlugRoute = KaloriSlugRouteImport.update({
+  id: '/$slug',
+  path: '/$slug',
+  getParentRoute: () => KaloriRoute,
 } as any)
 const KalkulatorSlugRoute = KalkulatorSlugRouteImport.update({
   id: '/$slug',
@@ -1015,6 +1021,7 @@ export interface FileRoutesByFullPath {
   '/weight': typeof AuthenticatedWeightRouteWithChildren
   '/workout': typeof AuthenticatedWorkoutRouteWithChildren
   '/kalkulator/$slug': typeof KalkulatorSlugRoute
+  '/kalori/$slug': typeof KaloriSlugRoute
   '/kalkulator/': typeof KalkulatorIndexRoute
   '/kalori/': typeof KaloriIndexRoute
   '/articles/$id': typeof AuthenticatedArticlesIdRoute
@@ -1159,6 +1166,7 @@ export interface FileRoutesByTo {
   '/weight': typeof AuthenticatedWeightRouteWithChildren
   '/workout': typeof AuthenticatedWorkoutRouteWithChildren
   '/kalkulator/$slug': typeof KalkulatorSlugRoute
+  '/kalori/$slug': typeof KaloriSlugRoute
   '/kalkulator': typeof KalkulatorIndexRoute
   '/kalori': typeof KaloriIndexRoute
   '/articles/$id': typeof AuthenticatedArticlesIdRoute
@@ -1307,6 +1315,7 @@ export interface FileRoutesById {
   '/_authenticated/weight': typeof AuthenticatedWeightRouteWithChildren
   '/_authenticated/workout': typeof AuthenticatedWorkoutRouteWithChildren
   '/kalkulator/$slug': typeof KalkulatorSlugRoute
+  '/kalori/$slug': typeof KaloriSlugRoute
   '/kalkulator/': typeof KalkulatorIndexRoute
   '/kalori/': typeof KaloriIndexRoute
   '/_authenticated/articles/$id': typeof AuthenticatedArticlesIdRoute
@@ -1455,6 +1464,7 @@ export interface FileRouteTypes {
     | '/weight'
     | '/workout'
     | '/kalkulator/$slug'
+    | '/kalori/$slug'
     | '/kalkulator/'
     | '/kalori/'
     | '/articles/$id'
@@ -1599,6 +1609,7 @@ export interface FileRouteTypes {
     | '/weight'
     | '/workout'
     | '/kalkulator/$slug'
+    | '/kalori/$slug'
     | '/kalkulator'
     | '/kalori'
     | '/articles/$id'
@@ -1746,6 +1757,7 @@ export interface FileRouteTypes {
     | '/_authenticated/weight'
     | '/_authenticated/workout'
     | '/kalkulator/$slug'
+    | '/kalori/$slug'
     | '/kalkulator/'
     | '/kalori/'
     | '/_authenticated/articles/$id'
@@ -1905,6 +1917,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/kalkulator/'
       preLoaderRoute: typeof KalkulatorIndexRouteImport
       parentRoute: typeof KalkulatorRoute
+    }
+    '/kalori/$slug': {
+      id: '/kalori/$slug'
+      path: '/$slug'
+      fullPath: '/kalori/$slug'
+      preLoaderRoute: typeof KaloriSlugRouteImport
+      parentRoute: typeof KaloriRoute
     }
     '/kalkulator/$slug': {
       id: '/kalkulator/$slug'
@@ -3368,10 +3387,12 @@ const KalkulatorRouteWithChildren = KalkulatorRoute._addFileChildren(
 )
 
 interface KaloriRouteChildren {
+  KaloriSlugRoute: typeof KaloriSlugRoute
   KaloriIndexRoute: typeof KaloriIndexRoute
 }
 
 const KaloriRouteChildren: KaloriRouteChildren = {
+  KaloriSlugRoute: KaloriSlugRoute,
   KaloriIndexRoute: KaloriIndexRoute,
 }
 
