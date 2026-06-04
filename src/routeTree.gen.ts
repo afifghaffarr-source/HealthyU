@@ -107,6 +107,7 @@ import { Route as AuthenticatedPushAlarmRouteImport } from './routes/_authentica
 import { Route as AuthenticatedProfileScanStatsRouteImport } from './routes/_authenticated/profile.scan-stats'
 import { Route as AuthenticatedProfilePrivacyRouteImport } from './routes/_authenticated/profile.privacy'
 import { Route as AuthenticatedPrayerQiblaRouteImport } from './routes/_authenticated/prayer.qibla'
+import { Route as AuthenticatedPrayerAladhanRouteImport } from './routes/_authenticated/prayer.aladhan'
 import { Route as AuthenticatedPodcastWeeklyRouteImport } from './routes/_authenticated/podcast.weekly'
 import { Route as AuthenticatedPetSvgRouteImport } from './routes/_authenticated/pet.svg'
 import { Route as AuthenticatedPetShopRouteImport } from './routes/_authenticated/pet.shop'
@@ -669,6 +670,12 @@ const AuthenticatedPrayerQiblaRoute =
     path: '/qibla',
     getParentRoute: () => AuthenticatedPrayerRoute,
   } as any)
+const AuthenticatedPrayerAladhanRoute =
+  AuthenticatedPrayerAladhanRouteImport.update({
+    id: '/aladhan',
+    path: '/aladhan',
+    getParentRoute: () => AuthenticatedPrayerRoute,
+  } as any)
 const AuthenticatedPodcastWeeklyRoute =
   AuthenticatedPodcastWeeklyRouteImport.update({
     id: '/podcast/weekly',
@@ -950,6 +957,7 @@ export interface FileRoutesByFullPath {
   '/pet/shop': typeof AuthenticatedPetShopRoute
   '/pet/svg': typeof AuthenticatedPetSvgRoute
   '/podcast/weekly': typeof AuthenticatedPodcastWeeklyRoute
+  '/prayer/aladhan': typeof AuthenticatedPrayerAladhanRoute
   '/prayer/qibla': typeof AuthenticatedPrayerQiblaRoute
   '/profile/privacy': typeof AuthenticatedProfilePrivacyRoute
   '/profile/scan-stats': typeof AuthenticatedProfileScanStatsRoute
@@ -1083,6 +1091,7 @@ export interface FileRoutesByTo {
   '/pet/shop': typeof AuthenticatedPetShopRoute
   '/pet/svg': typeof AuthenticatedPetSvgRoute
   '/podcast/weekly': typeof AuthenticatedPodcastWeeklyRoute
+  '/prayer/aladhan': typeof AuthenticatedPrayerAladhanRoute
   '/prayer/qibla': typeof AuthenticatedPrayerQiblaRoute
   '/profile/privacy': typeof AuthenticatedProfilePrivacyRoute
   '/profile/scan-stats': typeof AuthenticatedProfileScanStatsRoute
@@ -1218,6 +1227,7 @@ export interface FileRoutesById {
   '/_authenticated/pet/shop': typeof AuthenticatedPetShopRoute
   '/_authenticated/pet/svg': typeof AuthenticatedPetSvgRoute
   '/_authenticated/podcast/weekly': typeof AuthenticatedPodcastWeeklyRoute
+  '/_authenticated/prayer/aladhan': typeof AuthenticatedPrayerAladhanRoute
   '/_authenticated/prayer/qibla': typeof AuthenticatedPrayerQiblaRoute
   '/_authenticated/profile/privacy': typeof AuthenticatedProfilePrivacyRoute
   '/_authenticated/profile/scan-stats': typeof AuthenticatedProfileScanStatsRoute
@@ -1353,6 +1363,7 @@ export interface FileRouteTypes {
     | '/pet/shop'
     | '/pet/svg'
     | '/podcast/weekly'
+    | '/prayer/aladhan'
     | '/prayer/qibla'
     | '/profile/privacy'
     | '/profile/scan-stats'
@@ -1486,6 +1497,7 @@ export interface FileRouteTypes {
     | '/pet/shop'
     | '/pet/svg'
     | '/podcast/weekly'
+    | '/prayer/aladhan'
     | '/prayer/qibla'
     | '/profile/privacy'
     | '/profile/scan-stats'
@@ -1620,6 +1632,7 @@ export interface FileRouteTypes {
     | '/_authenticated/pet/shop'
     | '/_authenticated/pet/svg'
     | '/_authenticated/podcast/weekly'
+    | '/_authenticated/prayer/aladhan'
     | '/_authenticated/prayer/qibla'
     | '/_authenticated/profile/privacy'
     | '/_authenticated/profile/scan-stats'
@@ -2374,6 +2387,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedPrayerQiblaRouteImport
       parentRoute: typeof AuthenticatedPrayerRoute
     }
+    '/_authenticated/prayer/aladhan': {
+      id: '/_authenticated/prayer/aladhan'
+      path: '/aladhan'
+      fullPath: '/prayer/aladhan'
+      preLoaderRoute: typeof AuthenticatedPrayerAladhanRouteImport
+      parentRoute: typeof AuthenticatedPrayerRoute
+    }
     '/_authenticated/podcast/weekly': {
       id: '/_authenticated/podcast/weekly'
       path: '/podcast/weekly'
@@ -2761,10 +2781,12 @@ const AuthenticatedPetRouteWithChildren =
   AuthenticatedPetRoute._addFileChildren(AuthenticatedPetRouteChildren)
 
 interface AuthenticatedPrayerRouteChildren {
+  AuthenticatedPrayerAladhanRoute: typeof AuthenticatedPrayerAladhanRoute
   AuthenticatedPrayerQiblaRoute: typeof AuthenticatedPrayerQiblaRoute
 }
 
 const AuthenticatedPrayerRouteChildren: AuthenticatedPrayerRouteChildren = {
+  AuthenticatedPrayerAladhanRoute: AuthenticatedPrayerAladhanRoute,
   AuthenticatedPrayerQiblaRoute: AuthenticatedPrayerQiblaRoute,
 }
 
