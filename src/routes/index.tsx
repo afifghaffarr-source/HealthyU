@@ -559,6 +559,138 @@ function Index() {
         </div>
       </section>
 
+      {/* Comparison table */}
+      <section className="max-w-5xl mx-auto px-5 md:px-8 py-16">
+        <div className="text-center max-w-2xl mx-auto mb-8">
+          <h2 className="text-3xl md:text-4xl font-bold tracking-tight" style={{ fontFamily: "var(--font-display)" }}>HealthyU vs <span className="text-muted-foreground">yang lain</span></h2>
+          <p className="text-muted-foreground mt-2 text-sm">Kenapa ribuan orang Indonesia pindah ke HealthyU.</p>
+        </div>
+        <div className="glass rounded-2xl border border-white/15 overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead className="bg-card/60">
+              <tr className="text-left">
+                <th className="p-4 font-semibold">Fitur</th>
+                <th className="p-4 font-semibold text-primary">HealthyU</th>
+                <th className="p-4 font-semibold text-muted-foreground">MyFitnessPal</th>
+                <th className="p-4 font-semibold text-muted-foreground">Fitbit</th>
+              </tr>
+            </thead>
+            <tbody>
+              {COMPARE.map((r) => (
+                <tr key={r.f} className="border-t border-white/10">
+                  <td className="p-4 font-medium">{r.f}</td>
+                  {[r.us, r.mfp, r.fitbit].map((v, i) => (
+                    <td key={i} className="p-4">
+                      {v === true ? <Check className="size-4 text-primary" /> : v === false ? <span className="text-muted-foreground">—</span> : <span className="text-xs text-muted-foreground">{v}</span>}
+                    </td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      {/* Untuk siapa */}
+      <section className="max-w-6xl mx-auto px-5 md:px-8 py-16">
+        <div className="text-center max-w-2xl mx-auto mb-8">
+          <h2 className="text-3xl md:text-4xl font-bold tracking-tight" style={{ fontFamily: "var(--font-display)" }}>Dibuat untuk <span className="text-primary">semua orang</span></h2>
+        </div>
+        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
+          {AUDIENCES.map(({ icon: Icon, t, d }) => (
+            <div key={t} className="glass rounded-2xl p-5 border border-white/15 hover:border-primary/30 hover:-translate-y-1 transition-all">
+              <div className="size-10 rounded-xl bg-gradient-to-br from-primary/15 to-accent/15 grid place-items-center mb-3 text-primary"><Icon className="size-5" /></div>
+              <h3 className="font-bold text-sm mb-1" style={{ fontFamily: "var(--font-display)" }}>{t}</h3>
+              <p className="text-xs text-muted-foreground">{d}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* BMR Quiz */}
+      <section className="max-w-3xl mx-auto px-5 md:px-8 py-16">
+        <BmrQuiz />
+      </section>
+
+      {/* Resep populer */}
+      <section className="max-w-6xl mx-auto px-5 md:px-8 py-16">
+        <div className="flex items-end justify-between mb-6">
+          <div>
+            <h2 className="text-3xl md:text-4xl font-bold tracking-tight" style={{ fontFamily: "var(--font-display)" }}>Resep populer minggu ini</h2>
+            <p className="text-muted-foreground text-sm mt-1">Diuji dapur lokal, ramah kalori.</p>
+          </div>
+          <Link to={ctaPrimary} className="hidden sm:inline text-sm font-semibold text-primary">Lihat semua →</Link>
+        </div>
+        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
+          {RECIPES.map((r, i) => (
+            <article key={r.name} className="glass rounded-2xl border border-white/15 overflow-hidden hover:-translate-y-1 transition-all">
+              <div className="aspect-[4/3]" style={{ background: `linear-gradient(135deg, hsl(${i * 70} 70% 70%), hsl(${i * 70 + 40} 70% 55%))` }} />
+              <div className="p-4">
+                <h3 className="font-bold text-sm mb-1" style={{ fontFamily: "var(--font-display)" }}>{r.name}</h3>
+                <p className="text-xs text-muted-foreground flex items-center gap-3"><span className="inline-flex items-center gap-1"><Flame className="size-3 text-amber-500" />{r.kcal} kkal</span><span className="inline-flex items-center gap-1"><Timer className="size-3" />{r.time}</span></p>
+              </div>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      {/* Before / After */}
+      <section className="max-w-4xl mx-auto px-5 md:px-8 py-16">
+        <div className="text-center max-w-2xl mx-auto mb-8">
+          <h2 className="text-3xl md:text-4xl font-bold tracking-tight" style={{ fontFamily: "var(--font-display)" }}>Hasil nyata, <span className="text-primary">geser & lihat</span></h2>
+          <p className="text-muted-foreground mt-2 text-sm">Transformasi user HealthyU dalam 12 minggu.</p>
+        </div>
+        <BeforeAfter />
+      </section>
+
+      {/* Pricing teaser */}
+      <section className="max-w-5xl mx-auto px-5 md:px-8 py-16">
+        <div className="grid md:grid-cols-2 gap-4">
+          <div className="glass rounded-3xl p-7 border border-primary/30">
+            <span className="inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-primary bg-primary/10 px-2 py-1 rounded-full">Gratis</span>
+            <h3 className="text-2xl font-bold mt-3" style={{ fontFamily: "var(--font-display)" }}>Rp 0 <span className="text-sm font-normal text-muted-foreground">/ selamanya</span></h3>
+            <ul className="text-sm space-y-2 mt-4 text-muted-foreground">
+              {["Scan makanan AI","Meal plan personal","Puasa & jadwal sholat","Dr. Healthy chatbot"].map((x) => <li key={x} className="flex items-center gap-2"><Check className="size-4 text-primary" />{x}</li>)}
+            </ul>
+            <Link to={ctaPrimary} className="mt-5 block text-center bg-primary text-primary-foreground font-semibold py-3 rounded-xl">Mulai gratis</Link>
+          </div>
+          <div className="relative overflow-hidden bg-gradient-to-br from-primary via-primary-dark to-accent text-primary-foreground rounded-3xl p-7 shadow-xl">
+            <span className="inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider bg-white/20 px-2 py-1 rounded-full"><Crown className="size-3" /> Premium (segera)</span>
+            <h3 className="text-2xl font-bold mt-3" style={{ fontFamily: "var(--font-display)" }}>Rp 29rb <span className="text-sm font-normal opacity-80">/ bulan</span></h3>
+            <ul className="text-sm space-y-2 mt-4 opacity-95">
+              {["Konsultasi nutritionist real","Resep premium tanpa batas","Export laporan PDF","Sinkron Apple/Google Fit"].map((x) => <li key={x} className="flex items-center gap-2"><Check className="size-4" />{x}</li>)}
+            </ul>
+            <button className="mt-5 w-full text-center bg-white text-primary font-semibold py-3 rounded-xl">Notify saya</button>
+          </div>
+        </div>
+      </section>
+
+      {/* Newsletter */}
+      <section className="max-w-3xl mx-auto px-5 md:px-8 py-16">
+        <div className="glass rounded-3xl p-7 border border-white/15 text-center">
+          <h3 className="text-2xl font-bold" style={{ fontFamily: "var(--font-display)" }}>Dapat <span className="text-primary">ebook Meal Plan 7 hari</span> gratis</h3>
+          <p className="text-sm text-muted-foreground mt-2">Masukkan email — kirim PDF langsung ke inbox.</p>
+          {subscribed ? (
+            <p className="mt-4 text-primary font-semibold inline-flex items-center gap-2"><Check className="size-4" /> Cek inbox kamu ya!</p>
+          ) : (
+            <form onSubmit={(e) => { e.preventDefault(); if (email) setSubscribed(true); }} className="mt-4 flex flex-col sm:flex-row gap-2 max-w-md mx-auto">
+              <input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="nama@email.com" className="flex-1 bg-card border border-white/15 rounded-xl px-4 py-3 text-sm" />
+              <button className="bg-primary text-primary-foreground font-semibold px-5 py-3 rounded-xl inline-flex items-center justify-center gap-2"><Send className="size-4" /> Kirim</button>
+            </form>
+          )}
+        </div>
+      </section>
+
+      {/* Featured in */}
+      <section className="max-w-5xl mx-auto px-5 md:px-8 py-10">
+        <p className="text-center text-xs uppercase tracking-wider text-muted-foreground font-semibold mb-4 inline-flex items-center gap-2 justify-center w-full"><Users className="size-3.5" /> Featured in</p>
+        <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-3 opacity-70">
+          {["Kompas","Detik","Tempo","Tirto","CNN Indonesia","IDN Times"].map((m) => (
+            <span key={m} className="font-bold tracking-tight text-muted-foreground" style={{ fontFamily: "var(--font-display)" }}>{m}</span>
+          ))}
+        </div>
+      </section>
+
       {/* Final CTA */}
       <section className="max-w-3xl mx-auto px-5 md:px-8 py-16 md:py-24 text-center">
         <div className="relative overflow-hidden bg-gradient-to-br from-primary via-primary-dark to-accent text-primary-foreground rounded-3xl p-10 md:p-14 space-y-5 shadow-2xl shadow-primary/30">
