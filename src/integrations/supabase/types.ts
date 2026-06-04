@@ -14,6 +14,33 @@ export type Database = {
   }
   public: {
     Tables: {
+      account_deletion_requests: {
+        Row: {
+          id: string
+          processed_at: string | null
+          reason: string | null
+          requested_at: string
+          status: string
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          processed_at?: string | null
+          reason?: string | null
+          requested_at?: string
+          status?: string
+          user_id: string
+        }
+        Update: {
+          id?: string
+          processed_at?: string | null
+          reason?: string | null
+          requested_at?: string
+          status?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       achievement_showcase_order: {
         Row: {
           achievement_id: string
@@ -475,6 +502,42 @@ export type Database = {
           updated_at?: string
           video_url?: string | null
           view_count?: number
+        }
+        Relationships: []
+      }
+      audit_log: {
+        Row: {
+          action: string
+          created_at: string
+          entity: string | null
+          entity_id: string | null
+          id: number
+          ip_address: string | null
+          meta: Json
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          action: string
+          created_at?: string
+          entity?: string | null
+          entity_id?: string | null
+          id?: number
+          ip_address?: string | null
+          meta?: Json
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          action?: string
+          created_at?: string
+          entity?: string | null
+          entity_id?: string | null
+          id?: number
+          ip_address?: string | null
+          meta?: Json
+          user_agent?: string | null
+          user_id?: string | null
         }
         Relationships: []
       }
@@ -4055,6 +4118,36 @@ export type Database = {
         }
         Relationships: []
       }
+      sensitive_health_notes: {
+        Row: {
+          category: string | null
+          created_at: string
+          encrypted_note: string
+          id: string
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string
+          encrypted_note: string
+          id?: string
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          category?: string | null
+          created_at?: string
+          encrypted_note?: string
+          id?: string
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       sleep_diary: {
         Row: {
           bedtime: string | null
@@ -5449,6 +5542,7 @@ export type Database = {
       }
     }
     Functions: {
+      _get_field_key: { Args: never; Returns: string }
       check_rate_limit: {
         Args: {
           _bucket: string
@@ -5462,6 +5556,17 @@ export type Database = {
         Returns: Json
       }
       cleanup_rate_limit_log: { Args: never; Returns: undefined }
+      get_sensitive_note: {
+        Args: { _id: string }
+        Returns: {
+          category: string
+          created_at: string
+          id: string
+          note: string
+          title: string
+          updated_at: string
+        }[]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -5475,6 +5580,34 @@ export type Database = {
       }
       is_group_member: {
         Args: { _group_id: string; _user_id: string }
+        Returns: boolean
+      }
+      list_sensitive_notes: {
+        Args: never
+        Returns: {
+          category: string
+          created_at: string
+          id: string
+          title: string
+          updated_at: string
+        }[]
+      }
+      log_audit_event: {
+        Args: {
+          _action: string
+          _entity?: string
+          _entity_id?: string
+          _meta?: Json
+        }
+        Returns: undefined
+      }
+      request_account_deletion: { Args: { _reason?: string }; Returns: string }
+      save_sensitive_note: {
+        Args: { _category?: string; _note: string; _title: string }
+        Returns: string
+      }
+      update_sensitive_note: {
+        Args: { _category?: string; _id: string; _note: string; _title: string }
         Returns: boolean
       }
     }
