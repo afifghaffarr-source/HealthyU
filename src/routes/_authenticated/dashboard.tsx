@@ -507,19 +507,58 @@ function Dashboard() {
         </Link>
 
         {/* Gamification */}
-        <Link
-          to="/achievements"
-          className="bg-card p-4 rounded-3xl outline-1 outline-black/5 shadow-sm flex items-center gap-3 animate-fade-up"
-        >
-          <StreakRing days={game?.stats?.current_streak ?? 0} goal={30} size={64} />
-          <div className="flex-1 min-w-0">
-            <p className="text-[10px] font-bold uppercase text-muted-foreground tracking-wider">Level {game?.stats?.level ?? 1} · {game?.stats?.xp ?? 0} XP</p>
-            <p className="font-semibold text-sm">
-              Streak {game?.stats?.current_streak ?? 0} hari
-            </p>
+        <div className="bg-card p-4 rounded-3xl outline-1 outline-black/5 shadow-sm flex items-center gap-3 animate-fade-up">
+          <Link to="/achievements" className="flex items-center gap-3 flex-1 min-w-0">
+            <StreakRing days={game?.stats?.current_streak ?? 0} goal={30} size={64} />
+            <div className="flex-1 min-w-0">
+              <p className="text-[10px] font-bold uppercase text-muted-foreground tracking-wider">Level {game?.stats?.level ?? 1} · {game?.stats?.xp ?? 0} XP</p>
+              <p className="font-semibold text-sm">Streak {game?.stats?.current_streak ?? 0} hari</p>
+            </div>
+            <Trophy className="size-5 text-primary" />
+          </Link>
+          <button
+            onClick={() => setFreezeOpen(true)}
+            aria-label="Streak freeze"
+            className="size-10 rounded-xl bg-sky-100 grid place-items-center"
+          >
+            <Snowflake className="size-5 text-sky-600" />
+          </button>
+        </div>
+
+        {freezeOpen && (
+          <div
+            className="fixed inset-0 z-50 bg-black/50 grid place-items-center p-4"
+            onClick={() => setFreezeOpen(false)}
+          >
+            <div
+              className="bg-card rounded-3xl p-6 max-w-sm w-full text-center space-y-3"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="text-6xl">🧊</div>
+              <h3 className="font-bold text-lg">Streak Freeze</h3>
+              <p className="text-sm text-muted-foreground">
+                Lupa log hari ini? Gunakan 1 freeze untuk menyelamatkan streakmu.
+              </p>
+              <button
+                onClick={() => {
+                  setFreezeUsed(true);
+                  toast.success("Freeze digunakan untuk hari ini");
+                  setTimeout(() => setFreezeOpen(false), 600);
+                }}
+                disabled={freezeUsed}
+                className="w-full rounded-xl bg-primary text-primary-foreground py-2.5 text-sm font-semibold disabled:opacity-50"
+              >
+                {freezeUsed ? "✓ Freeze Digunakan" : "Gunakan 1 Freeze"}
+              </button>
+              <button
+                onClick={() => setFreezeOpen(false)}
+                className="w-full text-xs text-muted-foreground"
+              >
+                Tutup
+              </button>
+            </div>
           </div>
-          <Trophy className="size-5 text-primary" />
-        </Link>
+        )}
 
         {groupSummary.length > 0 && (
           <div className="block bg-card p-4 rounded-3xl outline-1 outline-black/5 shadow-sm animate-fade-up">
