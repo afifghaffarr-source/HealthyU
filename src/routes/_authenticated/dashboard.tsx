@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { getProfile } from "@/lib/profile.functions";
+import { getDailyTip } from "@/lib/dailyTips.functions";
 import { todaysMeals } from "@/lib/meals.functions";
 import { currentFast } from "@/lib/fasting.functions";
 import { todaysWater, logWater } from "@/lib/water.functions";
@@ -20,6 +21,7 @@ import { CoinPill } from "@/components/healthyu/coin-pill";
 import { usePullToRefresh } from "@/hooks/use-pull-to-refresh";
 import { formatDuration, fastingStage } from "@/lib/health";
 import { Droplet, Plus, Sparkles, ArrowRight, Flame, Trophy, Camera, Smile, Gift, Snowflake } from "lucide-react";
+import { Lightbulb } from "lucide-react";
 import { claimDailyLoginBonus } from "@/lib/scanBatch9.functions";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -45,6 +47,7 @@ function Dashboard() {
   const announce = useAnnounce();
   const prefersReducedMotion = useReducedMotion();
   const fetchProfile = useServerFn(getProfile);
+  const fetchDailyTip = useServerFn(getDailyTip);
   const fetchMeals = useServerFn(todaysMeals);
   const fetchFast = useServerFn(currentFast);
   const fetchWater = useServerFn(todaysWater);
@@ -73,6 +76,11 @@ function Dashboard() {
   });
 
   const { data: profile, isLoading: pLoad } = useQuery({ queryKey: ["profile"], queryFn: () => fetchProfile() });
+  const { data: dailyTip } = useQuery({
+    queryKey: ["daily-tip", new Date().toISOString().slice(0, 10)],
+    queryFn: () => fetchDailyTip(),
+    staleTime: 1000 * 60 * 60 * 6,
+  });
   const { data: meals = [] } = useQuery({ queryKey: ["meals", "today"], queryFn: () => fetchMeals() });
   const { data: fast } = useQuery({ queryKey: ["fast", "current"], queryFn: () => fetchFast(), refetchInterval: 30000 });
   const { data: waterMl = 0 } = useQuery({ queryKey: ["water", "today"], queryFn: () => fetchWater() });
