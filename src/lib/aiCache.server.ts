@@ -38,14 +38,6 @@ export async function getCached(key: string): Promise<string | null> {
     .maybeSingle();
   if (!data) return null;
   if (new Date(data.expires_at).getTime() < Date.now()) return null;
-  // Best-effort hit counter (fire & forget).
-  void supabaseAdmin.rpc("noop").catch(() => {});
-  void supabaseAdmin
-    .from("ai_response_cache")
-    .update({ hit_count: undefined })
-    .eq("key", key)
-    .then(() => {})
-    .catch?.(() => {});
   return data.response;
 }
 
