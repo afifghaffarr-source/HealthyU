@@ -60,32 +60,6 @@ export function BottomNav() {
         ))}
       </nav>
 
-      {/* Desktop / tablet side rail */}
-      <aside
-        aria-label="Navigasi samping"
-        className="hidden lg:flex fixed left-4 top-1/2 -translate-y-1/2 z-40 flex-col gap-1 bg-card/90 backdrop-blur-xl rounded-3xl outline-1 outline-black/5 shadow-lg shadow-black/5 p-2"
-      >
-        {items.map(({ to, label, icon: Icon }) => (
-          <Link
-            key={to}
-            to={to}
-            aria-label={label}
-            title={label}
-            className="group relative flex flex-col items-center gap-0.5 px-3 py-3 rounded-2xl text-muted-foreground transition-all duration-200 motion-safe:hover:scale-105"
-            activeProps={{ className: "text-primary [&_.nav-icon-wrap]:bg-primary/12" }}
-          >
-            <span className="nav-icon-wrap relative inline-flex size-10 items-center justify-center rounded-2xl transition-colors">
-              <Icon className="size-5" strokeWidth={2.2} />
-              {to === "/profile" && unread > 0 && (
-                <span className="absolute -top-0.5 -right-0.5 min-w-[16px] h-4 px-1 rounded-full bg-destructive text-destructive-foreground text-[9px] font-bold grid place-items-center shadow">
-                  {unread > 99 ? "99+" : unread}
-                </span>
-              )}
-            </span>
-            <span className="text-[10px] font-semibold">{label}</span>
-          </Link>
-        ))}
-      </aside>
     </>
   );
 }
