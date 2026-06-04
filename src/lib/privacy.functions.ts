@@ -30,9 +30,11 @@ export const updatePrivacySettings = createServerFn({ method: "POST" })
   .inputValidator((i: unknown) => parseInput(PrivacySchema, i))
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
-    const patch = Object.fromEntries(Object.entries(data).filter(([, v]) => v !== undefined));
+    const patch: Record<string, boolean> = Object.fromEntries(
+      Object.entries(data).filter(([, v]) => v !== undefined),
+    ) as Record<string, boolean>;
     if (Object.keys(patch).length === 0) return { ok: true };
-    const { error } = await supabase.from("profiles").update(patch).eq("id", userId);
+    const { error } = await supabase.from("profiles").update(patch as never).eq("id", userId);
     if (error) throw new Error(error.message);
     await supabase.rpc("log_audit_event", {
       _action: "privacy.updated",
