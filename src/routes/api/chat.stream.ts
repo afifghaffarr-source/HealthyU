@@ -2,6 +2,8 @@ import { createFileRoute } from "@tanstack/react-router";
 import { createClient } from "@supabase/supabase-js";
 import type { Database } from "@/integrations/supabase/types";
 import { buildChatPayload, persistUserMessage } from "@/lib/chat.functions";
+import { classifyMessage, buildCompactProfile } from "@/lib/aiRouter.server";
+import { cacheKey, getCached, setCached } from "@/lib/aiCache.server";
 
 export const Route = createFileRoute("/api/chat/stream")({
   server: {
@@ -38,6 +40,66 @@ export const Route = createFileRoute("/api/chat/stream")({
         }
 
         await persistUserMessage(supabase, userId, body.message, body.imageBase64);
+        const decision = classifyMessage(body.message, !!body.imageBase64);
+        const encoder = new TextEncoder();
+
+        // TIER 1 — local rule-based answer, no AI call.
+        if (decision.tier === 1 && decision.localAnswer) {
+          await supabase.from("chat_messages").insert({
+            user_id: userId, role: "assistant", content: decision.localAnswer,
+          });
+          const local = decision.localAnswer;
+          const stream = new ReadableStream({
+            start(controller) {
+              controller.enqueue(encoder.encode(`event: meta\ndata: ${JSON.stringify({ emergency: false, tier: 1, cached: false })}\n\n`));
+              controller.enqueue(encoder.encode(`data: ${JSON.stringify({ delta: local })}\n\n`));
+              controller.enqueue(encoder.encode(`event: done\ndata: {}\n\n`));
+              controller.close();
+            },
+          });
+          return new Response(stream, {
+            headers: {
+              "Content-Type": "text/event-stream",
+              "Cache-Control": "no-cache, no-transform",
+              "X-Accel-Buffering": "no",
+            },
+          });
+        }
+
+        // Cache lookup (skip for images — they bypass response cache).
+        const profile = body.imageBase64
+          ? { hash: "img", block: "" }
+          : await buildCompactProfile(supabase, userId);
+        const key = body.imageBase64
+          ? null
+          : await cacheKey({
+              model: decision.model,
+              tier: decision.tier,
+              question: body.message,
+              profileHash: profile.hash,
+            });
+        const cached = key ? await getCached(key) : null;
+        if (cached) {
+          await supabase.from("chat_messages").insert({
+            user_id: userId, role: "assistant", content: cached,
+          });
+          const stream = new ReadableStream({
+            start(controller) {
+              controller.enqueue(encoder.encode(`event: meta\ndata: ${JSON.stringify({ emergency: false, tier: decision.tier, cached: true })}\n\n`));
+              controller.enqueue(encoder.encode(`data: ${JSON.stringify({ delta: cached })}\n\n`));
+              controller.enqueue(encoder.encode(`event: done\ndata: {}\n\n`));
+              controller.close();
+            },
+          });
+          return new Response(stream, {
+            headers: {
+              "Content-Type": "text/event-stream",
+              "Cache-Control": "no-cache, no-transform",
+              "X-Accel-Buffering": "no",
+            },
+          });
+        }
+
         const { messages, isEmergency } = await buildChatPayload(
           supabase, userId, body.message, body.imageBase64, body.imageMime,
         );
@@ -45,7 +107,12 @@ export const Route = createFileRoute("/api/chat/stream")({
         const upstream = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
           method: "POST",
           headers: { "Content-Type": "application/json", Authorization: `Bearer ${apiKey}` },
-          body: JSON.stringify({ model: "google/gemini-2.5-flash", messages, stream: true }),
+          body: JSON.stringify({
+            model: decision.model,
+            messages,
+            stream: true,
+            ...(decision.maxTokens ? { max_tokens: decision.maxTokens } : {}),
+          }),
         });
 
         if (upstream.status === 429) return new Response("Rate limited", { status: 429 });
@@ -54,7 +121,6 @@ export const Route = createFileRoute("/api/chat/stream")({
           return new Response(`AI error ${upstream.status}`, { status: 500 });
         }
 
-        const encoder = new TextEncoder();
         const decoder = new TextDecoder();
         let fullText = "";
         let buffer = "";
@@ -62,7 +128,7 @@ export const Route = createFileRoute("/api/chat/stream")({
         const stream = new ReadableStream({
           async start(controller) {
             // Prefix with emergency flag header (line-prefixed JSON meta)
-            controller.enqueue(encoder.encode(`event: meta\ndata: ${JSON.stringify({ emergency: isEmergency })}\n\n`));
+            controller.enqueue(encoder.encode(`event: meta\ndata: ${JSON.stringify({ emergency: isEmergency, tier: decision.tier, cached: false })}\n\n`));
             const reader = upstream.body!.getReader();
             try {
               while (true) {
@@ -90,6 +156,19 @@ export const Route = createFileRoute("/api/chat/stream")({
                 await supabase.from("chat_messages").insert({
                   user_id: userId, role: "assistant", content: fullText,
                 });
+                if (key) {
+                  try {
+                    await setCached({
+                      key,
+                      response: fullText,
+                      model: decision.model,
+                      tier: decision.tier,
+                      isPersonal: decision.tier === 3,
+                    });
+                  } catch (e) {
+                    console.error("ai cache write fail", (e as Error).message);
+                  }
+                }
               }
               controller.enqueue(encoder.encode(`event: done\ndata: {}\n\n`));
             } catch (err) {

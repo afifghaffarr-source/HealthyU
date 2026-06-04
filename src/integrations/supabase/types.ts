@@ -197,6 +197,36 @@ export type Database = {
         }
         Relationships: []
       }
+      ai_response_cache: {
+        Row: {
+          created_at: string
+          expires_at: string
+          hit_count: number
+          key: string
+          model: string
+          response: string
+          tier: number
+        }
+        Insert: {
+          created_at?: string
+          expires_at: string
+          hit_count?: number
+          key: string
+          model: string
+          response: string
+          tier: number
+        }
+        Update: {
+          created_at?: string
+          expires_at?: string
+          hit_count?: number
+          key?: string
+          model?: string
+          response?: string
+          tier?: number
+        }
+        Relationships: []
+      }
       ai_weekly_reports: {
         Row: {
           content: string
