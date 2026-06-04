@@ -7,7 +7,7 @@ import { BottomNav } from "@/components/bottom-nav";
 import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { Moon, Trash2 } from "lucide-react";
 import { toast } from "sonner";
-import { AreaChart, Area, XAxis, Tooltip, ResponsiveContainer, defs } from "recharts";
+import { AreaChart, Area, XAxis, Tooltip, ResponsiveContainer } from "recharts";
 
 export const Route = createFileRoute("/_authenticated/sleep")({
   component: SleepPage,
