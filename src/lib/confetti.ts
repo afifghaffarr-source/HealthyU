@@ -25,3 +25,8 @@ export function fireConfetti(opts: { count?: number; origin?: { x: number; y: nu
   }
   setTimeout(() => root.remove(), 1300);
 }
+
+// Convenience wrapper used across pages
+export function celebrate(opts: { intense?: boolean } = {}) {
+  fireConfetti({ count: opts.intense ? 120 : 50 });
+}
