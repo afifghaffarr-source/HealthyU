@@ -133,6 +133,7 @@ import { Route as AuthenticatedCoachMealsRouteImport } from './routes/_authentic
 import { Route as AuthenticatedChallengesDailyRouteImport } from './routes/_authenticated/challenges.daily'
 import { Route as AuthenticatedCalendarGoogleRouteImport } from './routes/_authenticated/calendar.google'
 import { Route as AuthenticatedBonusAutoClaimRouteImport } from './routes/_authenticated/bonus.auto-claim'
+import { Route as AuthenticatedArticlesIdRouteImport } from './routes/_authenticated/articles.$id'
 import { Route as ApiWearableGoogleFitCallbackRouteImport } from './routes/api/wearable.google-fit.callback'
 import { Route as ApiPublicHooksWeeklyAiReportRouteImport } from './routes/api/public/hooks/weekly-ai-report'
 import { Route as ApiPublicHooksRecipesTrendingSnapshotRouteImport } from './routes/api/public/hooks/recipes-trending-snapshot'
@@ -824,6 +825,11 @@ const AuthenticatedBonusAutoClaimRoute =
     path: '/bonus/auto-claim',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedArticlesIdRoute = AuthenticatedArticlesIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => AuthenticatedArticlesRoute,
+} as any)
 const ApiWearableGoogleFitCallbackRoute =
   ApiWearableGoogleFitCallbackRouteImport.update({
     id: '/api/wearable/google-fit/callback',
@@ -896,7 +902,7 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/achievements': typeof AuthenticatedAchievementsRoute
   '/alarms': typeof AuthenticatedAlarmsRoute
-  '/articles': typeof AuthenticatedArticlesRoute
+  '/articles': typeof AuthenticatedArticlesRouteWithChildren
   '/backup': typeof AuthenticatedBackupRoute
   '/body': typeof AuthenticatedBodyRoute
   '/challenges': typeof AuthenticatedChallengesRouteWithChildren
@@ -948,6 +954,7 @@ export interface FileRoutesByFullPath {
   '/wearable': typeof AuthenticatedWearableRoute
   '/weight': typeof AuthenticatedWeightRouteWithChildren
   '/workout': typeof AuthenticatedWorkoutRouteWithChildren
+  '/articles/$id': typeof AuthenticatedArticlesIdRoute
   '/bonus/auto-claim': typeof AuthenticatedBonusAutoClaimRoute
   '/calendar/google': typeof AuthenticatedCalendarGoogleRoute
   '/challenges/daily': typeof AuthenticatedChallengesDailyRoute
@@ -1032,7 +1039,7 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/achievements': typeof AuthenticatedAchievementsRoute
   '/alarms': typeof AuthenticatedAlarmsRoute
-  '/articles': typeof AuthenticatedArticlesRoute
+  '/articles': typeof AuthenticatedArticlesRouteWithChildren
   '/backup': typeof AuthenticatedBackupRoute
   '/body': typeof AuthenticatedBodyRoute
   '/challenges': typeof AuthenticatedChallengesRouteWithChildren
@@ -1084,6 +1091,7 @@ export interface FileRoutesByTo {
   '/wearable': typeof AuthenticatedWearableRoute
   '/weight': typeof AuthenticatedWeightRouteWithChildren
   '/workout': typeof AuthenticatedWorkoutRouteWithChildren
+  '/articles/$id': typeof AuthenticatedArticlesIdRoute
   '/bonus/auto-claim': typeof AuthenticatedBonusAutoClaimRoute
   '/calendar/google': typeof AuthenticatedCalendarGoogleRoute
   '/challenges/daily': typeof AuthenticatedChallengesDailyRoute
@@ -1170,7 +1178,7 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/_authenticated/achievements': typeof AuthenticatedAchievementsRoute
   '/_authenticated/alarms': typeof AuthenticatedAlarmsRoute
-  '/_authenticated/articles': typeof AuthenticatedArticlesRoute
+  '/_authenticated/articles': typeof AuthenticatedArticlesRouteWithChildren
   '/_authenticated/backup': typeof AuthenticatedBackupRoute
   '/_authenticated/body': typeof AuthenticatedBodyRoute
   '/_authenticated/challenges': typeof AuthenticatedChallengesRouteWithChildren
@@ -1222,6 +1230,7 @@ export interface FileRoutesById {
   '/_authenticated/wearable': typeof AuthenticatedWearableRoute
   '/_authenticated/weight': typeof AuthenticatedWeightRouteWithChildren
   '/_authenticated/workout': typeof AuthenticatedWorkoutRouteWithChildren
+  '/_authenticated/articles/$id': typeof AuthenticatedArticlesIdRoute
   '/_authenticated/bonus/auto-claim': typeof AuthenticatedBonusAutoClaimRoute
   '/_authenticated/calendar/google': typeof AuthenticatedCalendarGoogleRoute
   '/_authenticated/challenges/daily': typeof AuthenticatedChallengesDailyRoute
@@ -1360,6 +1369,7 @@ export interface FileRouteTypes {
     | '/wearable'
     | '/weight'
     | '/workout'
+    | '/articles/$id'
     | '/bonus/auto-claim'
     | '/calendar/google'
     | '/challenges/daily'
@@ -1496,6 +1506,7 @@ export interface FileRouteTypes {
     | '/wearable'
     | '/weight'
     | '/workout'
+    | '/articles/$id'
     | '/bonus/auto-claim'
     | '/calendar/google'
     | '/challenges/daily'
@@ -1633,6 +1644,7 @@ export interface FileRouteTypes {
     | '/_authenticated/wearable'
     | '/_authenticated/weight'
     | '/_authenticated/workout'
+    | '/_authenticated/articles/$id'
     | '/_authenticated/bonus/auto-claim'
     | '/_authenticated/calendar/google'
     | '/_authenticated/challenges/daily'
@@ -2595,6 +2607,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedBonusAutoClaimRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/articles/$id': {
+      id: '/_authenticated/articles/$id'
+      path: '/$id'
+      fullPath: '/articles/$id'
+      preLoaderRoute: typeof AuthenticatedArticlesIdRouteImport
+      parentRoute: typeof AuthenticatedArticlesRoute
+    }
     '/api/wearable/google-fit/callback': {
       id: '/api/wearable/google-fit/callback'
       path: '/api/wearable/google-fit/callback'
@@ -2674,6 +2693,19 @@ declare module '@tanstack/react-router' {
     }
   }
 }
+
+interface AuthenticatedArticlesRouteChildren {
+  AuthenticatedArticlesIdRoute: typeof AuthenticatedArticlesIdRoute
+}
+
+const AuthenticatedArticlesRouteChildren: AuthenticatedArticlesRouteChildren = {
+  AuthenticatedArticlesIdRoute: AuthenticatedArticlesIdRoute,
+}
+
+const AuthenticatedArticlesRouteWithChildren =
+  AuthenticatedArticlesRoute._addFileChildren(
+    AuthenticatedArticlesRouteChildren,
+  )
 
 interface AuthenticatedChallengesRouteChildren {
   AuthenticatedChallengesDailyRoute: typeof AuthenticatedChallengesDailyRoute
@@ -2995,7 +3027,7 @@ const AuthenticatedWorkoutRouteWithChildren =
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAchievementsRoute: typeof AuthenticatedAchievementsRoute
   AuthenticatedAlarmsRoute: typeof AuthenticatedAlarmsRoute
-  AuthenticatedArticlesRoute: typeof AuthenticatedArticlesRoute
+  AuthenticatedArticlesRoute: typeof AuthenticatedArticlesRouteWithChildren
   AuthenticatedBackupRoute: typeof AuthenticatedBackupRoute
   AuthenticatedBodyRoute: typeof AuthenticatedBodyRoute
   AuthenticatedChallengesRoute: typeof AuthenticatedChallengesRouteWithChildren
@@ -3069,7 +3101,7 @@ interface AuthenticatedRouteRouteChildren {
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAchievementsRoute: AuthenticatedAchievementsRoute,
   AuthenticatedAlarmsRoute: AuthenticatedAlarmsRoute,
-  AuthenticatedArticlesRoute: AuthenticatedArticlesRoute,
+  AuthenticatedArticlesRoute: AuthenticatedArticlesRouteWithChildren,
   AuthenticatedBackupRoute: AuthenticatedBackupRoute,
   AuthenticatedBodyRoute: AuthenticatedBodyRoute,
   AuthenticatedChallengesRoute: AuthenticatedChallengesRouteWithChildren,
