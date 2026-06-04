@@ -77,6 +77,7 @@ import { Route as AuthenticatedStoriesIdRouteImport } from './routes/_authentica
 import { Route as AuthenticatedSleepDiaryRouteImport } from './routes/_authenticated/sleep.diary'
 import { Route as AuthenticatedShowcaseReorderRouteImport } from './routes/_authenticated/showcase.reorder'
 import { Route as AuthenticatedShoppingListRouteImport } from './routes/_authenticated/shopping.list'
+import { Route as AuthenticatedShoppingDeriveRouteImport } from './routes/_authenticated/shopping.derive'
 import { Route as AuthenticatedScanVoiceRouteImport } from './routes/_authenticated/scan.voice'
 import { Route as AuthenticatedScanRecipeRouteImport } from './routes/_authenticated/scan.recipe'
 import { Route as AuthenticatedScanNutritionLabelRouteImport } from './routes/_authenticated/scan.nutrition-label'
@@ -495,6 +496,12 @@ const AuthenticatedShoppingListRoute =
   AuthenticatedShoppingListRouteImport.update({
     id: '/shopping/list',
     path: '/shopping/list',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedShoppingDeriveRoute =
+  AuthenticatedShoppingDeriveRouteImport.update({
+    id: '/shopping/derive',
+    path: '/shopping/derive',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedScanVoiceRoute = AuthenticatedScanVoiceRouteImport.update({
@@ -988,6 +995,7 @@ export interface FileRoutesByFullPath {
   '/scan/nutrition-label': typeof AuthenticatedScanNutritionLabelRoute
   '/scan/recipe': typeof AuthenticatedScanRecipeRoute
   '/scan/voice': typeof AuthenticatedScanVoiceRoute
+  '/shopping/derive': typeof AuthenticatedShoppingDeriveRoute
   '/shopping/list': typeof AuthenticatedShoppingListRoute
   '/showcase/reorder': typeof AuthenticatedShowcaseReorderRoute
   '/sleep/diary': typeof AuthenticatedSleepDiaryRoute
@@ -1122,6 +1130,7 @@ export interface FileRoutesByTo {
   '/scan/nutrition-label': typeof AuthenticatedScanNutritionLabelRoute
   '/scan/recipe': typeof AuthenticatedScanRecipeRoute
   '/scan/voice': typeof AuthenticatedScanVoiceRoute
+  '/shopping/derive': typeof AuthenticatedShoppingDeriveRoute
   '/shopping/list': typeof AuthenticatedShoppingListRoute
   '/showcase/reorder': typeof AuthenticatedShowcaseReorderRoute
   '/sleep/diary': typeof AuthenticatedSleepDiaryRoute
@@ -1258,6 +1267,7 @@ export interface FileRoutesById {
   '/_authenticated/scan/nutrition-label': typeof AuthenticatedScanNutritionLabelRoute
   '/_authenticated/scan/recipe': typeof AuthenticatedScanRecipeRoute
   '/_authenticated/scan/voice': typeof AuthenticatedScanVoiceRoute
+  '/_authenticated/shopping/derive': typeof AuthenticatedShoppingDeriveRoute
   '/_authenticated/shopping/list': typeof AuthenticatedShoppingListRoute
   '/_authenticated/showcase/reorder': typeof AuthenticatedShowcaseReorderRoute
   '/_authenticated/sleep/diary': typeof AuthenticatedSleepDiaryRoute
@@ -1394,6 +1404,7 @@ export interface FileRouteTypes {
     | '/scan/nutrition-label'
     | '/scan/recipe'
     | '/scan/voice'
+    | '/shopping/derive'
     | '/shopping/list'
     | '/showcase/reorder'
     | '/sleep/diary'
@@ -1528,6 +1539,7 @@ export interface FileRouteTypes {
     | '/scan/nutrition-label'
     | '/scan/recipe'
     | '/scan/voice'
+    | '/shopping/derive'
     | '/shopping/list'
     | '/showcase/reorder'
     | '/sleep/diary'
@@ -1663,6 +1675,7 @@ export interface FileRouteTypes {
     | '/_authenticated/scan/nutrition-label'
     | '/_authenticated/scan/recipe'
     | '/_authenticated/scan/voice'
+    | '/_authenticated/shopping/derive'
     | '/_authenticated/shopping/list'
     | '/_authenticated/showcase/reorder'
     | '/_authenticated/sleep/diary'
@@ -2175,6 +2188,13 @@ declare module '@tanstack/react-router' {
       path: '/shopping/list'
       fullPath: '/shopping/list'
       preLoaderRoute: typeof AuthenticatedShoppingListRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/shopping/derive': {
+      id: '/_authenticated/shopping/derive'
+      path: '/shopping/derive'
+      fullPath: '/shopping/derive'
+      preLoaderRoute: typeof AuthenticatedShoppingDeriveRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/scan/voice': {
@@ -3017,6 +3037,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedPushAlarmRoute: typeof AuthenticatedPushAlarmRoute
   AuthenticatedQuizDailyRoute: typeof AuthenticatedQuizDailyRoute
   AuthenticatedRestaurantsNearbyRoute: typeof AuthenticatedRestaurantsNearbyRoute
+  AuthenticatedShoppingDeriveRoute: typeof AuthenticatedShoppingDeriveRoute
   AuthenticatedShoppingListRoute: typeof AuthenticatedShoppingListRoute
   AuthenticatedShowcaseReorderRoute: typeof AuthenticatedShowcaseReorderRoute
   AuthenticatedStreakFreezeWidgetRoute: typeof AuthenticatedStreakFreezeWidgetRoute
@@ -3090,6 +3111,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedPushAlarmRoute: AuthenticatedPushAlarmRoute,
   AuthenticatedQuizDailyRoute: AuthenticatedQuizDailyRoute,
   AuthenticatedRestaurantsNearbyRoute: AuthenticatedRestaurantsNearbyRoute,
+  AuthenticatedShoppingDeriveRoute: AuthenticatedShoppingDeriveRoute,
   AuthenticatedShoppingListRoute: AuthenticatedShoppingListRoute,
   AuthenticatedShowcaseReorderRoute: AuthenticatedShowcaseReorderRoute,
   AuthenticatedStreakFreezeWidgetRoute: AuthenticatedStreakFreezeWidgetRoute,
