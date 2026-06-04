@@ -31,7 +31,7 @@ export const exportMyData = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     const { supabase, userId } = context;
-    const dump: Record<string, unknown> = {
+    const dump: Record<string, any> = {
       exported_at: new Date().toISOString(),
       user_id: userId,
     };
@@ -42,7 +42,7 @@ export const exportMyData = createServerFn({ method: "GET" })
       else dump[table] = { error: error.message };
     }
     await supabase.rpc("log_audit_event", { _action: "pdp.export", _entity: "user", _entity_id: userId });
-    return dump;
+    return dump as Record<string, any>;
   });
 
 export const requestAccountDeletion = createServerFn({ method: "POST" })
