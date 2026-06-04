@@ -31,11 +31,12 @@ export const Route = createFileRoute("/kalori/")({
 
 function KaloriHub() {
   const foods = Route.useLoaderData();
-  const grouped = foods.reduce<Record<string, typeof foods>>((acc, f) => {
+  type Food = (typeof foods)[number];
+  const grouped: Record<string, Food[]> = {};
+  for (const f of foods) {
     const k = f.category || "Lainnya";
-    (acc[k] ||= []).push(f);
-    return acc;
-  }, {});
+    (grouped[k] ||= []).push(f);
+  }
 
   return (
     <main className="mx-auto max-w-5xl px-4 py-8">

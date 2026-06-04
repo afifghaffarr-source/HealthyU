@@ -15,6 +15,7 @@ import { Route as KalkulatorRouteImport } from './routes/kalkulator'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as KaloriIndexRouteImport } from './routes/kalori.index'
 import { Route as KalkulatorIndexRouteImport } from './routes/kalkulator.index'
 import { Route as KalkulatorSlugRouteImport } from './routes/kalkulator.$slug'
 import { Route as AuthenticatedWorkoutRouteImport } from './routes/_authenticated/workout'
@@ -182,6 +183,11 @@ const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const KaloriIndexRoute = KaloriIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => KaloriRoute,
 } as any)
 const KalkulatorIndexRoute = KalkulatorIndexRouteImport.update({
   id: '/',
@@ -952,7 +958,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/kalkulator': typeof KalkulatorRouteWithChildren
-  '/kalori': typeof KaloriRoute
+  '/kalori': typeof KaloriRouteWithChildren
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/achievements': typeof AuthenticatedAchievementsRoute
   '/alarms': typeof AuthenticatedAlarmsRoute
@@ -1010,6 +1016,7 @@ export interface FileRoutesByFullPath {
   '/workout': typeof AuthenticatedWorkoutRouteWithChildren
   '/kalkulator/$slug': typeof KalkulatorSlugRoute
   '/kalkulator/': typeof KalkulatorIndexRoute
+  '/kalori/': typeof KaloriIndexRoute
   '/articles/$id': typeof AuthenticatedArticlesIdRoute
   '/bonus/auto-claim': typeof AuthenticatedBonusAutoClaimRoute
   '/calendar/google': typeof AuthenticatedCalendarGoogleRoute
@@ -1096,7 +1103,6 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
-  '/kalori': typeof KaloriRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/achievements': typeof AuthenticatedAchievementsRoute
   '/alarms': typeof AuthenticatedAlarmsRoute
@@ -1154,6 +1160,7 @@ export interface FileRoutesByTo {
   '/workout': typeof AuthenticatedWorkoutRouteWithChildren
   '/kalkulator/$slug': typeof KalkulatorSlugRoute
   '/kalkulator': typeof KalkulatorIndexRoute
+  '/kalori': typeof KaloriIndexRoute
   '/articles/$id': typeof AuthenticatedArticlesIdRoute
   '/bonus/auto-claim': typeof AuthenticatedBonusAutoClaimRoute
   '/calendar/google': typeof AuthenticatedCalendarGoogleRoute
@@ -1243,7 +1250,7 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
   '/kalkulator': typeof KalkulatorRouteWithChildren
-  '/kalori': typeof KaloriRoute
+  '/kalori': typeof KaloriRouteWithChildren
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/_authenticated/achievements': typeof AuthenticatedAchievementsRoute
   '/_authenticated/alarms': typeof AuthenticatedAlarmsRoute
@@ -1301,6 +1308,7 @@ export interface FileRoutesById {
   '/_authenticated/workout': typeof AuthenticatedWorkoutRouteWithChildren
   '/kalkulator/$slug': typeof KalkulatorSlugRoute
   '/kalkulator/': typeof KalkulatorIndexRoute
+  '/kalori/': typeof KaloriIndexRoute
   '/_authenticated/articles/$id': typeof AuthenticatedArticlesIdRoute
   '/_authenticated/bonus/auto-claim': typeof AuthenticatedBonusAutoClaimRoute
   '/_authenticated/calendar/google': typeof AuthenticatedCalendarGoogleRoute
@@ -1448,6 +1456,7 @@ export interface FileRouteTypes {
     | '/workout'
     | '/kalkulator/$slug'
     | '/kalkulator/'
+    | '/kalori/'
     | '/articles/$id'
     | '/bonus/auto-claim'
     | '/calendar/google'
@@ -1534,7 +1543,6 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/auth'
-    | '/kalori'
     | '/sitemap.xml'
     | '/achievements'
     | '/alarms'
@@ -1592,6 +1600,7 @@ export interface FileRouteTypes {
     | '/workout'
     | '/kalkulator/$slug'
     | '/kalkulator'
+    | '/kalori'
     | '/articles/$id'
     | '/bonus/auto-claim'
     | '/calendar/google'
@@ -1738,6 +1747,7 @@ export interface FileRouteTypes {
     | '/_authenticated/workout'
     | '/kalkulator/$slug'
     | '/kalkulator/'
+    | '/kalori/'
     | '/_authenticated/articles/$id'
     | '/_authenticated/bonus/auto-claim'
     | '/_authenticated/calendar/google'
@@ -1827,7 +1837,7 @@ export interface RootRouteChildren {
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
   KalkulatorRoute: typeof KalkulatorRouteWithChildren
-  KaloriRoute: typeof KaloriRoute
+  KaloriRoute: typeof KaloriRouteWithChildren
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   ApiChatStreamRoute: typeof ApiChatStreamRoute
   ApiPublicHooksDailyCoachRoute: typeof ApiPublicHooksDailyCoachRoute
@@ -1881,6 +1891,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/kalori/': {
+      id: '/kalori/'
+      path: '/'
+      fullPath: '/kalori/'
+      preLoaderRoute: typeof KaloriIndexRouteImport
+      parentRoute: typeof KaloriRoute
     }
     '/kalkulator/': {
       id: '/kalkulator/'
@@ -3350,12 +3367,23 @@ const KalkulatorRouteWithChildren = KalkulatorRoute._addFileChildren(
   KalkulatorRouteChildren,
 )
 
+interface KaloriRouteChildren {
+  KaloriIndexRoute: typeof KaloriIndexRoute
+}
+
+const KaloriRouteChildren: KaloriRouteChildren = {
+  KaloriIndexRoute: KaloriIndexRoute,
+}
+
+const KaloriRouteWithChildren =
+  KaloriRoute._addFileChildren(KaloriRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
   KalkulatorRoute: KalkulatorRouteWithChildren,
-  KaloriRoute: KaloriRoute,
+  KaloriRoute: KaloriRouteWithChildren,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   ApiChatStreamRoute: ApiChatStreamRoute,
   ApiPublicHooksDailyCoachRoute: ApiPublicHooksDailyCoachRoute,
