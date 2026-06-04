@@ -196,6 +196,7 @@ function RecipesPage() {
 
   return (
     <main className="min-h-screen bg-background pb-28">
+      <PullIndicator pulling={pulling} refreshing={refreshing} />
       <div className="max-w-md mx-auto px-5 pt-2 space-y-5">
         <TopAppBar
           title="Resep Sehat"
