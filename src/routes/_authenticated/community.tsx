@@ -1,12 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { TopAppBar } from "@/components/healthyu/top-app-bar";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { listPosts, createPost, deletePost, toggleLike } from "@/lib/community.functions";
 import { listComments, createComment, deleteComment } from "@/lib/social.functions";
 import { BottomNav } from "@/components/bottom-nav";
-import { Heart, Trash2, Send, MessageCircle } from "lucide-react";
+import { Heart, Trash2, Send, MessageCircle, Flame, Clock, Users } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/community")({
@@ -53,13 +53,35 @@ function CommunityPage() {
   });
 
   const [openComments, setOpenComments] = useState<string | null>(null);
+  const [sort, setSort] = useState<"new" | "hot">("new");
 
-  const visiblePosts = filter === "all" ? posts : posts.filter((p) => p.category === filter);
+  const filteredPosts = filter === "all" ? posts : posts.filter((p) => p.category === filter);
+  const visiblePosts = useMemo(() => {
+    const arr = [...filteredPosts];
+    if (sort === "hot") {
+      arr.sort((a, b) => (b.like_count ?? 0) - (a.like_count ?? 0));
+    } else {
+      arr.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+    }
+    return arr;
+  }, [filteredPosts, sort]);
+
+  const counts = useMemo(() => {
+    const m: Record<string, number> = { all: posts.length };
+    for (const c of CATS) m[c.id] = posts.filter((p) => p.category === c.id).length;
+    return m;
+  }, [posts]);
 
   return (
     <main className="min-h-screen bg-background pb-28">
       <div className="max-w-md mx-auto px-5 pt-2 space-y-5">
         <TopAppBar title="Komunitas" subtitle="Berbagi tips & dukungan" showBack />
+
+        <div className="grid grid-cols-3 gap-2">
+          <Stat icon={<Users className="size-3.5" />} label="Posts" value={posts.length} />
+          <Stat icon={<Heart className="size-3.5" />} label="Likes" value={posts.reduce((a, p) => a + (p.like_count ?? 0), 0)} />
+          <Stat icon={<Flame className="size-3.5" />} label="Aktif" value={posts.filter((p) => Date.now() - new Date(p.created_at).getTime() < 24 * 3600_000).length} />
+        </div>
 
         <section className="bg-card p-4 rounded-3xl outline-1 outline-black/5 space-y-3 animate-fade-up">
           <textarea
@@ -92,6 +114,23 @@ function CommunityPage() {
         </section>
 
         <section className="space-y-3 animate-fade-up">
+          <div className="flex items-center justify-between gap-2">
+            <div className="inline-flex rounded-full bg-card outline-1 outline-black/10 p-0.5 text-xs font-semibold">
+              <button
+                onClick={() => setSort("new")}
+                className={`inline-flex items-center gap-1 px-3 py-1.5 rounded-full transition ${sort === "new" ? "bg-primary text-primary-foreground" : "text-muted-foreground"}`}
+              >
+                <Clock className="size-3" /> Terbaru
+              </button>
+              <button
+                onClick={() => setSort("hot")}
+                className={`inline-flex items-center gap-1 px-3 py-1.5 rounded-full transition ${sort === "hot" ? "bg-primary text-primary-foreground" : "text-muted-foreground"}`}
+              >
+                <Flame className="size-3" /> Populer
+              </button>
+            </div>
+            <span className="text-[11px] text-muted-foreground tabular-nums">{visiblePosts.length} post</span>
+          </div>
           <div className="flex gap-2 overflow-x-auto no-scrollbar -mx-1 px-1">
             <button
               onClick={() => setFilter("all")}
@@ -99,7 +138,7 @@ function CommunityPage() {
                 filter === "all" ? "bg-primary text-primary-foreground" : "bg-card outline-1 outline-black/10"
               }`}
             >
-              Semua
+              Semua <span className="opacity-70">· {counts.all}</span>
             </button>
             {CATS.map((c) => (
               <button
@@ -109,7 +148,7 @@ function CommunityPage() {
                   filter === c.id ? "bg-primary text-primary-foreground" : "bg-card outline-1 outline-black/10"
                 }`}
               >
-                {c.label}
+                {c.label} <span className="opacity-70">· {counts[c.id] ?? 0}</span>
               </button>
             ))}
           </div>
@@ -162,6 +201,17 @@ function CommunityPage() {
       </div>
       <BottomNav />
     </main>
+  );
+}
+
+function Stat({ icon, label, value }: { icon: React.ReactNode; label: string; value: number }) {
+  return (
+    <div className="rounded-2xl bg-card outline-1 outline-black/5 p-3">
+      <div className="inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+        {icon} {label}
+      </div>
+      <p className="mt-1 text-lg font-black tabular-nums leading-none">{value}</p>
+    </div>
   );
 }
 
