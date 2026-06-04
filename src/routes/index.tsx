@@ -14,6 +14,12 @@ import {
   Check,
   Shield,
   Trophy,
+  ArrowRight,
+  Flame,
+  Zap,
+  Heart,
+  Camera,
+  BarChart3,
 } from "lucide-react";
 
 export const Route = createFileRoute("/")({
@@ -50,14 +56,14 @@ export const Route = createFileRoute("/")({
 });
 
 const FEATURES = [
-  { icon: Utensils, title: "Database makanan Indonesia", desc: "Ribuan menu lokal lengkap dengan kalori & makro." },
-  { icon: Timer, title: "Puasa 16:8 & Ramadhan", desc: "Timer puasa cerdas dengan reminder sahur & berbuka." },
-  { icon: Moon, title: "Jadwal sholat", desc: "Waktu sholat akurat sesuai kota kamu." },
-  { icon: Activity, title: "Lacak makro & air", desc: "Pantau protein, karbo, lemak, dan hidrasi harian." },
-  { icon: ChefHat, title: "Rekomendasi AI", desc: "Meal plan harian otomatis sesuai goal & alergi." },
-  { icon: MessageCircle, title: "Chat Dr. Healthy", desc: "Tanya AI coach kapan saja, dalam Bahasa Indonesia." },
-  { icon: Bell, title: "Smart reminders", desc: "Pengingat makan, minum, olahraga, & obat." },
-  { icon: Trophy, title: "Gamifikasi & streak", desc: "Naik level, raih achievement, jaga konsistensi." },
+  { icon: Camera, title: "Scan makanan AI", desc: "Foto piringmu — kalori & makro muncul instan.", tint: "from-primary/15 to-primary/0" },
+  { icon: Utensils, title: "Database lokal Indonesia", desc: "Nasi padang, soto, gado-gado — ribuan menu lengkap.", tint: "from-accent/15 to-accent/0" },
+  { icon: Timer, title: "Puasa cerdas 16:8 & Ramadhan", desc: "Timer + reminder sahur & berbuka otomatis.", tint: "from-amber-300/20 to-amber-300/0" },
+  { icon: Moon, title: "Jadwal sholat & kiblat", desc: "Waktu sholat akurat + kompas kiblat berbasis sensor.", tint: "from-indigo-400/15 to-indigo-400/0" },
+  { icon: ChefHat, title: "Meal plan AI", desc: "Rencana mingguan personal sesuai goal & alergi.", tint: "from-primary/15 to-primary/0" },
+  { icon: MessageCircle, title: "Dr. Healthy chatbot", desc: "Tanya jawab AI 24/7 dalam Bahasa Indonesia.", tint: "from-accent/15 to-accent/0" },
+  { icon: Trophy, title: "Streak & gamifikasi", desc: "Level up, koin, achievement — konsisten jadi seru.", tint: "from-amber-300/20 to-amber-300/0" },
+  { icon: Heart, title: "Vitals & body comp", desc: "Lacak berat, tekanan darah, gula, & komposisi tubuh.", tint: "from-rose-300/20 to-rose-300/0" },
 ];
 
 const STEPS = [
@@ -89,12 +95,22 @@ function Index() {
   const ctaPrimaryLabel = hasSession ? "Buka Dashboard" : "Mulai gratis sekarang";
 
   return (
-    <main className="min-h-screen bg-background text-foreground">
+    <main className="min-h-screen bg-background text-foreground relative overflow-x-clip">
+      {/* Animated gradient mesh background */}
+      <div aria-hidden className="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
+        <div className="absolute -top-32 -left-32 size-[480px] rounded-full bg-primary/25 blur-3xl animate-blob" />
+        <div className="absolute top-1/3 -right-40 size-[520px] rounded-full bg-accent/20 blur-3xl animate-blob" style={{ animationDelay: "-6s" }} />
+        <div className="absolute bottom-0 left-1/3 size-[420px] rounded-full bg-primary-glow/25 blur-3xl animate-blob" style={{ animationDelay: "-12s" }} />
+      </div>
+
       {/* Sticky nav */}
-      <nav className="sticky top-0 z-30 bg-background/80 backdrop-blur border-b border-black/5">
+      <nav className="sticky top-0 z-30 glass border-b border-white/10">
         <div className="max-w-6xl mx-auto px-5 md:px-8 h-14 flex items-center justify-between">
-          <Link to="/" className="font-bold tracking-tight text-lg flex items-center gap-1.5">
-            <span className="size-7 bg-primary text-primary-foreground rounded-lg grid place-items-center text-sm">H</span>
+          <Link to="/" className="font-bold tracking-tight text-lg flex items-center gap-2" style={{ fontFamily: "var(--font-display)" }}>
+            <span className="relative size-8 rounded-xl grid place-items-center text-sm text-primary-foreground bg-gradient-to-br from-primary to-primary-dark shadow-lg shadow-primary/30">
+              H
+              <span className="absolute -inset-0.5 rounded-xl bg-primary/40 blur-md -z-10" />
+            </span>
             HealthyU
           </Link>
           <div className="hidden md:flex items-center gap-6 text-sm font-medium text-muted-foreground">
@@ -103,108 +119,225 @@ function Index() {
             <a href="#testimoni" className="hover:text-foreground">Testimoni</a>
             <a href="#faq" className="hover:text-foreground">FAQ</a>
           </div>
-          <Link to={ctaPrimary} className="bg-primary text-primary-foreground text-sm font-semibold px-4 py-2 rounded-xl">
-            {hasSession ? "Dashboard" : "Masuk"}
+          <Link
+            to={ctaPrimary}
+            className="relative overflow-hidden bg-gradient-to-r from-primary to-primary-dark text-primary-foreground text-sm font-semibold px-4 py-2 rounded-xl shadow-md shadow-primary/30 hover:shadow-lg hover:shadow-primary/40 transition-shadow"
+          >
+            <span className="relative z-10">{hasSession ? "Dashboard" : "Masuk"}</span>
+            <span className="pointer-events-none absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/30 to-transparent animate-shimmer" />
           </Link>
         </div>
       </nav>
 
       {/* Hero */}
-      <section className="max-w-6xl mx-auto px-5 md:px-8 pt-12 md:pt-20 pb-16 md:pb-24 grid md:grid-cols-2 gap-10 items-center">
+      <section className="max-w-6xl mx-auto px-5 md:px-8 pt-12 md:pt-20 pb-16 md:pb-24 grid md:grid-cols-2 gap-10 items-center relative">
         <div className="space-y-5 animate-fade-up">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-secondary text-secondary-foreground text-xs font-semibold uppercase tracking-wider">
-            <Sparkles className="size-3" /> Powered by AI · Gratis
+          <div className="relative inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-card/70 backdrop-blur border border-primary/20 text-xs font-semibold uppercase tracking-wider overflow-hidden">
+            <span className="size-1.5 rounded-full bg-primary animate-pulse" />
+            <Sparkles className="size-3 text-primary" /> Powered by Gemini AI · Gratis selamanya
+            <span className="pointer-events-none absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-primary/20 to-transparent animate-shimmer" />
           </div>
-          <h1 className="text-4xl md:text-5xl font-bold tracking-tight text-balance leading-tight">
-            Sahabat sehat berbasis AI untuk hidup yang lebih bermakna.
+          <h1 className="text-4xl md:text-6xl font-bold tracking-tight text-balance leading-[1.05]" style={{ fontFamily: "var(--font-display)" }}>
+            Hidup sehat,{" "}
+            <span className="relative inline-block">
+              <span className="bg-clip-text text-transparent bg-gradient-to-r from-primary via-accent to-primary-glow animate-aurora">
+                ditemani AI
+              </span>
+              <svg className="absolute -bottom-2 left-0 w-full" height="10" viewBox="0 0 200 10" fill="none" aria-hidden>
+                <path d="M2 7 Q 50 1 100 5 T 198 4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="text-primary/60" />
+              </svg>
+            </span>
+            <br />yang ngerti Indonesia.
           </h1>
-          <p className="text-muted-foreground text-lg text-balance">
-            Catat makanan Indonesia, atur puasa, ikuti jadwal sholat, dan tanya Dr. Healthy
-            kapan saja — semua dalam satu app.
+          <p className="text-muted-foreground text-lg text-balance max-w-md">
+            Scan piring, atur puasa, lihat jadwal sholat, dan tanya{" "}
+            <span className="font-semibold text-foreground">Dr. Healthy</span> kapan saja —
+            semua dalam satu app yang ringan & gratis.
           </p>
           <div className="flex flex-col sm:flex-row gap-3 pt-2">
-            <Link to={ctaPrimary} className="text-center bg-primary text-primary-foreground font-semibold py-4 px-6 rounded-2xl shadow-md shadow-primary/20">
-              {ctaPrimaryLabel}
+            <Link
+              to={ctaPrimary}
+              className="group relative overflow-hidden text-center bg-gradient-to-r from-primary to-primary-dark text-primary-foreground font-semibold py-4 px-6 rounded-2xl shadow-xl shadow-primary/30 hover:shadow-2xl hover:shadow-primary/40 hover:-translate-y-0.5 transition-all"
+            >
+              <span className="relative z-10 inline-flex items-center gap-2 justify-center">
+                {ctaPrimaryLabel}
+                <ArrowRight className="size-4 group-hover:translate-x-1 transition-transform" />
+              </span>
+              <span className="pointer-events-none absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/30 to-transparent animate-shimmer" />
             </Link>
-            <a href="#fitur" className="text-center bg-card text-foreground font-semibold py-4 px-6 rounded-2xl outline-1 outline-black/10">
+            <a
+              href="#fitur"
+              className="text-center glass text-foreground font-semibold py-4 px-6 rounded-2xl border border-white/15 hover:border-primary/30 transition-colors"
+            >
               Lihat fitur
             </a>
           </div>
-          <div className="flex items-center gap-4 pt-3 text-xs text-muted-foreground">
-            <div className="flex items-center gap-1">
-              <Shield className="size-3.5" /> Data aman
+          <div className="flex flex-wrap items-center gap-x-5 gap-y-2 pt-4 text-xs text-muted-foreground">
+            <div className="flex -space-x-2">
+              {["#16a34a", "#0ea5e9", "#f59e0b", "#ec4899"].map((c) => (
+                <span key={c} className="size-7 rounded-full border-2 border-background" style={{ background: c }} />
+              ))}
             </div>
             <div className="flex items-center gap-1">
-              <Star className="size-3.5 fill-amber-400 text-amber-400" /> 4.8 / 5 (1.240+ user)
+              <Star className="size-3.5 fill-amber-400 text-amber-400" />
+              <strong className="text-foreground">4.8</strong> / 5 · 1.240+ user
+            </div>
+            <div className="flex items-center gap-1">
+              <Shield className="size-3.5 text-primary" /> Data terenkripsi
             </div>
           </div>
         </div>
         <div className="relative animate-fade-up">
-          <div className="aspect-[4/5] max-w-sm mx-auto bg-gradient-to-br from-mint via-card to-secondary rounded-[2.5rem] p-6 outline-1 outline-black/5 shadow-xl">
+          {/* Floating chips around phone */}
+          <div className="absolute -top-4 -left-2 z-10 hidden sm:flex items-center gap-2 glass border border-white/15 rounded-2xl px-3 py-2 shadow-lg animate-float">
+            <Flame className="size-4 text-amber-500" />
+            <div className="text-xs">
+              <p className="font-bold leading-none">Streak 12 hari</p>
+              <p className="text-muted-foreground">Konsisten!</p>
+            </div>
+          </div>
+          <div className="absolute -bottom-4 -right-2 z-10 hidden sm:flex items-center gap-2 glass border border-white/15 rounded-2xl px-3 py-2 shadow-lg animate-float" style={{ animationDelay: "-3s" }}>
+            <Zap className="size-4 text-primary" />
+            <div className="text-xs">
+              <p className="font-bold leading-none">+120 poin</p>
+              <p className="text-muted-foreground">Goal harian</p>
+            </div>
+          </div>
+
+          <div className="relative aspect-[4/5] max-w-sm mx-auto rounded-[2.5rem] p-6 shadow-2xl shadow-primary/20 hover-tilt overflow-hidden border border-white/20"
+               style={{ background: "linear-gradient(140deg, color-mix(in oklab, var(--mint) 60%, transparent), color-mix(in oklab, var(--card) 90%, transparent) 50%, color-mix(in oklab, var(--accent) 25%, transparent))" }}>
+            {/* Glow ring */}
+            <div className="pointer-events-none absolute -inset-1 rounded-[2.5rem] bg-gradient-to-br from-primary/30 via-transparent to-accent/30 blur-xl -z-10" />
             <div className="space-y-3 h-full flex flex-col">
-              <div className="bg-card rounded-2xl p-4 outline-1 outline-black/5">
-                <p className="text-xs text-muted-foreground">Hari ini</p>
-                <p className="text-2xl font-bold">1.420 <span className="text-sm text-muted-foreground">/ 1.800 kkal</span></p>
-                <div className="h-1.5 bg-muted rounded-full mt-2 overflow-hidden">
-                  <div className="h-full bg-primary rounded-full" style={{ width: "78%" }} />
+              <div className="glass rounded-2xl p-4 border border-white/20">
+                <div className="flex items-center justify-between">
+                  <p className="text-xs text-muted-foreground font-medium">Hari ini</p>
+                  <span className="text-[10px] font-bold text-primary bg-primary/15 px-2 py-0.5 rounded-full">78%</span>
                 </div>
+                <p className="text-2xl font-bold mt-1" style={{ fontFamily: "var(--font-display)" }}>
+                  1.420 <span className="text-sm text-muted-foreground font-normal">/ 1.800 kkal</span>
+                </p>
+                <div className="h-2 bg-muted rounded-full mt-2 overflow-hidden">
+                  <div className="h-full bg-gradient-to-r from-primary via-primary-glow to-accent rounded-full" style={{ width: "78%" }} />
+                </div>
+                <p className="text-[10px] text-muted-foreground mt-1.5">Sisa ~380 kkal</p>
               </div>
               <div className="grid grid-cols-3 gap-2">
-                {[["P", "85g"], ["C", "150g"], ["F", "45g"]].map(([k, v]) => (
-                  <div key={k} className="bg-card rounded-xl p-3 text-center outline-1 outline-black/5">
-                    <p className="text-[10px] text-muted-foreground">{k}</p>
+                {[
+                  { k: "Protein", v: "85g", c: "bg-primary" },
+                  { k: "Karbo", v: "150g", c: "bg-accent" },
+                  { k: "Lemak", v: "45g", c: "bg-amber-500" },
+                ].map(({ k, v, c }) => (
+                  <div key={k} className="glass rounded-xl p-2.5 text-center border border-white/15">
+                    <div className={`size-1.5 ${c} rounded-full mx-auto mb-1`} />
+                    <p className="text-[9px] text-muted-foreground font-medium">{k}</p>
                     <p className="text-sm font-bold">{v}</p>
                   </div>
                 ))}
               </div>
-              <div className="bg-card rounded-2xl p-4 outline-1 outline-black/5 flex-1">
+              <div className="glass rounded-2xl p-4 border border-primary/20 flex-1 relative overflow-hidden">
                 <div className="flex items-center gap-2 mb-2">
-                  <Sparkles className="size-4 text-primary" />
-                  <p className="text-sm font-semibold">Dr. Healthy</p>
+                  <span className="relative inline-flex size-6 items-center justify-center rounded-full bg-gradient-to-br from-primary to-accent text-primary-foreground">
+                    <Sparkles className="size-3" />
+                  </span>
+                  <p className="text-sm font-bold">Dr. Healthy</p>
+                  <span className="ml-auto text-[9px] font-semibold text-primary bg-primary/10 px-1.5 py-0.5 rounded-full">AI</span>
                 </div>
-                <p className="text-xs text-muted-foreground leading-relaxed">
-                  Kamu sudah 78% target! Coba tambah ayam panggang 100g untuk sore ini agar protein tercapai. 💪
+                <p className="text-xs text-foreground/85 leading-relaxed">
+                  Hampir sampai target! Tambah <strong>ayam panggang 100g</strong> sore ini biar protein full. 💪
                 </p>
               </div>
-              <div className="bg-primary text-primary-foreground rounded-2xl p-3 text-center">
-                <p className="text-xs font-semibold">🔥 Streak 12 hari</p>
+              <div className="bg-gradient-to-r from-primary to-primary-dark text-primary-foreground rounded-2xl p-3 flex items-center justify-between">
+                <span className="text-xs font-bold inline-flex items-center gap-1.5">🔥 Streak 12 hari</span>
+                <span className="text-[10px] font-semibold bg-white/20 px-2 py-0.5 rounded-full">Level 4</span>
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Features */}
+      {/* Trust marquee */}
+      <section aria-label="Kota pengguna" className="border-y border-white/10 bg-card/30 py-4 overflow-hidden">
+        <div className="flex gap-12 animate-marquee whitespace-nowrap text-sm font-semibold text-muted-foreground">
+          {[...Array(2)].map((_, dup) => (
+            <div key={dup} className="flex gap-12 shrink-0">
+              {["Jakarta", "Surabaya", "Bandung", "Medan", "Makassar", "Yogyakarta", "Semarang", "Denpasar", "Palembang", "Balikpapan"].map((c) => (
+                <span key={c} className="inline-flex items-center gap-2">
+                  <span className="size-1.5 rounded-full bg-primary" />
+                  {c}
+                </span>
+              ))}
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Stats strip */}
+      <section className="max-w-6xl mx-auto px-5 md:px-8 py-10 grid grid-cols-2 md:grid-cols-4 gap-3">
+        {[
+          { v: "10K+", l: "Pengguna aktif", i: Heart },
+          { v: "5.000+", l: "Menu Indonesia", i: Utensils },
+          { v: "98%", l: "Akurasi scan AI", i: Camera },
+          { v: "24/7", l: "Dr. Healthy siap", i: MessageCircle },
+        ].map(({ v, l, i: Icon }) => (
+          <div key={l} className="glass rounded-2xl p-4 border border-white/15 text-center">
+            <Icon className="size-5 text-primary mx-auto mb-2" />
+            <p className="text-2xl font-bold" style={{ fontFamily: "var(--font-display)" }}>{v}</p>
+            <p className="text-xs text-muted-foreground">{l}</p>
+          </div>
+        ))}
+      </section>
+
+      {/* Features - bento */}
       <section id="fitur" className="max-w-6xl mx-auto px-5 md:px-8 py-16 md:py-24">
         <div className="text-center max-w-2xl mx-auto mb-10">
-          <h2 className="text-3xl md:text-4xl font-bold tracking-tight">Semua yang kamu butuh, dalam satu app</h2>
+          <span className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-primary bg-primary/10 px-3 py-1 rounded-full">
+            <Zap className="size-3" /> Fitur unggulan
+          </span>
+          <h2 className="text-3xl md:text-5xl font-bold tracking-tight mt-3" style={{ fontFamily: "var(--font-display)" }}>
+            Satu app. <span className="text-primary">Semua kebutuhan sehatmu.</span>
+          </h2>
           <p className="text-muted-foreground mt-3">Dirancang untuk gaya hidup Indonesia: dari nasi padang sampai puasa Ramadhan.</p>
         </div>
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
-          {FEATURES.map(({ icon: Icon, title, desc }) => (
-            <article key={title} className="bg-card rounded-2xl p-5 outline-1 outline-black/5 shadow-sm">
-              <div className="size-10 bg-mint text-sage-deep rounded-xl grid place-items-center mb-3">
-                <Icon className="size-5" />
+          {FEATURES.map(({ icon: Icon, title, desc, tint }, i) => (
+            <article
+              key={title}
+              className={`group relative overflow-hidden rounded-2xl p-5 glass border border-white/15 hover:border-primary/30 hover:-translate-y-1 transition-all shadow-sm hover:shadow-xl hover:shadow-primary/10 ${i === 0 ? "sm:col-span-2 sm:row-span-1" : ""}`}
+            >
+              <div className={`absolute inset-0 bg-gradient-to-br ${tint} opacity-60 group-hover:opacity-100 transition-opacity`} />
+              <div className="relative">
+                <div className="size-11 rounded-2xl bg-gradient-to-br from-primary/15 to-accent/15 text-primary grid place-items-center mb-3 border border-primary/20">
+                  <Icon className="size-5" />
+                </div>
+                <h3 className="font-bold text-sm mb-1" style={{ fontFamily: "var(--font-display)" }}>{title}</h3>
+                <p className="text-xs text-muted-foreground leading-relaxed">{desc}</p>
               </div>
-              <h3 className="font-semibold text-sm mb-1">{title}</h3>
-              <p className="text-xs text-muted-foreground leading-relaxed">{desc}</p>
             </article>
           ))}
         </div>
       </section>
 
       {/* How it works */}
-      <section id="cara" className="bg-mint/40">
+      <section id="cara" className="relative">
+        <div aria-hidden className="absolute inset-0 -z-10 bg-gradient-to-b from-transparent via-mint/40 to-transparent" />
         <div className="max-w-6xl mx-auto px-5 md:px-8 py-16 md:py-24">
           <div className="text-center max-w-2xl mx-auto mb-10">
-            <h2 className="text-3xl md:text-4xl font-bold tracking-tight">Mulai dalam 3 langkah</h2>
+            <h2 className="text-3xl md:text-5xl font-bold tracking-tight" style={{ fontFamily: "var(--font-display)" }}>
+              Mulai dalam <span className="text-primary">3 langkah</span>
+            </h2>
             <p className="text-muted-foreground mt-3">Tidak ribet. Hasil terlihat dalam minggu pertama.</p>
           </div>
-          <ol className="grid md:grid-cols-3 gap-4">
-            {STEPS.map(({ n, title, desc }) => (
-              <li key={n} className="bg-card rounded-2xl p-6 outline-1 outline-black/5">
-                <div className="text-3xl font-bold text-primary mb-2">{n}</div>
-                <h3 className="font-semibold mb-1">{title}</h3>
+          <ol className="grid md:grid-cols-3 gap-4 relative">
+            {STEPS.map(({ n, title, desc }, i) => (
+              <li key={n} className="relative glass rounded-2xl p-6 border border-white/15 hover:border-primary/30 transition-colors">
+                <div className="flex items-baseline gap-3 mb-2">
+                  <span className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-br from-primary to-accent" style={{ fontFamily: "var(--font-display)" }}>{n}</span>
+                  {i < STEPS.length - 1 && (
+                    <ArrowRight className="hidden md:block size-4 text-primary/40 ml-auto" />
+                  )}
+                </div>
+                <h3 className="font-bold mb-1" style={{ fontFamily: "var(--font-display)" }}>{title}</h3>
                 <p className="text-sm text-muted-foreground">{desc}</p>
               </li>
             ))}
@@ -215,20 +348,28 @@ function Index() {
       {/* Testimonials */}
       <section id="testimoni" className="max-w-6xl mx-auto px-5 md:px-8 py-16 md:py-24">
         <div className="text-center max-w-2xl mx-auto mb-10">
-          <h2 className="text-3xl md:text-4xl font-bold tracking-tight">Dipakai ribuan orang Indonesia</h2>
+          <h2 className="text-3xl md:text-5xl font-bold tracking-tight" style={{ fontFamily: "var(--font-display)" }}>
+            Cerita nyata, <span className="text-primary">hasil nyata</span>
+          </h2>
           <p className="text-muted-foreground mt-3">Cerita nyata dari user HealthyU.</p>
         </div>
         <div className="grid md:grid-cols-3 gap-4">
           {TESTIMONIALS.map((t) => (
-            <figure key={t.name} className="bg-card rounded-2xl p-6 outline-1 outline-black/5">
+            <figure key={t.name} className="glass rounded-2xl p-6 border border-white/15 hover:border-primary/30 hover:-translate-y-1 transition-all">
               <div className="flex gap-0.5 mb-3">
                 {Array.from({ length: t.rating }).map((_, i) => (
                   <Star key={i} className="size-4 fill-amber-400 text-amber-400" />
                 ))}
               </div>
               <blockquote className="text-sm leading-relaxed mb-4">"{t.quote}"</blockquote>
-              <figcaption className="text-xs text-muted-foreground">
-                <strong className="text-foreground">{t.name}</strong> · {t.city}
+              <figcaption className="flex items-center gap-2 text-xs text-muted-foreground">
+                <span className="size-8 rounded-full bg-gradient-to-br from-primary to-accent grid place-items-center text-primary-foreground text-xs font-bold">
+                  {t.name[0]}
+                </span>
+                <span>
+                  <strong className="text-foreground block">{t.name}</strong>
+                  {t.city}
+                </span>
               </figcaption>
             </figure>
           ))}
@@ -236,15 +377,16 @@ function Index() {
       </section>
 
       {/* FAQ */}
-      <section id="faq" className="bg-mint/40">
+      <section id="faq" className="relative">
+        <div aria-hidden className="absolute inset-0 -z-10 bg-gradient-to-b from-transparent via-mint/40 to-transparent" />
         <div className="max-w-3xl mx-auto px-5 md:px-8 py-16 md:py-24">
-          <h2 className="text-3xl md:text-4xl font-bold tracking-tight text-center mb-10">Pertanyaan umum</h2>
+          <h2 className="text-3xl md:text-5xl font-bold tracking-tight text-center mb-10" style={{ fontFamily: "var(--font-display)" }}>Pertanyaan umum</h2>
           <div className="space-y-3">
             {FAQ.map((item) => (
-              <details key={item.q} className="bg-card rounded-2xl p-5 outline-1 outline-black/5 group">
-                <summary className="font-semibold cursor-pointer flex items-center justify-between text-sm">
+              <details key={item.q} className="glass rounded-2xl p-5 border border-white/15 group hover:border-primary/30 transition-colors">
+                <summary className="font-bold cursor-pointer flex items-center justify-between text-sm">
                   {item.q}
-                  <span className="text-primary group-open:rotate-45 transition-transform">+</span>
+                  <span className="text-primary group-open:rotate-45 transition-transform text-xl leading-none">+</span>
                 </summary>
                 <p className="text-sm text-muted-foreground mt-3 leading-relaxed">{item.a}</p>
               </details>
@@ -255,19 +397,22 @@ function Index() {
 
       {/* Final CTA */}
       <section className="max-w-3xl mx-auto px-5 md:px-8 py-16 md:py-24 text-center">
-        <div className="bg-gradient-to-br from-primary to-sage-deep text-primary-foreground rounded-3xl p-10 md:p-14 space-y-5 shadow-xl">
-          <h2 className="text-3xl md:text-4xl font-bold tracking-tight text-balance">
+        <div className="relative overflow-hidden bg-gradient-to-br from-primary via-primary-dark to-accent text-primary-foreground rounded-3xl p-10 md:p-14 space-y-5 shadow-2xl shadow-primary/30">
+          <div aria-hidden className="absolute -top-20 -right-20 size-72 rounded-full bg-white/10 blur-3xl" />
+          <div aria-hidden className="absolute -bottom-20 -left-20 size-72 rounded-full bg-white/10 blur-3xl" />
+          <h2 className="relative text-3xl md:text-5xl font-bold tracking-tight text-balance" style={{ fontFamily: "var(--font-display)" }}>
             Mulai perjalanan sehatmu hari ini
           </h2>
-          <p className="text-primary-foreground/85 text-balance">
+          <p className="relative text-primary-foreground/85 text-balance">
             Gratis selamanya. Tanpa kartu kredit. Hasil terlihat dalam 7 hari pertama.
           </p>
-          <div className="flex flex-col sm:flex-row gap-3 justify-center pt-2">
-            <Link to={ctaPrimary} className="bg-white text-primary font-semibold py-4 px-6 rounded-2xl">
+          <div className="relative flex flex-col sm:flex-row gap-3 justify-center pt-2">
+            <Link to={ctaPrimary} className="group inline-flex items-center justify-center gap-2 bg-white text-primary font-semibold py-4 px-6 rounded-2xl shadow-xl hover:-translate-y-0.5 transition-transform">
               {ctaPrimaryLabel}
+              <ArrowRight className="size-4 group-hover:translate-x-1 transition-transform" />
             </Link>
           </div>
-          <ul className="flex flex-wrap justify-center gap-x-5 gap-y-2 text-xs text-primary-foreground/80 pt-2">
+          <ul className="relative flex flex-wrap justify-center gap-x-5 gap-y-2 text-xs text-primary-foreground/80 pt-2">
             <li className="flex items-center gap-1"><Check className="size-3.5" /> Gratis selamanya</li>
             <li className="flex items-center gap-1"><Check className="size-3.5" /> Database makanan Indonesia</li>
             <li className="flex items-center gap-1"><Check className="size-3.5" /> AI coach 24/7</li>
@@ -275,7 +420,7 @@ function Index() {
         </div>
       </section>
 
-      <footer className="border-t border-black/5">
+      <footer className="border-t border-white/10">
         <div className="max-w-6xl mx-auto px-5 md:px-8 py-8 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-muted-foreground">
           <p>© {new Date().getFullYear()} HealthyU · Dirancang khusus untuk Indonesia</p>
           <div className="flex gap-4">
