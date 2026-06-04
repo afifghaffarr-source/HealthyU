@@ -725,6 +725,18 @@ function Index() {
           </div>
         </div>
       </footer>
+
+      {/* Sticky CTA bar */}
+      <div className={`fixed left-1/2 -translate-x-1/2 bottom-4 z-40 transition-all ${showStickyCta ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6 pointer-events-none"}`}>
+        <div className="glass border border-white/20 shadow-2xl rounded-full pl-4 pr-1 py-1 flex items-center gap-3">
+          <span className="text-xs font-semibold hidden sm:inline">Siap memulai? Gratis selamanya.</span>
+          <Link to={ctaPrimary} onClick={fireConfetti} className="bg-gradient-to-r from-primary to-primary-dark text-primary-foreground text-xs font-bold px-4 py-2 rounded-full inline-flex items-center gap-1.5">
+            {hasSession ? "Dashboard" : "Mulai"} <ArrowRight className="size-3.5" />
+          </Link>
+        </div>
+      </div>
+
+      <FloatingChat />
     </main>
   );
 }
