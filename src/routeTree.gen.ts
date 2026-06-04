@@ -106,6 +106,7 @@ import { Route as AuthenticatedQuizDailyRouteImport } from './routes/_authentica
 import { Route as AuthenticatedPushAlarmRouteImport } from './routes/_authenticated/push.alarm'
 import { Route as AuthenticatedProfileScanStatsRouteImport } from './routes/_authenticated/profile.scan-stats'
 import { Route as AuthenticatedProfilePrivacyRouteImport } from './routes/_authenticated/profile.privacy'
+import { Route as AuthenticatedPrayerQiblaRouteImport } from './routes/_authenticated/prayer.qibla'
 import { Route as AuthenticatedPodcastWeeklyRouteImport } from './routes/_authenticated/podcast.weekly'
 import { Route as AuthenticatedPetSvgRouteImport } from './routes/_authenticated/pet.svg'
 import { Route as AuthenticatedPetShopRouteImport } from './routes/_authenticated/pet.shop'
@@ -662,6 +663,12 @@ const AuthenticatedProfilePrivacyRoute =
     path: '/privacy',
     getParentRoute: () => AuthenticatedProfileRoute,
   } as any)
+const AuthenticatedPrayerQiblaRoute =
+  AuthenticatedPrayerQiblaRouteImport.update({
+    id: '/qibla',
+    path: '/qibla',
+    getParentRoute: () => AuthenticatedPrayerRoute,
+  } as any)
 const AuthenticatedPodcastWeeklyRoute =
   AuthenticatedPodcastWeeklyRouteImport.update({
     id: '/podcast/weekly',
@@ -900,7 +907,7 @@ export interface FileRoutesByFullPath {
   '/offline-queue': typeof AuthenticatedOfflineQueueRoute
   '/onboarding': typeof AuthenticatedOnboardingRouteWithChildren
   '/pet': typeof AuthenticatedPetRouteWithChildren
-  '/prayer': typeof AuthenticatedPrayerRoute
+  '/prayer': typeof AuthenticatedPrayerRouteWithChildren
   '/profile': typeof AuthenticatedProfileRouteWithChildren
   '/progress': typeof AuthenticatedProgressRoute
   '/recipes': typeof AuthenticatedRecipesRouteWithChildren
@@ -943,6 +950,7 @@ export interface FileRoutesByFullPath {
   '/pet/shop': typeof AuthenticatedPetShopRoute
   '/pet/svg': typeof AuthenticatedPetSvgRoute
   '/podcast/weekly': typeof AuthenticatedPodcastWeeklyRoute
+  '/prayer/qibla': typeof AuthenticatedPrayerQiblaRoute
   '/profile/privacy': typeof AuthenticatedProfilePrivacyRoute
   '/profile/scan-stats': typeof AuthenticatedProfileScanStatsRoute
   '/push/alarm': typeof AuthenticatedPushAlarmRoute
@@ -1032,7 +1040,7 @@ export interface FileRoutesByTo {
   '/offline-queue': typeof AuthenticatedOfflineQueueRoute
   '/onboarding': typeof AuthenticatedOnboardingRouteWithChildren
   '/pet': typeof AuthenticatedPetRouteWithChildren
-  '/prayer': typeof AuthenticatedPrayerRoute
+  '/prayer': typeof AuthenticatedPrayerRouteWithChildren
   '/profile': typeof AuthenticatedProfileRouteWithChildren
   '/progress': typeof AuthenticatedProgressRoute
   '/recipes': typeof AuthenticatedRecipesRouteWithChildren
@@ -1075,6 +1083,7 @@ export interface FileRoutesByTo {
   '/pet/shop': typeof AuthenticatedPetShopRoute
   '/pet/svg': typeof AuthenticatedPetSvgRoute
   '/podcast/weekly': typeof AuthenticatedPodcastWeeklyRoute
+  '/prayer/qibla': typeof AuthenticatedPrayerQiblaRoute
   '/profile/privacy': typeof AuthenticatedProfilePrivacyRoute
   '/profile/scan-stats': typeof AuthenticatedProfileScanStatsRoute
   '/push/alarm': typeof AuthenticatedPushAlarmRoute
@@ -1166,7 +1175,7 @@ export interface FileRoutesById {
   '/_authenticated/offline-queue': typeof AuthenticatedOfflineQueueRoute
   '/_authenticated/onboarding': typeof AuthenticatedOnboardingRouteWithChildren
   '/_authenticated/pet': typeof AuthenticatedPetRouteWithChildren
-  '/_authenticated/prayer': typeof AuthenticatedPrayerRoute
+  '/_authenticated/prayer': typeof AuthenticatedPrayerRouteWithChildren
   '/_authenticated/profile': typeof AuthenticatedProfileRouteWithChildren
   '/_authenticated/progress': typeof AuthenticatedProgressRoute
   '/_authenticated/recipes': typeof AuthenticatedRecipesRouteWithChildren
@@ -1209,6 +1218,7 @@ export interface FileRoutesById {
   '/_authenticated/pet/shop': typeof AuthenticatedPetShopRoute
   '/_authenticated/pet/svg': typeof AuthenticatedPetSvgRoute
   '/_authenticated/podcast/weekly': typeof AuthenticatedPodcastWeeklyRoute
+  '/_authenticated/prayer/qibla': typeof AuthenticatedPrayerQiblaRoute
   '/_authenticated/profile/privacy': typeof AuthenticatedProfilePrivacyRoute
   '/_authenticated/profile/scan-stats': typeof AuthenticatedProfileScanStatsRoute
   '/_authenticated/push/alarm': typeof AuthenticatedPushAlarmRoute
@@ -1343,6 +1353,7 @@ export interface FileRouteTypes {
     | '/pet/shop'
     | '/pet/svg'
     | '/podcast/weekly'
+    | '/prayer/qibla'
     | '/profile/privacy'
     | '/profile/scan-stats'
     | '/push/alarm'
@@ -1475,6 +1486,7 @@ export interface FileRouteTypes {
     | '/pet/shop'
     | '/pet/svg'
     | '/podcast/weekly'
+    | '/prayer/qibla'
     | '/profile/privacy'
     | '/profile/scan-stats'
     | '/push/alarm'
@@ -1608,6 +1620,7 @@ export interface FileRouteTypes {
     | '/_authenticated/pet/shop'
     | '/_authenticated/pet/svg'
     | '/_authenticated/podcast/weekly'
+    | '/_authenticated/prayer/qibla'
     | '/_authenticated/profile/privacy'
     | '/_authenticated/profile/scan-stats'
     | '/_authenticated/push/alarm'
@@ -2354,6 +2367,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedProfilePrivacyRouteImport
       parentRoute: typeof AuthenticatedProfileRoute
     }
+    '/_authenticated/prayer/qibla': {
+      id: '/_authenticated/prayer/qibla'
+      path: '/qibla'
+      fullPath: '/prayer/qibla'
+      preLoaderRoute: typeof AuthenticatedPrayerQiblaRouteImport
+      parentRoute: typeof AuthenticatedPrayerRoute
+    }
     '/_authenticated/podcast/weekly': {
       id: '/_authenticated/podcast/weekly'
       path: '/podcast/weekly'
@@ -2740,6 +2760,17 @@ const AuthenticatedPetRouteChildren: AuthenticatedPetRouteChildren = {
 const AuthenticatedPetRouteWithChildren =
   AuthenticatedPetRoute._addFileChildren(AuthenticatedPetRouteChildren)
 
+interface AuthenticatedPrayerRouteChildren {
+  AuthenticatedPrayerQiblaRoute: typeof AuthenticatedPrayerQiblaRoute
+}
+
+const AuthenticatedPrayerRouteChildren: AuthenticatedPrayerRouteChildren = {
+  AuthenticatedPrayerQiblaRoute: AuthenticatedPrayerQiblaRoute,
+}
+
+const AuthenticatedPrayerRouteWithChildren =
+  AuthenticatedPrayerRoute._addFileChildren(AuthenticatedPrayerRouteChildren)
+
 interface AuthenticatedProfileRouteChildren {
   AuthenticatedProfilePrivacyRoute: typeof AuthenticatedProfilePrivacyRoute
   AuthenticatedProfileScanStatsRoute: typeof AuthenticatedProfileScanStatsRoute
@@ -2932,7 +2963,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedOfflineQueueRoute: typeof AuthenticatedOfflineQueueRoute
   AuthenticatedOnboardingRoute: typeof AuthenticatedOnboardingRouteWithChildren
   AuthenticatedPetRoute: typeof AuthenticatedPetRouteWithChildren
-  AuthenticatedPrayerRoute: typeof AuthenticatedPrayerRoute
+  AuthenticatedPrayerRoute: typeof AuthenticatedPrayerRouteWithChildren
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRouteWithChildren
   AuthenticatedProgressRoute: typeof AuthenticatedProgressRoute
   AuthenticatedRecipesRoute: typeof AuthenticatedRecipesRouteWithChildren
@@ -3005,7 +3036,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedOfflineQueueRoute: AuthenticatedOfflineQueueRoute,
   AuthenticatedOnboardingRoute: AuthenticatedOnboardingRouteWithChildren,
   AuthenticatedPetRoute: AuthenticatedPetRouteWithChildren,
-  AuthenticatedPrayerRoute: AuthenticatedPrayerRoute,
+  AuthenticatedPrayerRoute: AuthenticatedPrayerRouteWithChildren,
   AuthenticatedProfileRoute: AuthenticatedProfileRouteWithChildren,
   AuthenticatedProgressRoute: AuthenticatedProgressRoute,
   AuthenticatedRecipesRoute: AuthenticatedRecipesRouteWithChildren,
