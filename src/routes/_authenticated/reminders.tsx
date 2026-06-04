@@ -17,6 +17,7 @@ import {
   MoonStar,
 } from "lucide-react";
 import { useEffect, useState } from "react";
+import { useMemo } from "react";
 import { toast } from "sonner";
 import {
   DEFAULT_REMINDERS,
@@ -50,6 +51,33 @@ function RemindersPage() {
   const [newLabel, setNewLabel] = useState("");
   const [newTime, setNewTime] = useState("09:00");
   const [newCategory, setNewCategory] = useState<ReminderCategory>("custom");
+
+  const activeCount = items.filter((i) => i.enabled).length;
+  const next = useMemo(() => {
+    const now = new Date();
+    const today = now.getDay();
+    const nowMin = now.getHours() * 60 + now.getMinutes();
+    const enabled = items.filter(
+      (i) => i.enabled && (i.days.length === 0 || i.days.includes(today)),
+    );
+    const upcoming = enabled
+      .map((i) => {
+        const [h, m] = i.time.split(":").map(Number);
+        return { ...i, min: h * 60 + m };
+      })
+      .filter((i) => i.min >= nowMin)
+      .sort((a, b) => a.min - b.min);
+    return upcoming[0] ?? null;
+  }, [items]);
+
+  const fmtCountdown = (min: number) => {
+    const now = new Date();
+    const diff = min - (now.getHours() * 60 + now.getMinutes());
+    if (diff <= 0) return "segera";
+    const h = Math.floor(diff / 60);
+    const m = diff % 60;
+    return h > 0 ? `${h}j ${m}m lagi` : `${m}m lagi`;
+  };
 
   useEffect(() => {
     setItems(loadReminders());
@@ -133,6 +161,56 @@ function RemindersPage() {
         />
 
         <PushNotifications />
+
+        <section
+          className="relative overflow-hidden rounded-3xl p-5 text-white animate-fade-up"
+          style={{
+            background:
+              "linear-gradient(135deg, oklch(0.62 0.16 195) 0%, oklch(0.58 0.18 250) 100%)",
+          }}
+        >
+          <div className="flex items-center justify-between">
+            <div>
+              <div className="text-[11px] uppercase tracking-wider opacity-80">
+                Pengingat aktif
+              </div>
+              <div className="text-3xl font-bold mt-1">
+                {activeCount}
+                <span className="text-base font-medium opacity-80">
+                  /{items.length}
+                </span>
+              </div>
+            </div>
+            <div className="size-12 rounded-2xl bg-white/15 grid place-items-center">
+              <Bell className="size-5" />
+            </div>
+          </div>
+          {next ? (
+            <div className="mt-4 bg-white/15 rounded-2xl p-3 flex items-center gap-3">
+              {(() => {
+                const Icon = (CATEGORY_META[next.category] ?? CATEGORY_META.custom).icon;
+                return (
+                  <div className="size-9 rounded-xl bg-white/20 grid place-items-center">
+                    <Icon className="size-4" />
+                  </div>
+                );
+              })()}
+              <div className="flex-1 min-w-0">
+                <div className="text-[11px] opacity-80">Berikutnya</div>
+                <div className="text-sm font-semibold truncate">
+                  {next.label} · {next.time}
+                </div>
+              </div>
+              <div className="text-xs font-medium opacity-90">
+                {fmtCountdown(next.min)}
+              </div>
+            </div>
+          ) : (
+            <div className="mt-4 text-xs opacity-80">
+              Tidak ada pengingat tersisa hari ini
+            </div>
+          )}
+        </section>
 
         {permission !== "granted" ? (
           <button
