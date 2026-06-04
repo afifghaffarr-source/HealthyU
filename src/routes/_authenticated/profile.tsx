@@ -5,6 +5,7 @@ import { getProfile } from "@/lib/profile.functions";
 import { BottomNav } from "@/components/bottom-nav";
 import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { HealthCard } from "@/components/healthyu/health-card";
+import { HealthScoreCard } from "@/components/healthyu/health-score-card";
 import { supabase } from "@/integrations/supabase/client";
 import { calcAge, calcBMI, bmiCategory, calcBMR, calcTDEE, type ActivityLevel } from "@/lib/health";
 import {
@@ -85,6 +86,18 @@ function ProfilePage() {
             <HealthCard label="BMR" value={bmr ?? "-"} unit="kcal" tone="orange" icon={HeartPulse} />
             <HealthCard label="TDEE" value={tdee ?? "-"} unit="kcal" tone="blue" icon={Activity} />
           </section>
+        )}
+
+        {bmi && (
+          <HealthScoreCard
+            className="animate-fade-up"
+            factors={[
+              { label: "BMI", value: bmi >= 18.5 && bmi <= 24.9 ? 100 : Math.max(0, 100 - Math.abs(bmi - 22) * 8) },
+              { label: "Aktivitas", value: activityScore(p?.activity_level) },
+              { label: "Target berat", value: weightTargetScore(Number(p?.weight_kg), Number(p?.target_weight_kg)) },
+              { label: "Kalori harian", value: p?.daily_calorie_target ? 80 : 40 },
+            ]}
+          />
         )}
 
         <section className="bg-card rounded-3xl outline-1 outline-black/5 divide-y divide-border overflow-hidden animate-fade-up">
@@ -341,7 +354,7 @@ function Stat({ label, value, sub }: { label: string; value: string; sub?: strin
         {label}
       </p>
       <p className="text-xl font-bold tabular-nums mt-1">{value}</p>
-      {sub && <p className="text-[10px] text-muted-foreground">{sub}</p>}
+      {sub && <p className="text-[10px] text-muted-foreground mt-0.5">{sub}</p>}
     </div>
   );
 }
@@ -353,4 +366,21 @@ function Row({ label, value }: { label: string; value: string }) {
       <span className="text-sm font-semibold capitalize">{value}</span>
     </div>
   );
+}
+
+function activityScore(level: string | null | undefined): number {
+  switch (level) {
+    case "very_active": return 100;
+    case "active": return 85;
+    case "moderate": return 70;
+    case "light": return 55;
+    case "sedentary": return 35;
+    default: return 50;
+  }
+}
+
+function weightTargetScore(weight: number, target: number): number {
+  if (!weight || !target) return 50;
+  const diff = Math.abs(weight - target);
+  return Math.max(0, Math.round(100 - diff * 4));
 }
