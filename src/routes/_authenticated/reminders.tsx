@@ -83,6 +83,9 @@ function RemindersPage() {
   const updateTime = (id: string, time: string) =>
     setItems((arr) => arr.map((i) => (i.id === id ? { ...i, time } : i)));
 
+  const updateLabel = (id: string, label: string) =>
+    setItems((arr) => arr.map((i) => (i.id === id ? { ...i, label } : i)));
+
   const toggleDay = (id: string, day: number) =>
     setItems((arr) =>
       arr.map((i) => {
@@ -202,7 +205,12 @@ function RemindersPage() {
                     <Icon className={`size-4 ${it.enabled ? "text-sage-deep" : "text-muted-foreground"}`} />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="font-semibold text-sm truncate">{it.label}</p>
+                    <input
+                      value={it.label}
+                      onChange={(e) => updateLabel(it.id, e.target.value)}
+                      className="font-semibold text-sm bg-transparent outline-none w-full"
+                      aria-label="Nama pengingat"
+                    />
                     <input
                       type="time"
                       value={it.time}
