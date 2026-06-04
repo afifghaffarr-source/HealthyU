@@ -5,7 +5,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { listVitals, addVitals, deleteVitals } from "@/lib/vitals.functions";
 import { listBodyMetrics, addBodyMetrics, deleteBodyMetrics } from "@/lib/bodyMetrics.functions";
 import { BottomNav } from "@/components/bottom-nav";
-import { Heart, Activity, Droplet, Trash2, Ruler, ChevronDown } from "lucide-react";
+import { Heart, Activity, Droplet, Trash2, Ruler, ChevronDown, TrendingUp } from "lucide-react";
 import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { SyncPill } from "@/components/healthyu/sync-pill";
 import { toast } from "sonner";
@@ -139,6 +139,13 @@ function VitalsPage() {
   const latestBp = latest ? bpCategory(latest.systolic, latest.diastolic) : null;
   const latestGlu = latest ? glucoseCategory(latest.glucose_mgdl ? Number(latest.glucose_mgdl) : null, latest.glucose_state) : null;
 
+  const recentBp = logs
+    .filter((l) => l.systolic && l.diastolic)
+    .slice(0, 7)
+    .reverse() as Array<{ id: string; systolic: number; diastolic: number; logged_at: string }>;
+  const bpMax = Math.max(160, ...recentBp.map((r) => r.systolic ?? 0));
+  const bpMin = Math.min(60, ...recentBp.map((r) => r.diastolic ?? 0));
+
   return (
     <main className="min-h-screen bg-background pb-28">
       <div className="max-w-md mx-auto px-5 pt-2 space-y-5">
@@ -150,23 +157,61 @@ function VitalsPage() {
 
         {latest && (
           <section className="grid grid-cols-3 gap-2 animate-fade-up">
-            <div className="bg-card p-3 rounded-2xl outline-1 outline-black/5 text-center">
+            <div className="bg-card p-3 rounded-2xl outline-1 outline-black/5 text-center relative overflow-hidden">
+              <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-rose-400 to-coral" />
               <Heart className="size-4 mx-auto text-coral mb-1" />
               <p className="text-[10px] font-bold uppercase text-muted-foreground">Tekanan</p>
               <p className="text-sm font-bold tabular-nums">{latest.systolic ?? "-"}/{latest.diastolic ?? "-"}</p>
               {latestBp && <p className={`text-[10px] font-semibold ${latestBp.color}`}>{latestBp.label}</p>}
             </div>
-            <div className="bg-card p-3 rounded-2xl outline-1 outline-black/5 text-center">
+            <div className="bg-card p-3 rounded-2xl outline-1 outline-black/5 text-center relative overflow-hidden">
+              <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-primary to-emerald-400" />
               <Activity className="size-4 mx-auto text-primary mb-1" />
               <p className="text-[10px] font-bold uppercase text-muted-foreground">Detak</p>
               <p className="text-sm font-bold tabular-nums">{latest.heart_rate ?? "-"}</p>
               <p className="text-[10px] text-muted-foreground">bpm</p>
             </div>
-            <div className="bg-card p-3 rounded-2xl outline-1 outline-black/5 text-center">
+            <div className="bg-card p-3 rounded-2xl outline-1 outline-black/5 text-center relative overflow-hidden">
+              <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-sky-400 to-cyan-400" />
               <Droplet className="size-4 mx-auto text-sky-600 mb-1" />
               <p className="text-[10px] font-bold uppercase text-muted-foreground">Gula</p>
               <p className="text-sm font-bold tabular-nums">{latest.glucose_mgdl ?? "-"}</p>
               {latestGlu && <p className={`text-[10px] font-semibold ${latestGlu.color}`}>{latestGlu.label}</p>}
+            </div>
+          </section>
+        )}
+
+        {recentBp.length >= 2 && (
+          <section className="bg-card p-4 rounded-3xl outline-1 outline-black/5 animate-fade-up">
+            <div className="flex items-center justify-between mb-3">
+              <div className="inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                <TrendingUp className="size-3" /> Tren tekanan darah
+              </div>
+              <span className="text-[10px] text-muted-foreground">{recentBp.length} catatan</span>
+            </div>
+            <svg viewBox="0 0 280 80" className="w-full h-20">
+              {(() => {
+                const stepX = recentBp.length > 1 ? 280 / (recentBp.length - 1) : 0;
+                const range = Math.max(1, bpMax - bpMin);
+                const sysPts = recentBp.map((r, i) => `${i * stepX},${80 - ((r.systolic - bpMin) / range) * 70 - 5}`).join(" ");
+                const diaPts = recentBp.map((r, i) => `${i * stepX},${80 - ((r.diastolic - bpMin) / range) * 70 - 5}`).join(" ");
+                return (
+                  <>
+                    <polyline points={sysPts} fill="none" stroke="hsl(var(--coral, 0 80% 65%))" strokeWidth="2" strokeLinejoin="round" strokeLinecap="round" />
+                    <polyline points={diaPts} fill="none" stroke="hsl(var(--primary))" strokeWidth="2" strokeDasharray="4 3" strokeLinejoin="round" strokeLinecap="round" />
+                    {recentBp.map((r, i) => (
+                      <g key={r.id}>
+                        <circle cx={i * stepX} cy={80 - ((r.systolic - bpMin) / range) * 70 - 5} r="2.5" className="fill-coral" />
+                        <circle cx={i * stepX} cy={80 - ((r.diastolic - bpMin) / range) * 70 - 5} r="2" className="fill-primary" />
+                      </g>
+                    ))}
+                  </>
+                );
+              })()}
+            </svg>
+            <div className="flex items-center justify-center gap-4 text-[10px] mt-1">
+              <span className="inline-flex items-center gap-1"><span className="size-2 rounded-full bg-coral" /> Sistolik</span>
+              <span className="inline-flex items-center gap-1"><span className="size-2 rounded-full bg-primary" /> Diastolik</span>
             </div>
           </section>
         )}
