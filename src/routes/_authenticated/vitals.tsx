@@ -4,6 +4,15 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { listVitals, addVitals, deleteVitals } from "@/lib/vitals.functions";
 import { listBodyMetrics, addBodyMetrics, deleteBodyMetrics } from "@/lib/bodyMetrics.functions";
+import { getProfile } from "@/lib/profile.functions";
+import {
+  bmi as calcBmi,
+  bmiCategory,
+  bmr as calcBmr,
+  tdee as calcTdee,
+  waterTargetMl,
+  ageFromBirthDate,
+} from "@/lib/localCalc";
 import { BottomNav } from "@/components/bottom-nav";
 import { Heart, Activity, Droplet, Trash2, Ruler, ChevronDown, TrendingUp } from "lucide-react";
 import { TopAppBar } from "@/components/healthyu/top-app-bar";
@@ -49,10 +58,12 @@ function VitalsPage() {
   const fetchBody = useServerFn(listBodyMetrics);
   const addBody = useServerFn(addBodyMetrics);
   const delBody = useServerFn(deleteBodyMetrics);
+  const fetchProfile = useServerFn(getProfile);
   const { online, pending, sync } = useOfflineQueue();
 
   const { data: logs = [] } = useQuery({ queryKey: ["vitals"], queryFn: () => fetchList() });
   const { data: bodyLogs = [] } = useQuery({ queryKey: ["body_metrics"], queryFn: () => fetchBody() });
+  const { data: profile } = useQuery({ queryKey: ["profile"], queryFn: () => fetchProfile() });
 
   const [sys, setSys] = useState("");
   const [dia, setDia] = useState("");
