@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { listRecipeBookmarks } from "@/lib/recipeBookmarks.functions";
+import { listRecipeBookmarks } from "@/features/recipes/lib/recipeBookmarks.functions";
 import { BottomNav } from "@/components/bottom-nav";
 import { Bookmark, Clock, Flame, Star } from "lucide-react";
 
