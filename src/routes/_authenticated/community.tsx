@@ -3,24 +3,25 @@ import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { useMemo, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { listPosts, createPost, deletePost, toggleLike } from "@/features/groups/lib/community.functions";
-import { listComments, createComment, deleteComment } from "@/features/groups/lib/social.functions";
+import {
+  listPosts,
+  createPost,
+  deletePost,
+  toggleLike,
+} from "@/features/groups/lib/community.functions";
 import { BottomNav } from "@/components/bottom-nav";
-import { Heart, Trash2, Send, MessageCircle, Flame, Clock, Users } from "lucide-react";
+import { Heart, Flame, Clock, Users } from "lucide-react";
 import { toast } from "sonner";
 import { toastError } from "@/lib/toast-config";
+import { PostCard } from "@/features/groups/components/PostCard";
+import {
+  COMMUNITY_CATS,
+  CommunityComposer,
+} from "@/features/groups/components/CommunityComposer";
 
 export const Route = createFileRoute("/_authenticated/community")({
   component: CommunityPage,
 });
-
-const CATS = [
-  { id: "general", label: "Umum" },
-  { id: "diet", label: "Diet" },
-  { id: "fasting", label: "Puasa" },
-  { id: "workout", label: "Latihan" },
-  { id: "motivation", label: "Motivasi" },
-] as const;
 
 function CommunityPage() {
   const qc = useQueryClient();
@@ -32,8 +33,8 @@ function CommunityPage() {
   const { data: posts = [] } = useQuery({ queryKey: ["community"], queryFn: () => list() });
 
   const [content, setContent] = useState("");
-  const [category, setCategory] = useState<(typeof CATS)[number]["id"]>("general");
-  const [filter, setFilter] = useState<"all" | (typeof CATS)[number]["id"]>("all");
+  const [category, setCategory] = useState<string>("general");
+  const [filter, setFilter] = useState<string>("all");
 
   const createMut = useMutation({
     mutationFn: () => create({ data: { content: content.trim(), category } }),
@@ -69,7 +70,7 @@ function CommunityPage() {
 
   const counts = useMemo(() => {
     const m: Record<string, number> = { all: posts.length };
-    for (const c of CATS) m[c.id] = posts.filter((p) => p.category === c.id).length;
+    for (const c of COMMUNITY_CATS) m[c.id] = posts.filter((p) => p.category === c.id).length;
     return m;
   }, [posts]);
 
@@ -95,37 +96,14 @@ function CommunityPage() {
           />
         </div>
 
-        <section className="bg-card p-4 rounded-3xl outline-1 outline-black/5 space-y-3 animate-fade-up">
-          <textarea
-            value={content}
-            onChange={(e) => setContent(e.target.value.slice(0, 1000))}
-            placeholder="Apa yang ingin kamu bagikan?"
-            rows={3}
-            className="w-full bg-background outline-1 outline-black/10 rounded-2xl px-4 py-3 text-sm resize-none"
-          />
-          <div className="flex gap-2 overflow-x-auto no-scrollbar">
-            {CATS.map((c) => (
-              <button
-                key={c.id}
-                onClick={() => setCategory(c.id)}
-                className={`px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap ${
-                  category === c.id
-                    ? "bg-primary text-primary-foreground"
-                    : "bg-mint text-sage-deep"
-                }`}
-              >
-                {c.label}
-              </button>
-            ))}
-          </div>
-          <button
-            onClick={() => createMut.mutate()}
-            disabled={!content.trim() || createMut.isPending}
-            className="w-full flex items-center justify-center gap-2 bg-primary text-primary-foreground font-semibold py-3 rounded-2xl disabled:opacity-50"
-          >
-            <Send className="size-4" /> Kirim
-          </button>
-        </section>
+        <CommunityComposer
+          content={content}
+          setContent={setContent}
+          category={category}
+          setCategory={setCategory}
+          onSubmit={() => createMut.mutate()}
+          submitting={createMut.isPending}
+        />
 
         <section className="space-y-3 animate-fade-up">
           <div className="flex items-center justify-between gap-2">
@@ -158,7 +136,7 @@ function CommunityPage() {
             >
               Semua <span className="opacity-70">· {counts.all}</span>
             </button>
-            {CATS.map((c) => (
+            {COMMUNITY_CATS.map((c) => (
               <button
                 key={c.id}
                 onClick={() => setFilter(c.id)}
@@ -178,53 +156,14 @@ function CommunityPage() {
             </p>
           ) : (
             visiblePosts.map((p) => (
-              <article key={p.id} className="bg-card p-4 rounded-3xl outline-1 outline-black/5">
-                <div className="flex items-center gap-3 mb-2">
-                  <div className="size-9 rounded-full bg-primary text-primary-foreground grid place-items-center text-sm font-bold">
-                    {p.author.slice(0, 1).toUpperCase()}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="font-semibold text-sm truncate">{p.author}</p>
-                    <p className="text-[10px] text-muted-foreground">
-                      {new Date(p.created_at).toLocaleString("id-ID", {
-                        day: "numeric",
-                        month: "short",
-                        hour: "2-digit",
-                        minute: "2-digit",
-                      })}
-                      {" · "}
-                      <span className="text-primary capitalize">{p.category}</span>
-                    </p>
-                  </div>
-                  {p.is_mine && (
-                    <button
-                      onClick={() => delMut.mutate(p.id)}
-                      className="p-1.5 text-muted-foreground hover:text-destructive"
-                    >
-                      <Trash2 className="size-4" />
-                    </button>
-                  )}
-                </div>
-                <p className="text-sm whitespace-pre-wrap leading-relaxed">{p.content}</p>
-                <div className="flex gap-4 mt-3 items-center">
-                  <button
-                    onClick={() => likeMut.mutate(p.id)}
-                    className={`flex items-center gap-1.5 text-xs font-semibold ${
-                      p.liked_by_me ? "text-coral" : "text-muted-foreground"
-                    }`}
-                  >
-                    <Heart className={`size-4 ${p.liked_by_me ? "fill-coral" : ""}`} />
-                    {p.like_count}
-                  </button>
-                  <button
-                    onClick={() => setOpenComments(openComments === p.id ? null : p.id)}
-                    className="flex items-center gap-1.5 text-xs font-semibold text-muted-foreground"
-                  >
-                    <MessageCircle className="size-4" /> Komentar
-                  </button>
-                </div>
-                {openComments === p.id && <Comments postId={p.id} />}
-              </article>
+              <PostCard
+                key={p.id}
+                p={p}
+                commentsOpen={openComments === p.id}
+                onToggleComments={() => setOpenComments(openComments === p.id ? null : p.id)}
+                onLike={() => likeMut.mutate(p.id)}
+                onDelete={() => delMut.mutate(p.id)}
+              />
             ))
           )}
         </section>
@@ -241,65 +180,6 @@ function Stat({ icon, label, value }: { icon: React.ReactNode; label: string; va
         {icon} {label}
       </div>
       <p className="mt-1 text-lg font-black tabular-nums leading-none">{value}</p>
-    </div>
-  );
-}
-
-function Comments({ postId }: { postId: string }) {
-  const qc = useQueryClient();
-  const list = useServerFn(listComments);
-  const create = useServerFn(createComment);
-  const del = useServerFn(deleteComment);
-  const { data: comments = [] } = useQuery({
-    queryKey: ["comments", postId],
-    queryFn: () => list({ data: { post_id: postId } }),
-  });
-  const [text, setText] = useState("");
-  const createMut = useMutation({
-    mutationFn: () => create({ data: { post_id: postId, content: text.trim() } }),
-    onSuccess: () => {
-      setText("");
-      qc.invalidateQueries({ queryKey: ["comments", postId] });
-    },
-    onError: (e) => toastError(e, "Gagal"),
-  });
-  const delMut = useMutation({
-    mutationFn: (id: string) => del({ data: { id } }),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["comments", postId] }),
-  });
-  return (
-    <div className="mt-3 pt-3 border-t border-border space-y-2">
-      {comments.map((c) => (
-        <div key={c.id} className="flex items-start gap-2 text-xs">
-          <div className="size-7 rounded-full bg-mint text-sage-deep grid place-items-center text-[10px] font-bold shrink-0">
-            {c.author.slice(0, 1).toUpperCase()}
-          </div>
-          <div className="flex-1 bg-background rounded-2xl px-3 py-2">
-            <p className="font-semibold">{c.author}</p>
-            <p className="whitespace-pre-wrap leading-relaxed">{c.content}</p>
-          </div>
-          {c.is_mine && (
-            <button onClick={() => delMut.mutate(c.id)} className="p-1 text-muted-foreground">
-              <Trash2 className="size-3.5" />
-            </button>
-          )}
-        </div>
-      ))}
-      <div className="flex gap-2">
-        <input
-          value={text}
-          onChange={(e) => setText(e.target.value.slice(0, 500))}
-          placeholder="Tulis komentar..."
-          className="flex-1 bg-background outline-1 outline-black/10 rounded-2xl px-3 py-2 text-xs"
-        />
-        <button
-          onClick={() => createMut.mutate()}
-          disabled={!text.trim() || createMut.isPending}
-          className="px-3 bg-primary text-primary-foreground rounded-2xl text-xs font-semibold disabled:opacity-50"
-        >
-          Kirim
-        </button>
-      </div>
     </div>
   );
 }
