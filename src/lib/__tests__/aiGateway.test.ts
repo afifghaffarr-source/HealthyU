@@ -15,7 +15,7 @@ import {
   extractJsonFromResponse,
   AiGatewayError,
   AiSchemaError,
-} from "../aiGateway.server";
+} from "@/features/ai/lib/aiGateway.server";
 
 const origKey = process.env.LOVABLE_API_KEY;
 const origFetch = globalThis.fetch;

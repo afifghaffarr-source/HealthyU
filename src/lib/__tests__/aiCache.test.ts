@@ -12,7 +12,7 @@ vi.mock("@/integrations/supabase/client.server", () => ({
   },
 }));
 
-import { cacheKey, getCached, setCached } from "../aiCache.server";
+import { cacheKey, getCached, setCached } from "@/features/ai/lib/aiCache.server";
 
 beforeEach(() => {
   maybeSingle.mockReset();

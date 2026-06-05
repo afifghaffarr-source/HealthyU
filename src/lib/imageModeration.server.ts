@@ -6,7 +6,7 @@
  * Call BEFORE storing user-uploaded images (chat attachments, progress photos, scan photos).
  */
 
-import { callAiWithGuards, AiGatewayError } from "./aiGateway.server";
+import { callAiWithGuards, AiGatewayError } from "@/features/ai/lib/aiGateway.server";
 
 export type ModerationLabel = "safe" | "nudity" | "violence" | "spam" | "medical_graphic" | "other";
 

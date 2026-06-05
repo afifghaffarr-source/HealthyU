@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
 const callMock = vi.fn();
-vi.mock("../aiGateway.server", () => ({
+vi.mock("@/features/ai/lib/aiGateway.server", () => ({
   callAiWithGuards: (...a: unknown[]) => callMock(...a),
   AiGatewayError: class AiGatewayError extends Error {
     status: number;
@@ -10,7 +10,7 @@ vi.mock("../aiGateway.server", () => ({
 }));
 
 import { moderateImage } from "../imageModeration.server";
-import { AiGatewayError } from "../aiGateway.server";
+import { AiGatewayError } from "@/features/ai/lib/aiGateway.server";
 
 beforeEach(() => callMock.mockReset());
 
