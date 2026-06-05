@@ -1,6 +1,12 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate, redirect } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import {
+  queryOptions,
+  useQuery,
+  useSuspenseQuery,
+  useMutation,
+  useQueryClient,
+} from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { getProfile } from "@/lib/profile.functions";
 import { getDailyTip } from "@/lib/dailyTips.functions";
@@ -45,7 +51,39 @@ import { useMiniFocusTrap } from "@/hooks/useMiniFocusTrap";
 import { useAnnounce } from "@/components/live-announcer";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
 
+const profileQueryOptions = queryOptions({
+  queryKey: ["profile"],
+  queryFn: () => getProfile(),
+});
+
+const dailyTipQueryOptions = queryOptions({
+  queryKey: ["daily-tip", new Date().toISOString().slice(0, 10)],
+  queryFn: () => getDailyTip(),
+  staleTime: 1000 * 60 * 60 * 6,
+});
+
 export const Route = createFileRoute("/_authenticated/dashboard")({
+  loader: async ({ context: { queryClient } }) => {
+    // Critical: profile drives header + cal target + onboarding gate.
+    const profile = await queryClient.ensureQueryData(profileQueryOptions);
+    if (profile && !profile.onboarded) {
+      throw redirect({ to: "/onboarding" });
+    }
+    // Non-critical: kick off in parallel so cards mount with data already in cache.
+    queryClient.prefetchQuery(dailyTipQueryOptions);
+    queryClient.prefetchQuery({ queryKey: ["meals", "today"], queryFn: () => todaysMeals() });
+    queryClient.prefetchQuery({ queryKey: ["fast", "current"], queryFn: () => currentFast() });
+    queryClient.prefetchQuery({ queryKey: ["water", "today"], queryFn: () => todaysWater() });
+    queryClient.prefetchQuery({ queryKey: ["game", "summary"], queryFn: () => getGameSummary() });
+    queryClient.prefetchQuery({
+      queryKey: ["group-challenge-summary"],
+      queryFn: () => myGroupChallengeSummary(),
+    });
+    queryClient.prefetchQuery({
+      queryKey: ["unlinked-joined-challenges"],
+      queryFn: () => myUnlinkedJoinedChallenges(),
+    });
+  },
   component: Dashboard,
 });
 
@@ -57,8 +95,6 @@ function Dashboard() {
   });
   const announce = useAnnounce();
   const prefersReducedMotion = useReducedMotion();
-  const fetchProfile = useServerFn(getProfile);
-  const fetchDailyTip = useServerFn(getDailyTip);
   const fetchMeals = useServerFn(todaysMeals);
   const fetchFast = useServerFn(currentFast);
   const fetchWater = useServerFn(todaysWater);
@@ -90,15 +126,9 @@ function Dashboard() {
     onError: (e: Error) => toast.error(e.message),
   });
 
-  const { data: profile, isLoading: pLoad } = useQuery({
-    queryKey: ["profile"],
-    queryFn: () => fetchProfile(),
-  });
-  const { data: dailyTip } = useQuery({
-    queryKey: ["daily-tip", new Date().toISOString().slice(0, 10)],
-    queryFn: () => fetchDailyTip(),
-    staleTime: 1000 * 60 * 60 * 6,
-  });
+  // Profile is primed in the loader → no loading flicker, no `pLoad` gate.
+  const { data: profile } = useSuspenseQuery(profileQueryOptions);
+  const { data: dailyTip } = useQuery(dailyTipQueryOptions);
   const { data: meals = [] } = useQuery({
     queryKey: ["meals", "today"],
     queryFn: () => fetchMeals(),
@@ -284,12 +314,6 @@ function Dashboard() {
       supabase.removeChannel(ch);
     };
   }, [qc]);
-
-  useEffect(() => {
-    if (!pLoad && profile && !profile.onboarded) {
-      navigate({ to: "/onboarding" });
-    }
-  }, [profile, pLoad, navigate]);
 
   const waterMutation = useMutation({
     mutationFn: (ml: number) => logWaterFn({ data: { amount_ml: ml } }),
