@@ -323,6 +323,7 @@
   .animate-shimmer,
   .animate-aurora,
   .animate-tilt,
+  .animate-success-pop,
   .stagger-fade > * {
     animation: none !important;
   }
