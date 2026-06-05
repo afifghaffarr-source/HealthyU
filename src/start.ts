@@ -25,7 +25,8 @@ const errorMiddleware = createMiddleware().server(async ({ next }) => {
  * dan service worker. Tambahkan CSP terpisah setelah audit upstream.
  */
 const securityHeadersMiddleware = createMiddleware().server(async ({ next }) => {
-  const response = await next();
+  const result = await next();
+  const response = result.response;
   const headers = new Headers(response.headers);
 
   // Cegah MIME sniffing
@@ -59,11 +60,14 @@ const securityHeadersMiddleware = createMiddleware().server(async ({ next }) => 
     headers.set("cross-origin-opener-policy", "same-origin");
   }
 
-  return new Response(response.body, {
-    status: response.status,
-    statusText: response.statusText,
-    headers,
-  });
+  return {
+    ...result,
+    response: new Response(response.body, {
+      status: response.status,
+      statusText: response.statusText,
+      headers,
+    }),
+  };
 });
 
 export const startInstance = createStart(() => ({
