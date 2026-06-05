@@ -1,13 +1,15 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
-const mfa = {
-  listFactors: vi.fn(),
-  enroll: vi.fn(),
-  challenge: vi.fn(),
-  verify: vi.fn(),
-  unenroll: vi.fn(),
-  getAuthenticatorAssuranceLevel: vi.fn(),
-};
+const { mfa } = vi.hoisted(() => ({
+  mfa: {
+    listFactors: vi.fn(),
+    enroll: vi.fn(),
+    challenge: vi.fn(),
+    verify: vi.fn(),
+    unenroll: vi.fn(),
+    getAuthenticatorAssuranceLevel: vi.fn(),
+  },
+}));
 
 vi.mock("@/integrations/supabase/client", () => ({
   supabase: { auth: { mfa } },
