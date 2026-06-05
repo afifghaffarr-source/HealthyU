@@ -13,6 +13,7 @@ import {
   type ActivityLevel,
 } from "./health";
 import { buildCompactProfile, compactTodayBlock } from "./aiRouter.server";
+import { callAiWithGuards, type AiMultimodalMessage } from "./aiGateway.server";
 
 const SYSTEM_PROMPT = `Anda adalah "Dr. HealthyU" (panggilan: Dok/Dr), AI health assistant di aplikasi HealthyU.
 
@@ -376,9 +377,6 @@ export const sendChatMessage = createServerFn({ method: "POST" })
   )
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
-    const apiKey = process.env.LOVABLE_API_KEY;
-    if (!apiKey) throw new Error("AI service not configured");
-
     await persistUserMessage(supabase, userId, data.message, data.imageBase64);
     const { messages, isEmergency } = await buildChatPayload(
       supabase,
@@ -388,28 +386,12 @@ export const sendChatMessage = createServerFn({ method: "POST" })
       data.imageMime,
     );
 
-    const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${apiKey}`,
-      },
-      body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
-        messages,
-      }),
-    });
-
-    if (res.status === 429) throw new Error("Terlalu banyak permintaan. Coba lagi sebentar.");
-    if (res.status === 402) throw new Error("Kredit AI habis. Silakan top up.");
-    if (!res.ok) {
-      const txt = await res.text().catch(() => "");
-      throw new Error(`AI error: ${res.status} ${txt.slice(0, 200)}`);
-    }
-
-    const json = await res.json();
-    const reply: string =
-      json?.choices?.[0]?.message?.content ?? "Maaf, saya tidak bisa memproses sekarang.";
+    const reply =
+      (await callAiWithGuards({
+        userId,
+        feature: data.imageBase64 ? "chat.image" : "chat.text",
+        messages: messages as AiMultimodalMessage[],
+      })) || "Maaf, saya tidak bisa memproses sekarang.";
 
     await supabase.from("chat_messages").insert({
       user_id: userId,
@@ -424,9 +406,6 @@ export const weeklyHealthReport = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     const { supabase, userId } = context;
-    const apiKey = process.env.LOVABLE_API_KEY;
-    if (!apiKey) throw new Error("AI service not configured");
-
     const weekStart = new Date();
     weekStart.setDate(weekStart.getDate() - 6);
     weekStart.setHours(0, 0, 0, 0);
@@ -545,22 +524,15 @@ export const weeklyHealthReport = createServerFn({ method: "POST" })
 
     const prompt = `Buat Laporan Kesehatan Mingguan dalam Bahasa Indonesia untuk user berikut. Gunakan format markdown dengan heading, bullet, dan emoji. Berikan: (1) Ringkasan metrik dengan check ✅ / warning ⚠️, (2) Analisis singkat, (3) 3 rekomendasi actionable, (4) Prediksi progress jika pola berlanjut. Hindari diagnosis medis. Data:\n\n${JSON.stringify(data, null, 2)}`;
 
-    const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-      method: "POST",
-      headers: { "Content-Type": "application/json", Authorization: `Bearer ${apiKey}` },
-      body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
+    const report =
+      (await callAiWithGuards({
+        userId,
+        feature: "chat.weekly_report",
         messages: [
           { role: "system", content: SYSTEM_PROMPT },
           { role: "user", content: prompt },
         ],
-      }),
-    });
-    if (res.status === 429) throw new Error("Terlalu banyak permintaan. Coba lagi sebentar.");
-    if (res.status === 402) throw new Error("Kredit AI habis. Silakan top up.");
-    if (!res.ok) throw new Error(`AI error: ${res.status}`);
-    const json = await res.json();
-    const report: string = json?.choices?.[0]?.message?.content ?? "Belum bisa membuat laporan.";
+      })) || "Belum bisa membuat laporan.";
 
     await supabase.from("chat_messages").insert({
       user_id: userId,
