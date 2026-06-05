@@ -8,7 +8,7 @@ import {
   deleteMeal,
   logMealWithItems,
 } from "@/lib/meals.functions";
-import { parseMealFromVoice } from "@/lib/ai-extras.functions";
+import { parseMealFromVoice } from "@/features/ai/lib/ai-extras.functions";
 import { getAchievementToastPrefix } from "@/lib/achievement-icons";
 import { BottomNav } from "@/components/bottom-nav";
 import { Search, Mic, MicOff, Loader2, WifiOff, RefreshCw } from "lucide-react";

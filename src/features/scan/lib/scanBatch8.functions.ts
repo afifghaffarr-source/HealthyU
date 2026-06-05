@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { callAiWithGuards } from "@/lib/aiGateway.server";
+import { callAiWithGuards } from "@/features/ai/lib/aiGateway.server";
 
 async function callAI(prompt: string, system: string, userId: string | null = null) {
   return callAiWithGuards({

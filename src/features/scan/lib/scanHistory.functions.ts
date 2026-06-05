@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { callAiJsonWithSchema } from "@/lib/aiGateway.server";
+import { callAiJsonWithSchema } from "@/features/ai/lib/aiGateway.server";
 
 const InsightsSchema = z.object({
   summary: z.string().default(""),

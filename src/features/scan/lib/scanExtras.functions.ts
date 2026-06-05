@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { callAiJsonWithSchema, type AiContentPart } from "@/lib/aiGateway.server";
+import { callAiJsonWithSchema, type AiContentPart } from "@/features/ai/lib/aiGateway.server";
 import type { ZodTypeAny } from "zod";
 
 const ImgIn = z.object({

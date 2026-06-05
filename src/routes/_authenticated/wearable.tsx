@@ -12,7 +12,7 @@ import {
   getWearableStatus,
   syncGoogleFit,
   disconnectGoogleFit,
-} from "@/lib/google-fit.functions";
+} from "@/features/google-fit/lib/google-fit.functions";
 
 export const Route = createFileRoute("/_authenticated/wearable")({
   component: WearablePage,

@@ -7,7 +7,7 @@ import {
   addBodyMetrics,
   deleteBodyMetrics,
   listBodyMetrics,
-} from "@/lib/bodyMetrics.functions";
+} from "@/features/body/lib/bodyMetrics.functions";
 import { VitalInput } from "./VitalInput";
 
 type BodyField =

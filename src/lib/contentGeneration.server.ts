@@ -5,7 +5,7 @@
  * subsequent reads (DB itself is the cache).
  */
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
-import { callAiWithGuards } from "@/lib/aiGateway.server";
+import { callAiWithGuards } from "@/features/ai/lib/aiGateway.server";
 
 const MODEL = "google/gemini-2.5-flash";
 
