@@ -29,8 +29,10 @@ function Page() {
     },
     onError: (e: Error) => toast.error(e.message),
   });
-  const g = data?.goal as any;
-  const p = data?.prediction as any;
+  type Goal = { start_weight_kg: number; target_weight_kg: number; target_date: string };
+  type Prediction = { estDate: string | null; weeklyRate: number };
+  const g = data?.goal as Goal | undefined;
+  const p = data?.prediction as Prediction | undefined;
   return (
     <div className="min-h-dvh pb-24 bg-background">
       <TopAppBar title="Weight Goal" showBack />
