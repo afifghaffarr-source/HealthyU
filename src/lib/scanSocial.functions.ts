@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { callAiWithGuards, callAiJsonWithGuards } from "./aiGateway.server";
 
 // ============ 9: Streak Freeze ============
 export const useStreakFreeze = createServerFn({ method: "POST" })
@@ -71,26 +72,19 @@ export const reverseCalorie = createServerFn({ method: "POST" })
     z.object({ targetCalories: z.number().min(50).max(3000) }).parse(d),
   )
   .handler(async ({ data }) => {
-    const apiKey = process.env.LOVABLE_API_KEY;
-    if (!apiKey) throw new Error("LOVABLE_API_KEY missing");
-    const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-      method: "POST",
-      headers: { "Content-Type": "application/json", "Lovable-API-Key": apiKey },
-      body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
-        messages: [
-          {
-            role: "system",
-            content:
-              "Kamu ahli gizi Indonesia. Berikan 5 saran makanan/menu yang totalnya mendekati target kalori. Format JSON array: [{name, calories, protein_g, carbs_g, fat_g, why}].",
-          },
-          { role: "user", content: `Target ${data.targetCalories} kkal. Berikan opsi praktis.` },
-        ],
-      }),
+    const text = await callAiWithGuards({
+      userId: null,
+      feature: "social.reverse_calorie",
+      skipBudget: true,
+      messages: [
+        {
+          role: "system",
+          content:
+            "Kamu ahli gizi Indonesia. Berikan 5 saran makanan/menu yang totalnya mendekati target kalori. Format JSON array: [{name, calories, protein_g, carbs_g, fat_g, why}].",
+        },
+        { role: "user", content: `Target ${data.targetCalories} kkal. Berikan opsi praktis.` },
+      ],
     });
-    if (!res.ok) throw new Error(`AI ${res.status}`);
-    const json = await res.json();
-    const text = json.choices?.[0]?.message?.content ?? "[]";
     const m = text.match(/\[[\s\S]*\]/);
     let suggestions: any[] = [];
     try {
@@ -112,13 +106,19 @@ export const getDailyChallenge = createServerFn({ method: "POST" })
       .eq("challenge_date", today)
       .maybeSingle();
     if (existing) return { challenge: existing };
-    const apiKey = process.env.LOVABLE_API_KEY;
-    if (!apiKey) throw new Error("LOVABLE_API_KEY missing");
-    const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-      method: "POST",
-      headers: { "Content-Type": "application/json", "Lovable-API-Key": apiKey },
-      body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
+    const fallback = {
+      title: "Minum 8 gelas air",
+      description: "Hidrasi penuh",
+      goal_type: "water_ml",
+      goal_value: 2000,
+    };
+    let parsed: any = {
+      ...fallback,
+    };
+    try {
+      parsed = await callAiJsonWithGuards({
+        userId,
+        feature: "challenge.daily.generate",
         messages: [
           {
             role: "system",
@@ -127,19 +127,8 @@ export const getDailyChallenge = createServerFn({ method: "POST" })
           },
           { role: "user", content: "Tantangan hari ini" },
         ],
-      }),
-    });
-    const json = await res.json();
-    const text = json.choices?.[0]?.message?.content ?? "{}";
-    const m = text.match(/\{[\s\S]*\}/);
-    let parsed: any = {
-      title: "Minum 8 gelas air",
-      description: "Hidrasi penuh",
-      goal_type: "water_ml",
-      goal_value: 2000,
-    };
-    try {
-      if (m) parsed = JSON.parse(m[0]);
+      });
+      if (!parsed?.title) parsed = fallback;
     } catch {}
     const { data: created } = await supabase
       .from("ai_daily_challenges")
@@ -192,13 +181,11 @@ export const remixRecipe = createServerFn({ method: "POST" })
       .eq("id", data.recipeId)
       .maybeSingle();
     if (!r) throw new Error("Recipe not found");
-    const apiKey = process.env.LOVABLE_API_KEY;
-    if (!apiKey) throw new Error("LOVABLE_API_KEY missing");
-    const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-      method: "POST",
-      headers: { "Content-Type": "application/json", "Lovable-API-Key": apiKey },
-      body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
+    let remix: any = null;
+    try {
+      remix = await callAiJsonWithGuards({
+        userId: context.userId,
+        feature: "recipe.remix",
         messages: [
           {
             role: "system",
@@ -210,14 +197,7 @@ export const remixRecipe = createServerFn({ method: "POST" })
             content: `Resep:\n${JSON.stringify(r)}\nUbah/substitusi: ${data.substitute}`,
           },
         ],
-      }),
-    });
-    const json = await res.json();
-    const text = json.choices?.[0]?.message?.content ?? "{}";
-    const m = text.match(/\{[\s\S]*\}/);
-    let remix: any = null;
-    try {
-      if (m) remix = JSON.parse(m[0]);
+      });
     } catch {}
     return { remix };
   });
@@ -272,27 +252,21 @@ export const doctorChat = createServerFn({ method: "POST" })
       .from("user_allergies")
       .select("allergen, severity")
       .eq("user_id", userId);
-    const apiKey = process.env.LOVABLE_API_KEY;
-    if (!apiKey) throw new Error("LOVABLE_API_KEY missing");
     const ctx = `Medications: ${JSON.stringify(meds ?? [])}\nConditions: ${JSON.stringify(cond ?? [])}\nAlergi: ${JSON.stringify(allergies ?? [])}`;
-    const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-      method: "POST",
-      headers: { "Content-Type": "application/json", "Lovable-API-Key": apiKey },
-      body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
-        messages: [
-          {
-            role: "system",
-            content:
-              "Kamu AI health advisor (BUKAN dokter). Berikan info edukasi singkat & sarankan konsultasi tenaga medis. Bahasa Indonesia. Pertimbangkan konteks pengguna.",
-          },
-          { role: "system", content: ctx },
-          { role: "user", content: data.message },
-        ],
-      }),
+    const reply = await callAiWithGuards({
+      userId,
+      feature: "doctor.chat",
+      messages: [
+        {
+          role: "system",
+          content:
+            "Kamu AI health advisor (BUKAN dokter). Berikan info edukasi singkat & sarankan konsultasi tenaga medis. Bahasa Indonesia. Pertimbangkan konteks pengguna.",
+        },
+        { role: "system", content: ctx },
+        { role: "user", content: data.message },
+      ],
     });
-    const json = await res.json();
-    return { reply: json.choices?.[0]?.message?.content ?? "" };
+    return { reply };
   });
 
 // ============ 20: Follow / public profile ============
