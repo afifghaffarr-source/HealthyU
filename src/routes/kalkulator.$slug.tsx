@@ -1,22 +1,19 @@
 import { createFileRoute, notFound } from "@tanstack/react-router";
-import { useState } from "react";
 import { canonical } from "@/lib/seo";
 import {
   CalculatorShell,
   breadcrumbSchema,
 } from "@/components/healthyu/calculator-shell";
 import {
-  ACTIVITY,
-  bmiCategory,
-  calcBMI,
-  calcBMR,
-  calcBodyFat,
-  calcHeartRateZones,
-  calcIdealWeight,
-  calcMacros,
-  calcTDEE,
-  calcWaterIntake,
-} from "@/lib/calculators";
+  BMIForm,
+  BMRForm,
+  TDEEForm,
+  BodyFatForm,
+  IdealWeightForm,
+  WaterForm,
+  MacroForm,
+  HRForm,
+} from "@/features/calculators/components/CalcForms";
 
 type Slug =
   | "bmi"
