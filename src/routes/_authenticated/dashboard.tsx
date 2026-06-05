@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate, redirect } from "@tanstack/react-router";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   queryOptions,
   useQuery,
@@ -30,6 +30,8 @@ import { WaterCard } from "@/features/dashboard/components/WaterCard";
 import { MoodQuickLog } from "@/features/dashboard/components/MoodQuickLog";
 import { FreezeDialog } from "@/features/dashboard/components/FreezeDialog";
 import { TodaysMeals } from "@/features/dashboard/components/TodaysMeals";
+import { GroupChallengeSummaryCard } from "@/features/dashboard/components/GroupChallengeSummaryCard";
+import { UnlinkedChallengesCard } from "@/features/dashboard/components/UnlinkedChallengesCard";
 import { usePullToRefresh } from "@/hooks/use-pull-to-refresh";
 import { formatDuration, fastingStage } from "@/lib/health";
 import {
@@ -42,15 +44,7 @@ import {
 } from "lucide-react";
 import { claimDailyLoginBonus } from "@/features/scan/lib/scanBatch9.functions";
 import { toast } from "sonner";
-import { supabase } from "@/integrations/supabase/client";
-import {
-  GROUP_BONUS_AGGREGATE_MS,
-  GROUP_BONUS_BADGE_TTL_MS,
-  GROUP_BONUS_BADGE_TICK_MS,
-} from "@/lib/constants";
-import { useMiniFocusTrap } from "@/hooks/useMiniFocusTrap";
 import { useAnnounce } from "@/components/live-announcer";
-import { useReducedMotion } from "@/hooks/useReducedMotion";
 
 const profileQueryOptions = queryOptions({
   queryKey: ["profile"],
