@@ -1,12 +1,13 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
+import { requireCronSecret } from "@/lib/cronAuth.server";
 
 /**
  * Cron: daily-content
  * Picks 1 featured article + 1 featured recipe per day following the
  * 4-week theme calendar. Writes to daily_content_schedule. Idempotent
  * per date.
- * Auth: Supabase anon key in `apikey` header (per pg_cron pattern).
+ * Auth: CRON_SECRET via `x-cron-secret` header or `Authorization: Bearer`.
  */
 
 const THEMES = ["Diet Foundation", "Nutrition Deep Dive", "Puasa & Ramadan", "Mental & Recovery"];
@@ -20,11 +21,8 @@ export const Route = createFileRoute("/api/public/hooks/daily-content")({
   server: {
     handlers: {
       POST: async ({ request }) => {
-        const apiKey = request.headers.get("apikey") ?? request.headers.get("x-apikey");
-        const expected = process.env.SUPABASE_PUBLISHABLE_KEY;
-        if (!expected || apiKey !== expected) {
-          return new Response("Unauthorized", { status: 401 });
-        }
+        const unauthorized = requireCronSecret(request);
+        if (unauthorized) return unauthorized;
 
         const today = new Date();
         const date = today.toISOString().slice(0, 10);
