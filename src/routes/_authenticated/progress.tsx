@@ -14,9 +14,9 @@ import { generateTimelapse } from "@/lib/timelapse";
 const ProgressRadialChart = lazy(
   () => import("@/components/charts/progress-radial-chart"),
 );
-import { getProfile } from "@/lib/profile.functions";
+import { getProfile } from "@/features/profile/lib/profile.functions";
 import { todaysMeals } from "@/lib/meals.functions";
-import { todaysWater } from "@/lib/water.functions";
+import { todaysWater } from "@/features/water/lib/water.functions";
 
 export const Route = createFileRoute("/_authenticated/progress")({
   component: ProgressPage,

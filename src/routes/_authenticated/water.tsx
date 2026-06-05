@@ -7,7 +7,7 @@ import {
   weekWaterHistory,
   logWater,
   deleteWater,
-} from "@/lib/water.functions";
+} from "@/features/water/lib/water.functions";
 import { getAchievementToastPrefix } from "@/lib/achievement-icons";
 import { BottomNav } from "@/components/bottom-nav";
 import { Droplet, Trash2 } from "lucide-react";

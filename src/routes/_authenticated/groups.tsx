@@ -10,7 +10,7 @@ import {
   joinGroup,
   leaveGroup,
   getGroupLeaderboard,
-} from "@/lib/groups.functions";
+} from "@/features/groups/lib/groups.functions";
 import { BottomNav } from "@/components/bottom-nav";
 import { Users, Plus, LogIn, Copy, Share2, Trophy, Flame, LogOut, Loader2 } from "lucide-react";
 import { toast } from "sonner";

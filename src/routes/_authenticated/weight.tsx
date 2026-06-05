@@ -3,7 +3,7 @@ import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { listWeight, addWeight, deleteWeight } from "@/features/vitals/lib/weight.functions";
-import { getProfile } from "@/lib/profile.functions";
+import { getProfile } from "@/features/profile/lib/profile.functions";
 import { BottomNav } from "@/components/bottom-nav";
 import { Trash2, TrendingDown, TrendingUp, Minus } from "lucide-react";
 import { TopAppBar } from "@/components/healthyu/top-app-bar";

@@ -1,5 +1,5 @@
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
-import { sendWebPushTo } from "@/lib/push.server";
+import { sendWebPushTo } from "@/features/notifications/lib/push.server";
 import { computeGroupChallengeSummary } from "@/features/reports/lib/reportsGroupChallenges.server";
 import { callAiWithGuards } from "@/lib/aiGateway.server";
 

@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState, lazy, Suspense } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { logSleep, recentSleep, deleteSleep } from "@/lib/sleep.functions";
+import { logSleep, recentSleep, deleteSleep } from "@/features/sleep/lib/sleep.functions";
 import { BottomNav } from "@/components/bottom-nav";
 import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { Moon, Trash2 } from "lucide-react";

@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
-import { sendWebPushTo } from "@/lib/push.server";
+import { sendWebPushTo } from "@/features/notifications/lib/push.server";
 import { requireCronSecret } from "@/lib/cronAuth.server";
 
 // Cron-friendly scheduler. Runs frequently (e.g. every 5 minutes) and sends

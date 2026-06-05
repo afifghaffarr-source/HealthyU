@@ -1,5 +1,5 @@
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
-import { sendWebPushTo } from "@/lib/push.server";
+import { sendWebPushTo } from "@/features/notifications/lib/push.server";
 
 type PushSub = { endpoint: string; p256dh: string; auth: string };
 
