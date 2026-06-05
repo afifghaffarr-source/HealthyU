@@ -2,8 +2,8 @@ import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { Flame } from "lucide-react";
-import { getChallengeLeaderboard } from "@/lib/challengeLeaderboard.functions";
-import { listChallengeGroups } from "@/lib/groupChallenges.functions";
+import { getChallengeLeaderboard } from "@/features/challenges/lib/challengeLeaderboard.functions";
+import { listChallengeGroups } from "@/features/challenges/lib/groupChallenges.functions";
 
 export function Leaderboard({
   challengeId,

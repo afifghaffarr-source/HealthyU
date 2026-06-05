@@ -8,8 +8,8 @@ import { useMiniFocusTrap } from "@/hooks/useMiniFocusTrap";
 import {
   inviteGroupToChallenge,
   listMyGroupsForChallenge,
-} from "@/lib/groupChallenges.functions";
-import { groupChallengePendingMembers } from "@/lib/groupChallengePending.functions";
+} from "@/features/challenges/lib/groupChallenges.functions";
+import { groupChallengePendingMembers } from "@/features/challenges/lib/groupChallengePending.functions";
 
 export function GroupInviter({
   challengeId,
