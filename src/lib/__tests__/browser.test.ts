@@ -18,6 +18,14 @@ describe("browser helpers (jsdom)", () => {
     expect(getSafeSessionStorage()).toBeTruthy();
   });
   it("safeMatchMedia returns a MQL", () => {
+    if (typeof window.matchMedia !== "function") {
+      // jsdom may have matchMedia stripped by another test; stub it.
+      Object.defineProperty(window, "matchMedia", {
+        writable: true,
+        configurable: true,
+        value: () => ({ matches: false, media: "", addEventListener() {}, removeEventListener() {} }),
+      });
+    }
     const mql = safeMatchMedia("(min-width: 1px)");
     expect(mql).not.toBeNull();
   });
