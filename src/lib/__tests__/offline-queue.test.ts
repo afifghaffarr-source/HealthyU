@@ -13,14 +13,31 @@ import {
   type QueueKind,
 } from "../offline-queue";
 
-function resetIdb() {
-  // fake-indexeddb provides a reset hook via the factory; recreate by deleting the DB.
-  return new Promise<void>((resolve) => {
-    const req = indexedDB.deleteDatabase("sehatify-offline");
-    req.onsuccess = () => resolve();
-    req.onerror = () => resolve();
-    req.onblocked = () => resolve();
+async function resetIdb() {
+  // Clear both stores without deleting the DB (deleteDatabase blocks on open connections).
+  const open = indexedDB.open("sehatify-offline", 2);
+  await new Promise<void>((resolve, reject) => {
+    open.onsuccess = () => resolve();
+    open.onerror = () => reject(open.error);
+    open.onupgradeneeded = () => {
+      const db = open.result;
+      if (!db.objectStoreNames.contains("queue")) {
+        db.createObjectStore("queue", { keyPath: "id", autoIncrement: true });
+      }
+      if (!db.objectStoreNames.contains("dead")) {
+        db.createObjectStore("dead", { keyPath: "id", autoIncrement: true });
+      }
+    };
   });
+  const db = open.result;
+  await new Promise<void>((resolve, reject) => {
+    const t = db.transaction(["queue", "dead"], "readwrite");
+    t.objectStore("queue").clear();
+    t.objectStore("dead").clear();
+    t.oncomplete = () => resolve();
+    t.onerror = () => reject(t.error);
+  });
+  db.close();
 }
 
 describe("offline-queue", () => {
