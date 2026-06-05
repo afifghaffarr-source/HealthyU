@@ -41,6 +41,8 @@ import { HydrationSuggestCard } from "@/features/dashboard/components/HydrationS
 import { OfflineQueueBanner } from "@/components/healthyu/offline-queue-banner";
 import { MorningCheckInCard } from "@/features/dashboard/components/MorningCheckInCard";
 import { EveningReflectionCard } from "@/features/dashboard/components/EveningReflectionCard";
+import { WeeklyGoalCard } from "@/features/dashboard/components/WeeklyGoalCard";
+import { StreakFreezeBadge } from "@/features/dashboard/components/StreakFreezeBadge";
 import { WeeklyReviewCard } from "@/features/dashboard/components/WeeklyReviewCard";
 import { GamificationCard } from "@/features/dashboard/components/DashboardCtas";
 import { ActionRow } from "@/features/dashboard/components/ActionRow";
@@ -154,6 +156,9 @@ function Dashboard() {
         <MorningCheckInCard />
         <EveningReflectionCard />
         <WeeklyReviewCard />
+
+        <WeeklyGoalCard />
+        <StreakFreezeBadge />
 
         <Coachmark
           flagKey="dashboard-v1"
