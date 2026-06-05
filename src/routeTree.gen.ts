@@ -25,6 +25,7 @@ import { Route as KaloriIndexRouteImport } from './routes/kalori.index'
 import { Route as KalkulatorIndexRouteImport } from './routes/kalkulator.index'
 import { Route as DietIndexRouteImport } from './routes/diet.index'
 import { Route as ArtikelIndexRouteImport } from './routes/artikel.index'
+import { Route as ResepSlugRouteImport } from './routes/resep.$slug'
 import { Route as OlahragaSlugRouteImport } from './routes/olahraga.$slug'
 import { Route as KaloriSlugRouteImport } from './routes/kalori.$slug'
 import { Route as KalkulatorSlugRouteImport } from './routes/kalkulator.$slug'
@@ -245,6 +246,11 @@ const ArtikelIndexRoute = ArtikelIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => ArtikelRoute,
+} as any)
+const ResepSlugRoute = ResepSlugRouteImport.update({
+  id: '/$slug',
+  path: '/$slug',
+  getParentRoute: () => ResepRoute,
 } as any)
 const OlahragaSlugRoute = OlahragaSlugRouteImport.update({
   id: '/$slug',
@@ -1095,6 +1101,7 @@ export interface FileRoutesByFullPath {
   '/kalkulator/$slug': typeof KalkulatorSlugRoute
   '/kalori/$slug': typeof KaloriSlugRoute
   '/olahraga/$slug': typeof OlahragaSlugRoute
+  '/resep/$slug': typeof ResepSlugRoute
   '/artikel/': typeof ArtikelIndexRoute
   '/diet/': typeof DietIndexRoute
   '/kalkulator/': typeof KalkulatorIndexRoute
@@ -1247,6 +1254,7 @@ export interface FileRoutesByTo {
   '/kalkulator/$slug': typeof KalkulatorSlugRoute
   '/kalori/$slug': typeof KaloriSlugRoute
   '/olahraga/$slug': typeof OlahragaSlugRoute
+  '/resep/$slug': typeof ResepSlugRoute
   '/artikel': typeof ArtikelIndexRoute
   '/diet': typeof DietIndexRoute
   '/kalkulator': typeof KalkulatorIndexRoute
@@ -1407,6 +1415,7 @@ export interface FileRoutesById {
   '/kalkulator/$slug': typeof KalkulatorSlugRoute
   '/kalori/$slug': typeof KaloriSlugRoute
   '/olahraga/$slug': typeof OlahragaSlugRoute
+  '/resep/$slug': typeof ResepSlugRoute
   '/artikel/': typeof ArtikelIndexRoute
   '/diet/': typeof DietIndexRoute
   '/kalkulator/': typeof KalkulatorIndexRoute
@@ -1567,6 +1576,7 @@ export interface FileRouteTypes {
     | '/kalkulator/$slug'
     | '/kalori/$slug'
     | '/olahraga/$slug'
+    | '/resep/$slug'
     | '/artikel/'
     | '/diet/'
     | '/kalkulator/'
@@ -1719,6 +1729,7 @@ export interface FileRouteTypes {
     | '/kalkulator/$slug'
     | '/kalori/$slug'
     | '/olahraga/$slug'
+    | '/resep/$slug'
     | '/artikel'
     | '/diet'
     | '/kalkulator'
@@ -1878,6 +1889,7 @@ export interface FileRouteTypes {
     | '/kalkulator/$slug'
     | '/kalori/$slug'
     | '/olahraga/$slug'
+    | '/resep/$slug'
     | '/artikel/'
     | '/diet/'
     | '/kalkulator/'
@@ -2101,6 +2113,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/artikel/'
       preLoaderRoute: typeof ArtikelIndexRouteImport
       parentRoute: typeof ArtikelRoute
+    }
+    '/resep/$slug': {
+      id: '/resep/$slug'
+      path: '/$slug'
+      fullPath: '/resep/$slug'
+      preLoaderRoute: typeof ResepSlugRouteImport
+      parentRoute: typeof ResepRoute
     }
     '/olahraga/$slug': {
       id: '/olahraga/$slug'
@@ -3644,10 +3663,12 @@ const OlahragaRouteWithChildren = OlahragaRoute._addFileChildren(
 )
 
 interface ResepRouteChildren {
+  ResepSlugRoute: typeof ResepSlugRoute
   ResepIndexRoute: typeof ResepIndexRoute
 }
 
 const ResepRouteChildren: ResepRouteChildren = {
+  ResepSlugRoute: ResepSlugRoute,
   ResepIndexRoute: ResepIndexRoute,
 }
 
