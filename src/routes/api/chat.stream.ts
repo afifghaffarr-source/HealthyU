@@ -9,6 +9,8 @@ import { checkRateLimit, RATE_LIMITS } from "@/lib/rateLimit.server";
 import { chatMessageSchema } from "@/lib/validation";
 import { checkChatSafety } from "@/lib/chatSafety";
 import { moderateImage } from "@/lib/imageModeration.server";
+import { streamAiChat, parseSseChunk, AiGatewayError } from "@/lib/aiStreamGateway.server";
+import { AiGatewayError as _Aerr } from "@/lib/aiGateway.server";
 
 export const Route = createFileRoute("/api/chat/stream")({
   server: {
@@ -21,8 +23,6 @@ export const Route = createFileRoute("/api/chat/stream")({
         const token = auth.slice(7);
         const SUPABASE_URL = process.env.SUPABASE_URL!;
         const SUPABASE_PUBLISHABLE_KEY = process.env.SUPABASE_PUBLISHABLE_KEY!;
-        const apiKey = process.env.LOVABLE_API_KEY;
-        if (!apiKey) return new Response("AI not configured", { status: 500 });
 
         const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
           global: { headers: { Authorization: `Bearer ${token}` } },
