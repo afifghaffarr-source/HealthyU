@@ -1,12 +1,19 @@
 import { Link } from "@tanstack/react-router";
+import { Gift } from "lucide-react";
 import { CoinPill } from "@/components/healthyu/coin-pill";
 
 export function DashboardHeader({
   greeting,
   fullName,
+  bonusAvailable,
+  onClaimBonus,
+  claiming,
 }: {
   greeting: string;
   fullName?: string | null;
+  bonusAvailable?: boolean;
+  onClaimBonus?: () => void;
+  claiming?: boolean;
 }) {
   return (
     <header className="flex justify-between items-start animate-fade-up">
@@ -17,6 +24,17 @@ export function DashboardHeader({
         <h1 className="text-2xl font-bold">Halo, {fullName?.split(" ")[0] ?? "Sahabat"}!</h1>
       </div>
       <div className="flex items-center gap-2">
+        {bonusAvailable && onClaimBonus && (
+          <button
+            onClick={onClaimBonus}
+            disabled={claiming}
+            aria-label="Klaim bonus harian"
+            className="inline-flex items-center gap-1 h-11 px-3 rounded-full bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-200 text-xs font-semibold outline-1 outline-amber-500/30 disabled:opacity-60"
+          >
+            <Gift className="size-3.5" />
+            Bonus
+          </button>
+        )}
         <CoinPill />
         <Link
           to="/profile"
