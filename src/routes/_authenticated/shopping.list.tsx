@@ -34,7 +34,7 @@ function Page() {
         </button>
         {mut.data && (
           <div className="rounded-2xl bg-card border p-4 space-y-2">
-            {mut.data.items.map((it: any, i: number) => (
+            {mut.data.items.map((it, i) => (
               <div key={i} className="flex justify-between text-sm">
                 <span>
                   {it.item} {it.qty && <span className="text-muted-foreground">({it.qty})</span>}

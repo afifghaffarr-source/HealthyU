@@ -29,12 +29,12 @@ function Page() {
     mutationFn: (v: { id: string; equipped: boolean }) => eqFn({ data: v }),
     onSuccess: () => qc.invalidateQueries({ queryKey: ["pet-shop"] }),
   });
-  const ownedMap = new Map((data?.owned ?? []).map((o: any) => [o.accessory_id, o]));
+  const ownedMap = new Map((data?.owned ?? []).map((o) => [o.accessory_id, o]));
   return (
     <div className="min-h-dvh pb-24 bg-background">
       <TopAppBar title="Toko Aksesori Pet" showBack />
       <main className="max-w-md mx-auto px-4 pt-4 grid grid-cols-2 gap-3">
-        {(data?.shop ?? []).map((a: any) => {
+        {(data?.shop ?? []).map((a) => {
           const owned = ownedMap.get(a.id) as any;
           return (
             <div key={a.id} className="rounded-2xl bg-card border p-4 text-center space-y-2">

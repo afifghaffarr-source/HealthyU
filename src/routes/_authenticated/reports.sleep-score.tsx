@@ -15,7 +15,7 @@ function Page() {
   });
   const rows = data?.rows ?? [];
   const avg = rows.length
-    ? Math.round(rows.reduce((s: number, r: any) => s + r.score, 0) / rows.length)
+    ? Math.round(rows.reduce((s, r) => s + r.score, 0) / rows.length)
     : 0;
   return (
     <div className="min-h-dvh pb-24 bg-background">
@@ -26,7 +26,7 @@ function Page() {
           <div className="text-xs text-muted-foreground mt-1">Skor rata-rata 7 hari</div>
         </div>
         <div className="space-y-2">
-          {rows.map((r: any) => (
+          {rows.map((r) => (
             <div
               key={r.date}
               className="flex items-center justify-between p-3 rounded-xl bg-card border"

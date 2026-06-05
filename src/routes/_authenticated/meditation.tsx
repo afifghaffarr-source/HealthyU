@@ -87,7 +87,7 @@ function Page() {
         </div>
         <div className="space-y-2">
           <h3 className="font-semibold text-sm">Riwayat</h3>
-          {(data?.sessions ?? []).map((s: any) => (
+          {(data?.sessions ?? []).map((s) => (
             <div key={s.id} className="flex justify-between p-3 rounded-xl bg-card border text-sm">
               <span>{new Date(s.completed_at).toLocaleDateString("id-ID")}</span>
               <span className="font-medium">{s.duration_min} menit</span>

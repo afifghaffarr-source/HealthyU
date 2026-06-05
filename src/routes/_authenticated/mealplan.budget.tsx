@@ -55,10 +55,10 @@ function Page() {
         </div>
         {plan?.days && (
           <div className="space-y-3">
-            {plan.days.map((d: any, i: number) => (
+            {plan.days.map((d, i) => (
               <div key={i} className="rounded-2xl bg-card border p-3 space-y-1 text-sm">
                 <div className="font-semibold">Hari {d.day ?? i + 1}</div>
-                {(d.meals ?? []).map((m: any, j: number) => (
+                {(d.meals ?? []).map((m, j) => (
                   <div key={j} className="flex justify-between">
                     <span>{m.name}</span>
                     <span className="text-muted-foreground">

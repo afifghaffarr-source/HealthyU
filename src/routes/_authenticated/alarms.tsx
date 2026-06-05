@@ -57,7 +57,7 @@ function Page() {
           </button>
         </div>
         <div className="space-y-2">
-          {(data?.alarms ?? []).map((a: any) => (
+          {(data?.alarms ?? []).map((a) => (
             <div key={a.id} className="flex justify-between p-3 rounded-xl bg-card border text-sm">
               <span>{a.wake_time}</span>
               <span className="text-muted-foreground">±{a.window_min}m</span>

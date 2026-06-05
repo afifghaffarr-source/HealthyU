@@ -46,7 +46,7 @@ function Page() {
             Cari
           </button>
         </div>
-        {mut.data?.suggestions?.map((s: any, i: number) => (
+        {mut.data?.suggestions?.map((s, i) => (
           <div key={i} className="rounded-2xl bg-card border p-4">
             <div className="font-semibold">{s.name}</div>
             <div className="text-xs text-muted-foreground mb-2">

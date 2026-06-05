@@ -27,7 +27,7 @@ function Page() {
       <TopAppBar title="Notifikasi" showBack />
       <main className="max-w-md mx-auto px-4 pt-4 space-y-2">
         {isLoading && <ListSkeleton count={4} />}
-        {(data?.items ?? []).map((n: any) => (
+        {(data?.items ?? []).map((n) => (
           <Link
             key={n.id}
             to={n.link ?? "/dashboard"}

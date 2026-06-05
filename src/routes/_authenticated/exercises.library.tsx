@@ -38,7 +38,7 @@ function Page() {
           ))}
         </div>
         <div className="space-y-3">
-          {(data?.exercises ?? []).map((e: any) => (
+          {(data?.exercises ?? []).map((e) => (
             <div key={e.id} className="rounded-2xl bg-card border overflow-hidden">
               {e.video_url && (
                 <iframe src={e.video_url} className="w-full aspect-video" allowFullScreen />
