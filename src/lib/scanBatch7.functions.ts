@@ -1,27 +1,17 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { callAiWithGuards } from "./aiGateway.server";
 
-const LOVABLE_AI = "https://ai.gateway.lovable.dev/v1/chat/completions";
-
-async function callAI(prompt: string, system: string) {
-  const res = await fetch(LOVABLE_AI, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${process.env.LOVABLE_API_KEY}`,
-    },
-    body: JSON.stringify({
-      model: "google/gemini-2.5-flash",
-      messages: [
-        { role: "system", content: system },
-        { role: "user", content: prompt },
-      ],
-    }),
+async function callAI(prompt: string, system: string, userId: string | null = null) {
+  return callAiWithGuards({
+    userId,
+    feature: "scanBatch7",
+    messages: [
+      { role: "system", content: system },
+      { role: "user", content: prompt },
+    ],
   });
-  if (!res.ok) throw new Error(`AI error ${res.status}`);
-  const j = await res.json();
-  return j.choices?.[0]?.message?.content ?? "";
 }
 
 // 5. Daily AI quote
