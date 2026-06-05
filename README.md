@@ -2,6 +2,17 @@
 
 AI nutrition coach untuk Indonesia: diet, puasa, jadwal sholat, dan Dr. Healthy.
 
+## Fitur utama
+
+- **Dashboard harian** — kalori budget, macro ring, hydration suggest, weekly goal, streak freeze.
+- **Food log & scan** — manual log, AI scan dengan confidence badge & review-before-save, quick presets, frequent meals.
+- **AI Coach** — chat streaming dengan safety guardrails (medical disclaimer, eating-disorder safe, prompt chips ID).
+- **Progress** — weight trend, weekly sparkline, before/after frame, most-consistent-day badge, mood 7-day chart.
+- **Onboarding** — goal + pace selector (gentle/steady/ambisius) dengan live kcal preview & floor 1200.
+- **Wellness** — fasting timer, water, sleep, mood, vitals, medications, prayer times & qibla.
+- **Sistem & UX** — command palette (⌘K), keyboard shortcuts (`?`), route progress bar, scroll-to-top, dark mode, PWA + push.
+- **Privacy & PDP** — export data, request account deletion, sensitive notes (encrypted RPC), audit log.
+
 ## Stack
 
 - **Frontend**: React 19, TanStack Start v1, TanStack Router, TanStack Query, Tailwind v4, shadcn/ui
