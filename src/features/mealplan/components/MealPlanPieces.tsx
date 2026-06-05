@@ -15,7 +15,7 @@ export type PlanItem = {
   meal_type: string;
   calories: number | string;
   custom_name: string | null;
-  food_item: { name?: string } | null;
+  food_item: unknown;
 };
 
 export function WeekNav({
@@ -92,7 +92,7 @@ export function DayPlanCard({
                     {items.map((p) => (
                       <div key={p.id} className="flex items-center gap-2 text-sm">
                         <span className="flex-1 truncate">
-                          {p.food_item?.name ?? p.custom_name}
+                          {(p.food_item as { name?: string } | null)?.name ?? p.custom_name}
                         </span>
                         <span className="text-xs text-muted-foreground tabular-nums">
                           {Math.round(Number(p.calories))} kcal
