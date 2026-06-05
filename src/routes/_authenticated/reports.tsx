@@ -7,8 +7,6 @@ import { Download, FileText, Sparkles, Loader2, Share2 } from "lucide-react";
 import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
-import jsPDF from "jspdf";
-import autoTable from "jspdf-autotable";
 import { z } from "zod";
 import { fallback, zodValidator } from "@tanstack/zod-adapter";
 import { useNavigate } from "@tanstack/react-router";
@@ -252,13 +250,14 @@ function ReportsPage() {
     URL.revokeObjectURL(url);
   };
 
-  const exportAllArchivePdf = () => {
+  const exportAllArchivePdf = async () => {
     const filtered = history.filter((r) => {
       if (rangeWeeks === 0) return true;
       const cutoff = Date.now() - rangeWeeks * 7 * 86400000;
       return new Date(r.created_at).getTime() >= cutoff;
     });
     if (filtered.length === 0) return;
+    const { default: jsPDF } = await import("jspdf");
     const doc = new jsPDF({ unit: "pt", format: "a4" });
     // Index page (TOC)
     doc.setFont("helvetica", "bold");
@@ -434,8 +433,12 @@ function ReportsPage() {
     doc.save(`laporan-healthyu-arsip-${new Date().toISOString().slice(0, 10)}.pdf`);
   };
 
-  const exportPdf = () => {
+  const exportPdf = async () => {
     if (!data || !summary) return;
+    const [{ default: jsPDF }, { default: autoTable }] = await Promise.all([
+      import("jspdf"),
+      import("jspdf-autotable"),
+    ]);
     const doc = new jsPDF({ unit: "pt", format: "a4" });
     const today = new Date().toLocaleDateString("id-ID", {
       day: "numeric",
@@ -561,13 +564,14 @@ function ReportsPage() {
     window.open(url, "_blank", "noopener,noreferrer");
   };
 
-  const exportArchivePdf = (r: {
+  const exportArchivePdf = async (r: {
     report_period_start?: string | null;
     report_period_end?: string | null;
     created_at: string;
     recommendations: unknown;
   }) => {
     const text = Array.isArray(r.recommendations) ? String(r.recommendations[0] ?? "") : "";
+    const { default: jsPDF } = await import("jspdf");
     const doc = new jsPDF({ unit: "pt", format: "a4" });
     doc.setFont("helvetica", "bold");
     doc.setFontSize(PDF_TITLE_FONT_SIZE);

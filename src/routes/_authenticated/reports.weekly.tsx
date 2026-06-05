@@ -5,7 +5,6 @@ import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { BottomNav } from "@/components/bottom-nav";
 import { generateWeeklyReport } from "@/lib/scanBatch8.functions";
 import { Loader2, Download, FileText } from "lucide-react";
-import jsPDF from "jspdf";
 
 export const Route = createFileRoute("/_authenticated/reports/weekly")({ component: Page });
 
@@ -23,8 +22,9 @@ function Page() {
     a.download = `weekly-${data?.report?.week_start}.txt`;
     a.click();
   };
-  const downloadPdf = () => {
+  const downloadPdf = async () => {
     if (!data?.report) return;
+    const { default: jsPDF } = await import("jspdf");
     const doc = new jsPDF({ unit: "pt", format: "a4" });
     const margin = 48;
     const width = doc.internal.pageSize.getWidth() - margin * 2;
