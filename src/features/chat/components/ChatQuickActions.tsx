@@ -1,11 +1,17 @@
 import { Link } from "@tanstack/react-router";
-import { BarChart3, ChefHat, Flame, Timer, Utensils, type LucideIcon } from "lucide-react";
+import { BarChart3, ChefHat, ClipboardCheck, Flame, Timer, Utensils, type LucideIcon } from "lucide-react";
 
 type QuickAction =
   | { label: string; icon: LucideIcon; to: "/food" | "/recommendations" | "/fasting" }
   | { label: string; icon: LucideIcon; prompt: string };
 
 const QUICK_ACTIONS: QuickAction[] = [
+  {
+    label: "Evaluasi hari ini",
+    icon: ClipboardCheck,
+    prompt:
+      "Tolong evaluasi hari ini berdasarkan kalori, makro, air, puasa, dan aktivitas saya. Beri 1 saran konkret yang bisa saya lakukan sekarang.",
+  },
   { label: "Log makanan", icon: Utensils, to: "/food" },
   { label: "Rekomendasi AI", icon: ChefHat, to: "/recommendations" },
   { label: "Mulai puasa", icon: Timer, to: "/fasting" },
