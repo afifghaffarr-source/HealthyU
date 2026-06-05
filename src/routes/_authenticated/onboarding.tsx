@@ -15,6 +15,7 @@ import {
   StepLifestyle,
   StepHealth,
 } from "@/features/onboarding/components/OnboardingSteps";
+import { type Pace, paceDelta } from "@/features/onboarding/components/onboardingShared";
 
 export const Route = createFileRoute("/_authenticated/onboarding")({
   component: Onboarding,
@@ -32,6 +33,7 @@ function Onboarding() {
 
   const [step, setStep] = useState(1);
   const [goal, setGoal] = useState<Goal>("lose");
+  const [pace, setPace] = useState<Pace>("steady");
   const [form, setForm] = useState<OnboardingForm>({
     full_name: profile?.full_name ?? "",
     gender: "male",
@@ -78,16 +80,16 @@ function Onboarding() {
     onError: (e) => toastError(e, "Gagal simpan"),
   });
 
+  const bmr = calcBMR({
+    weightKg: form.weight_kg,
+    heightCm: form.height_cm,
+    age: calcAge(form.birth_date),
+    gender: form.gender,
+  });
+  const tdee = calcTDEE(bmr, form.activity_level);
+
   const finish = () => {
-    const bmr = calcBMR({
-      weightKg: form.weight_kg,
-      heightCm: form.height_cm,
-      age: calcAge(form.birth_date),
-      gender: form.gender,
-    });
-    const tdee = calcTDEE(bmr, form.activity_level);
-    const target =
-      goal === "lose" ? Math.max(1200, tdee - 400) : goal === "gain" ? tdee + 300 : tdee;
+    const target = Math.max(1200, tdee + paceDelta(goal, pace));
     mutation.mutate({ ...form, daily_calorie_target: target, onboarded: true });
   };
 
@@ -113,7 +115,15 @@ function Onboarding() {
         <StepBody form={form} setForm={setForm} onBack={() => setStep(1)} onNext={() => setStep(3)} />
       )}
       {step === 3 && (
-        <StepGoal goal={goal} setGoal={setGoal} onBack={() => setStep(2)} onNext={() => setStep(4)} />
+        <StepGoal
+          goal={goal}
+          setGoal={setGoal}
+          pace={pace}
+          setPace={setPace}
+          tdee={tdee}
+          onBack={() => setStep(2)}
+          onNext={() => setStep(4)}
+        />
       )}
       {step === 4 && (
         <StepLifestyle form={form} setForm={setForm} onBack={() => setStep(3)} onNext={() => setStep(5)} />
