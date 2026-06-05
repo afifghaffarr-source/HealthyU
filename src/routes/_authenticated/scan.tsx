@@ -10,7 +10,7 @@ import { recognizeFood, submitScanCorrection } from "@/features/food/lib/foodSca
 import { attachScanPhoto } from "@/features/scan/lib/scanPhoto.functions";
 import { recordScanGameify, checkScanLimit, classifyMealTags } from "@/features/scan/lib/scanMore.functions";
 import { logMeal } from "@/features/meals/lib/meals.functions";
-import { ScanItemCard } from "@/features/scan/components/ScanItemCard";
+import { ScanItemsList } from "@/features/scan/components/ScanItemsList";
 import {
   MEAL_TYPES,
   pickDefaultMealType,
@@ -232,36 +232,17 @@ function ScanPage() {
 
             <MealTypePicker value={mealType} onChange={setMealType} />
 
-            {items.length > 0 && (
-              <div className="space-y-2">
-                <p className="text-xs font-semibold text-muted-foreground">Terdeteksi</p>
-                <button
-                  onClick={() => items.forEach((it, idx) => logMut.mutate({ it, idx }))}
-                  disabled={logMut.isPending}
-                  className="w-full py-2 rounded-xl bg-primary/10 text-primary font-semibold text-xs disabled:opacity-50"
-                >
-                  Catat semua ({items.length})
-                </button>
-                {items.map((it, i) => (
-                  <ScanItemCard
-                    key={i}
-                    it={it}
-                    original={originals[i]}
-                    editing={editIdx === i}
-                    onToggleEdit={() => setEditIdx(editIdx === i ? null : i)}
-                    onUpdate={(patch) => updateItem(i, patch)}
-                    onLog={() => logMut.mutate({ it, idx: i })}
-                    logPending={logMut.isPending}
-                  />
-                ))}
-                <button
-                  onClick={() => navigate({ to: "/dashboard" })}
-                  className="w-full py-2 text-xs font-semibold text-primary"
-                >
-                  Selesai
-                </button>
-              </div>
-            )}
+            <ScanItemsList
+              items={items}
+              originals={originals}
+              editIdx={editIdx}
+              setEditIdx={setEditIdx}
+              onUpdate={updateItem}
+              onLog={(it, idx) => logMut.mutate({ it, idx })}
+              onLogAll={() => items.forEach((it, idx) => logMut.mutate({ it, idx }))}
+              onDone={() => navigate({ to: "/dashboard" })}
+              logPending={logMut.isPending}
+            />
 
             {!scanMut.isPending && items.length === 0 && (
               <button

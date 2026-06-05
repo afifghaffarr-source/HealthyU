@@ -18,6 +18,7 @@ import { Stat } from "@/features/reports/components/Stat";
 import { WeeklyChart } from "@/features/reports/components/WeeklyChart";
 import { AiReportHistorySection } from "@/features/reports/components/AiReportHistorySection";
 import { shareWeeklyToWhatsapp } from "@/features/reports/lib/shareWhatsapp";
+import { buildWeeklySummary } from "@/features/reports/lib/reportsSummary";
 
 export const Route = createFileRoute("/_authenticated/reports")({
   validateSearch: zodValidator(
@@ -25,10 +26,6 @@ export const Route = createFileRoute("/_authenticated/reports")({
   ),
   component: ReportsPage,
 });
-
-function dayKey(d: string | Date) {
-  return new Date(d).toISOString().slice(0, 10);
-}
 
 function ReportsPage() {
   const { focus } = Route.useSearch();
@@ -141,49 +138,7 @@ function ReportsPage() {
     },
   });
 
-  const summary = useMemo(() => {
-    if (!data) return null;
-    const days = Array.from({ length: 7 }, (_, i) => {
-      const d = new Date();
-      d.setDate(d.getDate() - (6 - i));
-      return d.toISOString().slice(0, 10);
-    });
-    const byDay = days.map((day) => {
-      const cals = data.meals
-        .filter((m) => dayKey(m.logged_at) === day)
-        .reduce((s, m) => s + Number(m.calories || 0), 0);
-      const ml = data.water
-        .filter((w) => dayKey(w.logged_at) === day)
-        .reduce((s, w) => s + (w.amount_ml || 0), 0);
-      const burn = data.workouts
-        .filter((w) => dayKey(w.performed_at) === day)
-        .reduce((s, w) => s + (w.calories_burned || 0), 0);
-      const slept = data.sleep.filter((s) => dayKey(s.sleep_end) === day);
-      const hours = slept.reduce(
-        (s, x) =>
-          s + (new Date(x.sleep_end).getTime() - new Date(x.sleep_start).getTime()) / 3600000,
-        0,
-      );
-      return { day, cals, ml, burn, hours };
-    });
-    const totals = byDay.reduce(
-      (a, b) => ({
-        cals: a.cals + b.cals,
-        ml: a.ml + b.ml,
-        burn: a.burn + b.burn,
-        hours: a.hours + b.hours,
-      }),
-      { cals: 0, ml: 0, burn: 0, hours: 0 },
-    );
-    const fastingDone = data.fasting.filter((f) => f.completed).length;
-    return {
-      byDay,
-      totals,
-      fastingDone,
-      workoutCount: data.workouts.length,
-      sleepCount: data.sleep.length,
-    };
-  }, [data]);
+  const summary = useMemo(() => buildWeeklySummary(data), [data]);
 
 
 
