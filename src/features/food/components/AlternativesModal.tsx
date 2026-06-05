@@ -103,10 +103,10 @@ export function AlternativesModal({
                     id: a.id,
                     name: a.name,
                     serving_unit: a.serving_unit,
-                    calories: a.calories,
-                    protein_g: a.protein_g,
-                    carbs_g: a.carbs_g,
-                    fat_g: a.fat_g,
+                    calories: a.calories ?? 0,
+                    protein_g: a.protein_g ?? 0,
+                    carbs_g: a.carbs_g ?? 0,
+                    fat_g: a.fat_g ?? 0,
                   });
                   onClose();
                   toast.success(`${a.name} ditambah ke keranjang`);
