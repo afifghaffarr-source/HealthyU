@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { callAiWithGuards, callAiJsonWithGuards } from "@/lib/aiGateway.server";
 
 // ============ 1, 12, 13: streak + achievements + coins ============
 export const recordScanGameify = createServerFn({ method: "POST" })
@@ -84,8 +85,6 @@ export const mealCoachChat = createServerFn({ method: "POST" })
   .inputValidator((i: unknown) => z.object({ message: z.string().min(1).max(1000) }).parse(i))
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
-    const apiKey = process.env.LOVABLE_API_KEY;
-    if (!apiKey) throw new Error("AI not configured");
     const since = new Date(Date.now() - 7 * 86400000).toISOString().slice(0, 10);
     const { data: logs } = await supabase
       .from("meal_logs")
@@ -100,25 +99,19 @@ export const mealCoachChat = createServerFn({ method: "POST" })
           `${l.log_date} ${l.meal_type}: ${l.custom_name ?? "meal"} (${l.calories}kkal P${l.protein_g} K${l.carbs_g} L${l.fat_g})`,
       )
       .join("\n");
-    const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-      method: "POST",
-      headers: { "Content-Type": "application/json", Authorization: `Bearer ${apiKey}` },
-      body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
-        messages: [
-          {
-            role: "system",
-            content: `Anda meal coach. Riwayat 7 hari user:\n${ctx || "(belum ada)"}\nJawab ringkas Bahasa Indonesia, actionable, max 3 paragraf.`,
-          },
-          { role: "user", content: data.message },
-        ],
-      }),
+    const reply = await callAiWithGuards({
+      userId,
+      feature: "meal.coach.chat",
+      model: "google/gemini-2.5-flash",
+      messages: [
+        {
+          role: "system",
+          content: `Anda meal coach. Riwayat 7 hari user:\n${ctx || "(belum ada)"}\nJawab ringkas Bahasa Indonesia, actionable, max 3 paragraf.`,
+        },
+        { role: "user", content: data.message },
+      ],
     });
-    if (res.status === 429) throw new Error("Rate limited");
-    if (res.status === 402) throw new Error("Kredit AI habis");
-    if (!res.ok) throw new Error(`AI error: ${res.status}`);
-    const j = (await res.json()) as { choices?: Array<{ message?: { content?: string } }> };
-    return { reply: j.choices?.[0]?.message?.content ?? "" };
+    return { reply };
   });
 
 // ============ 10: compare week ============
@@ -197,8 +190,6 @@ export const classifyMealTags = createServerFn({ method: "POST" })
   )
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
-    const apiKey = process.env.LOVABLE_API_KEY;
-    if (!apiKey) throw new Error("AI not configured");
     const { data: prof } = await supabase
       .from("profiles")
       .select("allergies, dietary_preference")
@@ -209,29 +200,19 @@ export const classifyMealTags = createServerFn({ method: "POST" })
     const prompt = `Makanan: "${data.name}". User allergies: ${allergies}. Diet: ${diet}.${
       data.translate_to ? ` Terjemahkan name ke kode bahasa "${data.translate_to}".` : ""
     } Balas JSON {"halal":true|false|null,"vegan":true|false,"vegetarian":true|false,"allergens":["..."],"allergy_warning":"...|null","translated_name":"...|null"}`;
-    const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-      method: "POST",
-      headers: { "Content-Type": "application/json", Authorization: `Bearer ${apiKey}` },
-      body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
-        messages: [{ role: "user", content: prompt }],
-        response_format: { type: "json_object" },
-      }),
+    return await callAiJsonWithGuards<{
+      halal?: boolean | null;
+      vegan?: boolean;
+      vegetarian?: boolean;
+      allergens?: string[];
+      allergy_warning?: string | null;
+      translated_name?: string | null;
+    }>({
+      userId,
+      feature: "meal.classify.tags",
+      model: "google/gemini-2.5-flash",
+      messages: [{ role: "user", content: prompt }],
     });
-    if (!res.ok) throw new Error(`AI error: ${res.status}`);
-    const j = (await res.json()) as { choices?: Array<{ message?: { content?: string } }> };
-    try {
-      return JSON.parse(j.choices?.[0]?.message?.content ?? "{}") as {
-        halal?: boolean | null;
-        vegan?: boolean;
-        vegetarian?: boolean;
-        allergens?: string[];
-        allergy_warning?: string | null;
-        translated_name?: string | null;
-      };
-    } catch {
-      return {};
-    }
   });
 
 // ============ 11: group meal feed ============

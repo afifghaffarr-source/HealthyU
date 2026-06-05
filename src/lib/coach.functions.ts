@@ -1,5 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { callAiJsonWithGuards } from "@/lib/aiGateway.server";
 
 type CoachOutput = {
   greeting: string;
@@ -14,8 +15,6 @@ export const dailyCoach = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }): Promise<CoachOutput> => {
     const { supabase, userId } = context;
-    const apiKey = process.env.LOVABLE_API_KEY;
-    if (!apiKey) throw new Error("LOVABLE_API_KEY belum dikonfigurasi");
 
     const since = new Date(Date.now() - 7 * 86400000).toISOString();
     const [profileRes, meals, water, workouts, sleep, fasting, vitals, weight] = await Promise.all([
@@ -107,34 +106,15 @@ export const dailyCoach = createServerFn({ method: "POST" })
   "warnings": ["0-2 peringatan halus jika ada pola tidak sehat, kosongkan jika tidak ada"]
 }`;
 
-    const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-      method: "POST",
-      headers: { "Content-Type": "application/json", Authorization: `Bearer ${apiKey}` },
-      body: JSON.stringify({
-        model: "google/gemini-3-flash-preview",
-        messages: [
-          { role: "system", content: sysPrompt },
-          { role: "user", content: userPrompt },
-        ],
-        response_format: { type: "json_object" },
-      }),
+    const parsed = await callAiJsonWithGuards<Partial<CoachOutput>>({
+      userId,
+      feature: "coach.daily",
+      model: "google/gemini-3-flash-preview",
+      messages: [
+        { role: "system", content: sysPrompt },
+        { role: "user", content: userPrompt },
+      ],
     });
-
-    if (!res.ok) {
-      const t = await res.text();
-      if (res.status === 429) throw new Error("Terlalu banyak permintaan AI. Coba lagi nanti.");
-      if (res.status === 402)
-        throw new Error("Kredit AI habis. Silakan hubungi admin atau coba lagi nanti.");
-      throw new Error(`AI error ${res.status}: ${t.slice(0, 200)}`);
-    }
-    const json = (await res.json()) as { choices?: Array<{ message?: { content?: string } }> };
-    const content = json.choices?.[0]?.message?.content ?? "{}";
-    let parsed: Partial<CoachOutput>;
-    try {
-      parsed = JSON.parse(content);
-    } catch {
-      parsed = { summary: content };
-    }
     return {
       greeting: parsed.greeting ?? "Selamat pagi!",
       focus: parsed.focus ?? "Jaga konsistensi hari ini.",

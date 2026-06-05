@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { callAiJsonWithGuards } from "@/lib/aiGateway.server";
 
 export const listScanHistory = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
@@ -101,10 +102,6 @@ export const getDailyInsights = createServerFn({ method: "GET" })
     if (rows.length === 0) {
       return { summary: "Belum ada meal log minggu ini.", tips: [] as string[] };
     }
-    const apiKey = process.env.LOVABLE_API_KEY;
-    if (!apiKey) {
-      return { summary: "AI tidak aktif.", tips: [] as string[] };
-    }
     const totals = rows.reduce(
       (a, r) => ({
         cal: a.cal + Number(r.calories ?? 0),
@@ -123,19 +120,12 @@ export const getDailyInsights = createServerFn({ method: "GET" })
     };
     const prompt = `Rata-rata harian 7 hari terakhir: ${avg.cal} kkal, P:${avg.p}g, K:${avg.c}g, L:${avg.f}g. Total ${rows.length} meal log dari ${days} hari. Berikan ringkasan singkat (1 kalimat) + 3 tips actionable dalam Bahasa Indonesia. Format JSON: {"summary":"...","tips":["...","...","..."]}`;
     try {
-      const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-        method: "POST",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${apiKey}` },
-        body: JSON.stringify({
-          model: "google/gemini-2.5-flash",
-          messages: [{ role: "user", content: prompt }],
-          response_format: { type: "json_object" },
-        }),
+      const parsed = await callAiJsonWithGuards<{ summary?: string; tips?: string[] }>({
+        userId,
+        feature: "scan.history.summary",
+        model: "google/gemini-2.5-flash",
+        messages: [{ role: "user", content: prompt }],
       });
-      if (!res.ok) return { summary: `Rata-rata ${avg.cal} kkal/hari`, tips: [] as string[] };
-      const j = (await res.json()) as { choices?: Array<{ message?: { content?: string } }> };
-      const raw = j.choices?.[0]?.message?.content ?? "{}";
-      const parsed = JSON.parse(raw) as { summary?: string; tips?: string[] };
       return {
         summary: parsed.summary ?? `Rata-rata ${avg.cal} kkal/hari`,
         tips: Array.isArray(parsed.tips) ? parsed.tips.slice(0, 5) : [],

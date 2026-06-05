@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { callAiWithGuards } from "@/lib/aiGateway.server";
 
 // ============ Pet evolution from scan streak ============
 function computeStage(streak: number): string {
@@ -213,26 +214,21 @@ export const estimateGroceryCost = createServerFn({ method: "POST" })
   .inputValidator((d: { items: string[] }) =>
     z.object({ items: z.array(z.string().min(1).max(100)).min(1).max(50) }).parse(d),
   )
-  .handler(async ({ data }) => {
-    const apiKey = process.env.LOVABLE_API_KEY;
-    if (!apiKey) throw new Error("LOVABLE_API_KEY missing");
-    const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-      method: "POST",
-      headers: { "Content-Type": "application/json", "Lovable-API-Key": apiKey },
-      body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
-        messages: [
-          {
-            role: "system",
-            content:
-              "Estimasi harga pasar Indonesia 2026 untuk bahan groceries. JSON array: [{item, estimatedIdr, note}].",
-          },
-          { role: "user", content: `Items: ${JSON.stringify(data.items)}` },
-        ],
-      }),
+  .handler(async ({ data, context }) => {
+    const { userId } = context;
+    const text = await callAiWithGuards({
+      userId,
+      feature: "grocery.cost.estimate",
+      model: "google/gemini-2.5-flash",
+      messages: [
+        {
+          role: "system",
+          content:
+            "Estimasi harga pasar Indonesia 2026 untuk bahan groceries. JSON array: [{item, estimatedIdr, note}].",
+        },
+        { role: "user", content: `Items: ${JSON.stringify(data.items)}` },
+      ],
     });
-    const json = await res.json();
-    const text = json.choices?.[0]?.message?.content ?? "[]";
     const m = text.match(/\[[\s\S]*\]/);
     let estimates: Array<{ item: string; estimatedIdr: number; note?: string }> = [];
     try {
