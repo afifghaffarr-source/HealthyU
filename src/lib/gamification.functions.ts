@@ -59,7 +59,24 @@ export const getGameSummary = createServerFn({ method: "GET" })
 type ActivityType = z.infer<typeof ActivitySchema>["type"];
 
 // Internal helper callable from other server fns.
-export async function recordActivityFor(supabase: any, userId: string, type: ActivityType) {
+// Supabase client passed in from a server-fn context — kept loose because the
+// concrete generic from `@supabase/supabase-js` differs between SSR/server.
+type SupabaseLike = {
+  from: (table: string) => {
+    select: (cols?: string) => {
+      eq: (col: string, val: unknown) => {
+        maybeSingle: () => Promise<{ data: Record<string, unknown> | null }>;
+      };
+    };
+    upsert: (row: Record<string, unknown>) => Promise<unknown>;
+    insert: (row: Record<string, unknown>) => Promise<unknown>;
+  };
+};
+export async function recordActivityFor(
+  supabase: SupabaseLike,
+  userId: string,
+  type: ActivityType,
+) {
   const today = isoDate(new Date());
 
   // 1) Streak + base XP for activity
