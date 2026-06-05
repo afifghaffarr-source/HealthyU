@@ -13,22 +13,20 @@ vi.mock("@/integrations/supabase/client", () => ({
 import { listCategories, listTopTags } from "../contentTaxonomy.functions";
 
 function buildCategoriesChain(result: { data: unknown; error: unknown }) {
-  // .from(t).select().eq().order().order() -> result
   const order2 = vi.fn().mockResolvedValue(result);
   const order1 = vi.fn().mockReturnValue({ order: order2 });
   const eq = vi.fn().mockReturnValue({ order: order1 });
   const select = vi.fn().mockReturnValue({ eq });
-  fromMock.mockReturnValueOnce({ select });
+  fromMock.mockReturnValue({ select });
   return { select, eq, order1, order2 };
 }
 
 function buildTagsChain(result: { data: unknown; error: unknown }) {
-  // .from(t).select().eq().order().limit() -> result
   const limit = vi.fn().mockResolvedValue(result);
   const order = vi.fn().mockReturnValue({ limit });
   const eq = vi.fn().mockReturnValue({ order });
   const select = vi.fn().mockReturnValue({ eq });
-  fromMock.mockReturnValueOnce({ select });
+  fromMock.mockReturnValue({ select });
   return { select, eq, order, limit };
 }
 
