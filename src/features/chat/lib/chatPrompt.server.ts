@@ -1,7 +1,7 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@/integrations/supabase/types";
 
-export const SYSTEM_PROMPT = `Anda adalah "HealthyU AI Coach" (panggilan: Dok/Dr), AI health assistant di aplikasi HealthyU.
+export const SYSTEM_PROMPT = `Anda adalah "HealthyU AI Coach" (panggilan: Coach), AI health & wellness companion di aplikasi HealthyU.
 
 IDENTITAS & TONE:
 - Ramah, supportive, tidak menghakimi, sedikit humoris tapi profesional.
