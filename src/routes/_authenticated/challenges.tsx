@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
-import { Trophy, Flame, Users, Calendar, Check, Medal, UserPlus, Gift } from "lucide-react";
+import { Trophy, Flame, Users, Calendar, Check, Medal } from "lucide-react";
 import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { EmptyState } from "@/components/healthyu/empty-state";
 import { ListSkeleton } from "@/components/healthyu/skeletons";
@@ -17,18 +17,6 @@ import {
   logChallengeDay,
   leaveChallenge,
 } from "@/lib/challenges.functions";
-import { getChallengeLeaderboard } from "@/lib/challengeLeaderboard.functions";
-import {
-  listMyGroupsForChallenge,
-  inviteGroupToChallenge,
-  listChallengeGroups,
-} from "@/lib/groupChallenges.functions";
-import {
-  claimGroupChallengeBonus,
-  listGroupBonusStatus,
-  listGroupBonusClaimers,
-} from "@/lib/groupChallengeBonus.functions";
-import { groupChallengePendingMembers } from "@/lib/groupChallengePending.functions";
 import {
   CHALLENGE_HIGHLIGHT_MS,
   CHALLENGE_HIGHLIGHT_FADE_MS,
@@ -37,7 +25,9 @@ import {
 } from "@/lib/constants";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
 import { useAnnounce } from "@/components/live-announcer";
-import { useMiniFocusTrap } from "@/hooks/useMiniFocusTrap";
+import { Leaderboard } from "@/components/challenges/Leaderboard";
+import { GroupInviter } from "@/components/challenges/GroupInviter";
+import { BonusClaimer } from "@/components/challenges/BonusClaimer";
 
 const challengesSearchSchema = z.object({
   group: fallback(z.string().uuid().optional(), undefined),
