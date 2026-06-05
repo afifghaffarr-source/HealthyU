@@ -9,7 +9,8 @@ import { checkRateLimit, RATE_LIMITS } from "@/lib/rateLimit.server";
 import { chatMessageSchema } from "@/lib/validation";
 import { checkChatSafety } from "@/features/chat/lib/chatSafety";
 import { moderateImage } from "@/features/moderation/lib/imageModeration.server";
-import { streamAiChat, parseSseChunk, AiGatewayError } from "@/features/ai/lib/aiStreamGateway.server";
+import { streamAiChat, AiGatewayError } from "@/features/ai/lib/aiStreamGateway.server";
+import { staticReplyStream, proxyUpstreamStream } from "@/features/chat/lib/chatStream.server";
 
 export const Route = createFileRoute("/api/chat/stream")({
   server: {
@@ -76,7 +77,6 @@ export const Route = createFileRoute("/api/chat/stream")({
 
         // Chatbot safety guard — bypass AI for crisis / dangerous content.
         const safety = checkChatSafety(body.message);
-        const encoder = new TextEncoder();
         if (safety.kind === "crisis" || safety.kind === "blocked") {
           await supabase.from("chat_messages").insert({
             user_id: userId,
@@ -88,26 +88,10 @@ export const Route = createFileRoute("/api/chat/stream")({
             _entity: "chat",
           });
           await logAiUsage({ userId, feature: "chat", tier: 0 as never, cacheHit: false });
-          const reply = safety.response;
-          const stream = new ReadableStream({
-            start(controller) {
-              controller.enqueue(
-                encoder.encode(
-                  `event: meta\ndata: ${JSON.stringify({ emergency: safety.kind === "crisis", tier: 0, cached: false, safety: safety.kind })}\n\n`,
-                ),
-              );
-              controller.enqueue(encoder.encode(`data: ${JSON.stringify({ delta: reply })}\n\n`));
-              controller.enqueue(encoder.encode(`event: done\ndata: {}\n\n`));
-              controller.close();
-            },
-          });
-          return new Response(stream, {
-            headers: {
-              "Content-Type": "text/event-stream",
-              "Cache-Control": "no-cache, no-transform",
-              "X-Accel-Buffering": "no",
-            },
-          });
+          return staticReplyStream(
+            { emergency: safety.kind === "crisis", tier: 0, cached: false, safety: safety.kind },
+            safety.response,
+          );
         }
 
         const decision = classifyMessage(body.message, !!body.imageBase64);
@@ -120,27 +104,11 @@ export const Route = createFileRoute("/api/chat/stream")({
             role: "assistant",
             content: decision.localAnswer,
           });
-          const local = decision.localAnswer;
           await logAiUsage({ userId, feature: "chat", tier: 1, cacheHit: false });
-          const stream = new ReadableStream({
-            start(controller) {
-              controller.enqueue(
-                encoder.encode(
-                  `event: meta\ndata: ${JSON.stringify({ emergency: false, tier: 1, cached: false })}\n\n`,
-                ),
-              );
-              controller.enqueue(encoder.encode(`data: ${JSON.stringify({ delta: local })}\n\n`));
-              controller.enqueue(encoder.encode(`event: done\ndata: {}\n\n`));
-              controller.close();
-            },
-          });
-          return new Response(stream, {
-            headers: {
-              "Content-Type": "text/event-stream",
-              "Cache-Control": "no-cache, no-transform",
-              "X-Accel-Buffering": "no",
-            },
-          });
+          return staticReplyStream(
+            { emergency: false, tier: 1, cached: false },
+            decision.localAnswer,
+          );
         }
 
         // Cache lookup (skip for images — they bypass response cache).
@@ -169,25 +137,10 @@ export const Route = createFileRoute("/api/chat/stream")({
             model: decision.model,
             cacheHit: true,
           });
-          const stream = new ReadableStream({
-            start(controller) {
-              controller.enqueue(
-                encoder.encode(
-                  `event: meta\ndata: ${JSON.stringify({ emergency: false, tier: decision.tier, cached: true })}\n\n`,
-                ),
-              );
-              controller.enqueue(encoder.encode(`data: ${JSON.stringify({ delta: cached })}\n\n`));
-              controller.enqueue(encoder.encode(`event: done\ndata: {}\n\n`));
-              controller.close();
-            },
-          });
-          return new Response(stream, {
-            headers: {
-              "Content-Type": "text/event-stream",
-              "Cache-Control": "no-cache, no-transform",
-              "X-Accel-Buffering": "no",
-            },
-          });
+          return staticReplyStream(
+            { emergency: false, tier: decision.tier, cached: true },
+            cached,
+          );
         }
 
         // Budget gate: only enforced for actual AI calls (tier 2/3 + image).
@@ -238,102 +191,45 @@ export const Route = createFileRoute("/api/chat/stream")({
           return new Response(`AI error: ${(e as Error).message}`, { status: 500 });
         }
 
-        const decoder = new TextDecoder();
-        let fullText = "";
-        let buffer = "";
-
-        const stream = new ReadableStream({
-          async start(controller) {
-            // Prefix with emergency flag header (line-prefixed JSON meta)
-            controller.enqueue(
-              encoder.encode(
-                `event: meta\ndata: ${JSON.stringify({ emergency: isEmergency, tier: decision.tier, cached: false })}\n\n`,
-              ),
-            );
-            const reader = upstreamBody.getReader();
-            try {
-              while (true) {
-                const { done, value } = await reader.read();
-                if (done) break;
-                buffer += decoder.decode(value, { stream: true });
-                const lines = buffer.split("\n");
-                buffer = lines.pop() ?? "";
-                for (const raw of lines) {
-                  const line = raw.trim();
-                  if (!line.startsWith("data:")) continue;
-                  const payload = line.slice(5).trim();
-                  if (payload === "[DONE]") continue;
-                  try {
-                    const json = JSON.parse(payload);
-                    const delta: string | undefined = json?.choices?.[0]?.delta?.content;
-                    if (delta) {
-                      fullText += delta;
-                      controller.enqueue(encoder.encode(`data: ${JSON.stringify({ delta })}\n\n`));
-                    }
-                  } catch {
-                    /* ignore parse errors */
-                  }
+        return proxyUpstreamStream(
+          upstreamBody,
+          { emergency: isEmergency, tier: decision.tier, cached: false },
+          {
+            onComplete: async (fullText) => {
+              await supabase.from("chat_messages").insert({
+                user_id: userId,
+                role: "assistant",
+                content: fullText,
+              });
+              if (key) {
+                try {
+                  await setCached({
+                    key,
+                    response: fullText,
+                    model: effectiveModel,
+                    tier: decision.tier,
+                    isPersonal: decision.tier === 3,
+                  });
+                } catch (e) {
+                  console.error("ai cache write fail", (e as Error).message);
                 }
               }
-              if (fullText) {
-                if (safetyDisclaimer) {
-                  fullText += safetyDisclaimer;
-                  controller.enqueue(
-                    encoder.encode(`data: ${JSON.stringify({ delta: safetyDisclaimer })}\n\n`),
-                  );
-                }
-                await supabase.from("chat_messages").insert({
-                  user_id: userId,
-                  role: "assistant",
-                  content: fullText,
-                });
-                if (key) {
-                  try {
-                    await setCached({
-                      key,
-                      response: fullText,
-                      model: effectiveModel,
-                      tier: decision.tier,
-                      isPersonal: decision.tier === 3,
-                    });
-                  } catch (e) {
-                    console.error("ai cache write fail", (e as Error).message);
-                  }
-                }
-                // Rough token estimate when upstream doesn't return usage.
-                const promptTokens = Math.ceil(JSON.stringify(messages).length / 4);
-                const completionTokens = Math.ceil(fullText.length / 4);
-                await logAiUsage({
-                  userId,
-                  feature: body.imageBase64 ? "chat_image" : "chat",
-                  tier: decision.tier,
-                  model: effectiveModel,
-                  promptTokens,
-                  completionTokens,
-                  cacheHit: false,
-                  wasDowngraded: downgraded,
-                });
-              }
-              controller.enqueue(encoder.encode(`event: done\ndata: {}\n\n`));
-            } catch (err) {
-              controller.enqueue(
-                encoder.encode(
-                  `event: error\ndata: ${JSON.stringify({ message: String(err) })}\n\n`,
-                ),
-              );
-            } finally {
-              controller.close();
-            }
+              const promptTokens = Math.ceil(JSON.stringify(messages).length / 4);
+              const completionTokens = Math.ceil(fullText.length / 4);
+              await logAiUsage({
+                userId,
+                feature: body.imageBase64 ? "chat_image" : "chat",
+                tier: decision.tier,
+                model: effectiveModel,
+                promptTokens,
+                completionTokens,
+                cacheHit: false,
+                wasDowngraded: downgraded,
+              });
+            },
           },
-        });
-
-        return new Response(stream, {
-          headers: {
-            "Content-Type": "text/event-stream",
-            "Cache-Control": "no-cache, no-transform",
-            "X-Accel-Buffering": "no",
-          },
-        });
+          safetyDisclaimer || undefined,
+        );
       },
     },
   },
