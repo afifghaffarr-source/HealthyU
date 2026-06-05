@@ -1,7 +1,25 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { callAiWithGuards, callAiJsonWithGuards } from "@/lib/aiGateway.server";
+import { callAiWithGuards, callAiJsonWithSchema } from "@/lib/aiGateway.server";
+
+const ImportedRecipeSchema = z
+  .object({
+    title: z.string().optional(),
+    ingredients: z.array(z.string()).default([]),
+    steps: z.array(z.string()).default([]),
+  })
+  .passthrough();
+
+const FormCheckSchema = z
+  .object({
+    score: z.number().optional(),
+    mistakes: z.array(z.string()).default([]),
+    tips: z.array(z.string()).default([]),
+  })
+  .passthrough();
+
+const NutritionLabelSchema = z.record(z.union([z.string(), z.number()]));
 
 // 9. Weekly leaderboard
 export const getWeeklyLeaderboard = createServerFn({ method: "POST" })
@@ -50,13 +68,11 @@ export const importRecipeFromUrl = createServerFn({ method: "POST" })
     } catch (e) {
       throw new Error("Gagal mengambil halaman");
     }
-    const parsed = await callAiJsonWithGuards<{
-      title?: string;
-      ingredients?: string[];
-      steps?: string[];
-    }>({
+    const parsed = await callAiJsonWithSchema({
       userId: context.userId,
       feature: "recipe.import_from_url",
+      schema: ImportedRecipeSchema,
+      fallback: { ingredients: [], steps: [] },
       messages: [
         {
           role: "system",
@@ -192,9 +208,11 @@ export const analyzeFormCheck = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     let feedback: { score?: number; mistakes?: string[]; tips?: string[]; raw?: string } = {};
     try {
-      feedback = await callAiJsonWithGuards<typeof feedback>({
+      feedback = await callAiJsonWithSchema({
         userId: context.userId,
         feature: "workout.form_check",
+        schema: FormCheckSchema,
+        fallback: { mistakes: [], tips: [] },
         messages: [
           {
             role: "system",
@@ -229,9 +247,11 @@ export const ocrNutritionLabel = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     let nutrition: Record<string, string | number> = {};
     try {
-      nutrition = await callAiJsonWithGuards<Record<string, string | number>>({
+      nutrition = await callAiJsonWithSchema({
         userId: context.userId,
         feature: "ocr.nutrition_label",
+        schema: NutritionLabelSchema,
+        fallback: {},
         messages: [
           {
             role: "system",

@@ -1,7 +1,25 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { callAiJsonWithGuards } from "./aiGateway.server";
+import { callAiJsonWithSchema } from "./aiGateway.server";
+
+const VoiceMealSchema = z.object({
+  items: z
+    .array(
+      z
+        .object({
+          name: z.string().default(""),
+          portion_g: z.number().optional(),
+          calories: z.number().optional(),
+          protein_g: z.number().optional(),
+          carbs_g: z.number().optional(),
+          fat_g: z.number().optional(),
+          confidence: z.number().optional(),
+        })
+        .passthrough(),
+    )
+    .default([]),
+});
 
 const BUCKET = "scan-photos";
 
@@ -75,20 +93,12 @@ export const parseVoiceMeal = createServerFn({ method: "POST" })
   )
   .handler(async ({ data, context }) => {
     const prompt = `Pengguna mengucapkan: "${data.transcript}". Ekstrak daftar makanan/minuman yang dikonsumsi beserta estimasi porsi & kalori (Bahasa Indonesia). Balas HANYA JSON: {"items":[{"name":"...","portion_g":150,"calories":300,"protein_g":10,"carbs_g":40,"fat_g":8,"confidence":0.7}]}`;
-    const parsed = await callAiJsonWithGuards<{
-      items?: Array<{
-        name: string;
-        portion_g?: number;
-        calories?: number;
-        protein_g?: number;
-        carbs_g?: number;
-        fat_g?: number;
-        confidence?: number;
-      }>;
-    }>({
+    const parsed = await callAiJsonWithSchema({
       userId: context.userId,
       feature: "scan.voice.meal_parse",
+      schema: VoiceMealSchema,
+      fallback: { items: [] },
       messages: [{ role: "user", content: prompt }],
     });
-    return { items: parsed.items ?? [] };
+    return { items: parsed.items };
   });

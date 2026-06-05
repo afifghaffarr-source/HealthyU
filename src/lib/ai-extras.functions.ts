@@ -1,19 +1,35 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { callAiJsonWithGuards } from "@/lib/aiGateway.server";
+import { callAiJsonWithSchema } from "@/lib/aiGateway.server";
 
-const callGemini = (
-  messages: Array<{ role: "system" | "user" | "assistant"; content: string }>,
-  userId: string | null,
-  feature: string,
-) =>
-  callAiJsonWithGuards({
-    userId,
-    feature,
-    messages,
-    model: "google/gemini-3-flash-preview",
-  });
+const RecipeSchema = z
+  .object({
+    title: z.string().default("Resep"),
+    description: z.string().default(""),
+    ingredients: z.array(z.string()).default([]),
+    instructions: z.array(z.string()).default([]),
+    prep_min: z.coerce.number().default(20),
+    servings: z.coerce.number().default(1),
+    calories: z.coerce.number().default(0),
+    protein_g: z.coerce.number().default(0),
+    carbs_g: z.coerce.number().default(0),
+    fat_g: z.coerce.number().default(0),
+    tips: z.array(z.string()).default([]),
+  })
+  .passthrough();
+
+const ParsedMealSchema = z
+  .object({
+    custom_name: z.string().default(""),
+    meal_type: z.enum(["breakfast", "lunch", "dinner", "snack"]).default("snack"),
+    serving_qty: z.coerce.number().default(1),
+    calories: z.coerce.number().default(0),
+    protein_g: z.coerce.number().default(0),
+    carbs_g: z.coerce.number().default(0),
+    fat_g: z.coerce.number().default(0),
+  })
+  .passthrough();
 
 export type GeneratedRecipe = {
   title: string;
@@ -71,28 +87,18 @@ Balas JSON:
   "tips": ["1-3 tips sehat"]
 }`;
 
-    const parsed = await callGemini([
-      { role: "system", content: sys },
-      { role: "user", content: user },
-    ], userId, "recipe.generate");
-    const arr = (v: unknown): string[] => (Array.isArray(v) ? v.map(String) : []);
-    const num = (v: unknown, d = 0): number => {
-      const n = Number(v);
-      return Number.isFinite(n) ? n : d;
-    };
-    return {
-      title: String(parsed.title ?? "Resep"),
-      description: String(parsed.description ?? ""),
-      ingredients: arr(parsed.ingredients),
-      instructions: arr(parsed.instructions),
-      prep_min: num(parsed.prep_min, 20),
-      servings: num(parsed.servings, 1),
-      calories: num(parsed.calories),
-      protein_g: num(parsed.protein_g),
-      carbs_g: num(parsed.carbs_g),
-      fat_g: num(parsed.fat_g),
-      tips: arr(parsed.tips),
-    };
+    const parsed = await callAiJsonWithSchema({
+      userId,
+      feature: "recipe.generate",
+      model: "google/gemini-3-flash-preview",
+      schema: RecipeSchema,
+      fallback: RecipeSchema.parse({}),
+      messages: [
+        { role: "system", content: sys },
+        { role: "user", content: user },
+      ],
+    });
+    return parsed as GeneratedRecipe;
   });
 
 export type ParsedMeal = {
@@ -125,25 +131,24 @@ Balas JSON:
   "carbs_g": number,
   "fat_g": number
 }`;
-    const parsed = await callGemini([
-      { role: "system", content: sys },
-      { role: "user", content: user },
-    ], userId, "voice.meal_parse");
-    const num = (v: unknown, d = 0): number => {
-      const n = Number(v);
-      return Number.isFinite(n) ? n : d;
-    };
-    const mt = String(parsed.meal_type ?? "snack");
-    const meal_type = (
-      ["breakfast", "lunch", "dinner", "snack"].includes(mt) ? mt : "snack"
-    ) as ParsedMeal["meal_type"];
+    const parsed = await callAiJsonWithSchema({
+      userId,
+      feature: "voice.meal_parse",
+      model: "google/gemini-3-flash-preview",
+      schema: ParsedMealSchema,
+      fallback: ParsedMealSchema.parse({}),
+      messages: [
+        { role: "system", content: sys },
+        { role: "user", content: user },
+      ],
+    });
     return {
-      custom_name: String(parsed.custom_name ?? data.transcript.slice(0, 60)),
-      meal_type,
-      serving_qty: num(parsed.serving_qty, 1),
-      calories: num(parsed.calories),
-      protein_g: num(parsed.protein_g),
-      carbs_g: num(parsed.carbs_g),
-      fat_g: num(parsed.fat_g),
+      custom_name: parsed.custom_name || data.transcript.slice(0, 60),
+      meal_type: parsed.meal_type,
+      serving_qty: parsed.serving_qty || 1,
+      calories: parsed.calories,
+      protein_g: parsed.protein_g,
+      carbs_g: parsed.carbs_g,
+      fat_g: parsed.fat_g,
     };
   });

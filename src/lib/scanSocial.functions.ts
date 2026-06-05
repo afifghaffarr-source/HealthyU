@@ -1,7 +1,29 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { callAiWithGuards, callAiJsonWithGuards } from "./aiGateway.server";
+import { callAiWithGuards, callAiJsonWithSchema } from "./aiGateway.server";
+
+const DailyChallengeSchema = z
+  .object({
+    title: z.string().optional(),
+    description: z.string().optional(),
+    goal_type: z.string().optional(),
+    goal_value: z.number().optional(),
+  })
+  .passthrough();
+
+const RemixSchema = z
+  .object({
+    title: z.string().default(""),
+    ingredients: z.array(z.string()).default([]),
+    instructions: z.array(z.string()).default([]),
+    calories: z.number().optional(),
+    protein_g: z.number().optional(),
+    carbs_g: z.number().optional(),
+    fat_g: z.number().optional(),
+    notes: z.string().optional(),
+  })
+  .passthrough();
 
 // ============ 9: Streak Freeze ============
 export const useStreakFreeze = createServerFn({ method: "POST" })
@@ -125,17 +147,14 @@ export const getDailyChallenge = createServerFn({ method: "POST" })
       goal_type: "water_ml",
       goal_value: 2000,
     };
-    type DailyChallenge = {
-      title?: string;
-      description?: string;
-      goal_type?: string;
-      goal_value?: number;
-    };
+    type DailyChallenge = z.infer<typeof DailyChallengeSchema>;
     let parsed: DailyChallenge = { ...fallback };
     try {
-      parsed = await callAiJsonWithGuards<DailyChallenge>({
+      parsed = await callAiJsonWithSchema({
         userId,
         feature: "challenge.daily.generate",
+        schema: DailyChallengeSchema,
+        fallback,
         messages: [
           {
             role: "system",
@@ -198,21 +217,14 @@ export const remixRecipe = createServerFn({ method: "POST" })
       .eq("id", data.recipeId)
       .maybeSingle();
     if (!r) throw new Error("Recipe not found");
-    type Remix = {
-      title: string;
-      ingredients: string[];
-      instructions: string[];
-      calories?: number;
-      protein_g?: number;
-      carbs_g?: number;
-      fat_g?: number;
-      notes?: string;
-    };
+    type Remix = z.infer<typeof RemixSchema>;
     let remix: Remix | null = null;
     try {
-      remix = await callAiJsonWithGuards<Remix>({
+      remix = await callAiJsonWithSchema({
         userId: context.userId,
         feature: "recipe.remix",
+        schema: RemixSchema,
+        fallback: { title: "", ingredients: [], instructions: [] },
         messages: [
           {
             role: "system",
