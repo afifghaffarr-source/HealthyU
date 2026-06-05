@@ -15,7 +15,7 @@ function Page() {
   const eqFn = useServerFn(equipPetAccessory);
   const { data } = useQuery({
     queryKey: ["pet-shop"],
-    queryFn: () => listFn({ data: undefined as any }),
+    queryFn: () => listFn({ data: undefined as never }),
   });
   const buy = useMutation({
     mutationFn: (id: string) => buyFn({ data: { accessoryId: id } }),

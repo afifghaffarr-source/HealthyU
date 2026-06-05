@@ -13,7 +13,7 @@ function Page() {
   const fn = useServerFn(generateWeeklyReport);
   const { data, isLoading } = useQuery({
     queryKey: ["weekly-report"],
-    queryFn: () => fn({ data: undefined as any }),
+    queryFn: () => fn({ data: undefined as never }),
   });
   const downloadTxt = () => {
     const blob = new Blob([data?.report?.content ?? ""], { type: "text/plain" });

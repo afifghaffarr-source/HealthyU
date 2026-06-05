@@ -17,7 +17,7 @@ function Page() {
   const searchFn = useServerFn(searchUsers);
   const { data: popular, isLoading: loadPop } = useQuery({
     queryKey: ["discover-users"],
-    queryFn: () => discoverFn({ data: undefined as any }),
+    queryFn: () => discoverFn({ data: undefined as never }),
   });
   const { data: searchRes, isFetching: loadSearch } = useQuery({
     queryKey: ["search-users", q],
@@ -74,7 +74,12 @@ function Page() {
 
         <div className="space-y-2">
           {!loading &&
-            users.map((u: any, i: number) => (
+            (users as Array<{
+              id: string;
+              full_name: string | null;
+              avatar_url: string | null;
+              scan_streak_current?: number | null;
+            }>).map((u, i) => (
               <Link
                 key={u.id}
                 to="/profile/public/$id"

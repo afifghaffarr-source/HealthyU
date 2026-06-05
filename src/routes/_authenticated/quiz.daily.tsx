@@ -16,11 +16,11 @@ function Page() {
   const quoteFn = useServerFn(getDailyQuote);
   const { data, isLoading } = useQuery({
     queryKey: ["daily-quiz"],
-    queryFn: () => quizFn({ data: undefined as any }),
+    queryFn: () => quizFn({ data: undefined as never }),
   });
   const { data: quote } = useQuery({
     queryKey: ["daily-quote"],
-    queryFn: () => quoteFn({ data: undefined as any }),
+    queryFn: () => quoteFn({ data: undefined as never }),
   });
   const mut = useMutation({
     mutationFn: (i: number) => ansFn({ data: { quizId: (data?.quiz as any).id, answer: i } }),

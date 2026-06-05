@@ -11,7 +11,7 @@ function Page() {
   const fn = useServerFn(getSleepScore);
   const { data } = useQuery({
     queryKey: ["sleep-score"],
-    queryFn: () => fn({ data: undefined as any }),
+    queryFn: () => fn({ data: undefined as never }),
   });
   const rows = data?.rows ?? [];
   const avg = rows.length

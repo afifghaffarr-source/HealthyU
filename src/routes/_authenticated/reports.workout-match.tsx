@@ -14,7 +14,7 @@ function Page() {
   const fn = useServerFn(getWorkoutMatch);
   const { data } = useQuery({
     queryKey: ["workout-match"],
-    queryFn: () => fn({ data: undefined as any }),
+    queryFn: () => fn({ data: undefined as never }),
   });
   return (
     <div className="min-h-dvh pb-24 bg-background">

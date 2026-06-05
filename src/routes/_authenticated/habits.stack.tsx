@@ -18,7 +18,7 @@ function Page() {
   const [steps, setSteps] = useState("");
   const { data } = useQuery({
     queryKey: ["habit-stacks"],
-    queryFn: () => listFn({ data: undefined as any }),
+    queryFn: () => listFn({ data: undefined as never }),
   });
   const mut = useMutation({
     mutationFn: () => createFn({ data: { name, steps: steps.split("\n").filter(Boolean) } }),

@@ -11,7 +11,7 @@ function Page() {
   const fn = useServerFn(getMealHeatmap);
   const { data } = useQuery({
     queryKey: ["meal-heatmap"],
-    queryFn: () => fn({ data: undefined as any }),
+    queryFn: () => fn({ data: undefined as never }),
   });
   const counts = data?.counts ?? {};
   const days: Array<{ date: string; n: number }> = [];

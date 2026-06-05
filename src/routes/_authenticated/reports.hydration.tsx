@@ -14,7 +14,7 @@ function Page() {
   const fn = useServerFn(hydrationMealPairing);
   const { data } = useQuery({
     queryKey: ["hydration-meal"],
-    queryFn: () => fn({ data: undefined as any }),
+    queryFn: () => fn({ data: undefined as never }),
   });
   return (
     <div className="min-h-dvh pb-24 bg-background">

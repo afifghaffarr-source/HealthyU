@@ -16,7 +16,7 @@ function Page() {
   const readFn = useServerFn(markNotifRead);
   const { data, isLoading } = useQuery({
     queryKey: ["notif-feed"],
-    queryFn: () => listFn({ data: undefined as any }),
+    queryFn: () => listFn({ data: undefined as never }),
   });
   const mut = useMutation({
     mutationFn: (id: string) => readFn({ data: { id } }),

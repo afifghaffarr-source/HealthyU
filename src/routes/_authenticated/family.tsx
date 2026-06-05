@@ -19,7 +19,7 @@ function Page() {
   const [name, setName] = useState("");
   const { data } = useQuery({
     queryKey: ["family-plans"],
-    queryFn: () => listFn({ data: undefined as any }),
+    queryFn: () => listFn({ data: undefined as never }),
   });
   const mut = useMutation({
     mutationFn: () => createFn({ data: { name: name || undefined } }),

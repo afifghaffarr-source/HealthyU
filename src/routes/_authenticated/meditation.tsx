@@ -16,7 +16,7 @@ function Page() {
   const listFn = useServerFn(listMeditations);
   const { data } = useQuery({
     queryKey: ["meditations"],
-    queryFn: () => listFn({ data: undefined as any }),
+    queryFn: () => listFn({ data: undefined as never }),
   });
   const [target, setTarget] = useState(5);
   const [seconds, setSeconds] = useState(0);
