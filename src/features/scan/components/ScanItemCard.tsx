@@ -1,5 +1,6 @@
 import { Check, Pencil } from "lucide-react";
 import { recognizeFood } from "@/features/food/lib/foodScan.functions";
+import { ConfidenceBadge, tierFromScore } from "@/components/healthyu/confidence-badge";
 
 type Item = Awaited<ReturnType<typeof recognizeFood>>["items"][number];
 
@@ -45,6 +46,7 @@ export function ScanItemCard({
   onLog: () => void;
   logPending: boolean;
 }) {
+  const tier = tierFromScore(it.confidence);
   return (
     <div className="p-3 rounded-2xl bg-card border border-border/50 space-y-2">
       <div className="flex items-start gap-3">
@@ -56,11 +58,9 @@ export function ScanItemCard({
               className="w-full text-sm font-semibold bg-muted/60 rounded-lg px-2 py-1 outline-none focus:bg-background border border-transparent focus:border-primary"
             />
           ) : (
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 flex-wrap">
               <p className="font-semibold text-sm truncate">{it.name}</p>
-              <span className="text-[10px] px-1.5 py-0.5 rounded bg-muted text-muted-foreground">
-                {Math.round((it.confidence ?? 0) * 100)}%
-              </span>
+              <ConfidenceBadge score={it.confidence} />
             </div>
           )}
           {!editing && (
@@ -72,6 +72,11 @@ export function ScanItemCard({
                   : ""}
               {" · "}P {Math.round(it.protein_g)}g · K {Math.round(it.carbs_g)}g · L{" "}
               {Math.round(it.fat_g)}g
+            </p>
+          )}
+          {!editing && tier === "low" && (
+            <p className="text-[11px] text-amber-700 dark:text-amber-300 mt-1 leading-snug">
+              Mirip <b>{it.name}</b>? Konfirmasi dulu sebelum disimpan.
             </p>
           )}
           {it.matched_food_id && !editing && (
