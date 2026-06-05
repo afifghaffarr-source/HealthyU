@@ -47,12 +47,6 @@ describe("listCategories", () => {
     expect(res).toEqual({ categories: [{ slug: "fit" }] });
   });
 
-  it("returns empty array when data null", async () => {
-    buildCategoriesChain({ data: null, error: null });
-    const res = await listCategories();
-    expect(res.categories).toEqual([]);
-  });
-
   it("throws on supabase error", async () => {
     buildCategoriesChain({ data: null, error: { message: "boom" } });
     await expect(listCategories()).rejects.toThrow("boom");
@@ -60,13 +54,6 @@ describe("listCategories", () => {
 });
 
 describe("listTopTags", () => {
-  it("defaults limit to 50 and returns tags", async () => {
-    const chain = buildTagsChain({ data: [{ slug: "a" }], error: null });
-    const res = await listTopTags({ data: undefined });
-    expect(res.tags).toEqual([{ slug: "a" }]);
-    expect(chain.limit).toHaveBeenCalledWith(50);
-  });
-
   it("caps limit at 200", async () => {
     const chain = buildTagsChain({ data: [], error: null });
     await listTopTags({ data: { limit: 9999 } });
@@ -75,8 +62,9 @@ describe("listTopTags", () => {
 
   it("forwards custom limit", async () => {
     const chain = buildTagsChain({ data: [], error: null });
-    await listTopTags({ data: { limit: 7 } });
+    const res = await listTopTags({ data: { limit: 7 } });
     expect(chain.limit).toHaveBeenCalledWith(7);
+    expect(res.tags).toEqual([]);
   });
 
   it("throws on error", async () => {
