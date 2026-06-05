@@ -1,24 +1,23 @@
-import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { getChatHistory, clearChatHistory, weeklyHealthReport } from "@/lib/chat.functions";
+import {
+  getChatHistory,
+  clearChatHistory,
+  weeklyHealthReport,
+} from "@/features/chat/lib/chat.functions";
 import { supabase } from "@/integrations/supabase/client";
 import { BottomNav } from "@/components/bottom-nav";
 import { Trash2, Volume2, VolumeX } from "lucide-react";
 import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { toast } from "sonner";
 import { toastError } from "@/lib/toast-config";
-import { useSpeech } from "@/hooks/useSpeech";
-import { ChatQuickActions } from "@/components/chat/ChatQuickActions";
-import { ChatEmptyState, ChatMessages } from "@/components/chat/ChatMessages";
-import { ChatComposer, type ImageData } from "@/components/chat/ChatComposer";
+import { useSpeech } from "@/features/chat/hooks/useSpeech";
+import { ChatQuickActions } from "@/features/chat/components/ChatQuickActions";
+import { ChatEmptyState, ChatMessages } from "@/features/chat/components/ChatMessages";
+import { ChatComposer, type ImageData } from "@/features/chat/components/ChatComposer";
 
-export const Route = createFileRoute("/_authenticated/chat")({
-  component: ChatPage,
-});
-
-function ChatPage() {
+export function ChatPage() {
   const qc = useQueryClient();
   const fetchHist = useServerFn(getChatHistory);
   const clearFn = useServerFn(clearChatHistory);
