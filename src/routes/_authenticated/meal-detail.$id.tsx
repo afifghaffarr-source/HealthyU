@@ -37,7 +37,7 @@ function MealDetailPage() {
   ];
 
   return (
-    <div className="min-h-screen pb-28 px-4 bg-background">
+    <div className="min-h-dvh pb-28 px-4 bg-background">
       <TopAppBar title="Detail Menu" showBack />
       <div className="mt-4 aspect-video rounded-2xl bg-gradient-to-br from-primary/30 to-accent/20 flex items-center justify-center text-muted-foreground relative overflow-hidden">
         <ChefHat className="size-12 opacity-40" />

@@ -52,7 +52,7 @@ function ArticleReader() {
 
   const minutes = 4;
   return (
-    <div className="min-h-screen pb-28 px-4">
+    <div className="min-h-dvh pb-28 px-4">
       <div className="fixed top-0 inset-x-0 z-40 h-1 bg-transparent">
         <div
           className="h-full bg-gradient-to-r from-primary to-accent transition-[width]"

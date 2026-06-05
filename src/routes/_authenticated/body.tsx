@@ -19,7 +19,7 @@ type TabId = (typeof tabs)[number]["id"];
 function BodyPage() {
   const [tab, setTab] = useState<TabId>("Berat");
   return (
-    <div className="min-h-screen pb-28 px-4 bg-background">
+    <div className="min-h-dvh pb-28 px-4 bg-background">
       <TopAppBar title="Body Composition" showBack />
       <div className="mt-4 flex gap-2 overflow-x-auto -mx-4 px-4 pb-1">
         {tabs.map(({ id, icon: Icon }) => (

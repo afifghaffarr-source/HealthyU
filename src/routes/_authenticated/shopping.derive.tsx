@@ -40,7 +40,7 @@ function ShoppingDerivePage() {
   const total = remaining.reduce((s, x) => s + x.price, 0);
   const doneCount = SAMPLE.length - remaining.length;
   return (
-    <div className="min-h-screen pb-32 px-4 bg-background">
+    <div className="min-h-dvh pb-32 px-4 bg-background">
       <TopAppBar title="Belanja dari Meal Plan" subtitle="Auto-derive mingguan" showBack />
       <div className="mt-4 rounded-3xl bg-gradient-to-br from-primary to-accent text-primary-foreground p-4">
         <p className="text-xs uppercase tracking-wider opacity-80 inline-flex items-center gap-1">

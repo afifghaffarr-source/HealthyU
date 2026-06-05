@@ -32,7 +32,7 @@ function QiblaPage() {
   const rotation = bearing !== null ? bearing - heading : 0;
 
   return (
-    <div className="min-h-screen pb-28 px-4">
+    <div className="min-h-dvh pb-28 px-4">
       <TopAppBar title="Arah Kiblat" showBack />
       <div className="mt-10 flex flex-col items-center gap-6">
         <div className="relative size-64 rounded-full border-4 border-primary/30 flex items-center justify-center">

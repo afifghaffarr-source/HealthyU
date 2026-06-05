@@ -346,7 +346,7 @@ function Dashboard() {
   })();
 
   return (
-    <main className="min-h-screen bg-background pb-28">
+    <main className="min-h-dvh bg-background pb-28">
       <PullIndicator pulling={pulling} refreshing={refreshing} />
       <div className="max-w-md mx-auto px-5 pt-8 space-y-5">
         <header className="flex justify-between items-start animate-fade-up">

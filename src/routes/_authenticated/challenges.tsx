@@ -185,7 +185,7 @@ function ChallengesPage() {
   }, [focus, data, navigate]);
 
   return (
-    <div className="min-h-screen pb-32">
+    <div className="min-h-dvh pb-32">
       <div className="max-w-md mx-auto px-4">
         <TopAppBar title="Challenges" showBack />
       </div>

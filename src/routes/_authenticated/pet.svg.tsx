@@ -12,7 +12,7 @@ const stages = ["🥚 Telur", "🐣 Anak", "🐥 Remaja", "🦆 Dewasa", "🦅 E
 function PetSvgPage() {
   const [stage, setStage] = useState(0);
   return (
-    <div className="min-h-screen pb-28 px-4">
+    <div className="min-h-dvh pb-28 px-4">
       <TopAppBar title="Evolusi Pet" showBack />
       <div className="mt-8 flex flex-col items-center gap-6">
         <div className="text-8xl motion-safe:animate-bounce" aria-label={stages[stage]}>
