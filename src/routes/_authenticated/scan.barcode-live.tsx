@@ -88,13 +88,14 @@ function Page() {
 
   const p = mut.data?.product as
     | {
-        name?: string;
+        product_name?: string;
         brand?: string;
-        calories?: number;
-        protein?: number;
-        carbs?: number;
-        fat?: number;
+        calories_per_100g?: number;
+        protein_g?: number;
+        carbs_g?: number;
+        fat_g?: number;
         image?: string;
+        allergens?: string[];
       }
     | undefined;
   return (
