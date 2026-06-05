@@ -17,9 +17,12 @@ function Page() {
     mutationFn: () => fn({ data: { budgetIdr: budget, days } }),
     onError: (e: Error) => toast.error(e.message),
   });
-  const plan = useMemo(() => {
+  type BudgetMeal = { name: string; est_idr: number; calories: number };
+  type BudgetDay = { day?: number; meals?: BudgetMeal[] };
+  type BudgetPlan = { days?: BudgetDay[] };
+  const plan = useMemo<BudgetPlan | null>(() => {
     try {
-      return mut.data?.planJson ? JSON.parse(mut.data.planJson) : null;
+      return mut.data?.planJson ? (JSON.parse(mut.data.planJson) as BudgetPlan) : null;
     } catch {
       return null;
     }
