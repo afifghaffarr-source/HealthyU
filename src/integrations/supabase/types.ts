@@ -4600,6 +4600,96 @@ export type Database = {
         }
         Relationships: []
       }
+      seo_recipes: {
+        Row: {
+          calories: number | null
+          carbs_g: number | null
+          category: string | null
+          cook_min: number | null
+          created_at: string
+          cuisine: string | null
+          description: string | null
+          fat_g: number | null
+          fiber_g: number | null
+          id: string
+          image_url: string | null
+          ingredients: string[]
+          instructions: string[]
+          is_halal: boolean | null
+          is_vegan: boolean | null
+          is_vegetarian: boolean | null
+          keywords: string[] | null
+          prep_min: number | null
+          protein_g: number | null
+          published: boolean
+          published_at: string | null
+          servings: number | null
+          slug: string
+          tags: string[] | null
+          title: string
+          total_min: number | null
+          updated_at: string
+        }
+        Insert: {
+          calories?: number | null
+          carbs_g?: number | null
+          category?: string | null
+          cook_min?: number | null
+          created_at?: string
+          cuisine?: string | null
+          description?: string | null
+          fat_g?: number | null
+          fiber_g?: number | null
+          id?: string
+          image_url?: string | null
+          ingredients?: string[]
+          instructions?: string[]
+          is_halal?: boolean | null
+          is_vegan?: boolean | null
+          is_vegetarian?: boolean | null
+          keywords?: string[] | null
+          prep_min?: number | null
+          protein_g?: number | null
+          published?: boolean
+          published_at?: string | null
+          servings?: number | null
+          slug: string
+          tags?: string[] | null
+          title: string
+          total_min?: number | null
+          updated_at?: string
+        }
+        Update: {
+          calories?: number | null
+          carbs_g?: number | null
+          category?: string | null
+          cook_min?: number | null
+          created_at?: string
+          cuisine?: string | null
+          description?: string | null
+          fat_g?: number | null
+          fiber_g?: number | null
+          id?: string
+          image_url?: string | null
+          ingredients?: string[]
+          instructions?: string[]
+          is_halal?: boolean | null
+          is_vegan?: boolean | null
+          is_vegetarian?: boolean | null
+          keywords?: string[] | null
+          prep_min?: number | null
+          protein_g?: number | null
+          published?: boolean
+          published_at?: string | null
+          servings?: number | null
+          slug?: string
+          tags?: string[] | null
+          title?: string
+          total_min?: number | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       sleep_diary: {
         Row: {
           bedtime: string | null
