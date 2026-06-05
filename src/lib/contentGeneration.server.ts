@@ -5,35 +5,22 @@
  * subsequent reads (DB itself is the cache).
  */
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
+import { callAiWithGuards } from "@/lib/aiGateway.server";
 
-const GATEWAY_URL = "https://ai.gateway.lovable.dev/v1/chat/completions";
 const MODEL = "google/gemini-2.5-flash";
 
-async function chat(system: string, user: string, maxTokens = 1200): Promise<string> {
-  const apiKey = process.env.LOVABLE_API_KEY;
-  if (!apiKey) throw new Error("LOVABLE_API_KEY missing");
-  const res = await fetch(GATEWAY_URL, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "Lovable-API-Key": apiKey,
-      "X-Lovable-AIG-SDK": "fetch",
-    },
-    body: JSON.stringify({
-      model: MODEL,
-      messages: [
-        { role: "system", content: system },
-        { role: "user", content: user },
-      ],
-      max_tokens: maxTokens,
-    }),
+async function chat(system: string, user: string, feature: string): Promise<string> {
+  const text = await callAiWithGuards({
+    userId: null, // server-side lazy content gen, not user-scoped
+    feature,
+    skipBudget: true,
+    model: MODEL,
+    messages: [
+      { role: "system", content: system },
+      { role: "user", content: user },
+    ],
   });
-  if (!res.ok) {
-    const t = await res.text().catch(() => "");
-    throw new Error(`AI gateway ${res.status}: ${t.slice(0, 200)}`);
-  }
-  const json = await res.json();
-  return (json?.choices?.[0]?.message?.content ?? "").trim();
+  return text.trim();
 }
 
 const ARTICLE_SYSTEM =
@@ -57,7 +44,7 @@ export async function generateArticleBody(slug: string): Promise<string | null> 
     `Judul: ${art.title}\nKategori: ${art.category}\n` +
     (art.excerpt ? `Ringkasan: ${art.excerpt}\n` : "") +
     `\nTulis isi artikel lengkap dalam Markdown.`;
-  const body = await chat(ARTICLE_SYSTEM, prompt, 1400);
+  const body = await chat(ARTICLE_SYSTEM, prompt, "content.article.generate");
   if (!body) return null;
 
   await supabaseAdmin
@@ -102,7 +89,7 @@ export async function generateRecipeBody(
     `Resep: ${rec.title}\nKategori: ${rec.category}\nPorsi: ${rec.servings}\n` +
     `Target nutrisi/porsi: ${rec.calories} kkal, P ${rec.protein_g}g / K ${rec.carbs_g}g / L ${rec.fat_g}g\n` +
     (rec.description ? `Deskripsi: ${rec.description}\n` : "");
-  const raw = await chat(RECIPE_SYSTEM, prompt, 800);
+  const raw = await chat(RECIPE_SYSTEM, prompt, "content.recipe.generate");
   const match = raw.match(/\{[\s\S]*\}/);
   if (!match) return null;
   let parsed: { ingredients?: unknown; instructions?: unknown };
