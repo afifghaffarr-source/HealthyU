@@ -41,7 +41,7 @@ const RecipeImageSchema = z
       .default([]),
     steps: z.array(z.string()).default([]),
   })
-  .passthrough();
+  ;
 
 const MenuImageSchema = z
   .object({
@@ -54,11 +54,11 @@ const MenuImageSchema = z
             description: z.string().optional(),
             est_calories: z.number().optional(),
           })
-          .passthrough(),
+          ,
       )
       .default([]),
   })
-  .passthrough();
+  ;
 
 export const parseRecipeImage = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])

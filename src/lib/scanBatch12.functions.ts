@@ -9,7 +9,7 @@ const ImportedRecipeSchema = z
     ingredients: z.array(z.string()).default([]),
     steps: z.array(z.string()).default([]),
   })
-  .passthrough();
+  ;
 
 const FormCheckSchema = z
   .object({
@@ -17,7 +17,7 @@ const FormCheckSchema = z
     mistakes: z.array(z.string()).default([]),
     tips: z.array(z.string()).default([]),
   })
-  .passthrough();
+  ;
 
 const NutritionLabelSchema = z.record(z.union([z.string(), z.number()]));
 

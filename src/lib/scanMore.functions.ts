@@ -12,7 +12,7 @@ const MealTagsSchema = z
     allergy_warning: z.union([z.string(), z.null()]).optional(),
     translated_name: z.union([z.string(), z.null()]).optional(),
   })
-  .passthrough();
+  ;
 
 // ============ 1, 12, 13: streak + achievements + coins ============
 export const recordScanGameify = createServerFn({ method: "POST" })

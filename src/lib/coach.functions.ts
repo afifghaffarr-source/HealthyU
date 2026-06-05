@@ -11,7 +11,7 @@ const CoachSchema = z
     tips: z.array(z.string()).default([]),
     warnings: z.array(z.string()).default([]),
   })
-  .passthrough();
+  ;
 
 type CoachOutput = {
   greeting: string;

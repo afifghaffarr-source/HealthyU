@@ -10,7 +10,7 @@ const DailyChallengeSchema = z
     goal_type: z.string().optional(),
     goal_value: z.number().optional(),
   })
-  .passthrough();
+  ;
 
 const RemixSchema = z
   .object({
@@ -23,7 +23,7 @@ const RemixSchema = z
     fat_g: z.number().optional(),
     notes: z.string().optional(),
   })
-  .passthrough();
+  ;
 
 // ============ 9: Streak Freeze ============
 export const useStreakFreeze = createServerFn({ method: "POST" })

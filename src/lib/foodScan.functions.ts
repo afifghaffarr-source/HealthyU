@@ -48,7 +48,7 @@ const ScanItemSchema = z
     fat_g: z.coerce.number().default(0),
     notes: z.string().optional(),
   })
-  .passthrough();
+  ;
 const ScanResultSchema = z.object({ items: z.array(ScanItemSchema).default([]) });
 type ScanItem = z.infer<typeof ScanItemSchema> & { matched_food_id?: string | null };
 

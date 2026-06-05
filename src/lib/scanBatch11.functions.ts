@@ -18,15 +18,15 @@ const BudgetPlanSchema = z
                     est_idr: z.number().optional(),
                     calories: z.number().optional(),
                   })
-                  .passthrough(),
+                  ,
               )
               .default([]),
           })
-          .passthrough(),
+          ,
       )
       .default([]),
   })
-  .passthrough();
+  ;
 
 const FridgeRecipesSchema = z
   .object({
@@ -40,7 +40,7 @@ const FridgeRecipesSchema = z
       )
       .default([]),
   })
-  .passthrough();
+  ;
 
 // Sleep diary
 export const upsertSleepDiary = createServerFn({ method: "POST" })

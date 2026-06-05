@@ -16,7 +16,7 @@ const VoiceMealSchema = z.object({
           fat_g: z.number().optional(),
           confidence: z.number().optional(),
         })
-        .passthrough(),
+        ,
     )
     .default([]),
 });

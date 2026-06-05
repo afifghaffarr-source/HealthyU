@@ -17,7 +17,7 @@ const RecipeSchema = z
     fat_g: z.coerce.number().default(0),
     tips: z.array(z.string()).default([]),
   })
-  .passthrough();
+  ;
 
 const ParsedMealSchema = z
   .object({
@@ -29,7 +29,7 @@ const ParsedMealSchema = z
     carbs_g: z.coerce.number().default(0),
     fat_g: z.coerce.number().default(0),
   })
-  .passthrough();
+  ;
 
 export type GeneratedRecipe = {
   title: string;
