@@ -9,7 +9,7 @@ import {
 } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { getProfile } from "@/features/profile/lib/profile.functions";
-import { getDailyTip } from "@/lib/dailyTips.functions";
+import { getDailyTip } from "@/features/daily-tips/lib/dailyTips.functions";
 import { todaysMeals } from "@/features/meals/lib/meals.functions";
 import { currentFast } from "@/features/fasting/lib/fasting.functions";
 import { todaysWater, logWater } from "@/features/water/lib/water.functions";

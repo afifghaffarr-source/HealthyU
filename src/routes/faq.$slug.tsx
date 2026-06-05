@@ -1,6 +1,6 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { canonical, SITE_NAME } from "@/lib/seo";
-import { getSeoFaq } from "@/lib/seoContent.functions";
+import { getSeoFaq } from "@/features/content/lib/seoContent.functions";
 
 interface QA { question: string; answer: string }
 

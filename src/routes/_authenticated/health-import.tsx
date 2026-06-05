@@ -5,7 +5,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { useMutation } from "@tanstack/react-query";
 import { Upload, Apple, Smartphone, Loader2, CheckCircle2 } from "lucide-react";
 import { BottomNav } from "@/components/bottom-nav";
-import { importHealthData } from "@/lib/health-import.functions";
+import { importHealthData } from "@/features/health-import/lib/health-import.functions";
 import { toast } from "sonner";
 import { toastError } from "@/lib/toast-config";
 
