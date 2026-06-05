@@ -5,7 +5,7 @@ vi.mock("../aiGateway.server", () => ({
   callAiWithGuards: (...a: unknown[]) => callMock(...a),
   AiGatewayError: class AiGatewayError extends Error {
     status: number;
-    constructor(status: number, msg: string) { super(msg); this.status = status; }
+    constructor(msg: string, status: number) { super(msg); this.status = status; this.name = "AiGatewayError"; }
   },
 }));
 
