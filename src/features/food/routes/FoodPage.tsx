@@ -1,4 +1,3 @@
-import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -24,11 +23,7 @@ import { MealBasket, type BasketItem } from "@/features/food/components/MealBask
 import { TodayMealsList } from "@/features/food/components/TodayMealsList";
 import { AlternativesModal } from "@/features/food/components/AlternativesModal";
 
-export const Route = createFileRoute("/_authenticated/food")({
-  component: FoodPage,
-});
-
-function FoodPage() {
+export function FoodPage() {
   const qc = useQueryClient();
   const search = useServerFn(searchFoods);
   const log = useServerFn(logMeal);

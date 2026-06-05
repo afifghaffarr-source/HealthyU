@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -13,11 +13,7 @@ import { PullIndicator } from "@/components/healthyu/pull-indicator";
 import { usePullToRefresh } from "@/hooks/use-pull-to-refresh";
 import { useQueryClient } from "@tanstack/react-query";
 
-export const Route = createFileRoute("/_authenticated/foods")({
-  component: FoodsPage,
-});
-
-function FoodsPage() {
+export function FoodsPage() {
   const browse = useServerFn(browseFoods);
   const facets = useServerFn(getFoodFacets);
   const detail = useServerFn(getFoodDetail);
