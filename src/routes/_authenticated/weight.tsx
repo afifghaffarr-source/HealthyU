@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { listWeight, addWeight, deleteWeight } from "@/lib/weight.functions";
+import { listWeight, addWeight, deleteWeight } from "@/features/vitals/lib/weight.functions";
 import { getProfile } from "@/lib/profile.functions";
 import { BottomNav } from "@/components/bottom-nav";
 import { Trash2, TrendingDown, TrendingUp, Minus } from "lucide-react";

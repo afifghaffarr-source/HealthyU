@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { listVitals, addVitals, deleteVitals } from "@/lib/vitals.functions";
+import { listVitals, addVitals, deleteVitals } from "@/features/vitals/lib/vitals.functions";
 import { listBodyMetrics } from "@/lib/bodyMetrics.functions";
 import { getProfile } from "@/lib/profile.functions";
 import { BottomNav } from "@/components/bottom-nav";
@@ -12,11 +12,11 @@ import { SyncPill } from "@/components/healthyu/sync-pill";
 import { toast } from "sonner";
 import { enqueue } from "@/lib/offline-queue";
 import { useOfflineQueue } from "@/hooks/use-offline-queue";
-import { bpCategory, glucoseCategory } from "@/lib/vitalsCalc";
-import { VitalInput } from "@/components/vitals/VitalInput";
-import { SnapshotCard } from "@/components/vitals/SnapshotCard";
-import { BpTrendChart } from "@/components/vitals/BpTrendChart";
-import { BodyCompositionPanel } from "@/components/vitals/BodyCompositionPanel";
+import { bpCategory, glucoseCategory } from "@/features/vitals/lib/vitalsCalc";
+import { VitalInput } from "@/features/vitals/components/VitalInput";
+import { SnapshotCard } from "@/features/vitals/components/SnapshotCard";
+import { BpTrendChart } from "@/features/vitals/components/BpTrendChart";
+import { BodyCompositionPanel } from "@/features/vitals/components/BodyCompositionPanel";
 
 export const Route = createFileRoute("/_authenticated/vitals")({
   component: VitalsPage,
