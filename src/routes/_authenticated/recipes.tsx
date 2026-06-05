@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { listRecipes } from "@/lib/recipes.functions";
+import { listRecipes } from "@/features/recipes/lib/recipes.functions";
 import {
   TRENDING_TTL_DAYS,
   TRENDING_COUNTER_PULSE_MS,
@@ -14,9 +14,9 @@ import { PullIndicator } from "@/components/healthyu/pull-indicator";
 import { usePullToRefresh } from "@/hooks/use-pull-to-refresh";
 import { Search, Sparkles, Star, Bookmark, TrendingUp } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { AiRecipeModal } from "@/components/recipes/AiRecipeModal";
-import { RecipeListItem } from "@/components/recipes/RecipeListItem";
-import { TrendingStrip } from "@/components/recipes/TrendingStrip";
+import { AiRecipeModal } from "@/features/recipes/components/AiRecipeModal";
+import { RecipeListItem } from "@/features/recipes/components/RecipeListItem";
+import { TrendingStrip } from "@/features/recipes/components/TrendingStrip";
 
 export const Route = createFileRoute("/_authenticated/recipes")({
   component: RecipesPage,
