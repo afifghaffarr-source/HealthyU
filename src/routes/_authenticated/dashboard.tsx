@@ -89,7 +89,6 @@ function Dashboard() {
     await qc.invalidateQueries();
   });
   const announce = useAnnounce();
-  const prefersReducedMotion = useReducedMotion();
   const fetchMeals = useServerFn(todaysMeals);
   const fetchFast = useServerFn(currentFast);
   const fetchWater = useServerFn(todaysWater);
