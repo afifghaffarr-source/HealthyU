@@ -5,6 +5,7 @@ import { requireCronSecret } from "@/lib/cronAuth.server";
 /**
  * Weekly snapshot of recipes.save_count so the app can compute 7-day growth
  * (for the "🔥 Trending minggu ini" section). Run weekly via pg_cron.
+ * Auth: x-cron-secret / Authorization: Bearer CRON_SECRET (see docs/cron.md).
  */
 export const Route = createFileRoute("/api/public/hooks/recipes-trending-snapshot")({
   server: {
