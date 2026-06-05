@@ -48,7 +48,7 @@ describe("moderateImage", () => {
 
   it("fails open on gateway error", async () => {
     const spy = vi.spyOn(console, "error").mockImplementation(() => {});
-    callMock.mockRejectedValue(new AiGatewayError("rate", 429));
+    callMock.mockImplementationOnce(() => { throw new AiGatewayError("rate", 429); });
     const r = await moderateImage("xx");
     expect(r).toEqual({ label: "safe", confidence: 0, blocked: false });
     spy.mockRestore();
@@ -56,7 +56,7 @@ describe("moderateImage", () => {
 
   it("fails open on generic error", async () => {
     const spy = vi.spyOn(console, "error").mockImplementation(() => {});
-    callMock.mockRejectedValue(new Error("boom"));
+    callMock.mockImplementationOnce(() => { throw new Error("boom"); });
     const r = await moderateImage("xx");
     expect(r.label).toBe("safe");
     spy.mockRestore();
