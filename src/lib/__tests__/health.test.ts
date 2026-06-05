@@ -39,8 +39,8 @@ describe("calcBMR / calcTDEE (Mifflin-St Jeor)", () => {
     expect(calcBMR({ weightKg: 70, heightCm: 175, age: 30, gender: "male" })).toBe(1649);
   });
   it("female formula subtracts 161", () => {
-    // = 1483.75 → 1484
-    expect(calcBMR({ weightKg: 70, heightCm: 175, age: 30, gender: "female" })).toBe(1484);
+    // 10*70 + 6.25*175 - 5*30 - 161 = 1482.75 → 1483
+    expect(calcBMR({ weightKg: 70, heightCm: 175, age: 30, gender: "female" })).toBe(1483);
   });
   it("TDEE multiplies by activity factor (sedentary 1.2)", () => {
     expect(calcTDEE(2000, "sedentary")).toBe(2400);
