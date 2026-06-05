@@ -1,16 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import {
-  Sparkles,
-  Star,
-  Check,
-  Shield,
-  ArrowRight,
-  Flame,
-  Zap,
-  Crown,
-} from "lucide-react";
+import { Sparkles, Star, Shield, ArrowRight, Flame, Zap } from "lucide-react";
 import { BmrQuiz } from "@/features/landing/components/BmrQuiz";
 import { FloatingChat } from "@/features/landing/components/FloatingChat";
 import {
@@ -28,6 +19,15 @@ import {
   PopularRecipes,
 } from "@/features/landing/components/LandingSections";
 import { NewsletterSection } from "@/features/landing/components/NewsletterSection";
+import {
+  ConfettiBurst,
+  LandingBackdrop,
+  LandingNav,
+  PricingSection,
+  FinalCtaSection,
+  LandingFooter,
+  StickyCta,
+} from "@/features/landing/components/LandingChrome";
 
 export const Route = createFileRoute("/")({
   head: () => ({
