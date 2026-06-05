@@ -55,7 +55,13 @@ function Page() {
           </button>
         </div>
         {isLoading && <p className="text-sm text-muted-foreground">Memuat…</p>}
-        {data?.stories?.map((s) => (
+        {(data?.stories as Array<{
+          id: string;
+          caption: string | null;
+          image_url: string | null;
+          created_at: string;
+          profiles?: { full_name: string | null } | null;
+        }> | undefined)?.map((s) => (
           <div key={s.id} className="rounded-2xl bg-card border p-3 space-y-1">
             <div className="text-xs text-muted-foreground">
               {s.profiles?.full_name ?? "User"} ·{" "}
