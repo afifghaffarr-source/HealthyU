@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { callAiWithGuards } from "@/lib/aiGateway.server";
 
 /**
  * Lightweight content personalization: score published articles & recipes
@@ -155,9 +156,6 @@ export const generateMealPlan = createServerFn({ method: "POST" })
     );
     const remaining = Math.max(300, Math.round(target - consumed));
 
-    const apiKey = process.env.LOVABLE_API_KEY;
-    if (!apiKey) throw new Error("LOVABLE_API_KEY missing");
-
     const system =
       "Anda ahli gizi HealthyU. Susun rencana 3-4 menu Indonesia untuk sisa hari ini. " +
       "Output HANYA JSON valid: " +
@@ -170,28 +168,15 @@ export const generateMealPlan = createServerFn({ method: "POST" })
       `Kategori BMI: ${profile?.bmi_category ?? "-"}\n` +
       (data.notes ? `Catatan user: ${data.notes}\n` : "");
 
-    const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Lovable-API-Key": apiKey,
-        "X-Lovable-AIG-SDK": "fetch",
-      },
-      body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
-        messages: [
-          { role: "system", content: system },
-          { role: "user", content: user },
-        ],
-        max_tokens: 900,
-      }),
+    const text = await callAiWithGuards({
+      userId,
+      feature: "mealplan.generate",
+      maxTokens: 900,
+      messages: [
+        { role: "system", content: system },
+        { role: "user", content: user },
+      ],
     });
-    if (!res.ok) {
-      const t = await res.text().catch(() => "");
-      throw new Error(`AI gateway ${res.status}: ${t.slice(0, 200)}`);
-    }
-    const json = await res.json();
-    const text: string = json?.choices?.[0]?.message?.content ?? "";
     const match = text.match(/\{[\s\S]*\}/);
     if (!match) throw new Error("AI response tidak valid");
     let parsed: { summary?: string; meals?: PlanMeal[] };
