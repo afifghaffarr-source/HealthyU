@@ -5,6 +5,7 @@ import {
   sendWeeklyReportPush,
   getTopTrendingRecipe,
 } from "@/lib/weeklyReportRunner.server";
+import { requireCronSecret } from "@/lib/cronAuth.server";
 
 /**
  * Weekly AI report scheduler. Runs every Sunday morning via pg_cron.
@@ -15,11 +16,8 @@ export const Route = createFileRoute("/api/public/hooks/weekly-ai-report")({
   server: {
     handlers: {
       POST: async ({ request }) => {
-        const apiKey = request.headers.get("apikey");
-        const expected = process.env.SUPABASE_PUBLISHABLE_KEY;
-        if (!apiKey || !expected || apiKey !== expected) {
-          return new Response("Unauthorized", { status: 401 });
-        }
+        const unauthorized = requireCronSecret(request);
+        if (unauthorized) return unauthorized;
 
         const since14 = new Date(Date.now() - 14 * 86400000).toISOString();
         const since5 = new Date(Date.now() - 5 * 86400000).toISOString();
