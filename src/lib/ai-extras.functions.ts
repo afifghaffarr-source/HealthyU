@@ -1,34 +1,19 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { callAiJsonWithGuards } from "@/lib/aiGateway.server";
 
-async function callGemini(messages: Array<{ role: string; content: string }>) {
-  const apiKey = process.env.LOVABLE_API_KEY;
-  if (!apiKey) throw new Error("LOVABLE_API_KEY belum dikonfigurasi");
-  const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-    method: "POST",
-    headers: { "Content-Type": "application/json", Authorization: `Bearer ${apiKey}` },
-    body: JSON.stringify({
-      model: "google/gemini-3-flash-preview",
-      messages,
-      response_format: { type: "json_object" },
-    }),
+const callGemini = (
+  messages: Array<{ role: "system" | "user" | "assistant"; content: string }>,
+  userId: string | null,
+  feature: string,
+) =>
+  callAiJsonWithGuards({
+    userId,
+    feature,
+    messages,
+    model: "google/gemini-3-flash-preview",
   });
-  if (!res.ok) {
-    const t = await res.text();
-    if (res.status === 429) throw new Error("Terlalu banyak permintaan AI. Coba lagi nanti.");
-    if (res.status === 402)
-      throw new Error("Kredit AI habis. Silakan hubungi admin atau coba lagi nanti.");
-    throw new Error(`AI error ${res.status}: ${t.slice(0, 200)}`);
-  }
-  const json = (await res.json()) as { choices?: Array<{ message?: { content?: string } }> };
-  const content = json.choices?.[0]?.message?.content ?? "{}";
-  try {
-    return JSON.parse(content) as Record<string, unknown>;
-  } catch {
-    return {} as Record<string, unknown>;
-  }
-}
 
 export type GeneratedRecipe = {
   title: string;
@@ -89,7 +74,7 @@ Balas JSON:
     const parsed = await callGemini([
       { role: "system", content: sys },
       { role: "user", content: user },
-    ]);
+    ], userId, "recipe.generate");
     const arr = (v: unknown): string[] => (Array.isArray(v) ? v.map(String) : []);
     const num = (v: unknown, d = 0): number => {
       const n = Number(v);
@@ -123,7 +108,8 @@ export type ParsedMeal = {
 export const parseMealFromVoice = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((i: unknown) => z.object({ transcript: z.string().min(2).max(500) }).parse(i))
-  .handler(async ({ data }): Promise<ParsedMeal> => {
+  .handler(async ({ data, context }): Promise<ParsedMeal> => {
+    const { userId } = context;
     const sys =
       "Kamu ekstrak makanan dari ucapan bahasa Indonesia. Estimasi gizi rata-rata (per porsi disebut). Jawab JSON valid saja.";
     const user = `Transkrip: "${data.transcript}"
@@ -142,7 +128,7 @@ Balas JSON:
     const parsed = await callGemini([
       { role: "system", content: sys },
       { role: "user", content: user },
-    ]);
+    ], userId, "voice.meal_parse");
     const num = (v: unknown, d = 0): number => {
       const n = Number(v);
       return Number.isFinite(n) ? n : d;
