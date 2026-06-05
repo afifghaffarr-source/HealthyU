@@ -242,3 +242,40 @@ export const frequentMeals = createServerFn({ method: "GET" })
       .sort((a, b) => b.count - a.count)
       .slice(0, data.limit);
   });
+
+/**
+ * Last-7-days calorie totals + meal counts per day for Progress sparkline
+ * and "most consistent day" badge.
+ */
+export const weekMealStats = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { supabase, userId } = context;
+    const now = new Date();
+    const startBoundary = new Date(now);
+    startBoundary.setDate(startBoundary.getDate() - 6);
+    startBoundary.setHours(0, 0, 0, 0);
+    const { data, error } = await supabase
+      .from("meal_logs")
+      .select("logged_at, calories")
+      .eq("user_id", userId)
+      .gte("logged_at", startBoundary.toISOString())
+      .order("logged_at", { ascending: true });
+    if (error) throw new Error(error.message);
+    const days: { date: string; calories: number; meals: number }[] = [];
+    for (let i = 6; i >= 0; i--) {
+      const d = new Date();
+      d.setDate(d.getDate() - i);
+      d.setHours(0, 0, 0, 0);
+      days.push({ date: d.toISOString().slice(0, 10), calories: 0, meals: 0 });
+    }
+    (data ?? []).forEach((r) => {
+      const key = new Date(r.logged_at as string).toISOString().slice(0, 10);
+      const slot = days.find((x) => x.date === key);
+      if (slot) {
+        slot.calories += Number(r.calories ?? 0);
+        slot.meals += 1;
+      }
+    });
+    return days;
+  });
