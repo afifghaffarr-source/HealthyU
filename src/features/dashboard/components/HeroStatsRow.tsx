@@ -1,0 +1,96 @@
+import { Link } from "@tanstack/react-router";
+import { ArrowRight } from "lucide-react";
+import { CalorieRing } from "@/components/calorie-ring";
+import { formatDuration, fastingStage } from "@/lib/health";
+
+export function HeroStatsRow({
+  totals,
+  calTarget,
+  fast,
+  fastMs,
+  fastHrs,
+  fastPct,
+}: {
+  totals: { cal: number; p: number; c: number; f: number };
+  calTarget: number;
+  fast: { start_time: string; target_hours: number | string } | null | undefined;
+  fastMs: number;
+  fastHrs: number;
+  fastPct: number;
+}) {
+  return (
+    <div className="grid grid-cols-2 gap-3 animate-fade-up">
+      <div className="bg-card p-4 rounded-3xl outline-1 outline-black/5 shadow-sm flex flex-col items-center justify-center">
+        <CalorieRing
+          consumed={totals.cal}
+          target={calTarget}
+          size={128}
+          macros={{ protein: totals.p, carbs: totals.c, fat: totals.f }}
+        />
+        <p className="text-xs font-semibold mt-2" style={{ fontFamily: "var(--font-display)" }}>
+          Nutrisi hari ini
+        </p>
+      </div>
+      <Link
+        to="/fasting"
+        className="bg-card p-4 rounded-3xl outline-1 outline-black/5 shadow-sm flex flex-col justify-between"
+      >
+        <p className="text-[10px] font-bold uppercase text-muted-foreground tracking-wider">
+          Puasa
+        </p>
+        {fast ? (
+          <>
+            <p className="text-2xl font-bold tabular-nums">{formatDuration(fastMs)}</p>
+            <div className="h-1.5 w-full bg-mint rounded-full overflow-hidden mt-2">
+              <div
+                className="h-full bg-coral transition-all"
+                style={{ width: `${fastPct}%` }}
+              />
+            </div>
+            <p className="text-[10px] text-muted-foreground mt-1.5 truncate">
+              {fastingStage(fastHrs)}
+            </p>
+          </>
+        ) : (
+          <>
+            <p className="text-base font-semibold">Mulai puasa</p>
+            <p className="text-[11px] text-muted-foreground mt-1">
+              16:8, OMAD, Ramadhan & lainnya
+            </p>
+            <p className="text-xs font-semibold text-primary mt-2 inline-flex items-center gap-1">
+              Pilih protokol <ArrowRight className="size-3" />
+            </p>
+          </>
+        )}
+      </Link>
+    </div>
+  );
+}
+
+export function MacroBreakdown({
+  totals,
+}: {
+  totals: { p: number; c: number; f: number };
+}) {
+  const items = [
+    { label: "Protein", value: totals.p, color: "bg-primary" },
+    { label: "Karbo", value: totals.c, color: "bg-accent" },
+    { label: "Lemak", value: totals.f, color: "bg-charcoal" },
+  ];
+  return (
+    <div className="bg-card p-4 rounded-3xl outline-1 outline-black/5 shadow-sm grid grid-cols-3 gap-2 animate-fade-up">
+      {items.map((m) => (
+        <div key={m.label}>
+          <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wide">
+            {m.label}
+          </p>
+          <p className="text-lg font-bold tabular-nums">
+            {Math.round(m.value)}
+            <span className="text-xs font-medium text-muted-foreground">g</span>
+          </p>
+          <div className={`h-1 w-8 rounded-full mt-1 ${m.color}`} />
+        </div>
+      ))}
+    </div>
+  );
+}

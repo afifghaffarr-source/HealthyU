@@ -1,9 +1,8 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { supabase } from "@/integrations/supabase/client";
-import { Trophy, Flame, Users, Calendar, Check, Medal } from "lucide-react";
+import { Trophy } from "lucide-react";
 import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { EmptyState } from "@/components/healthyu/empty-state";
 import { ListSkeleton } from "@/components/healthyu/skeletons";
@@ -20,14 +19,10 @@ import {
 import {
   CHALLENGE_HIGHLIGHT_MS,
   CHALLENGE_HIGHLIGHT_FADE_MS,
-  CHALLENGE_HIGHLIGHT_FADE_OPACITY,
-  CHALLENGE_HIGHLIGHT_TRANSITION_MS,
 } from "@/lib/constants";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
 import { useAnnounce } from "@/components/live-announcer";
-import { Leaderboard } from "@/features/challenges/components/Leaderboard";
-import { GroupInviter } from "@/features/challenges/components/GroupInviter";
-import { BonusClaimer } from "@/features/challenges/components/BonusClaimer";
+import { ChallengeCard } from "@/features/challenges/components/ChallengeCard";
 
 const challengesSearchSchema = z.object({
   group: fallback(z.string().uuid().optional(), undefined),
@@ -226,138 +221,30 @@ function ChallengesPage() {
         )}
         {challenges.map((c) => {
           const part = partsByCh.get(c.id);
-          const joined = !!part;
-          const nextDay = (part?.current_day ?? 0) + 1;
           return (
-            <article
+            <ChallengeCard
               key={c.id}
               ref={(el) => {
                 articleRefs.current[c.id] = el;
               }}
-              className={
-                highlightId === c.id
-                  ? `rounded-3xl bg-card outline-1 outline-black/5 p-4 shadow-sm ring-4 ring-primary/40 transition-[opacity,box-shadow] ease-[cubic-bezier(0.34,1.56,0.64,1)] motion-reduce:transition-none motion-reduce:!ring-[var(--ring-strong)] motion-reduce:!opacity-100 ${
-                      highlightFading
-                        ? "ring-primary/0"
-                        : "animate-pulse motion-reduce:animate-none"
-                    }`
-                  : "rounded-3xl bg-card outline-1 outline-black/5 p-4 shadow-sm"
+              c={c}
+              part={part}
+              highlighted={highlightId === c.id}
+              highlightFading={highlightFading}
+              prefersReducedMotion={prefersReducedMotion}
+              openLeaderboard={openLb === c.id}
+              focusGroup={focusChallenge === c.id ? focusGroup : undefined}
+              autoSelectFirstGroup={streakAutoChallenge === c.id}
+              initialOpenExtras={focusChallenge === c.id}
+              joining={joinM.isPending}
+              logging={logM.isPending}
+              onJoin={() => joinM.mutate(c.id)}
+              onLog={(participant_id, day_number) =>
+                logM.mutate({ participant_id, day_number })
               }
-              style={
-                highlightId === c.id
-                  ? {
-                      transitionDuration: prefersReducedMotion
-                        ? "0ms"
-                        : `${CHALLENGE_HIGHLIGHT_TRANSITION_MS}ms`,
-                      ...(highlightFading ? { opacity: CHALLENGE_HIGHLIGHT_FADE_OPACITY } : null),
-                    }
-                  : undefined
-              }
-            >
-              <div className="flex items-start justify-between gap-3">
-                <div className="min-w-0">
-                  <h2 className="font-semibold leading-tight truncate">{c.title}</h2>
-                  {c.description && (
-                    <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
-                      {c.description}
-                    </p>
-                  )}
-                </div>
-                {c.is_featured && (
-                  <span className="text-[10px] font-semibold uppercase tracking-wide bg-primary/10 text-primary px-2 py-0.5 rounded-full shrink-0">
-                    Featured
-                  </span>
-                )}
-              </div>
-
-              <div className="flex flex-wrap gap-3 text-[11px] text-muted-foreground mt-3">
-                {c.duration_days && (
-                  <span className="inline-flex items-center gap-1">
-                    <Calendar className="size-3" />
-                    {c.duration_days} hari
-                  </span>
-                )}
-                <span className="inline-flex items-center gap-1">
-                  <Users className="size-3" />
-                  {c.current_participants ?? 0}
-                </span>
-                {c.difficulty && <span className="capitalize">{c.difficulty}</span>}
-                {(c.xp_reward ?? 0) > 0 && (
-                  <span className="text-primary font-semibold">+{c.xp_reward} XP</span>
-                )}
-                {(c.coin_reward ?? 0) > 0 && (
-                  <span className="text-amber-600 font-semibold">+{c.coin_reward} 🪙</span>
-                )}
-              </div>
-
-              {joined && (
-                <div className="mt-3 flex items-center gap-3 text-xs">
-                  <span className="inline-flex items-center gap-1 font-semibold">
-                    <Flame className="size-3 text-orange-500" />
-                    Streak {part!.streak ?? 0}
-                  </span>
-                  <span className="text-muted-foreground">
-                    Hari {part!.current_day ?? 0}
-                    {c.duration_days ? ` / ${c.duration_days}` : ""}
-                  </span>
-                </div>
-              )}
-
-              <div className="mt-3 flex gap-2">
-                {!joined ? (
-                  <button
-                    onClick={() => joinM.mutate(c.id)}
-                    disabled={joinM.isPending}
-                    className="flex-1 h-10 rounded-2xl bg-primary text-primary-foreground text-sm font-semibold disabled:opacity-50"
-                  >
-                    Gabung
-                  </button>
-                ) : (
-                  <>
-                    <button
-                      onClick={() =>
-                        logM.mutate({
-                          participant_id: part!.id,
-                          day_number: nextDay,
-                        })
-                      }
-                      disabled={logM.isPending}
-                      className="flex-1 h-10 rounded-2xl bg-primary text-primary-foreground text-sm font-semibold inline-flex items-center justify-center gap-1 disabled:opacity-50"
-                    >
-                      <Check className="size-4" />
-                      Catat hari {nextDay}
-                    </button>
-                    <button
-                      onClick={() => {
-                        if (confirm("Keluar dari challenge ini?")) {
-                          leaveM.mutate(part!.id);
-                        }
-                      }}
-                      className="h-10 px-3 rounded-2xl bg-muted text-foreground text-sm"
-                    >
-                      Keluar
-                    </button>
-                  </>
-                )}
-              </div>
-
-              <button
-                onClick={() => setOpenLb(openLb === c.id ? null : c.id)}
-                className="mt-3 w-full text-[11px] font-semibold text-primary inline-flex items-center justify-center gap-1"
-              >
-                <Medal className="size-3" />
-                {openLb === c.id ? "Sembunyikan leaderboard" : "Lihat leaderboard"}
-              </button>
-              {openLb === c.id && (
-                <Leaderboard
-                  challengeId={c.id}
-                  initialGroup={focusChallenge === c.id ? focusGroup : undefined}
-                  autoSelectFirstGroup={streakAutoChallenge === c.id}
-                />
-              )}
-              {joined && <GroupInviter challengeId={c.id} initialOpen={focusChallenge === c.id} />}
-              {joined && <BonusClaimer challengeId={c.id} initialOpen={focusChallenge === c.id} />}
-            </article>
+              onLeave={(participant_id) => leaveM.mutate(participant_id)}
+              onToggleLeaderboard={() => setOpenLb(openLb === c.id ? null : c.id)}
+            />
           );
         })}
       </main>
