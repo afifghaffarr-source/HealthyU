@@ -4,7 +4,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { listVitals, addVitals, deleteVitals } from "@/features/vitals/lib/vitals.functions";
 import { listBodyMetrics } from "@/lib/bodyMetrics.functions";
-import { getProfile } from "@/lib/profile.functions";
+import { getProfile } from "@/features/profile/lib/profile.functions";
 import { BottomNav } from "@/components/bottom-nav";
 import { Heart, Activity, Droplet, Trash2 } from "lucide-react";
 import { TopAppBar } from "@/components/healthyu/top-app-bar";

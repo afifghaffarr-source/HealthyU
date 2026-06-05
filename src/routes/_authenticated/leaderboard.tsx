@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { listLeaderboard } from "@/lib/social.functions";
+import { listLeaderboard } from "@/features/groups/lib/social.functions";
 import { BottomNav } from "@/components/bottom-nav";
 import { Trophy, Flame } from "lucide-react";
 

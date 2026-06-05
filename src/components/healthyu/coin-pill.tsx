@@ -1,7 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { getProfile } from "@/lib/profile.functions";
+import { getProfile } from "@/features/profile/lib/profile.functions";
 import { Coins } from "lucide-react";
 
 export function CoinPill() {

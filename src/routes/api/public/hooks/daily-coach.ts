@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { sendWebPushTo } from "@/lib/push.server";
+import { sendWebPushTo } from "@/features/notifications/lib/push.server";
 import { requireCronSecret } from "@/lib/cronAuth.server";
 
 // Daily AI Coach push notification dispatcher.

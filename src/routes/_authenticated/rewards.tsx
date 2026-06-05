@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { listRewards, redeemReward } from "@/lib/rewards.functions";
+import { listRewards, redeemReward } from "@/features/rewards/lib/rewards.functions";
 import { BottomNav } from "@/components/bottom-nav";
 import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { Coins, Gift } from "lucide-react";

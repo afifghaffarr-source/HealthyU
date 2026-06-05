@@ -8,15 +8,15 @@ import {
   useQueryClient,
 } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { getProfile } from "@/lib/profile.functions";
+import { getProfile } from "@/features/profile/lib/profile.functions";
 import { getDailyTip } from "@/lib/dailyTips.functions";
 import { todaysMeals } from "@/lib/meals.functions";
 import { currentFast } from "@/lib/fasting.functions";
-import { todaysWater, logWater } from "@/lib/water.functions";
+import { todaysWater, logWater } from "@/features/water/lib/water.functions";
 import { getGameSummary } from "@/lib/gamification.functions";
 import { myGroupChallengeSummary } from "@/features/challenges/lib/groupChallengeSummary.functions";
 import { myUnlinkedJoinedChallenges } from "@/features/challenges/lib/myUnlinkedChallenges.functions";
-import { addMood } from "@/lib/mood.functions";
+import { addMood } from "@/features/mood/lib/mood.functions";
 import { getAchievementToastPrefix } from "@/lib/achievement-icons";
 import { BottomNav } from "@/components/bottom-nav";
 import { CalorieRing } from "@/components/calorie-ring";

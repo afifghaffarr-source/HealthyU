@@ -1,7 +1,7 @@
 // Web Push (RFC 8291) implementasi dengan Web Crypto.
 // Bekerja di Cloudflare Workers runtime.
 
-import { VAPID_PUBLIC_KEY } from "./push-config";
+import { VAPID_PUBLIC_KEY } from "@/lib/push-config";
 
 type PushSub = { endpoint: string; p256dh: string; auth: string };
 type PushPayload = { title: string; body: string; url?: string; tag?: string; icon?: string };

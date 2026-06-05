@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { getNotifPrefs, updateNotifPrefs } from "@/lib/notifPrefs.functions";
+import { getNotifPrefs, updateNotifPrefs } from "@/features/notifications/lib/notifPrefs.functions";
 import { BottomNav } from "@/components/bottom-nav";
 import { toast } from "sonner";
 import { toastError } from "@/lib/toast-config";
