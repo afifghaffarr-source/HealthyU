@@ -101,9 +101,14 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         content: "Diet, puasa, dan kesehatan holistik berbasis AI untuk Indonesia.",
       },
       { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary" },
-      { name: "twitter:site", content: "@Lovable" },
-      { name: "theme-color", content: "#4CAF50" },
+      { property: "og:site_name", content: "HealthyU" },
+      { property: "og:locale", content: "id_ID" },
+      { property: "og:image", content: "https://healthyu.id/icon-512.svg" },
+      { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:title", content: "HealthyU — Sahabat Sehat Berbasis AI" },
+      { name: "twitter:description", content: "Diet, puasa, dan kesehatan holistik berbasis AI untuk Indonesia." },
+      { name: "twitter:image", content: "https://healthyu.id/icon-512.svg" },
+      { name: "theme-color", content: "#6B8E5A" },
       { name: "apple-mobile-web-app-capable", content: "yes" },
       { name: "apple-mobile-web-app-status-bar-style", content: "default" },
       { name: "apple-mobile-web-app-title", content: "HealthyU" },
@@ -171,7 +176,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 
 function RootShell({ children }: { children: ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="id">
       <head>
         <HeadContent />
       </head>
@@ -217,9 +222,14 @@ function AuthListener() {
   useEffect(() => {
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange(() => {
+    } = supabase.auth.onAuthStateChange((event) => {
+      // Ignore high-frequency events (TOKEN_REFRESHED fires ~hourly + on focus,
+      // INITIAL_SESSION fires on every mount) — they would thrash router + query cache.
+      if (event !== "SIGNED_IN" && event !== "SIGNED_OUT" && event !== "USER_UPDATED") return;
       router.invalidate();
-      queryClient.invalidateQueries();
+      // On SIGNED_OUT, the auth gate redirects to /auth; refetching protected
+      // queries with no session would just storm 401s.
+      if (event !== "SIGNED_OUT") queryClient.invalidateQueries();
     });
     return () => subscription.unsubscribe();
   }, [router, queryClient]);
