@@ -1,66 +1,61 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { callAiJsonWithGuards, type AiContentPart } from "./aiGateway.server";
 
 const ImgIn = z.object({
   image_data_url: z.string().startsWith("data:image/").max(8_000_000),
 });
 
-async function callGemini(prompt: string, imageUrl: string | null): Promise<string> {
-  const apiKey = process.env.LOVABLE_API_KEY;
-  if (!apiKey) throw new Error("AI service not configured");
-  const content: Array<Record<string, unknown>> = [{ type: "text", text: prompt }];
+async function callGeminiJson<T>(
+  prompt: string,
+  imageUrl: string | null,
+  feature: string,
+  userId: string | null,
+): Promise<T> {
+  const content: AiContentPart[] = [{ type: "text", text: prompt }];
   if (imageUrl) content.push({ type: "image_url", image_url: { url: imageUrl } });
-  const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-    method: "POST",
-    headers: { "Content-Type": "application/json", Authorization: `Bearer ${apiKey}` },
-    body: JSON.stringify({
-      model: "google/gemini-2.5-flash",
-      messages: [{ role: "user", content }],
-      response_format: { type: "json_object" },
-    }),
+  return await callAiJsonWithGuards<T>({
+    userId,
+    feature,
+    messages: [{ role: "user", content }],
   });
-  if (res.status === 429) throw new Error("Rate limited, coba lagi.");
-  if (res.status === 402) throw new Error("Kredit AI habis.");
-  if (!res.ok) throw new Error(`AI error: ${res.status}`);
-  const j = (await res.json()) as { choices?: Array<{ message?: { content?: string } }> };
-  return j.choices?.[0]?.message?.content ?? "{}";
 }
 
 export const parseRecipeImage = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) => ImgIn.parse(input))
-  .handler(async ({ data }) => {
-    const raw = await callGemini(
+  .handler(async ({ data, context }) => {
+    const parsed = await callGeminiJson<{
+      title?: string;
+      ingredients?: { name: string; qty?: string; unit?: string }[];
+      steps?: string[];
+    }>(
       'Ekstrak bahan-bahan resep dari foto. Balas JSON {"title":"...","ingredients":[{"name":"...","qty":"...","unit":"..."}],"steps":["..."]}',
       data.image_data_url,
+      "scan.recipe.image",
+      context.userId,
     );
-    try {
-      return JSON.parse(raw) as {
-        title?: string;
-        ingredients?: { name: string; qty?: string; unit?: string }[];
-        steps?: string[];
-      };
-    } catch {
-      return { title: "", ingredients: [], steps: [] };
-    }
+    return {
+      title: parsed.title ?? "",
+      ingredients: parsed.ingredients ?? [],
+      steps: parsed.steps ?? [],
+    };
   });
 
 export const parseMenuImage = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) => ImgIn.parse(input))
-  .handler(async ({ data }) => {
-    const raw = await callGemini(
+  .handler(async ({ data, context }) => {
+    const parsed = await callGeminiJson<{
+      items?: { name: string; price?: number; description?: string; est_calories?: number }[];
+    }>(
       'OCR menu restoran. Balas JSON {"items":[{"name":"...","price":12345,"description":"...","est_calories":420}]}',
       data.image_data_url,
+      "scan.menu.image",
+      context.userId,
     );
-    try {
-      return JSON.parse(raw) as {
-        items?: { name: string; price?: number; description?: string; est_calories?: number }[];
-      };
-    } catch {
-      return { items: [] };
-    }
+    return { items: parsed.items ?? [] };
   });
 
 export const getWeeklyNutrition = createServerFn({ method: "GET" })
