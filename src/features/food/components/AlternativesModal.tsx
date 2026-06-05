@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import {
   getFoodAlternatives,
   regenerateAlternativeReasons,
-} from "@/lib/foodAlternatives.functions";
+} from "@/features/food/lib/foodAlternatives.functions";
 
 export type AltAddItem = {
   id: string;

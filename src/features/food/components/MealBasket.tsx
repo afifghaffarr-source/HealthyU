@@ -1,5 +1,5 @@
 import { Minus, Plus, ShoppingBasket, Trash2 } from "lucide-react";
-import { labelMeal, type MealType } from "@/lib/foodHelpers";
+import { labelMeal, type MealType } from "@/features/food/lib/foodHelpers";
 
 export type BasketItem = {
   key: string;

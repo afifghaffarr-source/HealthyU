@@ -1,8 +1,8 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
-import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { supabaseAdmin } from "@/integrations/supabase/client.server";
-import { callAiJsonWithSchema } from "@/lib/aiGateway.server";
+import { requireSupabaseAuth } from "@/lib/integrations/supabase/auth-middleware";
+import { supabaseAdmin } from "@/lib/integrations/supabase/client.server";
+import { callAiJsonWithSchema } from "@/lib/lib/aiGateway.server";
 
 export const getFoodAlternatives = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
