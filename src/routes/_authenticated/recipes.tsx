@@ -12,25 +12,21 @@ import { BottomNav } from "@/components/bottom-nav";
 import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { PullIndicator } from "@/components/healthyu/pull-indicator";
 import { usePullToRefresh } from "@/hooks/use-pull-to-refresh";
-import { Search, Sparkles, Star, Bookmark, TrendingUp } from "lucide-react";
+import { Search, Sparkles, Bookmark } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { AiRecipeModal } from "@/features/recipes/components/AiRecipeModal";
 import { RecipeListItem } from "@/features/recipes/components/RecipeListItem";
 import { TrendingStrip } from "@/features/recipes/components/TrendingStrip";
+import {
+  RECIPE_CATS,
+  RecipeFilters,
+  type RecipeCatId,
+  type RecipeSortMode,
+} from "@/features/recipes/components/RecipeFilters";
 
 export const Route = createFileRoute("/_authenticated/recipes")({
   component: RecipesPage,
 });
-
-const CATS = [
-  { id: "all", label: "Semua" },
-  { id: "breakfast", label: "Sarapan" },
-  { id: "main", label: "Utama" },
-  { id: "dinner", label: "Malam" },
-  { id: "snack", label: "Snack" },
-] as const;
-
-type SortMode = "title" | "rating" | "popular" | "trending";
 
 function RecipesPage() {
   const fetchList = useServerFn(listRecipes);
@@ -39,9 +35,9 @@ function RecipesPage() {
     await qc.invalidateQueries({ queryKey: ["recipes"] });
   });
   const { data: all = [] } = useQuery({ queryKey: ["recipes"], queryFn: () => fetchList() });
-  const [cat, setCat] = useState<(typeof CATS)[number]["id"]>("all");
+  const [cat, setCat] = useState<RecipeCatId>("all");
   const [q, setQ] = useState("");
-  const [sort, setSort] = useState<SortMode>(() => {
+  const [sort, setSort] = useState<RecipeSortMode>(() => {
     if (typeof window === "undefined") return "title";
     const v = window.localStorage.getItem("recipes:sort");
     return v === "rating" || v === "popular" || v === "trending" || v === "title" ? v : "title";
