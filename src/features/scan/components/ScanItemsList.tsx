@@ -1,16 +1,9 @@
 import { ScanItemCard } from "./ScanItemCard";
+import type { recognizeFood } from "@/features/food/lib/foodScan.functions";
 
-type Item = {
-  name: string;
-  calories: number;
-  portion_g?: number | null;
-  protein_g: number;
-  carbs_g: number;
-  fat_g: number;
-  matched_food_id?: string | null;
-};
+type Item = Awaited<ReturnType<typeof recognizeFood>>["items"][number];
 
-export function ScanItemsList<T extends Item>({
+export function ScanItemsList({
   items,
   originals,
   editIdx,
@@ -21,12 +14,12 @@ export function ScanItemsList<T extends Item>({
   onDone,
   logPending,
 }: {
-  items: T[];
-  originals: T[];
+  items: Item[];
+  originals: Item[];
   editIdx: number | null;
   setEditIdx: (n: number | null) => void;
-  onUpdate: (idx: number, patch: Partial<T>) => void;
-  onLog: (it: T, idx: number) => void;
+  onUpdate: (idx: number, patch: Partial<Item>) => void;
+  onLog: (it: Item, idx: number) => void;
   onLogAll: () => void;
   onDone: () => void;
   logPending: boolean;
@@ -49,7 +42,7 @@ export function ScanItemsList<T extends Item>({
           original={originals[i]}
           editing={editIdx === i}
           onToggleEdit={() => setEditIdx(editIdx === i ? null : i)}
-          onUpdate={(patch) => onUpdate(i, patch as Partial<T>)}
+          onUpdate={(patch) => onUpdate(i, patch)}
           onLog={() => onLog(it, i)}
           logPending={logPending}
         />
