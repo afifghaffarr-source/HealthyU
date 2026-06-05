@@ -52,7 +52,7 @@ export const Route = createFileRoute("/")({
         content: "Diet personal, puasa, jadwal sholat, dan AI coach.",
       },
     ],
-    links: [{ rel: "canonical", href: "https://healthyu.lovable.app/" }],
+    links: [{ rel: "canonical", href: "https://healthyu.id/" }],
     scripts: [
       {
         type: "application/ld+json",

@@ -59,7 +59,7 @@ export const sendTestPush = createServerFn({ method: "POST" })
       subs.map(async (s) => {
         try {
           await sendWebPushTo(s, {
-            title: "Sehatify",
+            title: "HealthyU",
             body: "Notifikasi push berfungsi! 🎉",
             url: "/dashboard",
           });

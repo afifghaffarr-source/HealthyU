@@ -38,10 +38,10 @@ function ReferralsPage() {
   };
 
   const share = async () => {
-    const text = `Yuk gabung Sehatify! Pakai kode ${code} dan dapatkan 50 koin bonus 🎁 ${shareUrl}`;
+    const text = `Yuk gabung HealthyU! Pakai kode ${code} dan dapatkan 50 koin bonus 🎁 ${shareUrl}`;
     if (navigator.share) {
       try {
-        await navigator.share({ title: "Sehatify", text, url: shareUrl });
+        await navigator.share({ title: "HealthyU", text, url: shareUrl });
       } catch {
         // cancelled
       }
