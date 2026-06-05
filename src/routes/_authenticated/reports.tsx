@@ -5,7 +5,7 @@ import { weeklyReport, weeklyAiAnalysis, listAiReports } from "@/features/report
 import { BottomNav } from "@/components/bottom-nav";
 import { Download, FileText, Sparkles, Loader2, Share2 } from "lucide-react";
 import { TopAppBar } from "@/components/healthyu/top-app-bar";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { z } from "zod";
 import { fallback, zodValidator } from "@tanstack/zod-adapter";
@@ -19,6 +19,11 @@ import { WeeklyChart } from "@/features/reports/components/WeeklyChart";
 import { AiReportHistorySection } from "@/features/reports/components/AiReportHistorySection";
 import { shareWeeklyToWhatsapp } from "@/features/reports/lib/shareWhatsapp";
 import { buildWeeklySummary } from "@/features/reports/lib/reportsSummary";
+import {
+  useLastSeenReportId,
+  useMarkReportSeen,
+  useAiReportsRealtime,
+} from "@/features/reports/hooks/useReportsRealtime";
 
 export const Route = createFileRoute("/_authenticated/reports")({
   validateSearch: zodValidator(
@@ -44,8 +49,8 @@ function ReportsPage() {
   const listFn = useServerFn(listAiReports);
   const qc = useQueryClient();
   const [rangeWeeks, setRangeWeeks] = useState<number>(0); // 0 = semua
-  const manualGenAtRef = useRef<number>(0);
   const [manualFlashId, setManualFlashId] = useState<string | null>(null);
+  const manualGenAtRef = useAiReportsRealtime();
   const { data } = useQuery({
     queryKey: ["report", 7],
     queryFn: () => fetchFn({ data: { days: 7 } }),
@@ -54,56 +59,9 @@ function ReportsPage() {
     queryKey: ["ai-reports"],
     queryFn: () => listFn(),
   });
-  const { data: lastSeenId = null } = useQuery({
-    queryKey: ["profile-last-seen-report"],
-    queryFn: async (): Promise<string | null> => {
-      const { data: auth } = await supabase.auth.getUser();
-      const uid = auth.user?.id;
-      if (!uid) return null;
-      const { data: prof } = await supabase
-        .from("profiles")
-        .select("last_seen_report_id")
-        .eq("id", uid)
-        .maybeSingle();
-      return (prof as { last_seen_report_id?: string | null } | null)?.last_seen_report_id ?? null;
-    },
-  });
+  const { data: lastSeenId = null } = useLastSeenReportId();
   const latestId = history[0]?.id ?? null;
-  useEffect(() => {
-    if (!latestId || lastSeenId === latestId) return;
-    if (focus !== "latest") return;
-    void (async () => {
-      const { data: auth } = await supabase.auth.getUser();
-      const uid = auth.user?.id;
-      if (!uid) return;
-      await supabase
-        .from("profiles")
-        .update({ last_seen_report_id: latestId } as never)
-        .eq("id", uid);
-      qc.invalidateQueries({ queryKey: ["profile-last-seen-report"] });
-    })();
-  }, [focus, latestId, lastSeenId, qc]);
-
-  // Realtime: refresh history when a new ai_reports row is inserted
-  useEffect(() => {
-    const ch = supabase
-      .channel("ai-reports-archive")
-      .on("postgres_changes", { event: "INSERT", schema: "public", table: "ai_reports" }, () => {
-        // Local-only: clear last-seen so the new row gets the "Baru" badge
-        // immediately without waiting for the user to open it.
-        qc.setQueryData(["profile-last-seen-report"], null);
-        qc.invalidateQueries({ queryKey: ["ai-reports"] });
-        // Suppress when the INSERT was caused by the user's own manual
-        // generation (toast would duplicate aiMut's result).
-        if (Date.now() - manualGenAtRef.current > 10000) {
-          toast.success("📄 Laporan minggu baru tersedia");
-        }
-      })
-      .subscribe();
-    return () => {
-      void supabase.removeChannel(ch);
-    };
-  }, [qc]);
+  useMarkReportSeen(focus, latestId, lastSeenId);
   const aiMut = useMutation({
     mutationFn: () => {
       manualGenAtRef.current = Date.now();
