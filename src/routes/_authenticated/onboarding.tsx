@@ -48,7 +48,7 @@ function Onboarding() {
 
   useEffect(() => {
     if (!profile) return;
-    setForm((current) => ({
+    setForm((current: OnboardingForm) => ({
       ...current,
       full_name: profile.full_name ?? current.full_name,
       gender: profile.gender === "female" ? "female" : current.gender,
@@ -92,9 +92,9 @@ function Onboarding() {
   };
 
   const toggleIn = (key: "allergies" | "health_conditions", val: string) =>
-    setForm((f) => {
+    setForm((f: OnboardingForm) => {
       const has = f[key].includes(val);
-      return { ...f, [key]: has ? f[key].filter((x) => x !== val) : [...f[key], val] };
+      return { ...f, [key]: has ? f[key].filter((x: string) => x !== val) : [...f[key], val] };
     });
 
   return (
