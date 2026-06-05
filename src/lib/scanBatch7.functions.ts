@@ -157,6 +157,7 @@ export const getMealHeatmap = createServerFn({ method: "POST" })
     const counts: Record<string, number> = {};
     for (const r of data ?? []) {
       const d = r.log_date;
+      if (!d) continue;
       counts[d] = (counts[d] ?? 0) + 1;
     }
     return { counts };
