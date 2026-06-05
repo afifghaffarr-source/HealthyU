@@ -22,15 +22,22 @@ function Page() {
     queryKey: ["daily-quote"],
     queryFn: () => quoteFn({ data: undefined as never }),
   });
+  type Quiz = {
+    id: string;
+    question: string;
+    options: string[];
+    user_answer: number | null;
+    correct_index: number;
+  };
+  const q = data?.quiz as Quiz | undefined;
   const mut = useMutation({
-    mutationFn: (i: number) => ansFn({ data: { quizId: (data?.quiz as any).id, answer: i } }),
+    mutationFn: (i: number) => ansFn({ data: { quizId: q!.id, answer: i } }),
     onSuccess: (r) => {
       toast.success(r.correct ? `Benar! +${r.coins} coin` : "Salah, coba lagi besok");
       qc.invalidateQueries({ queryKey: ["daily-quiz"] });
     },
     onError: (e: Error) => toast.error(e.message),
   });
-  const q = data?.quiz as any;
   return (
     <div className="min-h-dvh pb-24 bg-background">
       <TopAppBar title="Kuis Harian" showBack />
