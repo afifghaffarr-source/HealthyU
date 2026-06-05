@@ -1,6 +1,7 @@
 import { QueryClient } from "@tanstack/react-query";
 import { createRouter } from "@tanstack/react-router";
 import { routeTree } from "./routeTree.gen";
+import { RouteError, RouteNotFound } from "@/components/healthyu/route-boundaries";
 
 export const getRouter = () => {
   const queryClient = new QueryClient({
@@ -26,6 +27,8 @@ export const getRouter = () => {
     defaultPreloadStaleTime: 0,
     // Preserve referential identity untuk search params/loader data → kurangi re-render
     defaultStructuralSharing: true,
+    defaultErrorComponent: RouteError,
+    defaultNotFoundComponent: RouteNotFound,
   });
 
   return router;
