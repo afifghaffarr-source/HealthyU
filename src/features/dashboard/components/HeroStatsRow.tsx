@@ -17,28 +17,19 @@ export function HeroStatsRow({
   fastHrs: number;
   fastPct: number;
 }) {
+  void totals;
+  void calTarget;
   return (
-    <div className="grid grid-cols-2 gap-3 animate-fade-up">
-      <div className="bg-card p-4 rounded-3xl outline-1 outline-black/5 shadow-sm flex flex-col items-center justify-center">
-        <CalorieRing
-          consumed={totals.cal}
-          target={calTarget}
-          size={128}
-          macros={{ protein: totals.p, carbs: totals.c, fat: totals.f }}
-        />
-        <p className="text-xs font-semibold mt-2" style={{ fontFamily: "var(--font-display)" }}>
-          Nutrisi hari ini
-        </p>
-      </div>
-      <Link
+    <Link
         to="/fasting"
-        className="bg-card p-4 rounded-3xl outline-1 outline-black/5 shadow-sm flex flex-col justify-between"
+        className="block bg-card p-4 rounded-3xl outline-1 outline-black/5 dark:outline-white/10 shadow-sm animate-fade-up"
+        aria-live="polite"
       >
         <p className="text-[10px] font-bold uppercase text-muted-foreground tracking-wider">
           Puasa
         </p>
         {fast ? (
-          <>
+          <div className="mt-1">
             <p className="text-2xl font-bold tabular-nums">{formatDuration(fastMs)}</p>
             <div className="h-1.5 w-full bg-mint rounded-full overflow-hidden mt-2">
               <div
@@ -46,23 +37,24 @@ export function HeroStatsRow({
                 style={{ width: `${fastPct}%` }}
               />
             </div>
-            <p className="text-[10px] text-muted-foreground mt-1.5 truncate">
+            <p className="text-[11px] text-muted-foreground mt-1.5 truncate">
               {fastingStage(fastHrs)}
             </p>
-          </>
+          </div>
         ) : (
-          <>
-            <p className="text-base font-semibold">Mulai puasa</p>
-            <p className="text-[11px] text-muted-foreground mt-1">
-              16:8, OMAD, Ramadhan & lainnya
-            </p>
-            <p className="text-xs font-semibold text-primary mt-2 inline-flex items-center gap-1">
-              Pilih protokol <ArrowRight className="size-3" />
-            </p>
-          </>
+          <div className="mt-1 flex items-center justify-between gap-3">
+            <div className="min-w-0">
+              <p className="text-base font-semibold">Mulai puasa</p>
+              <p className="text-[11px] text-muted-foreground mt-0.5">
+                16:8, OMAD, Ramadhan & lainnya
+              </p>
+            </div>
+            <span className="text-xs font-semibold text-primary inline-flex items-center gap-1 shrink-0">
+              Pilih <ArrowRight className="size-3" />
+            </span>
+          </div>
         )}
       </Link>
-    </div>
   );
 }
 
