@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { TopAppBar } from "@/components/healthyu/top-app-bar";
-import { useState, useRef } from "react";
+import { useState, useRef, lazy, Suspense } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { listProgress, addProgress, deleteProgress } from "@/lib/progress.functions";
@@ -9,7 +9,6 @@ import { BottomNav } from "@/components/bottom-nav";
 import { Camera, Trash2, Loader2, Film } from "lucide-react";
 import { toast } from "sonner";
 import { generateTimelapse } from "@/lib/timelapse";
-import { lazy, Suspense } from "react";
 
 const ProgressRadialChart = lazy(
   () => import("@/components/charts/progress-radial-chart"),
