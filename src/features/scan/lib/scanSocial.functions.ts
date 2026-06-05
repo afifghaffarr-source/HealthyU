@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { callAiWithGuards, callAiJsonWithSchema } from "@/lib/aiGateway.server";
+import { callAiWithGuards, callAiJsonWithSchema } from "@/features/ai/lib/aiGateway.server";
 
 const DailyChallengeSchema = z
   .object({

@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from "vitest";
-import { classifyMessage, buildCompactProfile, compactTodayBlock } from "../aiRouter.server";
+import { classifyMessage, buildCompactProfile, compactTodayBlock } from "@/features/ai/lib/aiRouter.server";
 
 describe("classifyMessage", () => {
   it("tier 3 for image", () => {

@@ -9,7 +9,7 @@ import { ListSkeleton } from "@/components/healthyu/skeletons";
 import { LazyImage } from "@/components/healthyu/lazy-image";
 import { toast } from "sonner";
 import { BottomNav } from "@/components/bottom-nav";
-import { listArticles, toggleBookmark } from "@/lib/articles.functions";
+import { listArticles, toggleBookmark } from "@/features/articles/lib/articles.functions";
 
 export const Route = createFileRoute("/_authenticated/articles")({
   component: ArticlesPage,

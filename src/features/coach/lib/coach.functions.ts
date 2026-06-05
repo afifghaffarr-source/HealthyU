@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { z } from "zod";
-import { callAiJsonWithSchema } from "@/lib/aiGateway.server";
+import { callAiJsonWithSchema } from "@/features/ai/lib/aiGateway.server";
 
 const CoachSchema = z
   .object({

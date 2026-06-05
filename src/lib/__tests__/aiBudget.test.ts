@@ -39,7 +39,7 @@ vi.mock("@/integrations/supabase/client.server", () => {
   };
 });
 
-import { estimateCost, enforceAiBudget, logAiUsage } from "../aiBudget.server";
+import { estimateCost, enforceAiBudget, logAiUsage } from "@/features/ai/lib/aiBudget.server";
 
 describe("estimateCost", () => {
   it("uses model price when known", () => {

@@ -3,7 +3,7 @@ import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { generateMealPlan, acceptMealPlan } from "@/lib/recommendations.functions";
+import { generateMealPlan, acceptMealPlan } from "@/features/recommendations/lib/recommendations.functions";
 import { BottomNav } from "@/components/bottom-nav";
 import { Sparkles, Loader2, Sunrise, Sun, Moon, Cookie, Check, type LucideIcon } from "lucide-react";
 import { toast } from "sonner";

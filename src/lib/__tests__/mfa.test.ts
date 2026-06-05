@@ -23,7 +23,7 @@ import {
   challengeTotp,
   verifyTotpChallenge,
   getAuthenticatorLevel,
-} from "../mfa";
+} from "@/features/mfa/lib/mfa";
 
 beforeEach(() => {
   Object.values(mfa).forEach((m) => m.mockReset());

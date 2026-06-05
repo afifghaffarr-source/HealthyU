@@ -5,7 +5,7 @@ import { Clock, Loader2, Sparkles, X } from "lucide-react";
 import {
   generateRecipeFromIngredients,
   type GeneratedRecipe,
-} from "@/lib/ai-extras.functions";
+} from "@/features/ai/lib/ai-extras.functions";
 import { toastError } from "@/lib/toast-config";
 
 function Mini({ label, v }: { label: string; v: string }) {

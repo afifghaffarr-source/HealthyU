@@ -3,7 +3,7 @@ import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { useState, useRef, lazy, Suspense } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { listProgress, addProgress, deleteProgress } from "@/lib/progress.functions";
+import { listProgress, addProgress, deleteProgress } from "@/features/progress/lib/progress.functions";
 import { supabase } from "@/integrations/supabase/client";
 import { BottomNav } from "@/components/bottom-nav";
 import { Camera, Trash2, Loader2, Film } from "lucide-react";
