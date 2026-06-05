@@ -142,7 +142,7 @@ export async function sendWebPushTo(
   payload: PushPayload,
 ): Promise<{ ok: boolean; status: number }> {
   const privKeyB64 = process.env.VAPID_PRIVATE_KEY;
-  const subject = process.env.VAPID_SUBJECT || "mailto:admin@sehatify.app";
+  const subject = process.env.VAPID_SUBJECT || "mailto:support@healthyu.id";
   if (!privKeyB64) {
     throw new Error("VAPID_PRIVATE_KEY belum dikonfigurasi sebagai secret");
   }

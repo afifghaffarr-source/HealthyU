@@ -52,7 +52,7 @@ function BackupPage() {
       const stamp = new Date().toISOString().slice(0, 10);
       if (format === "json") {
         download(
-          `sehatify-backup-${stamp}.json`,
+          `healthyu-backup-${stamp}.json`,
           JSON.stringify({ exported_at: res.exported_at, user_id: res.user_id, tables }, null, 2),
           "application/json",
         );
@@ -64,7 +64,7 @@ function BackupPage() {
           parts.push(toCSV(rows));
           parts.push("");
         }
-        download(`sehatify-backup-${stamp}.csv`, parts.join("\n"), "text/csv");
+        download(`healthyu-backup-${stamp}.csv`, parts.join("\n"), "text/csv");
       }
       toast.success("Backup berhasil diunduh");
     } catch (e) {

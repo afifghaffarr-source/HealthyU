@@ -1,4 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
+import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { z } from "zod";
 import { callAiJsonWithSchema } from "@/lib/aiGateway.server";
@@ -24,6 +25,7 @@ type CoachOutput = {
 
 export const dailyCoach = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
+  .inputValidator(() => z.object({}).strict().parse({}))
   .handler(async ({ context }): Promise<CoachOutput> => {
     const { supabase, userId } = context;
 
