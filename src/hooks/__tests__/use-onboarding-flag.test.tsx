@@ -1,0 +1,26 @@
+import { describe, it, expect, beforeEach } from "vitest";
+import { renderHook, act, waitFor } from "@testing-library/react";
+import { useOnboardingFlag } from "../use-onboarding-flag";
+
+describe("useOnboardingFlag", () => {
+  beforeEach(() => window.localStorage.clear());
+
+  it("shows onboarding when no flag set", async () => {
+    const { result } = renderHook(() => useOnboardingFlag("tour1"));
+    await waitFor(() => expect(result.current.showOnboarding).toBe(true));
+  });
+
+  it("hides onboarding after dismiss + persists", async () => {
+    const { result } = renderHook(() => useOnboardingFlag("tour2"));
+    await waitFor(() => expect(result.current.showOnboarding).toBe(true));
+    act(() => result.current.dismiss());
+    expect(result.current.showOnboarding).toBe(false);
+    expect(window.localStorage.getItem("hu:onboarded:tour2")).toBe("1");
+  });
+
+  it("reads existing flag on mount", async () => {
+    window.localStorage.setItem("hu:onboarded:tour3", "1");
+    const { result } = renderHook(() => useOnboardingFlag("tour3"));
+    await waitFor(() => expect(result.current.showOnboarding).toBe(false));
+  });
+});
