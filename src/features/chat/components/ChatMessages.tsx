@@ -1,21 +1,30 @@
 import { SafeMarkdown } from "@/components/SafeMarkdown";
+import { Stethoscope } from "lucide-react";
 
 export type ChatMessage = { id: string; role: string; content: string };
 
 const SUGGESTIONS = [
-  "Berapa kalori nasi goreng?",
-  "Rekomendasi sarapan rendah karbo",
-  "Apakah puasa 16:8 cocok untuk saya?",
-  "Sahur sehat untuk Ramadhan",
+  "Protein saya kurang, makan apa?",
+  "Ide menu warung yang lebih sehat",
+  "Bantu evaluasi hari ini",
+  "Makan malam ringan apa?",
+  "Saya lewat target, harus bagaimana?",
 ];
 
 export function ChatEmptyState({ onPick }: { onPick: (text: string) => void }) {
   return (
     <div className="py-8 space-y-4 animate-fade-up">
       <div className="bg-card p-5 rounded-3xl outline-1 outline-black/5">
-        <p className="font-bold mb-1">Selamat datang! 👋</p>
+        <p className="font-bold mb-1">Halo, ada yang ingin ditanyakan?</p>
         <p className="text-sm text-muted-foreground">
-          Saya Dr. Healthy. Tanyakan apa saja seputar nutrisi, diet, puasa, atau gaya hidup sehat.
+          Aku Dr. Healthy — bisa bantu evaluasi makan, atur menu, atau jawab tanya soal nutrisi.
+          Pilih contoh di bawah atau tulis pertanyaanmu.
+        </p>
+        <p className="mt-3 inline-flex items-start gap-1.5 text-[11px] text-muted-foreground">
+          <Stethoscope className="size-3.5 mt-0.5 shrink-0" aria-hidden />
+          <span>
+            Saran umum, bukan saran medis. Untuk kondisi medis tertentu, sebaiknya konsultasikan ke profesional.
+          </span>
         </p>
       </div>
       <div className="space-y-2">
@@ -70,10 +79,13 @@ export function ChatMessages({
             {streaming ? (
               <SafeMarkdown>{streaming}</SafeMarkdown>
             ) : (
-              <div className="flex gap-1">
-                <span className="size-1.5 bg-primary rounded-full animate-pulse" />
-                <span className="size-1.5 bg-primary rounded-full animate-pulse [animation-delay:0.2s]" />
-                <span className="size-1.5 bg-primary rounded-full animate-pulse [animation-delay:0.4s]" />
+              <div className="flex items-center gap-2" aria-live="polite">
+                <span className="flex gap-1" aria-hidden>
+                  <span className="size-1.5 bg-primary rounded-full animate-pulse" />
+                  <span className="size-1.5 bg-primary rounded-full animate-pulse [animation-delay:0.2s]" />
+                  <span className="size-1.5 bg-primary rounded-full animate-pulse [animation-delay:0.4s]" />
+                </span>
+                <span className="text-xs text-muted-foreground">Memikirkan jawaban…</span>
               </div>
             )}
           </div>

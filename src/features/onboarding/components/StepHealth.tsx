@@ -26,7 +26,7 @@ export function StepHealth({
       <div>
         <h1 className="text-2xl font-bold mb-1">Kondisi & alergi</h1>
         <p className="text-muted-foreground text-sm">
-          AI akan menyesuaikan rekomendasi makanan.
+          AI akan menyesuaikan rekomendasi makanan. Data ini hanya untuk membuat saran lebih relevan.
         </p>
       </div>
       <DisclaimerCard />
@@ -86,6 +86,9 @@ export function StepHealth({
           {pending ? "Menyimpan..." : "Mulai"}
         </button>
       </div>
+      <p className="text-[11px] text-center text-muted-foreground pt-1">
+        Semua jawaban bisa diubah kapan saja di Profil.
+      </p>
     </section>
   );
 }

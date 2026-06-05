@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Check, X } from "lucide-react";
+import { Check, X, Droplets } from "lucide-react";
 import { ConfirmDialog } from "@/components/healthyu/confirm-dialog";
 import { FASTING_PROTOCOLS, fastingStage, formatDuration } from "@/lib/health";
 
@@ -25,20 +25,60 @@ export function ActiveFastCard({
         <p className="text-xs uppercase tracking-widest text-white/70 font-bold mb-2">
           Protokol {fast.protocol}
         </p>
-        <p className="text-5xl font-bold tabular-nums mb-2">{formatDuration(elapsedMs)}</p>
+        <p
+          className="text-5xl font-bold tabular-nums mb-2"
+          role="timer"
+          aria-live="polite"
+          aria-label={`Durasi puasa ${Math.floor(elapsedHrs)} jam ${Math.floor((elapsedHrs % 1) * 60)} menit dari target ${Number(fast.target_hours)} jam`}
+        >
+          {formatDuration(elapsedMs)}
+        </p>
         <p className="text-sm text-white/80 mb-6">Target: {Number(fast.target_hours)} jam</p>
         <div className="h-2 w-full bg-white/20 rounded-full overflow-hidden mb-3">
           <div className="h-full bg-coral transition-all" style={{ width: `${pct}%` }} />
         </div>
-        <p className="text-sm font-medium mb-6">{fastingStage(elapsedHrs)}</p>
+        <p className="text-sm font-medium mb-3">{fastingStage(elapsedHrs)}</p>
+        <p className="text-xs text-white/80 mb-6 inline-flex items-center gap-1.5">
+          <Droplets className="size-3.5" aria-hidden />
+          Ingat minum air ya — hidrasi bantu tubuh tetap nyaman.
+        </p>
         <button
           onClick={() => onStop(fast.id)}
           disabled={stopping}
-          className="w-full bg-white text-sage-deep font-bold py-3.5 rounded-2xl"
+          className="w-full bg-white text-sage-deep font-bold py-3.5 rounded-2xl min-h-12"
+          aria-label="Selesai puasa untuk sekarang"
         >
-          Hentikan puasa
+          Selesai untuk sekarang
         </button>
       </div>
+    </section>
+  );
+}
+
+export function BreakFastTipsCard() {
+  return (
+    <section className="bg-card p-5 rounded-3xl outline-1 outline-black/5 dark:outline-white/10 space-y-3 animate-fade-up">
+      <div>
+        <p className="font-bold text-sm">Break fast bijak</p>
+        <p className="text-[12px] text-muted-foreground">
+          Setelah puasa, beri tubuh waktu menyesuaikan.
+        </p>
+      </div>
+      <ul className="space-y-1.5 text-sm">
+        <li className="flex items-start gap-2">
+          <Droplets className="size-4 text-primary mt-0.5 shrink-0" aria-hidden />
+          <span>Mulai dengan minum air hangat dulu.</span>
+        </li>
+        <li className="flex items-start gap-2">
+          <Check className="size-4 text-primary mt-0.5 shrink-0" aria-hidden />
+          <span>Pilih makanan ringan: buah, kurma, atau sup hangat.</span>
+        </li>
+        <li className="flex items-start gap-2">
+          <Check className="size-4 text-primary mt-0.5 shrink-0" aria-hidden />
+          <span>Makan pelan-pelan, hindari langsung porsi besar.</span>
+        </li>
+      </ul>
+      <p className="text-[11px] text-muted-foreground">Progress kecil tetap progress.</p>
     </section>
   );
 }

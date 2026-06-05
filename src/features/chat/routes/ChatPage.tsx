@@ -17,6 +17,7 @@ import { ChatQuickActions } from "@/features/chat/components/ChatQuickActions";
 import { ChatEmptyState, ChatMessages } from "@/features/chat/components/ChatMessages";
 import { ChatComposer, type ImageData } from "@/features/chat/components/ChatComposer";
 import { SafetyChip } from "@/components/healthyu/safety-chip";
+import { CoachPromptChips } from "@/features/chat/components/CoachPromptChips";
 
 export function ChatPage() {
   const qc = useQueryClient();
@@ -201,8 +202,20 @@ export function ChatPage() {
         onToggleMic={speech.toggleMic}
       />
 
-      <div className="fixed bottom-[5.25rem] inset-x-0 z-10 flex justify-center pointer-events-none">
-        <SafetyChip variant="not-medical" className="shadow-sm pointer-events-auto" />
+      <div className="fixed bottom-[5.25rem] inset-x-0 z-10 px-3 pointer-events-none">
+        <div className="max-w-md mx-auto space-y-2">
+          {messages.length > 0 && (
+            <div className="pointer-events-auto">
+              <CoachPromptChips
+                onPick={(t) => handleSend(t)}
+                disabled={mutation.isPending}
+              />
+            </div>
+          )}
+          <div className="flex justify-center">
+            <SafetyChip variant="not-medical" className="shadow-sm pointer-events-auto" />
+          </div>
+        </div>
       </div>
 
       <BottomNav />

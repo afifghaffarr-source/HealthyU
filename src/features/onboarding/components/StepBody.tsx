@@ -16,7 +16,7 @@ export function StepBody({
       <div>
         <h1 className="text-2xl font-bold mb-1">Tubuhmu sekarang</h1>
         <p className="text-muted-foreground text-sm">
-          Untuk menghitung kebutuhan kalori harian.
+          Kami pakai data ini untuk menghitung kebutuhan kalori harian. Bisa diubah kapan saja.
         </p>
       </div>
       <NumberField
@@ -40,6 +40,9 @@ export function StepBody({
         min={30}
         max={200}
       />
+      <p className="text-[11px] text-muted-foreground px-1">
+        Tidak ada target “sempurna”. Fokus ke konsistensi, bukan angka.
+      </p>
       <div className="grid grid-cols-2 gap-3 pt-4">
         <button onClick={onBack} className={secondaryBtn}>
           Kembali

@@ -21,6 +21,7 @@ import {
   TimelapseButton,
   UploadProgressCard,
 } from "@/features/progress/components/ProgressPieces";
+import { NonScaleWinsCard } from "@/features/progress/components/NonScaleWinsCard";
 
 export const Route = createFileRoute("/_authenticated/progress")({
   component: ProgressPage,
@@ -101,6 +102,13 @@ function ProgressPage() {
 
         <GoalRadialCard data={goalData} />
 
+        <NonScaleWinsCard
+          mealsLogged={meals.length}
+          waterReached={waterMl >= waterTarget}
+          photosCount={photos.length}
+          calorieOnTrack={cal > 0 && cal <= calTarget}
+        />
+
         <UploadProgressCard
           weight={weight}
           setWeight={setWeight}
@@ -124,7 +132,12 @@ function ProgressPage() {
         />
 
         {photos.length === 0 && (
-          <p className="text-center text-sm text-muted-foreground py-6">Belum ada foto progres</p>
+          <div className="text-center py-6 space-y-1">
+            <p className="text-sm font-medium">Belum ada foto progres</p>
+            <p className="text-xs text-muted-foreground">
+              Foto pertama jadi titik awal — progres bertahap, bukan harus sempurna.
+            </p>
+          </div>
         )}
       </div>
       <BottomNav />
