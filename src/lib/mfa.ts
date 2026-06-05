@@ -28,7 +28,7 @@ export async function enrollTotp(friendlyName = "HealthyU Authenticator") {
   if (error) throw error;
   return {
     factorId: data.id,
-    qrSvg: data.totp.qr_code, // SVG string for <img src={...}>
+    qrSvg: data.totp.qr_code, // SVG string for <img loading="lazy" decoding="async" src={...}>
     secret: data.totp.secret, // for manual entry
     uri: data.totp.uri,
   };

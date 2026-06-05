@@ -38,7 +38,7 @@ function Page() {
       <main className="max-w-md mx-auto px-4 pt-4 space-y-4">
         <div className="flex items-center gap-4 rounded-2xl bg-card border p-4">
           {p.avatar_url ? (
-            <img src={p.avatar_url} alt="" className="size-16 rounded-full" />
+            <img loading="lazy" decoding="async" src={p.avatar_url} alt="" className="size-16 rounded-full" />
           ) : (
             <div className="size-16 rounded-full bg-muted" />
           )}

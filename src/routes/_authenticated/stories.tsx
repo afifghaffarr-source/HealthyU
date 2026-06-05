@@ -64,7 +64,7 @@ function Page() {
                 minute: "2-digit",
               })}
             </div>
-            {s.image_url && <img src={s.image_url} alt="" className="rounded-xl w-full" />}
+            {s.image_url && <img loading="lazy" decoding="async" src={s.image_url} alt="" className="rounded-xl w-full" />}
             {s.caption && <p className="text-sm">{s.caption}</p>}
           </div>
         ))}

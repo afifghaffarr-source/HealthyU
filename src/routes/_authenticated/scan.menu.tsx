@@ -56,7 +56,7 @@ function Page() {
             <Camera className="size-8" /> Foto menu restoran
           </button>
         ) : (
-          <img src={img} className="w-full rounded-2xl" alt="menu" />
+          <img loading="lazy" decoding="async" src={img} className="w-full rounded-2xl" alt="menu" />
         )}
         {m.isPending && (
           <div className="text-center text-sm">

@@ -39,7 +39,7 @@ function Page() {
         {data.meals.map((m) => (
           <div key={m.id} className="flex items-center gap-3 p-3 rounded-2xl bg-card border">
             {m.user_avatar ? (
-              <img src={m.user_avatar} className="size-10 rounded-full" alt="" />
+              <img loading="lazy" decoding="async" src={m.user_avatar} className="size-10 rounded-full" alt="" />
             ) : (
               <div className="size-10 rounded-full bg-primary/10 text-primary grid place-items-center text-sm font-semibold">
                 {m.user_name.charAt(0).toUpperCase()}
