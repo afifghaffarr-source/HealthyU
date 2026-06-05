@@ -18,7 +18,9 @@ export const exportAllData = createServerFn({ method: "GET" })
           tables[table] = [];
           continue;
         }
-        throw new Error(`${table}: ${error.message}`);
+        // Don't leak raw DB error text. Log server-side; throw a generic message.
+        console.error(`[export.allData] ${table}:`, error);
+        throw new Error("Gagal mengekspor data. Silakan coba lagi.");
       }
       tables[table] = data ?? [];
     }

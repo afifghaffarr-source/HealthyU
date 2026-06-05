@@ -1,5 +1,9 @@
 import { describe, it, expect } from "vitest";
-import { USER_DATA_TABLES, FORBIDDEN_LEGACY_TABLE_NAMES } from "../userDataTables";
+import {
+  USER_DATA_TABLES,
+  EXCLUDED_USER_DATA_TABLES,
+  FORBIDDEN_LEGACY_TABLE_NAMES,
+} from "../userDataTables";
 
 describe("USER_DATA_TABLES", () => {
   it("uses `id` ownerColumn for profiles (not user_id)", () => {
@@ -25,5 +29,13 @@ describe("USER_DATA_TABLES", () => {
   it("has no duplicate table entries", () => {
     const names = USER_DATA_TABLES.map((t) => t.table);
     expect(new Set(names).size).toBe(names.length);
+  });
+
+  it("USER_DATA_TABLES and EXCLUDED_USER_DATA_TABLES are disjoint", () => {
+    const included = new Set(USER_DATA_TABLES.map((t) => t.table));
+    for (const e of EXCLUDED_USER_DATA_TABLES) {
+      expect(included.has(e.table), `${e.table} appears in both lists`).toBe(false);
+      expect(e.reason.length, `${e.table} needs a reason`).toBeGreaterThan(10);
+    }
   });
 });

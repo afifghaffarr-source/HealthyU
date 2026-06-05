@@ -37,7 +37,10 @@ export const exportMyData = createServerFn({ method: "GET" })
       } else if (optional) {
         dump[table] = [];
       } else {
-        dump[table] = { error: error.message };
+        // Never leak raw DB errors to the user. Log full error server-side
+        // (Supabase logs already capture it) and surface a generic marker.
+        console.error(`[pdp.export] ${table}:`, error);
+        dump[table] = { error: "unavailable" };
       }
     }
     await supabase.rpc("log_audit_event", {

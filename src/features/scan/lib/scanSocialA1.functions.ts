@@ -42,11 +42,13 @@ export const getGroupScanLeaderboard = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: { groupId: string }) => z.object({ groupId: z.string().uuid() }).parse(d))
   .handler(async ({ context, data }) => {
-    const { supabase } = context;
+    const { supabase, userId } = context;
     const since = new Date(Date.now() - 7 * 86400000).toISOString();
     const { data: members } = await supabase
       .from("friend_group_members")
-      .select("user_id, profiles(full_name, avatar_url, scan_streak_current)")
+      .select(
+        "user_id, profiles(id, full_name, avatar_url, public_profile, scan_streak_current)",
+      )
       .eq("group_id", data.groupId);
     const rows: Array<{
       userId: string;
@@ -57,20 +59,30 @@ export const getGroupScanLeaderboard = createServerFn({ method: "POST" })
     }> = [];
     type MemberWithProfile = {
       user_id: string;
-      profiles?: { full_name?: string | null; avatar_url?: string | null; scan_streak_current?: number | null } | null;
+      profiles?: {
+        id?: string | null;
+        full_name?: string | null;
+        avatar_url?: string | null;
+        public_profile?: boolean | null;
+        scan_streak_current?: number | null;
+      } | null;
     };
+    const { maskPublicProfile, ANON_NAME } = await import("@/lib/privacy");
     for (const m of (members ?? []) as MemberWithProfile[]) {
       const { count } = await supabase
         .from("food_scans")
         .select("*", { count: "exact", head: true })
         .eq("user_id", m.user_id)
         .gte("created_at", since);
-      const p = m.profiles;
+      const masked = maskPublicProfile(
+        m.profiles ? { ...m.profiles, id: m.profiles.id ?? m.user_id } : null,
+        userId,
+      );
       rows.push({
         userId: m.user_id,
-        name: p?.full_name ?? "User",
-        avatar: p?.avatar_url ?? null,
-        streak: p?.scan_streak_current ?? 0,
+        name: masked?.full_name ?? ANON_NAME,
+        avatar: masked?.avatar_url ?? null,
+        streak: m.profiles?.scan_streak_current ?? 0,
         scans: count ?? 0,
       });
     }
