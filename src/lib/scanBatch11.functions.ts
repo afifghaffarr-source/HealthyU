@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { callAiJsonWithGuards } from "@/lib/aiGateway.server";
 
 // Sleep diary
 export const upsertSleepDiary = createServerFn({ method: "POST" })
@@ -138,38 +139,29 @@ export const generateBudgetMealPlan = createServerFn({ method: "POST" })
       .parse(d),
   )
   .handler(async ({ data, context }) => {
-    const apiKey = process.env.LOVABLE_API_KEY;
-    if (!apiKey) throw new Error("LOVABLE_API_KEY belum di-set");
-    const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-      method: "POST",
-      headers: { "Content-Type": "application/json", Authorization: `Bearer ${apiKey}` },
-      body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
-        messages: [
-          {
-            role: "system",
-            content:
-              "Kamu ahli gizi & budget Indonesia. Jawab JSON {days:[{day, meals:[{name, est_idr, calories}]}]} dengan total mendekati budget.",
-          },
-          {
-            role: "user",
-            content: `Budget total: Rp ${data.budgetIdr} untuk ${data.days} hari. 3 meal/hari. Gunakan bahan lokal murah.`,
-          },
-        ],
-      }),
+    const parsed = await callAiJsonWithGuards({
+      userId: context.userId,
+      feature: "mealplan.budget",
+      messages: [
+        {
+          role: "system",
+          content:
+            "Kamu ahli gizi & budget Indonesia. Jawab JSON {days:[{day, meals:[{name, est_idr, calories}]}]} dengan total mendekati budget.",
+        },
+        {
+          role: "user",
+          content: `Budget total: Rp ${data.budgetIdr} untuk ${data.days} hari. 3 meal/hari. Gunakan bahan lokal murah.`,
+        },
+      ],
     });
-    if (!res.ok) throw new Error(`AI error: ${res.status}`);
-    const json = (await res.json()) as { choices?: { message?: { content?: string } }[] };
-    const text = json.choices?.[0]?.message?.content ?? "{}";
-    const m = text.match(/\{[\s\S]*\}/);
-    const planStr = m ? m[0] : "{}";
+    const planStr = JSON.stringify(parsed ?? {});
     await context.supabase
       .from("budget_meal_plans")
       .insert({
         user_id: context.userId,
         budget_idr: data.budgetIdr,
         days: data.days,
-        plan: JSON.parse(planStr) as never,
+        plan: parsed as never,
       });
     return { planJson: planStr };
   });
@@ -178,40 +170,28 @@ export const generateBudgetMealPlan = createServerFn({ method: "POST" })
 export const recipeFromFridge = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d) => z.object({ imageBase64: z.string().min(10) }).parse(d))
-  .handler(async ({ data }) => {
-    const apiKey = process.env.LOVABLE_API_KEY;
-    if (!apiKey) throw new Error("LOVABLE_API_KEY belum di-set");
-    const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-      method: "POST",
-      headers: { "Content-Type": "application/json", Authorization: `Bearer ${apiKey}` },
-      body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
-        messages: [
-          {
-            role: "user",
-            content: [
-              {
-                type: "text",
-                text: "Lihat foto kulkas ini. Identifikasi bahan dan saran 3 resep. JSON {ingredients:[], recipes:[{name, steps:[]}]}.",
-              },
-              {
-                type: "image_url",
-                image_url: { url: `data:image/jpeg;base64,${data.imageBase64}` },
-              },
-            ],
-          },
-        ],
-      }),
+  .handler(async ({ data, context }) => {
+    const result = await callAiJsonWithGuards<{
+      ingredients?: string[];
+      recipes?: { name: string; steps: string[] }[];
+    }>({
+      userId: context.userId,
+      feature: "recipe.from_fridge",
+      messages: [
+        {
+          role: "user",
+          content: [
+            {
+              type: "text",
+              text: "Lihat foto kulkas ini. Identifikasi bahan dan saran 3 resep. JSON {ingredients:[], recipes:[{name, steps:[]}]}.",
+            },
+            {
+              type: "image_url",
+              image_url: { url: `data:image/jpeg;base64,${data.imageBase64}` },
+            },
+          ],
+        },
+      ],
     });
-    if (!res.ok) throw new Error(`AI error: ${res.status}`);
-    const json = (await res.json()) as { choices?: { message?: { content?: string } }[] };
-    const text = json.choices?.[0]?.message?.content ?? "{}";
-    const m = text.match(/\{[\s\S]*\}/);
-    let result: { ingredients?: string[]; recipes?: { name: string; steps: string[] }[] } = {};
-    try {
-      result = JSON.parse(m ? m[0] : "{}");
-    } catch {
-      result = {};
-    }
     return { result };
   });
