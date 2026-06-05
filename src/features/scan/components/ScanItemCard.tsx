@@ -30,7 +30,6 @@ function EditField({
 
 export function ScanItemCard({
   it,
-  idx,
   original,
   editing,
   onToggleEdit,
@@ -39,7 +38,6 @@ export function ScanItemCard({
   logPending,
 }: {
   it: Item;
-  idx: number;
   original: Item | undefined;
   editing: boolean;
   onToggleEdit: () => void;
@@ -156,5 +154,3 @@ export function ScanItemCard({
     </div>
   );
 }
-
-void idx;
