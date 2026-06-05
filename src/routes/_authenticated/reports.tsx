@@ -564,13 +564,14 @@ function ReportsPage() {
     window.open(url, "_blank", "noopener,noreferrer");
   };
 
-  const exportArchivePdf = (r: {
+  const exportArchivePdf = async (r: {
     report_period_start?: string | null;
     report_period_end?: string | null;
     created_at: string;
     recommendations: unknown;
   }) => {
     const text = Array.isArray(r.recommendations) ? String(r.recommendations[0] ?? "") : "";
+    const { default: jsPDF } = await import("jspdf");
     const doc = new jsPDF({ unit: "pt", format: "a4" });
     doc.setFont("helvetica", "bold");
     doc.setFontSize(PDF_TITLE_FONT_SIZE);
