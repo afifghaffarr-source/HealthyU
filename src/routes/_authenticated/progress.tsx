@@ -23,6 +23,9 @@ import {
 } from "@/features/progress/components/ProgressPieces";
 import { NonScaleWinsCard } from "@/features/progress/components/NonScaleWinsCard";
 import { ConsistencyScoreCard } from "@/features/progress/components/ConsistencyScoreCard";
+import { WeeklySparklineCard } from "@/features/progress/components/WeeklySparklineCard";
+import { MostConsistentDayBadge } from "@/features/progress/components/MostConsistentDayBadge";
+import { BeforeAfterFrame } from "@/features/progress/components/BeforeAfterFrame";
 
 export const Route = createFileRoute("/_authenticated/progress")({
   component: ProgressPage,
@@ -102,6 +105,12 @@ function ProgressPage() {
         <TopAppBar title="Foto Progres" subtitle="Pantau perubahan kamu" showBack />
 
         <GoalRadialCard data={goalData} />
+
+        <WeeklySparklineCard calTarget={calTarget} />
+
+        <MostConsistentDayBadge calTarget={calTarget} />
+
+        <BeforeAfterFrame photos={photos} />
 
         <ConsistencyScoreCard
           mealsLogged={meals.length}
