@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { sendWebPushTo } from "@/lib/push.server";
+import { requireCronSecret } from "@/lib/cronAuth.server";
 
 // Daily AI Coach push notification dispatcher.
 // Called by pg_cron daily (e.g. 07:00 WIB). Auth via Supabase anon key.
@@ -8,14 +9,8 @@ export const Route = createFileRoute("/api/public/hooks/daily-coach")({
   server: {
     handlers: {
       POST: async ({ request }) => {
-        const apiKey = request.headers.get("apikey");
-        const expected = process.env.SUPABASE_PUBLISHABLE_KEY ?? process.env.SUPABASE_ANON_KEY;
-        if (!apiKey || !expected || apiKey !== expected) {
-          return new Response(JSON.stringify({ error: "Unauthorized" }), {
-            status: 401,
-            headers: { "Content-Type": "application/json" },
-          });
-        }
+        const unauthorized = requireCronSecret(request);
+        if (unauthorized) return unauthorized;
 
         const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
         const { data: subs, error } = await supabaseAdmin
