@@ -1,4 +1,5 @@
 import { AiGatewayError, type AiMultimodalMessage } from "./aiGateway.server";
+export { AiGatewayError };
 
 const LOVABLE_AI = "https://ai.gateway.lovable.dev/v1/chat/completions";
 const DEFAULT_TIMEOUT_MS = 60_000;
