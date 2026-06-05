@@ -35,6 +35,9 @@ import {
 } from "@/features/dashboard/components/HeroStatsRow";
 import { TodaysBalanceCard } from "@/features/dashboard/components/TodaysBalanceCard";
 import { SmartNextStepCard } from "@/features/dashboard/components/SmartNextStepCard";
+import { MacroGapInsightCard } from "@/features/dashboard/components/MacroGapInsightCard";
+import { LocalFoodHintCard } from "@/features/dashboard/components/LocalFoodHintCard";
+import { OfflineQueueBanner } from "@/components/healthyu/offline-queue-banner";
 import { GamificationCard } from "@/features/dashboard/components/DashboardCtas";
 import { ActionRow } from "@/features/dashboard/components/ActionRow";
 import { usePullToRefresh } from "@/hooks/use-pull-to-refresh";
@@ -142,6 +145,8 @@ function Dashboard() {
           claiming={claimBonusMut.isPending}
         />
 
+        <OfflineQueueBanner />
+
         <Coachmark
           flagKey="dashboard-v1"
           title="Selamat datang di Healthy U"
@@ -161,6 +166,10 @@ function Dashboard() {
           fastActive={!!fast}
           remainingKcal={Math.max(0, calTarget - totals.cal)}
         />
+
+        <MacroGapInsightCard totals={totals} calTarget={calTarget} />
+
+        <LocalFoodHintCard hour={new Date().getHours()} />
 
         <HeroStatsRow
           totals={totals}
