@@ -88,6 +88,7 @@ import { Route as AuthenticatedBackupRouteImport } from './routes/_authenticated
 import { Route as AuthenticatedArticlesRouteImport } from './routes/_authenticated/articles'
 import { Route as AuthenticatedAlarmsRouteImport } from './routes/_authenticated/alarms'
 import { Route as AuthenticatedAchievementsRouteImport } from './routes/_authenticated/achievements'
+import { Route as ApiImgSplatRouteImport } from './routes/api/img.$'
 import { Route as ApiChatStreamRouteImport } from './routes/api/chat.stream'
 import { Route as AuthenticatedWorkoutTimerRouteImport } from './routes/_authenticated/workout.timer'
 import { Route as AuthenticatedWeightGoalRouteImport } from './routes/_authenticated/weight.goal'
@@ -574,6 +575,11 @@ const AuthenticatedAchievementsRoute =
     path: '/achievements',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const ApiImgSplatRoute = ApiImgSplatRouteImport.update({
+  id: '/api/img/$',
+  path: '/api/img/$',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiChatStreamRoute = ApiChatStreamRouteImport.update({
   id: '/api/chat/stream',
   path: '/api/chat/stream',
@@ -1198,6 +1204,7 @@ export interface FileRoutesByFullPath {
   '/weight/goal': typeof AuthenticatedWeightGoalRoute
   '/workout/timer': typeof AuthenticatedWorkoutTimerRoute
   '/api/chat/stream': typeof ApiChatStreamRoute
+  '/api/img/$': typeof ApiImgSplatRoute
   '/groups/$id/leaderboard': typeof AuthenticatedGroupsIdLeaderboardRoute
   '/groups/$id/meals': typeof AuthenticatedGroupsIdMealsRoute
   '/profile/followers/$id': typeof AuthenticatedProfileFollowersIdRoute
@@ -1353,6 +1360,7 @@ export interface FileRoutesByTo {
   '/weight/goal': typeof AuthenticatedWeightGoalRoute
   '/workout/timer': typeof AuthenticatedWorkoutTimerRoute
   '/api/chat/stream': typeof ApiChatStreamRoute
+  '/api/img/$': typeof ApiImgSplatRoute
   '/groups/$id/leaderboard': typeof AuthenticatedGroupsIdLeaderboardRoute
   '/groups/$id/meals': typeof AuthenticatedGroupsIdMealsRoute
   '/profile/followers/$id': typeof AuthenticatedProfileFollowersIdRoute
@@ -1517,6 +1525,7 @@ export interface FileRoutesById {
   '/_authenticated/weight/goal': typeof AuthenticatedWeightGoalRoute
   '/_authenticated/workout/timer': typeof AuthenticatedWorkoutTimerRoute
   '/api/chat/stream': typeof ApiChatStreamRoute
+  '/api/img/$': typeof ApiImgSplatRoute
   '/_authenticated/groups/$id/leaderboard': typeof AuthenticatedGroupsIdLeaderboardRoute
   '/_authenticated/groups/$id/meals': typeof AuthenticatedGroupsIdMealsRoute
   '/_authenticated/profile/followers/$id': typeof AuthenticatedProfileFollowersIdRoute
@@ -1681,6 +1690,7 @@ export interface FileRouteTypes {
     | '/weight/goal'
     | '/workout/timer'
     | '/api/chat/stream'
+    | '/api/img/$'
     | '/groups/$id/leaderboard'
     | '/groups/$id/meals'
     | '/profile/followers/$id'
@@ -1836,6 +1846,7 @@ export interface FileRouteTypes {
     | '/weight/goal'
     | '/workout/timer'
     | '/api/chat/stream'
+    | '/api/img/$'
     | '/groups/$id/leaderboard'
     | '/groups/$id/meals'
     | '/profile/followers/$id'
@@ -1999,6 +2010,7 @@ export interface FileRouteTypes {
     | '/_authenticated/weight/goal'
     | '/_authenticated/workout/timer'
     | '/api/chat/stream'
+    | '/api/img/$'
     | '/_authenticated/groups/$id/leaderboard'
     | '/_authenticated/groups/$id/meals'
     | '/_authenticated/profile/followers/$id'
@@ -2027,6 +2039,7 @@ export interface RootRouteChildren {
   ResepRoute: typeof ResepRouteWithChildren
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   ApiChatStreamRoute: typeof ApiChatStreamRoute
+  ApiImgSplatRoute: typeof ApiImgSplatRoute
   ApiPublicHooksDailyCoachRoute: typeof ApiPublicHooksDailyCoachRoute
   ApiPublicHooksDailyContentRoute: typeof ApiPublicHooksDailyContentRoute
   ApiPublicHooksNotificationSchedulerRoute: typeof ApiPublicHooksNotificationSchedulerRoute
@@ -2589,6 +2602,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/achievements'
       preLoaderRoute: typeof AuthenticatedAchievementsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/api/img/$': {
+      id: '/api/img/$'
+      path: '/api/img/$'
+      fullPath: '/api/img/$'
+      preLoaderRoute: typeof ApiImgSplatRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/api/chat/stream': {
       id: '/api/chat/stream'
@@ -3755,6 +3775,7 @@ const rootRouteChildren: RootRouteChildren = {
   ResepRoute: ResepRouteWithChildren,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   ApiChatStreamRoute: ApiChatStreamRoute,
+  ApiImgSplatRoute: ApiImgSplatRoute,
   ApiPublicHooksDailyCoachRoute: ApiPublicHooksDailyCoachRoute,
   ApiPublicHooksDailyContentRoute: ApiPublicHooksDailyContentRoute,
   ApiPublicHooksNotificationSchedulerRoute:
