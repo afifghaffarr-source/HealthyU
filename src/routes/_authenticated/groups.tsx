@@ -14,6 +14,7 @@ import {
 import { BottomNav } from "@/components/bottom-nav";
 import { Users, Plus, LogIn, Copy, Share2, Trophy, Flame, LogOut, Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import { toastError } from "@/lib/toast-config";
 
 export const Route = createFileRoute("/_authenticated/groups")({
   validateSearch: (s: Record<string, unknown>) =>
@@ -44,7 +45,7 @@ function GroupsPage() {
       setName("");
       qc.invalidateQueries({ queryKey: ["my-groups"] });
     },
-    onError: (e) => toast.error(e instanceof Error ? e.message : "Gagal membuat grup"),
+    onError: (e) => toastError(e, "Gagal membuat grup"),
   });
 
   const joinMut = useMutation({
@@ -54,7 +55,7 @@ function GroupsPage() {
       setCode("");
       qc.invalidateQueries({ queryKey: ["my-groups"] });
     },
-    onError: (e) => toast.error(e instanceof Error ? e.message : "Gagal bergabung"),
+    onError: (e) => toastError(e, "Gagal bergabung"),
   });
 
   const autoJoined = useRef(false);

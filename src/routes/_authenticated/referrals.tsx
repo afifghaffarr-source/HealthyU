@@ -7,6 +7,7 @@ import { BottomNav } from "@/components/bottom-nav";
 import { Copy, Share2, Gift, Users } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
+import { toastError } from "@/lib/toast-config";
 
 export const Route = createFileRoute("/_authenticated/referrals")({
   component: ReferralsPage,
@@ -26,7 +27,7 @@ function ReferralsPage() {
       toast.success(`Berhasil! +${r.earned} koin`);
       setInput("");
     },
-    onError: (e) => toast.error(e instanceof Error ? e.message : "Gagal"),
+    onError: (e) => toastError(e, "Gagal"),
   });
 
   const code = data?.code ?? "";

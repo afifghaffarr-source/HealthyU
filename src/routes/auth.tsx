@@ -3,6 +3,7 @@ import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable";
 import { toast } from "sonner";
+import { toastError } from "@/lib/toast-config";
 import { Sparkles } from "lucide-react";
 
 export const Route = createFileRoute("/auth")({
@@ -43,7 +44,7 @@ function AuthPage() {
         navigate({ to: "/dashboard" });
       }
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Terjadi kesalahan");
+      toastError(err, "Terjadi kesalahan");
     } finally {
       setLoading(false);
     }

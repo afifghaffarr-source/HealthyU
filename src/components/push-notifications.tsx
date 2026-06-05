@@ -9,6 +9,7 @@ import {
 import { VAPID_PUBLIC_KEY, urlBase64ToUint8Array } from "@/lib/push-config";
 import { Bell, BellOff, Send, Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import { toastError } from "@/lib/toast-config";
 
 type Status = "unsupported" | "denied" | "granted" | "default" | "loading";
 
@@ -73,7 +74,7 @@ export function PushNotifications() {
       setStatus("granted");
       toast.success("Notifikasi aktif di perangkat ini");
     },
-    onError: (e) => toast.error(e instanceof Error ? e.message : "Gagal mengaktifkan"),
+    onError: (e) => toastError(e, "Gagal mengaktifkan"),
   });
 
   const disableMut = useMutation({
@@ -94,7 +95,7 @@ export function PushNotifications() {
   const testMut = useMutation({
     mutationFn: () => testFn(),
     onSuccess: (r) => toast.success(`Terkirim ke ${r.sent} perangkat`),
-    onError: (e) => toast.error(e instanceof Error ? e.message : "Gagal mengirim test"),
+    onError: (e) => toastError(e, "Gagal mengirim test"),
   });
 
   if (status === "loading")

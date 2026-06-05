@@ -25,6 +25,7 @@ import {
   TrendingUp,
 } from "lucide-react";
 import { toast } from "sonner";
+import { toastError } from "@/lib/toast-config";
 import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/_authenticated/recipes")({
@@ -162,7 +163,7 @@ function RecipesPage() {
   const genMutation = useMutation({
     mutationFn: () => genRecipe({ data: { ingredients, preferences: prefs || undefined } }),
     onSuccess: (r) => setGenerated(r),
-    onError: (e) => toast.error(e instanceof Error ? e.message : "Gagal membuat resep"),
+    onError: (e) => toastError(e, "Gagal membuat resep"),
   });
   const items = all
     .filter((r) => cat === "all" || r.category === cat)

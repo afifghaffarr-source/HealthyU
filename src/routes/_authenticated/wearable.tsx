@@ -4,6 +4,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect } from "react";
 import { toast } from "sonner";
+import { toastError } from "@/lib/toast-config";
 import { Activity, RefreshCw, Plug, Unplug, Loader2 } from "lucide-react";
 import { BottomNav } from "@/components/bottom-nav";
 import {
@@ -47,7 +48,7 @@ function WearablePage() {
     onSuccess: (r) => {
       window.location.href = r.url;
     },
-    onError: (e) => toast.error(e instanceof Error ? e.message : "Gagal mulai OAuth"),
+    onError: (e) => toastError(e, "Gagal mulai OAuth"),
   });
 
   const syncMut = useMutation({
@@ -56,7 +57,7 @@ function WearablePage() {
       toast.success(`Sinkron OK — ${r.steps_days} hari langkah, ${r.heart_rate_days} hari HR`);
       qc.invalidateQueries({ queryKey: ["wearable"] });
     },
-    onError: (e) => toast.error(e instanceof Error ? e.message : "Gagal sinkron"),
+    onError: (e) => toastError(e, "Gagal sinkron"),
   });
 
   const disconnectMut = useMutation({

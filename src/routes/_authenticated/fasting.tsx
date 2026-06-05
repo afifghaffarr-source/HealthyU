@@ -10,6 +10,7 @@ import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { Check, X } from "lucide-react";
 import { FASTING_PROTOCOLS, fastingStage, formatDuration } from "@/lib/health";
 import { toast } from "sonner";
+import { toastError } from "@/lib/toast-config";
 
 export const Route = createFileRoute("/_authenticated/fasting")({
   component: FastingPage,
@@ -58,7 +59,7 @@ function FastingPage() {
       qc.invalidateQueries({ queryKey: ["fast", "schedule"] });
       toast.success("Jadwal tersimpan");
     },
-    onError: (e) => toast.error(e instanceof Error ? e.message : "Gagal"),
+    onError: (e) => toastError(e, "Gagal"),
   });
 
   const [now, setNow] = useState(Date.now());

@@ -8,6 +8,7 @@ import { listComments, createComment, deleteComment } from "@/lib/social.functio
 import { BottomNav } from "@/components/bottom-nav";
 import { Heart, Trash2, Send, MessageCircle, Flame, Clock, Users } from "lucide-react";
 import { toast } from "sonner";
+import { toastError } from "@/lib/toast-config";
 
 export const Route = createFileRoute("/_authenticated/community")({
   component: CommunityPage,
@@ -41,7 +42,7 @@ function CommunityPage() {
       qc.invalidateQueries({ queryKey: ["community"] });
       toast.success("Posting terkirim");
     },
-    onError: (e) => toast.error(e instanceof Error ? e.message : "Gagal"),
+    onError: (e) => toastError(e, "Gagal"),
   });
   const delMut = useMutation({
     mutationFn: (id: string) => del({ data: { id } }),
@@ -260,7 +261,7 @@ function Comments({ postId }: { postId: string }) {
       setText("");
       qc.invalidateQueries({ queryKey: ["comments", postId] });
     },
-    onError: (e) => toast.error(e instanceof Error ? e.message : "Gagal"),
+    onError: (e) => toastError(e, "Gagal"),
   });
   const delMut = useMutation({
     mutationFn: (id: string) => del({ data: { id } }),

@@ -7,6 +7,7 @@ import { Upload, Apple, Smartphone, Loader2, CheckCircle2 } from "lucide-react";
 import { BottomNav } from "@/components/bottom-nav";
 import { importHealthData } from "@/lib/health-import.functions";
 import { toast } from "sonner";
+import { toastError } from "@/lib/toast-config";
 
 export const Route = createFileRoute("/_authenticated/health-import")({
   component: HealthImportPage,
@@ -32,7 +33,7 @@ function HealthImportPage() {
       );
       setParsed(null);
     },
-    onError: (e) => toast.error(e instanceof Error ? e.message : "Gagal import"),
+    onError: (e) => toastError(e, "Gagal import"),
   });
 
   const handleFile = async (file: File, source: Parsed["source"]) => {
@@ -46,7 +47,7 @@ function HealthImportPage() {
         `Terdeteksi: ${data.steps.length} langkah, ${data.weight.length} berat, ${data.workouts.length} workout`,
       );
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Gagal parse file");
+      toastError(e, "Gagal parse file");
     } finally {
       setParsing(false);
     }

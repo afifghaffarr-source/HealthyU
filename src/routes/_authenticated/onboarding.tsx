@@ -5,6 +5,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { getProfile, updateProfile } from "@/lib/profile.functions";
 import { calcAge, calcBMR, calcTDEE, type ActivityLevel } from "@/lib/health";
 import { toast } from "sonner";
+import { toastError } from "@/lib/toast-config";
 import { Check } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/onboarding")({
@@ -99,7 +100,7 @@ function Onboarding() {
       toast.success("Profil tersimpan!");
       navigate({ to: "/dashboard" });
     },
-    onError: (e) => toast.error(e instanceof Error ? e.message : "Gagal simpan"),
+    onError: (e) => toastError(e, "Gagal simpan"),
   });
 
   const finish = () => {
