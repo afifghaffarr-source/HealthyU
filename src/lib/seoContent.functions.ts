@@ -102,3 +102,28 @@ export const getSeoArticle = createServerFn({ method: "GET" })
     if (error) throw new Error(error.message);
     return row;
   });
+
+export const listSeoRecipes = createServerFn({ method: "GET" }).handler(async () => {
+  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+  const { data, error } = await supabaseAdmin
+    .from("seo_recipes")
+    .select("slug,title,description,category,image_url,calories,protein_g,total_min,servings,tags")
+    .eq("published", true)
+    .order("published_at", { ascending: false });
+  if (error) throw new Error(error.message);
+  return data ?? [];
+});
+
+export const getSeoRecipe = createServerFn({ method: "GET" })
+  .inputValidator((d) => slugSchema.parse(d))
+  .handler(async ({ data }) => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: row, error } = await supabaseAdmin
+      .from("seo_recipes")
+      .select("*")
+      .eq("slug", data.slug)
+      .eq("published", true)
+      .maybeSingle();
+    if (error) throw new Error(error.message);
+    return row;
+  });
