@@ -17,7 +17,7 @@ function Page() {
   const searchFn = useServerFn(searchUsers);
   const { data: popular, isLoading: loadPop } = useQuery({
     queryKey: ["discover-users"],
-    queryFn: () => discoverFn({ data: undefined as any }),
+    queryFn: () => discoverFn({ data: undefined as never }),
   });
   const { data: searchRes, isFetching: loadSearch } = useQuery({
     queryKey: ["search-users", q],

@@ -19,7 +19,7 @@ function Page() {
   const [caption, setCaption] = useState("");
   const { data, isLoading } = useQuery({
     queryKey: ["stories-feed"],
-    queryFn: () => listFn({ data: undefined as any }),
+    queryFn: () => listFn({ data: undefined as never }),
   });
   const mut = useMutation({
     mutationFn: () => createFn({ data: { caption } }),

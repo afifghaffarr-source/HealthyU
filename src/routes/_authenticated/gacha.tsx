@@ -14,7 +14,7 @@ function Page() {
   const fn = useServerFn(gachaPull);
   const [last, setLast] = useState<string | null>(null);
   const mut = useMutation({
-    mutationFn: () => fn({ data: undefined as any }),
+    mutationFn: () => fn({ data: undefined as never }),
     onSuccess: (r) => {
       setLast(r.reward.label);
       toast.success(r.reward.label);

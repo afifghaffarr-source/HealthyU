@@ -14,7 +14,7 @@ function Page() {
   const fn = useServerFn(getSleepMealCorrelation);
   const { data } = useQuery({
     queryKey: ["sleep-meal"],
-    queryFn: () => fn({ data: undefined as any }),
+    queryFn: () => fn({ data: undefined as never }),
   });
   const max = Math.max(1, ...(data?.points ?? []).map((p) => p.calories));
   return (

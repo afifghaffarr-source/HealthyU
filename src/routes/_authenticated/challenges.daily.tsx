@@ -22,7 +22,7 @@ function Page() {
   const freezeFn = useServerFn(useStreakFreeze);
   const { data, isLoading } = useQuery({
     queryKey: ["daily-challenge"],
-    queryFn: () => getFn({ data: undefined as any }),
+    queryFn: () => getFn({ data: undefined as never }),
   });
   const completeMut = useMutation({
     mutationFn: (id: string) => completeFn({ data: { id } }),
@@ -33,7 +33,7 @@ function Page() {
     onError: (e: Error) => toast.error(e.message),
   });
   const freezeMut = useMutation({
-    mutationFn: () => freezeFn({ data: undefined as any }),
+    mutationFn: () => freezeFn({ data: undefined as never }),
     onSuccess: () => toast.success("Streak freeze aktif untuk hari ini"),
     onError: (e: Error) => toast.error(e.message),
   });
