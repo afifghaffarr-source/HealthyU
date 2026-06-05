@@ -158,7 +158,7 @@ function Page() {
               <div>Karbo: {p.carbs_g ?? "-"} g</div>
               <div>Lemak: {p.fat_g ?? "-"} g</div>
             </div>
-            {p.allergens?.length > 0 && (
+            {(p.allergens?.length ?? 0) > 0 && (
               <div className="pt-2 text-red-500 text-xs">⚠️ Alergen: {p.allergens.join(", ")}</div>
             )}
           </div>
