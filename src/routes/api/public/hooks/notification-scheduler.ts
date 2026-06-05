@@ -8,6 +8,7 @@ import { requireCronSecret } from "@/lib/cronAuth.server";
 
 type Pref = {
   user_id: string;
+  timezone: string | null;
   meal_reminder_enabled: boolean;
   meal_breakfast_time: string | null;
   meal_lunch_time: string | null;
@@ -27,6 +28,27 @@ function minutesFromHHMM(s: string | null): number | null {
   return h * 60 + m;
 }
 
+/**
+ * Returns the current minute-of-day in the user's IANA timezone.
+ * Falls back to Asia/Jakarta if the timezone is missing/invalid.
+ */
+function nowMinutesInTz(now: Date, tz: string | null): number {
+  const zone = tz && tz.length > 0 ? tz : "Asia/Jakarta";
+  try {
+    const parts = new Intl.DateTimeFormat("en-US", {
+      timeZone: zone,
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false,
+    }).formatToParts(now);
+    const h = Number(parts.find((p) => p.type === "hour")?.value ?? "0");
+    const m = Number(parts.find((p) => p.type === "minute")?.value ?? "0");
+    return (h % 24) * 60 + m;
+  } catch {
+    return now.getUTCHours() * 60 + now.getUTCMinutes();
+  }
+}
+
 export const Route = createFileRoute("/api/public/hooks/notification-scheduler")({
   server: {
     handlers: {
@@ -35,19 +57,19 @@ export const Route = createFileRoute("/api/public/hooks/notification-scheduler")
         if (unauthorized) return unauthorized;
 
         const now = new Date();
-        const nowMin = now.getUTCHours() * 60 + now.getUTCMinutes();
         const WINDOW = 3;
 
         const { data: prefs } = await supabaseAdmin
           .from("notification_preferences")
           .select(
-            "user_id, meal_reminder_enabled, meal_breakfast_time, meal_lunch_time, meal_dinner_time, water_reminder_enabled, water_interval_min, water_start_time, water_end_time, exercise_reminder_enabled, exercise_time",
+            "user_id, timezone, meal_reminder_enabled, meal_breakfast_time, meal_lunch_time, meal_dinner_time, water_reminder_enabled, water_interval_min, water_start_time, water_end_time, exercise_reminder_enabled, exercise_time",
           );
 
         let sent = 0;
         let errors = 0;
 
         for (const p of (prefs ?? []) as Pref[]) {
+          const nowMin = nowMinutesInTz(now, p.timezone);
           const toSend: { title: string; body: string; url?: string; tag: string }[] = [];
 
           if (p.meal_reminder_enabled) {
@@ -112,7 +134,7 @@ export const Route = createFileRoute("/api/public/hooks/notification-scheduler")
           }
         }
 
-        return Response.json({ ok: true, sent, errors, nowMin });
+        return Response.json({ ok: true, sent, errors });
       },
     },
   },
