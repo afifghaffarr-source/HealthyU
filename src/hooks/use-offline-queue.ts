@@ -37,19 +37,16 @@ export function useOfflineQueue() {
         await weight({ data: it.payload as { weight_kg: number; note?: string } });
       },
       meal: async (it) => {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        await meal({ data: it.payload as any });
+        await meal({ data: it.payload as Parameters<typeof meal>[0]["data"] });
       },
       mood: async (it) => {
         await mood({ data: it.payload as { mood: number; note?: string } });
       },
       vitals: async (it) => {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        await vitals({ data: it.payload as any });
+        await vitals({ data: it.payload as Parameters<typeof vitals>[0]["data"] });
       },
       workout: async (it) => {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        await workout({ data: it.payload as any });
+        await workout({ data: it.payload as Parameters<typeof workout>[0]["data"] });
       },
     });
     if (res.synced > 0) {
