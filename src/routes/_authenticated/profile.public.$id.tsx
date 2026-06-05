@@ -75,7 +75,7 @@ function Page() {
             <Trophy className="size-4 text-yellow-500" /> Achievements
           </h3>
           <div className="grid grid-cols-4 gap-2">
-            {data.achievements.map((a: any) => (
+            {data.achievements.map((a) => (
               <div key={a.achievement_id} className="rounded-xl bg-card border p-2 text-center">
                 <div className="text-2xl">{a.achievements?.icon ?? "🏆"}</div>
                 <div className="text-[10px] mt-1">{a.achievements?.title}</div>

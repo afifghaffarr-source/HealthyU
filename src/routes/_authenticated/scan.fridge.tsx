@@ -23,7 +23,9 @@ function Page() {
     const buf = await f.arrayBuffer();
     setB64(btoa(String.fromCharCode(...new Uint8Array(buf))));
   };
-  const r = mut.data?.result as any;
+  type FridgeRecipe = { name: string; steps?: string[] };
+  type FridgeResult = { ingredients?: string[]; recipes?: FridgeRecipe[] };
+  const r = mut.data?.result as FridgeResult | undefined;
   return (
     <div className="min-h-dvh pb-24 bg-background">
       <TopAppBar title="Resep dari Kulkas" showBack />
@@ -48,7 +50,7 @@ function Page() {
             <b>Bahan terdeteksi:</b> {r.ingredients.join(", ")}
           </div>
         )}
-        {(r?.recipes ?? []).map((rec: any, i: number) => (
+        {(r?.recipes ?? []).map((rec, i) => (
           <div key={i} className="rounded-2xl bg-card border p-3 text-sm space-y-1">
             <div className="font-semibold">{rec.name}</div>
             <ol className="list-decimal pl-5 space-y-0.5">

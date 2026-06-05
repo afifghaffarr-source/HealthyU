@@ -52,7 +52,7 @@ function Page() {
             <Plus className="size-4" /> Buat
           </button>
         </div>
-        {data?.plans.map((m: any) => (
+        {data?.plans.map((m) => (
           <div key={m.plan_id} className="rounded-2xl bg-card border p-3">
             <div className="font-medium">{m.family_plans?.name}</div>
             <div className="text-xs text-muted-foreground">

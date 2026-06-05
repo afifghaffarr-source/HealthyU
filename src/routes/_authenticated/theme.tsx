@@ -17,7 +17,8 @@ function Page() {
     queryKey: ["theme-pref"],
     queryFn: () => getFn({ data: undefined as never }),
   });
-  const mode = ((data?.pref as any)?.mode ?? "auto") as "auto" | "light" | "dark";
+  const mode =
+    (data?.pref as { mode?: "auto" | "light" | "dark" } | undefined)?.mode ?? "auto";
   const mut = useMutation({
     mutationFn: (m: "auto" | "light" | "dark") => setFn({ data: { mode: m } }),
     onSuccess: () => {

@@ -27,9 +27,8 @@ function Page() {
     onSuccess: () => toast.success("Berhasil menjadi teman!"),
     onError: (e: Error) => toast.error(e.message),
   });
-  const link = create.data?.invite
-    ? `${window.location.origin}/friends/invite?token=${(create.data.invite as any).token}`
-    : "";
+  const invite = create.data?.invite as { token: string } | undefined;
+  const link = invite ? `${window.location.origin}/friends/invite?token=${invite.token}` : "";
   return (
     <div className="min-h-dvh pb-24 bg-background">
       <TopAppBar title="Undang Teman" showBack />

@@ -1,6 +1,8 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import type { SupabaseClient } from "@supabase/supabase-js";
+import type { Database } from "@/integrations/supabase/types";
 import { todayRange } from "./health";
 
 export const levelFromXp = (xp: number) => Math.floor(Math.sqrt(Math.max(0, xp) / 100)) + 1;
@@ -59,7 +61,11 @@ export const getGameSummary = createServerFn({ method: "GET" })
 type ActivityType = z.infer<typeof ActivitySchema>["type"];
 
 // Internal helper callable from other server fns.
-export async function recordActivityFor(supabase: any, userId: string, type: ActivityType) {
+export async function recordActivityFor(
+  supabase: SupabaseClient<Database>,
+  userId: string,
+  type: ActivityType,
+) {
   const today = isoDate(new Date());
 
   // 1) Streak + base XP for activity

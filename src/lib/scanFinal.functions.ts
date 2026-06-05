@@ -57,7 +57,14 @@ export const listStoryComments = createServerFn({ method: "POST" })
       .select("id, body, user_id, created_at, profiles!inner(full_name, avatar_url)")
       .eq("story_id", data.storyId)
       .order("created_at", { ascending: true });
-    return { comments: rows ?? [] };
+    type Comment = {
+      id: string;
+      body: string;
+      user_id: string;
+      created_at: string;
+      profiles: { full_name: string | null; avatar_url: string | null } | null;
+    };
+    return { comments: (rows ?? []) as unknown as Comment[] };
   });
 
 export const toggleStoryLike = createServerFn({ method: "POST" })

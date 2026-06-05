@@ -14,7 +14,7 @@ function Page() {
   const mut = useMutation({
     mutationFn: () => fn({ data: undefined as never }),
     onSuccess: (r) => {
-      const b = r.bonus as any;
+      const b = r.bonus as { coins: number; streak: number };
       toast.success(
         r.alreadyClaimed
           ? `Sudah klaim hari ini (${b.coins} coin, streak ${b.streak})`

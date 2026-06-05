@@ -17,7 +17,12 @@ function Page() {
     onSuccess: () => toast.success("Referral dibuat"),
     onError: (e: Error) => toast.error(e.message),
   });
-  const r = mut.data?.referral as any;
+  type Referral = {
+    urgency: "high" | "medium" | "low" | string;
+    recommended_specialist: string;
+    notes: string;
+  };
+  const r = mut.data?.referral as Referral | undefined;
   return (
     <div className="min-h-dvh pb-24 bg-background">
       <TopAppBar title="Doctor Referral" showBack />

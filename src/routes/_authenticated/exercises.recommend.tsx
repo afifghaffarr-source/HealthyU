@@ -34,7 +34,7 @@ function Page() {
           {mut.isPending ? "AI menyusun…" : "Generate"}
         </button>
         <div className="space-y-2">
-          {(mut.data?.plan ?? []).map((p: any, i: number) => (
+          {(mut.data?.plan ?? []).map((p, i) => (
             <div key={i} className="rounded-xl bg-card border p-3 text-sm space-y-1">
               <div className="font-semibold">{p.name}</div>
               <div className="text-xs text-muted-foreground">

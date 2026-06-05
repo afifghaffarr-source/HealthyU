@@ -57,7 +57,7 @@ function Page() {
             <Plus className="size-4" /> Simpan
           </button>
         </div>
-        {(data?.stacks ?? []).map((s: any) => (
+        {(data?.stacks ?? []).map((s) => (
           <div key={s.id} className="rounded-2xl bg-card border p-4">
             <div className="flex items-center gap-2 mb-2">
               <LinkIcon className="size-4 text-primary" />

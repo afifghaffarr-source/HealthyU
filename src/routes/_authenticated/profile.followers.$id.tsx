@@ -36,7 +36,7 @@ function Page() {
           </button>
         </div>
         <div className="space-y-2">
-          {list.map((u: any) => (
+          {list.map((u) => (
             <Link
               key={u.id}
               to="/profile/public/$id"

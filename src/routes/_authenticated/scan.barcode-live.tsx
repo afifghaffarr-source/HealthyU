@@ -86,7 +86,18 @@ function Page() {
     }
   };
 
-  const p = mut.data?.product as any;
+  const p = mut.data?.product as
+    | {
+        product_name?: string;
+        brand?: string;
+        calories_per_100g?: number;
+        protein_g?: number;
+        carbs_g?: number;
+        fat_g?: number;
+        image?: string;
+        allergens?: string[];
+      }
+    | undefined;
   return (
     <div className="min-h-dvh pb-24 bg-background">
       <TopAppBar title="Barcode Scanner" showBack />
@@ -147,8 +158,8 @@ function Page() {
               <div>Karbo: {p.carbs_g ?? "-"} g</div>
               <div>Lemak: {p.fat_g ?? "-"} g</div>
             </div>
-            {p.allergens?.length > 0 && (
-              <div className="pt-2 text-red-500 text-xs">⚠️ Alergen: {p.allergens.join(", ")}</div>
+            {(p.allergens?.length ?? 0) > 0 && (
+              <div className="pt-2 text-red-500 text-xs">⚠️ Alergen: {p.allergens!.join(", ")}</div>
             )}
           </div>
         )}

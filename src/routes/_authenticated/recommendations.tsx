@@ -5,7 +5,7 @@ import { useMutation } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { generateMealPlan, acceptMealPlan } from "@/lib/recommendations.functions";
 import { BottomNav } from "@/components/bottom-nav";
-import { Sparkles, Loader2, Sunrise, Sun, Moon, Cookie, Check } from "lucide-react";
+import { Sparkles, Loader2, Sunrise, Sun, Moon, Cookie, Check, type LucideIcon } from "lucide-react";
 import { toast } from "sonner";
 import { toastError } from "@/lib/toast-config";
 
@@ -13,7 +13,12 @@ export const Route = createFileRoute("/_authenticated/recommendations")({
   component: RecommendationsPage,
 });
 
-const ICONS: Record<string, any> = { breakfast: Sunrise, lunch: Sun, dinner: Moon, snack: Cookie };
+const ICONS: Record<string, LucideIcon> = {
+  breakfast: Sunrise,
+  lunch: Sun,
+  dinner: Moon,
+  snack: Cookie,
+};
 const LABELS: Record<string, string> = {
   breakfast: "Sarapan",
   lunch: "Makan Siang",
@@ -38,7 +43,7 @@ function RecommendationsPage() {
         data: {
           plan_date: new Date().toISOString().slice(0, 10),
           items: gen.data.meals.map((m) => ({
-            meal_type: m.meal_type as any,
+            meal_type: m.meal_type as "breakfast" | "lunch" | "dinner" | "snack",
             food_item_id: m.food_item_id ?? null,
             custom_name: m.food_item_id ? null : m.name,
             calories: Math.round(m.calories),

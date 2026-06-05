@@ -57,7 +57,7 @@ function Page() {
         {mut.data && (
           <div className="rounded-2xl bg-card border p-4 text-left text-sm">
             <b>Transkrip:</b>
-            <p className="mt-1">{(mut.data as any).transcript}</p>
+            <p className="mt-1">{(mut.data as { transcript: string }).transcript}</p>
           </div>
         )}
       </main>

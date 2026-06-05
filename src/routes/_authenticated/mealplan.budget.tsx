@@ -17,9 +17,12 @@ function Page() {
     mutationFn: () => fn({ data: { budgetIdr: budget, days } }),
     onError: (e: Error) => toast.error(e.message),
   });
-  const plan = useMemo(() => {
+  type BudgetMeal = { name: string; est_idr: number; calories: number };
+  type BudgetDay = { day?: number; meals?: BudgetMeal[] };
+  type BudgetPlan = { days?: BudgetDay[] };
+  const plan = useMemo<BudgetPlan | null>(() => {
     try {
-      return mut.data?.planJson ? JSON.parse(mut.data.planJson) : null;
+      return mut.data?.planJson ? (JSON.parse(mut.data.planJson) as BudgetPlan) : null;
     } catch {
       return null;
     }
@@ -55,10 +58,10 @@ function Page() {
         </div>
         {plan?.days && (
           <div className="space-y-3">
-            {plan.days.map((d: any, i: number) => (
+            {plan.days.map((d, i) => (
               <div key={i} className="rounded-2xl bg-card border p-3 space-y-1 text-sm">
                 <div className="font-semibold">Hari {d.day ?? i + 1}</div>
-                {(d.meals ?? []).map((m: any, j: number) => (
+                {(d.meals ?? []).map((m, j) => (
                   <div key={j} className="flex justify-between">
                     <span>{m.name}</span>
                     <span className="text-muted-foreground">

@@ -45,7 +45,7 @@ function Page() {
         >
           <Heart className="size-4 text-red-500" /> Like
         </button>
-        {data?.comments.map((c: any) => (
+        {data?.comments.map((c) => (
           <div key={c.id} className="rounded-xl bg-card border p-3">
             <div className="text-xs text-muted-foreground">{c.profiles?.full_name}</div>
             <p className="text-sm">{c.body}</p>
