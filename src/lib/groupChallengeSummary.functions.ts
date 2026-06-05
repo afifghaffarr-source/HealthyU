@@ -4,6 +4,6 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 export const myGroupChallengeSummary = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
-    const { computeGroupChallengeSummary } = await import("./reportsGroupChallenges.server");
+    const { computeGroupChallengeSummary } = await import("@/features/reports/lib/reportsGroupChallenges.server");
     return computeGroupChallengeSummary(context.userId);
   });
