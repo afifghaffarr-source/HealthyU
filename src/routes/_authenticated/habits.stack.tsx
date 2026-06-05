@@ -4,7 +4,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
 import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { BottomNav } from "@/components/bottom-nav";
-import { listHabitStacks, createHabitStack } from "@/lib/scanBatch7.functions";
+import { listHabitStacks, createHabitStack } from "@/features/scan/lib/scanBatch7.functions";
 import { Plus, Link as LinkIcon } from "lucide-react";
 import { toast } from "sonner";
 

@@ -7,7 +7,7 @@ import {
   addMedication,
   deleteMedication,
   markMedicationTaken,
-} from "@/lib/medications.functions";
+} from "@/features/medications/lib/medications.functions";
 import { BottomNav } from "@/components/bottom-nav";
 import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { Pill, Check, Trash2, Plus, X, Clock } from "lucide-react";

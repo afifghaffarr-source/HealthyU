@@ -4,8 +4,8 @@ import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
 import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { BottomNav } from "@/components/bottom-nav";
-import { createStoryPhotoUploadUrl } from "@/lib/scanBatch10.functions";
-import { recordStoryPhoto } from "@/lib/scanBatch9.functions";
+import { createStoryPhotoUploadUrl } from "@/features/scan/lib/scanBatch10.functions";
+import { recordStoryPhoto } from "@/features/scan/lib/scanBatch9.functions";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 

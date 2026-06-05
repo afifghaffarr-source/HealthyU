@@ -7,7 +7,7 @@ import {
   getDailyChallenge,
   completeDailyChallenge,
   useStreakFreeze,
-} from "@/lib/scanSocial.functions";
+} from "@/features/scan/lib/scanSocial.functions";
 import { Sparkles, Check, Snowflake, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 

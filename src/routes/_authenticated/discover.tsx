@@ -4,7 +4,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
 import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { BottomNav } from "@/components/bottom-nav";
-import { discoverUsers, searchUsers } from "@/lib/scanBatch7.functions";
+import { discoverUsers, searchUsers } from "@/features/scan/lib/scanBatch7.functions";
 import { Search, Flame, Users, X, Sparkles } from "lucide-react";
 import { EmptyState } from "@/components/healthyu/empty-state";
 import { ListSkeleton } from "@/components/healthyu/skeletons";

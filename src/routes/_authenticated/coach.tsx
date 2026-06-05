@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMutation } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useState } from "react";
-import { dailyCoach } from "@/lib/coach.functions";
+import { dailyCoach } from "@/features/coach/lib/coach.functions";
 import { BottomNav } from "@/components/bottom-nav";
 import { Sparkles, Loader2, Sun, Target, Lightbulb, AlertTriangle, RefreshCw } from "lucide-react";
 import { TopAppBar } from "@/components/healthyu/top-app-bar";

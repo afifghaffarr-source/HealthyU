@@ -4,7 +4,7 @@ import { useMutation } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { BottomNav } from "@/components/bottom-nav";
-import { scanBarcode } from "@/lib/scanBatch9.functions";
+import { scanBarcode } from "@/features/scan/lib/scanBatch9.functions";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/scan/barcode-camera")({ component: Page });

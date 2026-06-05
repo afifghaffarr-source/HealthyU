@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { BottomNav } from "@/components/bottom-nav";
-import { getSleepMealCorrelation } from "@/lib/scanSocial.functions";
+import { getSleepMealCorrelation } from "@/features/scan/lib/scanSocial.functions";
 import { Moon } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/reports/sleep-meal")({

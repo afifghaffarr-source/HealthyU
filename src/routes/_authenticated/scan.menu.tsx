@@ -4,7 +4,7 @@ import { useMutation } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { BottomNav } from "@/components/bottom-nav";
-import { parseMenuImage } from "@/lib/scanExtras.functions";
+import { parseMenuImage } from "@/features/scan/lib/scanExtras.functions";
 import { Camera, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 

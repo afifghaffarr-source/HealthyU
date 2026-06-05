@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
 import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { BottomNav } from "@/components/bottom-nav";
-import { recommendRecipes } from "@/lib/scanExtras.functions";
+import { recommendRecipes } from "@/features/scan/lib/scanExtras.functions";
 
 const opts = queryOptions({ queryKey: ["recipe-recs"], queryFn: () => recommendRecipes() });
 

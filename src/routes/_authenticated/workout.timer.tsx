@@ -4,7 +4,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useRef, useState } from "react";
 import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { BottomNav } from "@/components/bottom-nav";
-import { logWorkoutTimer } from "@/lib/scanBatch11.functions";
+import { logWorkoutTimer } from "@/features/scan/lib/scanBatch11.functions";
 import { Play, Pause, Square } from "lucide-react";
 import { toast } from "sonner";
 

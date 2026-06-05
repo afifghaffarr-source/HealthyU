@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
 import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { BottomNav } from "@/components/bottom-nav";
-import { groupMealFeed } from "@/lib/scanMore.functions";
+import { groupMealFeed } from "@/features/scan/lib/scanMore.functions";
 import { Utensils } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/groups/$id/meals")({

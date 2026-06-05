@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { BottomNav } from "@/components/bottom-nav";
-import { getWorkoutMatch } from "@/lib/scanSocial.functions";
+import { getWorkoutMatch } from "@/features/scan/lib/scanSocial.functions";
 import { Activity } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/reports/workout-match")({

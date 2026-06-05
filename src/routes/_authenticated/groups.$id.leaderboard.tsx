@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { BottomNav } from "@/components/bottom-nav";
-import { getGroupScanLeaderboard } from "@/lib/scanSocial.functions";
+import { getGroupScanLeaderboard } from "@/features/scan/lib/scanSocial.functions";
 import { Flame, Trophy } from "lucide-react";
 import { lazy, Suspense } from "react";
 

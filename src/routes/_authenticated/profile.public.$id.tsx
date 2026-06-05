@@ -3,8 +3,8 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { BottomNav } from "@/components/bottom-nav";
-import { getPublicProfile } from "@/lib/scanFinal.functions";
-import { followUser, unfollowUser } from "@/lib/scanSocial.functions";
+import { getPublicProfile } from "@/features/scan/lib/scanFinal.functions";
+import { followUser, unfollowUser } from "@/features/scan/lib/scanSocial.functions";
 import { Flame, Trophy, UserPlus, UserMinus } from "lucide-react";
 import { toast } from "sonner";
 

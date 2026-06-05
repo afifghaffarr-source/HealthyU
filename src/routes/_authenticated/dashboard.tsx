@@ -11,9 +11,9 @@ import { useServerFn } from "@tanstack/react-start";
 import { getProfile } from "@/features/profile/lib/profile.functions";
 import { getDailyTip } from "@/lib/dailyTips.functions";
 import { todaysMeals } from "@/lib/meals.functions";
-import { currentFast } from "@/lib/fasting.functions";
+import { currentFast } from "@/features/fasting/lib/fasting.functions";
 import { todaysWater, logWater } from "@/features/water/lib/water.functions";
-import { getGameSummary } from "@/lib/gamification.functions";
+import { getGameSummary } from "@/features/gamification/lib/gamification.functions";
 import { myGroupChallengeSummary } from "@/features/challenges/lib/groupChallengeSummary.functions";
 import { myUnlinkedJoinedChallenges } from "@/features/challenges/lib/myUnlinkedChallenges.functions";
 import { addMood } from "@/features/mood/lib/mood.functions";
@@ -40,7 +40,7 @@ import {
   Camera,
   Snowflake,
 } from "lucide-react";
-import { claimDailyLoginBonus } from "@/lib/scanBatch9.functions";
+import { claimDailyLoginBonus } from "@/features/scan/lib/scanBatch9.functions";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import {

@@ -4,7 +4,7 @@ import { useOfflineQueue } from "@/hooks/use-offline-queue";
 import { SyncPill } from "@/components/healthyu/sync-pill";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { listNotifications } from "@/lib/scanBatch8.functions";
+import { listNotifications } from "@/features/scan/lib/scanBatch8.functions";
 
 const items = [
   { to: "/dashboard", label: "Beranda", icon: Home },

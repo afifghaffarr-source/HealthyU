@@ -3,7 +3,7 @@ import { queryOptions, useSuspenseQuery, useMutation, useQueryClient } from "@ta
 import { useServerFn } from "@tanstack/react-start";
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { setAuditOptIn } from "@/lib/scanExtras.functions";
+import { setAuditOptIn } from "@/features/scan/lib/scanExtras.functions";
 import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { BottomNav } from "@/components/bottom-nav";
 import { toast } from "sonner";

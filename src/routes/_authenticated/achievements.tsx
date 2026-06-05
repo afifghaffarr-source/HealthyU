@@ -3,7 +3,7 @@ import { useRef } from "react";
 import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { getGameSummary, levelFromXp, xpForLevel } from "@/lib/gamification.functions";
+import { getGameSummary, levelFromXp, xpForLevel } from "@/features/gamification/lib/gamification.functions";
 import { AchievementIcon } from "@/lib/achievement-icons";
 import { BottomNav } from "@/components/bottom-nav";
 import { Flame, Trophy, Star, Share2 } from "lucide-react";

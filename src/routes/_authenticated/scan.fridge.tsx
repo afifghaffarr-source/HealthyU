@@ -4,7 +4,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
 import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { BottomNav } from "@/components/bottom-nav";
-import { recipeFromFridge } from "@/lib/scanBatch11.functions";
+import { recipeFromFridge } from "@/features/scan/lib/scanBatch11.functions";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/scan/fridge")({ component: Page });

@@ -4,7 +4,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
 import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { BottomNav } from "@/components/bottom-nav";
-import { getWeightGoal, setWeightGoal } from "@/lib/scanBatch9.functions";
+import { getWeightGoal, setWeightGoal } from "@/features/scan/lib/scanBatch9.functions";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/weight/goal")({ component: Page });

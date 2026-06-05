@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { BottomNav } from "@/components/bottom-nav";
-import { moodMealCorrelation } from "@/lib/scanFinal.functions";
+import { moodMealCorrelation } from "@/features/scan/lib/scanFinal.functions";
 
 export const Route = createFileRoute("/_authenticated/reports/mood")({
   component: Page,

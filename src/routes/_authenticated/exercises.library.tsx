@@ -4,7 +4,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
 import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { BottomNav } from "@/components/bottom-nav";
-import { listExercises } from "@/lib/scanBatch9.functions";
+import { listExercises } from "@/features/scan/lib/scanBatch9.functions";
 
 export const Route = createFileRoute("/_authenticated/exercises/library")({ component: Page });
 

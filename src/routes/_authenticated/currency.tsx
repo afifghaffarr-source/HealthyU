@@ -4,7 +4,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
 import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { BottomNav } from "@/components/bottom-nav";
-import { convertCurrency } from "@/lib/scanBatch8.functions";
+import { convertCurrency } from "@/features/scan/lib/scanBatch8.functions";
 import { ArrowRight } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/currency")({ component: Page });

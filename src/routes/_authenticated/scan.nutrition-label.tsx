@@ -4,7 +4,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
 import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { BottomNav } from "@/components/bottom-nav";
-import { ocrNutritionLabel } from "@/lib/scanBatch12.functions";
+import { ocrNutritionLabel } from "@/features/scan/lib/scanBatch12.functions";
 
 export const Route = createFileRoute("/_authenticated/scan/nutrition-label")({ component: Page });
 

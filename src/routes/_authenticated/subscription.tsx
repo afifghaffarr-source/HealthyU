@@ -3,7 +3,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { BottomNav } from "@/components/bottom-nav";
-import { getSubscription, upgradeSubscription } from "@/lib/scanBatch12.functions";
+import { getSubscription, upgradeSubscription } from "@/features/scan/lib/scanBatch12.functions";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/subscription")({ component: Page });

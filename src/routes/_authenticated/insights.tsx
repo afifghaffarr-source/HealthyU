@@ -3,7 +3,7 @@ import { queryOptions, useSuspenseQuery, useMutation, useQueryClient } from "@ta
 import { useServerFn } from "@tanstack/react-start";
 import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { BottomNav } from "@/components/bottom-nav";
-import { getDailyInsights, copyYesterdayMeals } from "@/lib/scanHistory.functions";
+import { getDailyInsights, copyYesterdayMeals } from "@/features/scan/lib/scanHistory.functions";
 import { Sparkles, Copy, Share2, Lightbulb, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
 

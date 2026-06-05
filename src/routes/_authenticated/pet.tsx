@@ -7,7 +7,7 @@ import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { ListSkeleton } from "@/components/healthyu/skeletons";
 import { toast } from "sonner";
 import { BottomNav } from "@/components/bottom-nav";
-import { getPet, adoptPet, interactPet } from "@/lib/pet.functions";
+import { getPet, adoptPet, interactPet } from "@/features/pet/lib/pet.functions";
 
 export const Route = createFileRoute("/_authenticated/pet")({
   component: PetPage,

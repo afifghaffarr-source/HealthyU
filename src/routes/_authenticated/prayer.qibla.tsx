@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { BottomNav } from "@/components/bottom-nav";
-import { qiblaBearing } from "@/lib/qibla";
+import { qiblaBearing } from "@/features/prayer/lib/qibla";
 
 export const Route = createFileRoute("/_authenticated/prayer/qibla")({
   component: QiblaPage,

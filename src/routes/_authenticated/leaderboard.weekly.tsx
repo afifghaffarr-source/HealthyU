@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { BottomNav } from "@/components/bottom-nav";
-import { getWeeklyLeaderboard } from "@/lib/scanBatch12.functions";
+import { getWeeklyLeaderboard } from "@/features/scan/lib/scanBatch12.functions";
 
 export const Route = createFileRoute("/_authenticated/leaderboard/weekly")({ component: Page });
 

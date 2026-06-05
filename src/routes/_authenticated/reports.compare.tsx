@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
 import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { BottomNav } from "@/components/bottom-nav";
-import { compareWeeks } from "@/lib/scanMore.functions";
+import { compareWeeks } from "@/features/scan/lib/scanMore.functions";
 import { TrendingDown, TrendingUp, Minus } from "lucide-react";
 
 const opts = queryOptions({ queryKey: ["compare-weeks"], queryFn: () => compareWeeks() });

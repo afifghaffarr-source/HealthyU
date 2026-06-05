@@ -3,8 +3,8 @@ import { queryOptions, useSuspenseQuery, useMutation, useQueryClient } from "@ta
 import { useServerFn } from "@tanstack/react-start";
 import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { BottomNav } from "@/components/bottom-nav";
-import { listScanHistory } from "@/lib/scanHistory.functions";
-import { relogMeal } from "@/lib/scanExtras.functions";
+import { listScanHistory } from "@/features/scan/lib/scanHistory.functions";
+import { relogMeal } from "@/features/scan/lib/scanExtras.functions";
 import { Camera, RotateCw } from "lucide-react";
 import { toast } from "sonner";
 

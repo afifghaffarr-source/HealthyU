@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { BottomNav } from "@/components/bottom-nav";
-import { getPrayerTimes } from "@/lib/prayerTimes.functions";
+import { getPrayerTimes } from "@/features/prayer/lib/prayerTimes.functions";
 import { Sunrise, Sun, Sunset, Moon, CloudMoon, MapPin } from "lucide-react";
 
 const ICONS: Record<string, typeof Sunrise> = {

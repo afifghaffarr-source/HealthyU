@@ -4,7 +4,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
 import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { BottomNav } from "@/components/bottom-nav";
-import { createFamilyPlan, listMyFamily } from "@/lib/scanFinal.functions";
+import { createFamilyPlan, listMyFamily } from "@/features/scan/lib/scanFinal.functions";
 import { Users, Plus } from "lucide-react";
 import { toast } from "sonner";
 

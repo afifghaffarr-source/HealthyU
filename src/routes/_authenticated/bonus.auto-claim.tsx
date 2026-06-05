@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { BottomNav } from "@/components/bottom-nav";
-import { claimDailyLoginBonus } from "@/lib/scanBatch9.functions";
+import { claimDailyLoginBonus } from "@/features/scan/lib/scanBatch9.functions";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/bonus/auto-claim")({ component: Page });

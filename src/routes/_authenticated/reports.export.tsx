@@ -3,7 +3,7 @@ import { useMutation } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { BottomNav } from "@/components/bottom-nav";
-import { exportMealsCsv } from "@/lib/scanMore.functions";
+import { exportMealsCsv } from "@/features/scan/lib/scanMore.functions";
 import { Download, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 

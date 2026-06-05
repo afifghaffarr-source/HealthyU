@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
 import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { BottomNav } from "@/components/bottom-nav";
-import { getScanStats } from "@/lib/scanHistory.functions";
+import { getScanStats } from "@/features/scan/lib/scanHistory.functions";
 
 const opts = queryOptions({ queryKey: ["scan-stats"], queryFn: () => getScanStats() });
 

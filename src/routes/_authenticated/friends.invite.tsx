@@ -4,7 +4,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
 import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { BottomNav } from "@/components/bottom-nav";
-import { createFriendInvite, redeemFriendInvite } from "@/lib/scanBatch10.functions";
+import { createFriendInvite, redeemFriendInvite } from "@/features/scan/lib/scanBatch10.functions";
 import { toast } from "sonner";
 import { z } from "zod";
 
