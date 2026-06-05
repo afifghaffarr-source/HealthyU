@@ -58,6 +58,18 @@ export const startGoogleFit = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const clientId = process.env.GOOGLE_FIT_CLIENT_ID;
     if (!clientId) throw new Error("GOOGLE_FIT_CLIENT_ID belum di-set");
+    // Generate signed nonce, persist via service role
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { randomBytes } = await import("crypto");
+    const nonce = randomBytes(32).toString("hex");
+    const expiresAt = new Date(Date.now() + 10 * 60 * 1000).toISOString();
+    const { error: insErr } = await supabaseAdmin.from("oauth_states").insert({
+      user_id: context.userId,
+      provider: "google_fit",
+      nonce,
+      expires_at: expiresAt,
+    });
+    if (insErr) throw new Error("Gagal generate OAuth state");
     const url = new URL("https://accounts.google.com/o/oauth2/v2/auth");
     url.searchParams.set("client_id", clientId);
     url.searchParams.set("redirect_uri", redirectUri(data.origin));
@@ -65,7 +77,7 @@ export const startGoogleFit = createServerFn({ method: "POST" })
     url.searchParams.set("access_type", "offline");
     url.searchParams.set("prompt", "consent");
     url.searchParams.set("scope", SCOPES);
-    url.searchParams.set("state", context.userId);
+    url.searchParams.set("state", nonce);
     return { url: url.toString() };
   });
 
