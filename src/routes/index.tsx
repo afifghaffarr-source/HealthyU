@@ -3,31 +3,31 @@ import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import {
   Sparkles,
-  Utensils,
-  Timer,
-  Moon,
-  ChefHat,
-  MessageCircle,
   Star,
   Check,
   Shield,
-  Trophy,
   ArrowRight,
   Flame,
   Zap,
-  Heart,
-  Camera,
-  X,
-  Send,
   Crown,
-  Users,
-  Activity,
-  Baby,
 } from "lucide-react";
-import { StatsCounter } from "@/features/landing/components/StatsCounter";
-import { BeforeAfter } from "@/features/landing/components/BeforeAfter";
 import { BmrQuiz } from "@/features/landing/components/BmrQuiz";
 import { FloatingChat } from "@/features/landing/components/FloatingChat";
+import {
+  TrustMarquee,
+  StatsStrip,
+  FeaturesBento,
+  HowItWorks,
+  Testimonials,
+  FaqSection,
+  ComparisonTable,
+  ForWhom,
+  BeforeAfterSection,
+  FeaturedIn,
+  HeroDemoCard,
+  PopularRecipes,
+} from "@/features/landing/components/LandingSections";
+import { NewsletterSection } from "@/features/landing/components/NewsletterSection";
 
 export const Route = createFileRoute("/")({
   head: () => ({
