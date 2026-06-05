@@ -8,14 +8,14 @@ import rehypeSanitize from "rehype-sanitize";
  */
 export function SafeMarkdown({
   children,
-  remarkPlugins = [],
-  rehypePlugins = [],
+  remarkPlugins,
+  rehypePlugins,
   ...rest
 }: Options) {
   return (
     <ReactMarkdown
-      remarkPlugins={[remarkGfm, ...remarkPlugins]}
-      rehypePlugins={[rehypeSanitize, ...rehypePlugins]}
+      remarkPlugins={[remarkGfm, ...(remarkPlugins ?? [])]}
+      rehypePlugins={[rehypeSanitize, ...(rehypePlugins ?? [])]}
       {...rest}
     >
       {children}
