@@ -8,6 +8,7 @@ import { BottomNav } from "@/components/bottom-nav";
 import { recognizeFood } from "@/features/food/lib/foodScan.functions";
 import { checkScanLimit } from "@/features/scan/lib/scanMore.functions";
 import { ScanItemsList } from "@/features/scan/components/ScanItemsList";
+import { SafetyChip } from "@/components/healthyu/safety-chip";
 import {
   MEAL_TYPES,
   pickDefaultMealType,
@@ -100,6 +101,7 @@ function ScanPage() {
             </Link>
           }
         />
+        <SafetyChip variant="ai-estimate" className="w-full justify-center" />
         <div className="flex items-center justify-between rounded-2xl bg-card border px-3 py-2">
           <div className="flex items-center gap-2 text-xs">
             <Sparkles className="size-3.5 text-primary" />
@@ -116,6 +118,11 @@ function ScanPage() {
             <Zap className="size-3" /> {usePro ? "Pakai Cepat" : "Pakai Akurat"}
           </button>
         </div>
+        <p className="text-[11px] text-muted-foreground -mt-2 px-1">
+          {usePro
+            ? "Akurat: sedikit lebih lama, tapi lebih teliti."
+            : "Cepat: cocok untuk catatan harian."}
+        </p>
         {!imageUrl && (
           <div className="text-[11px] text-muted-foreground bg-muted/40 rounded-xl p-2">
             💡 Tip: sertakan referensi (sendok, garpu, atau tangan) di foto agar estimasi porsi
@@ -164,15 +171,32 @@ function ScanPage() {
               </button>
               {scanMut.isPending && (
                 <div className="absolute inset-0 bg-black/50 grid place-items-center text-white">
-                  <div className="flex flex-col items-center gap-2">
+                  <div className="flex flex-col items-center gap-2 px-6 text-center">
                     <Loader2 className="size-8 animate-spin" />
-                    <p className="text-sm font-medium">Mengenali makanan...</p>
+                    <p className="text-sm font-medium">Menganalisis foto…</p>
+                    <p className="text-[11px] text-white/80 max-w-[220px]">
+                      Hasilnya bisa kamu cek lagi sebelum simpan.
+                    </p>
                   </div>
                 </div>
               )}
             </div>
 
             <MealTypePicker value={mealType} onChange={setMealType} />
+
+            {scanMut.isError && (
+              <div
+                role="alert"
+                className="rounded-2xl border border-rose-500/30 bg-rose-500/5 p-4 text-center space-y-1"
+              >
+                <p className="text-sm font-semibold text-rose-700 dark:text-rose-300">
+                  Scan belum berhasil
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  Coba foto ulang dengan cahaya lebih terang, atau tambah manual.
+                </p>
+              </div>
+            )}
 
             <ScanItemsList
               items={items}
@@ -186,13 +210,32 @@ function ScanPage() {
               logPending={logMut.isPending}
             />
 
-            {!scanMut.isPending && items.length === 0 && (
-              <button
-                onClick={() => imageUrl && scanMut.mutate(imageUrl)}
-                className="w-full py-3 rounded-xl bg-primary text-primary-foreground font-semibold text-sm"
-              >
-                Pindai Ulang
-              </button>
+            {!scanMut.isPending && items.length === 0 && !scanMut.isError && (
+              <div className="rounded-3xl border border-dashed border-border bg-card p-6 text-center space-y-2">
+                <p className="font-semibold text-sm">Belum terbaca jelas</p>
+                <p className="text-xs text-muted-foreground">
+                  Coba foto lebih dekat, pastikan makanan terlihat penuh, atau tambah manual.
+                </p>
+              </div>
+            )}
+
+            {!scanMut.isPending && (
+              <div className="grid grid-cols-2 gap-2">
+                <button
+                  onClick={() => imageUrl && scanMut.mutate(imageUrl)}
+                  className="py-3 rounded-xl bg-muted text-foreground font-semibold text-sm min-h-11"
+                  aria-label="Pindai ulang foto"
+                >
+                  Pindai ulang
+                </button>
+                <Link
+                  to="/food"
+                  className="py-3 rounded-xl bg-card border text-foreground font-semibold text-sm min-h-11 inline-flex items-center justify-center"
+                  aria-label="Tambah makanan secara manual"
+                >
+                  Tambah manual
+                </Link>
+              </div>
             )}
           </>
         )}
