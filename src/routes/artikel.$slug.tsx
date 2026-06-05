@@ -1,4 +1,7 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+import rehypeSanitize from "rehype-sanitize";
 import { canonical, SITE_NAME } from "@/lib/seo";
 import { getSeoArticle } from "@/lib/seoContent.functions";
 
@@ -87,39 +90,6 @@ export const Route = createFileRoute("/artikel/$slug")({
   component: ArtikelDetail,
 });
 
-function renderMarkdown(md: string) {
-  // Minimal MD → HTML: headings, paragraphs, lists. Content is trusted (seeded by us).
-  const lines = md.split(/\r?\n/);
-  const out: string[] = [];
-  let inList = false;
-  for (const raw of lines) {
-    const line = raw.trimEnd();
-    if (/^### /.test(line)) {
-      if (inList) { out.push("</ul>"); inList = false; }
-      out.push(`<h3>${line.slice(4)}</h3>`);
-    } else if (/^## /.test(line)) {
-      if (inList) { out.push("</ul>"); inList = false; }
-      out.push(`<h2>${line.slice(3)}</h2>`);
-    } else if (/^# /.test(line)) {
-      if (inList) { out.push("</ul>"); inList = false; }
-      out.push(`<h1>${line.slice(2)}</h1>`);
-    } else if (/^[-*] /.test(line)) {
-      if (!inList) { out.push("<ul>"); inList = true; }
-      out.push(`<li>${line.slice(2)}</li>`);
-    } else if (/^\d+\. /.test(line)) {
-      if (!inList) { out.push("<ul>"); inList = true; }
-      out.push(`<li>${line.replace(/^\d+\.\s*/, "")}</li>`);
-    } else if (line.length === 0) {
-      if (inList) { out.push("</ul>"); inList = false; }
-    } else {
-      if (inList) { out.push("</ul>"); inList = false; }
-      out.push(`<p>${line}</p>`);
-    }
-  }
-  if (inList) out.push("</ul>");
-  return out.join("\n");
-}
-
 function ArtikelDetail() {
   const a = Route.useLoaderData();
   return (
@@ -140,10 +110,11 @@ function ArtikelDetail() {
           {a.published_at && ` · ${new Date(a.published_at).toLocaleDateString("id-ID")}`}
         </p>
       </header>
-      <article
-        className="prose prose-sm sm:prose-base dark:prose-invert max-w-none"
-        dangerouslySetInnerHTML={{ __html: renderMarkdown(a.content) }}
-      />
+      <article className="prose prose-sm sm:prose-base dark:prose-invert max-w-none">
+        <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeSanitize]}>
+          {a.content}
+        </ReactMarkdown>
+      </article>
       {a.tags && a.tags.length > 0 && (
         <footer className="mt-8 flex flex-wrap gap-2">
           {a.tags.map((t: string) => (
