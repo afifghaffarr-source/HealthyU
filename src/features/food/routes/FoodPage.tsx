@@ -26,6 +26,7 @@ import { useVoiceMealInput } from "@/features/food/hooks/useVoiceMealInput";
 import { FoodSearchBar, MealTypeTabs } from "@/features/food/components/FoodSearchBar";
 import { useFoodBasket } from "@/features/food/hooks/useFoodBasket";
 import { QuickRepeatRow } from "@/features/food/components/QuickRepeatRow";
+import { QuickPresetsRow } from "@/features/food/components/QuickPresetsRow";
 
 export function FoodPage() {
   const qc = useQueryClient();
@@ -148,6 +149,14 @@ export function FoodPage() {
         {q.trim() === "" && (
           <QuickRepeatRow
             currentMealType={mealType}
+            onLog={(it) => logMutation.mutate(it)}
+            disabled={logMutation.isPending}
+          />
+        )}
+
+        {q.trim() === "" && (
+          <QuickPresetsRow
+            mealType={mealType}
             onLog={(it) => logMutation.mutate(it)}
             disabled={logMutation.isPending}
           />
