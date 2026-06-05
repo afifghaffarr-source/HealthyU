@@ -1,6 +1,6 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { canonical, SITE_NAME } from "@/lib/seo";
-import { getSeoRecipe } from "@/lib/seoContent.functions";
+import { getSeoRecipe } from "@/features/content/lib/seoContent.functions";
 
 function minutesToISO(min?: number | null): string | undefined {
   if (!min || min <= 0) return undefined;

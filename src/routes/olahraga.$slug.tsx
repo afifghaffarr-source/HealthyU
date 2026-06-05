@@ -1,7 +1,7 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useState } from "react";
 import { canonical } from "@/lib/seo";
-import { getExercise } from "@/lib/seoContent.functions";
+import { getExercise } from "@/features/content/lib/seoContent.functions";
 
 export const Route = createFileRoute("/olahraga/$slug")({
   loader: async ({ params }) => {

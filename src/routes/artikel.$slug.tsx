@@ -3,7 +3,7 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import rehypeSanitize from "rehype-sanitize";
 import { canonical, SITE_NAME } from "@/lib/seo";
-import { getSeoArticle } from "@/lib/seoContent.functions";
+import { getSeoArticle } from "@/features/content/lib/seoContent.functions";
 
 export const Route = createFileRoute("/artikel/$slug")({
   loader: async ({ params }) => {

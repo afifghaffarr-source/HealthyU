@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { canonical } from "@/lib/seo";
-import { listSeoRecipes } from "@/lib/seoContent.functions";
+import { listSeoRecipes } from "@/features/content/lib/seoContent.functions";
 
 export const Route = createFileRoute("/resep/")({
   loader: () => listSeoRecipes(),

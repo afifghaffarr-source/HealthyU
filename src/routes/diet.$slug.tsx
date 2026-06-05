@@ -1,6 +1,6 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { canonical } from "@/lib/seo";
-import { getDiet } from "@/lib/seoContent.functions";
+import { getDiet } from "@/features/content/lib/seoContent.functions";
 
 export const Route = createFileRoute("/diet/$slug")({
   loader: async ({ params }) => {

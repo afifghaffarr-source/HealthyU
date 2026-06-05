@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { canonical } from "@/lib/seo";
-import { listExercises } from "@/lib/seoContent.functions";
+import { listExercises } from "@/features/content/lib/seoContent.functions";
 
 export const Route = createFileRoute("/olahraga/")({
   loader: () => listExercises(),
