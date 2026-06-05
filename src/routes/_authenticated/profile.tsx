@@ -19,6 +19,18 @@ import {
 import { useTheme } from "@/components/theme-provider";
 import { LocaleSwitcher } from "@/components/locale-switcher";
 import { ProfileNavGrid } from "@/features/profile/components/ProfileNavGrid";
+import { DisclaimerCard } from "@/components/healthyu/disclaimer-card";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 export const Route = createFileRoute("/_authenticated/profile")({
   component: ProfilePage,
@@ -184,12 +196,43 @@ function ProfilePage() {
 
         <ProfileNavGrid theme={theme} onToggleTheme={toggle} />
 
-        <button
-          onClick={handleLogout}
-          className="w-full flex items-center justify-center gap-2 text-destructive font-semibold py-4 rounded-2xl"
-        >
-          <LogOut className="size-4" /> Keluar
-        </button>
+        <DisclaimerCard />
+
+        <section className="space-y-2 pt-2">
+          <h3 className="text-[11px] uppercase tracking-wider text-muted-foreground font-semibold px-1">
+            Zona Hati-hati
+          </h3>
+          <div className="rounded-2xl bg-destructive/5 dark:bg-destructive/10 outline-1 outline-destructive/25 p-2">
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <button
+                  className="w-full flex items-center justify-center gap-2 text-destructive font-semibold py-3 rounded-xl hover:bg-destructive/10 transition min-h-11"
+                  aria-label="Keluar dari akun"
+                >
+                  <LogOut className="size-4" /> Keluar dari akun
+                </button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Keluar dari HealthyU?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    Kamu akan keluar dari akun ini. Data tetap aman dan bisa diakses lagi saat
+                    masuk kembali.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Batal</AlertDialogCancel>
+                  <AlertDialogAction
+                    onClick={handleLogout}
+                    className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                  >
+                    Ya, keluar
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          </div>
+        </section>
 
         <LocaleSwitcher />
       </div>
