@@ -13,6 +13,7 @@ import { EmptyState } from "@/components/healthyu/empty-state";
 import { BookOpen } from "lucide-react";
 import { toast } from "sonner";
 import { getArticle, toggleBookmark } from "@/features/articles/lib/articles.functions";
+import { SafeMarkdown } from "@/components/SafeMarkdown";
 
 export const Route = createFileRoute("/_authenticated/articles/$id")({
   component: ArticleReader,
@@ -176,10 +177,8 @@ function ArticleReader() {
           </header>
 
           <article className="prose prose-sm dark:prose-invert max-w-none mt-5 prose-headings:font-bold prose-headings:tracking-tight prose-p:leading-relaxed prose-img:rounded-2xl">
-            {article.content_html ? (
-              <div dangerouslySetInnerHTML={{ __html: article.content_html }} />
-            ) : article.content ? (
-              article.content.split(/\n{2,}/).map((para, i) => <p key={i}>{para}</p>)
+            {article.content ? (
+              <SafeMarkdown>{article.content}</SafeMarkdown>
             ) : (
               <p className="text-muted-foreground">Konten artikel belum tersedia.</p>
             )}

@@ -13,18 +13,13 @@ import { Toaster } from "@/components/ui/sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
 import { ThemeProvider } from "@/components/theme-provider";
-import { ReminderScheduler } from "@/components/reminder-scheduler";
 import { InstallPrompt } from "@/components/install-prompt";
 import { LiveAnnouncerProvider } from "@/components/live-announcer";
 import { I18nProvider } from "@/lib/i18n";
-import { DesktopSidebar } from "@/components/healthyu/desktop-sidebar";
 import { GlobalErrorBoundary } from "@/components/healthyu/global-error-boundary";
-import { CommandPalette } from "@/components/healthyu/command-palette";
-import { QuickActionFab } from "@/components/healthyu/quick-action-fab";
 import { RouteError, RouteNotFound } from "@/components/healthyu/route-boundaries";
 import { ScrollToTopButton } from "@/components/healthyu/scroll-to-top-button";
 import { RouteProgressBar } from "@/components/healthyu/route-progress-bar";
-import { KeyboardShortcutsDialog } from "@/components/healthyu/keyboard-shortcuts-dialog";
 
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
   head: () => ({
@@ -143,19 +138,12 @@ function RootComponent() {
           <LiveAnnouncerProvider>
             <ManifestLinkManager />
             <AuthListener />
-            <ReminderScheduler />
-            <DesktopSidebar />
             <RouteProgressBar />
-            <div className="lg:pl-64">
-              <GlobalErrorBoundary>
-                <Outlet />
-              </GlobalErrorBoundary>
-            </div>
+            <GlobalErrorBoundary>
+              <Outlet />
+            </GlobalErrorBoundary>
             <InstallPrompt />
-            <CommandPalette />
-            <QuickActionFab />
             <ScrollToTopButton />
-            <KeyboardShortcutsDialog />
             <Toaster position="top-center" />
           </LiveAnnouncerProvider>
         </I18nProvider>

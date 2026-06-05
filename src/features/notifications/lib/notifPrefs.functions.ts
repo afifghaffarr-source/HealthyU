@@ -28,6 +28,7 @@ const time = z
   .nullable();
 const PrefsSchema = z
   .object({
+    timezone: z.string().min(1).max(64).optional(),
     meal_reminder_enabled: z.boolean().optional(),
     meal_breakfast_time: time,
     meal_lunch_time: time,
