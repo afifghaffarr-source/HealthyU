@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { callAiJsonWithGuards } from "./aiGateway.server";
 
 const SYSTEM = `Anda adalah AI Food Recognition untuk makanan Indonesia.
 Diberikan satu foto, identifikasi SEMUA makanan & minuman yang terlihat.
@@ -53,63 +54,31 @@ export const recognizeFood = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) => ScanInput.parse(input))
   .handler(async ({ data, context }): Promise<{ scan_id: string | null; items: ScanItem[] }> => {
     const startedAt = Date.now();
-    const apiKey = process.env.LOVABLE_API_KEY;
-    if (!apiKey) throw new Error("AI service not configured");
+    const { supabase, userId } = context;
     const model = data.use_pro ? "google/gemini-2.5-pro" : "google/gemini-2.5-flash";
 
-    const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${apiKey}`,
-      },
-      body: JSON.stringify({
-        model,
-        messages: [
-          { role: "system", content: SYSTEM },
-          {
-            role: "user",
-            content: [
-              {
-                type: "text",
-                text: "Kenali makanan di foto ini dan kembalikan JSON sesuai schema.",
-              },
-              { type: "image_url", image_url: { url: data.image_data_url } },
-            ],
-          },
-        ],
-        response_format: { type: "json_object" },
-      }),
+    const parsed = await callAiJsonWithGuards<{ items?: ScanItem[] }>({
+      userId,
+      feature: "scan.food.recognize",
+      model,
+      isPremium: !!data.use_pro,
+      messages: [
+        { role: "system", content: SYSTEM },
+        {
+          role: "user",
+          content: [
+            {
+              type: "text",
+              text: "Kenali makanan di foto ini dan kembalikan JSON sesuai schema.",
+            },
+            { type: "image_url", image_url: { url: data.image_data_url } },
+          ],
+        },
+      ],
     });
-
-    if (res.status === 429) throw new Error("Terlalu banyak permintaan. Coba lagi sebentar.");
-    if (res.status === 402) throw new Error("Kredit AI habis. Silakan top up.");
-    if (!res.ok) {
-      const txt = await res.text().catch(() => "");
-      throw new Error(`AI error: ${res.status} ${txt.slice(0, 200)}`);
-    }
-
-    const json = (await res.json()) as {
-      choices?: Array<{ message?: { content?: string } }>;
-    };
-    const raw = json.choices?.[0]?.message?.content ?? "{}";
-    let parsed: { items?: ScanItem[] } = {};
-    try {
-      parsed = JSON.parse(raw);
-    } catch {
-      const m = raw.match(/\{[\s\S]*\}/);
-      if (m) {
-        try {
-          parsed = JSON.parse(m[0]);
-        } catch {
-          parsed = { items: [] };
-        }
-      }
-    }
     const items = Array.isArray(parsed.items) ? parsed.items : [];
 
     // Try matching each item against existing food_items by name (ILIKE)
-    const { supabase, userId } = context;
     const enriched: ScanItem[] = await Promise.all(
       items.slice(0, 8).map(async (it) => {
         const term = (it.name || "").trim().slice(0, 60);

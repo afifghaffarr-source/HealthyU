@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { callAiJsonWithGuards } from "./aiGateway.server";
 
 const BUCKET = "scan-photos";
 
@@ -72,37 +73,22 @@ export const parseVoiceMeal = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) =>
     z.object({ transcript: z.string().min(2).max(1000) }).parse(input),
   )
-  .handler(async ({ data }) => {
-    const apiKey = process.env.LOVABLE_API_KEY;
-    if (!apiKey) throw new Error("AI service not configured");
+  .handler(async ({ data, context }) => {
     const prompt = `Pengguna mengucapkan: "${data.transcript}". Ekstrak daftar makanan/minuman yang dikonsumsi beserta estimasi porsi & kalori (Bahasa Indonesia). Balas HANYA JSON: {"items":[{"name":"...","portion_g":150,"calories":300,"protein_g":10,"carbs_g":40,"fat_g":8,"confidence":0.7}]}`;
-    const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-      method: "POST",
-      headers: { "Content-Type": "application/json", Authorization: `Bearer ${apiKey}` },
-      body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
-        messages: [{ role: "user", content: prompt }],
-        response_format: { type: "json_object" },
-      }),
+    const parsed = await callAiJsonWithGuards<{
+      items?: Array<{
+        name: string;
+        portion_g?: number;
+        calories?: number;
+        protein_g?: number;
+        carbs_g?: number;
+        fat_g?: number;
+        confidence?: number;
+      }>;
+    }>({
+      userId: context.userId,
+      feature: "scan.voice.meal_parse",
+      messages: [{ role: "user", content: prompt }],
     });
-    if (res.status === 429) throw new Error("Rate limited.");
-    if (res.status === 402) throw new Error("Kredit AI habis.");
-    if (!res.ok) throw new Error(`AI error: ${res.status}`);
-    const j = (await res.json()) as { choices?: Array<{ message?: { content?: string } }> };
-    try {
-      const parsed = JSON.parse(j.choices?.[0]?.message?.content ?? "{}") as {
-        items?: Array<{
-          name: string;
-          portion_g?: number;
-          calories?: number;
-          protein_g?: number;
-          carbs_g?: number;
-          fat_g?: number;
-          confidence?: number;
-        }>;
-      };
-      return { items: parsed.items ?? [] };
-    } catch {
-      return { items: [] };
-    }
+    return { items: parsed.items ?? [] };
   });

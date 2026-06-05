@@ -6,6 +6,8 @@
  * Call BEFORE storing user-uploaded images (chat attachments, progress photos, scan photos).
  */
 
+import { callAiWithGuards, AiGatewayError } from "./aiGateway.server";
+
 export type ModerationLabel = "safe" | "nudity" | "violence" | "spam" | "medical_graphic" | "other";
 
 export interface ModerationResult {
@@ -25,38 +27,26 @@ const SYSTEM_PROMPT =
 export async function moderateImage(
   imageBase64: string,
   imageMime: string = "image/jpeg",
+  userId: string | null = null,
 ): Promise<ModerationResult> {
-  const apiKey = process.env.LOVABLE_API_KEY;
-  if (!apiKey) {
-    console.error("[imageMod] LOVABLE_API_KEY missing — failing open");
-    return { label: "safe", confidence: 0, blocked: false };
-  }
-
   try {
-    const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-      method: "POST",
-      headers: { "Content-Type": "application/json", Authorization: `Bearer ${apiKey}` },
-      body: JSON.stringify({
-        model: "google/gemini-2.5-flash-lite",
-        messages: [
-          { role: "system", content: SYSTEM_PROMPT },
-          {
-            role: "user",
-            content: [
-              { type: "text", text: "Classify this image." },
-              { type: "image_url", image_url: { url: `data:${imageMime};base64,${imageBase64}` } },
-            ],
-          },
-        ],
-        max_tokens: 100,
-      }),
+    const text = await callAiWithGuards({
+      userId,
+      feature: "moderation.image",
+      model: "google/gemini-2.5-flash-lite",
+      skipBudget: userId === null,
+      maxTokens: 100,
+      messages: [
+        { role: "system", content: SYSTEM_PROMPT },
+        {
+          role: "user",
+          content: [
+            { type: "text", text: "Classify this image." },
+            { type: "image_url", image_url: { url: `data:${imageMime};base64,${imageBase64}` } },
+          ],
+        },
+      ],
     });
-    if (!res.ok) {
-      console.error("[imageMod] upstream", res.status);
-      return { label: "safe", confidence: 0, blocked: false };
-    }
-    const json = await res.json();
-    const text = json?.choices?.[0]?.message?.content ?? "";
     const match = text.match(/\{[\s\S]*\}/);
     if (!match) return { label: "safe", confidence: 0, blocked: false };
     const parsed = JSON.parse(match[0]) as Partial<ModerationResult>;
@@ -65,7 +55,11 @@ export async function moderateImage(
     const blocked = label !== "safe" && label !== "medical_graphic" && confidence >= 0.6;
     return { label, confidence, blocked, reason: parsed.reason };
   } catch (err) {
-    console.error("[imageMod] error", (err as Error).message);
+    if (err instanceof AiGatewayError) {
+      console.error("[imageMod] gateway", err.status, err.message);
+    } else {
+      console.error("[imageMod] error", (err as Error).message);
+    }
     return { label: "safe", confidence: 0, blocked: false };
   }
 }
