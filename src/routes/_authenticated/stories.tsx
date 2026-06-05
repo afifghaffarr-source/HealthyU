@@ -55,7 +55,7 @@ function Page() {
           </button>
         </div>
         {isLoading && <p className="text-sm text-muted-foreground">Memuat…</p>}
-        {data?.stories?.map((s: any) => (
+        {data?.stories?.map((s) => (
           <div key={s.id} className="rounded-2xl bg-card border p-3 space-y-1">
             <div className="text-xs text-muted-foreground">
               {s.profiles?.full_name ?? "User"} ·{" "}
