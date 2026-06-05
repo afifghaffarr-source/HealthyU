@@ -76,7 +76,7 @@ export const Route = createFileRoute("/api/wearable/google-fit/callback")({
         await supabaseAdmin
           .from("oauth_states")
           .update({ used_at: new Date().toISOString() })
-          .eq("id", stateRow.id);
+          .eq("id", validation.stateId);
 
         return Response.redirect(`${url.origin}/wearable?connected=1`, 302);
       },
