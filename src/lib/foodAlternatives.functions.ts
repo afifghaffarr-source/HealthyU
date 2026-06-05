@@ -120,7 +120,7 @@ Output JSON: { "reasons": [{ "id": "<alt_id>", "reason": "..." }] }`;
     const parsed = await callGeminiJSON([
       { role: "system", content: "Kamu adalah ahli gizi. Balas hanya JSON valid." },
       { role: "user", content: prompt },
-    ]);
+    ], userId);
     const arr = (parsed?.reasons as Array<{ id?: string; reason?: string }> | undefined) ?? [];
 
     let updated = 0;
