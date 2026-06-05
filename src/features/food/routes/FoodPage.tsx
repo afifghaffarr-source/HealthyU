@@ -25,6 +25,7 @@ import { AlternativesModal } from "@/features/food/components/AlternativesModal"
 import { useVoiceMealInput } from "@/features/food/hooks/useVoiceMealInput";
 import { FoodSearchBar, MealTypeTabs } from "@/features/food/components/FoodSearchBar";
 import { useFoodBasket } from "@/features/food/hooks/useFoodBasket";
+import { QuickRepeatRow } from "@/features/food/components/QuickRepeatRow";
 
 export function FoodPage() {
   const qc = useQueryClient();
@@ -143,6 +144,14 @@ export function FoodPage() {
           parsing={parsing}
           onVoice={handleVoice}
         />
+
+        {q.trim() === "" && (
+          <QuickRepeatRow
+            currentMealType={mealType}
+            onLog={(it) => logMutation.mutate(it)}
+            disabled={logMutation.isPending}
+          />
+        )}
 
         <section className="space-y-2">
           {foods.map((f) => (
