@@ -1,52 +1,75 @@
-# Rencana — HealthyU AI Cost Optimization
+# HealthyU Production Hardening — Rencana Eksekusi
 
-Tujuan: hemat 80–90% biaya AI tanpa menurunkan UX. Implementasi dibagi 4 batch agar bisa dieksekusi bertahap. Saya akan jalankan **Batch 1 dulu**, lalu lanjut atas perintah `lanjut`.
+Rencana ini memecah audit jadi **8 batch kecil**. Tiap batch berdiri sendiri, bisa direview & rollback tanpa merusak fitur lain. Saya kerjakan satu batch per perintah `lanjut`. Tidak ada rewrite total, tidak ada penghapusan fitur, tidak ada migration destruktif.
 
 ---
 
-## Batch 1 — Smart Routing + Response Cache (chatbot)
+## P0 — Wajib (Batch H1–H5)
 
-Dampak terbesar (~50% saving). Sentuh `src/lib/chat.functions.ts` & `src/routes/api/chat.stream.ts`.
+### Batch H1 — Package manager & dependency
+- Pilih **Bun** sebagai single PM (sesuai environment Lovable).
+- Hapus `package-lock.json`. Pertahankan `bun.lock`.
+- Tambah `packageManager` + `engines` di `package.json`.
+- Selaraskan `@zxing/browser` & `@zxing/library` (pin versi yang kompatibel).
+- Verifikasi script `build`, `lint`, `test` masih jalan.
 
-1. Tambah `src/lib/aiRouter.server.ts`:
-   - `classifyMessage(text, hasImage)` → return `{ tier: 1|2|3, reason, model }`
-   - Level 1: regex kalori/BMI/air/streak → jawab tanpa AI (handler langsung di chat.functions).
-   - Level 2: default `google/gemini-3-flash-preview` (sudah dipakai) untuk pertanyaan ringan.
-   - Level 3: `google/gemini-2.5-pro` untuk emergency keywords, foto, atau ≥30 kata + ≥2 metric kompleks.
-2. Tambah `src/lib/aiCache.server.ts`:
-   - Tabel baru `ai_response_cache(key text pk, response text, model text, hit_count int, created_at, expires_at)`.
-   - Key = `sha256(model + tier + normalize(question) + profileHash)`.
-   - TTL 24 jam (factual) / 1 jam (personal). Lookup sebelum panggil gateway; insert sesudahnya.
-3. Compressed system prompt: ringkas profile dari ±800 token → ±200 token format `Budi|M30|80kg|170cm|BMI27.6→70kg|mod|alergi:kacang|diabetes2|lowcarb|1800kal`.
-4. Output cap: untuk tier 1/2 tambahkan `max_tokens: 350` dan instruksi "jawab maksimal 3 kalimat / 5 bullet".
+### Batch H2 — Cron/hook auth + env hygiene
+- Buat `src/lib/cronAuth.server.ts` (`requireCronSecret`).
+- Migrasi 5 route `src/routes/api/public/hooks/*` dari `SUPABASE_PUBLISHABLE_KEY` → `CRON_SECRET` (`x-cron-secret` / `Authorization: Bearer`). Fail-closed kalau secret kosong.
+- Minta secret `CRON_SECRET` via `add_secret` (kalau belum ada).
+- Update `.gitignore` (`.env`, `.env.*`, `!.env.example`) & buat `.env.example` placeholder.
 
-## Batch 2 — Local-first calculators + on-device guard
+### Batch H3 — Google Fit OAuth state
+- Migration: tabel `oauth_states (user_id, provider, nonce unique, expires_at, used_at)` + RLS service-role only.
+- Update entry-point OAuth (start) untuk generate nonce + simpan.
+- Update `wearable.google-fit.callback.ts`: validasi nonce, provider, expiry, mark used; tolak state mentah.
 
-- Audit semua serverFn AI: `vitals/bodyMetrics/water/sleep/fasting/prayerTimes` → pastikan hanya rumus lokal/DB lookup, tidak panggil gateway.
-- Tambah util `src/lib/localCalc.ts` (BMR Mifflin, TDEE, macros, water target, health score weighted) dipakai konsisten di UI & server.
-- Food search: pastikan `foodDb.functions.ts` query Postgres (full-text) dulu sebelum fallback ke `foodScan` AI.
+### Batch H4 — Sanitasi markdown artikel
+- `bun add react-markdown remark-gfm rehype-sanitize`.
+- Ganti `renderMarkdown` + `dangerouslySetInnerHTML` di `artikel.$slug.tsx` dengan `<ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeSanitize]}>`.
+- Pastikan styling Prose tetap.
 
-## Batch 3 — Batch & Precompute
+### Batch H5 — AI Gateway tersentralisasi
+- Buat `src/lib/aiGateway.server.ts` dengan `callAiWithGuards({ userId, feature, messages, model?, ... })`: rate-limit (pakai `aiBudget`/`aiCache` yg sudah ada), timeout, safe-parse, log minimal, fail-closed.
+- Refactor `chat.functions.ts`, `chat.stream.ts`, `foodScan.functions.ts`, `reports.functions.ts`, `recommendations.functions.ts`, `scanBatch7..12.functions.ts` agar lewat helper.
+- `LOVABLE_API_KEY` hanya dibaca di helper.
 
-- `daily_tips_pool(id, category, tags[], text)` — seed 200 tips via 1 batch job (`scripts/seed-tips.ts` dijalankan sekali). Runtime pilih tip via `pick by profile`, **0 AI call**.
-- Weekly report: cron sudah ada (`weekly-ai-report.ts`). Tambahkan early-skip jika user inactive 7 hari; gunakan `gemini-3-flash-preview` (sudah) + compressed input.
-- Meal plan free tier: pre-built templates di `meal_plan_templates`, AI generate hanya untuk premium.
+---
 
-## Batch 4 — Cost Monitoring + Hard Limits
+## P1 — Refactor Penting (Batch H6)
 
-- Tabel `ai_usage_logs(user_id, tier, model, input_tokens, output_tokens, cost_estimate_usd, cache_hit, feature, created_at)`.
-- Middleware `enforceAiBudget(userId, tier)`:
-  - Free: 10 req/jam, 10k token/hari → kalau hampir limit, force tier 2; kalau over, return 429 dengan pesan ramah.
-  - Premium: 50 req/jam, 50k token/hari.
-- View `ai_cost_daily` untuk admin. Tidak buat UI dashboard (di luar scope, bisa minta nanti).
+### Batch H6 — Data model & PDP/export
+- Buat `src/lib/userDataTables.ts` (konstanta tabel user real: `meal_logs`, `water_logs`, `workout_sessions`, `vitals_logs`, `food_scans`, `fasting_sessions`, `sleep_sessions`, `chat_messages`, dll).
+- Refactor `pdpRights.functions.ts` & `export.functions.ts` pakai konstanta, selalu filter `user_id`.
+- Audit nama kolom (duration_minutes/duration_min, started_at/performed_at, sleep_logs/sleep_sessions, vitals/vitals_logs) — perbaiki query yang mismatch via grep + check `types.ts`.
+
+> Refactor struktur `src/features/*` (item #8) dan pecah route besar (#9) **DITUNDA** ke iterasi berikutnya — risiko regresi terlalu besar untuk dilakukan bersamaan dengan H1–H6. Akan saya catat sebagai TODO terpisah.
+
+---
+
+## P1.5 — Branding & Validation (Batch H7)
+
+### Batch H7 — Config app + Zod everywhere
+- Buat `src/config/app.ts` (appName, canonicalUrl, OG image, dll).
+- Sapu sisa "Sehatify"/"Lovable" → HealthyU di root meta, manifest, push, SEO.
+- Audit semua `createServerFn({ method: "POST" })` — tambah `.inputValidator(z.object({}).strict())` di yang belum punya.
+
+---
+
+## P2 — CI, Test, Docs (Batch H8)
+
+### Batch H8 — CI + test + README
+- Update `.github/workflows/` jadi `install → typecheck → lint → test → build` (Bun).
+- Tambah Vitest minimal untuk: `requireCronSecret`, `callAiWithGuards` (rate-limit branch), OAuth state validator, PDP table mapping, markdown sanitization.
+- Buat `README.md` root: stack, install, env, Supabase, AI gateway, CRON_SECRET, deploy, test, known limits.
 
 ---
 
 ## Catatan teknis
 
-- Tidak ada Edge Function — semua di TanStack server fn / server route (sesuai stack).
-- Cache & usage log pakai tabel Supabase (bukan Redis) supaya tanpa infra tambahan. Aman untuk skala awal; bila perlu ganti Redis nanti.
-- "Embedding semantic cache" (Layer 2) di-skip dulu — butuh pgvector + biaya embedding, akan dievaluasi setelah Batch 1 jalan & data hit-rate kelihatan.
-- Rate limit murni di-app (DB counter) — backend tidak punya primitif rate-limit standar.
+- Tiap batch berakhir dengan summary: file diubah, security issue diperbaiki, dependency change, sisa risiko.
+- Tidak ada migration destruktif. Tabel baru (`oauth_states`) RLS service-role only.
+- Jika `CRON_SECRET` belum ada, di Batch H2 saya minta lewat `add_secret`; tidak commit nilai apapun.
+- Item #8 (folder `features/`) & #9 (pecah route besar) sengaja ditunda — dampak luas, tidak P0, lebih baik setelah test base ada (H8).
 
-Mulai dengan **Batch 1**?
+Mulai dari **Batch H1**?

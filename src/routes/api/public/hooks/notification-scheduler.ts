@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { sendWebPushTo } from "@/lib/push.server";
+import { requireCronSecret } from "@/lib/cronAuth.server";
 
 // Cron-friendly scheduler. Runs frequently (e.g. every 5 minutes) and sends
 // pushes when the current time matches a user's preference window (±3 minutes).
@@ -30,11 +31,8 @@ export const Route = createFileRoute("/api/public/hooks/notification-scheduler")
   server: {
     handlers: {
       POST: async ({ request }) => {
-        const apiKey = request.headers.get("apikey");
-        const expected = process.env.SUPABASE_PUBLISHABLE_KEY;
-        if (!apiKey || !expected || apiKey !== expected) {
-          return new Response("Unauthorized", { status: 401 });
-        }
+        const unauthorized = requireCronSecret(request);
+        if (unauthorized) return unauthorized;
 
         const now = new Date();
         const nowMin = now.getUTCHours() * 60 + now.getUTCMinutes();
