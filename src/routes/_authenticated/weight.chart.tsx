@@ -1,19 +1,13 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import {
-  AreaChart,
-  Area,
-  XAxis,
-  YAxis,
-  ResponsiveContainer,
-  Tooltip,
-  ReferenceLine,
-} from "recharts";
+import { lazy, Suspense } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useServerFn } from "@tanstack/react-start";
 import { getWeightGoal } from "@/lib/scanBatch9.functions";
 import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { BottomNav } from "@/components/bottom-nav";
+
+const WeightAreaChart = lazy(() => import("@/components/charts/weight-area-chart"));
 
 export const Route = createFileRoute("/_authenticated/weight/chart")({ component: Page });
 
@@ -40,34 +34,9 @@ function Page() {
       <TopAppBar title="Grafik Berat" showBack />
       <main className="max-w-md mx-auto px-4 pt-4 space-y-3">
         <div className="rounded-xl border bg-card p-3 h-64">
-          <ResponsiveContainer width="100%" height="100%">
-            <AreaChart data={logs ?? []}>
-              <defs>
-                <linearGradient id="wg" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="hsl(var(--primary))" stopOpacity={0.4} />
-                  <stop offset="100%" stopColor="hsl(var(--primary))" stopOpacity={0} />
-                </linearGradient>
-              </defs>
-              <XAxis dataKey="date" fontSize={10} />
-              <YAxis fontSize={10} domain={["auto", "auto"]} />
-              <Tooltip />
-              <Area
-                type="monotone"
-                dataKey="kg"
-                stroke="hsl(var(--primary))"
-                strokeWidth={2}
-                fill="url(#wg)"
-              />
-              {target && (
-                <ReferenceLine
-                  y={target}
-                  stroke="hsl(var(--destructive))"
-                  strokeDasharray="3 3"
-                  label="Target"
-                />
-              )}
-            </AreaChart>
-          </ResponsiveContainer>
+          <Suspense fallback={<div className="size-full animate-pulse rounded-lg bg-muted" />}>
+            <WeightAreaChart data={logs ?? []} target={target} />
+          </Suspense>
         </div>
         {goal?.prediction && (
           <p className="text-xs text-muted-foreground">

@@ -9,7 +9,11 @@ import { BottomNav } from "@/components/bottom-nav";
 import { Camera, Trash2, Loader2, Film } from "lucide-react";
 import { toast } from "sonner";
 import { generateTimelapse } from "@/lib/timelapse";
-import { RadialBarChart, RadialBar, PolarAngleAxis, ResponsiveContainer } from "recharts";
+import { lazy, Suspense } from "react";
+
+const ProgressRadialChart = lazy(
+  () => import("@/components/charts/progress-radial-chart"),
+);
 import { getProfile } from "@/lib/profile.functions";
 import { todaysMeals } from "@/lib/meals.functions";
 import { todaysWater } from "@/lib/water.functions";
@@ -98,18 +102,11 @@ function ProgressPage() {
             Goal Harian
           </p>
           <div className="h-44">
-            <ResponsiveContainer width="100%" height="100%">
-              <RadialBarChart
-                innerRadius="30%"
-                outerRadius="100%"
-                data={goalData}
-                startAngle={90}
-                endAngle={-270}
-              >
-                <PolarAngleAxis type="number" domain={[0, 100]} tick={false} />
-                <RadialBar background dataKey="value" cornerRadius={8} />
-              </RadialBarChart>
-            </ResponsiveContainer>
+            <Suspense
+              fallback={<div className="size-full animate-pulse rounded-lg bg-muted" />}
+            >
+              <ProgressRadialChart data={goalData} />
+            </Suspense>
           </div>
           <div className="grid grid-cols-3 gap-2 text-center text-[10px] mt-1">
             {goalData.map((g) => (
