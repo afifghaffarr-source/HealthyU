@@ -39,9 +39,16 @@ const DIAGNOSIS = [
   "apakah saya kanker",
   "apakah saya diabetes",
   "apakah saya hamil",
+  "apakah saya hipertensi",
+  "apakah saya pcos",
+  "apakah saya anemia",
+  "kenapa saya sakit",
+  "penyakit saya apa",
   "do i have",
   "diagnose me",
   "am i sick with",
+  "is this cancer",
+  "is this diabetes",
 ];
 
 const PRESCRIPTION = [
@@ -49,9 +56,57 @@ const PRESCRIPTION = [
   "dosis obat",
   "resep obat",
   "obat apa untuk",
+  "minum obat apa",
+  "obat penurun",
+  "obat pengencer",
+  "antibiotik untuk",
+  "insulin dosis",
+  "metformin",
   "what dose",
   "prescribe",
   "prescription for",
+  "which drug",
+  "what medication",
+];
+
+const MEDICAL_CONDITIONS = [
+  // Pregnancy & reproductive
+  "saya hamil",
+  "sedang hamil",
+  "menyusui",
+  "asi eksklusif",
+  "promil",
+  // Chronic conditions where nutrition advice needs a doctor
+  "diabetes tipe 1",
+  "diabetes tipe 2",
+  "gula darah tinggi",
+  "hipertensi",
+  "tekanan darah tinggi",
+  "gagal ginjal",
+  "penyakit ginjal",
+  "cuci darah",
+  "kolesterol tinggi",
+  "penyakit jantung",
+  "gagal jantung",
+  "asam urat tinggi",
+  "kanker",
+  "kemoterapi",
+  "hipotiroid",
+  "hipertiroid",
+  "celiac",
+  "ibd",
+  "crohn",
+  // Eating-disorder context (separate from DANGEROUS — these need referral, not block)
+  "anoreksia",
+  "bulimia",
+  "eating disorder",
+  "binge eating",
+  // English
+  "pregnant",
+  "breastfeeding",
+  "kidney disease",
+  "heart failure",
+  "thyroid",
 ];
 
 const DANGEROUS = [
@@ -95,7 +150,11 @@ export function checkChatSafety(message: string): SafetyResult {
   if (contains(message, DANGEROUS)) {
     return { kind: "blocked", response: BLOCKED_DANGEROUS };
   }
-  if (contains(message, DIAGNOSIS) || contains(message, PRESCRIPTION)) {
+  if (
+    contains(message, DIAGNOSIS) ||
+    contains(message, PRESCRIPTION) ||
+    contains(message, MEDICAL_CONDITIONS)
+  ) {
     return { kind: "disclaimer", response: DISCLAIMER };
   }
   return { kind: "safe" };
