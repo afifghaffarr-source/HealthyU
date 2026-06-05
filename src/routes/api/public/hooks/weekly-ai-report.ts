@@ -9,6 +9,7 @@ import { requireCronSecret } from "@/lib/cronAuth.server";
 
 /**
  * Weekly AI report scheduler. Runs every Sunday morning via pg_cron.
+ * Auth: x-cron-secret / Authorization: Bearer CRON_SECRET (see docs/cron.md).
  * For each user active in the last 14 days who has not received a weekly
  * report in the last 5 days, generate a new AI report + push.
  */
