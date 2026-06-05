@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { callAiWithGuards } from "@/features/ai/lib/aiGateway.server";
 
 // ============ Mood × meal correlation ============
 export const moodMealCorrelation = createServerFn({ method: "POST" })
