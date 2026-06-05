@@ -1,7 +1,7 @@
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 
-export type ChatMessage = { id: string; role: "user" | "assistant"; content: string };
+export type ChatMessage = { id: string; role: string; content: string };
 
 const SUGGESTIONS = [
   "Berapa kalori nasi goreng?",
