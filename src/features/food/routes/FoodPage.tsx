@@ -22,6 +22,7 @@ import { FoodSearchResult } from "@/features/food/components/FoodSearchResult";
 import { MealBasket, type BasketItem } from "@/features/food/components/MealBasket";
 import { TodayMealsList } from "@/features/food/components/TodayMealsList";
 import { AlternativesModal } from "@/features/food/components/AlternativesModal";
+import { useVoiceMealInput } from "@/features/food/hooks/useVoiceMealInput";
 
 export function FoodPage() {
   const qc = useQueryClient();
@@ -35,8 +36,6 @@ export function FoodPage() {
 
   const [q, setQ] = useState("");
   const [mealType, setMealType] = useState<MealType>(currentMealType());
-  const [listening, setListening] = useState(false);
-  const [parsing, setParsing] = useState(false);
 
   const [basket, setBasket] = useState<BasketItem[]>([]);
   const [altFor, setAltFor] = useState<{ id: string; name: string } | null>(null);
@@ -153,60 +152,23 @@ export function FoodPage() {
     onSuccess: () => qc.invalidateQueries({ queryKey: ["meals"] }),
   });
 
-  const handleVoice = () => {
-    type SR = {
-      new (): {
-        lang: string;
-        continuous: boolean;
-        interimResults: boolean;
-        start: () => void;
-        stop: () => void;
-        onresult: (e: { results: ArrayLike<ArrayLike<{ transcript: string }>> }) => void;
-        onerror: (e: { error: string }) => void;
-        onend: () => void;
-      };
-    };
-    const w = window as unknown as { SpeechRecognition?: SR; webkitSpeechRecognition?: SR };
-    const SRClass = w.SpeechRecognition ?? w.webkitSpeechRecognition;
-    if (!SRClass) {
-      toast.error("Browser tidak mendukung voice. Gunakan Chrome.");
-      return;
+  const { listening, parsing, start: handleVoice } = useVoiceMealInput(async (transcript) => {
+    try {
+      const parsed = await parseVoice({ data: { transcript } });
+      logMutation.mutate({
+        food_item_id: null,
+        custom_name: parsed.custom_name,
+        meal_type: parsed.meal_type,
+        serving_qty: parsed.serving_qty,
+        calories: parsed.calories,
+        protein_g: parsed.protein_g,
+        carbs_g: parsed.carbs_g,
+        fat_g: parsed.fat_g,
+      });
+    } catch (err) {
+      toastError(err, "Gagal parse suara");
     }
-    const rec = new SRClass();
-    rec.lang = "id-ID";
-    rec.continuous = false;
-    rec.interimResults = false;
-    setListening(true);
-    rec.onresult = async (e) => {
-      const transcript = e.results[0]?.[0]?.transcript ?? "";
-      setListening(false);
-      if (!transcript) return;
-      setParsing(true);
-      try {
-        const parsed = await parseVoice({ data: { transcript } });
-        logMutation.mutate({
-          food_item_id: null,
-          custom_name: parsed.custom_name,
-          meal_type: parsed.meal_type,
-          serving_qty: parsed.serving_qty,
-          calories: parsed.calories,
-          protein_g: parsed.protein_g,
-          carbs_g: parsed.carbs_g,
-          fat_g: parsed.fat_g,
-        });
-      } catch (err) {
-        toastError(err, "Gagal parse suara");
-      } finally {
-        setParsing(false);
-      }
-    };
-    rec.onerror = (e) => {
-      setListening(false);
-      toast.error(`Voice error: ${e.error}`);
-    };
-    rec.onend = () => setListening(false);
-    rec.start();
-  };
+  });
 
   return (
     <main className="min-h-dvh bg-background pb-28">
