@@ -43,7 +43,14 @@ export const exportMyData = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     const { supabase, userId } = context;
-    const dump: Record<string, unknown> = {
+    type JsonValue =
+      | string
+      | number
+      | boolean
+      | null
+      | JsonValue[]
+      | { [key: string]: JsonValue };
+    const dump: Record<string, JsonValue> = {
       exported_at: new Date().toISOString(),
       user_id: userId,
     };
@@ -54,7 +61,7 @@ export const exportMyData = createServerFn({ method: "GET" })
         .from(table as never)
         .select("*")
         .eq("user_id", userId);
-      if (!error) dump[table] = data ?? [];
+      if (!error) dump[table] = (data ?? []) as JsonValue;
       else dump[table] = { error: error.message };
     }
     await supabase.rpc("log_audit_event", {
