@@ -5,12 +5,21 @@ const DEFAULT_TIMEOUT_MS = 30_000;
 
 export type AiMessage = { role: "system" | "user" | "assistant"; content: string };
 
+export type AiContentPart =
+  | { type: "text"; text: string }
+  | { type: "image_url"; image_url: { url: string } };
+
+export type AiMultimodalMessage = {
+  role: "system" | "user" | "assistant";
+  content: string | AiContentPart[];
+};
+
 export type CallAiOptions = {
   /** Owner of the call for rate-limit/audit. Pass null for system jobs (cron, seed). */
   userId: string | null;
   /** Feature label for ai_usage_logs (e.g. "scan.quote", "chat", "coach.daily"). */
   feature: string;
-  messages: AiMessage[];
+  messages: AiMultimodalMessage[];
   model?: string;
   isPremium?: boolean;
   timeoutMs?: number;
@@ -18,6 +27,8 @@ export type CallAiOptions = {
   skipBudget?: boolean;
   /** If "json_object", asks the gateway to return strict JSON. */
   responseFormat?: "json_object";
+  /** Optional max_tokens cap forwarded to the gateway. */
+  maxTokens?: number;
 };
 
 export class AiGatewayError extends Error {
@@ -67,6 +78,7 @@ export async function callAiWithGuards(opts: CallAiOptions): Promise<string> {
       body: JSON.stringify({
         model,
         messages: opts.messages,
+        ...(opts.maxTokens ? { max_tokens: opts.maxTokens } : {}),
         ...(opts.responseFormat
           ? { response_format: { type: opts.responseFormat } }
           : {}),
