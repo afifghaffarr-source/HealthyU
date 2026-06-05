@@ -2,7 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { todayRange } from "@/lib/health";
-import { recordActivityFor } from "@/lib/gamification.functions";
+import { recordActivityFor } from "@/features/gamification/lib/gamification.functions";
 
 export const todaysWater = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])

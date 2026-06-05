@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { qiblaBearing } from "../qibla";
+import { qiblaBearing } from "@/features/prayer/lib/qibla";
 
 describe("qiblaBearing", () => {
   it("returns a value in [0, 360)", () => {

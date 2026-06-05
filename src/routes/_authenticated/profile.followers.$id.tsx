@@ -4,7 +4,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
 import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { BottomNav } from "@/components/bottom-nav";
-import { listFollowers } from "@/lib/scanBatch7.functions";
+import { listFollowers } from "@/features/scan/lib/scanBatch7.functions";
 
 export const Route = createFileRoute("/_authenticated/profile/followers/$id")({ component: Page });
 

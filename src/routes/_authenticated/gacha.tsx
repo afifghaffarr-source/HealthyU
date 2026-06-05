@@ -3,7 +3,7 @@ import { useMutation } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { BottomNav } from "@/components/bottom-nav";
-import { gachaPull } from "@/lib/scanBatch7.functions";
+import { gachaPull } from "@/features/scan/lib/scanBatch7.functions";
 import { Gift } from "lucide-react";
 import { toast } from "sonner";
 import { useState } from "react";

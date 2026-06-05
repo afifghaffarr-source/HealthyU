@@ -4,7 +4,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
 import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { BottomNav } from "@/components/bottom-nav";
-import { donateCoins } from "@/lib/scanBatch11.functions";
+import { donateCoins } from "@/features/scan/lib/scanBatch11.functions";
 import { toast } from "sonner";
 import { Heart } from "lucide-react";
 

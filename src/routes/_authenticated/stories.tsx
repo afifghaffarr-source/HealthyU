@@ -4,7 +4,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
 import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { BottomNav } from "@/components/bottom-nav";
-import { createMealStory, listStoriesFeed } from "@/lib/scanSocial.functions";
+import { createMealStory, listStoriesFeed } from "@/features/scan/lib/scanSocial.functions";
 import { Plus, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 

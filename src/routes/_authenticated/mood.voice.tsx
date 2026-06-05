@@ -4,7 +4,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { useRef, useState } from "react";
 import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { BottomNav } from "@/components/bottom-nav";
-import { transcribeVoice } from "@/lib/scanBatch10.functions";
+import { transcribeVoice } from "@/features/scan/lib/scanBatch10.functions";
 import { Mic, Square } from "lucide-react";
 import { toast } from "sonner";
 

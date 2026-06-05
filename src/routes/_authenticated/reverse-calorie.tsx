@@ -4,7 +4,7 @@ import { useMutation } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { BottomNav } from "@/components/bottom-nav";
-import { reverseCalorie } from "@/lib/scanSocial.functions";
+import { reverseCalorie } from "@/features/scan/lib/scanSocial.functions";
 import { Loader2, Search } from "lucide-react";
 import { toast } from "sonner";
 

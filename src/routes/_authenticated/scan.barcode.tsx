@@ -5,7 +5,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { BrowserMultiFormatReader } from "@zxing/browser";
 import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { BottomNav } from "@/components/bottom-nav";
-import { lookupBarcode, relogMeal } from "@/lib/scanExtras.functions";
+import { lookupBarcode, relogMeal } from "@/features/scan/lib/scanExtras.functions";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
 

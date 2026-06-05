@@ -3,7 +3,7 @@ import { useMutation } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { BottomNav } from "@/components/bottom-nav";
-import { generateWeeklyPodcast } from "@/lib/scanBatch12.functions";
+import { generateWeeklyPodcast } from "@/features/scan/lib/scanBatch12.functions";
 
 export const Route = createFileRoute("/_authenticated/podcast/weekly")({ component: Page });
 

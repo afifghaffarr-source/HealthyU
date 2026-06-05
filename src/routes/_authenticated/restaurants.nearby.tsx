@@ -4,7 +4,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
 import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { BottomNav } from "@/components/bottom-nav";
-import { restaurantsNearby } from "@/lib/scanBatch8.functions";
+import { restaurantsNearby } from "@/features/scan/lib/scanBatch8.functions";
 import { MapPin, Loader2 } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/restaurants/nearby")({ component: Page });

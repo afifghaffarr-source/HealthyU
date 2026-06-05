@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { callAiJsonWithSchema } from "./aiGateway.server";
+import { callAiJsonWithSchema } from "@/lib/aiGateway.server";
 
 const VoiceMealSchema = z.object({
   items: z

@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
 import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { BottomNav } from "@/components/bottom-nav";
-import { listScanGallery } from "@/lib/scanPhoto.functions";
+import { listScanGallery } from "@/features/scan/lib/scanPhoto.functions";
 import { ImageOff } from "lucide-react";
 
 const opts = queryOptions({ queryKey: ["scan-gallery"], queryFn: () => listScanGallery() });

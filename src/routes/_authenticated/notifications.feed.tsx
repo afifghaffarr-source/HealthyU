@@ -3,7 +3,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { BottomNav } from "@/components/bottom-nav";
-import { listNotifications, markNotifRead } from "@/lib/scanBatch8.functions";
+import { listNotifications, markNotifRead } from "@/features/scan/lib/scanBatch8.functions";
 import { Bell, BellOff } from "lucide-react";
 import { EmptyState } from "@/components/healthyu/empty-state";
 import { ListSkeleton } from "@/components/healthyu/skeletons";

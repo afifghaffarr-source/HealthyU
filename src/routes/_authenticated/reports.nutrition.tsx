@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
 import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { BottomNav } from "@/components/bottom-nav";
-import { getWeeklyNutrition } from "@/lib/scanExtras.functions";
+import { getWeeklyNutrition } from "@/features/scan/lib/scanExtras.functions";
 
 const opts = queryOptions({ queryKey: ["weekly-nutrition"], queryFn: () => getWeeklyNutrition() });
 

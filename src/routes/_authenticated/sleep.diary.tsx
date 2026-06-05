@@ -4,7 +4,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
 import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { BottomNav } from "@/components/bottom-nav";
-import { listSleepDiary, upsertSleepDiary } from "@/lib/scanBatch11.functions";
+import { listSleepDiary, upsertSleepDiary } from "@/features/scan/lib/scanBatch11.functions";
 import { toast } from "sonner";
 import { Moon, Sunrise, Star } from "lucide-react";
 
