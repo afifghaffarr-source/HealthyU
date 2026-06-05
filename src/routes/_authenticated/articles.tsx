@@ -103,7 +103,7 @@ function ArticlesPage() {
           return (
             <article
               key={a.id}
-              className="rounded-3xl bg-card outline-1 outline-black/5 overflow-hidden shadow-sm"
+              className="rounded-3xl bg-card outline-1 outline-foreground/10 overflow-hidden shadow-sm"
             >
               {a.image_url && (
                 <LazyImage src={a.image_url} alt={a.title} className="w-full h-36 object-cover" />
@@ -111,7 +111,7 @@ function ArticlesPage() {
               <div className="p-4">
                 <div className="flex items-start justify-between gap-2">
                   <div className="min-w-0">
-                    <p className="text-[10px] uppercase tracking-wide text-muted-foreground">
+                    <p className="text-xs uppercase tracking-wide text-muted-foreground font-semibold">
                       {a.category}
                     </p>
                     <Link
@@ -124,24 +124,25 @@ function ArticlesPage() {
                   </div>
                   <button
                     onClick={() => bookmarkM.mutate(a.id)}
-                    className="size-9 inline-flex items-center justify-center rounded-full bg-muted shrink-0"
-                    aria-label="Bookmark"
+                    className="size-11 inline-flex items-center justify-center rounded-full bg-muted shrink-0 hover:bg-muted/70 transition"
+                    aria-label={marked ? "Hapus bookmark" : "Simpan bookmark"}
+                    aria-pressed={marked}
                   >
                     {marked ? (
-                      <BookmarkCheck className="size-4 text-primary" />
+                      <BookmarkCheck className="size-5 text-primary" />
                     ) : (
-                      <Bookmark className="size-4" />
+                      <Bookmark className="size-5" />
                     )}
                   </button>
                 </div>
                 {a.excerpt && (
-                  <p className="text-xs text-muted-foreground mt-2 line-clamp-3">{a.excerpt}</p>
+                  <p className="text-sm text-muted-foreground mt-2 line-clamp-3">{a.excerpt}</p>
                 )}
-                <div className="flex gap-3 text-[11px] text-muted-foreground mt-3">
+                <div className="flex gap-3 text-xs text-muted-foreground mt-3">
                   {a.reading_time_minutes && (
                     <span className="inline-flex items-center gap-1">
                       <Clock className="size-3" />
-                      {a.reading_time_minutes} mnt
+                      {a.reading_time_minutes} menit baca
                     </span>
                   )}
                   {a.author_name && <span>oleh {a.author_name}</span>}
@@ -170,16 +171,17 @@ function Chip({
   return (
     <button
       onClick={onClick}
-      className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition ${
+      aria-pressed={active}
+      className={`inline-flex items-center gap-1.5 px-3.5 py-2 min-h-9 rounded-full text-xs font-semibold whitespace-nowrap transition ${
         active
           ? "bg-primary text-primary-foreground shadow"
-          : "bg-card border text-muted-foreground"
+          : "bg-card border border-border text-muted-foreground"
       }`}
     >
       {children}
       {typeof count === "number" && (
         <span
-          className={`text-[10px] px-1.5 py-0.5 rounded-full ${active ? "bg-white/25" : "bg-muted"}`}
+          className={`text-[11px] px-1.5 py-0.5 rounded-full tabular-nums ${active ? "bg-white/25" : "bg-muted"}`}
         >
           {count}
         </span>
