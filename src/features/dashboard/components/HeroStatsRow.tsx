@@ -1,6 +1,5 @@
 import { Link } from "@tanstack/react-router";
 import { ArrowRight } from "lucide-react";
-import { CalorieRing } from "@/components/calorie-ring";
 import { formatDuration, fastingStage } from "@/lib/health";
 
 export function HeroStatsRow({
