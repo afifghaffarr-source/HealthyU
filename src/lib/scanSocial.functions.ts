@@ -152,10 +152,10 @@ export const getDailyChallenge = createServerFn({ method: "POST" })
       .insert({
         user_id: userId,
         challenge_date: today,
-        title: parsed.title,
-        description: parsed.description,
-        goal_type: parsed.goal_type,
-        goal_value: parsed.goal_value,
+        title: parsed.title ?? fallback.title,
+        description: parsed.description ?? fallback.description,
+        goal_type: parsed.goal_type ?? fallback.goal_type,
+        goal_value: parsed.goal_value ?? fallback.goal_value,
       })
       .select()
       .single();
