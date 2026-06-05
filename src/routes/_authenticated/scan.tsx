@@ -318,28 +318,3 @@ function ScanPage() {
     </div>
   );
 }
-
-function EditField({
-  label,
-  value,
-  onChange,
-}: {
-  label: string;
-  value: number;
-  onChange: (v: number) => void;
-}) {
-  return (
-    <label className="block">
-      <span className="block text-[10px] uppercase tracking-wider text-muted-foreground mb-0.5">
-        {label}
-      </span>
-      <input
-        type="number"
-        inputMode="numeric"
-        value={value}
-        onChange={(e) => onChange(Number(e.target.value) || 0)}
-        className="w-full text-sm bg-muted/60 rounded-lg px-2 py-1.5 outline-none focus:bg-background border border-transparent focus:border-primary"
-      />
-    </label>
-  );
-}
