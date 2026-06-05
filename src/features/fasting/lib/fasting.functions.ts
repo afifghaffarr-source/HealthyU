@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { recordActivityFor } from "./gamification.functions";
+import { recordActivityFor } from "@/features/gamification/lib/gamification.functions";
 
 export const currentFast = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
