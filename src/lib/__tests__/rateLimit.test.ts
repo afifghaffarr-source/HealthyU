@@ -2,7 +2,7 @@ import { describe, it, expect, vi } from "vitest";
 import { checkRateLimit, RATE_LIMITS } from "../rateLimit.server";
 
 function client(rpcResult: { data?: unknown; error?: unknown }) {
-  return { rpc: vi.fn().mockResolvedValue(rpcResult) } as never;
+  return { rpc: vi.fn().mockResolvedValue(rpcResult) } as unknown as Parameters<typeof checkRateLimit>[0] & { rpc: ReturnType<typeof vi.fn> };
 }
 
 describe("checkRateLimit", () => {
