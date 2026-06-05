@@ -24,6 +24,10 @@ import {
   Activity,
   Baby,
 } from "lucide-react";
+import { StatsCounter } from "@/components/landing/StatsCounter";
+import { BeforeAfter } from "@/components/landing/BeforeAfter";
+import { BmrQuiz } from "@/components/landing/BmrQuiz";
+import { FloatingChat } from "@/components/landing/FloatingChat";
 
 export const Route = createFileRoute("/")({
   head: () => ({
