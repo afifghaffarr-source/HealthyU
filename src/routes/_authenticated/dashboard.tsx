@@ -10,7 +10,7 @@ import {
 import { useServerFn } from "@tanstack/react-start";
 import { getProfile } from "@/features/profile/lib/profile.functions";
 import { getDailyTip } from "@/lib/dailyTips.functions";
-import { todaysMeals } from "@/lib/meals.functions";
+import { todaysMeals } from "@/features/meals/lib/meals.functions";
 import { currentFast } from "@/features/fasting/lib/fasting.functions";
 import { todaysWater, logWater } from "@/features/water/lib/water.functions";
 import { getGameSummary } from "@/features/gamification/lib/gamification.functions";

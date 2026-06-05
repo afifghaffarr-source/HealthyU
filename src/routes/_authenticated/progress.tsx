@@ -15,7 +15,7 @@ const ProgressRadialChart = lazy(
   () => import("@/components/charts/progress-radial-chart"),
 );
 import { getProfile } from "@/features/profile/lib/profile.functions";
-import { todaysMeals } from "@/lib/meals.functions";
+import { todaysMeals } from "@/features/meals/lib/meals.functions";
 import { todaysWater } from "@/features/water/lib/water.functions";
 
 export const Route = createFileRoute("/_authenticated/progress")({

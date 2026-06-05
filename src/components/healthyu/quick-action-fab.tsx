@@ -3,7 +3,7 @@ import { Link, useLocation } from "@tanstack/react-router";
 import { Plus, Camera, Utensils, Droplet, Dumbbell, X, Zap } from "lucide-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { logMeal } from "@/lib/meals.functions";
+import { logMeal } from "@/features/meals/lib/meals.functions";
 import { toast } from "sonner";
 
 const ACTIONS = [

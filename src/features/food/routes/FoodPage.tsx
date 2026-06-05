@@ -7,7 +7,7 @@ import {
   todaysMeals,
   deleteMeal,
   logMealWithItems,
-} from "@/lib/meals.functions";
+} from "@/features/meals/lib/meals.functions";
 import { parseMealFromVoice } from "@/features/ai/lib/ai-extras.functions";
 import { getAchievementToastPrefix } from "@/lib/achievement-icons";
 import { BottomNav } from "@/components/bottom-nav";
