@@ -227,7 +227,7 @@ export const Route = createFileRoute("/api/chat/stream")({
         try {
           const r = await streamAiChat({
             model: effectiveModel,
-            messages,
+            messages: messages as never,
             maxTokens: decision.maxTokens,
           });
           upstreamBody = r.body;
@@ -250,7 +250,7 @@ export const Route = createFileRoute("/api/chat/stream")({
                 `event: meta\ndata: ${JSON.stringify({ emergency: isEmergency, tier: decision.tier, cached: false })}\n\n`,
               ),
             );
-            const reader = upstream.body!.getReader();
+            const reader = upstreamBody.getReader();
             try {
               while (true) {
                 const { done, value } = await reader.read();
