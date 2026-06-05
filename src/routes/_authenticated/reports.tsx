@@ -11,51 +11,15 @@ import { z } from "zod";
 import { fallback, zodValidator } from "@tanstack/zod-adapter";
 import { useNavigate } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
-import {
-  PDF_PAGE_FOOTER_Y,
-  PDF_MARGIN_X,
-  PDF_PAGE_W,
-  PDF_DIVIDER_GRAY,
-  PDF_HEADER_BASELINE_Y,
-  PDF_HEADER_SUBTITLE_Y,
-  PDF_BODY_TOP_Y,
-  PDF_TITLE_FONT_SIZE,
-  PDF_SUBTITLE_FONT_SIZE,
-  PDF_BODY_FONT_SIZE,
-  PDF_FOOTER_FONT_SIZE,
-  PDF_PAGE_CONTENT_W,
-  PDF_LINE_HEIGHT,
-  PDF_SECTION_GAP,
-  PDF_HEADER_FILL_RGB,
-  PDF_LINK_RGB,
-  PDF_MUTED_GRAY,
-  PDF_TOC_ROWS_PER_PAGE,
-  PDF_TOC_ROW_HEIGHT,
-  PDF_DIVIDER_GRAY_STRONG,
-  PDF_LINK_BASELINE_Y,
-  PDF_LINK_UNDERLINE_OFFSET,
-  PDF_LINK_RIGHT_X,
-  PDF_TOC_PAGE_BREAK_Y,
-  PDF_TOC_CONTINUED_TOP_Y,
-  PDF_FOOTER_DIVIDER_OFFSET,
-  PDF_LINK_BOUND_OFFSET,
-  PDF_LINK_BOUND_HEIGHT,
-  PDF_LINK_FONT_SIZE,
-  PDF_DIVIDER_LINE_WIDTH,
-  PDF_SECTION_DIVIDER_OFFSET,
-  PDF_LINK_BOUND_Y_OFFSET,
-  PDF_TOC_INDENT_X,
-  PDF_TOC_PAGE_LABEL_X,
-  PDF_TOC_ROW_BOUND_W,
-  PDF_TOC_ROW_BOUND_H,
-  PDF_AUTOTABLE_START_Y,
-  PDF_BODY_TEXT_OFFSET_Y,
-  PDF_TABLE_FONT_SIZE,
-  PDF_TABLE_FONT_SIZE_SM,
-  PDF_TABLE_CELL_PADDING,
-} from "@/lib/constants";
 import { useTranslation } from "@/lib/i18n";
 import { useAnnounce } from "@/components/live-announcer";
+import {
+  exportWeeklyCsv,
+  exportWeeklyPdf,
+  exportArchivePdf,
+  exportAllArchivePdf,
+} from "@/lib/reportsPdf";
+import { Stat } from "@/components/reports/Stat";
 
 export const Route = createFileRoute("/_authenticated/reports")({
   validateSearch: zodValidator(
