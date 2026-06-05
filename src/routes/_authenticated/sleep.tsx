@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { useState, lazy, Suspense } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { logSleep, recentSleep, deleteSleep } from "@/lib/sleep.functions";
@@ -7,7 +7,6 @@ import { BottomNav } from "@/components/bottom-nav";
 import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { Moon, Trash2 } from "lucide-react";
 import { toast } from "sonner";
-import { lazy, Suspense } from "react";
 
 const SleepAreaChart = lazy(() => import("@/components/charts/sleep-area-chart"));
 
