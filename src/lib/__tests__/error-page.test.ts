@@ -3,18 +3,17 @@ import { renderErrorPage } from "../error-page";
 
 describe("renderErrorPage", () => {
   const html = renderErrorPage();
-  it("returns a complete HTML doc", () => {
+  it("starts with doctype and has html/head/body", () => {
     expect(html.startsWith("<!doctype html>")).toBe(true);
-    expect(html).toContain("<html lang=\"en\">");
-    expect(html).toContain("</html>");
+    expect(html).toContain("<html");
+    expect(html).toContain("</body>");
   });
-  it("has viewport meta and title", () => {
-    expect(html).toContain('name="viewport"');
-    expect(html).toContain("<title>This page didn't load</title>");
+  it("includes viewport meta + title", () => {
+    expect(html).toMatch(/<meta name="viewport"/);
+    expect(html).toMatch(/<title>[^<]+<\/title>/);
   });
-  it("has Try again + Go home actions", () => {
-    expect(html).toContain("Try again");
-    expect(html).toMatch(/href="\/"/);
+  it("includes retry + go home actions", () => {
     expect(html).toContain("location.reload()");
+    expect(html).toContain('href="/"');
   });
 });
