@@ -11,9 +11,9 @@ import {
   calcTDEE,
   bmiCategory,
   type ActivityLevel,
-} from "./health";
-import { buildCompactProfile, compactTodayBlock } from "./aiRouter.server";
-import { callAiWithGuards, type AiMultimodalMessage } from "./aiGateway.server";
+} from "@/lib/health";
+import { buildCompactProfile, compactTodayBlock } from "@/lib/aiRouter.server";
+import { callAiWithGuards, type AiMultimodalMessage } from "@/lib/aiGateway.server";
 
 const SYSTEM_PROMPT = `Anda adalah "Dr. HealthyU" (panggilan: Dok/Dr), AI health assistant di aplikasi HealthyU.
 
