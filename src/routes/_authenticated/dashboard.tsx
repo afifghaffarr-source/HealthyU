@@ -154,6 +154,7 @@ function Dashboard() {
 
         <SmartNextStepCard
           hour={new Date().getHours()}
+          timezone={profile?.timezone ?? undefined}
           mealCount={meals.length}
           waterMl={waterMl}
           waterTarget={waterTarget}

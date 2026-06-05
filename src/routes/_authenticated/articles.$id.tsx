@@ -70,19 +70,20 @@ function ArticleReader() {
             <button
               onClick={share}
               aria-label="Bagikan"
-              className="inline-flex size-9 items-center justify-center rounded-full hover:bg-muted"
+              className="inline-flex size-11 items-center justify-center rounded-full hover:bg-muted transition"
             >
-              <Share2 className="size-5" />
+              <Share2 className="size-5" aria-hidden />
             </button>
             <button
               onClick={toggleSave}
               aria-label={saved ? "Hapus bookmark" : "Simpan bookmark"}
-              className="inline-flex size-9 items-center justify-center rounded-full hover:bg-muted"
+              aria-pressed={saved}
+              className="inline-flex size-11 items-center justify-center rounded-full hover:bg-muted transition"
             >
               {saved ? (
-                <BookmarkCheck className="size-5 text-primary" />
+                <BookmarkCheck className="size-5 text-primary" aria-hidden />
               ) : (
-                <Bookmark className="size-5" />
+                <Bookmark className="size-5" aria-hidden />
               )}
             </button>
           </div>
