@@ -6,7 +6,7 @@ export const Route = createFileRoute("/api/wearable/google-fit/callback")({
       GET: async ({ request }) => {
         const url = new URL(request.url);
         const code = url.searchParams.get("code");
-        const state = url.searchParams.get("state"); // userId
+        const state = url.searchParams.get("state"); // nonce
         const err = url.searchParams.get("error");
         if (err) return redirectBack(url.origin, `Google Fit: ${err}`);
         if (!code || !state) return redirectBack(url.origin, "Parameter OAuth tidak lengkap");
@@ -16,6 +16,21 @@ export const Route = createFileRoute("/api/wearable/google-fit/callback")({
         if (!clientId || !clientSecret) {
           return redirectBack(url.origin, "Server belum di-set GOOGLE_FIT credentials");
         }
+
+        // Validate OAuth state: must exist, match provider, not expired, not used
+        const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+        const { data: stateRow, error: stateErr } = await supabaseAdmin
+          .from("oauth_states")
+          .select("id, user_id, provider, expires_at, used_at")
+          .eq("nonce", state)
+          .eq("provider", "google_fit")
+          .maybeSingle();
+        if (stateErr || !stateRow) return redirectBack(url.origin, "State OAuth tidak valid");
+        if (stateRow.used_at) return redirectBack(url.origin, "State OAuth sudah digunakan");
+        if (new Date(stateRow.expires_at).getTime() < Date.now()) {
+          return redirectBack(url.origin, "State OAuth kadaluarsa");
+        }
+        const userId = stateRow.user_id as string;
 
         const tokenRes = await fetch("https://oauth2.googleapis.com/token", {
           method: "POST",
@@ -42,11 +57,10 @@ export const Route = createFileRoute("/api/wearable/google-fit/callback")({
           return redirectBack(url.origin, "Tidak dapat refresh_token. Cabut akses lalu coba lagi.");
         }
 
-        const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
         const expires = new Date(Date.now() + tok.expires_in * 1000).toISOString();
         const { error } = await supabaseAdmin.from("wearable_tokens").upsert(
           {
-            user_id: state,
+            user_id: userId,
             provider: "google_fit",
             access_token: tok.access_token,
             refresh_token: tok.refresh_token,
@@ -57,6 +71,12 @@ export const Route = createFileRoute("/api/wearable/google-fit/callback")({
           { onConflict: "user_id" },
         );
         if (error) return redirectBack(url.origin, `DB error: ${error.message}`);
+
+        // Mark state as used (one-shot)
+        await supabaseAdmin
+          .from("oauth_states")
+          .update({ used_at: new Date().toISOString() })
+          .eq("id", stateRow.id);
 
         return Response.redirect(`${url.origin}/wearable?connected=1`, 302);
       },
