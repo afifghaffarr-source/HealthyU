@@ -24,6 +24,8 @@ export const getRouter = () => {
     context: { queryClient },
     scrollRestoration: true,
     defaultPreloadStaleTime: 0,
+    // Preserve referential identity untuk search params/loader data → kurangi re-render
+    defaultStructuralSharing: true,
   });
 
   return router;
