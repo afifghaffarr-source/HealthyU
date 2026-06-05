@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useEffect, useRef, useState } from "react";
+import { useRef } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { Trophy } from "lucide-react";
@@ -16,13 +16,10 @@ import {
   logChallengeDay,
   leaveChallenge,
 } from "@/features/challenges/lib/challenges.functions";
-import {
-  CHALLENGE_HIGHLIGHT_MS,
-  CHALLENGE_HIGHLIGHT_FADE_MS,
-} from "@/lib/constants";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
 import { useAnnounce } from "@/components/live-announcer";
 import { ChallengeCard } from "@/features/challenges/components/ChallengeCard";
+import { useChallengeDeeplink } from "@/features/challenges/hooks/useChallengeDeeplink";
 
 const challengesSearchSchema = z.object({
   group: fallback(z.string().uuid().optional(), undefined),
@@ -37,7 +34,7 @@ export const Route = createFileRoute("/_authenticated/challenges")({
 
 function ChallengesPage() {
   const qc = useQueryClient();
-  const navigate = useNavigate();
+  useNavigate(); // type-safe register; navigation handled in hook
   const announce = useAnnounce();
   const { group: focusGroup, challenge: focusChallenge, focus } = Route.useSearch();
   // prefers-reduced-motion → override transisi spring jadi 0ms.
@@ -96,78 +93,9 @@ function ChallengesPage() {
 
   const challenges = data?.challenges ?? [];
   const partsByCh = new Map((data?.participations ?? []).map((p) => [p.challenge_id, p] as const));
-  const [openLb, setOpenLb] = useState<string | null>(null);
-  const [streakAutoChallenge, setStreakAutoChallenge] = useState<string | null>(null);
-  const [highlightId, setHighlightId] = useState<string | null>(null);
-  const [highlightFading, setHighlightFading] = useState(false);
   const articleRefs = useRef<Record<string, HTMLElement | null>>({});
-  const flashHighlight = (id: string) => {
-    setHighlightId(id);
-    setHighlightFading(false);
-    const ch = (data?.challenges ?? []).find((c) => c.id === id);
-    if (ch?.title) announce(`Kartu challenge ${ch.title} disorot`);
-    // Start fade-out 500ms before the end so the ring smoothly disappears.
-    window.setTimeout(
-      () => setHighlightFading(true),
-      Math.max(0, CHALLENGE_HIGHLIGHT_MS - CHALLENGE_HIGHLIGHT_FADE_MS),
-    );
-    window.setTimeout(() => {
-      setHighlightId((cur) => (cur === id ? null : cur));
-      setHighlightFading(false);
-    }, CHALLENGE_HIGHLIGHT_MS);
-  };
-
-  useEffect(() => {
-    if (!focusChallenge) return;
-    setOpenLb(focusChallenge);
-    const t = setTimeout(() => {
-      const el = articleRefs.current[focusChallenge];
-      el?.scrollIntoView({ behavior: "smooth", block: "start" });
-    }, 250);
-    return () => clearTimeout(t);
-  }, [focusChallenge]);
-
-  // Streak deeplink: scroll to challenge where user has the longest streak
-  useEffect(() => {
-    if (focus !== "streak") return;
-    const parts = data?.participations ?? [];
-    if (!data) return; // wait for data
-    const scrollToFirstUnjoined = () => {
-      const joinedIds = new Set(parts.map((p) => p.challenge_id));
-      const target = (data?.challenges ?? []).find((c) => !joinedIds.has(c.id));
-      if (target) {
-        articleRefs.current[target.id]?.scrollIntoView({ behavior: "smooth", block: "start" });
-        flashHighlight(target.id);
-      }
-    };
-    if (parts.length === 0) {
-      toast.info("Belum ada streak — gabung challenge dulu", {
-        action: { label: "Lihat challenge", onClick: scrollToFirstUnjoined },
-      });
-      navigate({ to: "/challenges", search: {}, replace: true });
-      return;
-    }
-    const active = parts.filter((p) => {
-      const s = (p as { status?: string }).status;
-      return !s || s === "active";
-    });
-    if (active.length === 0) {
-      toast.info("Semua streak sudah selesai — mulai challenge baru", {
-        action: { label: "Lihat challenge", onClick: scrollToFirstUnjoined },
-      });
-      navigate({ to: "/challenges", search: {}, replace: true });
-      return;
-    }
-    const top = active.slice().sort((a, b) => (b.streak ?? 0) - (a.streak ?? 0))[0];
-    if (!top?.challenge_id) return;
-    setOpenLb(top.challenge_id);
-    setStreakAutoChallenge(top.challenge_id);
-    const t = setTimeout(() => {
-      articleRefs.current[top.challenge_id]?.scrollIntoView({ behavior: "smooth", block: "start" });
-      flashHighlight(top.challenge_id);
-    }, 250);
-    return () => clearTimeout(t);
-  }, [focus, data, navigate]);
+  const { openLb, setOpenLb, streakAutoChallenge, highlightId, highlightFading } =
+    useChallengeDeeplink({ data, focus, focusChallenge, articleRefs });
 
   return (
     <div className="min-h-dvh pb-32">

@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { listRecipes } from "@/features/recipes/lib/recipes.functions";
@@ -40,10 +40,13 @@ function RecipesPage() {
     if (typeof window === "undefined") return false;
     return window.localStorage.getItem("recipes:trendingOnly") === "1";
   });
-  if (typeof window !== "undefined") {
-    window.localStorage.setItem("recipes:sort", sort);
-    window.localStorage.setItem("recipes:trendingOnly", trendingOnly ? "1" : "0");
-  }
+  useEffect(() => {
+    if (typeof window !== "undefined") window.localStorage.setItem("recipes:sort", sort);
+  }, [sort]);
+  useEffect(() => {
+    if (typeof window !== "undefined")
+      window.localStorage.setItem("recipes:trendingOnly", trendingOnly ? "1" : "0");
+  }, [trendingOnly]);
   const { trendingCount, pulseTrending, pulseCounter, flashIds, resetCounter } =
     useTrendingPulse(all, sort);
 

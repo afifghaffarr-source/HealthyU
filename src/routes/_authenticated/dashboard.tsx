@@ -1,10 +1,9 @@
 import { createFileRoute, redirect } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
   queryOptions,
   useQuery,
   useSuspenseQuery,
-  useMutation,
   useQueryClient,
 } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -12,12 +11,10 @@ import { getProfile } from "@/features/profile/lib/profile.functions";
 import { getDailyTip } from "@/features/daily-tips/lib/dailyTips.functions";
 import { todaysMeals } from "@/features/meals/lib/meals.functions";
 import { currentFast } from "@/features/fasting/lib/fasting.functions";
-import { todaysWater, logWater } from "@/features/water/lib/water.functions";
+import { todaysWater } from "@/features/water/lib/water.functions";
 import { getGameSummary } from "@/features/gamification/lib/gamification.functions";
 import { myGroupChallengeSummary } from "@/features/challenges/lib/groupChallengeSummary.functions";
 import { myUnlinkedJoinedChallenges } from "@/features/challenges/lib/myUnlinkedChallenges.functions";
-import { addMood } from "@/features/mood/lib/mood.functions";
-import { getAchievementToastPrefix } from "@/lib/achievement-icons";
 import { BottomNav } from "@/components/bottom-nav";
 import { Coachmark } from "@/components/healthyu/coachmark";
 import { PullIndicator } from "@/components/healthyu/pull-indicator";
@@ -44,9 +41,8 @@ import {
   GamificationCard,
 } from "@/features/dashboard/components/DashboardCtas";
 import { usePullToRefresh } from "@/hooks/use-pull-to-refresh";
-import { claimDailyLoginBonus } from "@/features/scan/lib/scanBatch9.functions";
-import { toast } from "sonner";
-import { useAnnounce } from "@/components/live-announcer";
+import { useFastClock } from "@/features/dashboard/hooks/useFastClock";
+import { useDashboardMutations } from "@/features/dashboard/hooks/useDashboardMutations";
 
 const profileQueryOptions = queryOptions({
   queryKey: ["profile"],
@@ -87,36 +83,15 @@ function Dashboard() {
   const { pulling, refreshing } = usePullToRefresh(async () => {
     await qc.invalidateQueries();
   });
-  const announce = useAnnounce();
   const fetchMeals = useServerFn(todaysMeals);
   const fetchFast = useServerFn(currentFast);
   const fetchWater = useServerFn(todaysWater);
-  const logWaterFn = useServerFn(logWater);
   const fetchGame = useServerFn(getGameSummary);
-  const addMoodFn = useServerFn(addMood);
   const fetchGroupChallenges = useServerFn(myGroupChallengeSummary);
   const fetchUnlinked = useServerFn(myUnlinkedJoinedChallenges);
-  const claimBonusFn = useServerFn(claimDailyLoginBonus);
-  const [bonusClaimed, setBonusClaimed] = useState<boolean>(() => {
-    if (typeof window === "undefined") return false;
-    return window.localStorage.getItem("dailyBonusClaimed") === new Date().toDateString();
-  });
   const [freezeOpen, setFreezeOpen] = useState(false);
-  const claimBonusMut = useMutation({
-    mutationFn: () => claimBonusFn({ data: undefined as never }),
-    onSuccess: (r) => {
-      const b = r.bonus as { coins?: number; streak?: number } | undefined;
-      window.localStorage.setItem("dailyBonusClaimed", new Date().toDateString());
-      setBonusClaimed(true);
-      qc.invalidateQueries({ queryKey: ["profile"] });
-      toast.success(
-        r.alreadyClaimed
-          ? "Sudah klaim hari ini"
-          : `+${b?.coins ?? 0} koin! Streak ${b?.streak ?? 0}`,
-      );
-    },
-    onError: (e: Error) => toast.error(e.message),
-  });
+  const { bonusClaimed, claimBonusMut, waterMutation, moodMutation } =
+    useDashboardMutations();
 
   const { data: profile } = useSuspenseQuery(profileQueryOptions);
   const { data: dailyTip } = useQuery(dailyTipQueryOptions);
@@ -143,29 +118,6 @@ function Dashboard() {
     queryFn: () => fetchUnlinked(),
   });
 
-  const waterMutation = useMutation({
-    mutationFn: (ml: number) => logWaterFn({ data: { amount_ml: ml } }),
-    onSuccess: (res) => {
-      qc.invalidateQueries({ queryKey: ["water", "today"] });
-      qc.invalidateQueries({ queryKey: ["game", "summary"] });
-      toast.success("+250ml dicatat");
-      announce("250 mililiter air tercatat");
-      const newlyUnlocked = res?.game?.newlyUnlocked ?? [];
-      newlyUnlocked.forEach((a) =>
-        toast.success(`${getAchievementToastPrefix(a.icon)} ${a.title} terbuka!`),
-      );
-    },
-  });
-
-  const moodMutation = useMutation({
-    mutationFn: (mood: number) => addMoodFn({ data: { mood } }),
-    onSuccess: (_r, mood) => {
-      qc.invalidateQueries({ queryKey: ["mood"] });
-      toast.success("Mood tercatat");
-      announce(`Mood ${mood} dari 5 tercatat`);
-    },
-  });
-
   const totals = meals.reduce(
     (acc, m) => ({
       cal: acc.cal + Number(m.calories || 0),
@@ -179,15 +131,7 @@ function Dashboard() {
   const calTarget = profile?.daily_calorie_target ?? 2000;
   const waterTarget = 2500;
 
-  const [now, setNow] = useState(Date.now());
-  useEffect(() => {
-    if (!fast) return;
-    const id = setInterval(() => setNow(Date.now()), 1000);
-    return () => clearInterval(id);
-  }, [fast]);
-  const fastMs = fast ? now - new Date(fast.start_time).getTime() : 0;
-  const fastHrs = fastMs / 3600000;
-  const fastPct = fast ? Math.min(100, (fastHrs / Number(fast.target_hours)) * 100) : 0;
+  const { fastMs, fastHrs, fastPct } = useFastClock(fast);
 
   return (
     <main className="min-h-dvh bg-background pb-28">
