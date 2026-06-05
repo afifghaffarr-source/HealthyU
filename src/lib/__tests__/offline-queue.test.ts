@@ -99,41 +99,40 @@ describe("offline-queue", () => {
 
   it("flush moves to dead-letter after MAX_ATTEMPTS", async () => {
     await enqueue("vitals", { hr: 70 });
-    const syncer = vi.fn().mockRejectedValue(new Error("perma-fail"));
-    const syncers = { vitals: syncer } as unknown as Record<
-      QueueKind,
-      (i: QueueItem) => Promise<void>
-    >;
-    // 6 attempts to hit MAX
-    for (let i = 0; i < 6; i++) {
-      // bypass next_attempt_at by clearing it
-      const items = await listAll();
-      if (items[0]?.id != null) {
-        await remove(items[0].id);
-        await enqueue("vitals", items[0].payload);
+    const syncers = {
+      vitals: vi.fn().mockRejectedValue(new Error("perma-fail")),
+    } as unknown as Record<QueueKind, (i: QueueItem) => Promise<void>>;
+    // Stub Date.now to advance well past any backoff between flushes.
+    let now = Date.now();
+    const realNow = Date.now;
+    const spy = vi.spyOn(Date, "now").mockImplementation(() => now);
+    try {
+      for (let i = 0; i < 6; i++) {
+        await flush(syncers);
+        now += 120_000; // skip past backoff window
       }
-      await flush(syncers);
+    } finally {
+      spy.mockRestore();
+      void realNow;
     }
     expect(await count()).toBe(0);
-    const dead = await listDead();
-    expect(dead.length).toBeGreaterThan(0);
+    expect((await listDead()).length).toBeGreaterThan(0);
   });
 
   it("retryDead re-enqueues and clearDead empties", async () => {
     await enqueue("workout", { name: "run" });
-    await flush({
+    const syncers = {
       workout: vi.fn().mockRejectedValue(new Error("x")),
-    } as unknown as Record<QueueKind, (i: QueueItem) => Promise<void>>);
-    // force into dead by simulating max attempts directly via repeated cycles
-    for (let i = 0; i < 6; i++) {
-      const items = await listAll();
-      if (items[0]?.id != null) {
-        await remove(items[0].id);
-        await enqueue("workout", items[0].payload);
+    } as unknown as Record<QueueKind, (i: QueueItem) => Promise<void>>;
+    let now = Date.now();
+    const spy = vi.spyOn(Date, "now").mockImplementation(() => now);
+    try {
+      for (let i = 0; i < 6; i++) {
+        await flush(syncers);
+        now += 120_000;
       }
-      await flush({
-        workout: vi.fn().mockRejectedValue(new Error("x")),
-      } as unknown as Record<QueueKind, (i: QueueItem) => Promise<void>>);
+    } finally {
+      spy.mockRestore();
     }
     const dead = await listDead();
     expect(dead.length).toBeGreaterThan(0);
