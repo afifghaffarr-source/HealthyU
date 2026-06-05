@@ -3546,6 +3546,36 @@ export type Database = {
         }
         Relationships: []
       }
+      oauth_states: {
+        Row: {
+          created_at: string
+          expires_at: string
+          id: string
+          nonce: string
+          provider: string
+          used_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          expires_at: string
+          id?: string
+          nonce: string
+          provider: string
+          used_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          expires_at?: string
+          id?: string
+          nonce?: string
+          provider?: string
+          used_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       payment_history: {
         Row: {
           amount_idr: number
