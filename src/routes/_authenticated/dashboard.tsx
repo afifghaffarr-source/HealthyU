@@ -24,12 +24,12 @@ import { Coachmark } from "@/components/healthyu/coachmark";
 import { PullIndicator } from "@/components/healthyu/pull-indicator";
 import { StreakRing } from "@/components/healthyu/streak-ring";
 import { CoinPill } from "@/components/healthyu/coin-pill";
-import { DailyBonusButton } from "@/components/dashboard/DailyBonusButton";
-import { DailyTipCard } from "@/components/dashboard/DailyTipCard";
-import { WaterCard } from "@/components/dashboard/WaterCard";
-import { MoodQuickLog } from "@/components/dashboard/MoodQuickLog";
-import { FreezeDialog } from "@/components/dashboard/FreezeDialog";
-import { TodaysMeals } from "@/components/dashboard/TodaysMeals";
+import { DailyBonusButton } from "@/features/dashboard/components/DailyBonusButton";
+import { DailyTipCard } from "@/features/dashboard/components/DailyTipCard";
+import { WaterCard } from "@/features/dashboard/components/WaterCard";
+import { MoodQuickLog } from "@/features/dashboard/components/MoodQuickLog";
+import { FreezeDialog } from "@/features/dashboard/components/FreezeDialog";
+import { TodaysMeals } from "@/features/dashboard/components/TodaysMeals";
 import { usePullToRefresh } from "@/hooks/use-pull-to-refresh";
 import { formatDuration, fastingStage } from "@/lib/health";
 import {
