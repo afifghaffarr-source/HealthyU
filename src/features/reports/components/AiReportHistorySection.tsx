@@ -1,13 +1,10 @@
 import { FileText, Share2 } from "lucide-react";
-import { exportAllArchivePdf, exportArchivePdf } from "@/features/reports/lib/reportsPdf";
-
-type Report = {
-  id: string;
-  created_at: string;
-  report_period_start: string | null;
-  report_period_end: string | null;
-  recommendations: unknown;
-};
+import {
+  exportAllArchivePdf,
+  exportArchivePdf,
+  type ArchiveReport,
+  type Translator,
+} from "@/features/reports/lib/reportsPdf";
 
 export function AiReportHistorySection({
   history,
@@ -20,14 +17,14 @@ export function AiReportHistorySection({
   t,
   onShare,
 }: {
-  history: Report[];
+  history: ArchiveReport[];
   rangeWeeks: number;
   setRangeWeeks: (n: number) => void;
   latestId: string | null;
   lastSeenId: string | null;
   manualFlashId: string | null;
   focusLatest: boolean;
-  t: (key: string) => string;
+  t: Translator;
   onShare: (args: { text: string; periodStart?: string; periodEnd?: string }) => void;
 }) {
   const filtered = history.filter((r) => {
