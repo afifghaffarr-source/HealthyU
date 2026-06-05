@@ -18,7 +18,6 @@ import { AiRecipeModal } from "@/features/recipes/components/AiRecipeModal";
 import { RecipeListItem } from "@/features/recipes/components/RecipeListItem";
 import { TrendingStrip } from "@/features/recipes/components/TrendingStrip";
 import {
-  RECIPE_CATS,
   RecipeFilters,
   type RecipeCatId,
   type RecipeSortMode,
