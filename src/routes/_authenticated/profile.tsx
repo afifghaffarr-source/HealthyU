@@ -12,29 +12,13 @@ import {
   LogOut,
   Settings,
   Trophy,
-  Moon,
-  Calendar,
-  Pill,
-  MoonStar,
-  BarChart3,
-  Bell,
-  Users,
-  Sun,
-  Medal,
-  Camera,
-  ChefHat,
-  Smile,
-  Droplet,
   Scale,
   HeartPulse,
   Activity,
-  Download,
-  UsersRound,
-  Sparkles,
-  AlertTriangle,
 } from "lucide-react";
 import { useTheme } from "@/components/theme-provider";
 import { LocaleSwitcher } from "@/components/locale-switcher";
+import { ProfileNavGrid } from "@/features/profile/components/ProfileNavGrid";
 
 export const Route = createFileRoute("/_authenticated/profile")({
   component: ProfilePage,
