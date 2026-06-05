@@ -24,6 +24,7 @@ type CoachOutput = {
 
 export const dailyCoach = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
+  .inputValidator(() => z.object({}).strict().parse({}))
   .handler(async ({ context }): Promise<CoachOutput> => {
     const { supabase, userId } = context;
 
