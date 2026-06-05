@@ -42,7 +42,12 @@ import {
   PDF_TABLE_CELL_PADDING,
 } from "@/lib/constants";
 
-export type Translator = (key: string, vars?: Record<string, string | number>) => string;
+import type { TranslationKey } from "@/lib/i18n";
+
+export type Translator = (
+  key: TranslationKey,
+  vars?: Record<string, string | number>,
+) => string;
 
 export type WeeklyData = {
   meals: Array<{ logged_at: string; calories: number | string; meal_type: string }>;
