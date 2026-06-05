@@ -7,7 +7,15 @@ vi.mock("../aiBudget.server", () => ({
   logAiUsage: (...a: unknown[]) => logMock(...a),
 }));
 
-import { callAiWithGuards, callAiJsonWithGuards, AiGatewayError } from "../aiGateway.server";
+import { z } from "zod";
+import {
+  callAiWithGuards,
+  callAiJsonWithGuards,
+  callAiJsonWithSchema,
+  extractJsonFromResponse,
+  AiGatewayError,
+  AiSchemaError,
+} from "../aiGateway.server";
 
 const origKey = process.env.LOVABLE_API_KEY;
 const origFetch = globalThis.fetch;
@@ -124,5 +132,53 @@ describe("callAiJsonWithGuards", () => {
     mkFetch(async () => new Response(JSON.stringify({ choices: [{ message: { content: "not json" } }] }), { status: 200 }));
     const out = await callAiJsonWithGuards({ userId: null, feature: "f", messages: msgs });
     expect(out).toEqual({});
+  });
+});
+
+describe("extractJsonFromResponse", () => {
+  it("strips ```json fences", () => {
+    expect(extractJsonFromResponse('```json\n{"a":1}\n```')).toBe('{"a":1}');
+  });
+  it("pulls first balanced object from prose", () => {
+    expect(extractJsonFromResponse('here ya go: {"a":{"b":2}} thanks')).toBe('{"a":{"b":2}}');
+  });
+  it("handles arrays", () => {
+    expect(extractJsonFromResponse("prefix [1,2,3] suffix")).toBe("[1,2,3]");
+  });
+  it("ignores braces inside strings", () => {
+    expect(extractJsonFromResponse('{"s":"a}b"}')).toBe('{"s":"a}b"}');
+  });
+});
+
+describe("callAiJsonWithSchema", () => {
+  const schema = z.object({ a: z.number() });
+  it("validates and returns typed data", async () => {
+    mkFetch(async () => new Response(JSON.stringify({ choices: [{ message: { content: '{"a":1}' } }] }), { status: 200 }));
+    const out = await callAiJsonWithSchema({ userId: null, feature: "f", messages: msgs, schema });
+    expect(out).toEqual({ a: 1 });
+  });
+  it("returns fallback on invalid JSON", async () => {
+    mkFetch(async () => new Response(JSON.stringify({ choices: [{ message: { content: "garbage" } }] }), { status: 200 }));
+    const out = await callAiJsonWithSchema({ userId: null, feature: "f", messages: msgs, schema, fallback: { a: 0 } });
+    expect(out).toEqual({ a: 0 });
+  });
+  it("returns fallback on schema mismatch", async () => {
+    mkFetch(async () => new Response(JSON.stringify({ choices: [{ message: { content: '{"a":"nope"}' } }] }), { status: 200 }));
+    const out = await callAiJsonWithSchema({ userId: null, feature: "f", messages: msgs, schema, fallback: { a: -1 } });
+    expect(out).toEqual({ a: -1 });
+  });
+  it("throws AiSchemaError without fallback on invalid JSON", async () => {
+    mkFetch(async () => new Response(JSON.stringify({ choices: [{ message: { content: "garbage" } }] }), { status: 200 }));
+    await expect(callAiJsonWithSchema({ userId: null, feature: "f", messages: msgs, schema }))
+      .rejects.toBeInstanceOf(AiSchemaError);
+  });
+  it("forwards default max_tokens=2048", async () => {
+    let captured: { max_tokens?: number } | undefined;
+    mkFetch(async (_u, init) => {
+      captured = JSON.parse(init!.body as string);
+      return new Response(JSON.stringify({ choices: [{ message: { content: '{"a":1}' } }] }), { status: 200 });
+    });
+    await callAiJsonWithSchema({ userId: null, feature: "f", messages: msgs, schema });
+    expect(captured!.max_tokens).toBe(2048);
   });
 });

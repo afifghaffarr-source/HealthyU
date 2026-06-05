@@ -1,4 +1,5 @@
 import { enforceAiBudget, logAiUsage } from "./aiBudget.server";
+import type { z, ZodTypeAny } from "zod";
 
 const LOVABLE_AI = "https://ai.gateway.lovable.dev/v1/chat/completions";
 const DEFAULT_TIMEOUT_MS = 30_000;
@@ -133,4 +134,90 @@ export async function callAiJsonWithGuards<T = Record<string, unknown>>(
   } catch {
     return {} as T;
   }
+}
+
+/**
+ * Strip ```json fences / control chars and pull the first balanced {...} or [...]
+ * out of a model response so JSON.parse stops dying on stray prose.
+ */
+export function extractJsonFromResponse(raw: string): string {
+  if (!raw) return "";
+  let s = raw.trim();
+  // strip code fences
+  s = s.replace(/^```(?:json)?\s*/i, "").replace(/```\s*$/i, "").trim();
+  // remove control chars (except \n \r \t)
+  s = s.replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F]/g, "");
+  // already starts with { or [
+  if (s.startsWith("{") || s.startsWith("[")) return s;
+  // find first balanced object/array
+  const start = s.search(/[{[]/);
+  if (start === -1) return s;
+  const open = s[start];
+  const close = open === "{" ? "}" : "]";
+  let depth = 0;
+  let inStr = false;
+  let esc = false;
+  for (let i = start; i < s.length; i++) {
+    const c = s[i];
+    if (inStr) {
+      if (esc) esc = false;
+      else if (c === "\\") esc = true;
+      else if (c === '"') inStr = false;
+      continue;
+    }
+    if (c === '"') inStr = true;
+    else if (c === open) depth++;
+    else if (c === close) {
+      depth--;
+      if (depth === 0) return s.slice(start, i + 1);
+    }
+  }
+  return s.slice(start);
+}
+
+export class AiSchemaError extends Error {
+  constructor(message: string, public readonly raw: string) {
+    super(message);
+    this.name = "AiSchemaError";
+  }
+}
+
+/**
+ * Like callAiJsonWithGuards but validates against a Zod schema and returns a
+ * typed fallback when parsing/validation fails (no exceptions to the UI).
+ * Pass `fallback` for the safe default; omit to throw AiSchemaError on failure.
+ */
+export async function callAiJsonWithSchema<S extends ZodTypeAny>(
+  opts: Omit<CallAiOptions, "responseFormat"> & {
+    schema: S;
+    fallback?: z.infer<S>;
+    /** Default 2048. Pushed to the gateway as max_tokens to reduce truncation. */
+    maxTokens?: number;
+  },
+): Promise<z.infer<S>> {
+  const { schema, fallback, ...rest } = opts;
+  const raw = await callAiWithGuards({
+    ...rest,
+    responseFormat: "json_object",
+    maxTokens: rest.maxTokens ?? 2048,
+  });
+  const cleaned = extractJsonFromResponse(raw);
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(cleaned || "{}");
+  } catch {
+    if (fallback !== undefined) return fallback;
+    throw new AiSchemaError("AI response was not valid JSON", raw);
+  }
+  const result = schema.safeParse(parsed);
+  if (!result.success) {
+    if (fallback !== undefined) return fallback;
+    throw new AiSchemaError(
+      `AI response failed schema validation: ${result.error.issues
+        .map((i) => `${i.path.join(".")}: ${i.message}`)
+        .join("; ")}`,
+      raw,
+    );
+  }
+  return result.data;
 }
