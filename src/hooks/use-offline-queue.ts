@@ -1,10 +1,10 @@
 import { useEffect, useState, useCallback } from "react";
 import { count, flush } from "@/lib/offline-queue";
 import { logWater } from "@/lib/water.functions";
-import { addWeight } from "@/lib/weight.functions";
+import { addWeight } from "@/features/vitals/lib/weight.functions";
 import { logMeal } from "@/lib/meals.functions";
 import { addMood } from "@/lib/mood.functions";
-import { addVitals } from "@/lib/vitals.functions";
+import { addVitals } from "@/features/vitals/lib/vitals.functions";
 import { logWorkout } from "@/lib/workouts.functions";
 import { useServerFn } from "@tanstack/react-start";
 import { useQueryClient } from "@tanstack/react-query";
