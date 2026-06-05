@@ -17,6 +17,7 @@ import {
   Activity,
   Baby,
 } from "lucide-react";
+import { Link } from "@tanstack/react-router";
 import { StatsCounter } from "./StatsCounter";
 import { BeforeAfter } from "./BeforeAfter";
 
@@ -570,9 +571,9 @@ export function PopularRecipes({ ctaHref }: { ctaHref: string }) {
           </h2>
           <p className="text-muted-foreground text-sm mt-1">Diuji dapur lokal, ramah kalori.</p>
         </div>
-        <a href={ctaHref} className="hidden sm:inline text-sm font-semibold text-primary">
+        <Link to={ctaHref} className="hidden sm:inline text-sm font-semibold text-primary">
           Lihat semua →
-        </a>
+        </Link>
       </div>
       <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
         {RECIPES.map((r, i) => (
