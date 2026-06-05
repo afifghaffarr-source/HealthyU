@@ -55,9 +55,10 @@ export const getDailyQuiz = createServerFn({ method: "POST" })
       "Buat 1 soal pilihan ganda nutrisi (4 opsi). Format JSON: {question, options:[..4], correct_index}. Bahasa Indonesia. Hanya JSON.",
       "Kamu pembuat kuis nutrisi.",
     );
-    let parsed: any;
+    type QuizParsed = { question: string; options: string[]; correct_index: number };
+    let parsed: QuizParsed;
     try {
-      parsed = JSON.parse(raw.replace(/```json|```/g, "").trim());
+      parsed = JSON.parse(raw.replace(/```json|```/g, "").trim()) as QuizParsed;
     } catch {
       parsed = {
         question: "Berapa kalori dalam 1 gram protein?",
@@ -154,10 +155,11 @@ export const getMealHeatmap = createServerFn({ method: "POST" })
       .eq("user_id", userId)
       .gte("log_date", sinceDate);
     const counts: Record<string, number> = {};
-    (data ?? []).forEach((r: any) => {
+    for (const r of data ?? []) {
       const d = r.log_date;
+      if (!d) continue;
       counts[d] = (counts[d] ?? 0) + 1;
-    });
+    }
     return { counts };
   });
 
@@ -184,7 +186,7 @@ export const syncWorkoutBurn = createServerFn({ method: "POST" })
       .select("calories_burned, started_at")
       .eq("user_id", userId)
       .gte("started_at", today);
-    const total = (data ?? []).reduce((s: number, w: any) => s + (w.calories_burned ?? 0), 0);
+    const total = (data ?? []).reduce<number>((s, w) => s + (w.calories_burned ?? 0), 0);
     return { totalBurned: total, sessions: data?.length ?? 0 };
   });
 
@@ -200,11 +202,12 @@ export const smartMealReminderPattern = createServerFn({ method: "POST" })
       .eq("user_id", userId)
       .gte("logged_at", since);
     const buckets: Record<string, number[]> = {};
-    (data ?? []).forEach((m: any) => {
+    for (const m of data ?? []) {
+      if (!m.logged_at || !m.meal_type) continue;
       const h = new Date(m.logged_at).getHours();
       if (!buckets[m.meal_type]) buckets[m.meal_type] = [];
       buckets[m.meal_type].push(h);
-    });
+    }
     const recommended: Record<string, number> = {};
     Object.entries(buckets).forEach(([k, arr]) => {
       recommended[k] = Math.round(arr.reduce((a, b) => a + b, 0) / arr.length);
@@ -380,9 +383,9 @@ export const getFamilyMealVotes = createServerFn({ method: "POST" })
       .eq("plan_id", data.planId)
       .eq("vote_date", today);
     const counts: Record<string, number> = {};
-    (rows ?? []).forEach((r: any) => {
+    for (const r of rows ?? []) {
       counts[r.meal_name] = (counts[r.meal_name] ?? 0) + 1;
-    });
+    }
     return { counts };
   });
 
@@ -428,13 +431,14 @@ export const listFollowers = createServerFn({ method: "POST" })
       .from("user_follows")
       .select("following_id")
       .eq("follower_id", data.userId);
-    const followerIds = (followerRows ?? []).map((r: any) => r.follower_id);
-    const followingIds = (followingRows ?? []).map((r: any) => r.following_id);
+    const followerIds = (followerRows ?? []).map((r) => r.follower_id);
+    const followingIds = (followingRows ?? []).map((r) => r.following_id);
     const allIds = Array.from(new Set([...followerIds, ...followingIds]));
+    type Profile = { id: string; full_name: string | null; avatar_url: string | null };
     const { data: profs } = allIds.length
       ? await supabase.from("profiles").select("id, full_name, avatar_url").in("id", allIds)
-      : { data: [] as any[] };
-    const map = new Map((profs ?? []).map((p: any) => [p.id, p]));
+      : { data: [] as Profile[] };
+    const map = new Map<string, Profile>((profs ?? []).map((p) => [p.id, p as Profile]));
     return {
       followers: followerIds.map((id) => map.get(id)).filter(Boolean),
       following: followingIds.map((id) => map.get(id)).filter(Boolean),

@@ -66,11 +66,35 @@ function ChatPage() {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [listening, setListening] = useState(false);
   const [ttsOn, setTtsOn] = useState(false);
-  const recogRef = useRef<any>(null);
+  // Minimal Web Speech API typings (not in lib.dom yet for Chrome's webkit prefix).
+  type SpeechRecognitionResultLike = { 0: { transcript: string }; isFinal: boolean };
+  type SpeechRecognitionEventLike = {
+    resultIndex: number;
+    results: ArrayLike<SpeechRecognitionResultLike>;
+  };
+  type SpeechRecognitionErrorLike = { error?: string };
+  interface SpeechRecognitionLike {
+    lang: string;
+    interimResults: boolean;
+    continuous: boolean;
+    onresult: ((e: SpeechRecognitionEventLike) => void) | null;
+    onerror: ((e: SpeechRecognitionErrorLike) => void) | null;
+    onend: (() => void) | null;
+    start: () => void;
+    stop: () => void;
+  }
+  type SpeechRecognitionCtor = new () => SpeechRecognitionLike;
+  const recogRef = useRef<SpeechRecognitionLike | null>(null);
+  const getSR = (): SpeechRecognitionCtor | null => {
+    if (typeof window === "undefined") return null;
+    const w = window as unknown as {
+      SpeechRecognition?: SpeechRecognitionCtor;
+      webkitSpeechRecognition?: SpeechRecognitionCtor;
+    };
+    return w.SpeechRecognition ?? w.webkitSpeechRecognition ?? null;
+  };
   const lastSpokenRef = useRef<string | null>(null);
-  const sttSupported =
-    typeof window !== "undefined" &&
-    !!((window as any).SpeechRecognition || (window as any).webkitSpeechRecognition);
+  const sttSupported = getSR() !== null;
   const ttsSupported = typeof window !== "undefined" && "speechSynthesis" in window;
 
   const mutation = useMutation({
@@ -209,13 +233,14 @@ function ChatPage() {
       } catch {}
       return;
     }
-    const SR: any = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
-    const r = new SR();
+    const SR = getSR();
+    if (!SR) return;
+    const r: SpeechRecognitionLike = new SR();
     r.lang = "id-ID";
     r.interimResults = true;
     r.continuous = false;
     let finalText = "";
-    r.onresult = (e: any) => {
+    r.onresult = (e) => {
       let interim = "";
       for (let i = e.resultIndex; i < e.results.length; i++) {
         const t = e.results[i][0].transcript;
@@ -224,7 +249,7 @@ function ChatPage() {
       }
       setInput((finalText + interim).trim());
     };
-    r.onerror = (e: any) => {
+    r.onerror = (e) => {
       toast.error(`Voice error: ${e.error ?? "unknown"}`);
       setListening(false);
     };
