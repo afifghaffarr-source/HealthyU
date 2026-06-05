@@ -297,13 +297,13 @@ function ReportsPage() {
 
         <section className="grid grid-cols-3 gap-2 print:hidden">
           <button
-            onClick={exportCsv}
+            onClick={() => data && exportWeeklyCsv(data)}
             className="flex items-center justify-center gap-2 bg-primary text-primary-foreground font-semibold py-3 rounded-2xl"
           >
             <Download className="size-4" /> <span className="text-sm">CSV</span>
           </button>
           <button
-            onClick={exportPdf}
+            onClick={() => summary && exportWeeklyPdf(summary, aiMut.data?.report, t)}
             className="flex items-center justify-center gap-2 bg-card outline-1 outline-black/10 font-semibold py-3 rounded-2xl"
           >
             <FileText className="size-4" /> <span className="text-sm">PDF</span>
@@ -344,7 +344,16 @@ function ReportsPage() {
               </h2>
               <div className="flex items-center gap-2">
                 <button
-                  onClick={exportAllArchivePdf}
+                  onClick={() =>
+                    exportAllArchivePdf(
+                      history.filter((r) => {
+                        if (rangeWeeks === 0) return true;
+                        const cutoff = Date.now() - rangeWeeks * 7 * 86400000;
+                        return new Date(r.created_at).getTime() >= cutoff;
+                      }),
+                      t,
+                    )
+                  }
                   className="inline-flex items-center gap-1 text-[11px] font-semibold bg-card outline-1 outline-black/10 rounded-lg px-2 py-1"
                   title="Export semua laporan ke 1 PDF"
                 >
