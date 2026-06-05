@@ -72,12 +72,14 @@ function Page() {
             <button
               onClick={() => setRunning((r) => !r)}
               className="size-14 rounded-full bg-primary text-primary-foreground inline-flex items-center justify-center"
+              aria-label={running ? "Jeda meditasi" : "Mulai meditasi"}
             >
               {running ? <Pause className="size-6" /> : <Play className="size-6" />}
             </button>
             <button
               onClick={finish}
               className="size-14 rounded-full border inline-flex items-center justify-center"
+              aria-label="Selesaikan sesi"
             >
               <RotateCcw className="size-5" />
             </button>
