@@ -1,6 +1,7 @@
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { sendWebPushTo } from "@/lib/push.server";
 import { computeGroupChallengeSummary } from "@/lib/reportsGroupChallenges.server";
+import { callAiWithGuards } from "@/lib/aiGateway.server";
 
 type PushSub = { endpoint: string; p256dh: string; auth: string };
 
@@ -16,8 +17,6 @@ export type WeeklyPushPayload = {
 };
 
 export async function runWeeklyReportForUser(userId: string, days = 7): Promise<WeeklyRunResult> {
-  const apiKey = process.env.LOVABLE_API_KEY;
-  if (!apiKey) throw new Error("LOVABLE_API_KEY missing");
   const since = new Date(Date.now() - days * 86400000).toISOString();
 
   // Early skip: inactive users — no AI call needed, save cost.
@@ -119,26 +118,22 @@ export async function runWeeklyReportForUser(userId: string, days = 7): Promise<
   if (topGroup) highlightParts.push(`rank #${topGroup.rank} di ${topGroup.group}`);
   const highlight = highlightParts.slice(0, 3).join(" · ") || "Lihat insight lengkap minggu ini";
 
-  const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-    method: "POST",
-    headers: { "Content-Type": "application/json", Authorization: `Bearer ${apiKey}` },
-    body: JSON.stringify({
-      model: "google/gemini-2.5-flash",
-      messages: [
-        {
-          role: "system",
-          content: `Kamu adalah Dr. HealthyU, AI health coach. Buat laporan analisis mingguan singkat dalam Bahasa Indonesia (markdown, max 350 kata) dengan section: Ringkasan, Yang Berjalan Baik, Area Perbaikan, Progress Challenge Grup (skip jika kosong), Rekomendasi.`,
-        },
-        {
-          role: "user",
-          content: `Data ${days} hari terakhir:\n${JSON.stringify(summary, null, 2)}`,
-        },
-      ],
-    }),
-  });
-  if (!res.ok) throw new Error(`AI error: ${res.status}`);
-  const json = await res.json();
-  const report: string = json?.choices?.[0]?.message?.content ?? "Tidak ada analisis.";
+  const report = (await callAiWithGuards({
+    userId,
+    feature: "report.weekly",
+    model: "google/gemini-2.5-flash",
+    skipBudget: true, // cron job, not user-initiated
+    messages: [
+      {
+        role: "system",
+        content: `Kamu adalah Dr. HealthyU, AI health coach. Buat laporan analisis mingguan singkat dalam Bahasa Indonesia (markdown, max 350 kata) dengan section: Ringkasan, Yang Berjalan Baik, Area Perbaikan, Progress Challenge Grup (skip jika kosong), Rekomendasi.`,
+      },
+      {
+        role: "user",
+        content: `Data ${days} hari terakhir:\n${JSON.stringify(summary, null, 2)}`,
+      },
+    ],
+  })) || "Tidak ada analisis.";
 
   const end = new Date();
   const start = new Date(end.getTime() - days * 86400000);

@@ -2,6 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
+import { callAiJsonWithGuards } from "@/lib/aiGateway.server";
 
 export const getFoodAlternatives = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
@@ -37,30 +38,16 @@ export const getFoodAlternatives = createServerFn({ method: "GET" })
       .filter((x): x is NonNullable<typeof x> => x !== null);
   });
 
-async function callGeminiJSON(messages: Array<{ role: string; content: string }>) {
-  const apiKey = process.env.LOVABLE_API_KEY;
-  if (!apiKey) throw new Error("LOVABLE_API_KEY belum dikonfigurasi");
-  const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-    method: "POST",
-    headers: { "Content-Type": "application/json", Authorization: `Bearer ${apiKey}` },
-    body: JSON.stringify({
-      model: "google/gemini-3-flash-preview",
-      messages,
-      response_format: { type: "json_object" },
-    }),
+const callGeminiJSON = (
+  messages: Array<{ role: "system" | "user" | "assistant"; content: string }>,
+  userId: string | null,
+) =>
+  callAiJsonWithGuards({
+    userId,
+    feature: "food.alternatives.reasons",
+    messages,
+    model: "google/gemini-3-flash-preview",
   });
-  if (!res.ok) {
-    if (res.status === 429) throw new Error("Terlalu banyak permintaan AI. Coba lagi nanti.");
-    if (res.status === 402) throw new Error("Kredit AI habis. Tambah kredit di workspace.");
-    throw new Error(`AI error ${res.status}`);
-  }
-  const j = (await res.json()) as { choices?: Array<{ message?: { content?: string } }> };
-  try {
-    return JSON.parse(j.choices?.[0]?.message?.content ?? "{}") as Record<string, unknown>;
-  } catch {
-    return {};
-  }
-}
 
 export const regenerateAlternativeReasons = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
@@ -133,7 +120,7 @@ Output JSON: { "reasons": [{ "id": "<alt_id>", "reason": "..." }] }`;
     const parsed = await callGeminiJSON([
       { role: "system", content: "Kamu adalah ahli gizi. Balas hanya JSON valid." },
       { role: "user", content: prompt },
-    ]);
+    ], userId);
     const arr = (parsed?.reasons as Array<{ id?: string; reason?: string }> | undefined) ?? [];
 
     let updated = 0;
