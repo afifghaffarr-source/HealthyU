@@ -12,7 +12,7 @@ export type UserDataTable = {
   optional?: boolean;
 };
 
-export const USER_DATA_TABLES = [
+export const USER_DATA_TABLES: readonly UserDataTable[] = [
   { table: "profiles", ownerColumn: "id" },
   { table: "meal_logs", ownerColumn: "user_id" },
   { table: "meal_plans", ownerColumn: "user_id" },
@@ -42,7 +42,7 @@ export const USER_DATA_TABLES = [
   { table: "user_allergies", ownerColumn: "user_id", optional: true },
   { table: "user_health_conditions", ownerColumn: "user_id", optional: true },
   { table: "audit_log", ownerColumn: "user_id", optional: true },
-] as const satisfies readonly UserDataTable[];
+];
 
 /** Legacy table names yang TIDAK boleh muncul lagi (dipakai test). */
 export const FORBIDDEN_LEGACY_TABLE_NAMES = [
