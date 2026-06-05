@@ -66,7 +66,7 @@ function ProfilePage() {
       <div className="max-w-md mx-auto px-5 pt-2 space-y-5">
         <TopAppBar title="Profil" subtitle={p?.full_name ?? "Sahabat"} showBack />
 
-        <section className="bg-card p-6 rounded-3xl outline-1 outline-black/5 text-center animate-fade-up">
+        <section className="bg-card p-6 rounded-3xl outline-1 outline-foreground/10 text-center animate-fade-up">
           <div className="size-20 mx-auto rounded-full bg-primary text-primary-foreground grid place-items-center text-2xl font-bold mb-3">
             {(p?.full_name ?? "U").slice(0, 1).toUpperCase()}
           </div>
@@ -114,7 +114,7 @@ function ProfilePage() {
           />
         )}
 
-        <section className="bg-card rounded-3xl outline-1 outline-black/5 divide-y divide-border overflow-hidden animate-fade-up">
+        <section className="bg-card rounded-3xl outline-1 outline-foreground/10 divide-y divide-border overflow-hidden animate-fade-up">
           <Row label="Tinggi" value={p?.height_cm ? `${p.height_cm} cm` : "-"} />
           <Row label="Berat" value={p?.weight_kg ? `${p.weight_kg} kg` : "-"} />
           <Row
@@ -131,14 +131,14 @@ function ProfilePage() {
 
         <Link
           to="/onboarding"
-          className="flex items-center justify-center gap-2 bg-card outline-1 outline-black/10 font-semibold py-4 rounded-2xl"
+          className="flex items-center justify-center gap-2 bg-card outline-1 outline-foreground/10 font-semibold py-4 rounded-2xl"
         >
           <Settings className="size-4" /> Edit profil
         </Link>
 
         <Link
           to="/achievements"
-          className="flex items-center justify-center gap-2 bg-card outline-1 outline-black/10 font-semibold py-4 rounded-2xl"
+          className="flex items-center justify-center gap-2 bg-card outline-1 outline-foreground/10 font-semibold py-4 rounded-2xl"
         >
           <Trophy className="size-4" /> Pencapaian & badge
         </Link>
@@ -146,49 +146,49 @@ function ProfilePage() {
         <div className="grid grid-cols-2 gap-2">
           <Link
             to="/profile/scan-stats"
-            className="text-center text-xs bg-card outline-1 outline-black/10 py-3 rounded-2xl"
+            className="text-center text-xs bg-card outline-1 outline-foreground/10 py-3 rounded-2xl"
           >
             📊 Statistik Scan AI
           </Link>
           <Link
             to="/profile/privacy"
-            className="text-center text-xs bg-card outline-1 outline-black/10 py-3 rounded-2xl"
+            className="text-center text-xs bg-card outline-1 outline-foreground/10 py-3 rounded-2xl"
           >
             🔒 Privasi
           </Link>
           <Link
             to="/insights"
-            className="text-center text-xs bg-card outline-1 outline-black/10 py-3 rounded-2xl"
+            className="text-center text-xs bg-card outline-1 outline-foreground/10 py-3 rounded-2xl"
           >
             ✨ Insight AI
           </Link>
           <Link
             to="/recipes/recommendations"
-            className="text-center text-xs bg-card outline-1 outline-black/10 py-3 rounded-2xl"
+            className="text-center text-xs bg-card outline-1 outline-foreground/10 py-3 rounded-2xl"
           >
             🍽️ Rekomendasi Resep
           </Link>
           <Link
             to="/reports/nutrition"
-            className="text-center text-xs bg-card outline-1 outline-black/10 py-3 rounded-2xl"
+            className="text-center text-xs bg-card outline-1 outline-foreground/10 py-3 rounded-2xl"
           >
             📈 Tren Nutrisi
           </Link>
           <Link
             to="/scan/barcode"
-            className="text-center text-xs bg-card outline-1 outline-black/10 py-3 rounded-2xl"
+            className="text-center text-xs bg-card outline-1 outline-foreground/10 py-3 rounded-2xl"
           >
             🏷️ Scan Barcode
           </Link>
           <Link
             to="/scan/menu"
-            className="text-center text-xs bg-card outline-1 outline-black/10 py-3 rounded-2xl"
+            className="text-center text-xs bg-card outline-1 outline-foreground/10 py-3 rounded-2xl"
           >
             📋 Scan Menu
           </Link>
           <Link
             to="/scan/recipe"
-            className="text-center text-xs bg-card outline-1 outline-black/10 py-3 rounded-2xl"
+            className="text-center text-xs bg-card outline-1 outline-foreground/10 py-3 rounded-2xl"
           >
             📖 Scan Resep
           </Link>
