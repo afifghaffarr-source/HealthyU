@@ -151,7 +151,17 @@ export const Route = createFileRoute("/api/chat/stream")({
           .maybeSingle();
         const isPremium =
           ((prof?.premium_status as string | null) ?? "free").toLowerCase() === "active";
-        const budget = await enforceAiBudget(userId, isPremium);
+        let budget: Awaited<ReturnType<typeof enforceAiBudget>>;
+        try {
+          budget = await enforceAiBudget(userId, isPremium);
+        } catch (e) {
+          console.error("chat.stream enforceAiBudget failed", (e as Error).message);
+          // Fail-closed: chat (esp. with images) is expensive.
+          return new Response(
+            JSON.stringify({ error: "ai_budget_unavailable" }),
+            { status: 503, headers: { "Content-Type": "application/json" } },
+          );
+        }
         if (!budget.allowed) {
           return new Response(
             JSON.stringify({
