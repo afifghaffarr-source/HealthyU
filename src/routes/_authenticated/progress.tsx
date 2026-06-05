@@ -26,6 +26,7 @@ import { ConsistencyScoreCard } from "@/features/progress/components/Consistency
 import { WeeklySparklineCard } from "@/features/progress/components/WeeklySparklineCard";
 import { MostConsistentDayBadge } from "@/features/progress/components/MostConsistentDayBadge";
 import { BeforeAfterFrame } from "@/features/progress/components/BeforeAfterFrame";
+import { MoodTrend7DayCard } from "@/features/progress/components/MoodTrend7DayCard";
 
 export const Route = createFileRoute("/_authenticated/progress")({
   component: ProgressPage,
@@ -111,6 +112,8 @@ function ProgressPage() {
         <MostConsistentDayBadge calTarget={calTarget} />
 
         <BeforeAfterFrame photos={photos} />
+
+        <MoodTrend7DayCard />
 
         <ConsistencyScoreCard
           mealsLogged={meals.length}
