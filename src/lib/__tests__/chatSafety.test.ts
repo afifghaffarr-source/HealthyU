@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { checkChatSafety } from "../chatSafety";
+import { checkChatSafety } from "@/features/chat/lib/chatSafety";
 
 describe("checkChatSafety", () => {
   it("safe for empty/normal messages", () => {

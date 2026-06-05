@@ -1,13 +1,13 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { createClient } from "@supabase/supabase-js";
 import type { Database } from "@/integrations/supabase/types";
-import { buildChatPayload, persistUserMessage } from "@/lib/chat.functions";
+import { buildChatPayload, persistUserMessage } from "@/features/chat/lib/chat.functions";
 import { classifyMessage, buildCompactProfile } from "@/lib/aiRouter.server";
 import { cacheKey, getCached, setCached } from "@/lib/aiCache.server";
 import { enforceAiBudget, logAiUsage } from "@/lib/aiBudget.server";
 import { checkRateLimit, RATE_LIMITS } from "@/lib/rateLimit.server";
 import { chatMessageSchema } from "@/lib/validation";
-import { checkChatSafety } from "@/lib/chatSafety";
+import { checkChatSafety } from "@/features/chat/lib/chatSafety";
 import { moderateImage } from "@/lib/imageModeration.server";
 import { streamAiChat, parseSseChunk, AiGatewayError } from "@/lib/aiStreamGateway.server";
 
