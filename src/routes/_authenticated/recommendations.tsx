@@ -7,6 +7,7 @@ import { generateMealPlan, acceptMealPlan } from "@/lib/recommendations.function
 import { BottomNav } from "@/components/bottom-nav";
 import { Sparkles, Loader2, Sunrise, Sun, Moon, Cookie, Check } from "lucide-react";
 import { toast } from "sonner";
+import { toastError } from "@/lib/toast-config";
 
 export const Route = createFileRoute("/_authenticated/recommendations")({
   component: RecommendationsPage,
@@ -27,7 +28,7 @@ function RecommendationsPage() {
 
   const gen = useMutation({
     mutationFn: () => genFn({ data: { notes: notes || undefined } }),
-    onError: (e) => toast.error(e instanceof Error ? e.message : "Gagal"),
+    onError: (e) => toastError(e, "Gagal"),
   });
 
   const accept = useMutation({
@@ -47,7 +48,7 @@ function RecommendationsPage() {
       });
     },
     onSuccess: () => toast.success("Rekomendasi disimpan ke meal plan hari ini"),
-    onError: (e) => toast.error(e instanceof Error ? e.message : "Gagal simpan"),
+    onError: (e) => toastError(e, "Gagal simpan"),
   });
 
   const totalCal = gen.data?.meals.reduce((s, m) => s + Number(m.calories || 0), 0) ?? 0;

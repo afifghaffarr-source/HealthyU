@@ -32,6 +32,7 @@ import {
   regenerateAlternativeReasons,
 } from "@/lib/foodAlternatives.functions";
 import { toast } from "sonner";
+import { toastError } from "@/lib/toast-config";
 import { enqueue } from "@/lib/offline-queue";
 import { useOfflineQueue } from "@/hooks/use-offline-queue";
 
@@ -146,7 +147,7 @@ function FoodPage() {
         toast.success(`${getAchievementToastPrefix(a.icon)} ${a.title} terbuka!`),
       );
     },
-    onError: (e) => toast.error(e instanceof Error ? e.message : "Gagal"),
+    onError: (e) => toastError(e, "Gagal"),
   });
 
   const { data: foods = [] } = useQuery({
@@ -189,7 +190,7 @@ function FoodPage() {
         toast.success(`${getAchievementToastPrefix(a.icon)} ${a.title} terbuka!`),
       );
     },
-    onError: (e) => toast.error(e instanceof Error ? e.message : "Gagal"),
+    onError: (e) => toastError(e, "Gagal"),
   });
 
   const delMutation = useMutation({
@@ -239,7 +240,7 @@ function FoodPage() {
           fat_g: parsed.fat_g,
         });
       } catch (err) {
-        toast.error(err instanceof Error ? err.message : "Gagal parse suara");
+        toastError(err, "Gagal parse suara");
       } finally {
         setParsing(false);
       }

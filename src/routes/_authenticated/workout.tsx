@@ -7,6 +7,7 @@ import { BottomNav } from "@/components/bottom-nav";
 import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { Activity, Trash2, WifiOff, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
+import { toastError } from "@/lib/toast-config";
 import { enqueue } from "@/lib/offline-queue";
 import { useOfflineQueue } from "@/hooks/use-offline-queue";
 
@@ -65,7 +66,7 @@ function WorkoutPage() {
       );
       setName("");
     },
-    onError: (e) => toast.error(e instanceof Error ? e.message : "Gagal"),
+    onError: (e) => toastError(e, "Gagal"),
   });
 
   const delMut = useMutation({

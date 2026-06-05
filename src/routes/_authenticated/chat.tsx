@@ -23,6 +23,7 @@ import {
 } from "lucide-react";
 import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { toast } from "sonner";
+import { toastError } from "@/lib/toast-config";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 
@@ -148,7 +149,7 @@ function ChatPage() {
     },
     onError: (e) => {
       setStreaming(null);
-      toast.error(e instanceof Error ? e.message : "Gagal kirim");
+      toastError(e, "Gagal kirim");
     },
   });
 

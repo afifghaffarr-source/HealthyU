@@ -5,6 +5,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { getNotifPrefs, updateNotifPrefs } from "@/lib/notifPrefs.functions";
 import { BottomNav } from "@/components/bottom-nav";
 import { toast } from "sonner";
+import { toastError } from "@/lib/toast-config";
 
 export const Route = createFileRoute("/_authenticated/notifications")({
   component: NotificationsPage,
@@ -22,7 +23,7 @@ function NotificationsPage() {
       qc.invalidateQueries({ queryKey: ["notif-prefs"] });
       toast.success("Tersimpan");
     },
-    onError: (e) => toast.error(e instanceof Error ? e.message : "Gagal"),
+    onError: (e) => toastError(e, "Gagal"),
   });
 
   const Toggle = ({ k, label }: { k: string; label: string }) => (

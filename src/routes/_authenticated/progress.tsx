@@ -8,6 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { BottomNav } from "@/components/bottom-nav";
 import { Camera, Trash2, Loader2, Film } from "lucide-react";
 import { toast } from "sonner";
+import { toastError } from "@/lib/toast-config";
 import { generateTimelapse } from "@/lib/timelapse";
 
 const ProgressRadialChart = lazy(
@@ -85,7 +86,7 @@ function ProgressPage() {
       qc.invalidateQueries({ queryKey: ["progress"] });
       toast.success("Foto progres tersimpan");
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Gagal upload");
+      toastError(e, "Gagal upload");
     } finally {
       setUploading(false);
     }
@@ -224,7 +225,7 @@ function TimelapseButton({ photos }: { photos: { url: string; taken_at: string }
       setVideo({ url: r.url, ext: r.ext });
       toast.success("Time-lapse siap!");
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Gagal membuat time-lapse");
+      toastError(e, "Gagal membuat time-lapse");
     } finally {
       setBusy(false);
     }

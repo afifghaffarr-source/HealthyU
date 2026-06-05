@@ -7,6 +7,7 @@ import { BottomNav } from "@/components/bottom-nav";
 import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { Moon, Trash2 } from "lucide-react";
 import { toast } from "sonner";
+import { toastError } from "@/lib/toast-config";
 
 const SleepAreaChart = lazy(() => import("@/components/charts/sleep-area-chart"));
 
@@ -56,7 +57,7 @@ function SleepPage() {
       qc.invalidateQueries({ queryKey: ["sleep"] });
       toast.success("Tidur dicatat");
     },
-    onError: (e) => toast.error(e instanceof Error ? e.message : "Gagal"),
+    onError: (e) => toastError(e, "Gagal"),
   });
 
   const delMut = useMutation({

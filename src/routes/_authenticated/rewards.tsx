@@ -6,6 +6,7 @@ import { BottomNav } from "@/components/bottom-nav";
 import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { Coins, Gift } from "lucide-react";
 import { toast } from "sonner";
+import { toastError } from "@/lib/toast-config";
 
 export const Route = createFileRoute("/_authenticated/rewards")({
   component: RewardsPage,
@@ -24,7 +25,7 @@ function RewardsPage() {
       qc.invalidateQueries({ queryKey: ["profile"] });
       toast.success(`Berhasil ditukar! Sisa koin: ${r.remaining_coins}`);
     },
-    onError: (e) => toast.error(e instanceof Error ? e.message : "Gagal"),
+    onError: (e) => toastError(e, "Gagal"),
   });
 
   const coins = data?.coins ?? 0;

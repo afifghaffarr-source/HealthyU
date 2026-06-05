@@ -12,6 +12,7 @@ import { BottomNav } from "@/components/bottom-nav";
 import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { Pill, Check, Trash2, Plus, X, Clock } from "lucide-react";
 import { toast } from "sonner";
+import { toastError } from "@/lib/toast-config";
 
 export const Route = createFileRoute("/_authenticated/medications")({
   component: MedsPage,
@@ -51,7 +52,7 @@ function MedsPage() {
       setDose("");
       setTimes(["08:00"]);
     },
-    onError: (e) => toast.error(e instanceof Error ? e.message : "Gagal"),
+    onError: (e) => toastError(e, "Gagal"),
   });
 
   const markMut = useMutation({
