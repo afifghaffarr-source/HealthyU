@@ -92,36 +92,29 @@ export const transcribeVoice = createServerFn({ method: "POST" })
       .parse(d),
   )
   .handler(async ({ data, context }) => {
-    const apiKey = process.env.LOVABLE_API_KEY;
-    if (!apiKey) throw new Error("LOVABLE_API_KEY belum di-set");
-    const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-      method: "POST",
-      headers: { "Content-Type": "application/json", Authorization: `Bearer ${apiKey}` },
-      body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
-        messages: [
-          {
-            role: "user",
-            content: [
-              {
-                type: "text",
-                text: "Transkripsikan audio bahasa Indonesia berikut secara ringkas. Jawab teks transkrip saja.",
+    const text = await callAiWithGuards({
+      userId: context.userId,
+      feature: "voice.transcribe",
+      messages: [
+        {
+          role: "user",
+          content: [
+            {
+              type: "text",
+              text: "Transkripsikan audio bahasa Indonesia berikut secara ringkas. Jawab teks transkrip saja.",
+            },
+            {
+              type: "input_audio",
+              input_audio: {
+                data: data.audioBase64,
+                format: data.mimeType.split("/")[1] ?? "webm",
               },
-              {
-                type: "input_audio",
-                input_audio: {
-                  data: data.audioBase64,
-                  format: data.mimeType.split("/")[1] ?? "webm",
-                },
-              },
-            ],
-          },
-        ],
-      }),
+            },
+          ],
+        },
+      ],
     });
-    if (!res.ok) throw new Error(`Transkripsi gagal: ${res.status}`);
-    const json = (await res.json()) as { choices?: { message?: { content?: string } }[] };
-    const transcript = json.choices?.[0]?.message?.content?.trim() ?? "";
+    const transcript = text.trim();
     const { data: row, error } = await context.supabase
       .from("voice_transcripts")
       .insert({
