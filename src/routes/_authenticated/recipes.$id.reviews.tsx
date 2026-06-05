@@ -60,7 +60,7 @@ function Page() {
           </button>
         </div>
         <div className="space-y-2">
-          {(data?.reviews ?? []).map((r: any) => (
+          {(data?.reviews ?? []).map((r) => (
             <div key={r.id} className="rounded-xl bg-card border p-3 text-sm space-y-1">
               <div className="flex gap-0.5">
                 {Array.from({ length: r.rating }).map((_, i) => (
