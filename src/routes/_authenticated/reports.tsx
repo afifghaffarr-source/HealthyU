@@ -13,13 +13,10 @@ import { useNavigate } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 import { useTranslation } from "@/lib/i18n";
 import { useAnnounce } from "@/components/live-announcer";
-import {
-  exportWeeklyCsv,
-  exportWeeklyPdf,
-  exportArchivePdf,
-  exportAllArchivePdf,
-} from "@/features/reports/lib/reportsPdf";
+import { exportWeeklyCsv, exportWeeklyPdf } from "@/features/reports/lib/reportsPdf";
 import { Stat } from "@/features/reports/components/Stat";
+import { WeeklyChart } from "@/features/reports/components/WeeklyChart";
+import { AiReportHistorySection } from "@/features/reports/components/AiReportHistorySection";
 
 export const Route = createFileRoute("/_authenticated/reports")({
   validateSearch: zodValidator(
