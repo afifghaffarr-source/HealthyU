@@ -9,6 +9,7 @@ import { checkRateLimit, RATE_LIMITS } from "@/lib/rateLimit.server";
 import { chatMessageSchema } from "@/lib/validation";
 import { checkChatSafety } from "@/lib/chatSafety";
 import { moderateImage } from "@/lib/imageModeration.server";
+import { streamAiChat, parseSseChunk, AiGatewayError } from "@/lib/aiStreamGateway.server";
 
 export const Route = createFileRoute("/api/chat/stream")({
   server: {
@@ -21,8 +22,6 @@ export const Route = createFileRoute("/api/chat/stream")({
         const token = auth.slice(7);
         const SUPABASE_URL = process.env.SUPABASE_URL!;
         const SUPABASE_PUBLISHABLE_KEY = process.env.SUPABASE_PUBLISHABLE_KEY!;
-        const apiKey = process.env.LOVABLE_API_KEY;
-        if (!apiKey) return new Response("AI not configured", { status: 500 });
 
         const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
           global: { headers: { Authorization: `Bearer ${token}` } },
@@ -224,21 +223,19 @@ export const Route = createFileRoute("/api/chat/stream")({
           decision.tier,
         );
 
-        const upstream = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-          method: "POST",
-          headers: { "Content-Type": "application/json", Authorization: `Bearer ${apiKey}` },
-          body: JSON.stringify({
+        let upstreamBody: ReadableStream<Uint8Array>;
+        try {
+          const r = await streamAiChat({
             model: effectiveModel,
-            messages,
-            stream: true,
-            ...(decision.maxTokens ? { max_tokens: decision.maxTokens } : {}),
-          }),
-        });
-
-        if (upstream.status === 429) return new Response("Rate limited", { status: 429 });
-        if (upstream.status === 402) return new Response("Credits exhausted", { status: 402 });
-        if (!upstream.ok || !upstream.body) {
-          return new Response(`AI error ${upstream.status}`, { status: 500 });
+            messages: messages as never,
+            maxTokens: decision.maxTokens,
+          });
+          upstreamBody = r.body;
+        } catch (e) {
+          if (e instanceof AiGatewayError) {
+            return new Response(e.message, { status: e.status });
+          }
+          return new Response(`AI error: ${(e as Error).message}`, { status: 500 });
         }
 
         const decoder = new TextDecoder();
@@ -253,7 +250,7 @@ export const Route = createFileRoute("/api/chat/stream")({
                 `event: meta\ndata: ${JSON.stringify({ emergency: isEmergency, tier: decision.tier, cached: false })}\n\n`,
               ),
             );
-            const reader = upstream.body!.getReader();
+            const reader = upstreamBody.getReader();
             try {
               while (true) {
                 const { done, value } = await reader.read();

@@ -15,8 +15,8 @@ self.addEventListener("push", (event) => {
   const safeUrl = rawUrl.startsWith("/") && !rawUrl.startsWith("//") ? rawUrl : "/dashboard";
   const options = {
     body: typeof payload.body === "string" ? payload.body : "",
-    icon: "/icon-192.png",
-    badge: "/icon-192.png",
+    icon: "/icon-192.svg",
+    badge: "/icon-192.svg",
     tag: typeof payload.tag === "string" ? payload.tag : "healthyu",
     data: { url: safeUrl },
     requireInteraction: false,

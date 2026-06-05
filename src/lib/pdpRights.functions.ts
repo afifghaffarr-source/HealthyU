@@ -2,42 +2,13 @@ import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { z } from "zod";
 import { parseInput } from "@/lib/validation";
+import { USER_DATA_TABLES } from "@/lib/userDataTables";
 
 /**
  * UU PDP (Pelindungan Data Pribadi) — user rights.
  * - exportMyData: returns JSON of all rows belonging to the user (Right to Portability).
  * - requestAccountDeletion: queues an account-deletion request (Right to Erasure).
  */
-
-const USER_TABLES = [
-  "profiles",
-  "meal_logs",
-  "meal_plans",
-  "water_logs",
-  "workout_sessions",
-  "weight_logs",
-  "mood_logs",
-  "sleep_logs",
-  "vitals_logs",
-  "medications",
-  "medication_logs",
-  "chat_messages",
-  "chat_sessions",
-  "sensitive_health_notes",
-  "food_scans",
-  "fasting_sessions",
-  "challenge_participants",
-  "daily_steps",
-  "progress_photos",
-  "user_stats",
-  "user_achievements",
-  "notification_preferences",
-  "push_subscriptions",
-  "wearable_tokens",
-  "user_allergies",
-  "user_health_conditions",
-  "audit_log",
-] as const;
 
 export const exportMyData = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
@@ -54,15 +25,20 @@ export const exportMyData = createServerFn({ method: "GET" })
       exported_at: new Date().toISOString(),
       user_id: userId,
     };
-    for (const table of USER_TABLES) {
+    for (const { table, ownerColumn, optional } of USER_DATA_TABLES) {
       // Dynamic table name — Supabase's `.from()` is typed against the union
       // of literal table names, which can't be satisfied at runtime here.
       const { data, error } = await supabase
         .from(table as never)
         .select("*")
-        .eq("user_id", userId);
-      if (!error) dump[table] = (data ?? []) as JsonValue;
-      else dump[table] = { error: error.message };
+        .eq(ownerColumn, userId);
+      if (!error) {
+        dump[table] = (data ?? []) as JsonValue;
+      } else if (optional) {
+        dump[table] = [];
+      } else {
+        dump[table] = { error: error.message };
+      }
     }
     await supabase.rpc("log_audit_event", {
       _action: "pdp.export",
