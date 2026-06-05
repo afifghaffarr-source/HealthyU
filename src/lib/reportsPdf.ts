@@ -42,14 +42,14 @@ import {
   PDF_TABLE_CELL_PADDING,
 } from "@/lib/constants";
 
-export type Translator = (key: string, vars?: Record<string, unknown>) => string;
+export type Translator = (key: string, vars?: Record<string, string | number>) => string;
 
 export type WeeklyData = {
   meals: Array<{ logged_at: string; calories: number | string; meal_type: string }>;
   water: Array<{ logged_at: string; amount_ml: number }>;
   workouts: Array<{ performed_at: string; name: string; calories_burned: number }>;
   sleep: Array<{ sleep_start: string; sleep_end: string; quality: number | string }>;
-  fasting: Array<{ start_time: string; protocol: string; completed: boolean }>;
+  fasting: Array<{ start_time: string; protocol: string; completed: boolean | null }>;
 };
 
 export type WeeklySummary = {
