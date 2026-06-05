@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { callAiWithGuards } from "@/lib/aiGateway.server";
 
 export const weeklyReport = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
@@ -55,8 +56,6 @@ export const weeklyAiAnalysis = createServerFn({ method: "POST" })
   )
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
-    const apiKey = process.env.LOVABLE_API_KEY;
-    if (!apiKey) throw new Error("AI tidak tersedia");
     const since = new Date(Date.now() - data.days * 86400000).toISOString();
 
     const [profileRes, meals, water, workouts, sleep, fasting] = await Promise.all([
@@ -129,28 +128,21 @@ export const weeklyAiAnalysis = createServerFn({ method: "POST" })
       group_challenges: groupChallenges,
     };
 
-    const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-      method: "POST",
-      headers: { "Content-Type": "application/json", Authorization: `Bearer ${apiKey}` },
-      body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
-        messages: [
-          {
-            role: "system",
-            content: `Kamu adalah Dr. HealthyU, AI health coach. Buat laporan analisis mingguan dalam Bahasa Indonesia berdasarkan data user. Format markdown ringkas dengan section:\n## 📊 Ringkasan\n## ✅ Yang Berjalan Baik\n## ⚠️ Area Perlu Perbaikan\n## 🔗 Korelasi & Insight\n(hubungkan tidur dengan kalori/olahraga, puasa dengan pola makan, hidrasi dengan aktivitas)\n## 👥 Progress Challenge Grup\n(jika field group_challenges tidak kosong: sebutkan rank user di tiap grup, streak, dan beri dorongan; lewati section ini jika kosong)\n## 🎯 Rekomendasi Minggu Depan\n(3-5 action items konkret)\n\nJangan diagnosis medis. Selalu beri disclaimer jika ada metrik di luar normal.`,
-          },
-          {
-            role: "user",
-            content: `Data ${d} hari terakhir:\n${JSON.stringify(summary, null, 2)}`,
-          },
-        ],
-      }),
-    });
-    if (res.status === 429) throw new Error("Terlalu banyak permintaan. Coba lagi.");
-    if (res.status === 402) throw new Error("Kredit AI habis.");
-    if (!res.ok) throw new Error(`AI error: ${res.status}`);
-    const json = await res.json();
-    const report: string = json?.choices?.[0]?.message?.content ?? "Tidak ada analisis.";
+    const report = (await callAiWithGuards({
+      userId,
+      feature: "report.weekly.ai",
+      model: "google/gemini-2.5-flash",
+      messages: [
+        {
+          role: "system",
+          content: `Kamu adalah Dr. HealthyU, AI health coach. Buat laporan analisis mingguan dalam Bahasa Indonesia berdasarkan data user. Format markdown ringkas dengan section:\n## 📊 Ringkasan\n## ✅ Yang Berjalan Baik\n## ⚠️ Area Perlu Perbaikan\n## 🔗 Korelasi & Insight\n(hubungkan tidur dengan kalori/olahraga, puasa dengan pola makan, hidrasi dengan aktivitas)\n## 👥 Progress Challenge Grup\n(jika field group_challenges tidak kosong: sebutkan rank user di tiap grup, streak, dan beri dorongan; lewati section ini jika kosong)\n## 🎯 Rekomendasi Minggu Depan\n(3-5 action items konkret)\n\nJangan diagnosis medis. Selalu beri disclaimer jika ada metrik di luar normal.`,
+        },
+        {
+          role: "user",
+          content: `Data ${d} hari terakhir:\n${JSON.stringify(summary, null, 2)}`,
+        },
+      ],
+    })) || "Tidak ada analisis.";
 
     const end = new Date();
     const start = new Date(end.getTime() - d * 86400000);
