@@ -27,6 +27,12 @@ export type CallAiOptions = {
   timeoutMs?: number;
   /** Skip rate-limit (use only for trusted internal jobs). */
   skipBudget?: boolean;
+  /**
+   * Fail-closed: when true, any error from the budget/rate-limit check
+   * (e.g. DB unreachable) denies the request instead of letting it through.
+   * Use for expensive features (image scan, weekly reports, long generations).
+   */
+  failClosed?: boolean;
   /** If "json_object", asks the gateway to return strict JSON. */
   responseFormat?: "json_object";
   /** Optional max_tokens cap forwarded to the gateway. */
@@ -55,7 +61,19 @@ export async function callAiWithGuards(opts: CallAiOptions): Promise<string> {
   const model = opts.model ?? "google/gemini-2.5-flash";
 
   if (opts.userId && !opts.skipBudget) {
-    const decision = await enforceAiBudget(opts.userId, !!opts.isPremium);
+    let decision: Awaited<ReturnType<typeof enforceAiBudget>>;
+    try {
+      decision = await enforceAiBudget(opts.userId, !!opts.isPremium);
+    } catch (e) {
+      console.error("enforceAiBudget failed", (e as Error).message);
+      if (opts.failClosed) {
+        throw new AiGatewayError(
+          "Layanan AI sedang sibuk. Coba lagi sebentar lagi.",
+          503,
+        );
+      }
+      decision = { allowed: true, shouldDowngrade: true };
+    }
     if (!decision.allowed) {
       throw new AiGatewayError(
         decision.reason === "rate_hour"
