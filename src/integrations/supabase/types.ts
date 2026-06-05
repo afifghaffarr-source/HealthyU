@@ -4537,6 +4537,48 @@ export type Database = {
         }
         Relationships: []
       }
+      seo_faqs: {
+        Row: {
+          category: string | null
+          created_at: string
+          description: string | null
+          id: string
+          keywords: string[] | null
+          published: boolean
+          published_at: string
+          questions: Json
+          slug: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          keywords?: string[] | null
+          published?: boolean
+          published_at?: string
+          questions?: Json
+          slug: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          category?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          keywords?: string[] | null
+          published?: boolean
+          published_at?: string
+          questions?: Json
+          slug?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       seo_foods: {
         Row: {
           calories: number
