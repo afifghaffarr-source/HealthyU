@@ -52,7 +52,7 @@ export function buildProfileBlock(profile: Profile): { profileBlock: string; tde
   return { profileBlock, tdee };
 }
 
-type Fasting = { start_time: string; end_time: string | null; target_hours: number; protocol: string; completed: boolean } | undefined;
+type Fasting = { start_time: string; end_time: string | null; target_hours: number; protocol: string; completed: boolean | null } | undefined;
 type Sleep = { sleep_start: string; sleep_end: string; quality: number } | undefined;
 type Workout = { name: string; duration_min: number; calories_burned: number };
 
@@ -81,7 +81,7 @@ export function buildWorkoutBlock(workouts: Workout[] | null): string {
 export function buildWeekBlock(args: {
   weekMeals: { calories: number | null; logged_at: string }[] | null;
   weekWorkouts: { performed_at: string }[] | null;
-  weekFasting: { completed: boolean }[] | null;
+  weekFasting: { completed: boolean | null }[] | null;
   weekWeight: { weight_kg: number; logged_at: string }[] | null;
   weekMood: { mood: number }[] | null;
 }): string {
