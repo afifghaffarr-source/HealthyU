@@ -86,7 +86,17 @@ function Page() {
     }
   };
 
-  const p = mut.data?.product as any;
+  const p = mut.data?.product as
+    | {
+        name?: string;
+        brand?: string;
+        calories?: number;
+        protein?: number;
+        carbs?: number;
+        fat?: number;
+        image?: string;
+      }
+    | undefined;
   return (
     <div className="min-h-dvh pb-24 bg-background">
       <TopAppBar title="Barcode Scanner" showBack />
