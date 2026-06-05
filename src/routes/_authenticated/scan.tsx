@@ -3,13 +3,14 @@ import { useRef, useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { TopAppBar } from "@/components/healthyu/top-app-bar";
-import { Camera, Loader2, Sparkles, X, Check, Pencil, History, Zap } from "lucide-react";
+import { Camera, Loader2, Sparkles, X, History, Zap } from "lucide-react";
 import { toast } from "sonner";
 import { BottomNav } from "@/components/bottom-nav";
 import { recognizeFood, submitScanCorrection } from "@/features/food/lib/foodScan.functions";
 import { attachScanPhoto } from "@/features/scan/lib/scanPhoto.functions";
 import { recordScanGameify, checkScanLimit, classifyMealTags } from "@/features/scan/lib/scanMore.functions";
 import { logMeal } from "@/features/meals/lib/meals.functions";
+import { ScanItemCard } from "@/features/scan/components/ScanItemCard";
 
 export const Route = createFileRoute("/_authenticated/scan")({
   component: ScanPage,
