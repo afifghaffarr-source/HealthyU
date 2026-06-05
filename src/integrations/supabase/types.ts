@@ -4979,6 +4979,36 @@ export type Database = {
         }
         Relationships: []
       }
+      streak_freezes: {
+        Row: {
+          created_at: string
+          earned_at: string
+          id: string
+          source: string
+          used_at: string | null
+          used_for_date: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          earned_at?: string
+          id?: string
+          source?: string
+          used_at?: string | null
+          used_for_date?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          earned_at?: string
+          id?: string
+          source?: string
+          used_at?: string | null
+          used_for_date?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       subscription_plans: {
         Row: {
           ai_chat_daily_limit: number | null
@@ -5654,6 +5684,36 @@ export type Database = {
           scope?: string | null
           updated_at?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      weekly_goals: {
+        Row: {
+          completed_at: string | null
+          created_at: string
+          goal_text: string
+          id: string
+          updated_at: string
+          user_id: string
+          week_start: string
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string
+          goal_text: string
+          id?: string
+          updated_at?: string
+          user_id: string
+          week_start: string
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string
+          goal_text?: string
+          id?: string
+          updated_at?: string
+          user_id?: string
+          week_start?: string
         }
         Relationships: []
       }
