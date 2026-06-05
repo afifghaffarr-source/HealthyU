@@ -24,21 +24,22 @@ import { Coachmark } from "@/components/healthyu/coachmark";
 import { PullIndicator } from "@/components/healthyu/pull-indicator";
 import { StreakRing } from "@/components/healthyu/streak-ring";
 import { CoinPill } from "@/components/healthyu/coin-pill";
+import { DailyBonusButton } from "@/components/dashboard/DailyBonusButton";
+import { DailyTipCard } from "@/components/dashboard/DailyTipCard";
+import { WaterCard } from "@/components/dashboard/WaterCard";
+import { MoodQuickLog } from "@/components/dashboard/MoodQuickLog";
+import { FreezeDialog } from "@/components/dashboard/FreezeDialog";
+import { TodaysMeals } from "@/components/dashboard/TodaysMeals";
 import { usePullToRefresh } from "@/hooks/use-pull-to-refresh";
 import { formatDuration, fastingStage } from "@/lib/health";
 import {
-  Droplet,
-  Plus,
   Sparkles,
   ArrowRight,
   Flame,
   Trophy,
   Camera,
-  Smile,
-  Gift,
   Snowflake,
 } from "lucide-react";
-import { Lightbulb } from "lucide-react";
 import { claimDailyLoginBonus } from "@/lib/scanBatch9.functions";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -109,7 +110,6 @@ function Dashboard() {
     return window.localStorage.getItem("dailyBonusClaimed") === new Date().toDateString();
   });
   const [freezeOpen, setFreezeOpen] = useState(false);
-  const [freezeUsed, setFreezeUsed] = useState(false);
   const claimBonusMut = useMutation({
     mutationFn: () => claimBonusFn({ data: undefined as never }),
     onSuccess: (r) => {
@@ -394,20 +394,10 @@ function Dashboard() {
         </header>
 
         {!bonusClaimed && (
-          <button
+          <DailyBonusButton
             onClick={() => claimBonusMut.mutate()}
             disabled={claimBonusMut.isPending}
-            className="w-full flex items-center gap-3 p-4 rounded-3xl bg-gradient-to-r from-amber-400/20 to-orange-500/20 outline-1 outline-amber-500/30 text-left animate-fade-up"
-          >
-            <div className="size-11 rounded-2xl bg-amber-100 grid place-items-center">
-              <Gift className="size-5 text-amber-600" />
-            </div>
-            <div className="flex-1">
-              <p className="text-sm font-bold">Klaim bonus harian</p>
-              <p className="text-xs text-muted-foreground">Tap untuk dapat koin & jaga streakmu</p>
-            </div>
-            <ArrowRight className="size-4 text-muted-foreground" />
-          </button>
+          />
         )}
 
         <Coachmark
@@ -416,19 +406,7 @@ function Dashboard() {
           description="Geser ke bawah untuk refresh, ketuk kartu untuk catat aktivitas, dan kunjungi Profil untuk personalisasi."
         />
 
-        {dailyTip && (
-          <div className="bg-card p-4 rounded-3xl outline-1 outline-black/5 shadow-sm flex items-start gap-3 animate-fade-up">
-            <div className="size-10 rounded-2xl bg-amber-100 grid place-items-center shrink-0">
-              <Lightbulb className="size-5 text-amber-600" />
-            </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-[10px] font-bold uppercase text-muted-foreground tracking-wider">
-                Tip hari ini · {dailyTip.category}
-              </p>
-              <p className="text-sm font-medium mt-0.5">{dailyTip.tip}</p>
-            </div>
-          </div>
-        )}
+        {dailyTip && <DailyTipCard category={dailyTip.category} tip={dailyTip.tip} />}
 
         {/* Top row: Calorie + Fasting */}
         <div className="grid grid-cols-2 gap-3 animate-fade-up">
@@ -497,68 +475,17 @@ function Dashboard() {
           ))}
         </div>
 
-        {/* Water */}
-        <Link
-          to="/water"
-          className="bg-card p-4 rounded-3xl outline-1 outline-black/5 shadow-sm flex items-center gap-4 animate-fade-up"
-        >
-          <div className="size-12 rounded-2xl bg-sky-100 grid place-items-center">
-            <Droplet className="size-5 text-sky-600" />
-          </div>
-          <div className="flex-1">
-            <p className="text-xs font-bold uppercase text-muted-foreground tracking-wider">Air</p>
-            <p className="text-lg font-bold tabular-nums">
-              {(waterMl / 1000).toFixed(1)}L{" "}
-              <span className="text-xs text-muted-foreground font-medium">
-                / {waterTarget / 1000}L
-              </span>
-            </p>
-          </div>
-          <button
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              waterMutation.mutate(250);
-            }}
-            disabled={waterMutation.isPending}
-            className="bg-primary text-primary-foreground text-xs font-semibold px-3 py-2 rounded-xl inline-flex items-center gap-1"
-          >
-            <Plus className="size-3.5" /> 250ml
-          </button>
-        </Link>
+        <WaterCard
+          waterMl={waterMl}
+          targetMl={waterTarget}
+          onLog={(ml) => waterMutation.mutate(ml)}
+          disabled={waterMutation.isPending}
+        />
 
-        {/* AI Scan CTA */}
-        {/* Mood quick log */}
-        <Link
-          to="/mood"
-          className="bg-card p-4 rounded-3xl outline-1 outline-black/5 shadow-sm flex items-center gap-3 animate-fade-up"
-        >
-          <div className="size-12 rounded-2xl bg-amber-100 grid place-items-center">
-            <Smile className="size-5 text-amber-600" />
-          </div>
-          <div className="flex-1">
-            <p className="text-xs font-bold uppercase text-muted-foreground tracking-wider">
-              Mood hari ini
-            </p>
-            <div className="flex gap-1 mt-1">
-              {[1, 2, 3, 4, 5].map((m) => (
-                <button
-                  key={m}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    moodMutation.mutate(m);
-                  }}
-                  disabled={moodMutation.isPending}
-                  className="text-xl hover:scale-125 transition-transform"
-                  aria-label={`Mood ${m}`}
-                >
-                  {["😢", "😕", "😐", "🙂", "😄"][m - 1]}
-                </button>
-              ))}
-            </div>
-          </div>
-        </Link>
+        <MoodQuickLog
+          onPick={(m) => moodMutation.mutate(m)}
+          disabled={moodMutation.isPending}
+        />
 
         <Link
           to="/scan"
@@ -634,40 +561,7 @@ function Dashboard() {
           </button>
         </div>
 
-        {freezeOpen && (
-          <div
-            className="fixed inset-0 z-50 bg-black/50 grid place-items-center p-4"
-            onClick={() => setFreezeOpen(false)}
-          >
-            <div
-              className="bg-card rounded-3xl p-6 max-w-sm w-full text-center space-y-3"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <div className="text-6xl">🧊</div>
-              <h3 className="font-bold text-lg">Streak Freeze</h3>
-              <p className="text-sm text-muted-foreground">
-                Lupa log hari ini? Gunakan 1 freeze untuk menyelamatkan streakmu.
-              </p>
-              <button
-                onClick={() => {
-                  setFreezeUsed(true);
-                  toast.success("Freeze digunakan untuk hari ini");
-                  setTimeout(() => setFreezeOpen(false), 600);
-                }}
-                disabled={freezeUsed}
-                className="w-full rounded-xl bg-primary text-primary-foreground py-2.5 text-sm font-semibold disabled:opacity-50"
-              >
-                {freezeUsed ? "✓ Freeze Digunakan" : "Gunakan 1 Freeze"}
-              </button>
-              <button
-                onClick={() => setFreezeOpen(false)}
-                className="w-full text-xs text-muted-foreground"
-              >
-                Tutup
-              </button>
-            </div>
-          </div>
-        )}
+        <FreezeDialog open={freezeOpen} onClose={() => setFreezeOpen(false)} />
 
         {groupSummary.length > 0 && (
           <div className="block bg-card p-4 rounded-3xl outline-1 outline-black/5 shadow-sm animate-fade-up">
@@ -884,53 +778,7 @@ function Dashboard() {
           </div>
         )}
 
-        {/* Today's meals */}
-        <section className="animate-fade-up">
-          <div className="flex justify-between items-center mb-3">
-            <h2 className="font-bold">Makan hari ini</h2>
-            <Link to="/food" className="text-xs font-semibold text-primary">
-              + Tambah
-            </Link>
-          </div>
-          {meals.length === 0 ? (
-            <div className="bg-card p-6 rounded-3xl outline-1 outline-black/5 text-center">
-              <p className="text-sm text-muted-foreground mb-3">Belum ada catatan hari ini</p>
-              <Link
-                to="/food"
-                className="inline-block bg-primary text-primary-foreground text-sm font-semibold px-4 py-2 rounded-xl"
-              >
-                Catat makanan
-              </Link>
-            </div>
-          ) : (
-            <div className="space-y-2">
-              {meals.map((m) => (
-                <div
-                  key={m.id}
-                  className="bg-card p-3 rounded-2xl outline-1 outline-black/5 flex items-center gap-3"
-                >
-                  <div className="size-12 rounded-xl bg-mint grid place-items-center text-lg">
-                    🍽️
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-[10px] font-bold uppercase text-coral tracking-wider">
-                      {m.meal_type}
-                    </p>
-                    <p className="font-semibold text-sm truncate">
-                      {(m.food_item as { name?: string } | null)?.name ??
-                        m.custom_name ??
-                        "Makanan"}
-                    </p>
-                  </div>
-                  <p className="text-sm font-bold tabular-nums">
-                    {Math.round(Number(m.calories))}
-                    <span className="text-[10px] text-muted-foreground"> kcal</span>
-                  </p>
-                </div>
-              ))}
-            </div>
-          )}
-        </section>
+        <TodaysMeals meals={meals} />
       </div>
       <BottomNav />
     </main>
