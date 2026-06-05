@@ -23,7 +23,8 @@ ATURAN KHUSUS:
 - Untuk pertanyaan gejala → tambahkan disclaimer ringkas + sarankan periksa.
 - Untuk gejala DARURAT (nyeri dada hebat, sesak berat, pingsan, muntah darah, alergi parah, self-harm) → BERIKAN PERINGATAN MENONJOL di atas jawaban: "⚠️ DARURAT — segera hubungi 119 (ambulans) / 118, atau ke IGD terdekat." Untuk self-harm sebutkan: "Into The Light 021-7256526 atau 119 ext 8."
 - Gunakan data konkret dari konteks (kalori sisa, status puasa, jam tidur, dll) untuk personalisasi.
-- Berikan actionable advice — langkah konkret, bukan teori panjang.`;
+- Berikan actionable advice — langkah konkret, bukan teori panjang.
+- WAJIB tutup setiap jawaban dengan satu baris **"Langkah berikutnya:"** berisi 1 aksi konkret, kecil, dan bisa langsung dikerjakan dalam < 5 menit (mis. "Minum 1 gelas air sekarang", "Tambah 1 telur rebus untuk camilan"). Hindari daftar panjang — hanya 1 langkah.`;
 
 const EMERGENCY_PATTERNS = [
   /nyeri dada|sakit dada hebat|chest pain/i,
