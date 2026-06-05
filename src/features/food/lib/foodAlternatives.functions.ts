@@ -16,7 +16,8 @@ export const getFoodAlternatives = createServerFn({ method: "GET" })
       .order("similarity_score", { ascending: false })
       .limit(10);
     if (error) throw new Error(error.message);
-    const ids = (rows ?? []).map((r: { alternative_food_id: string }) => r.alternative_food_id);
+    const rowList = (rows ?? []) as Array<{ alternative_food_id: string; similarity_score: number | null; reason: string | null }>;
+    const ids = rowList.map((r) => r.alternative_food_id);
     if (ids.length === 0) return [];
     const { data: foods } = await supabase
       .from("food_items")
@@ -24,18 +25,29 @@ export const getFoodAlternatives = createServerFn({ method: "GET" })
         "id, name, calories, protein_g, carbs_g, fat_g, sugar_g, sodium_mg, fiber_g, health_rating, serving_size, serving_unit",
       )
       .in("id", ids);
-    const fmap = new Map((foods ?? []).map((f: { id: string } & Record<string, unknown>) => [f.id, f] as const));
-    return (rows ?? [])
-      .map((r: { alternative_food_id: string; similarity_score: number | null; reason: string | null }) => {
-        const f = fmap.get(r.alternative_food_id) as Record<string, unknown> | undefined;
-        if (!f) return null;
-        return {
-          ...f,
-          similarity_score: r.similarity_score,
-          reason: r.reason,
-        };
-      })
-      .filter((x): x is NonNullable<typeof x> => x !== null);
+    type FoodItem = {
+      id: string;
+      name: string;
+      calories: number | null;
+      protein_g: number | null;
+      carbs_g: number | null;
+      fat_g: number | null;
+      sugar_g: number | null;
+      sodium_mg: number | null;
+      fiber_g: number | null;
+      health_rating: number | null;
+      serving_size: number | null;
+      serving_unit: string | null;
+    };
+    const foodList = (foods ?? []) as FoodItem[];
+    const fmap = new Map(foodList.map((f) => [f.id, f] as const));
+    const result: Array<FoodItem & { similarity_score: number | null; reason: string | null }> = [];
+    for (const r of rowList) {
+      const f = fmap.get(r.alternative_food_id);
+      if (!f) continue;
+      result.push({ ...f, similarity_score: r.similarity_score, reason: r.reason });
+    }
+    return result;
   });
 
 const ReasonsSchema = z.object({
@@ -94,35 +106,34 @@ export const regenerateAlternativeReasons = createServerFn({ method: "POST" })
       .limit(10);
     if (!alts || alts.length === 0) throw new Error("Belum ada alternatif untuk diregenerasi");
 
-    const ids = alts.map((a: { alternative_food_id: string }) => a.alternative_food_id);
+    const altList = alts as Array<{ id: string; alternative_food_id: string }>;
+    const ids = altList.map((a) => a.alternative_food_id);
     const { data: foods } = await supabase
       .from("food_items")
       .select("id, name, calories, sodium_mg, sugar_g, fiber_g, glycemic_index")
       .in("id", ids);
     type FoodRow = { id: string; name: string; calories: number | null; sodium_mg: number | null; sugar_g: number | null; fiber_g: number | null; glycemic_index: number | null };
-    const fmap = new Map((foods ?? []).map((f: FoodRow) => [f.id, f] as const));
-
-    const items = alts
-      .map((a: { id: string; alternative_food_id: string }) => {
-        const f = fmap.get(a.alternative_food_id);
-        return f
-          ? {
-              alt_id: a.id,
-              alt_name: f.name,
-              calories: f.calories,
-              sodium_mg: f.sodium_mg,
-              sugar_g: f.sugar_g,
-              fiber_g: f.fiber_g,
-              glycemic_index: f.glycemic_index,
-            }
-          : null;
-      })
-      .filter((x: unknown): x is NonNullable<typeof x> => x !== null);
+    const fmap = new Map(((foods ?? []) as FoodRow[]).map((f) => [f.id, f] as const));
+    type Item = { alt_id: string; alt_name: string; calories: number | null; sodium_mg: number | null; sugar_g: number | null; fiber_g: number | null; glycemic_index: number | null };
+    const items: Item[] = [];
+    for (const a of altList) {
+      const f = fmap.get(a.alternative_food_id);
+      if (!f) continue;
+      items.push({
+        alt_id: a.id,
+        alt_name: f.name,
+        calories: f.calories,
+        sodium_mg: f.sodium_mg,
+        sugar_g: f.sugar_g,
+        fiber_g: f.fiber_g,
+        glycemic_index: f.glycemic_index,
+      });
+    }
 
     const prompt = `Makanan asal: ${source.name} (kal ${source.calories}, natrium ${source.sodium_mg}mg, gula ${source.sugar_g}g, serat ${source.fiber_g}g, GI ${source.glycemic_index ?? "?"}).
 ${healthContext ? `Konteks kesehatan pengguna: ${healthContext}.` : ""}
 Untuk setiap alternatif berikut, beri penjelasan singkat (maks 12 kata, bahasa Indonesia, kontekstual & spesifik) kenapa lebih sehat. Sebutkan kondisi kesehatan relevan bila ada (mis. "lebih cocok untuk diabetes/hipertensi").
-Alternatif: ${JSON.stringify(items.map((x: { alt_id: string; alt_name: string; calories: number | null; sodium_mg: number | null; sugar_g: number | null; fiber_g: number | null; glycemic_index: number | null }) => ({ id: x.alt_id, name: x.alt_name, kal: x.calories, na: x.sodium_mg, gula: x.sugar_g, serat: x.fiber_g, gi: x.glycemic_index })))}
+Alternatif: ${JSON.stringify(items.map((x) => ({ id: x.alt_id, name: x.alt_name, kal: x.calories, na: x.sodium_mg, gula: x.sugar_g, serat: x.fiber_g, gi: x.glycemic_index })))}
 Output JSON: { "reasons": [{ "id": "<alt_id>", "reason": "..." }] }`;
 
     const parsed = await callGeminiJSON([
