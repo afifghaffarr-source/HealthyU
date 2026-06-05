@@ -1,4 +1,5 @@
 import { Check } from "lucide-react";
+import { DisclaimerCard } from "@/components/healthyu/disclaimer-card";
 import {
   ALLERGIES,
   HEALTH_CONDITIONS,
@@ -28,6 +29,7 @@ export function StepHealth({
           AI akan menyesuaikan rekomendasi makanan.
         </p>
       </div>
+      <DisclaimerCard />
       <div>
         <p className="text-sm font-medium mb-2">Kondisi kesehatan</p>
         <div className="flex flex-wrap gap-2">

@@ -16,6 +16,7 @@ import { useSpeech } from "@/features/chat/hooks/useSpeech";
 import { ChatQuickActions } from "@/features/chat/components/ChatQuickActions";
 import { ChatEmptyState, ChatMessages } from "@/features/chat/components/ChatMessages";
 import { ChatComposer, type ImageData } from "@/features/chat/components/ChatComposer";
+import { SafetyChip } from "@/components/healthyu/safety-chip";
 
 export function ChatPage() {
   const qc = useQueryClient();
@@ -199,6 +200,10 @@ export function ChatPage() {
         listening={speech.listening}
         onToggleMic={speech.toggleMic}
       />
+
+      <div className="fixed bottom-[5.25rem] inset-x-0 z-10 flex justify-center pointer-events-none">
+        <SafetyChip variant="not-medical" className="shadow-sm pointer-events-auto" />
+      </div>
 
       <BottomNav />
     </main>

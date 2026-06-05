@@ -1,4 +1,5 @@
 import { ScanItemCard } from "./ScanItemCard";
+import { SafetyChip } from "@/components/healthyu/safety-chip";
 import type { recognizeFood } from "@/features/food/lib/foodScan.functions";
 
 type Item = Awaited<ReturnType<typeof recognizeFood>>["items"][number];
@@ -27,7 +28,10 @@ export function ScanItemsList({
   if (items.length === 0) return null;
   return (
     <div className="space-y-2">
-      <p className="text-xs font-semibold text-muted-foreground">Terdeteksi</p>
+      <div className="flex items-center justify-between gap-2 flex-wrap">
+        <p className="text-xs font-semibold text-muted-foreground">Terdeteksi</p>
+        <SafetyChip variant="ai-estimate" />
+      </div>
       <button
         onClick={onLogAll}
         disabled={logPending}
