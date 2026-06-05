@@ -14,6 +14,7 @@ import {
   ProtocolPicker,
   RamadhanScheduleCard,
   FastHistoryList,
+  BreakFastTipsCard,
 } from "@/features/fasting/components/FastingPieces";
 
 export const Route = createFileRoute("/_authenticated/fasting")({
@@ -89,8 +90,11 @@ function FastingPage() {
       (r?.game?.newlyUnlocked ?? []).forEach((a) =>
         toast.success(`${getAchievementToastPrefix(a.icon)} ${a.title} terbuka!`),
       );
+      setJustStopped(true);
+      setTimeout(() => setJustStopped(false), 120000);
     },
   });
+  const [justStopped, setJustStopped] = useState(false);
 
   const elapsedMs = fast ? now - new Date(fast.start_time).getTime() : 0;
   const elapsedHrs = elapsedMs / 3600000;
@@ -111,10 +115,13 @@ function FastingPage() {
             stopping={stopMut.isPending}
           />
         ) : (
-          <ProtocolPicker
-            onStart={(p) => startMut.mutate(p)}
-            starting={startMut.isPending}
-          />
+          <>
+            {justStopped && <BreakFastTipsCard />}
+            <ProtocolPicker
+              onStart={(p) => startMut.mutate(p)}
+              starting={startMut.isPending}
+            />
+          </>
         )}
 
         <RamadhanScheduleCard
