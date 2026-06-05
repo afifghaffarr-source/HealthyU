@@ -48,7 +48,7 @@ describe("moderateImage", () => {
 
   it("fails open on gateway error", async () => {
     const spy = vi.spyOn(console, "error").mockImplementation(() => {});
-    callMock.mockRejectedValue(new AiGatewayError(429, "rate"));
+    callMock.mockRejectedValue(new AiGatewayError("rate", 429));
     const r = await moderateImage("xx");
     expect(r).toEqual({ label: "safe", confidence: 0, blocked: false });
     spy.mockRestore();
