@@ -480,68 +480,17 @@ function Dashboard() {
           ))}
         </div>
 
-        {/* Water */}
-        <Link
-          to="/water"
-          className="bg-card p-4 rounded-3xl outline-1 outline-black/5 shadow-sm flex items-center gap-4 animate-fade-up"
-        >
-          <div className="size-12 rounded-2xl bg-sky-100 grid place-items-center">
-            <Droplet className="size-5 text-sky-600" />
-          </div>
-          <div className="flex-1">
-            <p className="text-xs font-bold uppercase text-muted-foreground tracking-wider">Air</p>
-            <p className="text-lg font-bold tabular-nums">
-              {(waterMl / 1000).toFixed(1)}L{" "}
-              <span className="text-xs text-muted-foreground font-medium">
-                / {waterTarget / 1000}L
-              </span>
-            </p>
-          </div>
-          <button
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              waterMutation.mutate(250);
-            }}
-            disabled={waterMutation.isPending}
-            className="bg-primary text-primary-foreground text-xs font-semibold px-3 py-2 rounded-xl inline-flex items-center gap-1"
-          >
-            <Plus className="size-3.5" /> 250ml
-          </button>
-        </Link>
+        <WaterCard
+          waterMl={waterMl}
+          targetMl={waterTarget}
+          onLog={(ml) => waterMutation.mutate(ml)}
+          disabled={waterMutation.isPending}
+        />
 
-        {/* AI Scan CTA */}
-        {/* Mood quick log */}
-        <Link
-          to="/mood"
-          className="bg-card p-4 rounded-3xl outline-1 outline-black/5 shadow-sm flex items-center gap-3 animate-fade-up"
-        >
-          <div className="size-12 rounded-2xl bg-amber-100 grid place-items-center">
-            <Smile className="size-5 text-amber-600" />
-          </div>
-          <div className="flex-1">
-            <p className="text-xs font-bold uppercase text-muted-foreground tracking-wider">
-              Mood hari ini
-            </p>
-            <div className="flex gap-1 mt-1">
-              {[1, 2, 3, 4, 5].map((m) => (
-                <button
-                  key={m}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    moodMutation.mutate(m);
-                  }}
-                  disabled={moodMutation.isPending}
-                  className="text-xl hover:scale-125 transition-transform"
-                  aria-label={`Mood ${m}`}
-                >
-                  {["😢", "😕", "😐", "🙂", "😄"][m - 1]}
-                </button>
-              ))}
-            </div>
-          </div>
-        </Link>
+        <MoodQuickLog
+          onPick={(m) => moodMutation.mutate(m)}
+          disabled={moodMutation.isPending}
+        />
 
         <Link
           to="/scan"
@@ -617,40 +566,7 @@ function Dashboard() {
           </button>
         </div>
 
-        {freezeOpen && (
-          <div
-            className="fixed inset-0 z-50 bg-black/50 grid place-items-center p-4"
-            onClick={() => setFreezeOpen(false)}
-          >
-            <div
-              className="bg-card rounded-3xl p-6 max-w-sm w-full text-center space-y-3"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <div className="text-6xl">🧊</div>
-              <h3 className="font-bold text-lg">Streak Freeze</h3>
-              <p className="text-sm text-muted-foreground">
-                Lupa log hari ini? Gunakan 1 freeze untuk menyelamatkan streakmu.
-              </p>
-              <button
-                onClick={() => {
-                  setFreezeUsed(true);
-                  toast.success("Freeze digunakan untuk hari ini");
-                  setTimeout(() => setFreezeOpen(false), 600);
-                }}
-                disabled={freezeUsed}
-                className="w-full rounded-xl bg-primary text-primary-foreground py-2.5 text-sm font-semibold disabled:opacity-50"
-              >
-                {freezeUsed ? "✓ Freeze Digunakan" : "Gunakan 1 Freeze"}
-              </button>
-              <button
-                onClick={() => setFreezeOpen(false)}
-                className="w-full text-xs text-muted-foreground"
-              >
-                Tutup
-              </button>
-            </div>
-          </div>
-        )}
+        <FreezeDialog open={freezeOpen} onClose={() => setFreezeOpen(false)} />
 
         {groupSummary.length > 0 && (
           <div className="block bg-card p-4 rounded-3xl outline-1 outline-black/5 shadow-sm animate-fade-up">
