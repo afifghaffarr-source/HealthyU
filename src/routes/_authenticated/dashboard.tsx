@@ -37,6 +37,7 @@ import { TodaysBalanceCard } from "@/features/dashboard/components/TodaysBalance
 import { SmartNextStepCard } from "@/features/dashboard/components/SmartNextStepCard";
 import { MacroGapInsightCard } from "@/features/dashboard/components/MacroGapInsightCard";
 import { LocalFoodHintCard } from "@/features/dashboard/components/LocalFoodHintCard";
+import { HydrationSuggestCard } from "@/features/dashboard/components/HydrationSuggestCard";
 import { OfflineQueueBanner } from "@/components/healthyu/offline-queue-banner";
 import { MorningCheckInCard } from "@/features/dashboard/components/MorningCheckInCard";
 import { EveningReflectionCard } from "@/features/dashboard/components/EveningReflectionCard";
@@ -177,6 +178,14 @@ function Dashboard() {
         <MacroGapInsightCard totals={totals} calTarget={calTarget} />
 
         <LocalFoodHintCard hour={new Date().getHours()} />
+
+        <HydrationSuggestCard
+          waterMl={waterMl}
+          targetMl={waterTarget}
+          hour={new Date().getHours()}
+          onLog={(ml) => waterMutation.mutate(ml)}
+          disabled={waterMutation.isPending}
+        />
 
         <HeroStatsRow
           totals={totals}
