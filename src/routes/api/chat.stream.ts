@@ -8,7 +8,7 @@ import { enforceAiBudget, logAiUsage } from "@/features/ai/lib/aiBudget.server";
 import { checkRateLimit, RATE_LIMITS } from "@/lib/rateLimit.server";
 import { chatMessageSchema } from "@/lib/validation";
 import { checkChatSafety } from "@/features/chat/lib/chatSafety";
-import { moderateImage } from "@/lib/imageModeration.server";
+import { moderateImage } from "@/features/moderation/lib/imageModeration.server";
 import { streamAiChat, parseSseChunk, AiGatewayError } from "@/features/ai/lib/aiStreamGateway.server";
 
 export const Route = createFileRoute("/api/chat/stream")({

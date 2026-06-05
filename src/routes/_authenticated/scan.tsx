@@ -9,7 +9,7 @@ import { BottomNav } from "@/components/bottom-nav";
 import { recognizeFood, submitScanCorrection } from "@/features/food/lib/foodScan.functions";
 import { attachScanPhoto } from "@/features/scan/lib/scanPhoto.functions";
 import { recordScanGameify, checkScanLimit, classifyMealTags } from "@/features/scan/lib/scanMore.functions";
-import { logMeal } from "@/lib/meals.functions";
+import { logMeal } from "@/features/meals/lib/meals.functions";
 
 export const Route = createFileRoute("/_authenticated/scan")({
   component: ScanPage,

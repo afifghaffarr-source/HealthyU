@@ -3,7 +3,7 @@ import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { weekPlan, addPlan, deletePlan } from "@/features/mealplan/lib/mealplan.functions";
-import { searchFoods } from "@/lib/meals.functions";
+import { searchFoods } from "@/features/meals/lib/meals.functions";
 import { BottomNav } from "@/components/bottom-nav";
 import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { Plus, X } from "lucide-react";

@@ -9,7 +9,7 @@ vi.mock("@/features/ai/lib/aiGateway.server", () => ({
   },
 }));
 
-import { moderateImage } from "../imageModeration.server";
+import { moderateImage } from "@/features/moderation/lib/imageModeration.server";
 import { AiGatewayError } from "@/features/ai/lib/aiGateway.server";
 
 beforeEach(() => callMock.mockReset());

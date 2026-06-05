@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
-import { exportAllData } from "@/lib/export.functions";
+import { exportAllData } from "@/features/export/lib/export.functions";
 import { BottomNav } from "@/components/bottom-nav";
 import { Download, FileJson, FileSpreadsheet, Loader2 } from "lucide-react";
 import { toast } from "sonner";
