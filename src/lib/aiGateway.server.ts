@@ -1,5 +1,5 @@
 import { enforceAiBudget, logAiUsage } from "./aiBudget.server";
-import { z, type ZodTypeAny } from "zod";
+import type { z, ZodTypeAny } from "zod";
 
 const LOVABLE_AI = "https://ai.gateway.lovable.dev/v1/chat/completions";
 const DEFAULT_TIMEOUT_MS = 30_000;
