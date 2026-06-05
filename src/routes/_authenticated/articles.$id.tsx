@@ -3,6 +3,8 @@ import { useEffect, useState } from "react";
 import { Bookmark, BookmarkCheck, Share2 } from "lucide-react";
 import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { BottomNav } from "@/components/bottom-nav";
+import { TakeawayBox } from "@/components/healthyu/takeaway-box";
+import { DisclaimerCard } from "@/components/healthyu/disclaimer-card";
 
 export const Route = createFileRoute("/_authenticated/articles/$id")({
   component: ArticleReader,
@@ -101,6 +103,10 @@ function ArticleReader() {
           Minum sebelum lapar, hindari minuman manis berlebih.
         </p>
       </article>
+      <div className="mt-5 space-y-3">
+        <TakeawayBox body="Coba hari ini: tambahkan satu sumber protein di makan berikutnya, lalu minum satu gelas air sebelum makan." />
+        <DisclaimerCard />
+      </div>
       <BottomNav />
     </div>
   );
