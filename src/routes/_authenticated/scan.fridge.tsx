@@ -23,7 +23,9 @@ function Page() {
     const buf = await f.arrayBuffer();
     setB64(btoa(String.fromCharCode(...new Uint8Array(buf))));
   };
-  const r = mut.data?.result as any;
+  type FridgeRecipe = { name: string; steps?: string[] };
+  type FridgeResult = { ingredients?: string[]; recipes?: FridgeRecipe[] };
+  const r = mut.data?.result as FridgeResult | undefined;
   return (
     <div className="min-h-dvh pb-24 bg-background">
       <TopAppBar title="Resep dari Kulkas" showBack />
