@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { callAiWithGuards, callAiJsonWithGuards } from "@/lib/aiGateway.server";
 
 // 9. Weekly leaderboard
 export const getWeeklyLeaderboard = createServerFn({ method: "POST" })
@@ -42,7 +43,6 @@ export const importRecipeFromUrl = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d) => z.object({ url: z.string().url() }).parse(d))
   .handler(async ({ data, context }) => {
-    const apiKey = process.env.LOVABLE_API_KEY!;
     let html = "";
     try {
       const r = await fetch(data.url, { headers: { "User-Agent": "Mozilla/5.0 RecipeBot" } });
@@ -50,29 +50,22 @@ export const importRecipeFromUrl = createServerFn({ method: "POST" })
     } catch (e) {
       throw new Error("Gagal mengambil halaman");
     }
-    const ai = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-      method: "POST",
-      headers: { "Content-Type": "application/json", Authorization: `Bearer ${apiKey}` },
-      body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
-        messages: [
-          {
-            role: "system",
-            content:
-              "Ekstrak resep dari HTML. Balas JSON: {title, ingredients:[], steps:[]}. Tanpa markdown.",
-          },
-          { role: "user", content: html },
-        ],
-      }),
+    const parsed = await callAiJsonWithGuards<{
+      title?: string;
+      ingredients?: string[];
+      steps?: string[];
+    }>({
+      userId: context.userId,
+      feature: "recipe.import_from_url",
+      messages: [
+        {
+          role: "system",
+          content:
+            "Ekstrak resep dari HTML. Balas JSON: {title, ingredients:[], steps:[]}. Tanpa markdown.",
+        },
+        { role: "user", content: html },
+      ],
     });
-    const j = await ai.json();
-    const txt = j.choices?.[0]?.message?.content ?? "{}";
-    let parsed: { title?: string; ingredients?: string[]; steps?: string[] } = {};
-    try {
-      parsed = JSON.parse(txt.replace(/^```json|```$/g, "").trim());
-    } catch {
-      parsed = {};
-    }
     const { data: row } = await context.supabase
       .from("imported_recipes")
       .insert({
@@ -92,24 +85,18 @@ export const generateGroceryList = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d) => z.object({ planText: z.string().min(10).max(5000) }).parse(d))
   .handler(async ({ data, context }) => {
-    const apiKey = process.env.LOVABLE_API_KEY!;
-    const ai = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-      method: "POST",
-      headers: { "Content-Type": "application/json", Authorization: `Bearer ${apiKey}` },
-      body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
-        messages: [
-          {
-            role: "system",
-            content:
-              "Buat daftar belanja dari meal plan. Balas JSON array: [{name, qty, unit}]. Tanpa markdown.",
-          },
-          { role: "user", content: data.planText },
-        ],
-      }),
+    const txt = await callAiWithGuards({
+      userId: context.userId,
+      feature: "grocery.from_plan",
+      messages: [
+        {
+          role: "system",
+          content:
+            "Buat daftar belanja dari meal plan. Balas JSON array: [{name, qty, unit}]. Tanpa markdown.",
+        },
+        { role: "user", content: data.planText },
+      ],
     });
-    const j = await ai.json();
-    const txt = j.choices?.[0]?.message?.content ?? "[]";
     let items: Array<{ name: string; qty?: string; unit?: string }> = [];
     try {
       items = JSON.parse(txt.replace(/^```json|```$/g, "").trim());
@@ -164,7 +151,6 @@ export const upgradeSubscription = createServerFn({ method: "POST" })
 export const generateWeeklyPodcast = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
-    const apiKey = process.env.LOVABLE_API_KEY!;
     const monday = new Date();
     const day = monday.getDay() || 7;
     monday.setDate(monday.getDate() - day + 1);
@@ -174,23 +160,18 @@ export const generateWeeklyPodcast = createServerFn({ method: "POST" })
       .select("meal_type,calories,logged_at")
       .eq("user_id", context.userId)
       .gte("logged_at", week);
-    const ai = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-      method: "POST",
-      headers: { "Content-Type": "application/json", Authorization: `Bearer ${apiKey}` },
-      body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
-        messages: [
-          {
-            role: "system",
-            content:
-              "Buat skrip podcast mingguan ~150 kata dalam Bahasa Indonesia, motivasional, sebut highlight data.",
-          },
-          { role: "user", content: `Data meal minggu ini: ${JSON.stringify(meals ?? [])}` },
-        ],
-      }),
+    const script = await callAiWithGuards({
+      userId: context.userId,
+      feature: "podcast.weekly",
+      messages: [
+        {
+          role: "system",
+          content:
+            "Buat skrip podcast mingguan ~150 kata dalam Bahasa Indonesia, motivasional, sebut highlight data.",
+        },
+        { role: "user", content: `Data meal minggu ini: ${JSON.stringify(meals ?? [])}` },
+      ],
     });
-    const j = await ai.json();
-    const script = j.choices?.[0]?.message?.content ?? "";
     await context.supabase
       .from("weekly_podcasts")
       .upsert(
@@ -209,12 +190,11 @@ export const analyzeFormCheck = createServerFn({ method: "POST" })
       .parse(d),
   )
   .handler(async ({ data, context }) => {
-    const apiKey = process.env.LOVABLE_API_KEY!;
-    const ai = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-      method: "POST",
-      headers: { "Content-Type": "application/json", Authorization: `Bearer ${apiKey}` },
-      body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
+    let feedback: { score?: number; mistakes?: string[]; tips?: string[]; raw?: string } = {};
+    try {
+      feedback = await callAiJsonWithGuards<typeof feedback>({
+        userId: context.userId,
+        feature: "workout.form_check",
         messages: [
           {
             role: "system",
@@ -226,15 +206,9 @@ export const analyzeFormCheck = createServerFn({ method: "POST" })
             content: `Latihan: ${data.exercise}\nDeskripsi gerakan: ${data.description}`,
           },
         ],
-      }),
-    });
-    const j = await ai.json();
-    const txt = j.choices?.[0]?.message?.content ?? "{}";
-    let feedback: { score?: number; mistakes?: string[]; tips?: string[]; raw?: string } = {};
-    try {
-      feedback = JSON.parse(txt.replace(/^```json|```$/g, "").trim());
-    } catch {
-      feedback = { raw: txt };
+      });
+    } catch (e) {
+      feedback = { raw: (e as Error).message };
     }
     const { data: row } = await context.supabase
       .from("form_check_sessions")
@@ -252,13 +226,12 @@ export const analyzeFormCheck = createServerFn({ method: "POST" })
 export const ocrNutritionLabel = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d) => z.object({ imageBase64: z.string().min(50) }).parse(d))
-  .handler(async ({ data }) => {
-    const apiKey = process.env.LOVABLE_API_KEY!;
-    const ai = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-      method: "POST",
-      headers: { "Content-Type": "application/json", Authorization: `Bearer ${apiKey}` },
-      body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
+  .handler(async ({ data, context }) => {
+    let nutrition: Record<string, string | number> = {};
+    try {
+      nutrition = await callAiJsonWithGuards<Record<string, string | number>>({
+        userId: context.userId,
+        feature: "ocr.nutrition_label",
         messages: [
           {
             role: "system",
@@ -275,15 +248,9 @@ export const ocrNutritionLabel = createServerFn({ method: "POST" })
             ],
           },
         ],
-      }),
-    });
-    const j = await ai.json();
-    const txt = j.choices?.[0]?.message?.content ?? "{}";
-    let nutrition: Record<string, string | number> = {};
-    try {
-      nutrition = JSON.parse(txt.replace(/^```json|```$/g, "").trim());
-    } catch {
-      nutrition = { raw: txt };
+      });
+    } catch (e) {
+      nutrition = { raw: (e as Error).message };
     }
     return { nutrition };
   });
