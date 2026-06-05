@@ -268,29 +268,7 @@ function ReportsPage() {
           <Stat label="Puasa selesai" value={`${summary?.fastingDone ?? 0}`} sub="sesi" />
         </section>
 
-        <section className="bg-card p-4 rounded-3xl outline-1 outline-black/5 animate-fade-up">
-          <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-3">
-            Kalori harian
-          </p>
-          <div className="flex items-end gap-2 h-32">
-            {summary?.byDay.map((d) => (
-              <div key={d.day} className="flex-1 flex flex-col items-center gap-1">
-                <div className="flex-1 w-full flex items-end">
-                  <div
-                    className="w-full bg-primary rounded-t-md transition-all"
-                    style={{
-                      height: `${(d.cals / maxCal) * 100}%`,
-                      minHeight: d.cals > 0 ? "4px" : 0,
-                    }}
-                  />
-                </div>
-                <span className="text-[9px] text-muted-foreground tabular-nums">
-                  {new Date(d.day).toLocaleDateString("id-ID", { weekday: "narrow" })}
-                </span>
-              </div>
-            ))}
-          </div>
-        </section>
+        {summary && <WeeklyChart byDay={summary.byDay} maxCal={maxCal} />}
 
         <section className="grid grid-cols-3 gap-2 print:hidden">
           <button
@@ -334,108 +312,17 @@ function ReportsPage() {
         </section>
 
         {history.length > 0 && (
-          <section className="space-y-2 animate-fade-up">
-            <div className="flex items-center justify-between gap-2 px-1">
-              <h2 className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
-                Riwayat Laporan AI
-              </h2>
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={() =>
-                    exportAllArchivePdf(
-                      history.filter((r) => {
-                        if (rangeWeeks === 0) return true;
-                        const cutoff = Date.now() - rangeWeeks * 7 * 86400000;
-                        return new Date(r.created_at).getTime() >= cutoff;
-                      }),
-                      t,
-                    )
-                  }
-                  className="inline-flex items-center gap-1 text-[11px] font-semibold bg-card outline-1 outline-black/10 rounded-lg px-2 py-1"
-                  title="Export semua laporan ke 1 PDF"
-                >
-                  <FileText className="size-3" /> Export semua
-                </button>
-                <select
-                  value={rangeWeeks}
-                  onChange={(e) => setRangeWeeks(Number(e.target.value))}
-                  className="text-[11px] bg-card outline-1 outline-black/10 rounded-lg px-2 py-1"
-                >
-                  <option value={0}>Semua</option>
-                  <option value={4}>4 minggu</option>
-                  <option value={12}>12 minggu</option>
-                  <option value={26}>26 minggu</option>
-                </select>
-              </div>
-            </div>
-            {history
-              .filter((r) => {
-                if (rangeWeeks === 0) return true;
-                const cutoff = Date.now() - rangeWeeks * 7 * 86400000;
-                return new Date(r.created_at).getTime() >= cutoff;
-              })
-              .map((r, idx) => {
-                const text = Array.isArray(r.recommendations)
-                  ? String(r.recommendations[0] ?? "")
-                  : "";
-                const isNew = idx === 0 && latestId === r.id && lastSeenId !== r.id;
-                const isManualFlash = manualFlashId === r.id;
-                return (
-                  <details
-                    key={r.id}
-                    open={(focus === "latest" && idx === 0) || isNew}
-                    className={
-                      isManualFlash
-                        ? "bg-card rounded-2xl outline-2 outline-amber-400 p-4 ring-4 ring-amber-200 shadow-md animate-fade-up"
-                        : isNew
-                          ? "bg-card rounded-2xl outline-2 outline-primary p-4 ring-2 ring-primary/20 shadow-md animate-fade-up"
-                          : "bg-card rounded-2xl outline-1 outline-black/5 p-4"
-                    }
-                  >
-                    <summary className="cursor-pointer text-sm font-semibold flex items-center justify-between">
-                      <span className="inline-flex items-center gap-2">
-                        {isNew && (
-                          <span className="text-[9px] font-bold uppercase tracking-wider bg-primary text-primary-foreground rounded-full px-2 py-0.5">
-                            Baru
-                          </span>
-                        )}
-                        {r.report_period_start} → {r.report_period_end}
-                      </span>
-                      <span className="text-xs text-muted-foreground">
-                        {new Date(r.created_at).toLocaleDateString("id-ID")}
-                      </span>
-                    </summary>
-                    <p className="mt-3 text-sm whitespace-pre-wrap leading-relaxed">{text}</p>
-                    {isManualFlash && text && (
-                      <div className="mt-3 flex items-center gap-2">
-                        <button
-                          onClick={(e) => {
-                            e.preventDefault();
-                            shareWhatsapp({
-                              text,
-                              periodStart: r.report_period_start ?? undefined,
-                              periodEnd: r.report_period_end ?? undefined,
-                            });
-                          }}
-                          className="inline-flex items-center gap-1.5 bg-[#25D366] text-white text-xs font-semibold px-3 py-1.5 rounded-full"
-                        >
-                          <Share2 className="size-3" /> Share
-                        </button>
-                        <button
-                          onClick={(e) => {
-                            e.preventDefault();
-                            exportArchivePdf(r);
-                          }}
-                          className="inline-flex items-center gap-1.5 bg-card outline-1 outline-black/10 text-xs font-semibold px-3 py-1.5 rounded-full"
-                        >
-                          <FileText className="size-3" /> PDF
-                        </button>
-                      </div>
-                    )}
-                  </details>
-                );
-              })}
-          </section>
+          <AiReportHistorySection
+            history={history}
+            rangeWeeks={rangeWeeks}
+            setRangeWeeks={setRangeWeeks}
+            latestId={latestId}
+            lastSeenId={lastSeenId}
+            manualFlashId={manualFlashId}
+            focusLatest={focus === "latest"}
+            t={t}
+            onShare={(args) => shareWhatsapp(args)}
+          />
         )}
       </div>
       <BottomNav />
