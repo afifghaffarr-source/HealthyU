@@ -5,12 +5,12 @@ import { toast } from "sonner";
 import { Gift } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useMiniFocusTrap } from "@/hooks/useMiniFocusTrap";
-import { listChallengeGroups } from "@/lib/groupChallenges.functions";
+import { listChallengeGroups } from "@/features/challenges/lib/groupChallenges.functions";
 import {
   claimGroupChallengeBonus,
   listGroupBonusClaimers,
   listGroupBonusStatus,
-} from "@/lib/groupChallengeBonus.functions";
+} from "@/features/challenges/lib/groupChallengeBonus.functions";
 
 export function BonusClaimer({
   challengeId,

@@ -16,7 +16,7 @@ import {
   joinChallenge,
   logChallengeDay,
   leaveChallenge,
-} from "@/lib/challenges.functions";
+} from "@/features/challenges/lib/challenges.functions";
 import {
   CHALLENGE_HIGHLIGHT_MS,
   CHALLENGE_HIGHLIGHT_FADE_MS,
@@ -25,9 +25,9 @@ import {
 } from "@/lib/constants";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
 import { useAnnounce } from "@/components/live-announcer";
-import { Leaderboard } from "@/components/challenges/Leaderboard";
-import { GroupInviter } from "@/components/challenges/GroupInviter";
-import { BonusClaimer } from "@/components/challenges/BonusClaimer";
+import { Leaderboard } from "@/features/challenges/components/Leaderboard";
+import { GroupInviter } from "@/features/challenges/components/GroupInviter";
+import { BonusClaimer } from "@/features/challenges/components/BonusClaimer";
 
 const challengesSearchSchema = z.object({
   group: fallback(z.string().uuid().optional(), undefined),
