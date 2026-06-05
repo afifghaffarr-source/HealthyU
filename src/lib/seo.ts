@@ -1,5 +1,7 @@
-export const SITE_URL = "https://healthyu.id";
-export const SITE_NAME = "HealthyU";
+import { APP_CONFIG } from "@/config/app";
+
+export const SITE_URL = APP_CONFIG.siteUrl;
+export const SITE_NAME = APP_CONFIG.name;
 
 export function canonical(path: string): string {
   const clean = path.startsWith("/") ? path : `/${path}`;
