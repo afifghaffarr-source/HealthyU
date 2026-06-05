@@ -19,8 +19,9 @@ describe("classifyMessage", () => {
   });
   it("tier 3 when >=30 words AND >=2 complex hints", () => {
     const text = (
-      "tolong buat rencana menu 7 hari untuk diabetes dan hipertensi dengan analisis kandungan gizi " +
-      "dan evaluasi korelasi gula darah serta tekanan darah harian saya selama seminggu penuh ini"
+      "tolong tolong buat sebuah rencana menu 7 hari untuk diabetes dan hipertensi dengan analisis " +
+      "kandungan gizi serta evaluasi korelasi gula darah dan tekanan darah harian saya selama " +
+      "seminggu penuh ke depan ini supaya saya bisa konsisten benar"
     );
     expect(classifyMessage(text, false).reason).toBe("complex");
   });
