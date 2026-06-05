@@ -35,7 +35,7 @@ function Page() {
       <TopAppBar title="Toko Aksesori Pet" showBack />
       <main className="max-w-md mx-auto px-4 pt-4 grid grid-cols-2 gap-3">
         {(data?.shop ?? []).map((a) => {
-          const owned = ownedMap.get(a.id) as any;
+          const owned = ownedMap.get(a.id);
           return (
             <div key={a.id} className="rounded-2xl bg-card border p-4 text-center space-y-2">
               <div className="text-4xl">{a.emoji}</div>
