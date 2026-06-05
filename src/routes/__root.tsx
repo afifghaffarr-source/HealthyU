@@ -22,6 +22,9 @@ import { GlobalErrorBoundary } from "@/components/healthyu/global-error-boundary
 import { CommandPalette } from "@/components/healthyu/command-palette";
 import { QuickActionFab } from "@/components/healthyu/quick-action-fab";
 import { RouteError, RouteNotFound } from "@/components/healthyu/route-boundaries";
+import { ScrollToTopButton } from "@/components/healthyu/scroll-to-top-button";
+import { RouteProgressBar } from "@/components/healthyu/route-progress-bar";
+import { KeyboardShortcutsDialog } from "@/components/healthyu/keyboard-shortcuts-dialog";
 
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
   head: () => ({
@@ -142,6 +145,7 @@ function RootComponent() {
             <AuthListener />
             <ReminderScheduler />
             <DesktopSidebar />
+            <RouteProgressBar />
             <div className="lg:pl-64">
               <GlobalErrorBoundary>
                 <Outlet />
@@ -150,6 +154,8 @@ function RootComponent() {
             <InstallPrompt />
             <CommandPalette />
             <QuickActionFab />
+            <ScrollToTopButton />
+            <KeyboardShortcutsDialog />
             <Toaster position="top-center" />
           </LiveAnnouncerProvider>
         </I18nProvider>

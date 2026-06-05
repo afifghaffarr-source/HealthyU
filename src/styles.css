@@ -453,6 +453,24 @@
   animation: shimmer 2.4s ease-in-out infinite;
 }
 
+/* Route navigation progress bar */
+@keyframes route-progress {
+  0% {
+    transform: translateX(-100%);
+    width: 30%;
+  }
+  50% {
+    width: 55%;
+  }
+  100% {
+    transform: translateX(350%);
+    width: 30%;
+  }
+}
+.animate-route-progress {
+  animation: route-progress 1.1s ease-in-out infinite;
+}
+
 /* Subtle tilt on hover via class */
 .hover-tilt {
   transition: transform 0.4s cubic-bezier(0.2, 0.7, 0.2, 1);
