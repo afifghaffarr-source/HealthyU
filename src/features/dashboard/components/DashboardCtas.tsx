@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { ArrowRight, Camera, Sparkles, Trophy, Snowflake } from "lucide-react";
 import { StreakRing } from "@/components/healthyu/streak-ring";
+import { StreakRescueBadge } from "@/features/dashboard/components/StreakRescueBadge";
 
 export function ScanCta() {
   return (
@@ -83,6 +84,9 @@ export function GamificationCard({
             Level {level} · {xp} XP
           </p>
           <p className="font-semibold text-sm">Streak {streak} hari</p>
+          <div className="mt-1.5">
+            <StreakRescueBadge currentStreak={streak} />
+          </div>
         </div>
         <Trophy className="size-5 text-primary" />
       </Link>
