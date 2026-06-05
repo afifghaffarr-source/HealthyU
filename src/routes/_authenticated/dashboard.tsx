@@ -33,6 +33,8 @@ import {
   HeroStatsRow,
   MacroBreakdown,
 } from "@/features/dashboard/components/HeroStatsRow";
+import { TodaysBalanceCard } from "@/features/dashboard/components/TodaysBalanceCard";
+import { SmartNextStepCard } from "@/features/dashboard/components/SmartNextStepCard";
 import { GamificationCard } from "@/features/dashboard/components/DashboardCtas";
 import { ActionRow } from "@/features/dashboard/components/ActionRow";
 import { usePullToRefresh } from "@/hooks/use-pull-to-refresh";
@@ -146,7 +148,18 @@ function Dashboard() {
           description="Geser ke bawah untuk refresh, ketuk kartu untuk catat aktivitas, dan kunjungi Profil untuk personalisasi."
         />
 
-        {dailyTip && <DailyTipCard category={dailyTip.category} tip={dailyTip.tip} />}
+        <TodaysBalanceCard totals={totals} calTarget={calTarget} />
+
+        <ActionRow />
+
+        <SmartNextStepCard
+          hour={new Date().getHours()}
+          mealCount={meals.length}
+          waterMl={waterMl}
+          waterTarget={waterTarget}
+          fastActive={!!fast}
+          remainingKcal={Math.max(0, calTarget - totals.cal)}
+        />
 
         <HeroStatsRow
           totals={totals}
@@ -158,8 +171,6 @@ function Dashboard() {
         />
 
         <MacroBreakdown totals={totals} />
-
-        <ActionRow />
 
         <WaterCard
           waterMl={waterMl}
@@ -173,6 +184,10 @@ function Dashboard() {
           disabled={moodMutation.isPending}
         />
 
+        <TodaysMeals meals={meals} />
+
+        {dailyTip && <DailyTipCard category={dailyTip.category} tip={dailyTip.tip} />}
+
         <GamificationCard
           streak={game?.stats?.current_streak ?? 0}
           level={game?.stats?.level ?? 1}
@@ -185,8 +200,6 @@ function Dashboard() {
         <GroupChallengeSummaryCard groupSummary={groupSummary} />
 
         <UnlinkedChallengesCard challenges={unlinkedChallenges} />
-
-        <TodaysMeals meals={meals} />
       </div>
       <BottomNav />
     </main>
