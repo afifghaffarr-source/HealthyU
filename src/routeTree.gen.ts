@@ -14,6 +14,7 @@ import { Route as ResepRouteImport } from './routes/resep'
 import { Route as OlahragaRouteImport } from './routes/olahraga'
 import { Route as KaloriRouteImport } from './routes/kalori'
 import { Route as KalkulatorRouteImport } from './routes/kalkulator'
+import { Route as FaqRouteImport } from './routes/faq'
 import { Route as DietRouteImport } from './routes/diet'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as ArtikelRouteImport } from './routes/artikel'
@@ -23,12 +24,14 @@ import { Route as ResepIndexRouteImport } from './routes/resep.index'
 import { Route as OlahragaIndexRouteImport } from './routes/olahraga.index'
 import { Route as KaloriIndexRouteImport } from './routes/kalori.index'
 import { Route as KalkulatorIndexRouteImport } from './routes/kalkulator.index'
+import { Route as FaqIndexRouteImport } from './routes/faq.index'
 import { Route as DietIndexRouteImport } from './routes/diet.index'
 import { Route as ArtikelIndexRouteImport } from './routes/artikel.index'
 import { Route as ResepSlugRouteImport } from './routes/resep.$slug'
 import { Route as OlahragaSlugRouteImport } from './routes/olahraga.$slug'
 import { Route as KaloriSlugRouteImport } from './routes/kalori.$slug'
 import { Route as KalkulatorSlugRouteImport } from './routes/kalkulator.$slug'
+import { Route as FaqSlugRouteImport } from './routes/faq.$slug'
 import { Route as DietSlugRouteImport } from './routes/diet.$slug'
 import { Route as ArtikelSlugRouteImport } from './routes/artikel.$slug'
 import { Route as AuthenticatedWorkoutRouteImport } from './routes/_authenticated/workout'
@@ -193,6 +196,11 @@ const KalkulatorRoute = KalkulatorRouteImport.update({
   path: '/kalkulator',
   getParentRoute: () => rootRouteImport,
 } as any)
+const FaqRoute = FaqRouteImport.update({
+  id: '/faq',
+  path: '/faq',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DietRoute = DietRouteImport.update({
   id: '/diet',
   path: '/diet',
@@ -237,6 +245,11 @@ const KalkulatorIndexRoute = KalkulatorIndexRouteImport.update({
   path: '/',
   getParentRoute: () => KalkulatorRoute,
 } as any)
+const FaqIndexRoute = FaqIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => FaqRoute,
+} as any)
 const DietIndexRoute = DietIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -266,6 +279,11 @@ const KalkulatorSlugRoute = KalkulatorSlugRouteImport.update({
   id: '/$slug',
   path: '/$slug',
   getParentRoute: () => KalkulatorRoute,
+} as any)
+const FaqSlugRoute = FaqSlugRouteImport.update({
+  id: '/$slug',
+  path: '/$slug',
+  getParentRoute: () => FaqRoute,
 } as any)
 const DietSlugRoute = DietSlugRouteImport.update({
   id: '/$slug',
@@ -1037,6 +1055,7 @@ export interface FileRoutesByFullPath {
   '/artikel': typeof ArtikelRouteWithChildren
   '/auth': typeof AuthRoute
   '/diet': typeof DietRouteWithChildren
+  '/faq': typeof FaqRouteWithChildren
   '/kalkulator': typeof KalkulatorRouteWithChildren
   '/kalori': typeof KaloriRouteWithChildren
   '/olahraga': typeof OlahragaRouteWithChildren
@@ -1098,12 +1117,14 @@ export interface FileRoutesByFullPath {
   '/workout': typeof AuthenticatedWorkoutRouteWithChildren
   '/artikel/$slug': typeof ArtikelSlugRoute
   '/diet/$slug': typeof DietSlugRoute
+  '/faq/$slug': typeof FaqSlugRoute
   '/kalkulator/$slug': typeof KalkulatorSlugRoute
   '/kalori/$slug': typeof KaloriSlugRoute
   '/olahraga/$slug': typeof OlahragaSlugRoute
   '/resep/$slug': typeof ResepSlugRoute
   '/artikel/': typeof ArtikelIndexRoute
   '/diet/': typeof DietIndexRoute
+  '/faq/': typeof FaqIndexRoute
   '/kalkulator/': typeof KalkulatorIndexRoute
   '/kalori/': typeof KaloriIndexRoute
   '/olahraga/': typeof OlahragaIndexRoute
@@ -1251,12 +1272,14 @@ export interface FileRoutesByTo {
   '/workout': typeof AuthenticatedWorkoutRouteWithChildren
   '/artikel/$slug': typeof ArtikelSlugRoute
   '/diet/$slug': typeof DietSlugRoute
+  '/faq/$slug': typeof FaqSlugRoute
   '/kalkulator/$slug': typeof KalkulatorSlugRoute
   '/kalori/$slug': typeof KaloriSlugRoute
   '/olahraga/$slug': typeof OlahragaSlugRoute
   '/resep/$slug': typeof ResepSlugRoute
   '/artikel': typeof ArtikelIndexRoute
   '/diet': typeof DietIndexRoute
+  '/faq': typeof FaqIndexRoute
   '/kalkulator': typeof KalkulatorIndexRoute
   '/kalori': typeof KaloriIndexRoute
   '/olahraga': typeof OlahragaIndexRoute
@@ -1351,6 +1374,7 @@ export interface FileRoutesById {
   '/artikel': typeof ArtikelRouteWithChildren
   '/auth': typeof AuthRoute
   '/diet': typeof DietRouteWithChildren
+  '/faq': typeof FaqRouteWithChildren
   '/kalkulator': typeof KalkulatorRouteWithChildren
   '/kalori': typeof KaloriRouteWithChildren
   '/olahraga': typeof OlahragaRouteWithChildren
@@ -1412,12 +1436,14 @@ export interface FileRoutesById {
   '/_authenticated/workout': typeof AuthenticatedWorkoutRouteWithChildren
   '/artikel/$slug': typeof ArtikelSlugRoute
   '/diet/$slug': typeof DietSlugRoute
+  '/faq/$slug': typeof FaqSlugRoute
   '/kalkulator/$slug': typeof KalkulatorSlugRoute
   '/kalori/$slug': typeof KaloriSlugRoute
   '/olahraga/$slug': typeof OlahragaSlugRoute
   '/resep/$slug': typeof ResepSlugRoute
   '/artikel/': typeof ArtikelIndexRoute
   '/diet/': typeof DietIndexRoute
+  '/faq/': typeof FaqIndexRoute
   '/kalkulator/': typeof KalkulatorIndexRoute
   '/kalori/': typeof KaloriIndexRoute
   '/olahraga/': typeof OlahragaIndexRoute
@@ -1512,6 +1538,7 @@ export interface FileRouteTypes {
     | '/artikel'
     | '/auth'
     | '/diet'
+    | '/faq'
     | '/kalkulator'
     | '/kalori'
     | '/olahraga'
@@ -1573,12 +1600,14 @@ export interface FileRouteTypes {
     | '/workout'
     | '/artikel/$slug'
     | '/diet/$slug'
+    | '/faq/$slug'
     | '/kalkulator/$slug'
     | '/kalori/$slug'
     | '/olahraga/$slug'
     | '/resep/$slug'
     | '/artikel/'
     | '/diet/'
+    | '/faq/'
     | '/kalkulator/'
     | '/kalori/'
     | '/olahraga/'
@@ -1726,12 +1755,14 @@ export interface FileRouteTypes {
     | '/workout'
     | '/artikel/$slug'
     | '/diet/$slug'
+    | '/faq/$slug'
     | '/kalkulator/$slug'
     | '/kalori/$slug'
     | '/olahraga/$slug'
     | '/resep/$slug'
     | '/artikel'
     | '/diet'
+    | '/faq'
     | '/kalkulator'
     | '/kalori'
     | '/olahraga'
@@ -1825,6 +1856,7 @@ export interface FileRouteTypes {
     | '/artikel'
     | '/auth'
     | '/diet'
+    | '/faq'
     | '/kalkulator'
     | '/kalori'
     | '/olahraga'
@@ -1886,12 +1918,14 @@ export interface FileRouteTypes {
     | '/_authenticated/workout'
     | '/artikel/$slug'
     | '/diet/$slug'
+    | '/faq/$slug'
     | '/kalkulator/$slug'
     | '/kalori/$slug'
     | '/olahraga/$slug'
     | '/resep/$slug'
     | '/artikel/'
     | '/diet/'
+    | '/faq/'
     | '/kalkulator/'
     | '/kalori/'
     | '/olahraga/'
@@ -1986,6 +2020,7 @@ export interface RootRouteChildren {
   ArtikelRoute: typeof ArtikelRouteWithChildren
   AuthRoute: typeof AuthRoute
   DietRoute: typeof DietRouteWithChildren
+  FaqRoute: typeof FaqRouteWithChildren
   KalkulatorRoute: typeof KalkulatorRouteWithChildren
   KaloriRoute: typeof KaloriRouteWithChildren
   OlahragaRoute: typeof OlahragaRouteWithChildren
@@ -2035,6 +2070,13 @@ declare module '@tanstack/react-router' {
       path: '/kalkulator'
       fullPath: '/kalkulator'
       preLoaderRoute: typeof KalkulatorRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/faq': {
+      id: '/faq'
+      path: '/faq'
+      fullPath: '/faq'
+      preLoaderRoute: typeof FaqRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/diet': {
@@ -2100,6 +2142,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof KalkulatorIndexRouteImport
       parentRoute: typeof KalkulatorRoute
     }
+    '/faq/': {
+      id: '/faq/'
+      path: '/'
+      fullPath: '/faq/'
+      preLoaderRoute: typeof FaqIndexRouteImport
+      parentRoute: typeof FaqRoute
+    }
     '/diet/': {
       id: '/diet/'
       path: '/'
@@ -2141,6 +2190,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/kalkulator/$slug'
       preLoaderRoute: typeof KalkulatorSlugRouteImport
       parentRoute: typeof KalkulatorRoute
+    }
+    '/faq/$slug': {
+      id: '/faq/$slug'
+      path: '/$slug'
+      fullPath: '/faq/$slug'
+      preLoaderRoute: typeof FaqSlugRouteImport
+      parentRoute: typeof FaqRoute
     }
     '/diet/$slug': {
       id: '/diet/$slug'
@@ -3621,6 +3677,18 @@ const DietRouteChildren: DietRouteChildren = {
 
 const DietRouteWithChildren = DietRoute._addFileChildren(DietRouteChildren)
 
+interface FaqRouteChildren {
+  FaqSlugRoute: typeof FaqSlugRoute
+  FaqIndexRoute: typeof FaqIndexRoute
+}
+
+const FaqRouteChildren: FaqRouteChildren = {
+  FaqSlugRoute: FaqSlugRoute,
+  FaqIndexRoute: FaqIndexRoute,
+}
+
+const FaqRouteWithChildren = FaqRoute._addFileChildren(FaqRouteChildren)
+
 interface KalkulatorRouteChildren {
   KalkulatorSlugRoute: typeof KalkulatorSlugRoute
   KalkulatorIndexRoute: typeof KalkulatorIndexRoute
@@ -3680,6 +3748,7 @@ const rootRouteChildren: RootRouteChildren = {
   ArtikelRoute: ArtikelRouteWithChildren,
   AuthRoute: AuthRoute,
   DietRoute: DietRouteWithChildren,
+  FaqRoute: FaqRouteWithChildren,
   KalkulatorRoute: KalkulatorRouteWithChildren,
   KaloriRoute: KaloriRouteWithChildren,
   OlahragaRoute: OlahragaRouteWithChildren,

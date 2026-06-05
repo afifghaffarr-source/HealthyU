@@ -127,3 +127,28 @@ export const getSeoRecipe = createServerFn({ method: "GET" })
     if (error) throw new Error(error.message);
     return row;
   });
+
+export const listSeoFaqs = createServerFn({ method: "GET" }).handler(async () => {
+  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+  const { data, error } = await supabaseAdmin
+    .from("seo_faqs")
+    .select("slug,title,description,category,published_at")
+    .eq("published", true)
+    .order("title");
+  if (error) throw new Error(error.message);
+  return data ?? [];
+});
+
+export const getSeoFaq = createServerFn({ method: "GET" })
+  .inputValidator((d) => slugSchema.parse(d))
+  .handler(async ({ data }) => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: row, error } = await supabaseAdmin
+      .from("seo_faqs")
+      .select("*")
+      .eq("slug", data.slug)
+      .eq("published", true)
+      .maybeSingle();
+    if (error) throw new Error(error.message);
+    return row;
+  });
