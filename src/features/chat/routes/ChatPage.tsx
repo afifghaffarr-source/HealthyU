@@ -209,6 +209,7 @@ export function ChatPage() {
               <CoachPromptChips
                 onPick={(t) => handleSend(t)}
                 disabled={mutation.isPending}
+                hour={new Date().getHours()}
               />
             </div>
           )}
