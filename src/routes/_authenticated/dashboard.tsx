@@ -33,15 +33,11 @@ import { TodaysMeals } from "@/components/dashboard/TodaysMeals";
 import { usePullToRefresh } from "@/hooks/use-pull-to-refresh";
 import { formatDuration, fastingStage } from "@/lib/health";
 import {
-  Droplet,
-  Plus,
   Sparkles,
   ArrowRight,
   Flame,
   Trophy,
   Camera,
-  Smile,
-  Gift,
   Snowflake,
 } from "lucide-react";
 import { claimDailyLoginBonus } from "@/lib/scanBatch9.functions";
@@ -114,7 +110,6 @@ function Dashboard() {
     return window.localStorage.getItem("dailyBonusClaimed") === new Date().toDateString();
   });
   const [freezeOpen, setFreezeOpen] = useState(false);
-  const [freezeUsed, setFreezeUsed] = useState(false);
   const claimBonusMut = useMutation({
     mutationFn: () => claimBonusFn({ data: undefined as never }),
     onSuccess: (r) => {
