@@ -5,7 +5,11 @@ import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { BottomNav } from "@/components/bottom-nav";
 import { getGroupScanLeaderboard } from "@/lib/scanSocial.functions";
 import { Flame, Trophy } from "lucide-react";
-import { LineChart, Line, XAxis, Tooltip, ResponsiveContainer } from "recharts";
+import { lazy, Suspense } from "react";
+
+const LeaderboardLineChart = lazy(
+  () => import("@/components/charts/leaderboard-line-chart"),
+);
 
 export const Route = createFileRoute("/_authenticated/groups/$id/leaderboard")({
   component: Page,
@@ -28,23 +32,15 @@ function Page() {
               Scan 7 hari · top {Math.min(5, data.rows.length)}
             </p>
             <div className="h-32">
-              <ResponsiveContainer width="100%" height="100%">
-                <LineChart
+              <Suspense
+                fallback={<div className="size-full animate-pulse rounded-lg bg-muted" />}
+              >
+                <LeaderboardLineChart
                   data={data.rows
                     .slice(0, 5)
                     .map((r) => ({ name: r.name.slice(0, 8), scans: r.scans }))}
-                >
-                  <XAxis dataKey="name" tick={{ fontSize: 10 }} />
-                  <Tooltip />
-                  <Line
-                    type="monotone"
-                    dataKey="scans"
-                    stroke="hsl(var(--primary))"
-                    strokeWidth={2}
-                    dot={{ r: 3 }}
-                  />
-                </LineChart>
-              </ResponsiveContainer>
+                />
+              </Suspense>
             </div>
           </div>
         )}
