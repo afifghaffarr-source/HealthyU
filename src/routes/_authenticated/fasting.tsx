@@ -7,10 +7,14 @@ import { getFastingSchedule, saveFastingSchedule } from "@/features/fasting/lib/
 import { getAchievementToastPrefix } from "@/lib/achievement-icons";
 import { BottomNav } from "@/components/bottom-nav";
 import { TopAppBar } from "@/components/healthyu/top-app-bar";
-import { Check, X } from "lucide-react";
-import { FASTING_PROTOCOLS, fastingStage, formatDuration } from "@/lib/health";
 import { toast } from "sonner";
 import { toastError } from "@/lib/toast-config";
+import {
+  ActiveFastCard,
+  ProtocolPicker,
+  RamadhanScheduleCard,
+  FastHistoryList,
+} from "@/features/fasting/components/FastingPieces";
 
 export const Route = createFileRoute("/_authenticated/fasting")({
   component: FastingPage,
@@ -98,129 +102,33 @@ function FastingPage() {
         <TopAppBar title="Puasa" subtitle="Atur protokol & jadwal" showBack />
 
         {fast ? (
-          <section className="bg-gradient-to-br from-sage to-sage-deep text-primary-foreground p-8 rounded-[2rem] relative overflow-hidden animate-fade-up">
-            <div className="absolute -right-10 -top-10 size-40 bg-white/10 rounded-full blur-2xl" />
-            <div className="relative z-10">
-              <p className="text-xs uppercase tracking-widest text-white/70 font-bold mb-2">
-                Protokol {fast.protocol}
-              </p>
-              <p className="text-5xl font-bold tabular-nums mb-2">{formatDuration(elapsedMs)}</p>
-              <p className="text-sm text-white/80 mb-6">Target: {Number(fast.target_hours)} jam</p>
-              <div className="h-2 w-full bg-white/20 rounded-full overflow-hidden mb-3">
-                <div className="h-full bg-coral transition-all" style={{ width: `${pct}%` }} />
-              </div>
-              <p className="text-sm font-medium mb-6">{fastingStage(elapsedHrs)}</p>
-              <button
-                onClick={() => stopMut.mutate(fast.id)}
-                disabled={stopMut.isPending}
-                className="w-full bg-white text-sage-deep font-bold py-3.5 rounded-2xl"
-              >
-                Hentikan puasa
-              </button>
-            </div>
-          </section>
+          <ActiveFastCard
+            fast={fast}
+            elapsedMs={elapsedMs}
+            elapsedHrs={elapsedHrs}
+            pct={pct}
+            onStop={(id) => stopMut.mutate(id)}
+            stopping={stopMut.isPending}
+          />
         ) : (
-          <section className="space-y-3 animate-fade-up">
-            <h2 className="text-sm font-bold uppercase tracking-wider text-muted-foreground">
-              Pilih protokol
-            </h2>
-            {FASTING_PROTOCOLS.map((p) => (
-              <button
-                key={p.id}
-                onClick={() => startMut.mutate({ protocol: p.id, target_hours: p.fast })}
-                disabled={startMut.isPending}
-                className="w-full bg-card p-5 rounded-3xl outline-1 outline-black/5 text-left hover:bg-secondary/40 transition flex items-center justify-between"
-              >
-                <div>
-                  <p className="font-bold">{p.label}</p>
-                  <p className="text-xs text-muted-foreground">
-                    {p.fast}j puasa · {p.eat}j makan
-                  </p>
-                </div>
-                <span className="text-primary font-bold text-sm">Mulai →</span>
-              </button>
-            ))}
-          </section>
+          <ProtocolPicker
+            onStart={(p) => startMut.mutate(p)}
+            starting={startMut.isPending}
+          />
         )}
 
-        <section className="space-y-3 bg-card p-5 rounded-3xl outline-1 outline-black/5 animate-fade-up">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="font-bold">Mode Ramadhan</p>
-              <p className="text-xs text-muted-foreground">Jadwal puasa berulang harian</p>
-            </div>
-            <input
-              type="checkbox"
-              className="size-5"
-              checked={ramadhan}
-              onChange={(e) => setRamadhan(e.target.checked)}
-            />
-          </div>
-          <div className="grid grid-cols-2 gap-3">
-            <label className="text-xs space-y-1">
-              <span className="text-muted-foreground">Imsak</span>
-              <input
-                type="time"
-                value={imsak}
-                onChange={(e) => setImsak(e.target.value)}
-                className="w-full bg-secondary/40 rounded-lg px-2 py-2 text-sm"
-              />
-            </label>
-            <label className="text-xs space-y-1">
-              <span className="text-muted-foreground">Berbuka</span>
-              <input
-                type="time"
-                value={iftar}
-                onChange={(e) => setIftar(e.target.value)}
-                className="w-full bg-secondary/40 rounded-lg px-2 py-2 text-sm"
-              />
-            </label>
-          </div>
-          <button
-            onClick={() => saveSchedule.mutate({ ramadhan, imsak, iftar })}
-            disabled={saveSchedule.isPending}
-            className="w-full bg-primary text-primary-foreground font-semibold py-3 rounded-2xl disabled:opacity-60"
-          >
-            Simpan jadwal
-          </button>
-        </section>
+        <RamadhanScheduleCard
+          ramadhan={ramadhan}
+          setRamadhan={setRamadhan}
+          imsak={imsak}
+          setImsak={setImsak}
+          iftar={iftar}
+          setIftar={setIftar}
+          onSave={() => saveSchedule.mutate({ ramadhan, imsak, iftar })}
+          saving={saveSchedule.isPending}
+        />
 
-        {history.length > 0 && (
-          <section className="space-y-2 animate-fade-up">
-            <h2 className="text-sm font-bold uppercase tracking-wider text-muted-foreground">
-              Riwayat
-            </h2>
-            {history.map((h) => {
-              const dur = h.end_time
-                ? (new Date(h.end_time).getTime() - new Date(h.start_time).getTime()) / 3600000
-                : 0;
-              const date = new Date(h.start_time).toLocaleDateString("id-ID", {
-                day: "2-digit",
-                month: "short",
-              });
-              return (
-                <div
-                  key={h.id}
-                  className="bg-card p-4 rounded-2xl outline-1 outline-black/5 flex items-center gap-3"
-                >
-                  <div
-                    className={`size-9 rounded-xl grid place-items-center ${h.completed ? "bg-mint text-sage-deep" : "bg-muted text-muted-foreground"}`}
-                  >
-                    {h.completed ? <Check className="size-4" /> : <X className="size-4" />}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="font-semibold text-sm">
-                      {h.protocol} · {date}
-                    </p>
-                    <p className="text-xs text-muted-foreground tabular-nums">
-                      {dur.toFixed(1)}j / {Number(h.target_hours)}j
-                    </p>
-                  </div>
-                </div>
-              );
-            })}
-          </section>
-        )}
+        <FastHistoryList history={history} />
       </div>
       <BottomNav />
     </main>
