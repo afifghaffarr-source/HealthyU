@@ -18,7 +18,6 @@ import { myUnlinkedJoinedChallenges } from "@/features/challenges/lib/myUnlinked
 import { BottomNav } from "@/components/bottom-nav";
 import { Coachmark } from "@/components/healthyu/coachmark";
 import { PullIndicator } from "@/components/healthyu/pull-indicator";
-import { DailyBonusButton } from "@/features/dashboard/components/DailyBonusButton";
 import { DailyTipCard } from "@/features/dashboard/components/DailyTipCard";
 import { WaterCard } from "@/features/dashboard/components/WaterCard";
 import { MoodQuickLog } from "@/features/dashboard/components/MoodQuickLog";
@@ -34,12 +33,8 @@ import {
   HeroStatsRow,
   MacroBreakdown,
 } from "@/features/dashboard/components/HeroStatsRow";
-import {
-  ScanCta,
-  AiRecommendationsCta,
-  AiChatCta,
-  GamificationCard,
-} from "@/features/dashboard/components/DashboardCtas";
+import { GamificationCard } from "@/features/dashboard/components/DashboardCtas";
+import { ActionRow } from "@/features/dashboard/components/ActionRow";
 import { usePullToRefresh } from "@/hooks/use-pull-to-refresh";
 import { useFastClock } from "@/features/dashboard/hooks/useFastClock";
 import { useDashboardMutations } from "@/features/dashboard/hooks/useDashboardMutations";
@@ -137,14 +132,13 @@ function Dashboard() {
     <main className="min-h-dvh bg-background pb-28">
       <PullIndicator pulling={pulling} refreshing={refreshing} />
       <div className="max-w-md mx-auto px-5 pt-8 space-y-5">
-        <DashboardHeader greeting={dashboardGreeting()} fullName={profile?.full_name} />
-
-        {!bonusClaimed && (
-          <DailyBonusButton
-            onClick={() => claimBonusMut.mutate()}
-            disabled={claimBonusMut.isPending}
-          />
-        )}
+        <DashboardHeader
+          greeting={dashboardGreeting()}
+          fullName={profile?.full_name}
+          bonusAvailable={!bonusClaimed}
+          onClaimBonus={() => claimBonusMut.mutate()}
+          claiming={claimBonusMut.isPending}
+        />
 
         <Coachmark
           flagKey="dashboard-v1"
@@ -165,6 +159,8 @@ function Dashboard() {
 
         <MacroBreakdown totals={totals} />
 
+        <ActionRow />
+
         <WaterCard
           waterMl={waterMl}
           targetMl={waterTarget}
@@ -176,10 +172,6 @@ function Dashboard() {
           onPick={(m) => moodMutation.mutate(m)}
           disabled={moodMutation.isPending}
         />
-
-        <ScanCta />
-        <AiRecommendationsCta />
-        <AiChatCta />
 
         <GamificationCard
           streak={game?.stats?.current_streak ?? 0}

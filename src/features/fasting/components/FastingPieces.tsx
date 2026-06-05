@@ -1,4 +1,6 @@
+import { useState } from "react";
 import { Check, X } from "lucide-react";
+import { ConfirmDialog } from "@/components/healthyu/confirm-dialog";
 import { FASTING_PROTOCOLS, fastingStage, formatDuration } from "@/lib/health";
 
 export function ActiveFastCard({
@@ -48,6 +50,14 @@ export function ProtocolPicker({
   onStart: (p: { protocol: string; target_hours: number }) => void;
   starting: boolean;
 }) {
+  const [pending, setPending] = useState<{ protocol: string; target_hours: number } | null>(null);
+  const handlePick = (p: { protocol: string; target_hours: number }) => {
+    if (p.target_hours > 16) {
+      setPending(p);
+      return;
+    }
+    onStart(p);
+  };
   return (
     <section className="space-y-3 animate-fade-up">
       <h2 className="text-sm font-bold uppercase tracking-wider text-muted-foreground">
@@ -56,7 +66,7 @@ export function ProtocolPicker({
       {FASTING_PROTOCOLS.map((p) => (
         <button
           key={p.id}
-          onClick={() => onStart({ protocol: p.id, target_hours: p.fast })}
+          onClick={() => handlePick({ protocol: p.id, target_hours: p.fast })}
           disabled={starting}
           className="w-full bg-card p-5 rounded-3xl outline-1 outline-black/5 text-left hover:bg-secondary/40 transition flex items-center justify-between"
         >
@@ -69,6 +79,18 @@ export function ProtocolPicker({
           <span className="text-primary font-bold text-sm">Mulai →</span>
         </button>
       ))}
+      <ConfirmDialog
+        open={!!pending}
+        title="Puasa lebih dari 16 jam"
+        description="Puasa panjang tidak disarankan untuk ibu hamil/menyusui, remaja, atau yang punya riwayat gangguan makan, diabetes, atau kondisi medis lain. Pastikan kamu cukup hidrasi & berhenti kapan saja jika tidak nyaman."
+        confirmLabel="Saya mengerti, mulai"
+        cancelLabel="Batal"
+        onConfirm={() => {
+          if (pending) onStart(pending);
+          setPending(null);
+        }}
+        onCancel={() => setPending(null)}
+      />
     </section>
   );
 }

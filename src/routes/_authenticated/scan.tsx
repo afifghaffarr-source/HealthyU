@@ -104,15 +104,16 @@ function ScanPage() {
           <div className="flex items-center gap-2 text-xs">
             <Sparkles className="size-3.5 text-primary" />
             <span>
-              Mode AI: <b>{usePro ? "Pro (akurat)" : "Flash (cepat)"}</b>
+              Mode AI: <b>{usePro ? "Akurat (lebih lambat)" : "Cepat"}</b>
             </span>
           </div>
           <button
             type="button"
             onClick={() => setUsePro((v) => !v)}
-            className="text-xs px-2 py-1 rounded-lg bg-primary/10 text-primary font-medium inline-flex items-center gap-1"
+            className="text-xs px-3 py-1.5 rounded-lg bg-primary/10 text-primary font-medium inline-flex items-center gap-1 min-h-9"
+            aria-label={usePro ? "Beralih ke mode cepat" : "Beralih ke mode akurat"}
           >
-            <Zap className="size-3" /> {usePro ? "Pakai Flash" : "Pakai Pro"}
+            <Zap className="size-3" /> {usePro ? "Pakai Cepat" : "Pakai Akurat"}
           </button>
         </div>
         {!imageUrl && (
@@ -141,7 +142,7 @@ function ScanPage() {
             <div>
               <p className="font-semibold">Foto makananmu</p>
               <p className="text-xs text-muted-foreground mt-1">
-                AI akan mengenali nama, porsi, dan kalori secara otomatis
+                AI memperkirakan nama, porsi, & kalori — kamu bisa ubah sebelum simpan
               </p>
             </div>
             <button
