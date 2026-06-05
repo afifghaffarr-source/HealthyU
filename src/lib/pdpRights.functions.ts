@@ -43,13 +43,17 @@ export const exportMyData = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     const { supabase, userId } = context;
-    const dump: Record<string, any> = {
+    const dump: Record<string, unknown> = {
       exported_at: new Date().toISOString(),
       user_id: userId,
     };
     for (const table of USER_TABLES) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const { data, error } = await (supabase as any).from(table).select("*").eq("user_id", userId);
+      // Dynamic table name — Supabase's `.from()` is typed against the union
+      // of literal table names, which can't be satisfied at runtime here.
+      const { data, error } = await supabase
+        .from(table as never)
+        .select("*")
+        .eq("user_id", userId);
       if (!error) dump[table] = data ?? [];
       else dump[table] = { error: error.message };
     }
@@ -58,7 +62,7 @@ export const exportMyData = createServerFn({ method: "GET" })
       _entity: "user",
       _entity_id: userId,
     });
-    return dump as Record<string, any>;
+    return dump;
   });
 
 export const requestAccountDeletion = createServerFn({ method: "POST" })
