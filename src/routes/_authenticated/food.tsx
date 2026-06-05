@@ -12,35 +12,21 @@ import {
 import { parseMealFromVoice } from "@/lib/ai-extras.functions";
 import { getAchievementToastPrefix } from "@/lib/achievement-icons";
 import { BottomNav } from "@/components/bottom-nav";
-import {
-  Search,
-  Trash2,
-  Mic,
-  MicOff,
-  Loader2,
-  WifiOff,
-  RefreshCw,
-  Plus,
-  Minus,
-  ShoppingBasket,
-  Sparkles,
-  X,
-} from "lucide-react";
+import { Search, Mic, MicOff, Loader2, WifiOff, RefreshCw } from "lucide-react";
 import { TopAppBar } from "@/components/healthyu/top-app-bar";
-import {
-  getFoodAlternatives,
-  regenerateAlternativeReasons,
-} from "@/lib/foodAlternatives.functions";
 import { toast } from "sonner";
 import { toastError } from "@/lib/toast-config";
 import { enqueue } from "@/lib/offline-queue";
 import { useOfflineQueue } from "@/hooks/use-offline-queue";
+import { labelMeal, currentMealType, type MealType } from "@/lib/foodHelpers";
+import { FoodSearchResult } from "@/components/food/FoodSearchResult";
+import { MealBasket, type BasketItem } from "@/components/food/MealBasket";
+import { TodayMealsList } from "@/components/food/TodayMealsList";
+import { AlternativesModal } from "@/components/food/AlternativesModal";
 
 export const Route = createFileRoute("/_authenticated/food")({
   component: FoodPage,
 });
-
-type MealType = "breakfast" | "lunch" | "dinner" | "snack";
 
 function FoodPage() {
   const qc = useQueryClient();
@@ -57,34 +43,8 @@ function FoodPage() {
   const [listening, setListening] = useState(false);
   const [parsing, setParsing] = useState(false);
 
-  type BasketItem = {
-    key: string;
-    food_item_id: string | null;
-    food_name: string;
-    serving_qty: number;
-    serving_unit: string | null;
-    calories: number;
-    protein_g: number;
-    carbs_g: number;
-    fat_g: number;
-  };
   const [basket, setBasket] = useState<BasketItem[]>([]);
   const [altFor, setAltFor] = useState<{ id: string; name: string } | null>(null);
-  const altFn = useServerFn(getFoodAlternatives);
-  const regenFn = useServerFn(regenerateAlternativeReasons);
-  const { data: alts = [], isLoading: altLoading } = useQuery({
-    queryKey: ["food-alternatives", altFor?.id],
-    queryFn: () => altFn({ data: { food_id: altFor!.id } }),
-    enabled: !!altFor,
-  });
-  const regenM = useMutation({
-    mutationFn: () => regenFn({ data: { food_id: altFor!.id } }),
-    onSuccess: (r) => {
-      toast.success(`AI memperbarui ${r.updated} penjelasan`);
-      qc.invalidateQueries({ queryKey: ["food-alternatives", altFor?.id] });
-    },
-    onError: (e: Error) => toast.error(e.message),
-  });
 
   const addToBasket = (f: {
     id: string;
@@ -317,239 +277,47 @@ function FoodPage() {
 
         <section className="space-y-2">
           {foods.map((f) => (
-            <div
+            <FoodSearchResult
               key={f.id}
-              className="w-full text-left bg-card p-3 rounded-2xl outline-1 outline-black/5 flex items-center gap-3"
-            >
-              <div className="size-12 rounded-xl bg-mint grid place-items-center text-lg">🍽️</div>
-              <div className="flex-1 min-w-0">
-                <p className="font-semibold text-sm truncate">{f.name}</p>
-                <p className="text-[11px] text-muted-foreground">
-                  {Math.round(Number(f.calories))} kcal · {f.serving_size}
-                  {f.serving_unit}
-                </p>
-              </div>
-              <button
-                onClick={() => setAltFor({ id: f.id, name: f.name })}
-                className="size-9 rounded-full bg-mint/60 text-emerald-700 grid place-items-center hover:bg-mint"
-                aria-label="Lihat pengganti sehat"
-                title="Saran pengganti sehat"
-              >
-                <Sparkles className="size-4" />
-              </button>
-              <button
-                onClick={() => addToBasket(f)}
-                className="size-9 rounded-full bg-primary/10 text-primary grid place-items-center hover:bg-primary/20"
-                aria-label="Tambah ke keranjang"
-              >
-                <Plus className="size-4" />
-              </button>
-              <button
-                onClick={() =>
-                  logMutation.mutate({
-                    food_item_id: f.id,
-                    custom_name: null,
-                    meal_type: mealType,
-                    serving_qty: 1,
-                    calories: Number(f.calories),
-                    protein_g: Number(f.protein_g ?? 0),
-                    carbs_g: Number(f.carbs_g ?? 0),
-                    fat_g: Number(f.fat_g ?? 0),
-                  })
-                }
-                className="text-primary text-xs font-bold"
-              >
-                Catat
-              </button>
-            </div>
+              f={f}
+              onShowAlternatives={() => setAltFor({ id: f.id, name: f.name })}
+              onAddToBasket={() => addToBasket(f)}
+              onLog={() =>
+                logMutation.mutate({
+                  food_item_id: f.id,
+                  custom_name: null,
+                  meal_type: mealType,
+                  serving_qty: 1,
+                  calories: Number(f.calories),
+                  protein_g: Number(f.protein_g ?? 0),
+                  carbs_g: Number(f.carbs_g ?? 0),
+                  fat_g: Number(f.fat_g ?? 0),
+                })
+              }
+            />
           ))}
         </section>
 
-        {basket.length > 0 && (
-          <section className="bg-card p-4 rounded-3xl outline-1 outline-black/5 space-y-3 animate-fade-up">
-            <div className="flex items-center gap-2">
-              <ShoppingBasket className="size-4 text-primary" />
-              <h2 className="font-bold text-sm">Keranjang ({basket.length})</h2>
-              <span className="ml-auto text-sm font-bold tabular-nums">
-                {Math.round(basketTotals.calories)} kcal
-              </span>
-            </div>
-            <div className="space-y-2">
-              {basket.map((b) => (
-                <div
-                  key={b.key}
-                  className="flex items-center gap-2 bg-muted/40 rounded-xl px-3 py-2"
-                >
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-semibold truncate">{b.food_name}</p>
-                    <p className="text-[11px] text-muted-foreground tabular-nums">
-                      {Math.round(b.calories * b.serving_qty)} kcal · P
-                      {(b.protein_g * b.serving_qty).toFixed(0)} K
-                      {(b.carbs_g * b.serving_qty).toFixed(0)} L
-                      {(b.fat_g * b.serving_qty).toFixed(0)}
-                    </p>
-                  </div>
-                  <button
-                    onClick={() => updateQty(b.key, -0.5)}
-                    className="size-7 rounded-full bg-background grid place-items-center"
-                  >
-                    <Minus className="size-3" />
-                  </button>
-                  <span className="w-8 text-center text-xs font-bold tabular-nums">
-                    {b.serving_qty}x
-                  </span>
-                  <button
-                    onClick={() => updateQty(b.key, 0.5)}
-                    className="size-7 rounded-full bg-background grid place-items-center"
-                  >
-                    <Plus className="size-3" />
-                  </button>
-                  <button
-                    onClick={() => removeFromBasket(b.key)}
-                    className="text-muted-foreground hover:text-destructive"
-                  >
-                    <Trash2 className="size-3.5" />
-                  </button>
-                </div>
-              ))}
-            </div>
-            <button
-              onClick={() => logBasketM.mutate()}
-              disabled={logBasketM.isPending}
-              className="w-full bg-primary text-primary-foreground font-semibold py-3 rounded-2xl disabled:opacity-50"
-            >
-              Catat semua sebagai {labelMeal(mealType).toLowerCase()}
-            </button>
-          </section>
-        )}
+        <MealBasket
+          basket={basket}
+          mealType={mealType}
+          totalCalories={basketTotals.calories}
+          isSubmitting={logBasketM.isPending}
+          onUpdateQty={updateQty}
+          onRemove={removeFromBasket}
+          onSubmit={() => logBasketM.mutate()}
+        />
 
-        {meals.length > 0 && (
-          <section className="pt-2">
-            <h2 className="font-bold mb-3">Tercatat hari ini</h2>
-            <div className="space-y-2">
-              {meals.map((m) => (
-                <div
-                  key={m.id}
-                  className="bg-card p-3 rounded-2xl outline-1 outline-black/5 flex items-center gap-3"
-                >
-                  <div className="flex-1 min-w-0">
-                    <p className="text-[10px] font-bold uppercase text-coral tracking-wider">
-                      {labelMeal(m.meal_type as MealType)}
-                    </p>
-                    <p className="font-semibold text-sm truncate">
-                      {(m.food_item as { name?: string } | null)?.name ?? m.custom_name}
-                    </p>
-                  </div>
-                  <p className="text-sm font-bold tabular-nums">
-                    {Math.round(Number(m.calories))} kcal
-                  </p>
-                  <button
-                    onClick={() => delMutation.mutate(m.id)}
-                    className="text-muted-foreground hover:text-destructive"
-                  >
-                    <Trash2 className="size-4" />
-                  </button>
-                </div>
-              ))}
-            </div>
-          </section>
-        )}
+        <TodayMealsList meals={meals} onDelete={(id) => delMutation.mutate(id)} />
       </div>
       {altFor && (
-        <div
-          className="fixed inset-0 z-50 flex items-end justify-center bg-black/50"
-          onClick={() => setAltFor(null)}
-        >
-          <div
-            className="w-full max-w-md bg-card rounded-t-3xl p-5 max-h-[80vh] overflow-y-auto"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="flex items-center justify-between mb-3">
-              <h2 className="font-bold text-base flex items-center gap-2">
-                <Sparkles className="size-4 text-emerald-600" />
-                Pengganti sehat
-              </h2>
-              <button onClick={() => setAltFor(null)} className="p-1 rounded-full hover:bg-muted">
-                <X className="size-5" />
-              </button>
-            </div>
-            <p className="text-xs text-muted-foreground mb-3">
-              Alternatif untuk <span className="font-semibold">{altFor.name}</span>
-            </p>
-            <button
-              onClick={() => regenM.mutate()}
-              disabled={regenM.isPending || alts.length === 0}
-              className="w-full mb-3 inline-flex items-center justify-center gap-2 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white text-xs font-semibold py-2 rounded-xl disabled:opacity-50"
-            >
-              {regenM.isPending ? (
-                <Loader2 className="size-3 animate-spin" />
-              ) : (
-                <Sparkles className="size-3" />
-              )}
-              {regenM.isPending ? "AI menulis penjelasan…" : "Perbaiki penjelasan dengan AI"}
-            </button>
-            {altLoading && (
-              <p className="text-sm text-muted-foreground text-center py-6">Memuat…</p>
-            )}
-            {!altLoading && alts.length === 0 && (
-              <p className="text-sm text-muted-foreground text-center py-6">
-                Belum ada saran pengganti untuk makanan ini.
-              </p>
-            )}
-            <div className="space-y-2">
-              {alts.map((a) => (
-                <div key={a.id} className="bg-muted/40 rounded-2xl p-3 flex items-center gap-3">
-                  <div className="size-10 rounded-xl bg-mint grid place-items-center text-base">
-                    🥗
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-semibold truncate">{a.name}</p>
-                    <p className="text-[11px] text-muted-foreground">
-                      {Math.round(Number(a.calories))} kcal · P
-                      {Math.round(Number(a.protein_g ?? 0))} K{Math.round(Number(a.carbs_g ?? 0))} L
-                      {Math.round(Number(a.fat_g ?? 0))}
-                    </p>
-                    {a.reason && (
-                      <p className="text-[10px] text-emerald-700 mt-0.5 line-clamp-2">{a.reason}</p>
-                    )}
-                  </div>
-                  <button
-                    onClick={() => {
-                      addToBasket({
-                        id: a.id,
-                        name: a.name,
-                        serving_unit: a.serving_unit,
-                        calories: a.calories,
-                        protein_g: a.protein_g,
-                        carbs_g: a.carbs_g,
-                        fat_g: a.fat_g,
-                      });
-                      setAltFor(null);
-                      toast.success(`${a.name} ditambah ke keranjang`);
-                    }}
-                    className="size-9 rounded-full bg-primary/10 text-primary grid place-items-center"
-                    aria-label="Tambah ke keranjang"
-                  >
-                    <Plus className="size-4" />
-                  </button>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
+        <AlternativesModal
+          target={altFor}
+          onClose={() => setAltFor(null)}
+          onAdd={(item) => addToBasket(item)}
+        />
       )}
       <BottomNav />
     </main>
   );
-}
-
-function labelMeal(t: MealType): string {
-  return { breakfast: "Sarapan", lunch: "Makan Siang", dinner: "Makan Malam", snack: "Camilan" }[t];
-}
-function currentMealType(): MealType {
-  const h = new Date().getHours();
-  if (h < 10) return "breakfast";
-  if (h < 15) return "lunch";
-  if (h < 20) return "dinner";
-  return "snack";
 }
