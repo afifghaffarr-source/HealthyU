@@ -1,5 +1,4 @@
-import ReactMarkdown from "react-markdown";
-import remarkGfm from "remark-gfm";
+import { SafeMarkdown } from "@/components/SafeMarkdown";
 
 export type ChatMessage = { id: string; role: string; content: string };
 
@@ -58,7 +57,7 @@ export function ChatMessages({
             }`}
           >
             {m.role === "assistant" ? (
-              <ReactMarkdown remarkPlugins={[remarkGfm]}>{m.content}</ReactMarkdown>
+              <SafeMarkdown>{m.content}</SafeMarkdown>
             ) : (
               m.content
             )}
@@ -69,7 +68,7 @@ export function ChatMessages({
         <div className="flex justify-start">
           <div className="max-w-[85%] px-4 py-3 rounded-3xl rounded-bl-md text-sm leading-relaxed bg-card outline-1 outline-black/5 prose prose-sm max-w-none prose-p:my-1 prose-headings:my-2 prose-strong:text-foreground">
             {streaming ? (
-              <ReactMarkdown remarkPlugins={[remarkGfm]}>{streaming}</ReactMarkdown>
+              <SafeMarkdown>{streaming}</SafeMarkdown>
             ) : (
               <div className="flex gap-1">
                 <span className="size-1.5 bg-primary rounded-full animate-pulse" />
