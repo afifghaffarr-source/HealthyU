@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 
 const enforceMock = vi.fn();
 const logMock = vi.fn();
-vi.mock("../aiBudget.server", () => ({
+vi.mock("@/features/ai/lib/aiBudget.server", () => ({
   enforceAiBudget: (...a: unknown[]) => enforceMock(...a),
   logAiUsage: (...a: unknown[]) => logMock(...a),
 }));
