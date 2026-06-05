@@ -46,7 +46,7 @@ export const FEATURES = [
   },
   {
     icon: MessageCircle,
-    title: "Dr. Healthy chatbot",
+    title: "HealthyU AI Coach chatbot",
     desc: "Tanya jawab AI 24/7 dalam Bahasa Indonesia.",
     tint: "from-accent/15 to-accent/0",
   },
@@ -91,7 +91,7 @@ export const TESTIMONIALS = [
   {
     name: "Sari, 24",
     city: "Bandung",
-    quote: "Dr. Healthy jawab pertanyaan diet lebih cepat dari nutritionist saya. Worth it banget!",
+    quote: "HealthyU AI Coach jawab pertanyaan diet lebih cepat dari nutritionist saya. Worth it banget!",
     rating: 5,
   },
 ];
@@ -107,7 +107,7 @@ export const FAQ_ITEMS = [
   },
   {
     q: "Bagaimana AI coach bekerja?",
-    a: "Dr. Healthy menggunakan AI canggih untuk memberi saran berdasarkan profil, riwayat makan, dan goal kamu.",
+    a: "HealthyU AI Coach menggunakan AI canggih untuk memberi saran berdasarkan profil, riwayat makan, dan goal kamu.",
   },
   {
     q: "Aman untuk data saya?",

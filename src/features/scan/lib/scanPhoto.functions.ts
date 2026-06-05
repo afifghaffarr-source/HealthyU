@@ -98,6 +98,7 @@ export const parseVoiceMeal = createServerFn({ method: "POST" })
       feature: "scan.voice.meal_parse",
       schema: VoiceMealSchema,
       fallback: { items: [] },
+      failClosed: true,
       messages: [{ role: "user", content: prompt }],
     });
     return { items: parsed.items };

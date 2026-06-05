@@ -9,6 +9,8 @@ export function makeScanAiCaller(feature: string) {
     return callAiWithGuards({
       userId,
       feature,
+      // Scan/AI vision is expensive — deny if rate-limit check fails.
+      failClosed: true,
       messages: [
         { role: "system", content: system },
         { role: "user", content: prompt },

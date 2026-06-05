@@ -55,7 +55,7 @@ export function AiChatCta() {
           <Sparkles className="size-6" />
         </div>
         <div className="flex-1">
-          <p className="font-bold text-lg">Tanya Dr. Healthy</p>
+          <p className="font-bold text-lg">Tanya HealthyU AI Coach</p>
           <p className="text-xs text-white/80">"Berapa kalori 1 porsi rendang?"</p>
         </div>
         <ArrowRight className="size-5" />

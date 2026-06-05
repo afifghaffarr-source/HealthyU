@@ -49,7 +49,7 @@ export function HeroDemoCard() {
             <span className="relative inline-flex size-6 items-center justify-center rounded-full bg-gradient-to-br from-primary to-accent text-primary-foreground">
               <Sparkles className="size-3" />
             </span>
-            <p className="text-sm font-bold">Dr. Healthy</p>
+            <p className="text-sm font-bold">HealthyU AI Coach</p>
             <span className="ml-auto text-[9px] font-semibold text-primary bg-primary/10 px-1.5 py-0.5 rounded-full">
               AI
             </span>

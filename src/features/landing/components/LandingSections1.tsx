@@ -29,7 +29,7 @@ export function StatsStrip() {
     { n: 10000, s: "+", l: "Pengguna aktif", i: Heart },
     { n: 5000, s: "+", l: "Menu Indonesia", i: Utensils },
     { n: 98, s: "%", l: "Akurasi scan AI", i: Camera },
-    { n: 24, s: "/7", l: "Dr. Healthy siap", i: MessageCircle },
+    { n: 24, s: "/7", l: "HealthyU AI Coach siap", i: MessageCircle },
   ];
   return (
     <section className="max-w-6xl mx-auto px-5 md:px-8 py-10 grid grid-cols-2 md:grid-cols-4 gap-3">

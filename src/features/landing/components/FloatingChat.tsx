@@ -8,7 +8,7 @@ export function FloatingChat() {
     <>
       <button
         onClick={() => setOpen((v) => !v)}
-        aria-label="Buka Dr. Healthy"
+        aria-label="Buka HealthyU AI Coach"
         className="fixed bottom-5 right-5 z-40 size-14 rounded-full bg-gradient-to-br from-primary to-accent text-primary-foreground shadow-xl shadow-primary/40 grid place-items-center hover:scale-105 transition-transform"
       >
         {open ? <X className="size-5" /> : <MessageCircle className="size-6" />}
@@ -23,7 +23,7 @@ export function FloatingChat() {
               <Sparkles className="size-4" />
             </span>
             <div>
-              <p className="font-bold text-sm">Dr. Healthy</p>
+              <p className="font-bold text-sm">HealthyU AI Coach</p>
               <p className="text-[10px] text-muted-foreground">AI · biasanya membalas instan</p>
             </div>
           </div>

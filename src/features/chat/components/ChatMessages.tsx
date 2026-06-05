@@ -18,7 +18,7 @@ export function ChatEmptyState({ onPick }: { onPick: (text: string) => void }) {
       <div className="bg-card p-5 rounded-3xl outline-1 outline-black/5">
         <p className="font-bold mb-1">Halo, ada yang ingin ditanyakan?</p>
         <p className="text-sm text-muted-foreground">
-          Aku Dr. Healthy — bisa bantu evaluasi makan, atur menu, atau jawab tanya soal nutrisi.
+          Aku HealthyU AI Coach — bisa bantu evaluasi makan, atur menu, atau jawab tanya soal nutrisi.
           Pilih contoh di bawah atau tulis pertanyaanmu.
         </p>
         <p className="mt-3 inline-flex items-start gap-1.5 text-[11px] text-muted-foreground">
