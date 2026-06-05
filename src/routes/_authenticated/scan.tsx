@@ -11,40 +11,18 @@ import { attachScanPhoto } from "@/features/scan/lib/scanPhoto.functions";
 import { recordScanGameify, checkScanLimit, classifyMealTags } from "@/features/scan/lib/scanMore.functions";
 import { logMeal } from "@/features/meals/lib/meals.functions";
 import { ScanItemCard } from "@/features/scan/components/ScanItemCard";
+import {
+  MEAL_TYPES,
+  pickDefaultMealType,
+  fileToDataUrl,
+} from "@/features/scan/lib/scanHelpers";
+import { MealTypePicker } from "@/features/scan/components/MealTypePicker";
 
 export const Route = createFileRoute("/_authenticated/scan")({
   component: ScanPage,
 });
 
 type Item = Awaited<ReturnType<typeof recognizeFood>>["items"][number];
-
-const MEAL_TYPES = [
-  { v: "breakfast", l: "Sarapan" },
-  { v: "lunch", l: "Makan Siang" },
-  { v: "dinner", l: "Makan Malam" },
-  { v: "snack", l: "Camilan" },
-] as const;
-
-function pickDefaultMealType(): (typeof MEAL_TYPES)[number]["v"] {
-  const h = new Date().getHours();
-  if (h < 10) return "breakfast";
-  if (h < 15) return "lunch";
-  if (h < 21) return "dinner";
-  return "snack";
-}
-
-async function fileToDataUrl(file: File, maxSize = 1280): Promise<string> {
-  const bitmap = await createImageBitmap(file);
-  const scale = Math.min(1, maxSize / Math.max(bitmap.width, bitmap.height));
-  const w = Math.round(bitmap.width * scale);
-  const h = Math.round(bitmap.height * scale);
-  const canvas = document.createElement("canvas");
-  canvas.width = w;
-  canvas.height = h;
-  const ctx = canvas.getContext("2d")!;
-  ctx.drawImage(bitmap, 0, 0, w, h);
-  return canvas.toDataURL("image/jpeg", 0.82);
-}
 
 function ScanPage() {
   const navigate = useNavigate();
@@ -252,24 +230,7 @@ function ScanPage() {
               )}
             </div>
 
-            <div>
-              <p className="text-xs font-semibold text-muted-foreground mb-2">Jenis makan</p>
-              <div className="grid grid-cols-4 gap-2">
-                {MEAL_TYPES.map((m) => (
-                  <button
-                    key={m.v}
-                    onClick={() => setMealType(m.v)}
-                    className={`py-2 rounded-xl text-xs font-medium border transition ${
-                      mealType === m.v
-                        ? "bg-primary text-primary-foreground border-primary"
-                        : "bg-muted/60 border-transparent text-muted-foreground"
-                    }`}
-                  >
-                    {m.l}
-                  </button>
-                ))}
-              </div>
-            </div>
+            <MealTypePicker value={mealType} onChange={setMealType} />
 
             {items.length > 0 && (
               <div className="space-y-2">
