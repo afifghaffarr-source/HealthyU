@@ -51,7 +51,7 @@ function Page() {
           onChange={(e) => onPick(e.target.files?.[0] ?? null)}
           className="w-full text-sm"
         />
-        {preview && <img src={preview} alt="preview" className="w-full rounded-xl" />}
+        {preview && <img loading="lazy" decoding="async" src={preview} alt="preview" className="w-full rounded-xl" />}
         <textarea
           value={caption}
           onChange={(e) => setCaption(e.target.value)}

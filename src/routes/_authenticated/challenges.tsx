@@ -600,7 +600,7 @@ function GroupInviteRow({
                   className="size-5 rounded-full bg-primary/15 outline-2 outline-card grid place-items-center text-[9px] font-bold text-primary overflow-hidden"
                 >
                   {m.avatar_url ? (
-                    <img src={m.avatar_url} alt={m.name} className="size-full object-cover" />
+                    <img loading="lazy" decoding="async" src={m.avatar_url} alt={m.name} className="size-full object-cover" />
                   ) : (
                     (m.name ?? "?").slice(0, 1).toUpperCase()
                   )}

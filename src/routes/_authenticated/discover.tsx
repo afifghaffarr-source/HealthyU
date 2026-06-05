@@ -90,7 +90,7 @@ function Page() {
                 )}
                 <div className="size-11 rounded-full bg-gradient-to-br from-primary/30 to-accent/30 overflow-hidden grid place-items-center text-sm font-bold">
                   {u.avatar_url ? (
-                    <img src={u.avatar_url} alt="" className="size-full object-cover" />
+                    <img loading="lazy" decoding="async" src={u.avatar_url} alt="" className="size-full object-cover" />
                   ) : (
                     (u.full_name?.[0]?.toUpperCase() ?? "?")
                   )}

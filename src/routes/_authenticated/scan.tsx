@@ -234,7 +234,7 @@ function ScanPage() {
         ) : (
           <>
             <div className="relative rounded-3xl overflow-hidden bg-muted">
-              <img src={imageUrl} alt="Scan" className="w-full aspect-square object-cover" />
+              <img loading="lazy" decoding="async" src={imageUrl} alt="Scan" className="w-full aspect-square object-cover" />
               <button
                 onClick={reset}
                 className="absolute top-2 right-2 size-8 rounded-full bg-black/60 text-white grid place-items-center"

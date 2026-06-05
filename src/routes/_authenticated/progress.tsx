@@ -182,7 +182,7 @@ function ProgressPage() {
               className="bg-card rounded-2xl outline-1 outline-black/5 overflow-hidden relative group"
             >
               {p.signed_url ? (
-                <img src={p.signed_url} alt="" className="w-full aspect-square object-cover" />
+                <img loading="lazy" decoding="async" src={p.signed_url} alt="" className="w-full aspect-square object-cover" />
               ) : (
                 <div className="w-full aspect-square bg-muted" />
               )}

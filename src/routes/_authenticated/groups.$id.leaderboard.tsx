@@ -54,7 +54,7 @@ function Page() {
               {i === 0 ? <Trophy className="size-5 text-yellow-500" /> : i + 1}
             </div>
             {r.avatar ? (
-              <img src={r.avatar} alt="" className="size-9 rounded-full" />
+              <img loading="lazy" decoding="async" src={r.avatar} alt="" className="size-9 rounded-full" />
             ) : (
               <div className="size-9 rounded-full bg-muted" />
             )}

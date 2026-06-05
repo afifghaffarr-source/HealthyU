@@ -35,7 +35,7 @@ function Page() {
           onChange={(e) => onPick(e.target.files?.[0] ?? null)}
           className="w-full text-sm"
         />
-        {preview && <img src={preview} alt="" className="w-full rounded-xl" />}
+        {preview && <img loading="lazy" decoding="async" src={preview} alt="" className="w-full rounded-xl" />}
         <button
           onClick={() => mut.mutate()}
           disabled={!b64 || mut.isPending}
