@@ -19,9 +19,10 @@ function Page() {
   const createFn = useServerFn(createFamilyInvite);
   const redeemFn = useServerFn(redeemFamilyInvite);
   const [token, setToken] = useState(initial ?? "");
+  type Invite = { token: string };
   const create = useMutation({
     mutationFn: () => createFn({ data: { planId: planId! } }),
-    onSuccess: (r) => toast.success(`Token: ${(r.invite as any)?.token}`),
+    onSuccess: (r) => toast.success(`Token: ${(r.invite as Invite | undefined)?.token}`),
     onError: (e: Error) => toast.error(e.message),
   });
   const redeem = useMutation({
@@ -29,10 +30,9 @@ function Page() {
     onSuccess: () => toast.success("Bergabung dengan family plan!"),
     onError: (e: Error) => toast.error(e.message),
   });
-  const inviteUrl = create.data?.invite
-    ? `${window.location.origin}/family/invite?token=${(create.data.invite as any).token}`
-    : "";
-  const tokenStr = (create.data?.invite as any)?.token as string | undefined;
+  const invite = create.data?.invite as Invite | undefined;
+  const inviteUrl = invite ? `${window.location.origin}/family/invite?token=${invite.token}` : "";
+  const tokenStr = invite?.token;
 
   const copy = async (text: string) => {
     try {
