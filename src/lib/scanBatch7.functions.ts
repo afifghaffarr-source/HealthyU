@@ -440,7 +440,11 @@ export const listFollowers = createServerFn({ method: "POST" })
       : { data: [] as Profile[] };
     const map = new Map<string, Profile>((profs ?? []).map((p) => [p.id, p as Profile]));
     return {
-      followers: followerIds.map((id) => map.get(id)).filter(Boolean),
-      following: followingIds.map((id) => map.get(id)).filter(Boolean),
+      followers: followerIds
+        .map((id) => map.get(id))
+        .filter((p): p is Profile => Boolean(p)),
+      following: followingIds
+        .map((id) => map.get(id))
+        .filter((p): p is Profile => Boolean(p)),
     };
   });
