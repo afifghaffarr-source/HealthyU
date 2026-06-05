@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
+import { requireCronSecret } from "@/lib/cronAuth.server";
 
 /**
  * Weekly snapshot of recipes.save_count so the app can compute 7-day growth
@@ -9,11 +10,8 @@ export const Route = createFileRoute("/api/public/hooks/recipes-trending-snapsho
   server: {
     handlers: {
       POST: async ({ request }) => {
-        const apiKey = request.headers.get("apikey");
-        const expected = process.env.SUPABASE_PUBLISHABLE_KEY;
-        if (!apiKey || !expected || apiKey !== expected) {
-          return new Response("Unauthorized", { status: 401 });
-        }
+        const unauthorized = requireCronSecret(request);
+        if (unauthorized) return unauthorized;
         const { data: recipes } = await supabaseAdmin.from("recipes").select("id, save_count");
         let updated = 0;
         for (const r of recipes ?? []) {
