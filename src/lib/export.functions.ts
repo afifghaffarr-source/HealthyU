@@ -16,10 +16,17 @@ const USER_TABLES = [
   "progress_photos",
   "daily_steps",
   "chat_messages",
+  "chat_sessions",
   "community_posts",
   "community_comments",
   "user_stats",
   "user_achievements",
+  "food_scans",
+  "notification_preferences",
+  "push_subscriptions",
+  "wearable_tokens",
+  "user_allergies",
+  "user_health_conditions",
 ] as const;
 
 export const exportAllData = createServerFn({ method: "GET" })
