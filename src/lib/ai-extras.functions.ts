@@ -18,7 +18,7 @@ async function callGemini(messages: Array<{ role: string; content: string }>) {
     const t = await res.text();
     if (res.status === 429) throw new Error("Terlalu banyak permintaan AI. Coba lagi nanti.");
     if (res.status === 402)
-      throw new Error("Kredit AI habis. Tambah kredit di Lovable AI workspace.");
+      throw new Error("Kredit AI habis. Silakan hubungi admin atau coba lagi nanti.");
     throw new Error(`AI error ${res.status}: ${t.slice(0, 200)}`);
   }
   const json = (await res.json()) as { choices?: Array<{ message?: { content?: string } }> };
