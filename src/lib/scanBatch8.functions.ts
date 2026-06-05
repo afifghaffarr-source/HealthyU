@@ -132,10 +132,10 @@ export const generateWeeklyReport = createServerFn({ method: "POST" })
     ]);
     const stats = {
       meals: meals.data?.length ?? 0,
-      totalCal: (meals.data ?? []).reduce((s: number, m: any) => s + (m.calories ?? 0), 0),
-      totalProtein: (meals.data ?? []).reduce((s: number, m: any) => s + (m.protein_g ?? 0), 0),
-      water: (water.data ?? []).reduce((s: number, w: any) => s + (w.amount_ml ?? 0), 0),
-      sleep: (sleep.data ?? []).reduce((s: number, w: any) => s + (w.duration_hours ?? 0), 0),
+      totalCal: (meals.data ?? []).reduce<number>((s, m) => s + (m.calories ?? 0), 0),
+      totalProtein: (meals.data ?? []).reduce<number>((s, m) => s + (m.protein_g ?? 0), 0),
+      water: (water.data ?? []).reduce<number>((s, w) => s + (w.amount_ml ?? 0), 0),
+      sleep: (sleep.data ?? []).reduce<number>((s, w) => s + (w.duration_hours ?? 0), 0),
       workouts: workouts.data?.length ?? 0,
     };
     const content = await callAI(
@@ -242,7 +242,7 @@ export const getSleepScore = createServerFn({ method: "POST" })
       .eq("user_id", userId)
       .gte("log_date", since)
       .order("log_date");
-    const rows = (data ?? []).map((r: any) => ({
+    const rows = (data ?? []).map((r) => ({
       date: r.log_date,
       score: Math.min(100, Math.round(((r.duration_hours ?? 0) / 8) * 60 + (r.quality ?? 3) * 8)),
     }));
@@ -333,9 +333,10 @@ export const createDoctorReferral = createServerFn({ method: "POST" })
       `Pasien: "${data.reason}". Tentukan urgency (low/medium/high) dan spesialis yang direkomendasikan. Format JSON: {urgency, specialist, notes}.`,
       "Kamu triage assistant.",
     );
-    let parsed: any = {};
+    type ReferralParsed = { urgency?: string; specialist?: string; notes?: string };
+    let parsed: ReferralParsed = {};
     try {
-      parsed = JSON.parse(analysis.replace(/```json|```/g, "").trim());
+      parsed = JSON.parse(analysis.replace(/```json|```/g, "").trim()) as ReferralParsed;
     } catch {
       parsed = { urgency: "low", specialist: "General Practitioner", notes: analysis };
     }
@@ -364,13 +365,15 @@ export const smartShoppingList = createServerFn({ method: "POST" })
       `Estimasi harga pasar Indonesia (IDR) untuk: ${data.ingredients.join(", ")}. Format JSON array: [{item, qty, price_idr}]. Hanya JSON.`,
       "Kamu shopping assistant Indonesia.",
     );
-    let items: any[] = [];
+    type ShopItem = { item: string; qty: string | number; price_idr: number };
+    let items: ShopItem[] = [];
     try {
-      items = JSON.parse(text.replace(/```json|```/g, "").trim());
+      const raw = JSON.parse(text.replace(/```json|```/g, "").trim());
+      items = Array.isArray(raw) ? (raw as ShopItem[]) : [];
     } catch {
       items = data.ingredients.map((i) => ({ item: i, qty: "1", price_idr: 10000 }));
     }
-    const total = items.reduce((s, it) => s + (it.price_idr ?? 0), 0);
+    const total = items.reduce<number>((s, it) => s + (it.price_idr ?? 0), 0);
     return { items, total };
   });
 
