@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { todayRange } from "./health";
+import { todayRange } from "@/lib/health";
 import { recordActivityFor } from "@/features/gamification/lib/gamification.functions";
 
 export const searchFoods = createServerFn({ method: "GET" })

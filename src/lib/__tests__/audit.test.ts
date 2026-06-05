@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from "vitest";
-import { logAudit } from "../audit.server";
+import { logAudit } from "@/features/audit/lib/audit.server";
 
 function mkClient(rpcImpl: (...a: unknown[]) => Promise<{ error: unknown }>) {
   return { rpc: vi.fn(rpcImpl) } as unknown as Parameters<typeof logAudit>[0] & { rpc: ReturnType<typeof vi.fn> };
