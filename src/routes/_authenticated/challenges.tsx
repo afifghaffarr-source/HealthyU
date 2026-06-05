@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
-import { Trophy, Flame, Users, Calendar, Check, Medal } from "lucide-react";
+import { Trophy } from "lucide-react";
 import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { EmptyState } from "@/components/healthyu/empty-state";
 import { ListSkeleton } from "@/components/healthyu/skeletons";
@@ -20,14 +20,10 @@ import {
 import {
   CHALLENGE_HIGHLIGHT_MS,
   CHALLENGE_HIGHLIGHT_FADE_MS,
-  CHALLENGE_HIGHLIGHT_FADE_OPACITY,
-  CHALLENGE_HIGHLIGHT_TRANSITION_MS,
 } from "@/lib/constants";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
 import { useAnnounce } from "@/components/live-announcer";
-import { Leaderboard } from "@/features/challenges/components/Leaderboard";
-import { GroupInviter } from "@/features/challenges/components/GroupInviter";
-import { BonusClaimer } from "@/features/challenges/components/BonusClaimer";
+import { ChallengeCard } from "@/features/challenges/components/ChallengeCard";
 
 const challengesSearchSchema = z.object({
   group: fallback(z.string().uuid().optional(), undefined),
