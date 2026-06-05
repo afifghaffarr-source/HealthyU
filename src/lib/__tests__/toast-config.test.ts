@@ -1,15 +1,18 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
-const sonner = {
-  success: vi.fn(),
-  error: vi.fn(),
-  info: vi.fn(),
-  warning: vi.fn(),
-  loading: vi.fn(),
-  dismiss: vi.fn(),
-  promise: vi.fn(),
-};
-const base = vi.fn();
+const { base, sonner } = vi.hoisted(() => {
+  const sonner = {
+    success: vi.fn(),
+    error: vi.fn(),
+    info: vi.fn(),
+    warning: vi.fn(),
+    loading: vi.fn(),
+    dismiss: vi.fn(),
+    promise: vi.fn(),
+  };
+  const base = vi.fn();
+  return { base, sonner };
+});
 
 vi.mock("sonner", () => ({
   toast: Object.assign(base, sonner),
