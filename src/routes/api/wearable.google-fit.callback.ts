@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { oauthStateErrorMessage, validateOAuthState } from "@/lib/oauthState";
 
 export const Route = createFileRoute("/api/wearable/google-fit/callback")({
   server: {
@@ -17,7 +18,6 @@ export const Route = createFileRoute("/api/wearable/google-fit/callback")({
           return redirectBack(url.origin, "Server belum di-set GOOGLE_FIT credentials");
         }
 
-        // Validate OAuth state: must exist, match provider, not expired, not used
         const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
         const { data: stateRow, error: stateErr } = await supabaseAdmin
           .from("oauth_states")
@@ -25,12 +25,12 @@ export const Route = createFileRoute("/api/wearable/google-fit/callback")({
           .eq("nonce", state)
           .eq("provider", "google_fit")
           .maybeSingle();
-        if (stateErr || !stateRow) return redirectBack(url.origin, "State OAuth tidak valid");
-        if (stateRow.used_at) return redirectBack(url.origin, "State OAuth sudah digunakan");
-        if (new Date(stateRow.expires_at).getTime() < Date.now()) {
-          return redirectBack(url.origin, "State OAuth kadaluarsa");
+        if (stateErr) return redirectBack(url.origin, "State OAuth tidak valid");
+        const validation = validateOAuthState(stateRow, "google_fit");
+        if (!validation.ok) {
+          return redirectBack(url.origin, oauthStateErrorMessage(validation.reason));
         }
-        const userId = stateRow.user_id as string;
+        const userId = validation.userId;
 
         const tokenRes = await fetch("https://oauth2.googleapis.com/token", {
           method: "POST",
