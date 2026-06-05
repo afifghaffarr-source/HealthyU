@@ -19,3 +19,17 @@ export const toast = Object.assign(
     promise: sonnerToast.promise,
   },
 );
+
+/**
+ * Helper untuk menampilkan error toast dari nilai unknown (mis. error mutasi).
+ * Menggantikan pola berulang `toast.error(e instanceof Error ? e.message : "Gagal")`.
+ */
+export function toastError(e: unknown, fallback = "Gagal"): void {
+  const msg =
+    e instanceof Error
+      ? e.message
+      : typeof e === "string"
+        ? e
+        : fallback;
+  sonnerToast.error(msg || fallback, { duration: 3500 });
+}
