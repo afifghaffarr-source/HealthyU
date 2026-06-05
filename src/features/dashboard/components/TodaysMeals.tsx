@@ -1,4 +1,5 @@
 import { Link } from "@tanstack/react-router";
+import { Camera, PenLine, Utensils } from "lucide-react";
 
 type Meal = {
   id: string;
@@ -18,14 +19,30 @@ export function TodaysMeals({ meals }: { meals: Meal[] }) {
         </Link>
       </div>
       {meals.length === 0 ? (
-        <div className="bg-card p-6 rounded-3xl outline-1 outline-black/5 text-center">
-          <p className="text-sm text-muted-foreground mb-3">Belum ada catatan hari ini</p>
-          <Link
-            to="/food"
-            className="inline-block bg-primary text-primary-foreground text-sm font-semibold px-4 py-2 rounded-xl"
-          >
-            Catat makanan
-          </Link>
+        <div className="bg-card p-6 rounded-3xl outline-1 outline-black/5 dark:outline-white/10 text-center space-y-3">
+          <div className="size-12 mx-auto rounded-2xl bg-primary/10 grid place-items-center text-primary">
+            <Utensils className="size-5" aria-hidden />
+          </div>
+          <div>
+            <p className="font-semibold text-sm">Belum ada catatan hari ini</p>
+            <p className="text-[12px] text-muted-foreground mt-0.5">
+              Mulai dari foto atau cari makanan manual — santai saja.
+            </p>
+          </div>
+          <div className="grid grid-cols-2 gap-2 pt-1">
+            <Link
+              to="/scan"
+              className="inline-flex items-center justify-center gap-1.5 bg-primary text-primary-foreground text-sm font-semibold px-3 py-2.5 rounded-xl min-h-11"
+            >
+              <Camera className="size-4" /> Scan
+            </Link>
+            <Link
+              to="/food"
+              className="inline-flex items-center justify-center gap-1.5 bg-muted text-foreground text-sm font-semibold px-3 py-2.5 rounded-xl min-h-11"
+            >
+              <PenLine className="size-4" /> Manual
+            </Link>
+          </div>
         </div>
       ) : (
         <div className="space-y-2">
