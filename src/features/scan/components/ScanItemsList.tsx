@@ -1,5 +1,4 @@
 import { ScanItemCard } from "./ScanItemCard";
-import { SafetyChip } from "@/components/healthyu/safety-chip";
 import type { recognizeFood } from "@/features/food/lib/foodScan.functions";
 
 type Item = Awaited<ReturnType<typeof recognizeFood>>["items"][number];
@@ -28,16 +27,15 @@ export function ScanItemsList({
   if (items.length === 0) return null;
   return (
     <div className="space-y-2">
-      <div className="flex items-center justify-between gap-2 flex-wrap">
-        <p className="text-xs font-semibold text-muted-foreground">Terdeteksi</p>
-        <SafetyChip variant="ai-estimate" />
-      </div>
+      <p className="text-xs font-semibold text-muted-foreground">
+        Terdeteksi · periksa sebelum simpan
+      </p>
       <button
         onClick={onLogAll}
         disabled={logPending}
         className="w-full py-2 rounded-xl bg-primary/10 text-primary font-semibold text-xs disabled:opacity-50"
       >
-        Catat semua ({items.length})
+        Simpan ke log ({items.length})
       </button>
       {items.map((it, i) => (
         <ScanItemCard
