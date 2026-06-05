@@ -30,8 +30,25 @@ export const DIETARY = [
   ["low_carb", "Rendah karbo"],
   ["vegetarian", "Vegetarian"],
   ["vegan", "Vegan"],
+  ["pescatarian", "Pescatarian"],
   ["halal", "Halal tradisional"],
+  ["no_preference", "Tanpa preferensi"],
 ] as const;
+
+export type Pace = "gentle" | "steady" | "ambitious";
+
+// Calorie delta (negative = deficit for lose, positive = surplus for gain).
+export function paceDelta(goal: "lose" | "maintain" | "gain", pace: Pace): number {
+  if (goal === "maintain") return 0;
+  const map: Record<Pace, number> = { gentle: 200, steady: 400, ambitious: 600 };
+  const gainMap: Record<Pace, number> = { gentle: 150, steady: 300, ambitious: 500 };
+  return goal === "lose" ? -map[pace] : gainMap[pace];
+}
+
+// Convert a calorie delta to estimated kg/week (≈7700 kcal/kg fat).
+export function paceKgPerWeek(deltaKcal: number): number {
+  return Math.round(((Math.abs(deltaKcal) * 7) / 7700) * 100) / 100;
+}
 
 export type OnboardingForm = {
   full_name: string;
