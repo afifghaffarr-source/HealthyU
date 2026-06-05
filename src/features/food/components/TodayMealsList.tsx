@@ -1,5 +1,5 @@
 import { Trash2 } from "lucide-react";
-import { labelMeal, type MealType } from "@/lib/foodHelpers";
+import { labelMeal, type MealType } from "@/features/food/lib/foodHelpers";
 
 type Meal = {
   id: string;

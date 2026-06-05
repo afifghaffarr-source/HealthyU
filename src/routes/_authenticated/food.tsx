@@ -18,11 +18,11 @@ import { toast } from "sonner";
 import { toastError } from "@/lib/toast-config";
 import { enqueue } from "@/lib/offline-queue";
 import { useOfflineQueue } from "@/hooks/use-offline-queue";
-import { labelMeal, currentMealType, type MealType } from "@/lib/foodHelpers";
-import { FoodSearchResult } from "@/components/food/FoodSearchResult";
-import { MealBasket, type BasketItem } from "@/components/food/MealBasket";
-import { TodayMealsList } from "@/components/food/TodayMealsList";
-import { AlternativesModal } from "@/components/food/AlternativesModal";
+import { labelMeal, currentMealType, type MealType } from "@/features/food/lib/foodHelpers";
+import { FoodSearchResult } from "@/features/food/components/FoodSearchResult";
+import { MealBasket, type BasketItem } from "@/features/food/components/MealBasket";
+import { TodayMealsList } from "@/features/food/components/TodayMealsList";
+import { AlternativesModal } from "@/features/food/components/AlternativesModal";
 
 export const Route = createFileRoute("/_authenticated/food")({
   component: FoodPage,

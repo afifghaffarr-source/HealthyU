@@ -6,7 +6,7 @@ import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { Camera, Loader2, Sparkles, X, Check, Pencil, History, Zap } from "lucide-react";
 import { toast } from "sonner";
 import { BottomNav } from "@/components/bottom-nav";
-import { recognizeFood, submitScanCorrection } from "@/lib/foodScan.functions";
+import { recognizeFood, submitScanCorrection } from "@/features/food/lib/foodScan.functions";
 import { attachScanPhoto } from "@/lib/scanPhoto.functions";
 import { recordScanGameify, checkScanLimit, classifyMealTags } from "@/lib/scanMore.functions";
 import { logMeal } from "@/lib/meals.functions";

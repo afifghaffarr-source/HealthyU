@@ -7,7 +7,7 @@ import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { SearchChips } from "@/components/healthyu/search-chips";
 import { useRecentSearch } from "@/hooks/use-recent-search";
 import { BottomNav } from "@/components/bottom-nav";
-import { browseFoods, getFoodDetail, getFoodFacets } from "@/lib/foodDb.functions";
+import { browseFoods, getFoodDetail, getFoodFacets } from "@/features/food/lib/foodDb.functions";
 import { ListSkeleton } from "@/components/healthyu/skeletons";
 import { PullIndicator } from "@/components/healthyu/pull-indicator";
 import { usePullToRefresh } from "@/hooks/use-pull-to-refresh";
