@@ -137,3 +137,108 @@ export const todaysMeals = createServerFn({ method: "GET" })
     if (error) throw new Error(error.message);
     return data ?? [];
   });
+
+/**
+ * Returns yesterday's meals filtered by meal_type (default: breakfast).
+ * Used by the "Repeat yesterday's breakfast" quick-action on Food page.
+ */
+export const yesterdaysMeals = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) =>
+    z
+      .object({
+        meal_type: z.enum(["breakfast", "lunch", "dinner", "snack"]).default("breakfast"),
+      })
+      .parse(input ?? {}),
+  )
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    const { start } = todayRange();
+    // Yesterday window = [start - 24h, start)
+    const startMs = new Date(start).getTime();
+    const yStart = new Date(startMs - 24 * 60 * 60 * 1000).toISOString();
+    const yEnd = new Date(startMs).toISOString();
+    const { data: rows, error } = await supabase
+      .from("meal_logs")
+      .select(
+        "id, meal_type, custom_name, serving_qty, calories, protein_g, carbs_g, fat_g, food_item_id, food_item:food_items(name)",
+      )
+      .eq("user_id", userId)
+      .eq("meal_type", data.meal_type)
+      .gte("logged_at", yStart)
+      .lt("logged_at", yEnd)
+      .order("logged_at", { ascending: true });
+    if (error) throw new Error(error.message);
+    return rows ?? [];
+  });
+
+/**
+ * Top recurring meals in the last 30 days, grouped by (food_item_id|custom_name)
+ * + meal_type. Returns the most-logged first; macros are the median-ish
+ * last-logged value for that group. Used as "Save as frequent meal".
+ */
+export const frequentMeals = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) =>
+    z.object({ limit: z.number().int().min(1).max(20).default(6) }).parse(input ?? {}),
+  )
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    const since = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
+    const { data: rows, error } = await supabase
+      .from("meal_logs")
+      .select(
+        "meal_type, custom_name, serving_qty, calories, protein_g, carbs_g, fat_g, food_item_id, food_item:food_items(name), logged_at",
+      )
+      .eq("user_id", userId)
+      .gte("logged_at", since)
+      .order("logged_at", { ascending: false })
+      .limit(500);
+    if (error) throw new Error(error.message);
+    type Row = (typeof rows extends Array<infer R> ? R : never) & {
+      food_item?: { name?: string } | null;
+    };
+    const groups = new Map<
+      string,
+      {
+        key: string;
+        name: string;
+        meal_type: "breakfast" | "lunch" | "dinner" | "snack";
+        count: number;
+        food_item_id: string | null;
+        custom_name: string | null;
+        serving_qty: number;
+        calories: number;
+        protein_g: number;
+        carbs_g: number;
+        fat_g: number;
+      }
+    >();
+    for (const r of (rows ?? []) as Row[]) {
+      const name = (r.food_item?.name ?? r.custom_name ?? "").trim();
+      if (!name) continue;
+      const key = `${r.food_item_id ?? `c:${name.toLowerCase()}`}|${r.meal_type}`;
+      const existing = groups.get(key);
+      if (existing) {
+        existing.count += 1;
+      } else {
+        groups.set(key, {
+          key,
+          name,
+          meal_type: r.meal_type as "breakfast" | "lunch" | "dinner" | "snack",
+          count: 1,
+          food_item_id: r.food_item_id ?? null,
+          custom_name: r.food_item_id ? null : name,
+          serving_qty: Number(r.serving_qty ?? 1),
+          calories: Math.round(Number(r.calories ?? 0)),
+          protein_g: Number(r.protein_g ?? 0),
+          carbs_g: Number(r.carbs_g ?? 0),
+          fat_g: Number(r.fat_g ?? 0),
+        });
+      }
+    }
+    return Array.from(groups.values())
+      .filter((g) => g.count >= 2)
+      .sort((a, b) => b.count - a.count)
+      .slice(0, data.limit);
+  });
