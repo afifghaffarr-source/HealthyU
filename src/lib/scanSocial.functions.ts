@@ -46,13 +46,17 @@ export const getGroupScanLeaderboard = createServerFn({ method: "POST" })
       streak: number;
       scans: number;
     }> = [];
-    for (const m of members ?? []) {
+    type MemberWithProfile = {
+      user_id: string;
+      profiles?: { full_name?: string | null; avatar_url?: string | null; scan_streak_current?: number | null } | null;
+    };
+    for (const m of (members ?? []) as MemberWithProfile[]) {
       const { count } = await supabase
         .from("food_scans")
         .select("*", { count: "exact", head: true })
         .eq("user_id", m.user_id)
         .gte("created_at", since);
-      const p = (m as any).profiles;
+      const p = m.profiles;
       rows.push({
         userId: m.user_id,
         name: p?.full_name ?? "User",
@@ -86,9 +90,18 @@ export const reverseCalorie = createServerFn({ method: "POST" })
       ],
     });
     const m = text.match(/\[[\s\S]*\]/);
-    let suggestions: any[] = [];
+    type Suggestion = {
+      name: string;
+      calories: number;
+      protein_g?: number;
+      carbs_g?: number;
+      fat_g?: number;
+      why?: string;
+    };
+    let suggestions: Suggestion[] = [];
     try {
-      suggestions = m ? JSON.parse(m[0]) : [];
+      const parsed = m ? JSON.parse(m[0]) : [];
+      suggestions = Array.isArray(parsed) ? (parsed as Suggestion[]) : [];
     } catch {}
     return { suggestions };
   });
@@ -112,11 +125,15 @@ export const getDailyChallenge = createServerFn({ method: "POST" })
       goal_type: "water_ml",
       goal_value: 2000,
     };
-    let parsed: any = {
-      ...fallback,
+    type DailyChallenge = {
+      title?: string;
+      description?: string;
+      goal_type?: string;
+      goal_value?: number;
     };
+    let parsed: DailyChallenge = { ...fallback };
     try {
-      parsed = await callAiJsonWithGuards({
+      parsed = await callAiJsonWithGuards<DailyChallenge>({
         userId,
         feature: "challenge.daily.generate",
         messages: [
@@ -181,9 +198,19 @@ export const remixRecipe = createServerFn({ method: "POST" })
       .eq("id", data.recipeId)
       .maybeSingle();
     if (!r) throw new Error("Recipe not found");
-    let remix: any = null;
+    type Remix = {
+      title: string;
+      ingredients: string[];
+      instructions: string[];
+      calories?: number;
+      protein_g?: number;
+      carbs_g?: number;
+      fat_g?: number;
+      notes?: string;
+    };
+    let remix: Remix | null = null;
     try {
-      remix = await callAiJsonWithGuards({
+      remix = await callAiJsonWithGuards<Remix>({
         userId: context.userId,
         feature: "recipe.remix",
         messages: [
@@ -215,8 +242,13 @@ export const getGroceryFromPlan = createServerFn({ method: "POST" })
       .select("food_name, recipe_id, serving_qty, serving_unit, recipes(ingredients)")
       .eq("meal_plan_id", data.mealPlanId);
     const counter = new Map<string, number>();
-    for (const it of items ?? []) {
-      const ings: string[] = (it as any).recipes?.ingredients ?? [];
+    type PlanItem = {
+      food_name: string | null;
+      serving_qty: number | null;
+      recipes?: { ingredients?: string[] | null } | null;
+    };
+    for (const it of (items ?? []) as PlanItem[]) {
+      const ings: string[] = it.recipes?.ingredients ?? [];
       for (const ing of ings) {
         const key = ing.toLowerCase().trim();
         counter.set(key, (counter.get(key) ?? 0) + Number(it.serving_qty ?? 1));
