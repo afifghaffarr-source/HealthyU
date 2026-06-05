@@ -24,6 +24,12 @@ import { Coachmark } from "@/components/healthyu/coachmark";
 import { PullIndicator } from "@/components/healthyu/pull-indicator";
 import { StreakRing } from "@/components/healthyu/streak-ring";
 import { CoinPill } from "@/components/healthyu/coin-pill";
+import { DailyBonusButton } from "@/components/dashboard/DailyBonusButton";
+import { DailyTipCard } from "@/components/dashboard/DailyTipCard";
+import { WaterCard } from "@/components/dashboard/WaterCard";
+import { MoodQuickLog } from "@/components/dashboard/MoodQuickLog";
+import { FreezeDialog } from "@/components/dashboard/FreezeDialog";
+import { TodaysMeals } from "@/components/dashboard/TodaysMeals";
 import { usePullToRefresh } from "@/hooks/use-pull-to-refresh";
 import { formatDuration, fastingStage } from "@/lib/health";
 import {
@@ -38,7 +44,6 @@ import {
   Gift,
   Snowflake,
 } from "lucide-react";
-import { Lightbulb } from "lucide-react";
 import { claimDailyLoginBonus } from "@/lib/scanBatch9.functions";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
