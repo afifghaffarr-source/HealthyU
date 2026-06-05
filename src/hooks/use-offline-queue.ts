@@ -37,16 +37,16 @@ export function useOfflineQueue() {
         await weight({ data: it.payload as { weight_kg: number; note?: string } });
       },
       meal: async (it) => {
-        await meal({ data: it.payload as Parameters<typeof meal>[0]["data"] });
+        await meal({ data: it.payload } as Parameters<typeof meal>[0]);
       },
       mood: async (it) => {
         await mood({ data: it.payload as { mood: number; note?: string } });
       },
       vitals: async (it) => {
-        await vitals({ data: it.payload as Parameters<typeof vitals>[0]["data"] });
+        await vitals({ data: it.payload } as Parameters<typeof vitals>[0]);
       },
       workout: async (it) => {
-        await workout({ data: it.payload as Parameters<typeof workout>[0]["data"] });
+        await workout({ data: it.payload } as Parameters<typeof workout>[0]);
       },
     });
     if (res.synced > 0) {
