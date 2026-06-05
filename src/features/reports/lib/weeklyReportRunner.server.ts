@@ -126,7 +126,7 @@ export async function runWeeklyReportForUser(userId: string, days = 7): Promise<
     messages: [
       {
         role: "system",
-        content: `Kamu adalah Dr. HealthyU, AI health coach. Buat laporan analisis mingguan singkat dalam Bahasa Indonesia (markdown, max 350 kata) dengan section: Ringkasan, Yang Berjalan Baik, Area Perbaikan, Progress Challenge Grup (skip jika kosong), Rekomendasi.`,
+        content: `Kamu adalah HealthyU AI Coach, AI health coach. Buat laporan analisis mingguan singkat dalam Bahasa Indonesia (markdown, max 350 kata) dengan section: Ringkasan, Yang Berjalan Baik, Area Perbaikan, Progress Challenge Grup (skip jika kosong), Rekomendasi.`,
       },
       {
         role: "user",

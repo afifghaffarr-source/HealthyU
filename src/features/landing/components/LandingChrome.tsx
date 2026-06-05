@@ -99,7 +99,7 @@ export function PricingSection({ ctaPrimary }: { ctaPrimary: string }) {
               "Scan makanan AI",
               "Meal plan personal",
               "Puasa & jadwal sholat",
-              "Dr. Healthy chatbot",
+              "HealthyU AI Coach chatbot",
             ].map((x) => (
               <li key={x} className="flex items-center gap-2">
                 <Check className="size-4 text-primary" />

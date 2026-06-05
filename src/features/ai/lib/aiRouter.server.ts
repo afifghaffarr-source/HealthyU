@@ -30,7 +30,7 @@ const COMPLEX_HINTS = [
 function tryLocalAnswer(text: string): string | null {
   const t = text.trim().toLowerCase();
   if (/^(hai|halo|hi|hello|hey)[!. ]*$/.test(t)) {
-    return "Halo! 👋 Saya Dr. HealthyU. Ada yang bisa saya bantu soal nutrisi, olahraga, tidur, atau target sehatmu hari ini?";
+    return "Halo! 👋 Saya HealthyU AI Coach. Ada yang bisa saya bantu soal nutrisi, olahraga, tidur, atau target sehatmu hari ini?";
   }
   if (/^(makasih|terima kasih|thanks|thank you)[!. ]*$/.test(t)) {
     return "Sama-sama! 💪 Tetap konsisten ya.";

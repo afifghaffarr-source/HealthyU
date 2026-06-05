@@ -141,7 +141,7 @@ export function ChatPage() {
     <main className="min-h-dvh bg-background flex flex-col">
       <div className="max-w-md w-full mx-auto px-5 pt-0">
         <TopAppBar
-          title="Dr. Healthy"
+          title="HealthyU AI Coach"
           subtitle="AI nutrition coach"
           showBack
           action={

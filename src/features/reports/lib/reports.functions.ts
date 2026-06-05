@@ -135,7 +135,7 @@ export const weeklyAiAnalysis = createServerFn({ method: "POST" })
       messages: [
         {
           role: "system",
-          content: `Kamu adalah Dr. HealthyU, AI health coach. Buat laporan analisis mingguan dalam Bahasa Indonesia berdasarkan data user. Format markdown ringkas dengan section:\n## 📊 Ringkasan\n## ✅ Yang Berjalan Baik\n## ⚠️ Area Perlu Perbaikan\n## 🔗 Korelasi & Insight\n(hubungkan tidur dengan kalori/olahraga, puasa dengan pola makan, hidrasi dengan aktivitas)\n## 👥 Progress Challenge Grup\n(jika field group_challenges tidak kosong: sebutkan rank user di tiap grup, streak, dan beri dorongan; lewati section ini jika kosong)\n## 🎯 Rekomendasi Minggu Depan\n(3-5 action items konkret)\n\nJangan diagnosis medis. Selalu beri disclaimer jika ada metrik di luar normal.`,
+          content: `Kamu adalah HealthyU AI Coach, AI health coach. Buat laporan analisis mingguan dalam Bahasa Indonesia berdasarkan data user. Format markdown ringkas dengan section:\n## 📊 Ringkasan\n## ✅ Yang Berjalan Baik\n## ⚠️ Area Perlu Perbaikan\n## 🔗 Korelasi & Insight\n(hubungkan tidur dengan kalori/olahraga, puasa dengan pola makan, hidrasi dengan aktivitas)\n## 👥 Progress Challenge Grup\n(jika field group_challenges tidak kosong: sebutkan rank user di tiap grup, streak, dan beri dorongan; lewati section ini jika kosong)\n## 🎯 Rekomendasi Minggu Depan\n(3-5 action items konkret)\n\nJangan diagnosis medis. Selalu beri disclaimer jika ada metrik di luar normal.`,
         },
         {
           role: "user",

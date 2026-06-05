@@ -6,7 +6,7 @@ export const APP_CONFIG = {
   name: "HealthyU",
   shortName: "HealthyU",
   siteUrl: "https://healthyu.id",
-  description: "AI nutrition coach untuk Indonesia: diet, puasa, jadwal sholat, dan Dr. Healthy.",
+  description: "AI nutrition coach untuk Indonesia: diet, puasa, jadwal sholat, dan HealthyU AI Coach.",
   supportEmail: "support@healthyu.id",
   twitterHandle: "@healthyu_id",
   defaultOgImage: "/icon-512.svg",

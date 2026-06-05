@@ -87,7 +87,7 @@ export function ChatComposer({
                 ? "Mendengarkan..."
                 : imageData
                   ? "Tambah pertanyaan (opsional)..."
-                  : "Tanya Dr. Healthy..."
+                  : "Tanya HealthyU AI Coach..."
             }
             disabled={pending}
             className="flex-1 bg-transparent px-3 py-2 text-sm focus:outline-none disabled:opacity-50"

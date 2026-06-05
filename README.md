@@ -1,6 +1,6 @@
 # HealthyU
 
-AI nutrition coach untuk Indonesia: diet, puasa, jadwal sholat, dan Dr. Healthy.
+AI nutrition coach untuk Indonesia: diet, puasa, jadwal sholat, dan HealthyU AI Coach.
 
 ## Fitur utama
 

@@ -21,7 +21,7 @@ const ROUTES: { label: string; to: string; hint?: string }[] = [
   { label: "Meal plan", to: "/mealplan" },
   { label: "Shopping list", to: "/shopping/list" },
   { label: "AI Coach (chat)", to: "/chat" },
-  { label: "Dr. Healthy", to: "/coach" },
+  { label: "HealthyU AI Coach", to: "/coach" },
   { label: "Profil saya", to: "/profile" },
   { label: "Achievements", to: "/achievements" },
   { label: "Leaderboard", to: "/leaderboard" },
