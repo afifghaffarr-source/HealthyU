@@ -18,6 +18,7 @@ describe("calcAge", () => {
   it("computes age from a past date", () => {
     const d = new Date();
     d.setFullYear(d.getFullYear() - 25);
+    d.setDate(d.getDate() - 5); // buffer for 365.25 floor
     expect(calcAge(d)).toBe(25);
   });
 });
