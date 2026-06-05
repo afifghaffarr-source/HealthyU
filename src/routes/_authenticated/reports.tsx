@@ -17,6 +17,7 @@ import { exportWeeklyCsv, exportWeeklyPdf } from "@/features/reports/lib/reports
 import { Stat } from "@/features/reports/components/Stat";
 import { WeeklyChart } from "@/features/reports/components/WeeklyChart";
 import { AiReportHistorySection } from "@/features/reports/components/AiReportHistorySection";
+import { shareWeeklyToWhatsapp } from "@/features/reports/lib/shareWhatsapp";
 
 export const Route = createFileRoute("/_authenticated/reports")({
   validateSearch: zodValidator(
@@ -187,53 +188,12 @@ function ReportsPage() {
 
 
 
-  const shareWhatsapp = (overrideReport?: {
-    text: string;
-    periodStart?: string;
-    periodEnd?: string;
-  }) => {
-    if (!summary && !overrideReport) return;
-    const header = overrideReport
-      ? `📊 *Laporan HealthyU* ${overrideReport.periodStart ?? ""} → ${overrideReport.periodEnd ?? ""}`.trim()
-      : "📊 *Laporan HealthyU 7 Hari*";
-    const body = overrideReport?.text ?? aiMut.data?.report;
-    if (overrideReport) {
-      const text = [
-        header,
-        "",
-        body ? `_${body.slice(0, 600)}${body.length > 600 ? "…" : ""}_` : "",
-        "— dikirim dari HealthyU",
-      ]
-        .filter(Boolean)
-        .join("\n");
-      window.open(
-        `https://wa.me/?text=${encodeURIComponent(text)}`,
-        "_blank",
-        "noopener,noreferrer",
-      );
-      return;
-    }
-    const lines = [
-      "📊 *Laporan HealthyU 7 Hari*",
-      "",
-      `🍽️ Total kalori masuk: ${Math.round(summary!.totals.cals)} kcal`,
-      `🔥 Kalori terbakar: ${summary!.totals.burn} kcal`,
-      `💧 Total air: ${(summary!.totals.ml / 1000).toFixed(1)} L`,
-      `😴 Total tidur: ${summary!.totals.hours.toFixed(1)} jam`,
-      `🏃 Latihan: ${summary!.workoutCount} sesi`,
-      `⏱️ Puasa selesai: ${summary!.fastingDone} sesi`,
-      "",
-      aiMut.data?.report
-        ? `_${aiMut.data.report.slice(0, 400)}${aiMut.data.report.length > 400 ? "…" : ""}_`
-        : "",
-      "— dikirim dari HealthyU",
-    ]
-      .filter(Boolean)
-      .join("\n");
-    const url = `https://wa.me/?text=${encodeURIComponent(lines)}`;
-    window.open(url, "_blank", "noopener,noreferrer");
-  };
-
+  const shareWhatsapp = (override?: { text: string; periodStart?: string; periodEnd?: string }) =>
+    shareWeeklyToWhatsapp({
+      summary,
+      aiReport: aiMut.data?.report ?? null,
+      override,
+    });
 
   const maxCal = Math.max(1, ...(summary?.byDay.map((d) => d.cals) ?? [1]));
 
