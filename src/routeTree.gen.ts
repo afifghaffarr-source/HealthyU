@@ -14,6 +14,7 @@ import { Route as ResepRouteImport } from './routes/resep'
 import { Route as OlahragaRouteImport } from './routes/olahraga'
 import { Route as KaloriRouteImport } from './routes/kalori'
 import { Route as KalkulatorRouteImport } from './routes/kalkulator'
+import { Route as FaqRouteImport } from './routes/faq'
 import { Route as DietRouteImport } from './routes/diet'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as ArtikelRouteImport } from './routes/artikel'
@@ -191,6 +192,11 @@ const KaloriRoute = KaloriRouteImport.update({
 const KalkulatorRoute = KalkulatorRouteImport.update({
   id: '/kalkulator',
   path: '/kalkulator',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FaqRoute = FaqRouteImport.update({
+  id: '/faq',
+  path: '/faq',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DietRoute = DietRouteImport.update({
@@ -1037,6 +1043,7 @@ export interface FileRoutesByFullPath {
   '/artikel': typeof ArtikelRouteWithChildren
   '/auth': typeof AuthRoute
   '/diet': typeof DietRouteWithChildren
+  '/faq': typeof FaqRoute
   '/kalkulator': typeof KalkulatorRouteWithChildren
   '/kalori': typeof KaloriRouteWithChildren
   '/olahraga': typeof OlahragaRouteWithChildren
@@ -1194,6 +1201,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/faq': typeof FaqRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/achievements': typeof AuthenticatedAchievementsRoute
   '/alarms': typeof AuthenticatedAlarmsRoute
@@ -1351,6 +1359,7 @@ export interface FileRoutesById {
   '/artikel': typeof ArtikelRouteWithChildren
   '/auth': typeof AuthRoute
   '/diet': typeof DietRouteWithChildren
+  '/faq': typeof FaqRoute
   '/kalkulator': typeof KalkulatorRouteWithChildren
   '/kalori': typeof KaloriRouteWithChildren
   '/olahraga': typeof OlahragaRouteWithChildren
@@ -1512,6 +1521,7 @@ export interface FileRouteTypes {
     | '/artikel'
     | '/auth'
     | '/diet'
+    | '/faq'
     | '/kalkulator'
     | '/kalori'
     | '/olahraga'
@@ -1669,6 +1679,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/auth'
+    | '/faq'
     | '/sitemap.xml'
     | '/achievements'
     | '/alarms'
@@ -1825,6 +1836,7 @@ export interface FileRouteTypes {
     | '/artikel'
     | '/auth'
     | '/diet'
+    | '/faq'
     | '/kalkulator'
     | '/kalori'
     | '/olahraga'
@@ -1986,6 +1998,7 @@ export interface RootRouteChildren {
   ArtikelRoute: typeof ArtikelRouteWithChildren
   AuthRoute: typeof AuthRoute
   DietRoute: typeof DietRouteWithChildren
+  FaqRoute: typeof FaqRoute
   KalkulatorRoute: typeof KalkulatorRouteWithChildren
   KaloriRoute: typeof KaloriRouteWithChildren
   OlahragaRoute: typeof OlahragaRouteWithChildren
@@ -2035,6 +2048,13 @@ declare module '@tanstack/react-router' {
       path: '/kalkulator'
       fullPath: '/kalkulator'
       preLoaderRoute: typeof KalkulatorRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/faq': {
+      id: '/faq'
+      path: '/faq'
+      fullPath: '/faq'
+      preLoaderRoute: typeof FaqRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/diet': {
@@ -3680,6 +3700,7 @@ const rootRouteChildren: RootRouteChildren = {
   ArtikelRoute: ArtikelRouteWithChildren,
   AuthRoute: AuthRoute,
   DietRoute: DietRouteWithChildren,
+  FaqRoute: FaqRoute,
   KalkulatorRoute: KalkulatorRouteWithChildren,
   KaloriRoute: KaloriRouteWithChildren,
   OlahragaRoute: OlahragaRouteWithChildren,
