@@ -132,6 +132,7 @@ export const weeklyAiAnalysis = createServerFn({ method: "POST" })
       userId,
       feature: "report.weekly.ai",
       model: "google/gemini-2.5-flash",
+      failClosed: true,
       messages: [
         {
           role: "system",
