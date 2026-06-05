@@ -1,6 +1,6 @@
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { sendWebPushTo } from "@/lib/push.server";
-import { computeGroupChallengeSummary } from "@/lib/reportsGroupChallenges.server";
+import { computeGroupChallengeSummary } from "@/features/reports/lib/reportsGroupChallenges.server";
 import { callAiWithGuards } from "@/lib/aiGateway.server";
 
 type PushSub = { endpoint: string; p256dh: string; auth: string };

@@ -4,7 +4,7 @@ import {
   runWeeklyReportForUser,
   sendWeeklyReportPush,
   getTopTrendingRecipe,
-} from "@/lib/weeklyReportRunner.server";
+} from "@/features/reports/lib/weeklyReportRunner.server";
 import { requireCronSecret } from "@/lib/cronAuth.server";
 
 /**
