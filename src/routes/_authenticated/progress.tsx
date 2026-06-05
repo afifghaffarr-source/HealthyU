@@ -22,6 +22,7 @@ import {
   UploadProgressCard,
 } from "@/features/progress/components/ProgressPieces";
 import { NonScaleWinsCard } from "@/features/progress/components/NonScaleWinsCard";
+import { ConsistencyScoreCard } from "@/features/progress/components/ConsistencyScoreCard";
 
 export const Route = createFileRoute("/_authenticated/progress")({
   component: ProgressPage,
@@ -101,6 +102,13 @@ function ProgressPage() {
         <TopAppBar title="Foto Progres" subtitle="Pantau perubahan kamu" showBack />
 
         <GoalRadialCard data={goalData} />
+
+        <ConsistencyScoreCard
+          mealsLogged={meals.length}
+          waterReached={waterMl >= waterTarget}
+          photosCount={photos.length}
+          calorieOnTrack={cal > 0 && cal <= calTarget}
+        />
 
         <NonScaleWinsCard
           mealsLogged={meals.length}

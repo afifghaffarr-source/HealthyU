@@ -11,6 +11,25 @@ export function TodaysBalanceCard({
   const over = remaining < 0;
   const proteinTarget = Math.round((calTarget * 0.3) / 4);
   const proteinGap = Math.max(0, proteinTarget - Math.round(totals.p));
+  // Granular over-target tones: slight (≤10% over) → amber soft,
+  // notable (10–20%) → amber, large (>20%) → rose. Never shaming.
+  const overPct = over ? Math.abs(remaining) / Math.max(1, calTarget) : 0;
+  const overBanner = !over
+    ? null
+    : overPct <= 0.1
+      ? {
+          tone: "bg-amber-50/70 dark:bg-amber-950/20 text-amber-900 dark:text-amber-100",
+          msg: "Sedikit lewat target — tetap aman. Jaga ritme di sesi berikutnya.",
+        }
+      : overPct <= 0.2
+        ? {
+            tone: "bg-amber-50 dark:bg-amber-950/30 text-amber-900 dark:text-amber-100",
+            msg: "Hari ini agak lewat target. Pilih protein & sayur di waktu berikutnya, itu cukup.",
+          }
+        : {
+            tone: "bg-rose-50 dark:bg-rose-950/30 text-rose-900 dark:text-rose-100",
+            msg: "Cukup lewat target hari ini — tidak apa-apa. Besok kita bantu seimbangkan, bukan menghukum.",
+          };
 
   return (
     <section
@@ -46,10 +65,9 @@ export function TodaysBalanceCard({
           )}
         </div>
       </div>
-      {over && (
-        <div className="mt-4 p-3 rounded-2xl bg-amber-50 dark:bg-amber-950/30 text-[12px] leading-relaxed text-amber-900 dark:text-amber-100">
-          Sedikit lewat target hari ini — tidak apa-apa. Kita bantu seimbangkan besok dengan
-          pilihan tinggi protein & sayur.
+      {overBanner && (
+        <div className={`mt-4 p-3 rounded-2xl text-[12px] leading-relaxed ${overBanner.tone}`}>
+          {overBanner.msg}
         </div>
       )}
     </section>

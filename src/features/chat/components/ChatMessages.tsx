@@ -1,5 +1,6 @@
 import { SafeMarkdown } from "@/components/SafeMarkdown";
-import { Stethoscope } from "lucide-react";
+import { Link } from "@tanstack/react-router";
+import { BookOpen, Stethoscope, Utensils } from "lucide-react";
 
 export type ChatMessage = { id: string; role: string; content: string };
 
@@ -26,6 +27,32 @@ export function ChatEmptyState({ onPick }: { onPick: (text: string) => void }) {
             Saran umum, bukan saran medis. Untuk kondisi medis tertentu, sebaiknya konsultasikan ke profesional.
           </span>
         </p>
+      </div>
+      <div className="grid grid-cols-2 gap-2">
+        <Link
+          to="/foods"
+          className="bg-card p-3 rounded-2xl outline-1 outline-black/5 text-xs flex items-center gap-2 hover:bg-secondary/40 transition"
+        >
+          <span className="size-7 rounded-lg bg-primary/10 text-primary grid place-items-center" aria-hidden>
+            <Utensils className="size-3.5" />
+          </span>
+          <span className="min-w-0">
+            <span className="block font-semibold truncate">Catat makan dulu</span>
+            <span className="block text-muted-foreground text-[10px] truncate">Biar saran lebih pas</span>
+          </span>
+        </Link>
+        <Link
+          to="/articles"
+          className="bg-card p-3 rounded-2xl outline-1 outline-black/5 text-xs flex items-center gap-2 hover:bg-secondary/40 transition"
+        >
+          <span className="size-7 rounded-lg bg-primary/10 text-primary grid place-items-center" aria-hidden>
+            <BookOpen className="size-3.5" />
+          </span>
+          <span className="min-w-0">
+            <span className="block font-semibold truncate">Baca artikel singkat</span>
+            <span className="block text-muted-foreground text-[10px] truncate">2 menit, langsung pakai</span>
+          </span>
+        </Link>
       </div>
       <div className="space-y-2">
         {SUGGESTIONS.map((s) => (

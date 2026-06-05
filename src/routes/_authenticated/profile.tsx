@@ -40,7 +40,10 @@ function ProfilePage() {
   const navigate = useNavigate();
   const { theme, toggle } = useTheme();
   const fetchProfile = useServerFn(getProfile);
-  const { data: p } = useQuery({ queryKey: ["profile"], queryFn: () => fetchProfile() });
+  const { data: p, isLoading } = useQuery({
+    queryKey: ["profile"],
+    queryFn: () => fetchProfile(),
+  });
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
@@ -60,6 +63,29 @@ function ProfilePage() {
         })
       : null;
   const tdee = bmr && p?.activity_level ? calcTDEE(bmr, p.activity_level as ActivityLevel) : null;
+
+  if (isLoading && !p) {
+    return (
+      <main className="min-h-dvh bg-background pb-28">
+        <div className="max-w-md mx-auto px-5 pt-2 space-y-5">
+          <TopAppBar title="Profil" subtitle="Memuat…" showBack />
+          <div className="bg-card p-6 rounded-3xl outline-1 outline-foreground/10 text-center animate-pulse">
+            <div className="size-20 mx-auto rounded-full bg-muted mb-3" />
+            <div className="h-5 w-32 mx-auto bg-muted rounded mb-2" />
+            <div className="h-3 w-24 mx-auto bg-muted rounded" />
+          </div>
+          <div className="grid grid-cols-3 gap-3">
+            {[0, 1, 2].map((i) => (
+              <div key={i} className="h-24 bg-card rounded-2xl outline-1 outline-foreground/10 animate-pulse" />
+            ))}
+          </div>
+          <div className="h-40 bg-card rounded-3xl outline-1 outline-foreground/10 animate-pulse" />
+          <div className="h-48 bg-card rounded-3xl outline-1 outline-foreground/10 animate-pulse" />
+        </div>
+        <BottomNav />
+      </main>
+    );
+  }
 
   return (
     <main className="min-h-dvh bg-background pb-28">
