@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { callAiWithGuards } from "@/lib/aiGateway.server";
 
 // ---------- Friend invite ----------
 export const createFriendInvite = createServerFn({ method: "POST" })
@@ -139,30 +140,24 @@ export const transcribeVoice = createServerFn({ method: "POST" })
 export const recommendExercises = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d) => z.object({ goal: z.string().min(3).max(200) }).parse(d))
-  .handler(async ({ data }) => {
-    const apiKey = process.env.LOVABLE_API_KEY;
-    if (!apiKey) throw new Error("LOVABLE_API_KEY belum di-set");
-    const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-      method: "POST",
-      headers: { "Content-Type": "application/json", Authorization: `Bearer ${apiKey}` },
-      body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
-        messages: [
-          {
-            role: "system",
-            content:
-              "Kamu coach fitness Indonesia. Jawab JSON array {name, sets, reps, rationale}.",
-          },
-          {
-            role: "user",
-            content: `Goal user: ${data.goal}. Berikan 5 latihan praktis di rumah, format JSON.`,
-          },
-        ],
-      }),
+  .handler(async ({ data, context }) => {
+    const { userId } = context;
+    const text = await callAiWithGuards({
+      userId,
+      feature: "exercises.recommend",
+      model: "google/gemini-2.5-flash",
+      messages: [
+        {
+          role: "system",
+          content:
+            "Kamu coach fitness Indonesia. Jawab JSON array {name, sets, reps, rationale}.",
+        },
+        {
+          role: "user",
+          content: `Goal user: ${data.goal}. Berikan 5 latihan praktis di rumah, format JSON.`,
+        },
+      ],
     });
-    if (!res.ok) throw new Error(`AI error: ${res.status}`);
-    const json = (await res.json()) as { choices?: { message?: { content?: string } }[] };
-    const text = json.choices?.[0]?.message?.content ?? "[]";
     const m = text.match(/\[[\s\S]*\]/);
     let plan: Record<string, string | number>[] = [];
     try {
