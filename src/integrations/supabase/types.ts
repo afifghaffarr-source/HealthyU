@@ -3354,6 +3354,7 @@ export type Database = {
           scan_reminder_enabled: boolean
           social_enabled: boolean
           system_enabled: boolean
+          timezone: string
           updated_at: string
           user_id: string
           water_end_time: string | null
@@ -3383,6 +3384,7 @@ export type Database = {
           scan_reminder_enabled?: boolean
           social_enabled?: boolean
           system_enabled?: boolean
+          timezone?: string
           updated_at?: string
           user_id: string
           water_end_time?: string | null
@@ -3412,6 +3414,7 @@ export type Database = {
           scan_reminder_enabled?: boolean
           social_enabled?: boolean
           system_enabled?: boolean
+          timezone?: string
           updated_at?: string
           user_id?: string
           water_end_time?: string | null
