@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
+import { Route as ResepRouteImport } from './routes/resep'
 import { Route as OlahragaRouteImport } from './routes/olahraga'
 import { Route as KaloriRouteImport } from './routes/kalori'
 import { Route as KalkulatorRouteImport } from './routes/kalkulator'
@@ -168,6 +169,11 @@ import { Route as AuthenticatedGroupsIdLeaderboardRouteImport } from './routes/_
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
   path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ResepRoute = ResepRouteImport.update({
+  id: '/resep',
+  path: '/resep',
   getParentRoute: () => rootRouteImport,
 } as any)
 const OlahragaRoute = OlahragaRouteImport.update({
@@ -1022,6 +1028,7 @@ export interface FileRoutesByFullPath {
   '/kalkulator': typeof KalkulatorRouteWithChildren
   '/kalori': typeof KaloriRouteWithChildren
   '/olahraga': typeof OlahragaRouteWithChildren
+  '/resep': typeof ResepRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/achievements': typeof AuthenticatedAchievementsRoute
   '/alarms': typeof AuthenticatedAlarmsRoute
@@ -1173,6 +1180,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/resep': typeof ResepRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/achievements': typeof AuthenticatedAchievementsRoute
   '/alarms': typeof AuthenticatedAlarmsRoute
@@ -1331,6 +1339,7 @@ export interface FileRoutesById {
   '/kalkulator': typeof KalkulatorRouteWithChildren
   '/kalori': typeof KaloriRouteWithChildren
   '/olahraga': typeof OlahragaRouteWithChildren
+  '/resep': typeof ResepRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/_authenticated/achievements': typeof AuthenticatedAchievementsRoute
   '/_authenticated/alarms': typeof AuthenticatedAlarmsRoute
@@ -1489,6 +1498,7 @@ export interface FileRouteTypes {
     | '/kalkulator'
     | '/kalori'
     | '/olahraga'
+    | '/resep'
     | '/sitemap.xml'
     | '/achievements'
     | '/alarms'
@@ -1640,6 +1650,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/auth'
+    | '/resep'
     | '/sitemap.xml'
     | '/achievements'
     | '/alarms'
@@ -1797,6 +1808,7 @@ export interface FileRouteTypes {
     | '/kalkulator'
     | '/kalori'
     | '/olahraga'
+    | '/resep'
     | '/sitemap.xml'
     | '/_authenticated/achievements'
     | '/_authenticated/alarms'
@@ -1955,6 +1967,7 @@ export interface RootRouteChildren {
   KalkulatorRoute: typeof KalkulatorRouteWithChildren
   KaloriRoute: typeof KaloriRouteWithChildren
   OlahragaRoute: typeof OlahragaRouteWithChildren
+  ResepRoute: typeof ResepRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   ApiChatStreamRoute: typeof ApiChatStreamRoute
   ApiPublicHooksDailyCoachRoute: typeof ApiPublicHooksDailyCoachRoute
@@ -1972,6 +1985,13 @@ declare module '@tanstack/react-router' {
       path: '/sitemap.xml'
       fullPath: '/sitemap.xml'
       preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/resep': {
+      id: '/resep'
+      path: '/resep'
+      fullPath: '/resep'
+      preLoaderRoute: typeof ResepRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/olahraga': {
@@ -3615,6 +3635,7 @@ const rootRouteChildren: RootRouteChildren = {
   KalkulatorRoute: KalkulatorRouteWithChildren,
   KaloriRoute: KaloriRouteWithChildren,
   OlahragaRoute: OlahragaRouteWithChildren,
+  ResepRoute: ResepRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   ApiChatStreamRoute: ApiChatStreamRoute,
   ApiPublicHooksDailyCoachRoute: ApiPublicHooksDailyCoachRoute,
