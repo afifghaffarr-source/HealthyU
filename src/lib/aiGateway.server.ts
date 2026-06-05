@@ -16,6 +16,8 @@ export type CallAiOptions = {
   timeoutMs?: number;
   /** Skip rate-limit (use only for trusted internal jobs). */
   skipBudget?: boolean;
+  /** If "json_object", asks the gateway to return strict JSON. */
+  responseFormat?: "json_object";
 };
 
 export class AiGatewayError extends Error {
@@ -62,7 +64,13 @@ export async function callAiWithGuards(opts: CallAiOptions): Promise<string> {
         "Content-Type": "application/json",
         Authorization: `Bearer ${apiKey}`,
       },
-      body: JSON.stringify({ model, messages: opts.messages }),
+      body: JSON.stringify({
+        model,
+        messages: opts.messages,
+        ...(opts.responseFormat
+          ? { response_format: { type: opts.responseFormat } }
+          : {}),
+      }),
       signal: ctrl.signal,
     });
   } catch (e) {
@@ -97,4 +105,19 @@ export async function callAiWithGuards(opts: CallAiOptions): Promise<string> {
   });
 
   return content;
+}
+
+/**
+ * Same as callAiWithGuards but parses JSON response.
+ * Forces response_format: json_object. Returns {} on parse failure.
+ */
+export async function callAiJsonWithGuards<T = Record<string, unknown>>(
+  opts: Omit<CallAiOptions, "responseFormat">,
+): Promise<T> {
+  const text = await callAiWithGuards({ ...opts, responseFormat: "json_object" });
+  try {
+    return JSON.parse(text || "{}") as T;
+  } catch {
+    return {} as T;
+  }
 }
