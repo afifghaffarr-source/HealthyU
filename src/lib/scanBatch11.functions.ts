@@ -1,7 +1,46 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { callAiJsonWithGuards } from "@/lib/aiGateway.server";
+import { callAiJsonWithSchema } from "@/lib/aiGateway.server";
+
+const BudgetPlanSchema = z
+  .object({
+    days: z
+      .array(
+        z
+          .object({
+            day: z.union([z.string(), z.number()]).optional(),
+            meals: z
+              .array(
+                z
+                  .object({
+                    name: z.string().default(""),
+                    est_idr: z.number().optional(),
+                    calories: z.number().optional(),
+                  })
+                  ,
+              )
+              .default([]),
+          })
+          ,
+      )
+      .default([]),
+  })
+  ;
+
+const FridgeRecipesSchema = z
+  .object({
+    ingredients: z.array(z.string()).default([]),
+    recipes: z
+      .array(
+        z.object({
+          name: z.string().default(""),
+          steps: z.array(z.string()).default([]),
+        }),
+      )
+      .default([]),
+  })
+  ;
 
 // Sleep diary
 export const upsertSleepDiary = createServerFn({ method: "POST" })
@@ -139,9 +178,11 @@ export const generateBudgetMealPlan = createServerFn({ method: "POST" })
       .parse(d),
   )
   .handler(async ({ data, context }) => {
-    const parsed = await callAiJsonWithGuards({
+    const parsed = await callAiJsonWithSchema({
       userId: context.userId,
       feature: "mealplan.budget",
+      schema: BudgetPlanSchema,
+      fallback: { days: [] },
       messages: [
         {
           role: "system",
@@ -171,12 +212,11 @@ export const recipeFromFridge = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d) => z.object({ imageBase64: z.string().min(10) }).parse(d))
   .handler(async ({ data, context }) => {
-    const result = await callAiJsonWithGuards<{
-      ingredients?: string[];
-      recipes?: { name: string; steps: string[] }[];
-    }>({
+    const result = await callAiJsonWithSchema({
       userId: context.userId,
       feature: "recipe.from_fridge",
+      schema: FridgeRecipesSchema,
+      fallback: { ingredients: [], recipes: [] },
       messages: [
         {
           role: "user",

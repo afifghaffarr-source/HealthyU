@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { callAiJsonWithGuards } from "./aiGateway.server";
+import { callAiJsonWithSchema } from "./aiGateway.server";
 
 const SYSTEM = `Anda adalah AI Food Recognition untuk makanan Indonesia.
 Diberikan satu foto, identifikasi SEMUA makanan & minuman yang terlihat.
@@ -35,19 +35,22 @@ const ScanInput = z.object({
   use_pro: z.boolean().optional(),
 });
 
-type ScanItem = {
-  name: string;
-  name_en?: string;
-  portion_g?: number;
-  portion_ml?: number;
-  confidence: number;
-  calories: number;
-  protein_g: number;
-  carbs_g: number;
-  fat_g: number;
-  notes?: string;
-  matched_food_id?: string | null;
-};
+const ScanItemSchema = z
+  .object({
+    name: z.string().default(""),
+    name_en: z.string().optional(),
+    portion_g: z.number().optional(),
+    portion_ml: z.number().optional(),
+    confidence: z.coerce.number().default(0),
+    calories: z.coerce.number().default(0),
+    protein_g: z.coerce.number().default(0),
+    carbs_g: z.coerce.number().default(0),
+    fat_g: z.coerce.number().default(0),
+    notes: z.string().optional(),
+  })
+  ;
+const ScanResultSchema = z.object({ items: z.array(ScanItemSchema).default([]) });
+type ScanItem = z.infer<typeof ScanItemSchema> & { matched_food_id?: string | null };
 
 export const recognizeFood = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
@@ -57,11 +60,13 @@ export const recognizeFood = createServerFn({ method: "POST" })
     const { supabase, userId } = context;
     const model = data.use_pro ? "google/gemini-2.5-pro" : "google/gemini-2.5-flash";
 
-    const parsed = await callAiJsonWithGuards<{ items?: ScanItem[] }>({
+    const parsed = await callAiJsonWithSchema({
       userId,
       feature: "scan.food.recognize",
       model,
       isPremium: !!data.use_pro,
+      schema: ScanResultSchema,
+      fallback: { items: [] },
       messages: [
         { role: "system", content: SYSTEM },
         {

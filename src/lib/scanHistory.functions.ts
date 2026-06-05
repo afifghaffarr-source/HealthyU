@@ -1,7 +1,12 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { callAiJsonWithGuards } from "@/lib/aiGateway.server";
+import { callAiJsonWithSchema } from "@/lib/aiGateway.server";
+
+const InsightsSchema = z.object({
+  summary: z.string().default(""),
+  tips: z.array(z.string()).default([]),
+});
 
 export const listScanHistory = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
@@ -120,15 +125,17 @@ export const getDailyInsights = createServerFn({ method: "GET" })
     };
     const prompt = `Rata-rata harian 7 hari terakhir: ${avg.cal} kkal, P:${avg.p}g, K:${avg.c}g, L:${avg.f}g. Total ${rows.length} meal log dari ${days} hari. Berikan ringkasan singkat (1 kalimat) + 3 tips actionable dalam Bahasa Indonesia. Format JSON: {"summary":"...","tips":["...","...","..."]}`;
     try {
-      const parsed = await callAiJsonWithGuards<{ summary?: string; tips?: string[] }>({
+      const parsed = await callAiJsonWithSchema({
         userId,
         feature: "scan.history.summary",
         model: "google/gemini-2.5-flash",
+        schema: InsightsSchema,
+        fallback: { summary: "", tips: [] },
         messages: [{ role: "user", content: prompt }],
       });
       return {
-        summary: parsed.summary ?? `Rata-rata ${avg.cal} kkal/hari`,
-        tips: Array.isArray(parsed.tips) ? parsed.tips.slice(0, 5) : [],
+        summary: parsed.summary || `Rata-rata ${avg.cal} kkal/hari`,
+        tips: parsed.tips.slice(0, 5),
       };
     } catch {
       return { summary: `Rata-rata ${avg.cal} kkal/hari`, tips: [] as string[] };

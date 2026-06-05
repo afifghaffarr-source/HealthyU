@@ -1,6 +1,17 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { callAiJsonWithGuards } from "@/lib/aiGateway.server";
+import { z } from "zod";
+import { callAiJsonWithSchema } from "@/lib/aiGateway.server";
+
+const CoachSchema = z
+  .object({
+    greeting: z.string().default("Selamat pagi!"),
+    focus: z.string().default("Jaga konsistensi hari ini."),
+    summary: z.string().default(""),
+    tips: z.array(z.string()).default([]),
+    warnings: z.array(z.string()).default([]),
+  })
+  ;
 
 type CoachOutput = {
   greeting: string;
@@ -106,21 +117,22 @@ export const dailyCoach = createServerFn({ method: "POST" })
   "warnings": ["0-2 peringatan halus jika ada pola tidak sehat, kosongkan jika tidak ada"]
 }`;
 
-    const parsed = await callAiJsonWithGuards<Partial<CoachOutput>>({
+    const parsed = await callAiJsonWithSchema({
       userId,
       feature: "coach.daily",
       model: "google/gemini-3-flash-preview",
+      schema: CoachSchema,
+      fallback: {
+        greeting: "Selamat pagi!",
+        focus: "Jaga konsistensi hari ini.",
+        summary: "",
+        tips: [],
+        warnings: [],
+      },
       messages: [
         { role: "system", content: sysPrompt },
         { role: "user", content: userPrompt },
       ],
     });
-    return {
-      greeting: parsed.greeting ?? "Selamat pagi!",
-      focus: parsed.focus ?? "Jaga konsistensi hari ini.",
-      summary: parsed.summary ?? "",
-      tips: Array.isArray(parsed.tips) ? parsed.tips : [],
-      warnings: Array.isArray(parsed.warnings) ? parsed.warnings : [],
-      generated_at: new Date().toISOString(),
-    };
+    return { ...parsed, generated_at: new Date().toISOString() };
   });

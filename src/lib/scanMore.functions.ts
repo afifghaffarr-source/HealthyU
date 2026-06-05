@@ -1,7 +1,18 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { callAiWithGuards, callAiJsonWithGuards } from "@/lib/aiGateway.server";
+import { callAiWithGuards, callAiJsonWithSchema } from "@/lib/aiGateway.server";
+
+const MealTagsSchema = z
+  .object({
+    halal: z.union([z.boolean(), z.null()]).optional(),
+    vegan: z.boolean().optional(),
+    vegetarian: z.boolean().optional(),
+    allergens: z.array(z.string()).default([]),
+    allergy_warning: z.union([z.string(), z.null()]).optional(),
+    translated_name: z.union([z.string(), z.null()]).optional(),
+  })
+  ;
 
 // ============ 1, 12, 13: streak + achievements + coins ============
 export const recordScanGameify = createServerFn({ method: "POST" })
@@ -200,17 +211,12 @@ export const classifyMealTags = createServerFn({ method: "POST" })
     const prompt = `Makanan: "${data.name}". User allergies: ${allergies}. Diet: ${diet}.${
       data.translate_to ? ` Terjemahkan name ke kode bahasa "${data.translate_to}".` : ""
     } Balas JSON {"halal":true|false|null,"vegan":true|false,"vegetarian":true|false,"allergens":["..."],"allergy_warning":"...|null","translated_name":"...|null"}`;
-    return await callAiJsonWithGuards<{
-      halal?: boolean | null;
-      vegan?: boolean;
-      vegetarian?: boolean;
-      allergens?: string[];
-      allergy_warning?: string | null;
-      translated_name?: string | null;
-    }>({
+    return await callAiJsonWithSchema({
       userId,
       feature: "meal.classify.tags",
       model: "google/gemini-2.5-flash",
+      schema: MealTagsSchema,
+      fallback: { allergens: [] },
       messages: [{ role: "user", content: prompt }],
     });
   });

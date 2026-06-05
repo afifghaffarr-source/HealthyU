@@ -2,7 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
-import { callAiJsonWithGuards } from "@/lib/aiGateway.server";
+import { callAiJsonWithSchema } from "@/lib/aiGateway.server";
 
 export const getFoodAlternatives = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
@@ -38,15 +38,22 @@ export const getFoodAlternatives = createServerFn({ method: "GET" })
       .filter((x): x is NonNullable<typeof x> => x !== null);
   });
 
+const ReasonsSchema = z.object({
+  reasons: z
+    .array(z.object({ id: z.string().optional(), reason: z.string().optional() }))
+    .default([]),
+});
 const callGeminiJSON = (
   messages: Array<{ role: "system" | "user" | "assistant"; content: string }>,
   userId: string | null,
 ) =>
-  callAiJsonWithGuards({
+  callAiJsonWithSchema({
     userId,
     feature: "food.alternatives.reasons",
     messages,
     model: "google/gemini-3-flash-preview",
+    schema: ReasonsSchema,
+    fallback: { reasons: [] },
   });
 
 export const regenerateAlternativeReasons = createServerFn({ method: "POST" })
@@ -121,7 +128,7 @@ Output JSON: { "reasons": [{ "id": "<alt_id>", "reason": "..." }] }`;
       { role: "system", content: "Kamu adalah ahli gizi. Balas hanya JSON valid." },
       { role: "user", content: prompt },
     ], userId);
-    const arr = (parsed?.reasons as Array<{ id?: string; reason?: string }> | undefined) ?? [];
+    const arr = parsed.reasons;
 
     let updated = 0;
     for (const r of arr) {
