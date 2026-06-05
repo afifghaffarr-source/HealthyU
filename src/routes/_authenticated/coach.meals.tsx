@@ -69,6 +69,7 @@ function Page() {
             onClick={send}
             disabled={mut.isPending || !input.trim()}
             className="size-9 rounded-xl bg-primary text-primary-foreground grid place-items-center disabled:opacity-50"
+            aria-label="Kirim"
           >
             <Send className="size-4" />
           </button>

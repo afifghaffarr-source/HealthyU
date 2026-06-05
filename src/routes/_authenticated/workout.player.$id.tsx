@@ -76,7 +76,7 @@ function WorkoutPlayer() {
   const upNext = playlist[idx + 1];
 
   return (
-    <div className="min-h-screen pb-28 px-4">
+    <div className="min-h-dvh pb-28 px-4">
       <TopAppBar title={`Workout #${id}`} subtitle={`${idx + 1}/${playlist.length}`} showBack />
       <div className="mt-6 flex flex-col items-center gap-4">
         <p

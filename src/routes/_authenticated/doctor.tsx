@@ -69,6 +69,7 @@ function Page() {
             onClick={send}
             disabled={mut.isPending}
             className="rounded-xl bg-primary text-primary-foreground px-3 py-2"
+            aria-label="Kirim pesan"
           >
             <Send className="size-4" />
           </button>

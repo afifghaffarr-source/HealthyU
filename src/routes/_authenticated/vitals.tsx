@@ -204,7 +204,7 @@ function VitalsPage() {
   const bpMin = Math.min(60, ...recentBp.map((r) => r.diastolic ?? 0));
 
   return (
-    <main className="min-h-screen bg-background pb-28">
+    <main className="min-h-dvh bg-background pb-28">
       <div className="max-w-md mx-auto px-5 pt-2 space-y-5">
         <TopAppBar
           title="Vital Signs"

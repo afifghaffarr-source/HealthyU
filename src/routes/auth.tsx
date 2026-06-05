@@ -68,7 +68,7 @@ function AuthPage() {
   };
 
   return (
-    <main className="min-h-screen bg-background flex flex-col">
+    <main className="min-h-dvh bg-background flex flex-col">
       <div className="max-w-md w-full mx-auto px-6 pt-12 pb-8 flex-1 flex flex-col">
         <Link
           to="/"

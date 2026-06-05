@@ -122,7 +122,7 @@ function Onboarding() {
     });
 
   return (
-    <main className="min-h-screen bg-background px-6 py-10 max-w-md mx-auto">
+    <main className="min-h-dvh bg-background px-6 py-10 max-w-md mx-auto">
       <div className="flex gap-1.5 mb-8">
         {Array.from({ length: TOTAL_STEPS }, (_, idx) => idx + 1).map((i) => (
           <div

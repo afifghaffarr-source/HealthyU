@@ -86,7 +86,7 @@ function WaterPage() {
   const maxWeek = Math.max(GOAL_ML, ...week.map((d) => d.total_ml));
 
   return (
-    <div className="min-h-screen bg-background pb-28">
+    <div className="min-h-dvh bg-background pb-28">
       <div className="max-w-md mx-auto px-4">
         <TopAppBar
           title="Hidrasi"

@@ -412,7 +412,7 @@ function Index() {
   };
 
   return (
-    <main className="min-h-screen bg-background text-foreground relative overflow-x-clip">
+    <main className="min-h-dvh bg-background text-foreground relative overflow-x-clip">
       {confetti && (
         <div aria-hidden className="pointer-events-none fixed inset-0 z-50 overflow-hidden">
           {Array.from({ length: 60 }).map((_, i) => (

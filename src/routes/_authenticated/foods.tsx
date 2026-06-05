@@ -269,7 +269,7 @@ function FoodDetailSheet({
       >
         <div className="flex items-center justify-between mb-3">
           <h2 className="font-bold text-lg">{loading ? "Memuat..." : food?.name}</h2>
-          <button onClick={onClose} className="p-1 rounded-full hover:bg-muted">
+          <button onClick={onClose} className="p-1 rounded-full hover:bg-muted" aria-label="Tutup">
             <X className="size-5" />
           </button>
         </div>

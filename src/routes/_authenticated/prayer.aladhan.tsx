@@ -88,7 +88,7 @@ function AladhanPage() {
   const next = upcoming ?? filtered[0];
 
   return (
-    <div className="min-h-screen pb-28 px-4 bg-background">
+    <div className="min-h-dvh pb-28 px-4 bg-background">
       <TopAppBar title="Jadwal Sholat (Aladhan)" showBack />
       <div className="mt-4 space-y-3">
         {loading && <p className="text-sm text-muted-foreground">Memuat lokasi & jadwal...</p>}

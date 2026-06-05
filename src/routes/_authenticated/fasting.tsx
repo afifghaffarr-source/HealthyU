@@ -92,7 +92,7 @@ function FastingPage() {
   const pct = fast ? Math.min(100, (elapsedHrs / Number(fast.target_hours)) * 100) : 0;
 
   return (
-    <main className="min-h-screen bg-background pb-28">
+    <main className="min-h-dvh bg-background pb-28">
       <div className="max-w-md mx-auto px-5 pt-2 space-y-5">
         <TopAppBar title="Puasa" subtitle="Atur protokol & jadwal" showBack />
 

@@ -72,7 +72,7 @@ function WeightPage() {
   const range = Math.max(max - min, 1);
 
   return (
-    <div className="min-h-screen bg-background pb-24">
+    <div className="min-h-dvh bg-background pb-24">
       <div className="max-w-md mx-auto px-4">
         <TopAppBar
           title="Berat Badan"
