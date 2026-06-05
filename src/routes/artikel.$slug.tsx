@@ -1,7 +1,5 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import ReactMarkdown from "react-markdown";
-import remarkGfm from "remark-gfm";
-import rehypeSanitize from "rehype-sanitize";
+import { SafeMarkdown } from "@/components/SafeMarkdown";
 import { canonical, SITE_NAME } from "@/lib/seo";
 import { getSeoArticle } from "@/features/content/lib/seoContent.functions";
 
@@ -111,9 +109,7 @@ function ArtikelDetail() {
         </p>
       </header>
       <article className="prose prose-sm sm:prose-base dark:prose-invert max-w-none">
-        <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeSanitize]}>
-          {a.content}
-        </ReactMarkdown>
+        <SafeMarkdown>{a.content}</SafeMarkdown>
       </article>
       {a.tags && a.tags.length > 0 && (
         <footer className="mt-8 flex flex-wrap gap-2">
