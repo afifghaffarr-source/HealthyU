@@ -34,29 +34,39 @@ export function ChatQuickActions({
   sendDisabled: boolean;
 }) {
   return (
-    <div className="flex gap-2 overflow-x-auto pt-2 -mx-1 px-1 pb-1 no-scrollbar">
+    <div
+      className="-mx-1 flex min-w-0 gap-2 overflow-x-auto px-1 pb-1 pt-2 no-scrollbar [scrollbar-width:none]"
+      style={{ WebkitOverflowScrolling: "touch", touchAction: "pan-x" }}
+    >
       <button
         onClick={onReport}
         disabled={reportPending}
-        className="flex items-center gap-1.5 bg-primary/10 outline-1 outline-primary/30 text-primary px-3 py-2 rounded-2xl text-xs font-semibold whitespace-nowrap disabled:opacity-50"
+        className="shrink-0 rounded-2xl bg-primary/10 px-3 py-2 text-xs font-semibold whitespace-nowrap text-primary outline-1 outline-primary/30 disabled:opacity-50"
       >
-        <BarChart3 className="size-3.5" />
-        {reportPending ? "Membuat..." : "Laporan Mingguan"}
+        <span className="flex items-center gap-1.5">
+          <BarChart3 className="size-3.5" />
+          {reportPending ? "Membuat..." : "Laporan Mingguan"}
+        </span>
       </button>
       {QUICK_ACTIONS.map((a) => {
         const Icon = a.icon;
         const content = (
-          <span className="flex items-center gap-1.5 bg-card outline-1 outline-black/10 px-3 py-2 rounded-2xl text-xs font-medium whitespace-nowrap hover:bg-secondary/40 transition">
+          <span className="flex shrink-0 items-center gap-1.5 rounded-2xl bg-card px-3 py-2 text-xs font-medium whitespace-nowrap outline-1 outline-black/10 transition hover:bg-secondary/40">
             <Icon className="size-3.5 text-primary" />
             {a.label}
           </span>
         );
         return "to" in a ? (
-          <Link key={a.label} to={a.to}>
+          <Link key={a.label} to={a.to} className="shrink-0">
             {content}
           </Link>
         ) : (
-          <button key={a.label} onClick={() => onPrompt(a.prompt)} disabled={sendDisabled}>
+          <button
+            key={a.label}
+            onClick={() => onPrompt(a.prompt)}
+            disabled={sendDisabled}
+            className="shrink-0"
+          >
             {content}
           </button>
         );
