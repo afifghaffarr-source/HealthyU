@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import {
@@ -30,6 +30,8 @@ export function ChatPage() {
   const [imageData, setImageData] = useState<ImageData | null>(null);
   const [streaming, setStreaming] = useState<string | null>(null);
   const endRef = useRef<HTMLDivElement>(null);
+  const dockRef = useRef<HTMLDivElement>(null);
+  const [dockHeight, setDockHeight] = useState(224);
 
   const mutation = useMutation({
     mutationFn: async (payload: { message: string; imageBase64?: string; imageMime?: string }) => {
@@ -137,6 +139,17 @@ export function ChatPage() {
     speech.speak(last.id, last.content);
   }, [messages, speech]);
 
+  useLayoutEffect(() => {
+    const updateDockHeight = () => {
+      const next = dockRef.current?.offsetHeight ?? 0;
+      setDockHeight(next > 0 ? next : 224);
+    };
+
+    updateDockHeight();
+    window.addEventListener("resize", updateDockHeight);
+    return () => window.removeEventListener("resize", updateDockHeight);
+  }, [input, imageData, messages.length, mutation.isPending]);
+
   return (
     <main className="min-h-dvh bg-background">
       <div className="max-w-md w-full mx-auto px-5 pt-0">
@@ -174,7 +187,7 @@ export function ChatPage() {
         />
       </div>
 
-      <div className="max-w-md w-full mx-auto px-5 pb-[12.5rem]">
+      <div className="max-w-md w-full mx-auto px-5" style={{ paddingBottom: `calc(${dockHeight}px + 2rem)` }}>
         <ChatQuickActions
           onPrompt={(t) => handleSend(t)}
           onReport={() => reportMut.mutate()}
@@ -192,7 +205,10 @@ export function ChatPage() {
         <div ref={endRef} className="h-1" aria-hidden="true" />
       </div>
 
-      <div className="fixed inset-x-0 bottom-0 z-30 border-t border-border/50 bg-background/98 backdrop-blur supports-[backdrop-filter]:bg-background/92">
+      <div
+        ref={dockRef}
+        className="fixed inset-x-0 bottom-0 z-30 border-t border-border/50 bg-background/98 backdrop-blur supports-[backdrop-filter]:bg-background/92"
+      >
         <div className="max-w-md mx-auto px-4 pt-3 pb-24 space-y-3">
           {messages.length > 0 && (
             <section className="space-y-2">
