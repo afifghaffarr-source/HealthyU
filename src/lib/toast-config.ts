@@ -23,6 +23,10 @@ export const toast = Object.assign(
 /**
  * Helper untuk menampilkan error toast dari nilai unknown (mis. error mutasi).
  * Menggantikan pola berulang `toast.error(e instanceof Error ? e.message : "Gagal")`.
+ *
+ * Mendeteksi pola error AI gateway (429 / 402 / 503 / 504 / timeout) dan
+ * memetakan ke severity + microcopy ramah pengguna. Untuk non-AI error,
+ * tampilkan pesan asli (atau fallback) sebagai toast.error standar.
  */
 export function toastError(e: unknown, fallback = "Gagal"): void {
   const msg =
@@ -31,5 +35,42 @@ export function toastError(e: unknown, fallback = "Gagal"): void {
       : typeof e === "string"
         ? e
         : fallback;
-  sonnerToast.error(msg || fallback, { duration: 3500 });
+  const final = msg || fallback;
+  const lower = final.toLowerCase();
+
+  // Rate limit (AI gateway 429)
+  if (
+    lower.includes("batas ai") ||
+    lower.includes("rate-limit") ||
+    lower.includes("terlalu banyak") ||
+    lower.includes(" 429")
+  ) {
+    sonnerToast.warning(final, {
+      description: "Progress kecil tetap progress — istirahat sebentar ya.",
+      duration: 4000,
+    });
+    return;
+  }
+  // Credit habis (402)
+  if (lower.includes("kredit ai") || lower.includes(" 402")) {
+    sonnerToast.error("Kredit AI sedang habis", {
+      description: "Tim kami sudah diberi tahu. Coba lagi nanti.",
+      duration: 4500,
+    });
+    return;
+  }
+  // Busy / timeout (503 / 504)
+  if (
+    lower.includes("timeout") ||
+    lower.includes("sedang sibuk") ||
+    lower.includes(" 503") ||
+    lower.includes(" 504")
+  ) {
+    sonnerToast.error("Layanan AI sedang sibuk", {
+      description: "Coba lagi sebentar lagi.",
+      duration: 4000,
+    });
+    return;
+  }
+  sonnerToast.error(final, { duration: 3500 });
 }
