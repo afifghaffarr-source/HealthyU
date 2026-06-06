@@ -1,4 +1,10 @@
-import { NumberField, type OnboardingForm, primaryBtn, secondaryBtn } from "./onboardingShared";
+import {
+  NumberField,
+  WhyAskDisclosure,
+  type OnboardingForm,
+  primaryBtn,
+  secondaryBtn,
+} from "./onboardingShared";
 
 export function StepBody({
   form,
@@ -43,6 +49,10 @@ export function StepBody({
       <p className="text-[11px] text-muted-foreground px-1">
         Tidak ada target “sempurna”. Fokus ke konsistensi, bukan angka.
       </p>
+      <WhyAskDisclosure>
+        Tinggi & berat dipakai untuk menghitung kebutuhan kalori harianmu (BMR & TDEE). Data
+        tersimpan privat di akunmu dan bisa diubah kapan saja.
+      </WhyAskDisclosure>
       <div className="grid grid-cols-2 gap-3 pt-4">
         <button onClick={onBack} className={secondaryBtn}>
           Kembali

@@ -1,4 +1,6 @@
 import type { ActivityLevel } from "@/lib/health";
+import { useState } from "react";
+import { HelpCircle, ChevronDown } from "lucide-react";
 
 export type Goal = "lose" | "maintain" | "gain";
 
@@ -94,5 +96,37 @@ export function NumberField({
         className="mt-1.5 w-full bg-card outline-1 outline-black/10 rounded-2xl px-4 py-3.5 tabular-nums"
       />
     </label>
+  );
+}
+
+/**
+ * Inline disclosure: "Kenapa kami tanya ini?" → expands to a short, friendly
+ * explanation. Helps onboarding transparency without crowding the layout.
+ */
+export function WhyAskDisclosure({ children }: { children: React.ReactNode }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <div className="rounded-2xl bg-muted/40 dark:bg-muted/20 px-3 py-2">
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        aria-expanded={open}
+        className="w-full inline-flex items-center justify-between gap-2 text-[12px] font-medium text-muted-foreground hover:text-foreground transition"
+      >
+        <span className="inline-flex items-center gap-1.5">
+          <HelpCircle className="size-3.5 text-primary" aria-hidden />
+          Kenapa kami tanya ini?
+        </span>
+        <ChevronDown
+          className={`size-3.5 transition-transform ${open ? "rotate-180" : ""}`}
+          aria-hidden
+        />
+      </button>
+      {open && (
+        <div className="mt-1.5 text-[12px] leading-relaxed text-muted-foreground">
+          {children}
+        </div>
+      )}
+    </div>
   );
 }
