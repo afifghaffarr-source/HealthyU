@@ -41,8 +41,7 @@ export function QuickActionFab() {
           </span>
           <span>Log cepat</span>
         </button>
-        {open && (
-          ACTIONS.map((a, i) => (
+        {open && ACTIONS.map((a, i) => (
             <Link
               key={a.to}
               to={a.to}
@@ -59,7 +58,7 @@ export function QuickActionFab() {
                 <a.icon className="size-5" />
               </span>
             </Link>
-          ))}
+        ))}
         <button
           onClick={() => setOpen((v) => !v)}
           aria-label={open ? "Tutup aksi cepat" : "Buka aksi cepat"}
