@@ -56,7 +56,7 @@ export function ChatComposer({
           </button>
         </div>
       )}
-      <div className="flex items-center gap-2 rounded-[1.75rem] border border-border/60 bg-card px-2 py-2">
+      <div className="flex items-end gap-2 rounded-[1.75rem] border border-border/60 bg-card px-2 py-2 shadow-sm">
         <input
           ref={fileRef}
           type="file"
@@ -77,10 +77,15 @@ export function ChatComposer({
         >
           <ImagePlus className="size-4" />
         </button>
-        <input
+        <textarea
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          onKeyDown={(e) => e.key === "Enter" && onSend()}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" && !e.shiftKey) {
+              e.preventDefault();
+              onSend();
+            }
+          }}
           placeholder={
             listening
               ? "Mendengarkan..."
@@ -89,7 +94,8 @@ export function ChatComposer({
                 : "Tanya HealthyU AI Coach..."
           }
           disabled={pending}
-          className="flex-1 bg-transparent px-3 py-2.5 text-sm focus:outline-none disabled:opacity-50"
+          rows={1}
+          className="max-h-32 min-h-[2.75rem] flex-1 resize-none bg-transparent px-3 py-2.5 text-sm leading-5 focus:outline-none disabled:opacity-50"
         />
         <button
           onClick={onToggleMic}
