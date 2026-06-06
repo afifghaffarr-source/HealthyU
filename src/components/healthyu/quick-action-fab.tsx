@@ -70,7 +70,8 @@ export function QuickActionFab() {
           type="button"
           onClick={() => setOpen((v) => !v)}
           aria-label={open ? "Tutup aksi cepat" : "Buka aksi cepat"}
-          className="size-14 rounded-full bg-gradient-to-br from-primary to-primary-dark text-primary-foreground shadow-xl shadow-primary/40 grid place-items-center hover:scale-105 transition-transform"
+          aria-expanded={open}
+          className="grid size-14 place-items-center rounded-full border border-primary/20 bg-gradient-to-br from-primary to-primary-dark text-primary-foreground shadow-xl shadow-primary/35 transition-transform hover:scale-105"
         >
           {open ? <X className="size-6" /> : <Plus className="size-6" />}
         </button>
