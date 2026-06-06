@@ -22,6 +22,27 @@ export function QuickActionFab() {
     return null;
   }
 
+  if (isChat) {
+    return (
+      <>
+        <div className="fixed bottom-[6.1rem] right-4 z-40 lg:bottom-6">
+          <button
+            type="button"
+            onClick={() => setSheetOpen(true)}
+            aria-label="Buka log cepat"
+            className="inline-flex h-12 items-center gap-2 rounded-full border border-border/60 bg-card px-4 text-sm font-semibold text-foreground shadow-lg backdrop-blur transition-transform hover:scale-[1.02]"
+          >
+            <span className="inline-flex size-8 items-center justify-center rounded-full bg-primary/12 text-primary">
+              <Zap className="size-4" />
+            </span>
+            <span>Log cepat</span>
+          </button>
+        </div>
+        <QuickLogSheet open={sheetOpen} onOpenChange={setSheetOpen} />
+      </>
+    );
+  }
+
   return (
     <>
       {open && (
