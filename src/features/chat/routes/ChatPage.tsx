@@ -8,7 +8,7 @@ import {
 } from "@/features/chat/lib/chat.functions";
 import { supabase } from "@/integrations/supabase/client";
 import { BottomNav } from "@/components/bottom-nav";
-import { ArrowUp, Trash2, Volume2, VolumeX, Zap } from "lucide-react";
+import { ArrowUp, Trash2, Volume2, VolumeX } from "lucide-react";
 import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { toast } from "sonner";
 import { toastError } from "@/lib/toast-config";
@@ -18,7 +18,7 @@ import { ChatEmptyState, ChatMessages } from "@/features/chat/components/ChatMes
 import { ChatComposer, type ImageData } from "@/features/chat/components/ChatComposer";
 import { SafetyChip } from "@/components/healthyu/safety-chip";
 import { CoachPromptChips } from "@/features/chat/components/CoachPromptChips";
-import { QuickLogSheet } from "@/components/healthyu/quick-log-sheet";
+import { cn } from "@/lib/utils";
 
 export function ChatPage() {
   const qc = useQueryClient();
@@ -30,7 +30,7 @@ export function ChatPage() {
   const [input, setInput] = useState("");
   const [imageData, setImageData] = useState<ImageData | null>(null);
   const [streaming, setStreaming] = useState<string | null>(null);
-  const [quickLogOpen, setQuickLogOpen] = useState(false);
+  const [showScrollUp, setShowScrollUp] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const scrollChatToTop = () => {
@@ -143,6 +143,16 @@ export function ChatPage() {
     speech.speak(last.id, last.content);
   }, [messages, speech]);
 
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+
+    const onScroll = () => setShowScrollUp(el.scrollTop > 260);
+    onScroll();
+    el.addEventListener("scroll", onScroll, { passive: true });
+    return () => el.removeEventListener("scroll", onScroll);
+  }, []);
+
   return (
     <main className="min-h-dvh bg-background flex flex-col">
       <div className="max-w-md w-full mx-auto px-5 pt-0">
@@ -182,7 +192,7 @@ export function ChatPage() {
 
       <div
         ref={scrollRef}
-        className={`flex-1 overflow-y-auto max-w-md w-full mx-auto px-5 ${imageData ? "pb-[21.5rem]" : "pb-[18rem]"}`}
+        className="flex-1 overflow-y-auto max-w-md w-full mx-auto px-5 pb-6"
       >
         <ChatQuickActions
           onPrompt={(t) => handleSend(t)}
@@ -200,60 +210,46 @@ export function ChatPage() {
         />
       </div>
 
-      <div className="fixed bottom-24 inset-x-0 z-30 px-4 pb-2">
-        <div className="max-w-md mx-auto rounded-[2rem] border border-border/60 bg-background/95 shadow-xl backdrop-blur-xl">
-          <div className="px-3 pt-3 pb-3 space-y-3">
-            <div className="flex items-center justify-between gap-2">
-              <SafetyChip variant="not-medical" className="shadow-none" />
-              <div className="flex items-center gap-2">
-                <button
-                  type="button"
-                  onClick={scrollChatToTop}
-                  className="inline-flex size-9 items-center justify-center rounded-full border border-border/60 bg-card text-muted-foreground hover:bg-secondary/40 hover:text-foreground transition"
-                  aria-label="Scroll ke atas"
-                >
-                  <ArrowUp className="size-4" />
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setQuickLogOpen(true)}
-                  className="inline-flex min-h-9 items-center gap-1.5 rounded-full border border-border/60 bg-card px-3 text-xs font-semibold text-foreground hover:bg-secondary/40 transition"
-                >
-                  <Zap className="size-3.5 text-primary" />
-                  Log cepat
-                </button>
-              </div>
-            </div>
-
-            {messages.length > 0 && (
-              <div className="space-y-2">
-                <div className="flex items-center justify-between gap-2 px-1">
-                  <p className="text-[11px] font-medium text-muted-foreground">Saran cepat</p>
-                  <p className="text-[11px] text-muted-foreground">Geser untuk lihat semua</p>
-                </div>
-                <CoachPromptChips
-                  onPick={(t) => handleSend(t)}
-                  disabled={mutation.isPending}
-                  hour={new Date().getHours()}
-                />
-              </div>
-            )}
-
-            <ChatComposer
-              input={input}
-              setInput={setInput}
-              imageData={imageData}
-              setImageData={setImageData}
-              onSend={() => handleSend()}
-              pending={mutation.isPending}
-              listening={speech.listening}
-              onToggleMic={speech.toggleMic}
+      <div className="w-full shrink-0 border-t border-border/50 bg-background/98">
+        <div className="max-w-md mx-auto px-4 pt-3 pb-24 space-y-3">
+          {messages.length > 0 && (
+            <CoachPromptChips
+              onPick={(t) => handleSend(t)}
+              disabled={mutation.isPending}
+              hour={new Date().getHours()}
             />
+          )}
+
+          <div className="flex justify-center">
+            <SafetyChip variant="not-medical" className="shadow-none" />
           </div>
+
+          <ChatComposer
+            input={input}
+            setInput={setInput}
+            imageData={imageData}
+            setImageData={setImageData}
+            onSend={() => handleSend()}
+            pending={mutation.isPending}
+            listening={speech.listening}
+            onToggleMic={speech.toggleMic}
+          />
         </div>
       </div>
 
-      <QuickLogSheet open={quickLogOpen} onOpenChange={setQuickLogOpen} />
+      <button
+        type="button"
+        onClick={scrollChatToTop}
+        aria-label="Scroll ke atas"
+        className={cn(
+          "fixed bottom-[10.75rem] left-4 z-40 inline-flex h-11 w-11 items-center justify-center rounded-full border border-border/60 bg-card shadow-lg backdrop-blur transition-all duration-300 lg:bottom-6 lg:left-auto lg:right-20",
+          showScrollUp
+            ? "pointer-events-auto translate-y-0 opacity-100"
+            : "pointer-events-none translate-y-4 opacity-0",
+        )}
+      >
+        <ArrowUp className="size-5" aria-hidden="true" />
+      </button>
 
       <BottomNav />
     </main>

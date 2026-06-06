@@ -14,9 +14,10 @@ export function QuickActionFab() {
   const [open, setOpen] = useState(false);
   const [sheetOpen, setSheetOpen] = useState(false);
   const loc = useLocation();
+  const isChat = loc.pathname === "/chat" || loc.pathname.startsWith("/chat/");
   // Sembunyikan di halaman yang sudah punya composer/aksi bawah sendiri
-  // (chat, scan, food, foods) supaya FAB tidak menabrak input/CTA.
-  const HIDE_ON = ["/", "/auth", "/chat", "/scan", "/food", "/foods"];
+  // (scan, food, foods) supaya FAB tidak menabrak input/CTA.
+  const HIDE_ON = ["/", "/auth", "/scan", "/food", "/foods"];
   if (HIDE_ON.some((p) => loc.pathname === p || loc.pathname.startsWith(`${p}/`))) {
     return null;
   }
@@ -29,7 +30,12 @@ export function QuickActionFab() {
           onClick={() => setOpen(false)}
         />
       )}
-      <div className="fixed bottom-28 right-4 z-40 flex flex-col items-end gap-2 lg:bottom-6">
+      <div
+        className={isChat
+          ? "fixed bottom-[10.75rem] right-4 z-40 flex flex-col items-end gap-2 lg:bottom-6"
+          : "fixed bottom-28 right-4 z-40 flex flex-col items-end gap-2 lg:bottom-6"
+        }
+      >
         {open && (
           <button
             onClick={() => {
