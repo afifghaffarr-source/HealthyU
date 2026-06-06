@@ -115,6 +115,7 @@ export function CoachPromptChips({
               <span className="line-clamp-2 block text-foreground">{p}</span>
             </button>
           ))}
+          <div className="w-1 shrink-0" aria-hidden="true" />
         </div>
       </div>
 

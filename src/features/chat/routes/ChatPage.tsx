@@ -33,7 +33,7 @@ export function ChatPage() {
   const dockRef = useRef<HTMLDivElement>(null);
   const [dockHeight, setDockHeight] = useState(224);
   const shellClassName = "mx-auto w-full max-w-md px-4 sm:px-5";
-  const pageGutterClassName = "pb-[11rem] lg:pb-8";
+  const pageGutterClassName = "pb-6 lg:pb-8";
 
   const mutation = useMutation({
     mutationFn: async (payload: { message: string; imageBase64?: string; imageMime?: string }) => {
@@ -148,8 +148,14 @@ export function ChatPage() {
     };
 
     updateDockHeight();
+    const observer = new ResizeObserver(updateDockHeight);
+    if (dockRef.current) observer.observe(dockRef.current);
     window.addEventListener("resize", updateDockHeight);
-    return () => window.removeEventListener("resize", updateDockHeight);
+
+    return () => {
+      observer.disconnect();
+      window.removeEventListener("resize", updateDockHeight);
+    };
   }, [input, imageData, messages.length, mutation.isPending]);
 
   return (
@@ -193,7 +199,7 @@ export function ChatPage() {
         className={shellClassName}
         style={{ paddingBottom: `calc(${dockHeight}px + 2rem)` }}
       >
-        <section className="overflow-hidden pt-1">
+        <section className="overflow-hidden rounded-[1.6rem] border border-border/60 bg-background/70 px-2 py-2 shadow-sm backdrop-blur-sm supports-[backdrop-filter]:bg-background/60">
           <ChatQuickActions
             onPrompt={(t) => handleSend(t)}
             onReport={() => reportMut.mutate()}

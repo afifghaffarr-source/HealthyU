@@ -83,6 +83,7 @@ export function ChatQuickActions({
             </button>
           );
         })}
+        <div className="w-1 shrink-0" aria-hidden="true" />
       </div>
     </section>
   );
