@@ -193,12 +193,14 @@ export function ChatPage() {
         className={shellClassName}
         style={{ paddingBottom: `calc(${dockHeight}px + 1.5rem)` }}
       >
-        <ChatQuickActions
-          onPrompt={(t) => handleSend(t)}
-          onReport={() => reportMut.mutate()}
-          reportPending={reportMut.isPending}
-          sendDisabled={mutation.isPending}
-        />
+        <section className="overflow-hidden pt-1">
+          <ChatQuickActions
+            onPrompt={(t) => handleSend(t)}
+            onReport={() => reportMut.mutate()}
+            reportPending={reportMut.isPending}
+            sendDisabled={mutation.isPending}
+          />
+        </section>
         {messages.length === 0 && !mutation.isPending && (
           <ChatEmptyState onPick={(t) => handleSend(t)} />
         )}
