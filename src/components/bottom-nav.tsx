@@ -1,4 +1,4 @@
-import { Link } from "@tanstack/react-router";
+import { Link, useLocation } from "@tanstack/react-router";
 import { Home, Camera, Database, Timer, Activity, User } from "lucide-react";
 import { useOfflineQueue } from "@/hooks/use-offline-queue";
 import { SyncPill } from "@/components/healthyu/sync-pill";
@@ -16,6 +16,8 @@ const items = [
 ] as const;
 
 export function BottomNav() {
+  const location = useLocation();
+  const isChat = location.pathname.startsWith("/chat");
   const { online, pending, sync } = useOfflineQueue();
   const fetchNotifs = useServerFn(listNotifications);
   const { data: notif } = useQuery({
@@ -28,7 +30,13 @@ export function BottomNav() {
   return (
     <>
       {(!online || pending > 0) && (
-        <div className="fixed bottom-24 left-1/2 -translate-x-1/2 z-40 shadow-lg rounded-full lg:bottom-6 lg:left-28">
+        <div
+          className={
+            isChat
+              ? "fixed bottom-[10.75rem] left-1/2 -translate-x-1/2 z-40 shadow-lg rounded-full lg:bottom-6 lg:left-28"
+              : "fixed bottom-24 left-1/2 -translate-x-1/2 z-40 shadow-lg rounded-full lg:bottom-6 lg:left-28"
+          }
+        >
           <SyncPill online={online} pending={pending} onSync={() => sync()} />
         </div>
       )}
