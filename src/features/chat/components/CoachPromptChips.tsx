@@ -54,7 +54,7 @@ export function CoachPromptChips({
   const prompts = buildPersonalizedPrompts({ hour, remainingKcal, proteinGap });
   return (
     <div
-      className="-mx-1 flex gap-2 overflow-x-auto px-1 pb-1 snap-x"
+      className="-mx-1 flex gap-2 overflow-x-auto overscroll-x-contain px-1 pr-4 pb-1 snap-x snap-mandatory touch-pan-x"
       role="group"
       aria-label="Ide pertanyaan untuk AI Coach"
     >
