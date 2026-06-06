@@ -34,43 +34,56 @@ export function ChatQuickActions({
   sendDisabled: boolean;
 }) {
   return (
-    <div
-      className="-mx-1 flex min-w-0 gap-2 overflow-x-auto px-1 pb-1 pt-2 no-scrollbar [scrollbar-width:none]"
-      style={{ WebkitOverflowScrolling: "touch", touchAction: "pan-x" }}
-    >
-      <button
-        onClick={onReport}
-        disabled={reportPending}
-        className="shrink-0 rounded-2xl bg-primary/10 px-3 py-2 text-xs font-semibold whitespace-nowrap text-primary outline-1 outline-primary/30 disabled:opacity-50"
-      >
-        <span className="flex items-center gap-1.5">
-          <BarChart3 className="size-3.5" />
-          {reportPending ? "Membuat..." : "Laporan Mingguan"}
+    <section className="space-y-2" aria-label="Aksi cepat chat">
+      <div className="flex items-center justify-between gap-3 px-1">
+        <div>
+          <p className="text-xs font-semibold text-foreground">Aksi cepat</p>
+          <p className="text-[11px] text-muted-foreground">Geser ke samping untuk lihat semua</p>
+        </div>
+        <span className="shrink-0 rounded-full bg-muted px-2 py-1 text-[10px] font-medium text-muted-foreground">
+          Swipe
         </span>
-      </button>
-      {QUICK_ACTIONS.map((a) => {
-        const Icon = a.icon;
-        const content = (
-          <span className="flex shrink-0 items-center gap-1.5 rounded-2xl bg-card px-3 py-2 text-xs font-medium whitespace-nowrap outline-1 outline-black/10 transition hover:bg-secondary/40">
-            <Icon className="size-3.5 text-primary" />
-            {a.label}
+      </div>
+
+      <div
+        className="-mx-1 flex min-w-0 gap-2 overflow-x-auto px-1 pb-1 pt-0.5 no-scrollbar snap-x snap-mandatory [scrollbar-width:none]"
+        style={{ WebkitOverflowScrolling: "touch", touchAction: "pan-x" }}
+      >
+        <button
+          onClick={onReport}
+          disabled={reportPending}
+          className="snap-start shrink-0 rounded-2xl border border-primary/20 bg-primary/10 px-3 py-2 text-xs font-semibold whitespace-nowrap text-primary shadow-sm disabled:opacity-50"
+        >
+          <span className="flex items-center gap-1.5">
+            <BarChart3 className="size-3.5" />
+            {reportPending ? "Membuat..." : "Laporan Mingguan"}
           </span>
-        );
-        return "to" in a ? (
-          <Link key={a.label} to={a.to} className="shrink-0">
-            {content}
-          </Link>
-        ) : (
-          <button
-            key={a.label}
-            onClick={() => onPrompt(a.prompt)}
-            disabled={sendDisabled}
-            className="shrink-0"
-          >
-            {content}
-          </button>
-        );
-      })}
-    </div>
+        </button>
+        {QUICK_ACTIONS.map((a) => {
+          const Icon = a.icon;
+          const content = (
+            <span className="flex min-h-10 shrink-0 snap-start items-center gap-1.5 rounded-2xl border border-border/70 bg-card px-3 py-2 text-xs font-medium whitespace-nowrap text-foreground shadow-sm transition hover:bg-muted/60">
+              <Icon className="size-3.5 text-primary" />
+              {a.label}
+            </span>
+          );
+          return "to" in a ? (
+            <Link key={a.label} to={a.to} className="shrink-0" aria-label={a.label}>
+              {content}
+            </Link>
+          ) : (
+            <button
+              key={a.label}
+              onClick={() => onPrompt(a.prompt)}
+              disabled={sendDisabled}
+              className="shrink-0 disabled:opacity-50"
+              aria-label={a.label}
+            >
+              {content}
+            </button>
+          );
+        })}
+      </div>
+    </section>
   );
 }
