@@ -30,36 +30,44 @@ export function QuickActionFab() {
       <div
         className="fixed bottom-[5.75rem] right-4 z-50 flex flex-col items-end gap-2 lg:bottom-6"
       >
-        <button
-          type="button"
-          onClick={() => setSheetOpen(true)}
-          aria-label="Buka log cepat"
-          className="inline-flex h-12 items-center gap-2 rounded-full border border-border/60 bg-card px-4 text-sm font-semibold text-foreground shadow-lg backdrop-blur transition-transform hover:scale-[1.02]"
-        >
-          <span className="inline-flex size-8 items-center justify-center rounded-full bg-primary/12 text-primary">
-            <Zap className="size-4" />
-          </span>
-          <span>Log cepat</span>
-        </button>
+        {open && (
+          <button
+            type="button"
+            onClick={() => {
+              setOpen(false);
+              setSheetOpen(true);
+            }}
+            aria-label="Buka log cepat"
+            className="flex items-center gap-2 animate-fade-up"
+          >
+            <span className="rounded-full border border-border bg-card px-3 py-1.5 text-xs font-semibold text-foreground shadow-md">
+              Log cepat
+            </span>
+            <span className="grid size-11 place-items-center rounded-full bg-primary text-primary-foreground shadow-lg">
+              <Zap className="size-5" />
+            </span>
+          </button>
+        )}
         {open && ACTIONS.map((a, i) => (
-            <Link
-              key={a.to}
-              to={a.to}
-              onClick={() => setOpen(false)}
-              className="flex items-center gap-2 animate-fade-up"
-              style={{ animationDelay: `${i * 40}ms` }}
+          <Link
+            key={a.to}
+            to={a.to}
+            onClick={() => setOpen(false)}
+            className="flex items-center gap-2 animate-fade-up"
+            style={{ animationDelay: `${(i + 1) * 40}ms` }}
+          >
+            <span className="bg-card text-foreground text-xs font-semibold px-3 py-1.5 rounded-full shadow-md border border-border">
+              {a.label}
+            </span>
+            <span
+              className={`size-11 rounded-full bg-gradient-to-br ${a.color} text-white grid place-items-center shadow-lg`}
             >
-              <span className="bg-card text-foreground text-xs font-semibold px-3 py-1.5 rounded-full shadow-md border border-border">
-                {a.label}
-              </span>
-              <span
-                className={`size-11 rounded-full bg-gradient-to-br ${a.color} text-white grid place-items-center shadow-lg`}
-              >
-                <a.icon className="size-5" />
-              </span>
-            </Link>
+              <a.icon className="size-5" />
+            </span>
+          </Link>
         ))}
         <button
+          type="button"
           onClick={() => setOpen((v) => !v)}
           aria-label={open ? "Tutup aksi cepat" : "Buka aksi cepat"}
           className="size-14 rounded-full bg-gradient-to-br from-primary to-primary-dark text-primary-foreground shadow-xl shadow-primary/40 grid place-items-center hover:scale-105 transition-transform"
