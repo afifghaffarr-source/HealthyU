@@ -208,9 +208,9 @@ export function ChatPage() {
 
       <div
         ref={dockRef}
-        className="fixed inset-x-0 bottom-0 z-30 border-t border-border/50 bg-background/98 backdrop-blur supports-[backdrop-filter]:bg-background/92"
+        className="fixed inset-x-0 bottom-0 z-30 border-t border-border/50 bg-background/98 backdrop-blur supports-[backdrop-filter]:bg-background/92 lg:left-64"
       >
-        <div className={`${shellClassName} space-y-3 pt-3 pb-24`}>
+        <div className={`${shellClassName} space-y-3 pt-3 pb-24 lg:pb-6`}>
           {messages.length > 0 && (
             <section className="space-y-2 rounded-[1.6rem] border border-border/60 bg-muted/20 px-3 py-3">
               <div className="flex items-center justify-between gap-3 px-1">
