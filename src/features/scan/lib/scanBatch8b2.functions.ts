@@ -1,9 +1,5 @@
 // Re-exports from consolidated scan modules
-export {
-  shouldSuggestFreeze,
-  logMeditation,
-  listMeditations,
-} from "./scanWellness.functions";
+export { shouldSuggestFreeze, logMeditation, listMeditations } from "./scanWellness.functions";
 export {
   createFamilyInvite,
   redeemFamilyInvite,

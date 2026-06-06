@@ -5,9 +5,5 @@ export {
   upsertSmartAlarm,
   listSmartAlarms,
 } from "./scanWellness.functions";
-export {
-  scanBarcode,
-} from "./scanBarcode.functions";
-export {
-  recordStoryPhoto,
-} from "./scanSocial.functions";
+export { scanBarcode } from "./scanBarcode.functions";
+export { recordStoryPhoto } from "./scanSocial.functions";

@@ -6,9 +6,5 @@ export {
   getThemePref,
   transcribeVoice,
 } from "./scanMisc.functions";
-export {
-  recommendExercises,
-} from "./scanWellness.functions";
-export {
-  createStoryPhotoUploadUrl,
-} from "./scanSocial.functions";
+export { recommendExercises } from "./scanWellness.functions";
+export { createStoryPhotoUploadUrl } from "./scanSocial.functions";

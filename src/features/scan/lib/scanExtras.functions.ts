@@ -1,8 +1,6 @@
-export { parseRecipeImage, parseMenuImage } from "./scanExtras1.functions";
-export {
-  getWeeklyNutrition,
-  recommendRecipes,
-  setAuditOptIn,
-  relogMeal,
-  lookupBarcode,
-} from "./scanExtras2.functions";
+// Re-exports from consolidated scan modules
+export { parseRecipeImage, parseMenuImage } from "./scanVision.functions";
+export { getWeeklyNutrition } from "./scanReports.functions";
+export { recommendRecipes, relogMeal } from "./scanMeal.functions";
+export { setAuditOptIn } from "./scanMisc.functions";
+export { lookupBarcode } from "./scanBarcode.functions";

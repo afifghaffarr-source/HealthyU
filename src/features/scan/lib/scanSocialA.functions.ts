@@ -1,12 +1,6 @@
-export {
-  useStreakFreeze,
-  getGroupScanLeaderboard,
-  reverseCalorie,
-  getDailyChallenge,
-} from "./scanSocialA1.functions";
-export {
-  completeDailyChallenge,
-  remixRecipe,
-  getGroceryFromPlan,
-  doctorChat,
-} from "./scanSocialA2.functions";
+// Re-exports from consolidated scan modules
+export { useStreakFreeze, reverseCalorie } from "./scanMisc.functions";
+export { getGroupScanLeaderboard } from "./scanDiscovery.functions";
+export { getDailyChallenge, completeDailyChallenge } from "./scanContent.functions";
+export { remixRecipe, getGroceryFromPlan } from "./scanMeal.functions";
+export { doctorChat } from "./scanSocial.functions";

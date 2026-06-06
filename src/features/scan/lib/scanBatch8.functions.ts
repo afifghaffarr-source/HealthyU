@@ -1,7 +1,5 @@
 // Re-exports from consolidated scan modules
-export {
-  generateWeeklyReport,
-} from "./scanReports.functions";
+export { generateWeeklyReport } from "./scanReports.functions";
 export {
   notifyUser,
   listNotifications,
@@ -15,16 +13,9 @@ export {
   logMeditation,
   listMeditations,
 } from "./scanWellness.functions";
-export {
-  restaurantsNearby,
-  convertCurrency,
-} from "./scanMisc.functions";
-export {
-  getSleepScore,
-} from "./scanReports.functions";
-export {
-  getPublicProfileMeta,
-} from "./scanDiscovery.functions";
+export { restaurantsNearby, convertCurrency } from "./scanMisc.functions";
+export { getSleepScore } from "./scanReports.functions";
+export { getPublicProfileMeta } from "./scanDiscovery.functions";
 export {
   createFamilyInvite,
   redeemFamilyInvite,

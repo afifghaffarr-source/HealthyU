@@ -1,14 +1,12 @@
+// Re-exports from consolidated scan modules
 export {
   getWeeklyLeaderboard,
   upsertWeeklyScore,
-  importRecipeFromUrl,
-  generateGroceryList,
   getSubscription,
   upgradeSubscription,
-} from "./scanBatch12a.functions";
-export {
-  generateWeeklyPodcast,
   analyzeFormCheck,
-  ocrNutritionLabel,
-  getMoodHeatmap,
-} from "./scanBatch12b.functions";
+} from "./scanMisc.functions";
+export { importRecipeFromUrl, generateGroceryList } from "./scanPlan.functions";
+export { generateWeeklyPodcast } from "./scanContent.functions";
+export { ocrNutritionLabel } from "./scanVision.functions";
+export { getMoodHeatmap } from "./scanReports.functions";

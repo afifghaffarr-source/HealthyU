@@ -7,14 +7,6 @@ export {
   listHabitStacks,
   createHabitStack,
 } from "./scanGamification.functions";
-export {
-  voteFamilyMeal,
-  getFamilyMealVotes,
-} from "./scanPlan.functions";
-export {
-  generateRecipeVideoScript,
-  coachInterview,
-} from "./scanMisc.functions";
-export {
-  listFollowers,
-} from "./scanDiscovery.functions";
+export { voteFamilyMeal, getFamilyMealVotes } from "./scanPlan.functions";
+export { generateRecipeVideoScript, coachInterview } from "./scanMisc.functions";
+export { listFollowers } from "./scanDiscovery.functions";

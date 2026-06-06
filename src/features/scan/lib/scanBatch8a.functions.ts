@@ -1,7 +1,5 @@
 // Re-exports from consolidated scan modules
-export {
-  generateWeeklyReport,
-} from "./scanReports.functions";
+export { generateWeeklyReport } from "./scanReports.functions";
 export {
   notifyUser,
   listNotifications,

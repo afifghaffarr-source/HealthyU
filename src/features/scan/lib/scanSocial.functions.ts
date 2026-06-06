@@ -195,3 +195,11 @@ export const createStoryPhotoUploadUrl = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
     return { path, token: signed.token, signedUrl: signed.signedUrl };
   });
+
+// Backward-compat re-exports (previously accessible via barrel)
+export { useStreakFreeze, reverseCalorie } from "./scanMisc.functions";
+export { getGroupScanLeaderboard, followUser, unfollowUser } from "./scanDiscovery.functions";
+export { getDailyChallenge, completeDailyChallenge } from "./scanContent.functions";
+export { remixRecipe, getGroceryFromPlan } from "./scanMeal.functions";
+export { getWorkoutMatch } from "./scanWellness.functions";
+export { getSleepMealCorrelation } from "./scanReports.functions";

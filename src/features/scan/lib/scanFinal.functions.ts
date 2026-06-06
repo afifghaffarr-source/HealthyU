@@ -1,16 +1,15 @@
-export {
-  evolvePet,
-  commentOnStory,
-  listStoryComments,
-  toggleStoryLike,
-  getPublicProfile,
-} from "./scanFinal1.functions";
+// Re-exports from consolidated scan modules
+export { evolvePet } from "./scanGamification.functions";
+export { commentOnStory, listStoryComments, toggleStoryLike } from "./scanSocial.functions";
+export { getPublicProfile } from "./scanDiscovery.functions";
 export {
   moodMealCorrelation,
   hydrationMealPairing,
   checkStreakAtRisk,
+} from "./scanReports.functions";
+export {
   estimateGroceryCost,
   convertIdr,
   createFamilyPlan,
   listMyFamily,
-} from "./scanFinal2.functions";
+} from "./scanPlan.functions";
