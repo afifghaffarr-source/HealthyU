@@ -174,7 +174,7 @@ export function ChatPage() {
         />
       </div>
 
-      <div className="max-w-md w-full mx-auto px-5 pb-6">
+      <div className="max-w-md w-full mx-auto px-5 pb-[12.5rem]">
         <ChatQuickActions
           onPrompt={(t) => handleSend(t)}
           onReport={() => reportMut.mutate()}
@@ -192,8 +192,8 @@ export function ChatPage() {
         <div ref={endRef} className="h-1" aria-hidden="true" />
       </div>
 
-      <div className="w-full border-t border-border/50 bg-background/98 backdrop-blur supports-[backdrop-filter]:bg-background/92">
-        <div className="max-w-md mx-auto px-4 pt-3 pb-28 space-y-3">
+      <div className="fixed inset-x-0 bottom-0 z-30 border-t border-border/50 bg-background/98 backdrop-blur supports-[backdrop-filter]:bg-background/92">
+        <div className="max-w-md mx-auto px-4 pt-3 pb-24 space-y-3">
           {messages.length > 0 && (
             <section className="space-y-2">
               <div className="flex items-center justify-between gap-3 px-1">
