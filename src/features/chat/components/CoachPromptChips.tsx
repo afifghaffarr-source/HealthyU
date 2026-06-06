@@ -94,11 +94,11 @@ export function CoachPromptChips({
   };
 
   return (
-    <div className="space-y-2">
-      <div className="relative overflow-hidden rounded-[1.5rem]">
+    <div className="min-w-0 space-y-2">
+      <div className="relative min-w-0 overflow-hidden rounded-[1.5rem]">
         <div
           ref={scrollerRef}
-          className="flex gap-2 overflow-x-auto overflow-y-hidden overscroll-x-contain px-0.5 pb-1 pt-1 snap-x snap-mandatory no-scrollbar [scrollbar-width:none]"
+          className="flex min-w-0 gap-2 overflow-x-auto overflow-y-hidden overscroll-x-contain px-0.5 pb-1 pt-1 snap-x snap-mandatory no-scrollbar [scrollbar-width:none]"
           style={{ WebkitOverflowScrolling: "touch", touchAction: "pan-x", scrollPaddingLeft: "0.25rem" }}
           role="group"
           aria-label="Ide pertanyaan untuk AI Coach"
@@ -118,8 +118,8 @@ export function CoachPromptChips({
         </div>
       </div>
 
-      <div className="flex items-center justify-between gap-3 px-1">
-        <div className="flex items-center gap-1.5" aria-label="Posisi saran cepat">
+      <div className="flex flex-wrap items-center justify-between gap-3 px-1">
+        <div className="flex min-w-0 items-center gap-1.5" aria-label="Posisi saran cepat">
           {prompts.map((prompt, index) => (
             <span
               key={prompt}
@@ -134,7 +134,7 @@ export function CoachPromptChips({
           </span>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="ml-auto flex shrink-0 items-center gap-2">
           <button
             type="button"
             onClick={() => scrollCards("prev")}

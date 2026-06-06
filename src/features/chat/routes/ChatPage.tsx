@@ -33,6 +33,7 @@ export function ChatPage() {
   const dockRef = useRef<HTMLDivElement>(null);
   const [dockHeight, setDockHeight] = useState(224);
   const shellClassName = "mx-auto w-full max-w-md px-4 sm:px-5";
+  const pageGutterClassName = "pb-[12.5rem] lg:pb-8";
 
   const mutation = useMutation({
     mutationFn: async (payload: { message: string; imageBase64?: string; imageMime?: string }) => {
@@ -190,7 +191,7 @@ export function ChatPage() {
 
       <div
         className={shellClassName}
-        style={{ paddingBottom: `calc(${dockHeight}px + 3.75rem)` }}
+        style={{ paddingBottom: `calc(${dockHeight}px + 1.5rem)` }}
       >
         <ChatQuickActions
           onPrompt={(t) => handleSend(t)}
@@ -213,9 +214,9 @@ export function ChatPage() {
         ref={dockRef}
         className="fixed inset-x-0 bottom-0 z-30 border-t border-border/50 bg-background/95 shadow-[0_-10px_30px_-24px_color-mix(in_oklab,var(--foreground)_24%,transparent)] backdrop-blur supports-[backdrop-filter]:bg-background/90 lg:left-64"
       >
-        <div className={`${shellClassName} space-y-3 pt-3 pb-28 lg:pb-6`}>
+        <div className={`${shellClassName} space-y-3 pt-3 ${pageGutterClassName}`}>
           {messages.length > 0 && (
-            <section className="space-y-2 rounded-[1.6rem] border border-border/60 bg-background/88 px-3 py-3 shadow-sm backdrop-blur-sm supports-[backdrop-filter]:bg-background/78">
+            <section className="space-y-2 overflow-hidden rounded-[1.6rem] border border-border/60 bg-background/88 px-3 py-3 shadow-sm backdrop-blur-sm supports-[backdrop-filter]:bg-background/78">
               <div className="flex items-center justify-between gap-3 px-1">
                 <div>
                   <p className="text-xs font-semibold text-foreground">Saran cepat</p>
