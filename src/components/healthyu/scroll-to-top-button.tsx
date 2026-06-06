@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useLocation } from "@tanstack/react-router";
 import { ArrowUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -8,6 +9,9 @@ import { cn } from "@/lib/utils";
  * Subtle, only shows on long pages — avoids clutter on short screens.
  */
 export function ScrollToTopButton() {
+  const location = useLocation();
+  const isChat = location.pathname.startsWith("/chat");
+  if (isChat) return null;
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
