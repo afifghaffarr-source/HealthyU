@@ -139,6 +139,21 @@ function Dashboard() {
 
   const { fastMs, fastHrs, fastPct } = useFastClock(fast);
 
+  const remainingKcal = Math.max(0, calTarget - totals.cal);
+  const overKcal = Math.max(0, totals.cal - calTarget);
+  const hour = new Date().getHours();
+  const heroSubtitle = (() => {
+    if (meals.length === 0) {
+      return hour < 11
+        ? "Mulai dengan sarapan ringan ya. Catat satu menu dulu."
+        : "Belum ada catatan hari ini. Yuk catat satu makanan dulu.";
+    }
+    if (overKcal > 0) {
+      return `Hari ini sedikit lewat target (~${overKcal} kkal). Tidak apa-apa, kita seimbangkan besok.`;
+    }
+    return `Sisa kalori hari ini ~${remainingKcal} kkal. Progress kecil tetap progress.`;
+  })();
+
   return (
     <main className="min-h-dvh bg-background pb-28">
       <PullIndicator pulling={pulling} refreshing={refreshing} />
@@ -146,6 +161,7 @@ function Dashboard() {
         <DashboardHeader
           greeting={dashboardGreeting()}
           fullName={profile?.full_name}
+          subtitle={heroSubtitle}
           bonusAvailable={!bonusClaimed}
           onClaimBonus={() => claimBonusMut.mutate()}
           claiming={claimBonusMut.isPending}
