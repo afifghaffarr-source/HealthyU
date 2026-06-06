@@ -8,7 +8,7 @@ import {
 } from "@/features/chat/lib/chat.functions";
 import { supabase } from "@/integrations/supabase/client";
 import { BottomNav } from "@/components/bottom-nav";
-import { Trash2, Volume2, VolumeX } from "lucide-react";
+import { Trash2, Volume2, VolumeX, Zap } from "lucide-react";
 import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { toast } from "sonner";
 import { toastError } from "@/lib/toast-config";
@@ -18,6 +18,7 @@ import { ChatEmptyState, ChatMessages } from "@/features/chat/components/ChatMes
 import { ChatComposer, type ImageData } from "@/features/chat/components/ChatComposer";
 import { SafetyChip } from "@/components/healthyu/safety-chip";
 import { CoachPromptChips } from "@/features/chat/components/CoachPromptChips";
+import { QuickLogSheet } from "@/components/healthyu/quick-log-sheet";
 
 export function ChatPage() {
   const qc = useQueryClient();
@@ -29,6 +30,7 @@ export function ChatPage() {
   const [input, setInput] = useState("");
   const [imageData, setImageData] = useState<ImageData | null>(null);
   const [streaming, setStreaming] = useState<string | null>(null);
+  const [quickLogOpen, setQuickLogOpen] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const mutation = useMutation({
@@ -174,7 +176,10 @@ export function ChatPage() {
         />
       </div>
 
-      <div ref={scrollRef} className="flex-1 overflow-y-auto max-w-md w-full mx-auto px-5 pb-[17.5rem]">
+      <div
+        ref={scrollRef}
+        className={`flex-1 overflow-y-auto max-w-md w-full mx-auto px-5 ${imageData ? "pb-[22rem]" : "pb-[18.5rem]"}`}
+      >
         <ChatQuickActions
           onPrompt={(t) => handleSend(t)}
           onReport={() => reportMut.mutate()}
@@ -191,8 +196,20 @@ export function ChatPage() {
         />
       </div>
 
-      <div className="fixed bottom-24 inset-x-0 z-30 px-4 pb-2 pointer-events-none">
-        <div className="max-w-md mx-auto space-y-2 pointer-events-auto">
+      <div className="fixed bottom-24 inset-x-0 z-30 border-t border-border/60 bg-background/95 backdrop-blur-xl">
+        <div className="max-w-md mx-auto px-4 pt-3 pb-3 space-y-3">
+          <div className="flex items-center justify-between gap-2">
+            <SafetyChip variant="not-medical" className="shadow-none" />
+            <button
+              type="button"
+              onClick={() => setQuickLogOpen(true)}
+              className="inline-flex min-h-9 items-center gap-1.5 rounded-full border border-border/60 bg-card px-3 text-xs font-semibold text-foreground hover:bg-secondary/40 transition"
+            >
+              <Zap className="size-3.5 text-primary" />
+              Log cepat
+            </button>
+          </div>
+
           {messages.length > 0 && (
             <CoachPromptChips
               onPick={(t) => handleSend(t)}
@@ -200,9 +217,7 @@ export function ChatPage() {
               hour={new Date().getHours()}
             />
           )}
-          <div className="flex justify-center">
-            <SafetyChip variant="not-medical" className="shadow-sm" />
-          </div>
+
           <ChatComposer
             input={input}
             setInput={setInput}
@@ -215,6 +230,8 @@ export function ChatPage() {
           />
         </div>
       </div>
+
+      <QuickLogSheet open={quickLogOpen} onOpenChange={setQuickLogOpen} />
 
       <BottomNav />
     </main>
