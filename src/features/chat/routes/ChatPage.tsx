@@ -117,7 +117,7 @@ export function ChatPage() {
   const reportMut = useMutation({
     mutationFn: () => reportFn(),
     onSuccess: () => qc.invalidateQueries({ queryKey: ["chat"] }),
-    onError: (e: Error) => toast.error(e.message),
+    onError: (e: Error) => toastError(e, "Gagal membuat laporan"),
   });
 
   const handleClear = () => {

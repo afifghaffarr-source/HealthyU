@@ -4,6 +4,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { Camera, Loader2, Sparkles, X, History, Zap } from "lucide-react";
 import { toast } from "sonner";
+import { FeatureErrorBoundary } from "@/components/healthyu/feature-error-boundary";
 import { BottomNav } from "@/components/bottom-nav";
 import { recognizeFood } from "@/features/food/lib/foodScan.functions";
 import { checkScanLimit } from "@/features/scan/lib/scanMore.functions";
@@ -21,7 +22,11 @@ import {
 } from "@/features/scan/hooks/useScanMutations";
 
 export const Route = createFileRoute("/_authenticated/scan")({
-  component: ScanPage,
+  component: () => (
+    <FeatureErrorBoundary feature="Scan makanan">
+      <ScanPage />
+    </FeatureErrorBoundary>
+  ),
 });
 
 type Item = Awaited<ReturnType<typeof recognizeFood>>["items"][number];

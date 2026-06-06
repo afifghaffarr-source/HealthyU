@@ -16,3 +16,4 @@ export { NutritionPieChart } from "./nutrition-pie-chart";
 export type { MacroSlice } from "./nutrition-pie-chart";
 export { HealthScoreCard } from "./health-score-card";
 export type { HealthScoreFactor } from "./health-score-card";
+export { FeatureErrorBoundary } from "./feature-error-boundary";
