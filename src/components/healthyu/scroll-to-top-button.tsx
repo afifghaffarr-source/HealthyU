@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useLocation } from "@tanstack/react-router";
 import { ArrowUp } from "lucide-react";
 
@@ -9,28 +9,69 @@ import { ArrowUp } from "lucide-react";
 export function ScrollToTopButton() {
   const location = useLocation();
   const [isVisible, setIsVisible] = useState(false);
+  const activeScrollerRef = useRef<Window | Element | null>(null);
   const hideOn = ["/auth"];
   const isHiddenRoute = hideOn.some(
     (path) => location.pathname === path || location.pathname.startsWith(`${path}/`),
   );
 
   useEffect(() => {
-    const onScroll = () => setIsVisible(window.scrollY > 220);
-    onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
+    if (isHiddenRoute) return;
 
-  if (isHiddenRoute || !isVisible) return null;
+    const readScrollTop = (target?: EventTarget | null) => {
+      if (target instanceof Element) {
+        activeScrollerRef.current = target;
+        return target.scrollTop;
+      }
+
+      activeScrollerRef.current = window;
+      return window.scrollY || document.documentElement.scrollTop || document.body.scrollTop || 0;
+    };
+
+    const syncVisibility = (target?: EventTarget | null) => {
+      setIsVisible(readScrollTop(target) > 160);
+    };
+
+    const onScroll = (event: Event) => syncVisibility(event.target);
+    const onResize = () => syncVisibility(activeScrollerRef.current);
+
+    syncVisibility();
+    document.addEventListener("scroll", onScroll, { passive: true, capture: true });
+    window.addEventListener("resize", onResize, { passive: true });
+
+    return () => {
+      document.removeEventListener("scroll", onScroll, true);
+      window.removeEventListener("resize", onResize);
+    };
+  }, [isHiddenRoute, location.pathname]);
+
+  if (isHiddenRoute) return null;
 
   return (
-    <button
-      type="button"
-      aria-label="Kembali ke atas"
-      onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-      className="fixed bottom-[5.75rem] left-4 z-50 grid size-14 place-items-center rounded-full border border-border/70 bg-card/95 text-foreground shadow-xl backdrop-blur transition-all duration-200 hover:scale-105 supports-[backdrop-filter]:bg-card/85 lg:bottom-6"
-    >
-      <ArrowUp className="size-6" aria-hidden="true" strokeWidth={2.4} />
-    </button>
+    <div className="pointer-events-none fixed inset-x-0 bottom-[5.75rem] z-50 px-4 lg:bottom-6">
+      <div className="mx-auto flex max-w-md justify-start">
+        <button
+          type="button"
+          aria-label="Kembali ke atas"
+          aria-hidden={!isVisible}
+          onClick={() => {
+            const activeScroller = activeScrollerRef.current;
+            if (activeScroller instanceof Element) {
+              activeScroller.scrollTo({ top: 0, behavior: "smooth" });
+              return;
+            }
+
+            window.scrollTo({ top: 0, behavior: "smooth" });
+          }}
+          className={`pointer-events-auto grid size-14 place-items-center rounded-full border border-border/70 bg-card/95 text-foreground shadow-xl backdrop-blur transition-all duration-200 supports-[backdrop-filter]:bg-card/85 ${
+            isVisible
+              ? "translate-y-0 opacity-100 hover:scale-105"
+              : "pointer-events-none translate-y-3 opacity-0"
+          }`}
+        >
+          <ArrowUp className="size-6" aria-hidden="true" strokeWidth={2.4} />
+        </button>
+      </div>
+    </div>
   );
 }
