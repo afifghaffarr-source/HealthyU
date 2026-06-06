@@ -14,8 +14,8 @@ const SUGGESTIONS = [
 
 export function ChatEmptyState({ onPick }: { onPick: (text: string) => void }) {
   return (
-    <div className="py-8 space-y-4 animate-fade-up">
-      <div className="bg-card p-5 rounded-3xl outline-1 outline-black/5">
+    <div className="space-y-4 py-8 animate-fade-up">
+      <div className="rounded-[1.75rem] border border-border/70 bg-card px-5 py-5 shadow-sm">
         <p className="font-bold mb-1">Halo, ada yang ingin ditanyakan?</p>
         <p className="text-sm text-muted-foreground">
           Aku HealthyU AI Coach — bisa bantu evaluasi makan, atur menu, atau jawab tanya soal nutrisi.
@@ -31,7 +31,7 @@ export function ChatEmptyState({ onPick }: { onPick: (text: string) => void }) {
       <div className="grid grid-cols-2 gap-2">
         <Link
           to="/foods"
-          className="bg-card p-3 rounded-2xl outline-1 outline-black/5 text-xs flex items-center gap-2 hover:bg-secondary/40 transition"
+          className="flex items-center gap-2 rounded-2xl border border-border/70 bg-card p-3 text-xs transition hover:bg-muted/60"
         >
           <span className="size-7 rounded-lg bg-primary/10 text-primary grid place-items-center" aria-hidden>
             <Utensils className="size-3.5" />
@@ -43,7 +43,7 @@ export function ChatEmptyState({ onPick }: { onPick: (text: string) => void }) {
         </Link>
         <Link
           to="/articles"
-          className="bg-card p-3 rounded-2xl outline-1 outline-black/5 text-xs flex items-center gap-2 hover:bg-secondary/40 transition"
+          className="flex items-center gap-2 rounded-2xl border border-border/70 bg-card p-3 text-xs transition hover:bg-muted/60"
         >
           <span className="size-7 rounded-lg bg-primary/10 text-primary grid place-items-center" aria-hidden>
             <BookOpen className="size-3.5" />
@@ -59,7 +59,7 @@ export function ChatEmptyState({ onPick }: { onPick: (text: string) => void }) {
           <button
             key={s}
             onClick={() => onPick(s)}
-            className="w-full text-left bg-card p-3 rounded-2xl outline-1 outline-black/5 text-sm hover:bg-secondary/40 transition"
+            className="w-full rounded-2xl border border-border/70 bg-card p-3 text-left text-sm transition hover:bg-muted/60"
           >
             {s}
           </button>
@@ -83,13 +83,13 @@ export function ChatMessages({
       {messages.map((m) => (
         <div
           key={m.id}
-          className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}
+          className={`flex w-full ${m.role === "user" ? "justify-end" : "justify-start"}`}
         >
           <div
-            className={`max-w-[85%] px-4 py-3 rounded-3xl text-sm leading-relaxed ${
+            className={`min-w-0 max-w-[88%] break-words px-4 py-3 text-sm leading-relaxed shadow-sm ${
               m.role === "user"
-                ? "bg-primary text-primary-foreground rounded-br-md whitespace-pre-wrap"
-                : "bg-card outline-1 outline-black/5 rounded-bl-md prose prose-sm max-w-none prose-p:my-1 prose-headings:my-2 prose-headings:font-bold prose-ul:my-1 prose-ol:my-1 prose-li:my-0 prose-strong:text-foreground prose-code:bg-secondary prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-code:text-xs prose-code:before:content-none prose-code:after:content-none"
+                ? "rounded-[1.5rem] rounded-br-md bg-primary text-primary-foreground whitespace-pre-wrap"
+                : "rounded-[1.5rem] rounded-bl-md border border-border/70 bg-card text-foreground prose prose-sm max-w-none prose-p:my-1 prose-headings:my-2 prose-headings:font-bold prose-ul:my-1 prose-ol:my-1 prose-li:my-0 prose-pre:max-w-full prose-pre:overflow-x-auto prose-code:bg-secondary prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-code:text-xs prose-code:text-foreground prose-code:before:content-none prose-code:after:content-none prose-strong:text-foreground"
             }`}
           >
             {m.role === "assistant" ? (
@@ -102,7 +102,7 @@ export function ChatMessages({
       ))}
       {pending && (
         <div className="flex justify-start">
-          <div className="max-w-[85%] px-4 py-3 rounded-3xl rounded-bl-md text-sm leading-relaxed bg-card outline-1 outline-black/5 prose prose-sm max-w-none prose-p:my-1 prose-headings:my-2 prose-strong:text-foreground">
+          <div className="min-w-0 max-w-[88%] rounded-[1.5rem] rounded-bl-md border border-border/70 bg-card px-4 py-3 text-sm leading-relaxed text-foreground shadow-sm prose prose-sm max-w-none prose-p:my-1 prose-headings:my-2 prose-strong:text-foreground">
             {streaming ? (
               <SafeMarkdown>{streaming}</SafeMarkdown>
             ) : (

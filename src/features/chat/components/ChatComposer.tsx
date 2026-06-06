@@ -47,7 +47,7 @@ export function ChatComposer({
             alt="preview"
             className="size-12 rounded-xl object-cover"
           />
-          <span className="text-xs text-muted-foreground flex-1">Foto siap dikirim</span>
+          <span className="min-w-0 flex-1 text-xs text-muted-foreground">Foto siap dikirim</span>
           <button
             type="button"
             onClick={() => setImageData(null)}
@@ -97,7 +97,7 @@ export function ChatComposer({
           }
           disabled={pending}
           rows={1}
-          className="max-h-32 min-h-[2.75rem] min-w-0 flex-1 resize-none bg-transparent px-2 py-2.5 text-sm leading-5 focus:outline-none disabled:opacity-50"
+          className="max-h-32 min-h-[2.75rem] min-w-0 flex-1 resize-none bg-transparent px-2 py-2.5 text-sm leading-5 text-foreground placeholder:text-muted-foreground focus:outline-none disabled:opacity-50"
         />
         <button
           type="button"
@@ -116,7 +116,7 @@ export function ChatComposer({
           type="button"
           onClick={onSend}
           disabled={pending || (!input.trim() && !imageData)}
-          className="size-10 bg-primary text-primary-foreground rounded-2xl grid place-items-center disabled:opacity-40"
+          className="grid size-10 shrink-0 place-items-center rounded-2xl bg-primary text-primary-foreground shadow-sm disabled:opacity-40"
         >
           <Send className="size-4" />
         </button>
