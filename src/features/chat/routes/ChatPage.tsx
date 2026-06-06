@@ -8,7 +8,7 @@ import {
 } from "@/features/chat/lib/chat.functions";
 import { supabase } from "@/integrations/supabase/client";
 import { BottomNav } from "@/components/bottom-nav";
-import { Trash2, Volume2, VolumeX, Zap } from "lucide-react";
+import { ArrowUp, Trash2, Volume2, VolumeX, Zap } from "lucide-react";
 import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { toast } from "sonner";
 import { toastError } from "@/lib/toast-config";
@@ -32,6 +32,10 @@ export function ChatPage() {
   const [streaming, setStreaming] = useState<string | null>(null);
   const [quickLogOpen, setQuickLogOpen] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
+
+  const scrollChatToTop = () => {
+    scrollRef.current?.scrollTo({ top: 0, behavior: "smooth" });
+  };
 
   const mutation = useMutation({
     mutationFn: async (payload: { message: string; imageBase64?: string; imageMime?: string }) => {
@@ -178,7 +182,7 @@ export function ChatPage() {
 
       <div
         ref={scrollRef}
-        className={`flex-1 overflow-y-auto max-w-md w-full mx-auto px-5 ${imageData ? "pb-[22rem]" : "pb-[18.5rem]"}`}
+        className={`flex-1 overflow-y-auto max-w-md w-full mx-auto px-5 ${imageData ? "pb-[21.5rem]" : "pb-[18rem]"}`}
       >
         <ChatQuickActions
           onPrompt={(t) => handleSend(t)}
@@ -196,38 +200,56 @@ export function ChatPage() {
         />
       </div>
 
-      <div className="fixed bottom-24 inset-x-0 z-30 border-t border-border/60 bg-background/95 backdrop-blur-xl">
-        <div className="max-w-md mx-auto px-4 pt-3 pb-3 space-y-3">
-          <div className="flex items-center justify-between gap-2">
-            <SafetyChip variant="not-medical" className="shadow-none" />
-            <button
-              type="button"
-              onClick={() => setQuickLogOpen(true)}
-              className="inline-flex min-h-9 items-center gap-1.5 rounded-full border border-border/60 bg-card px-3 text-xs font-semibold text-foreground hover:bg-secondary/40 transition"
-            >
-              <Zap className="size-3.5 text-primary" />
-              Log cepat
-            </button>
-          </div>
+      <div className="fixed bottom-24 inset-x-0 z-30 px-4 pb-2">
+        <div className="max-w-md mx-auto rounded-[2rem] border border-border/60 bg-background/95 shadow-xl backdrop-blur-xl">
+          <div className="px-3 pt-3 pb-3 space-y-3">
+            <div className="flex items-center justify-between gap-2">
+              <SafetyChip variant="not-medical" className="shadow-none" />
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={scrollChatToTop}
+                  className="inline-flex size-9 items-center justify-center rounded-full border border-border/60 bg-card text-muted-foreground hover:bg-secondary/40 hover:text-foreground transition"
+                  aria-label="Scroll ke atas"
+                >
+                  <ArrowUp className="size-4" />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setQuickLogOpen(true)}
+                  className="inline-flex min-h-9 items-center gap-1.5 rounded-full border border-border/60 bg-card px-3 text-xs font-semibold text-foreground hover:bg-secondary/40 transition"
+                >
+                  <Zap className="size-3.5 text-primary" />
+                  Log cepat
+                </button>
+              </div>
+            </div>
 
-          {messages.length > 0 && (
-            <CoachPromptChips
-              onPick={(t) => handleSend(t)}
-              disabled={mutation.isPending}
-              hour={new Date().getHours()}
+            {messages.length > 0 && (
+              <div className="space-y-2">
+                <div className="flex items-center justify-between gap-2 px-1">
+                  <p className="text-[11px] font-medium text-muted-foreground">Saran cepat</p>
+                  <p className="text-[11px] text-muted-foreground">Geser untuk lihat semua</p>
+                </div>
+                <CoachPromptChips
+                  onPick={(t) => handleSend(t)}
+                  disabled={mutation.isPending}
+                  hour={new Date().getHours()}
+                />
+              </div>
+            )}
+
+            <ChatComposer
+              input={input}
+              setInput={setInput}
+              imageData={imageData}
+              setImageData={setImageData}
+              onSend={() => handleSend()}
+              pending={mutation.isPending}
+              listening={speech.listening}
+              onToggleMic={speech.toggleMic}
             />
-          )}
-
-          <ChatComposer
-            input={input}
-            setInput={setInput}
-            imageData={imageData}
-            setImageData={setImageData}
-            onSend={() => handleSend()}
-            pending={mutation.isPending}
-            listening={speech.listening}
-            onToggleMic={speech.toggleMic}
-          />
+          </div>
         </div>
       </div>
 
