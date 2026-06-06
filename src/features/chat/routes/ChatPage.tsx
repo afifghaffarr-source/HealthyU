@@ -187,7 +187,7 @@ export function ChatPage() {
         />
       </div>
 
-      <div className="max-w-md w-full mx-auto px-5" style={{ paddingBottom: `calc(${dockHeight}px + 2rem)` }}>
+      <div className="max-w-md w-full mx-auto px-5" style={{ paddingBottom: `calc(${dockHeight}px + 2.5rem)` }}>
         <ChatQuickActions
           onPrompt={(t) => handleSend(t)}
           onReport={() => reportMut.mutate()}
@@ -211,10 +211,12 @@ export function ChatPage() {
       >
         <div className="max-w-md mx-auto px-4 pt-3 pb-24 space-y-3">
           {messages.length > 0 && (
-            <section className="space-y-2">
+            <section className="space-y-2 rounded-[1.6rem] border border-border/60 bg-muted/20 px-3 py-3">
               <div className="flex items-center justify-between gap-3 px-1">
-                <p className="text-xs font-semibold text-foreground">Saran cepat</p>
-                <p className="text-[11px] text-muted-foreground">Geser untuk lihat semua</p>
+                <div>
+                  <p className="text-xs font-semibold text-foreground">Saran cepat</p>
+                  <p className="text-[11px] text-muted-foreground">Geser ke samping untuk lihat lainnya</p>
+                </div>
               </div>
               <CoachPromptChips
                 onPick={(t) => handleSend(t)}
