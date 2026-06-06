@@ -18,6 +18,8 @@ const items = [
 export function BottomNav() {
   const location = useLocation();
   const isChat = location.pathname.startsWith("/chat");
+  if (isChat) return null;
+
   const { online, pending, sync } = useOfflineQueue();
   const fetchNotifs = useServerFn(listNotifications);
   const { data: notif } = useQuery({
