@@ -28,9 +28,9 @@ export function ScrollToTopButton() {
       type="button"
       aria-label="Kembali ke atas"
       onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-      className="fixed bottom-[5.75rem] left-4 z-50 grid h-11 w-11 place-items-center rounded-full border border-border/60 bg-card text-foreground shadow-lg backdrop-blur transition-transform duration-200 hover:scale-105 lg:bottom-6 lg:left-auto lg:right-[5.25rem]"
+      className="fixed bottom-[5.75rem] left-4 z-50 grid size-14 place-items-center rounded-full border border-border/70 bg-card/95 text-foreground shadow-xl backdrop-blur transition-all duration-200 hover:scale-105 supports-[backdrop-filter]:bg-card/85 lg:bottom-6"
     >
-      <ArrowUp className="h-5 w-5" aria-hidden="true" />
+      <ArrowUp className="size-6" aria-hidden="true" strokeWidth={2.4} />
     </button>
   );
 }
