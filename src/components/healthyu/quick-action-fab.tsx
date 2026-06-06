@@ -45,8 +45,12 @@ export function QuickActionFab() {
     onError: (e: Error) => toast.error(e.message),
   });
   const loc = useLocation();
-  // Only show on authenticated app pages, not on landing
-  if (loc.pathname === "/" || loc.pathname.startsWith("/auth")) return null;
+  // Sembunyikan di halaman yang sudah punya composer/aksi bawah sendiri
+  // (chat, scan, food, foods) supaya FAB tidak menabrak input/CTA.
+  const HIDE_ON = ["/", "/auth", "/chat", "/scan", "/food", "/foods"];
+  if (HIDE_ON.some((p) => loc.pathname === p || loc.pathname.startsWith(`${p}/`))) {
+    return null;
+  }
 
   return (
     <>
