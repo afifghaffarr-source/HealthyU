@@ -41,7 +41,7 @@ export function ChatComposer({
   return (
     <div className="space-y-2">
       {imageData && (
-        <div className="bg-card rounded-2xl outline-1 outline-black/10 p-2 flex items-center gap-2 shadow-lg">
+        <div className="flex items-center gap-2 rounded-2xl border border-border/60 bg-card px-3 py-2">
           <img
             src={imageData.preview}
             alt="preview"
@@ -56,7 +56,7 @@ export function ChatComposer({
           </button>
         </div>
       )}
-      <div className="bg-card rounded-3xl outline-1 outline-black/10 shadow-lg p-2 flex items-center gap-2">
+      <div className="flex items-center gap-2 rounded-[1.75rem] border border-border/60 bg-card px-2 py-2">
         <input
           ref={fileRef}
           type="file"
@@ -89,7 +89,7 @@ export function ChatComposer({
                 : "Tanya HealthyU AI Coach..."
           }
           disabled={pending}
-          className="flex-1 bg-transparent px-3 py-2 text-sm focus:outline-none disabled:opacity-50"
+          className="flex-1 bg-transparent px-3 py-2.5 text-sm focus:outline-none disabled:opacity-50"
         />
         <button
           onClick={onToggleMic}
