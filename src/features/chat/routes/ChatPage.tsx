@@ -32,6 +32,7 @@ export function ChatPage() {
   const endRef = useRef<HTMLDivElement>(null);
   const dockRef = useRef<HTMLDivElement>(null);
   const [dockHeight, setDockHeight] = useState(224);
+  const shellClassName = "mx-auto w-full max-w-md px-4 sm:px-5";
 
   const mutation = useMutation({
     mutationFn: async (payload: { message: string; imageBase64?: string; imageMime?: string }) => {
@@ -152,7 +153,7 @@ export function ChatPage() {
 
   return (
     <main className="min-h-dvh bg-background">
-      <div className="max-w-md w-full mx-auto px-5 pt-0">
+      <div className={shellClassName}>
         <TopAppBar
           title="HealthyU AI Coach"
           subtitle="AI nutrition coach"
@@ -187,7 +188,7 @@ export function ChatPage() {
         />
       </div>
 
-      <div className="max-w-md w-full mx-auto px-5" style={{ paddingBottom: `calc(${dockHeight}px + 2.5rem)` }}>
+      <div className={shellClassName} style={{ paddingBottom: `calc(${dockHeight}px + 2.5rem)` }}>
         <ChatQuickActions
           onPrompt={(t) => handleSend(t)}
           onReport={() => reportMut.mutate()}
@@ -209,7 +210,7 @@ export function ChatPage() {
         ref={dockRef}
         className="fixed inset-x-0 bottom-0 z-30 border-t border-border/50 bg-background/98 backdrop-blur supports-[backdrop-filter]:bg-background/92"
       >
-        <div className="max-w-md mx-auto px-4 pt-3 pb-24 space-y-3">
+        <div className={`${shellClassName} space-y-3 pt-3 pb-24`}>
           {messages.length > 0 && (
             <section className="space-y-2 rounded-[1.6rem] border border-border/60 bg-muted/20 px-3 py-3">
               <div className="flex items-center justify-between gap-3 px-1">
