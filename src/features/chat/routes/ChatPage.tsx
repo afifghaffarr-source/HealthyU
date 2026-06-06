@@ -147,11 +147,14 @@ export function ChatPage() {
     const el = scrollRef.current;
     if (!el) return;
 
-    const onScroll = () => setShowScrollUp(el.scrollTop > 260);
+    const onScroll = () => {
+      const canScroll = el.scrollHeight - el.clientHeight > 120;
+      setShowScrollUp(canScroll && el.scrollTop > 260);
+    };
     onScroll();
     el.addEventListener("scroll", onScroll, { passive: true });
     return () => el.removeEventListener("scroll", onScroll);
-  }, []);
+  }, [messages.length, imageData]);
 
   return (
     <main className="min-h-dvh bg-background flex flex-col">
