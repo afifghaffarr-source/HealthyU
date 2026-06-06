@@ -24,6 +24,11 @@ export const getRouter = () => {
     routeTree,
     context: { queryClient },
     scrollRestoration: true,
+    // Prefetch route + loader saat hover/focus link (≤50ms delay).
+    // Kombinasikan dengan staleTime 30s → tap berikutnya terasa instan
+    // tanpa double-fetch.
+    defaultPreload: "intent",
+    defaultPreloadDelay: 50,
     defaultPreloadStaleTime: 0,
     // Preserve referential identity untuk search params/loader data → kurangi re-render
     defaultStructuralSharing: true,
