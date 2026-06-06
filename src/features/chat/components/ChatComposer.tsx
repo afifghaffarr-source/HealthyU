@@ -41,7 +41,7 @@ export function ChatComposer({
   return (
     <div className="space-y-2">
       {imageData && (
-        <div className="flex items-center gap-2 rounded-2xl border border-border/60 bg-card px-3 py-2">
+        <div className="flex items-center gap-2 rounded-[1.35rem] border border-border/60 bg-card px-3 py-2 shadow-sm">
           <img
             src={imageData.preview}
             alt="preview"
@@ -49,6 +49,7 @@ export function ChatComposer({
           />
           <span className="text-xs text-muted-foreground flex-1">Foto siap dikirim</span>
           <button
+            type="button"
             onClick={() => setImageData(null)}
             className="size-7 grid place-items-center rounded-lg hover:bg-secondary/50"
           >
@@ -56,7 +57,7 @@ export function ChatComposer({
           </button>
         </div>
       )}
-      <div className="flex items-end gap-2 rounded-[1.75rem] border border-border/60 bg-card px-2 py-2 shadow-sm">
+      <div className="flex min-w-0 items-end gap-2 rounded-[1.75rem] border border-border/60 bg-card px-2 py-2 shadow-sm">
         <input
           ref={fileRef}
           type="file"
@@ -70,6 +71,7 @@ export function ChatComposer({
           }}
         />
         <button
+          type="button"
           onClick={() => fileRef.current?.click()}
           disabled={pending}
           className="size-10 grid place-items-center rounded-2xl text-muted-foreground hover:bg-secondary/50 disabled:opacity-40"
@@ -95,9 +97,10 @@ export function ChatComposer({
           }
           disabled={pending}
           rows={1}
-          className="max-h-32 min-h-[2.75rem] flex-1 resize-none bg-transparent px-3 py-2.5 text-sm leading-5 focus:outline-none disabled:opacity-50"
+          className="max-h-32 min-h-[2.75rem] min-w-0 flex-1 resize-none bg-transparent px-2 py-2.5 text-sm leading-5 focus:outline-none disabled:opacity-50"
         />
         <button
+          type="button"
           onClick={onToggleMic}
           disabled={pending}
           className={`size-10 grid place-items-center rounded-2xl transition disabled:opacity-40 ${
@@ -110,6 +113,7 @@ export function ChatComposer({
           {listening ? <MicOff className="size-4" /> : <Mic className="size-4" />}
         </button>
         <button
+          type="button"
           onClick={onSend}
           disabled={pending || (!input.trim() && !imageData)}
           className="size-10 bg-primary text-primary-foreground rounded-2xl grid place-items-center disabled:opacity-40"
