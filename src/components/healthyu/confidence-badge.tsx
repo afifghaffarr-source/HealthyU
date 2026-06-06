@@ -9,10 +9,7 @@ export function tierFromScore(score: number | null | undefined): ConfidenceTier 
   return "low";
 }
 
-const STYLE: Record<
-  ConfidenceTier,
-  { label: string; Icon: typeof CheckCircle2; cls: string }
-> = {
+const STYLE: Record<ConfidenceTier, { label: string; Icon: typeof CheckCircle2; cls: string }> = {
   high: {
     label: "Tinggi",
     Icon: CheckCircle2,

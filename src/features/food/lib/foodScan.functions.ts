@@ -35,20 +35,18 @@ const ScanInput = z.object({
   use_pro: z.boolean().optional(),
 });
 
-const ScanItemSchema = z
-  .object({
-    name: z.string().default(""),
-    name_en: z.string().optional(),
-    portion_g: z.number().optional(),
-    portion_ml: z.number().optional(),
-    confidence: z.coerce.number().default(0),
-    calories: z.coerce.number().default(0),
-    protein_g: z.coerce.number().default(0),
-    carbs_g: z.coerce.number().default(0),
-    fat_g: z.coerce.number().default(0),
-    notes: z.string().optional(),
-  })
-  ;
+const ScanItemSchema = z.object({
+  name: z.string().default(""),
+  name_en: z.string().optional(),
+  portion_g: z.number().optional(),
+  portion_ml: z.number().optional(),
+  confidence: z.coerce.number().default(0),
+  calories: z.coerce.number().default(0),
+  protein_g: z.coerce.number().default(0),
+  carbs_g: z.coerce.number().default(0),
+  fat_g: z.coerce.number().default(0),
+  notes: z.string().optional(),
+});
 const ScanResultSchema = z.object({ items: z.array(ScanItemSchema).default([]) });
 type ScanItem = z.infer<typeof ScanItemSchema> & { matched_food_id?: string | null };
 

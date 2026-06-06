@@ -31,9 +31,9 @@ describe("chatMessageSchema", () => {
     expect(chatMessageSchema.safeParse({ message: "x".repeat(2001) }).success).toBe(false);
   });
   it("rejects unsupported image mime", () => {
-    expect(
-      chatMessageSchema.safeParse({ message: "hi", imageMime: "image/gif" }).success,
-    ).toBe(false);
+    expect(chatMessageSchema.safeParse({ message: "hi", imageMime: "image/gif" }).success).toBe(
+      false,
+    );
   });
 });
 

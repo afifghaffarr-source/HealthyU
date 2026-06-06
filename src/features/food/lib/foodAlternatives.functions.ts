@@ -16,7 +16,11 @@ export const getFoodAlternatives = createServerFn({ method: "GET" })
       .order("similarity_score", { ascending: false })
       .limit(10);
     if (error) throw new Error(error.message);
-    const rowList = (rows ?? []) as Array<{ alternative_food_id: string; similarity_score: number | null; reason: string | null }>;
+    const rowList = (rows ?? []) as Array<{
+      alternative_food_id: string;
+      similarity_score: number | null;
+      reason: string | null;
+    }>;
     const ids = rowList.map((r) => r.alternative_food_id);
     if (ids.length === 0) return [];
     const { data: foods } = await supabase
@@ -112,9 +116,25 @@ export const regenerateAlternativeReasons = createServerFn({ method: "POST" })
       .from("food_items")
       .select("id, name, calories, sodium_mg, sugar_g, fiber_g, glycemic_index")
       .in("id", ids);
-    type FoodRow = { id: string; name: string; calories: number | null; sodium_mg: number | null; sugar_g: number | null; fiber_g: number | null; glycemic_index: number | null };
+    type FoodRow = {
+      id: string;
+      name: string;
+      calories: number | null;
+      sodium_mg: number | null;
+      sugar_g: number | null;
+      fiber_g: number | null;
+      glycemic_index: number | null;
+    };
     const fmap = new Map(((foods ?? []) as FoodRow[]).map((f) => [f.id, f] as const));
-    type Item = { alt_id: string; alt_name: string; calories: number | null; sodium_mg: number | null; sugar_g: number | null; fiber_g: number | null; glycemic_index: number | null };
+    type Item = {
+      alt_id: string;
+      alt_name: string;
+      calories: number | null;
+      sodium_mg: number | null;
+      sugar_g: number | null;
+      fiber_g: number | null;
+      glycemic_index: number | null;
+    };
     const items: Item[] = [];
     for (const a of altList) {
       const f = fmap.get(a.alternative_food_id);
@@ -136,10 +156,13 @@ Untuk setiap alternatif berikut, beri penjelasan singkat (maks 12 kata, bahasa I
 Alternatif: ${JSON.stringify(items.map((x) => ({ id: x.alt_id, name: x.alt_name, kal: x.calories, na: x.sodium_mg, gula: x.sugar_g, serat: x.fiber_g, gi: x.glycemic_index })))}
 Output JSON: { "reasons": [{ "id": "<alt_id>", "reason": "..." }] }`;
 
-    const parsed = await callGeminiJSON([
-      { role: "system", content: "Kamu adalah ahli gizi. Balas hanya JSON valid." },
-      { role: "user", content: prompt },
-    ], userId);
+    const parsed = await callGeminiJSON(
+      [
+        { role: "system", content: "Kamu adalah ahli gizi. Balas hanya JSON valid." },
+        { role: "user", content: prompt },
+      ],
+      userId,
+    );
     const arr = parsed.reasons;
 
     let updated = 0;

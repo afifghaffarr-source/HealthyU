@@ -10,13 +10,7 @@ import {
 
 type Point = { date: string; kg: number };
 
-export default function WeightAreaChart({
-  data,
-  target,
-}: {
-  data: Point[];
-  target?: number;
-}) {
+export default function WeightAreaChart({ data, target }: { data: Point[]; target?: number }) {
   return (
     <ResponsiveContainer width="100%" height="100%">
       <AreaChart data={data}>

@@ -15,10 +15,7 @@ const ITEMS: Item[] = [
 
 export function ActionRow() {
   return (
-    <nav
-      aria-label="Aksi cepat"
-      className="grid grid-cols-3 gap-2 animate-fade-up"
-    >
+    <nav aria-label="Aksi cepat" className="grid grid-cols-3 gap-2 animate-fade-up">
       {ITEMS.map(({ to, label, Icon }) => (
         <Link
           key={to}

@@ -3,17 +3,14 @@ import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { callAiJsonWithSchema } from "@/features/ai/lib/aiGateway.server";
 
-const MealTagsSchema = z
-  .object({
-    halal: z.union([z.boolean(), z.null()]).optional(),
-    vegan: z.boolean().optional(),
-    vegetarian: z.boolean().optional(),
-    allergens: z.array(z.string()).default([]),
-    allergy_warning: z.union([z.string(), z.null()]).optional(),
-    translated_name: z.union([z.string(), z.null()]).optional(),
-  })
-  ;
-
+const MealTagsSchema = z.object({
+  halal: z.union([z.boolean(), z.null()]).optional(),
+  vegan: z.boolean().optional(),
+  vegetarian: z.boolean().optional(),
+  allergens: z.array(z.string()).default([]),
+  allergy_warning: z.union([z.string(), z.null()]).optional(),
+  translated_name: z.union([z.string(), z.null()]).optional(),
+});
 // ============ 14: export CSV ============
 export const exportMealsCsv = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])

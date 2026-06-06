@@ -36,10 +36,10 @@ export function WeeklyReviewCard() {
   const daysWithCheckIn = new Set(
     thisWeek.map((m) => new Date(m.logged_at).toISOString().slice(0, 10)),
   ).size;
-  const lastWin = thisWeek.find((m) => m.note?.startsWith("[malam] menang:"))?.note?.replace(
-    "[malam] menang:",
-    "",
-  ).trim();
+  const lastWin = thisWeek
+    .find((m) => m.note?.startsWith("[malam] menang:"))
+    ?.note?.replace("[malam] menang:", "")
+    .trim();
 
   // Hide if no signal at all — empty review feels worse than nothing.
   if (daysWithCheckIn === 0 && !lastWin) return null;
@@ -47,7 +47,10 @@ export function WeeklyReviewCard() {
   return (
     <section className="bg-card p-4 rounded-3xl outline-1 outline-black/5 dark:outline-white/10 space-y-2 animate-fade-up">
       <div className="flex items-center gap-2">
-        <span className="size-8 rounded-xl bg-primary/10 text-primary grid place-items-center" aria-hidden>
+        <span
+          className="size-8 rounded-xl bg-primary/10 text-primary grid place-items-center"
+          aria-hidden
+        >
           <CalendarCheck2 className="size-4" />
         </span>
         <div className="min-w-0">
@@ -58,9 +61,7 @@ export function WeeklyReviewCard() {
       <ul className="text-xs text-muted-foreground space-y-1 pl-1">
         <li>
           Check-in tercatat:{" "}
-          <span className="font-semibold text-foreground tabular-nums">
-            {daysWithCheckIn} hari
-          </span>{" "}
+          <span className="font-semibold text-foreground tabular-nums">{daysWithCheckIn} hari</span>{" "}
           minggu ini.
         </li>
         {lastWin && (

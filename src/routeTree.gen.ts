@@ -162,6 +162,7 @@ import { Route as ApiWearableGoogleFitCallbackRouteImport } from './routes/api/w
 import { Route as ApiPublicHooksWeeklyAiReportRouteImport } from './routes/api/public/hooks/weekly-ai-report'
 import { Route as ApiPublicHooksRecipesTrendingSnapshotRouteImport } from './routes/api/public/hooks/recipes-trending-snapshot'
 import { Route as ApiPublicHooksNotificationSchedulerRouteImport } from './routes/api/public/hooks/notification-scheduler'
+import { Route as ApiPublicHooksDataRetentionRouteImport } from './routes/api/public/hooks/data-retention'
 import { Route as ApiPublicHooksDailyContentRouteImport } from './routes/api/public/hooks/daily-content'
 import { Route as ApiPublicHooksDailyCoachRouteImport } from './routes/api/public/hooks/daily-coach'
 import { Route as AuthenticatedWorkoutPlayerIdRouteImport } from './routes/_authenticated/workout.player.$id'
@@ -1001,6 +1002,12 @@ const ApiPublicHooksNotificationSchedulerRoute =
     path: '/api/public/hooks/notification-scheduler',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicHooksDataRetentionRoute =
+  ApiPublicHooksDataRetentionRouteImport.update({
+    id: '/api/public/hooks/data-retention',
+    path: '/api/public/hooks/data-retention',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicHooksDailyContentRoute =
   ApiPublicHooksDailyContentRouteImport.update({
     id: '/api/public/hooks/daily-content',
@@ -1214,6 +1221,7 @@ export interface FileRoutesByFullPath {
   '/workout/player/$id': typeof AuthenticatedWorkoutPlayerIdRoute
   '/api/public/hooks/daily-coach': typeof ApiPublicHooksDailyCoachRoute
   '/api/public/hooks/daily-content': typeof ApiPublicHooksDailyContentRoute
+  '/api/public/hooks/data-retention': typeof ApiPublicHooksDataRetentionRoute
   '/api/public/hooks/notification-scheduler': typeof ApiPublicHooksNotificationSchedulerRoute
   '/api/public/hooks/recipes-trending-snapshot': typeof ApiPublicHooksRecipesTrendingSnapshotRoute
   '/api/public/hooks/weekly-ai-report': typeof ApiPublicHooksWeeklyAiReportRoute
@@ -1370,6 +1378,7 @@ export interface FileRoutesByTo {
   '/workout/player/$id': typeof AuthenticatedWorkoutPlayerIdRoute
   '/api/public/hooks/daily-coach': typeof ApiPublicHooksDailyCoachRoute
   '/api/public/hooks/daily-content': typeof ApiPublicHooksDailyContentRoute
+  '/api/public/hooks/data-retention': typeof ApiPublicHooksDataRetentionRoute
   '/api/public/hooks/notification-scheduler': typeof ApiPublicHooksNotificationSchedulerRoute
   '/api/public/hooks/recipes-trending-snapshot': typeof ApiPublicHooksRecipesTrendingSnapshotRoute
   '/api/public/hooks/weekly-ai-report': typeof ApiPublicHooksWeeklyAiReportRoute
@@ -1535,6 +1544,7 @@ export interface FileRoutesById {
   '/_authenticated/workout/player/$id': typeof AuthenticatedWorkoutPlayerIdRoute
   '/api/public/hooks/daily-coach': typeof ApiPublicHooksDailyCoachRoute
   '/api/public/hooks/daily-content': typeof ApiPublicHooksDailyContentRoute
+  '/api/public/hooks/data-retention': typeof ApiPublicHooksDataRetentionRoute
   '/api/public/hooks/notification-scheduler': typeof ApiPublicHooksNotificationSchedulerRoute
   '/api/public/hooks/recipes-trending-snapshot': typeof ApiPublicHooksRecipesTrendingSnapshotRoute
   '/api/public/hooks/weekly-ai-report': typeof ApiPublicHooksWeeklyAiReportRoute
@@ -1700,6 +1710,7 @@ export interface FileRouteTypes {
     | '/workout/player/$id'
     | '/api/public/hooks/daily-coach'
     | '/api/public/hooks/daily-content'
+    | '/api/public/hooks/data-retention'
     | '/api/public/hooks/notification-scheduler'
     | '/api/public/hooks/recipes-trending-snapshot'
     | '/api/public/hooks/weekly-ai-report'
@@ -1856,6 +1867,7 @@ export interface FileRouteTypes {
     | '/workout/player/$id'
     | '/api/public/hooks/daily-coach'
     | '/api/public/hooks/daily-content'
+    | '/api/public/hooks/data-retention'
     | '/api/public/hooks/notification-scheduler'
     | '/api/public/hooks/recipes-trending-snapshot'
     | '/api/public/hooks/weekly-ai-report'
@@ -2020,6 +2032,7 @@ export interface FileRouteTypes {
     | '/_authenticated/workout/player/$id'
     | '/api/public/hooks/daily-coach'
     | '/api/public/hooks/daily-content'
+    | '/api/public/hooks/data-retention'
     | '/api/public/hooks/notification-scheduler'
     | '/api/public/hooks/recipes-trending-snapshot'
     | '/api/public/hooks/weekly-ai-report'
@@ -2042,6 +2055,7 @@ export interface RootRouteChildren {
   ApiImgSplatRoute: typeof ApiImgSplatRoute
   ApiPublicHooksDailyCoachRoute: typeof ApiPublicHooksDailyCoachRoute
   ApiPublicHooksDailyContentRoute: typeof ApiPublicHooksDailyContentRoute
+  ApiPublicHooksDataRetentionRoute: typeof ApiPublicHooksDataRetentionRoute
   ApiPublicHooksNotificationSchedulerRoute: typeof ApiPublicHooksNotificationSchedulerRoute
   ApiPublicHooksRecipesTrendingSnapshotRoute: typeof ApiPublicHooksRecipesTrendingSnapshotRoute
   ApiPublicHooksWeeklyAiReportRoute: typeof ApiPublicHooksWeeklyAiReportRoute
@@ -3121,6 +3135,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicHooksNotificationSchedulerRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/hooks/data-retention': {
+      id: '/api/public/hooks/data-retention'
+      path: '/api/public/hooks/data-retention'
+      fullPath: '/api/public/hooks/data-retention'
+      preLoaderRoute: typeof ApiPublicHooksDataRetentionRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/hooks/daily-content': {
       id: '/api/public/hooks/daily-content'
       path: '/api/public/hooks/daily-content'
@@ -3778,6 +3799,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiImgSplatRoute: ApiImgSplatRoute,
   ApiPublicHooksDailyCoachRoute: ApiPublicHooksDailyCoachRoute,
   ApiPublicHooksDailyContentRoute: ApiPublicHooksDailyContentRoute,
+  ApiPublicHooksDataRetentionRoute: ApiPublicHooksDataRetentionRoute,
   ApiPublicHooksNotificationSchedulerRoute:
     ApiPublicHooksNotificationSchedulerRoute,
   ApiPublicHooksRecipesTrendingSnapshotRoute:

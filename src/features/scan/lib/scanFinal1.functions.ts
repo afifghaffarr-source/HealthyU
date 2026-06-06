@@ -131,4 +131,3 @@ export const getPublicProfile = createServerFn({ method: "POST" })
       isFollowing: !!isFollowing,
     };
   });
-

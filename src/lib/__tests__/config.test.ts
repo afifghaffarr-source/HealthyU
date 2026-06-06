@@ -3,7 +3,9 @@ import { getServerConfig } from "../config.server";
 
 describe("getServerConfig", () => {
   const orig = process.env.NODE_ENV;
-  afterEach(() => { process.env.NODE_ENV = orig; });
+  afterEach(() => {
+    process.env.NODE_ENV = orig;
+  });
 
   it("reads NODE_ENV per call", () => {
     process.env.NODE_ENV = "production";

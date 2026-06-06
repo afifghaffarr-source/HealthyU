@@ -63,7 +63,9 @@ export const Route = createFileRoute("/kalori/$slug")({
   },
   errorComponent: ({ error }) => (
     <main className="mx-auto max-w-3xl px-4 py-8">
-      <p role="alert" className="text-destructive">Gagal memuat: {error.message}</p>
+      <p role="alert" className="text-destructive">
+        Gagal memuat: {error.message}
+      </p>
     </main>
   ),
   notFoundComponent: () => (
@@ -82,7 +84,9 @@ function FoodDetail() {
   return (
     <main className="mx-auto max-w-3xl px-4 py-8">
       <nav aria-label="Breadcrumb" className="mb-4 text-sm text-muted-foreground">
-        <Link to="/kalori" className="hover:text-foreground">Kalori</Link>
+        <Link to="/kalori" className="hover:text-foreground">
+          Kalori
+        </Link>
         <span className="mx-2">/</span>
         <span className="text-foreground">{f.name}</span>
       </nav>
@@ -127,9 +131,7 @@ function Stat({
 }) {
   return (
     <div
-      className={`rounded-lg border p-4 ${
-        highlight ? "border-primary bg-primary/5" : "bg-card"
-      }`}
+      className={`rounded-lg border p-4 ${highlight ? "border-primary bg-primary/5" : "bg-card"}`}
     >
       <div className="text-xs uppercase text-muted-foreground">{label}</div>
       <div className="mt-1 text-2xl font-bold">

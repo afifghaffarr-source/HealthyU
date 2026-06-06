@@ -1,5 +1,9 @@
 import { describe, it, expect, vi } from "vitest";
-import { classifyMessage, buildCompactProfile, compactTodayBlock } from "@/features/ai/lib/aiRouter.server";
+import {
+  classifyMessage,
+  buildCompactProfile,
+  compactTodayBlock,
+} from "@/features/ai/lib/aiRouter.server";
 
 describe("classifyMessage", () => {
   it("tier 3 for image", () => {
@@ -18,11 +22,10 @@ describe("classifyMessage", () => {
     expect(classifyMessage("berapa target air per hari?", false).tier).toBe(1);
   });
   it("tier 3 when >=30 words AND >=2 complex hints", () => {
-    const text = (
+    const text =
       "tolong tolong buat sebuah rencana menu 7 hari untuk diabetes dan hipertensi dengan analisis " +
       "kandungan gizi serta evaluasi korelasi gula darah dan tekanan darah harian saya selama " +
-      "seminggu penuh ke depan ini supaya saya bisa konsisten benar"
-    );
+      "seminggu penuh ke depan ini supaya saya bisa konsisten benar";
     expect(classifyMessage(text, false).reason).toBe("complex");
   });
   it("default tier 2 flash", () => {
@@ -48,10 +51,17 @@ describe("buildCompactProfile", () => {
 
   it("builds block + stable hash", async () => {
     const p = {
-      full_name: "Ali", gender: "male", birth_date: "1990-01-01",
-      weight_kg: 70, height_cm: 170, target_weight_kg: 65,
-      activity_level: "moderate", daily_calorie_target: 2000,
-      dietary_preference: "none", allergies: ["udang"], health_conditions: ["diabetes"],
+      full_name: "Ali",
+      gender: "male",
+      birth_date: "1990-01-01",
+      weight_kg: 70,
+      height_cm: 170,
+      target_weight_kg: 65,
+      activity_level: "moderate",
+      daily_calorie_target: 2000,
+      dietary_preference: "none",
+      allergies: ["udang"],
+      health_conditions: ["diabetes"],
     };
     const a = await buildCompactProfile(client(p), "u1");
     const b = await buildCompactProfile(client(p), "u1");
@@ -63,7 +73,15 @@ describe("buildCompactProfile", () => {
 
 describe("compactTodayBlock", () => {
   it("formats today summary", () => {
-    const s = compactTodayBlock({ cal: 1500.7, calTarget: 2000, burn: 300.4, water: 1500, fastingActive: true, sleepH: 7.25, workoutDone: false });
+    const s = compactTodayBlock({
+      cal: 1500.7,
+      calTarget: 2000,
+      burn: 300.4,
+      water: 1500,
+      fastingActive: true,
+      sleepH: 7.25,
+      workoutDone: false,
+    });
     expect(s).toContain("1501/2000kal");
     expect(s).toContain("air1500ml");
     expect(s).toContain("olahraga–");
@@ -71,6 +89,16 @@ describe("compactTodayBlock", () => {
     expect(s).toContain("tidur7.3j");
   });
   it("handles null sleep", () => {
-    expect(compactTodayBlock({ cal: 0, calTarget: 0, burn: 0, water: 0, fastingActive: false, sleepH: null, workoutDone: true })).toContain("tidur-");
+    expect(
+      compactTodayBlock({
+        cal: 0,
+        calTarget: 0,
+        burn: 0,
+        water: 0,
+        fastingActive: false,
+        sleepH: null,
+        workoutDone: true,
+      }),
+    ).toContain("tidur-");
   });
 });

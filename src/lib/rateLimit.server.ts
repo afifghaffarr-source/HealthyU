@@ -7,13 +7,16 @@ import type { Database } from "@/integrations/supabase/types";
  *
  * Use within server functions / server routes AFTER the user is authenticated,
  * passing the user-scoped `supabase` client so auth.uid() resolves correctly.
+ *
+ * **Default: fail-closed** — when the RPC errors the request is blocked.
+ * Pass `{ failOpen: true }` explicitly for non-critical paths.
  */
 export async function checkRateLimit(
   supabase: SupabaseClient<Database>,
   bucket: string,
   maxRequests: number,
   windowSeconds: number,
-  opts?: { failClosed?: boolean },
+  opts?: { failOpen?: boolean },
 ): Promise<boolean> {
   const { data, error } = await supabase.rpc("check_rate_limit", {
     _bucket: bucket,
@@ -22,7 +25,7 @@ export async function checkRateLimit(
   });
   if (error) {
     console.error("[rateLimit] RPC error:", error.message);
-    return opts?.failClosed ? false : true;
+    return opts?.failOpen ? true : false;
   }
   return data === true;
 }

@@ -55,13 +55,17 @@ function Page() {
           </button>
         </div>
         {isLoading && <p className="text-sm text-muted-foreground">Memuat…</p>}
-        {(data?.stories as Array<{
-          id: string;
-          caption: string | null;
-          image_url: string | null;
-          created_at: string;
-          profiles?: { full_name: string | null } | null;
-        }> | undefined)?.map((s) => (
+        {(
+          data?.stories as
+            | Array<{
+                id: string;
+                caption: string | null;
+                image_url: string | null;
+                created_at: string;
+                profiles?: { full_name: string | null } | null;
+              }>
+            | undefined
+        )?.map((s) => (
           <div key={s.id} className="rounded-2xl bg-card border p-3 space-y-1">
             <div className="text-xs text-muted-foreground">
               {s.profiles?.full_name ?? "User"} ·{" "}
@@ -70,7 +74,15 @@ function Page() {
                 minute: "2-digit",
               })}
             </div>
-            {s.image_url && <img loading="lazy" decoding="async" src={s.image_url} alt="" className="rounded-xl w-full" />}
+            {s.image_url && (
+              <img
+                loading="lazy"
+                decoding="async"
+                src={s.image_url}
+                alt=""
+                className="rounded-xl w-full"
+              />
+            )}
             {s.caption && <p className="text-sm">{s.caption}</p>}
           </div>
         ))}

@@ -89,7 +89,9 @@ export const Route = createFileRoute("/resep/$slug")({
   },
   errorComponent: ({ error }) => (
     <main className="mx-auto max-w-3xl px-4 py-8">
-      <p role="alert" className="text-destructive">Gagal memuat: {error.message}</p>
+      <p role="alert" className="text-destructive">
+        Gagal memuat: {error.message}
+      </p>
     </main>
   ),
   notFoundComponent: () => (
@@ -108,7 +110,9 @@ function ResepDetail() {
   return (
     <main className="mx-auto max-w-3xl px-4 py-8">
       <nav aria-label="Breadcrumb" className="mb-4 text-sm text-muted-foreground">
-        <Link to="/resep" className="hover:text-foreground">Resep</Link>
+        <Link to="/resep" className="hover:text-foreground">
+          Resep
+        </Link>
         <span className="mx-2">/</span>
         <span className="text-foreground">{r.title}</span>
       </nav>

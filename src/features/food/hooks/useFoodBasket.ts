@@ -47,8 +47,7 @@ export function useFoodBasket(mealType: MealType) {
       ),
     );
 
-  const removeFromBasket = (k: string) =>
-    setBasket((prev) => prev.filter((b) => b.key !== k));
+  const removeFromBasket = (k: string) => setBasket((prev) => prev.filter((b) => b.key !== k));
 
   const basketTotals = basket.reduce(
     (a, b) => ({

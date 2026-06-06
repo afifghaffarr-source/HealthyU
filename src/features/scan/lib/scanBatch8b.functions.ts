@@ -1,16 +1,33 @@
+// Re-exports from consolidated scan modules
 export {
   adjustPortion,
+} from "./scanWellness.functions";
+export {
   restaurantsNearby,
   convertCurrency,
+} from "./scanMisc.functions";
+export {
   getSleepScore,
+  generateWeeklyReport,
+} from "./scanReports.functions";
+export {
   getPublicProfileMeta,
-} from "./scanBatch8b1.functions";
+} from "./scanDiscovery.functions";
 export {
   shouldSuggestFreeze,
+  logMeditation,
+  listMeditations,
+} from "./scanWellness.functions";
+export {
   createFamilyInvite,
   redeemFamilyInvite,
   createDoctorReferral,
   smartShoppingList,
-  logMeditation,
-  listMeditations,
-} from "./scanBatch8b2.functions";
+} from "./scanPlan.functions";
+export {
+  notifyUser,
+  listNotifications,
+  markNotifRead,
+  checkMyStreakRisk,
+  transcribeMoodVoice,
+} from "./scanNotifications.functions";

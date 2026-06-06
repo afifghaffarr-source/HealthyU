@@ -71,9 +71,7 @@ export async function streamAiChat(opts: StreamAiOptions): Promise<{
  * Returns `{ deltas, remainder }` so the caller can carry the unfinished
  * tail across reads.
  */
-export function parseSseChunk(
-  buffer: string,
-): { deltas: string[]; remainder: string } {
+export function parseSseChunk(buffer: string): { deltas: string[]; remainder: string } {
   const lines = buffer.split("\n");
   const remainder = lines.pop() ?? "";
   const deltas: string[] = [];

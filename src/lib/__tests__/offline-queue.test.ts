@@ -9,13 +9,16 @@ import {
   remove,
   retryDead,
   clearDead,
+  clearAll,
+  cleanupExpired,
+  TTL_MS,
   type QueueItem,
   type QueueKind,
 } from "../offline-queue";
 
 async function resetIdb() {
   // Clear both stores without deleting the DB (deleteDatabase blocks on open connections).
-  const open = indexedDB.open("sehatify-offline", 2);
+  const open = indexedDB.open("sehatify-offline", 3);
   await new Promise<void>((resolve, reject) => {
     open.onsuccess = () => resolve();
     open.onerror = () => reject(open.error);
@@ -141,6 +144,65 @@ describe("offline-queue", () => {
       expect(await count()).toBeGreaterThan(0);
     }
     await clearDead();
+    expect(await listDead()).toHaveLength(0);
+  });
+
+  it("enqueue sets expires_at field", async () => {
+    await enqueue("water", { ml: 250 });
+    const items = await listAll();
+    expect(items[0].expires_at).toBeGreaterThan(Date.now());
+    expect(items[0].expires_at).toBeLessThanOrEqual(Date.now() + TTL_MS + 1000);
+  });
+
+  it("cleanupExpired removes items past TTL", async () => {
+    // Manually add an expired item
+    const now = Date.now();
+    const spy = vi.spyOn(Date, "now").mockReturnValue(now);
+    try {
+      await enqueue("water", { ml: 100 });
+    } finally {
+      spy.mockRestore();
+    }
+    // Item should exist
+    expect(await count()).toBe(1);
+
+    // Now pretend time has advanced past TTL
+    const futureSpy = vi.spyOn(Date, "now").mockReturnValue(now + TTL_MS + 1);
+    try {
+      await cleanupExpired();
+    } finally {
+      futureSpy.mockRestore();
+    }
+    expect(await count()).toBe(0);
+  });
+
+  it("flush skips expired items", async () => {
+    const now = Date.now();
+    const spy = vi.spyOn(Date, "now").mockReturnValue(now);
+    try {
+      await enqueue("meal", { id: "m1" });
+    } finally {
+      spy.mockRestore();
+    }
+    const syncer = vi.fn().mockResolvedValue(undefined);
+    const futureSpy = vi.spyOn(Date, "now").mockReturnValue(now + TTL_MS + 1);
+    try {
+      const result = await flush({
+        meal: syncer,
+      } as unknown as Record<QueueKind, (i: QueueItem) => Promise<void>>);
+      expect(result.synced).toBe(0);
+      expect(syncer).not.toHaveBeenCalled();
+    } finally {
+      futureSpy.mockRestore();
+    }
+  });
+
+  it("clearAll empties both stores", async () => {
+    await enqueue("water", { ml: 100 });
+    await enqueue("weight", { kg: 70 });
+    expect(await count()).toBe(2);
+    await clearAll();
+    expect(await count()).toBe(0);
     expect(await listDead()).toHaveLength(0);
   });
 });

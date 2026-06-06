@@ -4,9 +4,7 @@ import { toast } from "sonner";
 import { toastError } from "@/lib/toast-config";
 import { generateTimelapse } from "@/lib/timelapse";
 
-const ProgressRadialChart = lazy(
-  () => import("@/components/charts/progress-radial-chart"),
-);
+const ProgressRadialChart = lazy(() => import("@/components/charts/progress-radial-chart"));
 
 type GoalDatum = { name: string; value: number; fill: string };
 
@@ -139,9 +137,7 @@ export function ProgressPhotoGrid({
                 month: "short",
               })}
             </p>
-            {p.weight_kg && (
-              <p className="text-[10px] text-muted-foreground">{p.weight_kg} kg</p>
-            )}
+            {p.weight_kg && <p className="text-[10px] text-muted-foreground">{p.weight_kg} kg</p>}
             {p.notes && <p className="text-[10px] text-muted-foreground truncate">{p.notes}</p>}
           </div>
           <button
@@ -156,11 +152,7 @@ export function ProgressPhotoGrid({
   );
 }
 
-export function TimelapseButton({
-  photos,
-}: {
-  photos: { url: string; taken_at: string }[];
-}) {
+export function TimelapseButton({ photos }: { photos: { url: string; taken_at: string }[] }) {
   const [busy, setBusy] = useState(false);
   const [video, setVideo] = useState<{ url: string; ext: string } | null>(null);
 

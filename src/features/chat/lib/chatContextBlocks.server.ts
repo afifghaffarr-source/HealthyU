@@ -1,11 +1,4 @@
-import {
-  calcAge,
-  calcBMI,
-  calcBMR,
-  calcTDEE,
-  bmiCategory,
-  type ActivityLevel,
-} from "@/lib/health";
+import { calcAge, calcBMI, calcBMR, calcTDEE, bmiCategory, type ActivityLevel } from "@/lib/health";
 import { fmtNum } from "./chatPrompt.server";
 
 type Profile = {
@@ -52,7 +45,15 @@ export function buildProfileBlock(profile: Profile): { profileBlock: string; tde
   return { profileBlock, tdee };
 }
 
-type Fasting = { start_time: string; end_time: string | null; target_hours: number; protocol: string; completed: boolean | null } | undefined;
+type Fasting =
+  | {
+      start_time: string;
+      end_time: string | null;
+      target_hours: number;
+      protocol: string;
+      completed: boolean | null;
+    }
+  | undefined;
 type Sleep = { sleep_start: string; sleep_end: string; quality: number } | undefined;
 type Workout = { name: string; duration_min: number; calories_burned: number };
 

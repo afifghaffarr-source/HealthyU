@@ -49,8 +49,8 @@ export function LandingHero({
         </h1>
         <p className="text-muted-foreground text-lg text-balance max-w-md">
           Scan piring, atur puasa, lihat jadwal sholat, dan tanya{" "}
-          <span className="font-semibold text-foreground">HealthyU AI Coach</span> kapan saja — semua
-          dalam satu app yang ringan & gratis.
+          <span className="font-semibold text-foreground">HealthyU AI Coach</span> kapan saja —
+          semua dalam satu app yang ringan & gratis.
         </p>
         <div className="flex flex-col sm:flex-row gap-3 pt-2">
           <Link

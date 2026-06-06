@@ -14,9 +14,7 @@ function Page() {
     queryFn: () => fn({ data: undefined as never }),
   });
   const rows = data?.rows ?? [];
-  const avg = rows.length
-    ? Math.round(rows.reduce((s, r) => s + r.score, 0) / rows.length)
-    : 0;
+  const avg = rows.length ? Math.round(rows.reduce((s, r) => s + r.score, 0) / rows.length) : 0;
   return (
     <div className="min-h-dvh pb-24 bg-background">
       <TopAppBar title="Skor Tidur" showBack />

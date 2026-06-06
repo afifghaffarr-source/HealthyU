@@ -30,12 +30,7 @@ export function KeyboardShortcutsDialog() {
       if (e.key !== "?" || e.ctrlKey || e.metaKey || e.altKey) return;
       const target = e.target as HTMLElement | null;
       const tag = target?.tagName;
-      if (
-        tag === "INPUT" ||
-        tag === "TEXTAREA" ||
-        tag === "SELECT" ||
-        target?.isContentEditable
-      )
+      if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT" || target?.isContentEditable)
         return;
       e.preventDefault();
       setOpen((v) => !v);
@@ -52,9 +47,7 @@ export function KeyboardShortcutsDialog() {
             <Keyboard className="h-5 w-5 text-primary" aria-hidden="true" />
             Pintasan Keyboard
           </DialogTitle>
-          <DialogDescription>
-            Navigasi lebih cepat tanpa lepas dari keyboard.
-          </DialogDescription>
+          <DialogDescription>Navigasi lebih cepat tanpa lepas dari keyboard.</DialogDescription>
         </DialogHeader>
         <ul className="mt-2 space-y-2">
           {SHORTCUTS.map((s) => (
@@ -77,7 +70,10 @@ export function KeyboardShortcutsDialog() {
           ))}
         </ul>
         <p className="mt-3 text-xs text-muted-foreground">
-          Tekan <kbd className="rounded border border-border bg-background px-1.5 py-0.5 font-mono">?</kbd>{" "}
+          Tekan{" "}
+          <kbd className="rounded border border-border bg-background px-1.5 py-0.5 font-mono">
+            ?
+          </kbd>{" "}
           kapan saja untuk membuka panel ini.
         </p>
       </DialogContent>

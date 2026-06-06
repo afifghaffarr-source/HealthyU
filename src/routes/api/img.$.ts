@@ -1,9 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 
 // Allow-list of upstream hosts. Anything else returns 403 (SSRF guard).
-const ALLOWED_HOSTS = new Set<string>([
-  "tpyckpdlzpbfguyrgeuy.supabase.co",
-]);
+const ALLOWED_HOSTS = new Set<string>(["tpyckpdlzpbfguyrgeuy.supabase.co"]);
 
 export const Route = createFileRoute("/api/img/$")({
   server: {

@@ -1,17 +1,23 @@
-// Barrel re-exports — split into scanBatch9a / scanBatch9b for line-budget.
+// Re-exports from consolidated scan modules
 export {
   addRecipeReview,
   listRecipeReviews,
+} from "./scanMisc.functions";
+export {
   setWeightGoal,
   getWeightGoal,
   listExercises,
-  claimDailyLoginBonus,
-} from "./scanBatch9a.functions";
-export {
   createHydrationChallenge,
   joinHydrationChallenge,
   upsertSmartAlarm,
   listSmartAlarms,
+} from "./scanWellness.functions";
+export {
+  claimDailyLoginBonus,
+} from "./scanGamification.functions";
+export {
   scanBarcode,
+} from "./scanBarcode.functions";
+export {
   recordStoryPhoto,
-} from "./scanBatch9b.functions";
+} from "./scanSocial.functions";

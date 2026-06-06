@@ -74,12 +74,14 @@ function Page() {
 
         <div className="space-y-2">
           {!loading &&
-            (users as Array<{
-              id: string;
-              full_name: string | null;
-              avatar_url: string | null;
-              scan_streak_current?: number | null;
-            }>).map((u, i) => (
+            (
+              users as Array<{
+                id: string;
+                full_name: string | null;
+                avatar_url: string | null;
+                scan_streak_current?: number | null;
+              }>
+            ).map((u, i) => (
               <Link
                 key={u.id}
                 to="/profile/public/$id"
@@ -95,7 +97,13 @@ function Page() {
                 )}
                 <div className="size-11 rounded-full bg-gradient-to-br from-primary/30 to-accent/30 overflow-hidden grid place-items-center text-sm font-bold">
                   {u.avatar_url ? (
-                    <img loading="lazy" decoding="async" src={u.avatar_url} alt="" className="size-full object-cover" />
+                    <img
+                      loading="lazy"
+                      decoding="async"
+                      src={u.avatar_url}
+                      alt=""
+                      className="size-full object-cover"
+                    />
                   ) : (
                     (u.full_name?.[0]?.toUpperCase() ?? "?")
                   )}

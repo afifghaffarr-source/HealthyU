@@ -20,7 +20,11 @@ export function useLastSeenReportId() {
   });
 }
 
-export function useMarkReportSeen(focus: string | undefined, latestId: string | null, lastSeenId: string | null) {
+export function useMarkReportSeen(
+  focus: string | undefined,
+  latestId: string | null,
+  lastSeenId: string | null,
+) {
   const qc = useQueryClient();
   useEffect(() => {
     if (!latestId || lastSeenId === latestId) return;

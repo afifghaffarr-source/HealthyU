@@ -29,12 +29,7 @@ export const toast = Object.assign(
  * tampilkan pesan asli (atau fallback) sebagai toast.error standar.
  */
 export function toastError(e: unknown, fallback = "Gagal"): void {
-  const msg =
-    e instanceof Error
-      ? e.message
-      : typeof e === "string"
-        ? e
-        : fallback;
+  const msg = e instanceof Error ? e.message : typeof e === "string" ? e : fallback;
   const final = msg || fallback;
   const lower = final.toLowerCase();
 

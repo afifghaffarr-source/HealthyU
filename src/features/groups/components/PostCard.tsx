@@ -45,10 +45,7 @@ export function PostCard({
           </p>
         </div>
         {p.is_mine && (
-          <button
-            onClick={onDelete}
-            className="p-1.5 text-muted-foreground hover:text-destructive"
-          >
+          <button onClick={onDelete} className="p-1.5 text-muted-foreground hover:text-destructive">
             <Trash2 className="size-4" />
           </button>
         )}

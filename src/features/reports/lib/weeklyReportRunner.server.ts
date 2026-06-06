@@ -118,22 +118,23 @@ export async function runWeeklyReportForUser(userId: string, days = 7): Promise<
   if (topGroup) highlightParts.push(`rank #${topGroup.rank} di ${topGroup.group}`);
   const highlight = highlightParts.slice(0, 3).join(" · ") || "Lihat insight lengkap minggu ini";
 
-  const report = (await callAiWithGuards({
-    userId,
-    feature: "report.weekly",
-    model: "google/gemini-2.5-flash",
-    skipBudget: true, // cron job, not user-initiated
-    messages: [
-      {
-        role: "system",
-        content: `Kamu adalah HealthyU AI Coach, AI health coach. Buat laporan analisis mingguan singkat dalam Bahasa Indonesia (markdown, max 350 kata) dengan section: Ringkasan, Yang Berjalan Baik, Area Perbaikan, Progress Challenge Grup (skip jika kosong), Rekomendasi.`,
-      },
-      {
-        role: "user",
-        content: `Data ${days} hari terakhir:\n${JSON.stringify(summary, null, 2)}`,
-      },
-    ],
-  })) || "Tidak ada analisis.";
+  const report =
+    (await callAiWithGuards({
+      userId,
+      feature: "report.weekly",
+      model: "google/gemini-2.5-flash",
+      skipBudget: true, // cron job, not user-initiated
+      messages: [
+        {
+          role: "system",
+          content: `Kamu adalah HealthyU AI Coach, AI health coach. Buat laporan analisis mingguan singkat dalam Bahasa Indonesia (markdown, max 350 kata) dengan section: Ringkasan, Yang Berjalan Baik, Area Perbaikan, Progress Challenge Grup (skip jika kosong), Rekomendasi.`,
+        },
+        {
+          role: "user",
+          content: `Data ${days} hari terakhir:\n${JSON.stringify(summary, null, 2)}`,
+        },
+      ],
+    })) || "Tidak ada analisis.";
 
   const end = new Date();
   const start = new Date(end.getTime() - days * 86400000);

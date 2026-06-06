@@ -4,11 +4,7 @@ import type { myUnlinkedJoinedChallenges } from "@/features/challenges/lib/myUnl
 
 type UnlinkedChallenge = Awaited<ReturnType<typeof myUnlinkedJoinedChallenges>>[number];
 
-export function UnlinkedChallengesCard({
-  challenges,
-}: {
-  challenges: UnlinkedChallenge[];
-}) {
+export function UnlinkedChallengesCard({ challenges }: { challenges: UnlinkedChallenge[] }) {
   if (challenges.length === 0) return null;
   return (
     <div className="bg-card p-4 rounded-3xl outline-1 outline-primary/20 shadow-sm animate-fade-up">
@@ -41,11 +37,7 @@ export function UnlinkedChallengesCard({
                         className="size-5 rounded-full bg-primary/15 outline-2 outline-card grid place-items-center text-[9px] font-bold text-primary overflow-hidden"
                       >
                         {m.avatar_url ? (
-                          <img
-                            src={m.avatar_url}
-                            alt={m.name}
-                            className="size-full object-cover"
-                          />
+                          <img src={m.avatar_url} alt={m.name} className="size-full object-cover" />
                         ) : (
                           (m.name ?? "?").slice(0, 1).toUpperCase()
                         )}

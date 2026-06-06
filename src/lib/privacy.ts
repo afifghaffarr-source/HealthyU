@@ -7,6 +7,7 @@
  *  - If `viewerId === profile.id`, return data untouched (user sees own data).
  *  - Else if `profile.public_profile === false`, return an anonymous shell.
  *  - Else only expose name/avatar + metrics whose `show_*` flag is true.
+ *  - Non-owners NEVER see sensitive fields (email, health_conditions, etc.).
  */
 
 export type PrivacyAwareProfile = {
@@ -19,26 +20,40 @@ export type PrivacyAwareProfile = {
   show_progress_photos?: boolean | null;
   show_workouts?: boolean | null;
   allow_dm?: boolean | null;
+  [key: string]: unknown;
 };
 
-export type ProfileMetric =
-  | "weight"
-  | "meals"
-  | "progress_photos"
-  | "workouts"
-  | "dm";
+export type ProfileMetric = "weight" | "meals" | "progress_photos" | "workouts" | "dm";
 
 export const ANON_NAME = "Pengguna HealthyU";
 
 /**
+ * Fields safe to expose to non-owners when public_profile = true.
+ * All other fields are stripped to prevent leaking sensitive data.
+ */
+const PUBLIC_SAFE_FIELDS = new Set([
+  "id",
+  "full_name",
+  "avatar_url",
+  "public_profile",
+  "show_weight",
+  "show_meals",
+  "show_progress_photos",
+  "show_workouts",
+  "allow_dm",
+]);
+
+/**
  * Mask a profile object for display to a viewer other than its owner.
  * Always safe to call — returns the original object when the viewer is the owner.
+ * Non-owners only see whitelisted fields (prevents leaking email, health data, etc.).
  */
 export function maskPublicProfile<T extends PrivacyAwareProfile>(
   profile: T | null | undefined,
   viewerId: string | null,
 ): T | null {
   if (!profile) return null;
+  // Owner sees everything
   if (viewerId && viewerId === profile.id) return profile;
 
   if (profile.public_profile === false) {
@@ -48,7 +63,15 @@ export function maskPublicProfile<T extends PrivacyAwareProfile>(
       avatar_url: null,
     };
   }
-  return profile;
+
+  // Public profile — strip all non-whitelisted fields
+  const safe: Record<string, unknown> = {};
+  for (const key of Object.keys(profile)) {
+    if (PUBLIC_SAFE_FIELDS.has(key)) {
+      safe[key] = profile[key];
+    }
+  }
+  return safe as T;
 }
 
 /**

@@ -2,7 +2,12 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { currentFast, startFast, stopFast, fastHistory } from "@/features/fasting/lib/fasting.functions";
+import {
+  currentFast,
+  startFast,
+  stopFast,
+  fastHistory,
+} from "@/features/fasting/lib/fasting.functions";
 import { getFastingSchedule, saveFastingSchedule } from "@/features/fasting/lib/fasting.functions";
 import { getAchievementToastPrefix } from "@/lib/achievement-icons";
 import { BottomNav } from "@/components/bottom-nav";
@@ -117,10 +122,7 @@ function FastingPage() {
         ) : (
           <>
             {justStopped && <BreakFastTipsCard />}
-            <ProtocolPicker
-              onStart={(p) => startMut.mutate(p)}
-              starting={startMut.isPending}
-            />
+            <ProtocolPicker onStart={(p) => startMut.mutate(p)} starting={startMut.isPending} />
           </>
         )}
 

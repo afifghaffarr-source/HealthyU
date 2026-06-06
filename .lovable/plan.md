@@ -1,4 +1,3 @@
-
 # TasteSkill Audit & Improvement Plan — HealthyU
 
 Scope: design, UX, copy, safety, and component-system audit only. No DB, auth, dependency, or feature removal. Implementation strictly after approval.
@@ -104,7 +103,9 @@ N10. Fasting "Break fast wisely" suggestion card after stop.
 ## 8. Page-by-Page Redesign Plan
 
 ### 8.1 Dashboard / Home
+
 Goal: 1-second answer to "what's my day, what do I do next?"
+
 - Replace top stack with: **Greeting (compact) → Today Hero (calorie ring + remaining + smart next step) → Quick Actions row (Scan, Log, Water+1) → Compact stats row (fast, water, mood) → Today's meals → Secondary cards (challenges, gamification, tip) collapsed below the fold.**
 - Demote `DailyBonusButton` into the greeting row as a small coin chip.
 - Merge `ScanCta` + `AiRecommendationsCta` + `AiChatCta` into one 3-button action row.
@@ -112,7 +113,9 @@ Goal: 1-second answer to "what's my day, what do I do next?"
 - Use skeletons in every sub-card during initial load.
 
 ### 8.2 Food Scan
+
 Goal: scan fast → review safely → save confidently.
+
 - Add persistent **"Estimasi AI — periksa porsi & kalori sebelum simpan"** banner above result list.
 - Confidence badge per item (color-coded; from server data).
 - Reword mode toggle: "Cepat / Akurat" with tiny help icon.
@@ -121,12 +124,14 @@ Goal: scan fast → review safely → save confidently.
 - Add a "Mirip [nama]? Konfirmasi" chip when low confidence.
 
 ### 8.3 Food Log
+
 - Group meals by `breakfast / lunch / dinner / snack` with section headers.
 - Add "Ulangi sarapan kemarin" chip when relevant.
 - Add macro-gap insight line above list ("Protein masih -22g hari ini").
 - Strong empty state with two CTAs: Scan / Tambah manual.
 
 ### 8.4 Onboarding
+
 - Above each field add "Kenapa kami tanya ini?" inline disclosure.
 - Bottom of each step: "Bisa diubah kapan saja di Profil." reassurance.
 - Replace `bg-mint` progress with `bg-muted` token.
@@ -135,33 +140,39 @@ Goal: scan fast → review safely → save confidently.
 - Add comfort-pace selector for "lose" goal (santai 0.25kg/mg, normal 0.5, ambisius 0.75) instead of hard −400.
 
 ### 8.5 AI Coach
+
 - Persistent footer chip: "Saran umum, bukan saran medis."
 - Above input: 4 prompt chips per Project Knowledge.
 - Long replies: collapse with "Tampilkan lebih banyak".
 - Detect medical keywords → append "Pertimbangkan konsultasi dengan profesional" (server-side, safe).
 
 ### 8.6 Fasting Timer
+
 - Pre-start friction card: 2 quick checks (tidak hamil/menyusui · tidak ada gangguan makan) before allowing extreme protocols (>16h).
 - Active card: phase explainer ("0–4h: pencernaan", "4–12h: glikogen", …), hydration nudge every 2h via toast.
 - Stop button: large, guilt-free copy "Selesai untuk sekarang".
 - After stop: "Break fast bijak" suggestion card.
 
 ### 8.7 Progress
+
 - 3 simple charts max: weight trend, calorie consistency, fasting consistency.
 - Add Consistency Score (0–100) + Non-scale Wins list.
 - Avoid shame language; replace any "deficit/failed" with "rata-rata".
 
 ### 8.8 Articles / Education
+
 - Add "2 menit baca" badge + "Coba hari ini" CTA at article foot.
 - Short sections with H2 every ~150 words.
 - Related articles row at bottom.
 
 ### 8.9 Settings / Profile
+
 - Group: Akun · Target & nutrisi · Estimasi AI · Notifikasi · Data & privasi · Tentang.
 - Destructive actions (delete account, reset) in dedicated red-tinted card with confirm dialog.
 - Add "Disclaimer medis" link surface.
 
 ### 8.10 Auth & Disclaimer
+
 - On first sign-in (post-onboarding step 5 or first dashboard visit) show one-time disclaimer modal: "HealthyU bukan pengganti dokter…" with "Saya mengerti" CTA, persisted in profile flag (no schema change — reuse existing `onboarded` or local flag).
 
 ---
@@ -169,6 +180,7 @@ Goal: scan fast → review safely → save confidently.
 ## 9. Component System Plan
 
 Codify the following primitives (most exist; tighten props/variants):
+
 - `PageShell` (wraps `max-w-md mx-auto px-5 pt-2 pb-28` + optional `TopAppBar`).
 - `HeroCard` (single page hero — used on Dashboard/Today, Fasting active, Progress).
 - `ActionRow` (2–4 icon+label buttons; replaces stacked CTAs).
@@ -206,6 +218,7 @@ U10. **One-tap "Ulangi kemarin"** for breakfast/lunch.
 ## 11. Safe Implementation Order
 
 Phase 1 — Safety & trust (no visual rewrites; copy + small UI):
+
 - C2 add SafetyChip on Scan result list + Coach footer.
 - C3 add DisclaimerCard component, mount on Onboarding step 5 + first-visit Coach.
 - C4 fasting safety friction for >16h protocols.
@@ -213,12 +226,14 @@ Phase 1 — Safety & trust (no visual rewrites; copy + small UI):
 - H5 reword Pro/Flash toggle.
 
 Phase 2 — Dashboard hierarchy redesign:
+
 - C1 introduce HeroCard + ActionRow; collapse secondary cards below fold; demote DailyBonus.
 - M5 merge 3 CTAs into ActionRow.
 - N1/U1 Today's Balance hero (uses existing data, no schema change).
 - U2 Smart Next Step (pure client rule).
 
 Phase 3 — Page polish:
+
 - 8.2 Scan UI polish + confidence badge.
 - 8.3 Food log grouping + macro-gap insight.
 - 8.4 Onboarding microcopy + reassurance + comfort pace.
@@ -226,12 +241,14 @@ Phase 3 — Page polish:
 - 8.7 Progress consistency score + non-scale wins.
 
 Phase 4 — System tightening:
+
 - Component primitives (PageShell, SafetyChip, ConfidenceBadge, DisclaimerCard).
 - Empty/loading/error pass across 8 main pages.
 - Dark mode contrast + tap target audit.
 - `aria-live` on fast clock + scan loading.
 
 Phase 5 — Nice-to-haves:
+
 - Articles "2 menit baca" + Apply CTA.
 - Settings grouped sections.
 - Subtle motion on log success.

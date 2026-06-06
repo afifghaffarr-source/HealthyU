@@ -43,10 +43,7 @@ const securityHeadersMiddleware = createMiddleware().server(async ({ next }) => 
   }
   // Paksa HTTPS 1 tahun (subdomain include). Aman karena app sudah HTTPS-only.
   if (!headers.has("strict-transport-security")) {
-    headers.set(
-      "strict-transport-security",
-      "max-age=31536000; includeSubDomains",
-    );
+    headers.set("strict-transport-security", "max-age=31536000; includeSubDomains");
   }
   // Batasi akses sensor browser yang tidak dipakai
   if (!headers.has("permissions-policy")) {

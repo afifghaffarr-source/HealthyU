@@ -16,10 +16,10 @@
 export function requireCronSecret(request: Request): Response | null {
   const expected = process.env.CRON_SECRET;
   if (!expected || expected.length < 16) {
-    return new Response(
-      JSON.stringify({ error: "CRON_SECRET not configured on server" }),
-      { status: 500, headers: { "Content-Type": "application/json" } },
-    );
+    return new Response(JSON.stringify({ error: "CRON_SECRET not configured on server" }), {
+      status: 500,
+      headers: { "Content-Type": "application/json" },
+    });
   }
 
   const headerSecret = request.headers.get("x-cron-secret");
@@ -27,10 +27,10 @@ export function requireCronSecret(request: Request): Response | null {
   const received = headerSecret || bearer;
 
   if (!received || !timingSafeEqualStr(received, expected)) {
-    return new Response(
-      JSON.stringify({ error: "Unauthorized" }),
-      { status: 401, headers: { "Content-Type": "application/json" } },
-    );
+    return new Response(JSON.stringify({ error: "Unauthorized" }), {
+      status: 401,
+      headers: { "Content-Type": "application/json" },
+    });
   }
 
   return null;

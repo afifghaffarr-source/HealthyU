@@ -138,9 +138,7 @@ export function MoodHistoryItem({
             })}
           </p>
         </div>
-        {log.note && (
-          <p className="text-xs text-muted-foreground mt-0.5 break-words">{log.note}</p>
-        )}
+        {log.note && <p className="text-xs text-muted-foreground mt-0.5 break-words">{log.note}</p>}
       </div>
       <button
         onClick={() => onDelete(log.id)}

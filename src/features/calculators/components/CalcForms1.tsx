@@ -9,10 +9,20 @@ export function BMIForm() {
   return (
     <div className="space-y-4">
       <Field label="Berat (kg)">
-        <input type="number" value={w} onChange={(e) => setW(+e.target.value)} className={inputCls} />
+        <input
+          type="number"
+          value={w}
+          onChange={(e) => setW(+e.target.value)}
+          className={inputCls}
+        />
       </Field>
       <Field label="Tinggi (cm)">
-        <input type="number" value={h} onChange={(e) => setH(+e.target.value)} className={inputCls} />
+        <input
+          type="number"
+          value={h}
+          onChange={(e) => setH(+e.target.value)}
+          className={inputCls}
+        />
       </Field>
       <Result label="BMI Anda" value={`${bmi.toFixed(1)} — ${bmiCategory(bmi)}`} />
     </div>
@@ -27,7 +37,16 @@ export function BMRForm() {
   const bmr = calcBMR(w, h, age, sex);
   return (
     <div className="space-y-4">
-      <PersonInputs w={w} h={h} age={age} sex={sex} setW={setW} setH={setH} setAge={setAge} setSex={setSex} />
+      <PersonInputs
+        w={w}
+        h={h}
+        age={age}
+        sex={sex}
+        setW={setW}
+        setH={setH}
+        setAge={setAge}
+        setSex={setSex}
+      />
       <Result label="BMR Anda" value={`${Math.round(bmr)} kkal/hari`} />
     </div>
   );
@@ -43,7 +62,16 @@ export function TDEEForm() {
   const tdee = calcTDEE(bmr, act);
   return (
     <div className="space-y-4">
-      <PersonInputs w={w} h={h} age={age} sex={sex} setW={setW} setH={setH} setAge={setAge} setSex={setSex} />
+      <PersonInputs
+        w={w}
+        h={h}
+        age={age}
+        sex={sex}
+        setW={setW}
+        setH={setH}
+        setAge={setAge}
+        setSex={setSex}
+      />
       <Field label="Tingkat aktivitas">
         <select
           value={act}
@@ -71,7 +99,16 @@ export function BodyFatForm() {
   const bf = calcBodyFat(bmi, age, sex);
   return (
     <div className="space-y-4">
-      <PersonInputs w={w} h={h} age={age} sex={sex} setW={setW} setH={setH} setAge={setAge} setSex={setSex} />
+      <PersonInputs
+        w={w}
+        h={h}
+        age={age}
+        sex={sex}
+        setW={setW}
+        setH={setH}
+        setAge={setAge}
+        setSex={setSex}
+      />
       <Result label="Estimasi Body Fat" value={`${bf.toFixed(1)} %`} />
     </div>
   );

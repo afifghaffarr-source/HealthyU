@@ -1,9 +1,5 @@
 import { describe, it, expect } from "vitest";
-import {
-  buildArticleSchema,
-  buildRecipeSchema,
-  cleanSchema,
-} from "../schemaOrg";
+import { buildArticleSchema, buildRecipeSchema, cleanSchema } from "../schemaOrg";
 
 describe("buildArticleSchema", () => {
   it("builds a minimal Article with required fields", () => {

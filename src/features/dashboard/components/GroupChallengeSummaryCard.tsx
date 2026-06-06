@@ -7,11 +7,7 @@ import { GroupBonusBadge } from "@/features/dashboard/components/GroupBonusBadge
 
 type GroupSummary = Awaited<ReturnType<typeof myGroupChallengeSummary>>[number];
 
-export function GroupChallengeSummaryCard({
-  groupSummary,
-}: {
-  groupSummary: GroupSummary[];
-}) {
+export function GroupChallengeSummaryCard({ groupSummary }: { groupSummary: GroupSummary[] }) {
   const { newClaims, setNewClaims, claimsTsRef, nowTick } = useGroupBonusClaims();
 
   if (groupSummary.length === 0) return null;
@@ -70,9 +66,7 @@ export function GroupChallengeSummaryCard({
             <div className="text-right shrink-0 ml-2">
               <p className="font-bold">
                 #{g.rank || "-"}
-                <span className="text-muted-foreground font-normal">
-                  /{g.total_participants}
-                </span>
+                <span className="text-muted-foreground font-normal">/{g.total_participants}</span>
               </p>
               <p className="text-[10px] text-muted-foreground">
                 Hari {g.my_day}

@@ -37,8 +37,8 @@ export function TodayMedSummary({
       </div>
       {next && (
         <p className="mt-3 text-xs opacity-90 inline-flex items-center gap-1">
-          <Clock className="size-3" /> Berikutnya:{" "}
-          <b className="font-semibold">{next.med.name}</b> · {next.time}
+          <Clock className="size-3" /> Berikutnya: <b className="font-semibold">{next.med.name}</b>{" "}
+          · {next.time}
         </p>
       )}
     </section>
@@ -66,10 +66,7 @@ export function MedicationCard({
           <p className="font-bold">{m.name}</p>
           {m.dose && <p className="text-xs text-muted-foreground">{m.dose}</p>}
         </div>
-        <button
-          onClick={onDelete}
-          className="text-muted-foreground hover:text-destructive p-1"
-        >
+        <button onClick={onDelete} className="text-muted-foreground hover:text-destructive p-1">
           <Trash2 className="size-4" />
         </button>
       </div>
@@ -119,10 +116,7 @@ export function AddMedicationDialog({
   submitting: boolean;
 }) {
   return (
-    <div
-      className="fixed inset-0 z-50 bg-black/50 flex items-end"
-      onClick={onClose}
-    >
+    <div className="fixed inset-0 z-50 bg-black/50 flex items-end" onClick={onClose}>
       <div
         className="bg-background w-full max-w-md mx-auto rounded-t-3xl p-5 space-y-3"
         onClick={(e) => e.stopPropagation()}

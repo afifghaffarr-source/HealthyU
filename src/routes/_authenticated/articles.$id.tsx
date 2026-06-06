@@ -212,9 +212,7 @@ function ArticleReader() {
                       </div>
                     )}
                     <div className="p-3 space-y-1">
-                      <p className="text-xs font-semibold leading-snug line-clamp-2">
-                        {r.title}
-                      </p>
+                      <p className="text-xs font-semibold leading-snug line-clamp-2">{r.title}</p>
                       {r.reading_time_minutes && (
                         <p className="text-[12px] text-muted-foreground inline-flex items-center gap-1">
                           <Clock className="size-3" aria-hidden /> {r.reading_time_minutes} mnt

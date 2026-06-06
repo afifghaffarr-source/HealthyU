@@ -3,14 +3,11 @@ import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { callAiWithGuards, callAiJsonWithSchema } from "@/features/ai/lib/aiGateway.server";
 
-const ImportedRecipeSchema = z
-  .object({
-    title: z.string().optional(),
-    ingredients: z.array(z.string()).default([]),
-    steps: z.array(z.string()).default([]),
-  })
-  ;
-
+const ImportedRecipeSchema = z.object({
+  title: z.string().optional(),
+  ingredients: z.array(z.string()).default([]),
+  steps: z.array(z.string()).default([]),
+});
 // 9. Weekly leaderboard
 export const getWeeklyLeaderboard = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
@@ -138,18 +135,15 @@ export const upgradeSubscription = createServerFn({ method: "POST" })
   .inputValidator((d) => z.object({ tier: z.enum(["free", "pro", "ultimate"]) }).parse(d))
   .handler(async ({ data, context }) => {
     const periodEnd = new Date(Date.now() + 30 * 24 * 3600 * 1000).toISOString();
-    const { error } = await context.supabase
-      .from("subscriptions")
-      .upsert(
-        {
-          user_id: context.userId,
-          tier: data.tier,
-          status: "active",
-          current_period_end: periodEnd,
-        },
-        { onConflict: "user_id" },
-      );
+    const { error } = await context.supabase.from("subscriptions").upsert(
+      {
+        user_id: context.userId,
+        tier: data.tier,
+        status: "active",
+        current_period_end: periodEnd,
+      },
+      { onConflict: "user_id" },
+    );
     if (error) throw new Error(error.message);
     return { ok: true, tier: data.tier };
   });
-

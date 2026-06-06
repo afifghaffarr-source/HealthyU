@@ -4,7 +4,10 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { getRecipe } from "@/features/recipes/lib/recipes.functions";
 import { getRecipeRating, rateRecipe } from "@/features/recipes/lib/recipeRatings.functions";
-import { isRecipeBookmarked, toggleRecipeBookmark } from "@/features/recipes/lib/recipeBookmarks.functions";
+import {
+  isRecipeBookmarked,
+  toggleRecipeBookmark,
+} from "@/features/recipes/lib/recipeBookmarks.functions";
 import { BottomNav } from "@/components/bottom-nav";
 import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { Clock, Flame, Users, Star, Bookmark } from "lucide-react";

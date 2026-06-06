@@ -17,10 +17,19 @@ export function IdealWeightForm() {
   return (
     <div className="space-y-4">
       <Field label="Tinggi (cm)">
-        <input type="number" value={h} onChange={(e) => setH(+e.target.value)} className={inputCls} />
+        <input
+          type="number"
+          value={h}
+          onChange={(e) => setH(+e.target.value)}
+          className={inputCls}
+        />
       </Field>
       <Field label="Jenis kelamin">
-        <select value={sex} onChange={(e) => setSex(e.target.value as "male" | "female")} className={inputCls}>
+        <select
+          value={sex}
+          onChange={(e) => setSex(e.target.value as "male" | "female")}
+          className={inputCls}
+        >
           <option value="male">Laki-laki</option>
           <option value="female">Perempuan</option>
         </select>
@@ -37,10 +46,19 @@ export function WaterForm() {
   return (
     <div className="space-y-4">
       <Field label="Berat (kg)">
-        <input type="number" value={w} onChange={(e) => setW(+e.target.value)} className={inputCls} />
+        <input
+          type="number"
+          value={w}
+          onChange={(e) => setW(+e.target.value)}
+          className={inputCls}
+        />
       </Field>
       <Field label="Aktivitas">
-        <select value={act} onChange={(e) => setAct(e.target.value as keyof typeof ACTIVITY)} className={inputCls}>
+        <select
+          value={act}
+          onChange={(e) => setAct(e.target.value as keyof typeof ACTIVITY)}
+          className={inputCls}
+        >
           {Object.entries(ACTIVITY).map(([k, v]) => (
             <option key={k} value={k}>
               {v.label}
@@ -64,9 +82,22 @@ export function MacroForm() {
   const { calories, macros } = calcMacros(tdee, goal);
   return (
     <div className="space-y-4">
-      <PersonInputs w={w} h={h} age={age} sex={sex} setW={setW} setH={setH} setAge={setAge} setSex={setSex} />
+      <PersonInputs
+        w={w}
+        h={h}
+        age={age}
+        sex={sex}
+        setW={setW}
+        setH={setH}
+        setAge={setAge}
+        setSex={setSex}
+      />
       <Field label="Aktivitas">
-        <select value={act} onChange={(e) => setAct(e.target.value as keyof typeof ACTIVITY)} className={inputCls}>
+        <select
+          value={act}
+          onChange={(e) => setAct(e.target.value as keyof typeof ACTIVITY)}
+          className={inputCls}
+        >
           {Object.entries(ACTIVITY).map(([k, v]) => (
             <option key={k} value={k}>
               {v.label}
@@ -75,7 +106,11 @@ export function MacroForm() {
         </select>
       </Field>
       <Field label="Tujuan">
-        <select value={goal} onChange={(e) => setGoal(e.target.value as "cut" | "maintain" | "bulk")} className={inputCls}>
+        <select
+          value={goal}
+          onChange={(e) => setGoal(e.target.value as "cut" | "maintain" | "bulk")}
+          className={inputCls}
+        >
           <option value="cut">Diet (defisit)</option>
           <option value="maintain">Pertahankan</option>
           <option value="bulk">Naikkan massa</option>
@@ -106,7 +141,12 @@ export function HRForm() {
   return (
     <div className="space-y-4">
       <Field label="Usia (tahun)">
-        <input type="number" value={age} onChange={(e) => setAge(+e.target.value)} className={inputCls} />
+        <input
+          type="number"
+          value={age}
+          onChange={(e) => setAge(+e.target.value)}
+          className={inputCls}
+        />
       </Field>
       <Result label="Detak jantung maksimum" value={`${Math.round(max)} bpm`} />
       <ul className="mt-3 space-y-2 text-sm">

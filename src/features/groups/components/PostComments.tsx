@@ -2,11 +2,7 @@ import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { Trash2 } from "lucide-react";
-import {
-  listComments,
-  createComment,
-  deleteComment,
-} from "@/features/groups/lib/social.functions";
+import { listComments, createComment, deleteComment } from "@/features/groups/lib/social.functions";
 import { toastError } from "@/lib/toast-config";
 
 export function PostComments({ postId }: { postId: string }) {

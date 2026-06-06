@@ -18,13 +18,14 @@ export function ChatEmptyState({ onPick }: { onPick: (text: string) => void }) {
       <div className="rounded-[1.75rem] border border-border/70 bg-card px-5 py-5 shadow-sm">
         <p className="font-bold mb-1">Halo, ada yang ingin ditanyakan?</p>
         <p className="text-sm text-muted-foreground">
-          Aku HealthyU AI Coach — bisa bantu evaluasi makan, atur menu, atau jawab tanya soal nutrisi.
-          Pilih contoh di bawah atau tulis pertanyaanmu.
+          Aku HealthyU AI Coach — bisa bantu evaluasi makan, atur menu, atau jawab tanya soal
+          nutrisi. Pilih contoh di bawah atau tulis pertanyaanmu.
         </p>
         <p className="mt-3 inline-flex items-start gap-1.5 text-[11px] text-muted-foreground">
           <Stethoscope className="size-3.5 mt-0.5 shrink-0" aria-hidden />
           <span>
-            Saran umum, bukan saran medis. Untuk kondisi medis tertentu, sebaiknya konsultasikan ke profesional.
+            Saran umum, bukan saran medis. Untuk kondisi medis tertentu, sebaiknya konsultasikan ke
+            profesional.
           </span>
         </p>
       </div>
@@ -33,24 +34,34 @@ export function ChatEmptyState({ onPick }: { onPick: (text: string) => void }) {
           to="/foods"
           className="flex items-center gap-2 rounded-2xl border border-border/70 bg-card p-3 text-xs transition hover:bg-muted/60"
         >
-          <span className="size-7 rounded-lg bg-primary/10 text-primary grid place-items-center" aria-hidden>
+          <span
+            className="size-7 rounded-lg bg-primary/10 text-primary grid place-items-center"
+            aria-hidden
+          >
             <Utensils className="size-3.5" />
           </span>
           <span className="min-w-0">
             <span className="block font-semibold truncate">Catat makan dulu</span>
-            <span className="block text-muted-foreground text-[10px] truncate">Biar saran lebih pas</span>
+            <span className="block text-muted-foreground text-[10px] truncate">
+              Biar saran lebih pas
+            </span>
           </span>
         </Link>
         <Link
           to="/articles"
           className="flex items-center gap-2 rounded-2xl border border-border/70 bg-card p-3 text-xs transition hover:bg-muted/60"
         >
-          <span className="size-7 rounded-lg bg-primary/10 text-primary grid place-items-center" aria-hidden>
+          <span
+            className="size-7 rounded-lg bg-primary/10 text-primary grid place-items-center"
+            aria-hidden
+          >
             <BookOpen className="size-3.5" />
           </span>
           <span className="min-w-0">
             <span className="block font-semibold truncate">Baca artikel singkat</span>
-            <span className="block text-muted-foreground text-[10px] truncate">2 menit, langsung pakai</span>
+            <span className="block text-muted-foreground text-[10px] truncate">
+              2 menit, langsung pakai
+            </span>
           </span>
         </Link>
       </div>
@@ -92,11 +103,7 @@ export function ChatMessages({
                 : "rounded-[1.5rem] rounded-bl-md border border-border/70 bg-card text-foreground prose prose-sm max-w-none prose-p:my-1 prose-headings:my-2 prose-headings:font-bold prose-ul:my-1 prose-ol:my-1 prose-li:my-0 prose-pre:max-w-full prose-pre:overflow-x-auto prose-code:bg-secondary prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-code:text-xs prose-code:text-foreground prose-code:before:content-none prose-code:after:content-none prose-strong:text-foreground"
             }`}
           >
-            {m.role === "assistant" ? (
-              <SafeMarkdown>{m.content}</SafeMarkdown>
-            ) : (
-              m.content
-            )}
+            {m.role === "assistant" ? <SafeMarkdown>{m.content}</SafeMarkdown> : m.content}
           </div>
         </div>
       ))}

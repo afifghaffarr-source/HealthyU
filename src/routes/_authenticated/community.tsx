@@ -14,10 +14,7 @@ import { Heart, Flame, Clock, Users } from "lucide-react";
 import { toast } from "sonner";
 import { toastError } from "@/lib/toast-config";
 import { PostCard } from "@/features/groups/components/PostCard";
-import {
-  COMMUNITY_CATS,
-  CommunityComposer,
-} from "@/features/groups/components/CommunityComposer";
+import { COMMUNITY_CATS, CommunityComposer } from "@/features/groups/components/CommunityComposer";
 
 export const Route = createFileRoute("/_authenticated/community")({
   component: CommunityPage,

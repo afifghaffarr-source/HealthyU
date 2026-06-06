@@ -102,10 +102,7 @@ export function PopularRecipes({ ctaHref }: { ctaHref: string }) {
               }}
             />
             <div className="p-4">
-              <h3
-                className="font-bold text-sm mb-1"
-                style={{ fontFamily: "var(--font-display)" }}
-              >
+              <h3 className="font-bold text-sm mb-1" style={{ fontFamily: "var(--font-display)" }}>
                 {r.name}
               </h3>
               <p className="text-xs text-muted-foreground flex items-center gap-3">

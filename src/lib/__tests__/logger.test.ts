@@ -26,7 +26,11 @@ describe("logServerError", () => {
     logServerError("scope", new Error("boom"), { token: "x", ok: 1 });
     expect(spy).toHaveBeenCalled();
     const [, payload] = spy.mock.calls[0];
-    expect(payload).toMatchObject({ message: "boom", name: "Error", meta: { token: "[redacted]", ok: 1 } });
+    expect(payload).toMatchObject({
+      message: "boom",
+      name: "Error",
+      meta: { token: "[redacted]", ok: 1 },
+    });
     spy.mockRestore();
   });
   it("stringifies non-Error", () => {

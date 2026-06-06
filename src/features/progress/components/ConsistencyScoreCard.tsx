@@ -25,10 +25,13 @@ export function ConsistencyScoreCard({
   score = Math.min(100, score);
 
   const tone =
-    score >= 75 ? "Mantap, lanjutkan ritmenya." :
-    score >= 50 ? "Sudah di jalur — sedikit lagi." :
-    score >= 25 ? "Awal yang baik, satu langkah kecil lagi." :
-                  "Mulai dari satu catatan hari ini.";
+    score >= 75
+      ? "Mantap, lanjutkan ritmenya."
+      : score >= 50
+        ? "Sudah di jalur — sedikit lagi."
+        : score >= 25
+          ? "Awal yang baik, satu langkah kecil lagi."
+          : "Mulai dari satu catatan hari ini.";
 
   return (
     <section className="bg-card p-4 rounded-3xl outline-1 outline-black/5 dark:outline-white/10 flex items-center gap-4 animate-fade-up">
@@ -36,9 +39,13 @@ export function ConsistencyScoreCard({
         <svg viewBox="0 0 36 36" className="size-16 -rotate-90">
           <circle cx="18" cy="18" r="15.9" fill="none" className="stroke-muted" strokeWidth="3" />
           <circle
-            cx="18" cy="18" r="15.9" fill="none"
+            cx="18"
+            cy="18"
+            r="15.9"
+            fill="none"
             className="stroke-primary"
-            strokeWidth="3" strokeLinecap="round"
+            strokeWidth="3"
+            strokeLinecap="round"
             strokeDasharray={`${score}, 100`}
           />
         </svg>

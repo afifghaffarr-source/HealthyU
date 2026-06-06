@@ -47,7 +47,9 @@ export const Route = createFileRoute("/olahraga/$slug")({
   },
   errorComponent: ({ error }) => (
     <main className="mx-auto max-w-3xl px-4 py-8">
-      <p role="alert" className="text-destructive">Gagal memuat: {error.message}</p>
+      <p role="alert" className="text-destructive">
+        Gagal memuat: {error.message}
+      </p>
     </main>
   ),
   notFoundComponent: () => (
@@ -65,12 +67,14 @@ function ExerciseDetail() {
   const e = Route.useLoaderData();
   const [weight, setWeight] = useState(60);
   const [minutes, setMinutes] = useState(30);
-  const kcal = Math.round((e.met * 3.5 * weight) / 200 * minutes);
+  const kcal = Math.round(((e.met * 3.5 * weight) / 200) * minutes);
 
   return (
     <main className="mx-auto max-w-3xl px-4 py-8">
       <nav aria-label="Breadcrumb" className="mb-4 text-sm text-muted-foreground">
-        <Link to="/olahraga" className="hover:text-foreground">Olahraga</Link>
+        <Link to="/olahraga" className="hover:text-foreground">
+          Olahraga
+        </Link>
         <span className="mx-2">/</span>
         <span className="text-foreground">{e.name}</span>
       </nav>
@@ -109,9 +113,7 @@ function ExerciseDetail() {
           <div className="text-3xl font-bold text-primary">
             {kcal} <span className="text-sm font-normal">kkal</span>
           </div>
-          <p className="mt-1 text-xs text-muted-foreground">
-            Rumus: MET × 3,5 × kg ÷ 200 × menit
-          </p>
+          <p className="mt-1 text-xs text-muted-foreground">Rumus: MET × 3,5 × kg ÷ 200 × menit</p>
         </div>
       </section>
 
@@ -120,7 +122,9 @@ function ExerciseDetail() {
           <h2 className="text-lg font-semibold">Otot yang dilatih</h2>
           <div className="mt-2 flex flex-wrap gap-2">
             {e.muscle_groups.map((m: string) => (
-              <span key={m} className="rounded-full bg-accent px-3 py-1 text-sm">{m}</span>
+              <span key={m} className="rounded-full bg-accent px-3 py-1 text-sm">
+                {m}
+              </span>
             ))}
           </div>
         </section>

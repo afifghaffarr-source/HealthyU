@@ -2,7 +2,7 @@
  * Image moderation via Lovable AI Gateway (vision model).
  * Classifies an image as: safe | nudity | violence | spam | medical_graphic | other.
  *
- * Cheap call (~tier 2). Returns "safe" on infra error to fail-open (logged).
+ * Cheap call (~tier 2). Returns "blocked" on infra error to fail-closed (logged).
  * Call BEFORE storing user-uploaded images (chat attachments, progress photos, scan photos).
  */
 
@@ -60,6 +60,7 @@ export async function moderateImage(
     } else {
       console.error("[imageMod] error", (err as Error).message);
     }
-    return { label: "safe", confidence: 0, blocked: false };
+    // Fail-closed: block the image when moderation is unavailable
+    return { label: "other", confidence: 1, blocked: true, reason: "moderation_error" };
   }
 }

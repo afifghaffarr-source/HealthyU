@@ -3,45 +3,35 @@ import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { callAiJsonWithSchema } from "@/features/ai/lib/aiGateway.server";
 
-const BudgetPlanSchema = z
-  .object({
-    days: z
-      .array(
-        z
-          .object({
-            day: z.union([z.string(), z.number()]).optional(),
-            meals: z
-              .array(
-                z
-                  .object({
-                    name: z.string().default(""),
-                    est_idr: z.number().optional(),
-                    calories: z.number().optional(),
-                  })
-                  ,
-              )
-              .default([]),
-          })
-          ,
-      )
-      .default([]),
-  })
-  ;
-
-const FridgeRecipesSchema = z
-  .object({
-    ingredients: z.array(z.string()).default([]),
-    recipes: z
-      .array(
-        z.object({
-          name: z.string().default(""),
-          steps: z.array(z.string()).default([]),
-        }),
-      )
-      .default([]),
-  })
-  ;
-
+const BudgetPlanSchema = z.object({
+  days: z
+    .array(
+      z.object({
+        day: z.union([z.string(), z.number()]).optional(),
+        meals: z
+          .array(
+            z.object({
+              name: z.string().default(""),
+              est_idr: z.number().optional(),
+              calories: z.number().optional(),
+            }),
+          )
+          .default([]),
+      }),
+    )
+    .default([]),
+});
+const FridgeRecipesSchema = z.object({
+  ingredients: z.array(z.string()).default([]),
+  recipes: z
+    .array(
+      z.object({
+        name: z.string().default(""),
+        steps: z.array(z.string()).default([]),
+      }),
+    )
+    .default([]),
+});
 // Sleep diary
 export const upsertSleepDiary = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
@@ -196,14 +186,12 @@ export const generateBudgetMealPlan = createServerFn({ method: "POST" })
       ],
     });
     const planStr = JSON.stringify(parsed ?? {});
-    await context.supabase
-      .from("budget_meal_plans")
-      .insert({
-        user_id: context.userId,
-        budget_idr: data.budgetIdr,
-        days: data.days,
-        plan: parsed as never,
-      });
+    await context.supabase.from("budget_meal_plans").insert({
+      user_id: context.userId,
+      budget_idr: data.budgetIdr,
+      days: data.days,
+      plan: parsed as never,
+    });
     return { planJson: planStr };
   });
 

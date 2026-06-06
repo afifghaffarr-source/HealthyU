@@ -41,12 +41,16 @@ describe("getCached", () => {
   });
 
   it("returns null when expired", async () => {
-    maybeSingle.mockResolvedValue({ data: { response: "r", expires_at: new Date(Date.now() - 1000).toISOString() } });
+    maybeSingle.mockResolvedValue({
+      data: { response: "r", expires_at: new Date(Date.now() - 1000).toISOString() },
+    });
     expect(await getCached("k")).toBeNull();
   });
 
   it("returns response when fresh", async () => {
-    maybeSingle.mockResolvedValue({ data: { response: "hi", expires_at: new Date(Date.now() + 60_000).toISOString() } });
+    maybeSingle.mockResolvedValue({
+      data: { response: "hi", expires_at: new Date(Date.now() + 60_000).toISOString() },
+    });
     expect(await getCached("k")).toBe("hi");
   });
 });

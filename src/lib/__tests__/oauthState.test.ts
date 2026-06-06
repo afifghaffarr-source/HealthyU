@@ -17,8 +17,9 @@ describe("validateOAuthState", () => {
     expect(validateOAuthState(base, "fitbit")).toEqual({ ok: false, reason: "wrong_provider" });
   });
   it("rejects already-used state", () => {
-    expect(validateOAuthState({ ...base, used_at: new Date().toISOString() }, "google_fit"))
-      .toEqual({ ok: false, reason: "used" });
+    expect(
+      validateOAuthState({ ...base, used_at: new Date().toISOString() }, "google_fit"),
+    ).toEqual({ ok: false, reason: "used" });
   });
   it("rejects expired state", () => {
     const expired = { ...base, expires_at: new Date(Date.now() - 1000).toISOString() };

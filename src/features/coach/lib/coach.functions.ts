@@ -3,16 +3,13 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { z } from "zod";
 import { callAiJsonWithSchema } from "@/features/ai/lib/aiGateway.server";
 
-const CoachSchema = z
-  .object({
-    greeting: z.string().default("Selamat pagi!"),
-    focus: z.string().default("Jaga konsistensi hari ini."),
-    summary: z.string().default(""),
-    tips: z.array(z.string()).default([]),
-    warnings: z.array(z.string()).default([]),
-  })
-  ;
-
+const CoachSchema = z.object({
+  greeting: z.string().default("Selamat pagi!"),
+  focus: z.string().default("Jaga konsistensi hari ini."),
+  summary: z.string().default(""),
+  tips: z.array(z.string()).default([]),
+  warnings: z.array(z.string()).default([]),
+});
 type CoachOutput = {
   greeting: string;
   focus: string;

@@ -79,12 +79,7 @@ export function WeeklyGoalCard() {
               Simpan
             </Button>
             {goal ? (
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                onClick={() => setEditing(false)}
-              >
+              <Button type="button" variant="ghost" size="sm" onClick={() => setEditing(false)}>
                 Batal
               </Button>
             ) : null}

@@ -40,7 +40,10 @@ export type CallAiOptions = {
 };
 
 export class AiGatewayError extends Error {
-  constructor(message: string, public status: number) {
+  constructor(
+    message: string,
+    public status: number,
+  ) {
     super(message);
     this.name = "AiGatewayError";
   }
@@ -67,10 +70,7 @@ export async function callAiWithGuards(opts: CallAiOptions): Promise<string> {
     } catch (e) {
       console.error("enforceAiBudget failed", (e as Error).message);
       if (opts.failClosed) {
-        throw new AiGatewayError(
-          "Layanan AI sedang sibuk. Coba lagi sebentar lagi.",
-          503,
-        );
+        throw new AiGatewayError("Layanan AI sedang sibuk. Coba lagi sebentar lagi.", 503);
       }
       decision = { allowed: true, shouldDowngrade: true };
     }
@@ -99,9 +99,7 @@ export async function callAiWithGuards(opts: CallAiOptions): Promise<string> {
         model,
         messages: opts.messages,
         ...(opts.maxTokens ? { max_tokens: opts.maxTokens } : {}),
-        ...(opts.responseFormat
-          ? { response_format: { type: opts.responseFormat } }
-          : {}),
+        ...(opts.responseFormat ? { response_format: { type: opts.responseFormat } } : {}),
       }),
       signal: ctrl.signal,
     });
@@ -162,7 +160,10 @@ export function extractJsonFromResponse(raw: string): string {
   if (!raw) return "";
   let s = raw.trim();
   // strip code fences
-  s = s.replace(/^```(?:json)?\s*/i, "").replace(/```\s*$/i, "").trim();
+  s = s
+    .replace(/^```(?:json)?\s*/i, "")
+    .replace(/```\s*$/i, "")
+    .trim();
   // remove control chars (except \n \r \t)
   s = s.replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F]/g, "");
   // already starts with { or [
@@ -194,7 +195,10 @@ export function extractJsonFromResponse(raw: string): string {
 }
 
 export class AiSchemaError extends Error {
-  constructor(message: string, public readonly raw: string) {
+  constructor(
+    message: string,
+    public readonly raw: string,
+  ) {
     super(message);
     this.name = "AiSchemaError";
   }

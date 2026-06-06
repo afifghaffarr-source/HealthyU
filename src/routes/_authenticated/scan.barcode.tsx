@@ -96,7 +96,13 @@ function Page() {
           <div className="rounded-2xl bg-card border p-4 space-y-3">
             <div className="flex gap-3">
               {product.image && (
-                <img loading="lazy" decoding="async" src={product.image} alt="" className="size-16 rounded-xl object-cover" />
+                <img
+                  loading="lazy"
+                  decoding="async"
+                  src={product.image}
+                  alt=""
+                  className="size-16 rounded-xl object-cover"
+                />
               )}
               <div className="min-w-0 flex-1">
                 <div className="font-semibold truncate">{product.name}</div>

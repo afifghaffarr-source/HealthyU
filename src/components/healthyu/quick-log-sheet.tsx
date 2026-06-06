@@ -72,7 +72,9 @@ export function QuickLogSheet({
         <div className="mx-auto h-1.5 w-12 rounded-full bg-muted" />
         <div className="space-y-1">
           <h3 className="font-bold text-base">Log makanan cepat</h3>
-          <p className="text-xs text-muted-foreground">Catat cepat sekarang, detail lain bisa kamu lengkapi nanti.</p>
+          <p className="text-xs text-muted-foreground">
+            Catat cepat sekarang, detail lain bisa kamu lengkapi nanti.
+          </p>
         </div>
 
         <input
@@ -97,9 +99,10 @@ export function QuickLogSheet({
               key={option.value}
               type="button"
               onClick={() => setMealType(option.value)}
-              className={mealType === option.value
-                ? "min-h-10 rounded-xl bg-primary text-primary-foreground text-xs font-semibold"
-                : "min-h-10 rounded-xl border border-border/60 bg-background text-xs font-medium text-muted-foreground"
+              className={
+                mealType === option.value
+                  ? "min-h-10 rounded-xl bg-primary text-primary-foreground text-xs font-semibold"
+                  : "min-h-10 rounded-xl border border-border/60 bg-background text-xs font-medium text-muted-foreground"
               }
             >
               {option.label}

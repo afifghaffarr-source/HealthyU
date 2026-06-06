@@ -27,7 +27,9 @@ export function LatestVitalsRow({
         <p className="text-sm font-bold tabular-nums">
           {latest.systolic ?? "-"}/{latest.diastolic ?? "-"}
         </p>
-        {latestBp && <p className={`text-[10px] font-semibold ${latestBp.color}`}>{latestBp.label}</p>}
+        {latestBp && (
+          <p className={`text-[10px] font-semibold ${latestBp.color}`}>{latestBp.label}</p>
+        )}
       </div>
       <div className="bg-card p-3 rounded-2xl outline-1 outline-black/5 text-center relative overflow-hidden">
         <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-primary to-emerald-400" />

@@ -3,34 +3,28 @@ import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { callAiJsonWithSchema } from "@/features/ai/lib/aiGateway.server";
 
-const RecipeSchema = z
-  .object({
-    title: z.string().default("Resep"),
-    description: z.string().default(""),
-    ingredients: z.array(z.string()).default([]),
-    instructions: z.array(z.string()).default([]),
-    prep_min: z.coerce.number().default(20),
-    servings: z.coerce.number().default(1),
-    calories: z.coerce.number().default(0),
-    protein_g: z.coerce.number().default(0),
-    carbs_g: z.coerce.number().default(0),
-    fat_g: z.coerce.number().default(0),
-    tips: z.array(z.string()).default([]),
-  })
-  ;
-
-const ParsedMealSchema = z
-  .object({
-    custom_name: z.string().default(""),
-    meal_type: z.enum(["breakfast", "lunch", "dinner", "snack"]).default("snack"),
-    serving_qty: z.coerce.number().default(1),
-    calories: z.coerce.number().default(0),
-    protein_g: z.coerce.number().default(0),
-    carbs_g: z.coerce.number().default(0),
-    fat_g: z.coerce.number().default(0),
-  })
-  ;
-
+const RecipeSchema = z.object({
+  title: z.string().default("Resep"),
+  description: z.string().default(""),
+  ingredients: z.array(z.string()).default([]),
+  instructions: z.array(z.string()).default([]),
+  prep_min: z.coerce.number().default(20),
+  servings: z.coerce.number().default(1),
+  calories: z.coerce.number().default(0),
+  protein_g: z.coerce.number().default(0),
+  carbs_g: z.coerce.number().default(0),
+  fat_g: z.coerce.number().default(0),
+  tips: z.array(z.string()).default([]),
+});
+const ParsedMealSchema = z.object({
+  custom_name: z.string().default(""),
+  meal_type: z.enum(["breakfast", "lunch", "dinner", "snack"]).default("snack"),
+  serving_qty: z.coerce.number().default(1),
+  calories: z.coerce.number().default(0),
+  protein_g: z.coerce.number().default(0),
+  carbs_g: z.coerce.number().default(0),
+  fat_g: z.coerce.number().default(0),
+});
 export type GeneratedRecipe = {
   title: string;
   description: string;

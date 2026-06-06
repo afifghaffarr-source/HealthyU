@@ -112,7 +112,12 @@ function Onboarding() {
 
       {step === 1 && <StepIdentity form={form} setForm={setForm} onNext={() => setStep(2)} />}
       {step === 2 && (
-        <StepBody form={form} setForm={setForm} onBack={() => setStep(1)} onNext={() => setStep(3)} />
+        <StepBody
+          form={form}
+          setForm={setForm}
+          onBack={() => setStep(1)}
+          onNext={() => setStep(3)}
+        />
       )}
       {step === 3 && (
         <StepGoal
@@ -126,7 +131,12 @@ function Onboarding() {
         />
       )}
       {step === 4 && (
-        <StepLifestyle form={form} setForm={setForm} onBack={() => setStep(3)} onNext={() => setStep(5)} />
+        <StepLifestyle
+          form={form}
+          setForm={setForm}
+          onBack={() => setStep(3)}
+          onNext={() => setStep(5)}
+        />
       )}
       {step === 5 && (
         <StepHealth

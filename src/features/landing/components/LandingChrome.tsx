@@ -155,8 +155,14 @@ export function FinalCtaSection({
   return (
     <section className="max-w-3xl mx-auto px-5 md:px-8 py-16 md:py-24 text-center">
       <div className="relative overflow-hidden bg-gradient-to-br from-primary via-primary-dark to-accent text-primary-foreground rounded-3xl p-10 md:p-14 space-y-5 shadow-2xl shadow-primary/30">
-        <div aria-hidden className="absolute -top-20 -right-20 size-72 rounded-full bg-white/10 blur-3xl" />
-        <div aria-hidden className="absolute -bottom-20 -left-20 size-72 rounded-full bg-white/10 blur-3xl" />
+        <div
+          aria-hidden
+          className="absolute -top-20 -right-20 size-72 rounded-full bg-white/10 blur-3xl"
+        />
+        <div
+          aria-hidden
+          className="absolute -bottom-20 -left-20 size-72 rounded-full bg-white/10 blur-3xl"
+        />
         <h2
           className="relative text-3xl md:text-5xl font-bold tracking-tight text-balance"
           style={{ fontFamily: "var(--font-display)" }}

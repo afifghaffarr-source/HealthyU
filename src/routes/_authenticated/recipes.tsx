@@ -47,8 +47,10 @@ function RecipesPage() {
     if (typeof window !== "undefined")
       window.localStorage.setItem("recipes:trendingOnly", trendingOnly ? "1" : "0");
   }, [trendingOnly]);
-  const { trendingCount, pulseTrending, pulseCounter, flashIds, resetCounter } =
-    useTrendingPulse(all, sort);
+  const { trendingCount, pulseTrending, pulseCounter, flashIds, resetCounter } = useTrendingPulse(
+    all,
+    sort,
+  );
 
   const [aiOpen, setAiOpen] = useState(false);
   const items = all

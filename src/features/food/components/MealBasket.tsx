@@ -47,9 +47,8 @@ export function MealBasket({
               <p className="text-sm font-semibold truncate">{b.food_name}</p>
               <p className="text-[11px] text-muted-foreground tabular-nums">
                 {Math.round(b.calories * b.serving_qty)} kcal · P
-                {(b.protein_g * b.serving_qty).toFixed(0)} K
-                {(b.carbs_g * b.serving_qty).toFixed(0)} L
-                {(b.fat_g * b.serving_qty).toFixed(0)}
+                {(b.protein_g * b.serving_qty).toFixed(0)} K{(b.carbs_g * b.serving_qty).toFixed(0)}{" "}
+                L{(b.fat_g * b.serving_qty).toFixed(0)}
               </p>
             </div>
             <button
@@ -58,9 +57,7 @@ export function MealBasket({
             >
               <Minus className="size-3" />
             </button>
-            <span className="w-8 text-center text-xs font-bold tabular-nums">
-              {b.serving_qty}x
-            </span>
+            <span className="w-8 text-center text-xs font-bold tabular-nums">{b.serving_qty}x</span>
             <button
               onClick={() => onUpdateQty(b.key, 0.5)}
               className="size-7 rounded-full bg-background grid place-items-center"

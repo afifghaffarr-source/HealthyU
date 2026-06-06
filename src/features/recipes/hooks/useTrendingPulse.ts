@@ -61,15 +61,11 @@ export function useTrendingPulse(all: RecipeLike[], sort: string) {
     if (sort !== "trending") return;
     const ch = supabase
       .channel("recipes-trending-bookmarks")
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "recipe_bookmarks" },
-        () => {
-          qc.invalidateQueries({ queryKey: ["recipes"] });
-          setPulseTrending(true);
-          window.setTimeout(() => setPulseTrending(false), 3000);
-        },
-      )
+      .on("postgres_changes", { event: "*", schema: "public", table: "recipe_bookmarks" }, () => {
+        qc.invalidateQueries({ queryKey: ["recipes"] });
+        setPulseTrending(true);
+        window.setTimeout(() => setPulseTrending(false), 3000);
+      })
       .subscribe();
     return () => {
       void supabase.removeChannel(ch);

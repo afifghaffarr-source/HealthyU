@@ -5,7 +5,11 @@ vi.mock("@/features/ai/lib/aiGateway.server", () => ({
   callAiWithGuards: (...a: unknown[]) => callMock(...a),
   AiGatewayError: class AiGatewayError extends Error {
     status: number;
-    constructor(msg: string, status: number) { super(msg); this.status = status; this.name = "AiGatewayError"; }
+    constructor(msg: string, status: number) {
+      super(msg);
+      this.status = status;
+      this.name = "AiGatewayError";
+    }
   },
 }));
 
@@ -46,19 +50,24 @@ describe("moderateImage", () => {
     expect((await moderateImage("xx")).blocked).toBe(false);
   });
 
-  it("fails open on gateway error", async () => {
+  it("fails closed on gateway error", async () => {
     const spy = vi.spyOn(console, "error").mockImplementation(() => {});
-    callMock.mockImplementationOnce(() => { throw new AiGatewayError("rate", 429); });
+    callMock.mockImplementationOnce(() => {
+      throw new AiGatewayError("rate", 429);
+    });
     const r = await moderateImage("xx");
-    expect(r).toEqual({ label: "safe", confidence: 0, blocked: false });
+    expect(r).toEqual({ label: "other", confidence: 1, blocked: true, reason: "moderation_error" });
     spy.mockRestore();
   });
 
-  it("fails open on generic error", async () => {
+  it("fails closed on generic error", async () => {
     const spy = vi.spyOn(console, "error").mockImplementation(() => {});
-    callMock.mockImplementationOnce(() => { throw new Error("boom"); });
+    callMock.mockImplementationOnce(() => {
+      throw new Error("boom");
+    });
     const r = await moderateImage("xx");
-    expect(r.label).toBe("safe");
+    expect(r.blocked).toBe(true);
+    expect(r.reason).toBe("moderation_error");
     spy.mockRestore();
   });
 

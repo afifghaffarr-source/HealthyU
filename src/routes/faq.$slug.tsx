@@ -2,7 +2,10 @@ import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { canonical, SITE_NAME } from "@/lib/seo";
 import { getSeoFaq } from "@/features/content/lib/seoContent.functions";
 
-interface QA { question: string; answer: string }
+interface QA {
+  question: string;
+  answer: string;
+}
 
 export const Route = createFileRoute("/faq/$slug")({
   loader: async ({ params }) => {
@@ -62,7 +65,9 @@ export const Route = createFileRoute("/faq/$slug")({
   },
   errorComponent: ({ error }) => (
     <main className="mx-auto max-w-3xl px-4 py-8">
-      <p role="alert" className="text-destructive">Gagal memuat: {error.message}</p>
+      <p role="alert" className="text-destructive">
+        Gagal memuat: {error.message}
+      </p>
     </main>
   ),
   notFoundComponent: () => (
@@ -82,7 +87,9 @@ function FaqDetail() {
   return (
     <main className="mx-auto max-w-3xl px-4 py-8">
       <nav aria-label="Breadcrumb" className="mb-4 text-sm text-muted-foreground">
-        <Link to="/faq" className="hover:text-foreground">FAQ</Link>
+        <Link to="/faq" className="hover:text-foreground">
+          FAQ
+        </Link>
         <span className="mx-2">/</span>
         <span className="text-foreground">{f.title}</span>
       </nav>

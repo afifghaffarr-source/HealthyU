@@ -2,7 +2,9 @@ import { describe, it, expect, vi } from "vitest";
 import { checkRateLimit, RATE_LIMITS } from "../rateLimit.server";
 
 function client(rpcResult: { data?: unknown; error?: unknown }) {
-  return { rpc: vi.fn().mockResolvedValue(rpcResult) } as unknown as Parameters<typeof checkRateLimit>[0] & { rpc: ReturnType<typeof vi.fn> };
+  return { rpc: vi.fn().mockResolvedValue(rpcResult) } as unknown as Parameters<
+    typeof checkRateLimit
+  >[0] & { rpc: ReturnType<typeof vi.fn> };
 }
 
 describe("checkRateLimit", () => {
@@ -10,7 +12,9 @@ describe("checkRateLimit", () => {
     const c = client({ data: true });
     await checkRateLimit(c, "chat", 10, 60);
     expect(c.rpc).toHaveBeenCalledWith("check_rate_limit", {
-      _bucket: "chat", _max_requests: 10, _window_seconds: 60,
+      _bucket: "chat",
+      _max_requests: 10,
+      _window_seconds: 60,
     });
   });
   it("returns true on data=true", async () => {
@@ -19,9 +23,16 @@ describe("checkRateLimit", () => {
   it("returns false on data=false", async () => {
     expect(await checkRateLimit(client({ data: false }), "b", 1, 1)).toBe(false);
   });
-  it("fails open on RPC error", async () => {
+  it("fails closed on RPC error by default", async () => {
     const spy = vi.spyOn(console, "error").mockImplementation(() => {});
-    expect(await checkRateLimit(client({ error: { message: "x" } }), "b", 1, 1)).toBe(true);
+    expect(await checkRateLimit(client({ error: { message: "x" } }), "b", 1, 1)).toBe(false);
+    spy.mockRestore();
+  });
+  it("fails open on RPC error when failOpen=true", async () => {
+    const spy = vi.spyOn(console, "error").mockImplementation(() => {});
+    expect(
+      await checkRateLimit(client({ error: { message: "x" } }), "b", 1, 1, { failOpen: true }),
+    ).toBe(true);
     spy.mockRestore();
   });
 });

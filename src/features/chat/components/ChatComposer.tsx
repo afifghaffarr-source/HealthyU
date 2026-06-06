@@ -42,11 +42,7 @@ export function ChatComposer({
     <div className="space-y-2">
       {imageData && (
         <div className="flex items-center gap-2 rounded-[1.35rem] border border-border/60 bg-card px-3 py-2 shadow-sm">
-          <img
-            src={imageData.preview}
-            alt="preview"
-            className="size-12 rounded-xl object-cover"
-          />
+          <img src={imageData.preview} alt="preview" className="size-12 rounded-xl object-cover" />
           <span className="min-w-0 flex-1 text-xs text-muted-foreground">Foto siap dikirim</span>
           <button
             type="button"

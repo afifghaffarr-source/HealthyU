@@ -151,4 +151,3 @@ export const compareWeeks = createServerFn({ method: "GET" })
       lastWeek: agg(fmt(startLast), fmt(endLast)),
     };
   });
-

@@ -66,9 +66,7 @@ export function DayPlanCard({
             month: "short",
           })}
         </p>
-        <p className="text-xs text-muted-foreground tabular-nums">
-          {Math.round(totalCal)} kcal
-        </p>
+        <p className="text-xs text-muted-foreground tabular-nums">{Math.round(totalCal)} kcal</p>
       </div>
       <div className="space-y-2">
         {MEAL_TYPES.map((mt) => {
@@ -176,9 +174,7 @@ export function FoodPickerSheet({
           ))}
           {query && (
             <button
-              onClick={() =>
-                onPick({ food_item_id: null, custom_name: query, calories: 300 })
-              }
+              onClick={() => onPick({ food_item_id: null, custom_name: query, calories: 300 })}
               className="w-full bg-mint p-3 rounded-2xl text-sm font-semibold inline-flex items-center justify-center gap-1"
             >
               <Plus className="size-4" /> Tambah "{query}" (300 kcal)

@@ -45,7 +45,10 @@ export function LocalFoodHintCard({ hour }: { hour: number }) {
   return (
     <section className="bg-card p-4 rounded-3xl outline-1 outline-black/5 dark:outline-white/10 animate-fade-up">
       <div className="flex items-start gap-3">
-        <span className="size-9 rounded-xl bg-secondary text-foreground grid place-items-center shrink-0" aria-hidden>
+        <span
+          className="size-9 rounded-xl bg-secondary text-foreground grid place-items-center shrink-0"
+          aria-hidden
+        >
           <Utensils className="size-4" />
         </span>
         <div className="min-w-0 flex-1">

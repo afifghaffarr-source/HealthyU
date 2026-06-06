@@ -43,9 +43,7 @@ export function CommunityComposer({
             key={c.id}
             onClick={() => setCategory(c.id)}
             className={`px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap ${
-              category === c.id
-                ? "bg-primary text-primary-foreground"
-                : "bg-mint text-sage-deep"
+              category === c.id ? "bg-primary text-primary-foreground" : "bg-mint text-sage-deep"
             }`}
           >
             {c.label}

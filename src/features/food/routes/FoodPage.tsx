@@ -40,14 +40,8 @@ export function FoodPage() {
   const [q, setQ] = useState("");
   const [mealType, setMealType] = useState<MealType>(currentMealType());
 
-  const {
-    basket,
-    addToBasket,
-    updateQty,
-    removeFromBasket,
-    basketTotals,
-    logBasketM,
-  } = useFoodBasket(mealType);
+  const { basket, addToBasket, updateQty, removeFromBasket, basketTotals, logBasketM } =
+    useFoodBasket(mealType);
   const [altFor, setAltFor] = useState<{ id: string; name: string } | null>(null);
 
   const { data: foods = [] } = useQuery({
@@ -98,7 +92,11 @@ export function FoodPage() {
     onSuccess: () => qc.invalidateQueries({ queryKey: ["meals"] }),
   });
 
-  const { listening, parsing, start: handleVoice } = useVoiceMealInput(async (transcript) => {
+  const {
+    listening,
+    parsing,
+    start: handleVoice,
+  } = useVoiceMealInput(async (transcript) => {
     try {
       const parsed = await parseVoice({ data: { transcript } });
       logMutation.mutate({
@@ -218,7 +216,9 @@ export function FoodPage() {
               <button
                 type="button"
                 onClick={() => {
-                  const el = document.querySelector<HTMLInputElement>('input[type="search"], input[role="searchbox"], input[placeholder]');
+                  const el = document.querySelector<HTMLInputElement>(
+                    'input[type="search"], input[role="searchbox"], input[placeholder]',
+                  );
                   el?.focus();
                 }}
                 className="inline-flex items-center justify-center gap-1.5 bg-muted text-foreground text-sm font-semibold px-3 py-2.5 rounded-xl min-h-11"

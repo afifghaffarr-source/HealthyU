@@ -16,7 +16,7 @@ export function makeScanAiCaller(feature: string) {
         RATE_LIMITS.ai_scan.bucket,
         RATE_LIMITS.ai_scan.max,
         RATE_LIMITS.ai_scan.windowSec,
-        { failClosed: true },
+        {},
       );
       if (!allowed) {
         throw new AiGatewayError("Batas scan AI tercapai. Coba lagi nanti.", 429);

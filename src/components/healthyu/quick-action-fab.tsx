@@ -29,51 +29,52 @@ export function QuickActionFab() {
       )}
       <div className="pointer-events-none fixed bottom-[5.75rem] right-4 z-50 lg:bottom-6 lg:right-6">
         <div className="flex flex-col items-end gap-2 pointer-events-auto">
-        {open && (
+          {open && (
+            <button
+              type="button"
+              onClick={() => {
+                setOpen(false);
+                setSheetOpen(true);
+              }}
+              aria-label="Buka log cepat"
+              className="flex items-center gap-2 animate-fade-up"
+            >
+              <span className="rounded-full border border-border bg-card px-3 py-1.5 text-xs font-semibold text-foreground shadow-md">
+                Log cepat
+              </span>
+              <span className="grid size-11 place-items-center rounded-full bg-primary text-primary-foreground shadow-lg">
+                <Zap className="size-5" />
+              </span>
+            </button>
+          )}
+          {open &&
+            ACTIONS.map((a, i) => (
+              <Link
+                key={a.to}
+                to={a.to}
+                onClick={() => setOpen(false)}
+                className="flex items-center gap-2 animate-fade-up"
+                style={{ animationDelay: `${(i + 1) * 40}ms` }}
+              >
+                <span className="bg-card text-foreground text-xs font-semibold px-3 py-1.5 rounded-full shadow-md border border-border">
+                  {a.label}
+                </span>
+                <span
+                  className={`size-11 rounded-full bg-gradient-to-br ${a.color} text-white grid place-items-center shadow-lg`}
+                >
+                  <a.icon className="size-5" />
+                </span>
+              </Link>
+            ))}
           <button
             type="button"
-            onClick={() => {
-              setOpen(false);
-              setSheetOpen(true);
-            }}
-            aria-label="Buka log cepat"
-            className="flex items-center gap-2 animate-fade-up"
+            onClick={() => setOpen((v) => !v)}
+            aria-label={open ? "Tutup aksi cepat" : "Buka aksi cepat"}
+            aria-expanded={open}
+            className="grid size-14 place-items-center rounded-full border border-primary/20 bg-gradient-to-br from-primary to-primary-dark text-primary-foreground shadow-xl shadow-primary/35 transition-transform hover:scale-105"
           >
-            <span className="rounded-full border border-border bg-card px-3 py-1.5 text-xs font-semibold text-foreground shadow-md">
-              Log cepat
-            </span>
-            <span className="grid size-11 place-items-center rounded-full bg-primary text-primary-foreground shadow-lg">
-              <Zap className="size-5" />
-            </span>
+            {open ? <X className="size-6" /> : <Plus className="size-6" />}
           </button>
-        )}
-        {open && ACTIONS.map((a, i) => (
-          <Link
-            key={a.to}
-            to={a.to}
-            onClick={() => setOpen(false)}
-            className="flex items-center gap-2 animate-fade-up"
-            style={{ animationDelay: `${(i + 1) * 40}ms` }}
-          >
-            <span className="bg-card text-foreground text-xs font-semibold px-3 py-1.5 rounded-full shadow-md border border-border">
-              {a.label}
-            </span>
-            <span
-              className={`size-11 rounded-full bg-gradient-to-br ${a.color} text-white grid place-items-center shadow-lg`}
-            >
-              <a.icon className="size-5" />
-            </span>
-          </Link>
-        ))}
-        <button
-          type="button"
-          onClick={() => setOpen((v) => !v)}
-          aria-label={open ? "Tutup aksi cepat" : "Buka aksi cepat"}
-          aria-expanded={open}
-          className="grid size-14 place-items-center rounded-full border border-primary/20 bg-gradient-to-br from-primary to-primary-dark text-primary-foreground shadow-xl shadow-primary/35 transition-transform hover:scale-105"
-        >
-          {open ? <X className="size-6" /> : <Plus className="size-6" />}
-        </button>
         </div>
       </div>
       <QuickLogSheet open={sheetOpen} onOpenChange={setSheetOpen} />

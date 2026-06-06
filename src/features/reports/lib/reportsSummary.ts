@@ -29,8 +29,7 @@ export function buildWeeklySummary(data: WeeklyData | undefined) {
       .reduce((s, w) => s + (w.calories_burned || 0), 0);
     const slept = data.sleep.filter((s) => dayKey(s.sleep_end) === day);
     const hours = slept.reduce(
-      (s, x) =>
-        s + (new Date(x.sleep_end).getTime() - new Date(x.sleep_start).getTime()) / 3600000,
+      (s, x) => s + (new Date(x.sleep_end).getTime() - new Date(x.sleep_start).getTime()) / 3600000,
       0,
     );
     return { day, cals, ml, burn, hours };

@@ -4,11 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { z } from "zod";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import {
-  listMyGroups,
-  createGroup,
-  joinGroup,
-} from "@/features/groups/lib/groups.functions";
+import { listMyGroups, createGroup, joinGroup } from "@/features/groups/lib/groups.functions";
 import { BottomNav } from "@/components/bottom-nav";
 import { Plus, LogIn } from "lucide-react";
 import { toast } from "sonner";

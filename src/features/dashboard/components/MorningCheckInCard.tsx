@@ -63,7 +63,10 @@ export function MorningCheckInCard() {
   return (
     <section className="bg-card p-4 rounded-3xl outline-1 outline-black/5 dark:outline-white/10 space-y-3 animate-fade-up">
       <div className="flex items-center gap-2">
-        <span className="size-8 rounded-xl bg-amber-100 dark:bg-amber-950/40 text-amber-700 dark:text-amber-200 grid place-items-center" aria-hidden>
+        <span
+          className="size-8 rounded-xl bg-amber-100 dark:bg-amber-950/40 text-amber-700 dark:text-amber-200 grid place-items-center"
+          aria-hidden
+        >
           <Sun className="size-4" />
         </span>
         <div className="min-w-0">

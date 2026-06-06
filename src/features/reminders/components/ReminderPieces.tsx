@@ -41,8 +41,7 @@ export function NextReminderSummary({
     <section
       className="relative overflow-hidden rounded-3xl p-5 text-white animate-fade-up"
       style={{
-        background:
-          "linear-gradient(135deg, oklch(0.62 0.16 195) 0%, oklch(0.58 0.18 250) 100%)",
+        background: "linear-gradient(135deg, oklch(0.62 0.16 195) 0%, oklch(0.58 0.18 250) 100%)",
       }}
     >
       <div className="flex items-center justify-between">
@@ -170,9 +169,7 @@ export function ReminderRow({
         <div
           className={`size-10 rounded-xl grid place-items-center ${it.enabled ? "bg-mint" : "bg-muted"}`}
         >
-          <Icon
-            className={`size-4 ${it.enabled ? "text-sage-deep" : "text-muted-foreground"}`}
-          />
+          <Icon className={`size-4 ${it.enabled ? "text-sage-deep" : "text-muted-foreground"}`} />
         </div>
         <div className="flex-1 min-w-0">
           <input

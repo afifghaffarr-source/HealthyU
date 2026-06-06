@@ -23,7 +23,12 @@ describe("browser helpers (jsdom)", () => {
       Object.defineProperty(window, "matchMedia", {
         writable: true,
         configurable: true,
-        value: () => ({ matches: false, media: "", addEventListener() {}, removeEventListener() {} }),
+        value: () => ({
+          matches: false,
+          media: "",
+          addEventListener() {},
+          removeEventListener() {},
+        }),
       });
     }
     const mql = safeMatchMedia("(min-width: 1px)");

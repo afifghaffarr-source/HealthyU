@@ -36,7 +36,8 @@ export function MostConsistentDayBadge({ calTarget }: { calTarget: number }) {
       <div className="flex-1 min-w-0">
         <p className="text-sm font-semibold">Hari paling konsisten: {dayName}</p>
         <p className="text-[11px] text-muted-foreground">
-          {best.meals} log makanan · {Math.round(best.calories)} kkal. Tetap pertahankan ritme ini ya!
+          {best.meals} log makanan · {Math.round(best.calories)} kkal. Tetap pertahankan ritme ini
+          ya!
         </p>
       </div>
     </section>

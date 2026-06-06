@@ -30,8 +30,8 @@ export const listMyGroups = createServerFn({ method: "GET" })
       .select("id, name, invite_code, owner_id")
       .in("id", ids);
     if (gErr) throw new Error(gErr.message);
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { data: counts } = await supabaseAdmin
+    // User is already a member of these groups (verified above), so RLS allows counting.
+    const { data: counts } = await supabase
       .from("friend_group_members")
       .select("group_id")
       .in("group_id", ids);

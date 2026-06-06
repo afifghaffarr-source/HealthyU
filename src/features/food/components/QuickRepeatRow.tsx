@@ -1,10 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { History, Repeat2 } from "lucide-react";
-import {
-  frequentMeals,
-  yesterdaysMeals,
-} from "@/features/meals/lib/meals.functions";
+import { frequentMeals, yesterdaysMeals } from "@/features/meals/lib/meals.functions";
 import { labelMeal, type MealType } from "@/features/food/lib/foodHelpers";
 
 type QuickItem = {
@@ -55,14 +52,15 @@ export function QuickRepeatRow({
       {yMeals.length > 0 && (
         <div className="bg-card p-4 rounded-3xl outline-1 outline-black/5 dark:outline-white/10 space-y-3">
           <div className="flex items-center gap-2">
-            <span className="size-7 rounded-lg bg-primary/10 text-primary grid place-items-center" aria-hidden>
+            <span
+              className="size-7 rounded-lg bg-primary/10 text-primary grid place-items-center"
+              aria-hidden
+            >
               <Repeat2 className="size-4" />
             </span>
             <div className="min-w-0">
               <p className="text-sm font-semibold leading-tight">Ulang sarapan kemarin</p>
-              <p className="text-[11px] text-muted-foreground">
-                Sekali ketuk untuk catat ulang.
-              </p>
+              <p className="text-[11px] text-muted-foreground">Sekali ketuk untuk catat ulang.</p>
             </div>
           </div>
           <ul className="space-y-1.5">
@@ -93,9 +91,7 @@ export function QuickRepeatRow({
                         {Math.round(Number(m.calories ?? 0))} kkal
                       </span>
                     </span>
-                    <span className="text-[11px] font-semibold text-primary shrink-0">
-                      + Catat
-                    </span>
+                    <span className="text-[11px] font-semibold text-primary shrink-0">+ Catat</span>
                   </button>
                 </li>
               );
@@ -107,7 +103,10 @@ export function QuickRepeatRow({
       {freq.length > 0 && (
         <div className="bg-card p-4 rounded-3xl outline-1 outline-black/5 dark:outline-white/10 space-y-3">
           <div className="flex items-center gap-2">
-            <span className="size-7 rounded-lg bg-secondary text-foreground grid place-items-center" aria-hidden>
+            <span
+              className="size-7 rounded-lg bg-secondary text-foreground grid place-items-center"
+              aria-hidden
+            >
               <History className="size-4" />
             </span>
             <div className="min-w-0">

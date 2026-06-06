@@ -42,12 +42,36 @@ export const Route = createFileRoute("/sitemap.xml")({
         ]);
         const faqs = await supabaseAdmin.from("seo_faqs").select("slug").eq("published", true);
         const dynamic: SitemapEntry[] = [
-          ...(foods.data ?? []).map((r) => ({ path: `/kalori/${r.slug}`, changefreq: "monthly" as const, priority: "0.7" })),
-          ...(exercises.data ?? []).map((r) => ({ path: `/olahraga/${r.slug}`, changefreq: "monthly" as const, priority: "0.7" })),
-          ...(diets.data ?? []).map((r) => ({ path: `/diet/${r.slug}`, changefreq: "monthly" as const, priority: "0.7" })),
-          ...(articles.data ?? []).map((r) => ({ path: `/artikel/${r.slug}`, changefreq: "weekly" as const, priority: "0.8" })),
-          ...(recipes.data ?? []).map((r) => ({ path: `/resep/${r.slug}`, changefreq: "weekly" as const, priority: "0.8" })),
-          ...(faqs.data ?? []).map((r) => ({ path: `/faq/${r.slug}`, changefreq: "monthly" as const, priority: "0.7" })),
+          ...(foods.data ?? []).map((r) => ({
+            path: `/kalori/${r.slug}`,
+            changefreq: "monthly" as const,
+            priority: "0.7",
+          })),
+          ...(exercises.data ?? []).map((r) => ({
+            path: `/olahraga/${r.slug}`,
+            changefreq: "monthly" as const,
+            priority: "0.7",
+          })),
+          ...(diets.data ?? []).map((r) => ({
+            path: `/diet/${r.slug}`,
+            changefreq: "monthly" as const,
+            priority: "0.7",
+          })),
+          ...(articles.data ?? []).map((r) => ({
+            path: `/artikel/${r.slug}`,
+            changefreq: "weekly" as const,
+            priority: "0.8",
+          })),
+          ...(recipes.data ?? []).map((r) => ({
+            path: `/resep/${r.slug}`,
+            changefreq: "weekly" as const,
+            priority: "0.8",
+          })),
+          ...(faqs.data ?? []).map((r) => ({
+            path: `/faq/${r.slug}`,
+            changefreq: "monthly" as const,
+            priority: "0.7",
+          })),
         ];
         const urls = [...STATIC_ENTRIES, ...dynamic].map((e) =>
           [

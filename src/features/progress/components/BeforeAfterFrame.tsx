@@ -69,9 +69,7 @@ export function BeforeAfterFrame({ photos }: { photos: Photo[] }) {
           </figcaption>
         </figure>
       </div>
-      <p className="text-[11px] text-muted-foreground text-center">
-        Progres kecil tetap progres.
-      </p>
+      <p className="text-[11px] text-muted-foreground text-center">Progres kecil tetap progres.</p>
     </section>
   );
 }

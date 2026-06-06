@@ -91,7 +91,8 @@ export const TESTIMONIALS = [
   {
     name: "Sari, 24",
     city: "Bandung",
-    quote: "HealthyU AI Coach jawab pertanyaan diet lebih cepat dari nutritionist saya. Worth it banget!",
+    quote:
+      "HealthyU AI Coach jawab pertanyaan diet lebih cepat dari nutritionist saya. Worth it banget!",
     rating: 5,
   },
 ];

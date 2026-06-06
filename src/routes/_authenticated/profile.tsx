@@ -8,14 +8,7 @@ import { HealthCard } from "@/components/healthyu/health-card";
 import { HealthScoreCard } from "@/components/healthyu/health-score-card";
 import { supabase } from "@/integrations/supabase/client";
 import { calcAge, calcBMI, bmiCategory, calcBMR, calcTDEE, type ActivityLevel } from "@/lib/health";
-import {
-  LogOut,
-  Settings,
-  Trophy,
-  Scale,
-  HeartPulse,
-  Activity,
-} from "lucide-react";
+import { LogOut, Settings, Trophy, Scale, HeartPulse, Activity } from "lucide-react";
 import { useTheme } from "@/components/theme-provider";
 import { LocaleSwitcher } from "@/components/locale-switcher";
 import { ProfileNavGrid } from "@/features/profile/components/ProfileNavGrid";
@@ -76,7 +69,10 @@ function ProfilePage() {
           </div>
           <div className="grid grid-cols-3 gap-3">
             {[0, 1, 2].map((i) => (
-              <div key={i} className="h-24 bg-card rounded-2xl outline-1 outline-foreground/10 animate-pulse" />
+              <div
+                key={i}
+                className="h-24 bg-card rounded-2xl outline-1 outline-foreground/10 animate-pulse"
+              />
             ))}
           </div>
           <div className="h-40 bg-card rounded-3xl outline-1 outline-foreground/10 animate-pulse" />
@@ -242,8 +238,8 @@ function ProfilePage() {
                 <AlertDialogHeader>
                   <AlertDialogTitle>Keluar dari HealthyU?</AlertDialogTitle>
                   <AlertDialogDescription>
-                    Kamu akan keluar dari akun ini. Data tetap aman dan bisa diakses lagi saat
-                    masuk kembali.
+                    Kamu akan keluar dari akun ini. Data tetap aman dan bisa diakses lagi saat masuk
+                    kembali.
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>

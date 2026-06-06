@@ -5,8 +5,12 @@ const SECRET = "x".repeat(32);
 
 describe("requireCronSecret", () => {
   const orig = process.env.CRON_SECRET;
-  beforeEach(() => { process.env.CRON_SECRET = SECRET; });
-  afterEach(() => { process.env.CRON_SECRET = orig; });
+  beforeEach(() => {
+    process.env.CRON_SECRET = SECRET;
+  });
+  afterEach(() => {
+    process.env.CRON_SECRET = orig;
+  });
 
   it("returns 500 when secret unset", async () => {
     delete process.env.CRON_SECRET;
@@ -26,17 +30,23 @@ describe("requireCronSecret", () => {
   });
 
   it("rejects wrong secret with 401", () => {
-    const res = requireCronSecret(new Request("http://x", { headers: { "x-cron-secret": "y".repeat(32) } }));
+    const res = requireCronSecret(
+      new Request("http://x", { headers: { "x-cron-secret": "y".repeat(32) } }),
+    );
     expect(res?.status).toBe(401);
   });
 
   it("accepts via x-cron-secret header", () => {
-    const res = requireCronSecret(new Request("http://x", { headers: { "x-cron-secret": SECRET } }));
+    const res = requireCronSecret(
+      new Request("http://x", { headers: { "x-cron-secret": SECRET } }),
+    );
     expect(res).toBeNull();
   });
 
   it("accepts via authorization Bearer", () => {
-    const res = requireCronSecret(new Request("http://x", { headers: { authorization: `Bearer ${SECRET}` } }));
+    const res = requireCronSecret(
+      new Request("http://x", { headers: { authorization: `Bearer ${SECRET}` } }),
+    );
     expect(res).toBeNull();
   });
 

@@ -10,11 +10,7 @@ import { recognizeFood } from "@/features/food/lib/foodScan.functions";
 import { checkScanLimit } from "@/features/scan/lib/scanMore.functions";
 import { ScanItemsList } from "@/features/scan/components/ScanItemsList";
 import { SafetyChip } from "@/components/healthyu/safety-chip";
-import {
-  MEAL_TYPES,
-  pickDefaultMealType,
-  fileToDataUrl,
-} from "@/features/scan/lib/scanHelpers";
+import { MEAL_TYPES, pickDefaultMealType, fileToDataUrl } from "@/features/scan/lib/scanHelpers";
 import { MealTypePicker } from "@/features/scan/components/MealTypePicker";
 import {
   useScanRecognizeMutation,
@@ -167,7 +163,13 @@ function ScanPage() {
         ) : (
           <>
             <div className="relative rounded-3xl overflow-hidden bg-muted">
-              <img loading="lazy" decoding="async" src={imageUrl} alt="Scan" className="w-full aspect-square object-cover" />
+              <img
+                loading="lazy"
+                decoding="async"
+                src={imageUrl}
+                alt="Scan"
+                className="w-full aspect-square object-cover"
+              />
               <button
                 onClick={reset}
                 className="absolute top-2 right-2 size-8 rounded-full bg-black/60 text-white grid place-items-center"

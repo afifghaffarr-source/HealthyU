@@ -3,15 +3,12 @@ import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { callAiWithGuards, callAiJsonWithSchema } from "@/features/ai/lib/aiGateway.server";
 
-const DailyChallengeSchema = z
-  .object({
-    title: z.string().optional(),
-    description: z.string().optional(),
-    goal_type: z.string().optional(),
-    goal_value: z.number().optional(),
-  })
-  ;
-
+const DailyChallengeSchema = z.object({
+  title: z.string().optional(),
+  description: z.string().optional(),
+  goal_type: z.string().optional(),
+  goal_value: z.number().optional(),
+});
 // ============ 9: Streak Freeze ============
 export const useStreakFreeze = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
@@ -46,9 +43,7 @@ export const getGroupScanLeaderboard = createServerFn({ method: "POST" })
     const since = new Date(Date.now() - 7 * 86400000).toISOString();
     const { data: members } = await supabase
       .from("friend_group_members")
-      .select(
-        "user_id, profiles(id, full_name, avatar_url, public_profile, scan_streak_current)",
-      )
+      .select("user_id, profiles(id, full_name, avatar_url, public_profile, scan_streak_current)")
       .eq("group_id", data.groupId);
     const rows: Array<{
       userId: string;

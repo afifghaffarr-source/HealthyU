@@ -113,9 +113,7 @@ function VitalsPage() {
           latestWeightKg={bodyLogs[0]?.weight_kg as number | string | null | undefined}
         />
 
-        {latest && (
-          <LatestVitalsRow latest={latest} latestBp={latestBp} latestGlu={latestGlu} />
-        )}
+        {latest && <LatestVitalsRow latest={latest} latestBp={latestBp} latestGlu={latestGlu} />}
 
         <BpTrendChart recentBp={recentBp} />
 
@@ -144,4 +142,3 @@ function VitalsPage() {
     </main>
   );
 }
-

@@ -1,9 +1,6 @@
 import { createFileRoute, notFound } from "@tanstack/react-router";
 import { canonical } from "@/lib/seo";
-import {
-  CalculatorShell,
-  breadcrumbSchema,
-} from "@/components/healthyu/calculator-shell";
+import { CalculatorShell, breadcrumbSchema } from "@/components/healthyu/calculator-shell";
 import {
   BMIForm,
   BMRForm,
@@ -35,8 +32,7 @@ const META: Record<Slug, { title: string; description: string; h1: string; intro
   },
   bmr: {
     title: "Kalkulator BMR — Basal Metabolic Rate | HealthyU",
-    description:
-      "Hitung BMR (kalori istirahat) dengan rumus Mifflin-St Jeor — paling akurat.",
+    description: "Hitung BMR (kalori istirahat) dengan rumus Mifflin-St Jeor — paling akurat.",
     h1: "Kalkulator BMR",
     intro: "Hitung jumlah kalori yang dibakar tubuh saat istirahat total.",
   },
@@ -74,8 +70,7 @@ const META: Record<Slug, { title: string; description: string; h1: string; intro
   },
   "heart-rate-zone": {
     title: "Kalkulator Zona Detak Jantung untuk Olahraga | HealthyU",
-    description:
-      "Hitung 5 zona detak jantung untuk pemulihan, bakar lemak, hingga maksimal.",
+    description: "Hitung 5 zona detak jantung untuk pemulihan, bakar lemak, hingga maksimal.",
     h1: "Zona Detak Jantung",
     intro: "Temukan zona detak jantung optimal untuk olahraga Anda.",
   },

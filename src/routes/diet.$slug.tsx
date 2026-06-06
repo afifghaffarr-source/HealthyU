@@ -53,7 +53,9 @@ export const Route = createFileRoute("/diet/$slug")({
   },
   errorComponent: ({ error }) => (
     <main className="mx-auto max-w-3xl px-4 py-8">
-      <p role="alert" className="text-destructive">Gagal memuat: {error.message}</p>
+      <p role="alert" className="text-destructive">
+        Gagal memuat: {error.message}
+      </p>
     </main>
   ),
   notFoundComponent: () => (
@@ -72,7 +74,9 @@ function DietDetail() {
   return (
     <main className="mx-auto max-w-3xl px-4 py-8">
       <nav aria-label="Breadcrumb" className="mb-4 text-sm text-muted-foreground">
-        <Link to="/diet" className="hover:text-foreground">Diet</Link>
+        <Link to="/diet" className="hover:text-foreground">
+          Diet
+        </Link>
         <span className="mx-2">/</span>
         <span className="text-foreground">{d.name}</span>
       </nav>
@@ -92,9 +96,7 @@ function DietDetail() {
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         {d.pros && d.pros.length > 0 && (
           <section className="rounded-xl border bg-card p-5">
-            <h2 className="mb-3 font-semibold text-emerald-600 dark:text-emerald-400">
-              Kelebihan
-            </h2>
+            <h2 className="mb-3 font-semibold text-emerald-600 dark:text-emerald-400">Kelebihan</h2>
             <ul className="space-y-2 text-sm">
               {d.pros.map((p: string) => (
                 <li key={p} className="flex gap-2">

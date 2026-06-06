@@ -34,9 +34,7 @@ export function AiRecommendationsCta() {
       </div>
       <div className="flex-1">
         <p className="font-bold text-sm">Rekomendasi Meal Plan AI</p>
-        <p className="text-[11px] text-muted-foreground">
-          Personal sesuai sisa kalori & profil
-        </p>
+        <p className="text-[11px] text-muted-foreground">Personal sesuai sisa kalori & profil</p>
       </div>
       <ArrowRight className="size-5 text-muted-foreground" />
     </Link>

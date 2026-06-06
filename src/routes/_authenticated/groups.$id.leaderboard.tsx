@@ -7,9 +7,7 @@ import { getGroupScanLeaderboard } from "@/features/scan/lib/scanSocial.function
 import { Flame, Trophy } from "lucide-react";
 import { lazy, Suspense } from "react";
 
-const LeaderboardLineChart = lazy(
-  () => import("@/components/charts/leaderboard-line-chart"),
-);
+const LeaderboardLineChart = lazy(() => import("@/components/charts/leaderboard-line-chart"));
 
 export const Route = createFileRoute("/_authenticated/groups/$id/leaderboard")({
   component: Page,
@@ -32,9 +30,7 @@ function Page() {
               Scan 7 hari · top {Math.min(5, data.rows.length)}
             </p>
             <div className="h-32">
-              <Suspense
-                fallback={<div className="size-full animate-pulse rounded-lg bg-muted" />}
-              >
+              <Suspense fallback={<div className="size-full animate-pulse rounded-lg bg-muted" />}>
                 <LeaderboardLineChart
                   data={data.rows
                     .slice(0, 5)
@@ -50,7 +46,13 @@ function Page() {
               {i === 0 ? <Trophy className="size-5 text-yellow-500" /> : i + 1}
             </div>
             {r.avatar ? (
-              <img loading="lazy" decoding="async" src={r.avatar} alt="" className="size-9 rounded-full" />
+              <img
+                loading="lazy"
+                decoding="async"
+                src={r.avatar}
+                alt=""
+                className="size-9 rounded-full"
+              />
             ) : (
               <div className="size-9 rounded-full bg-muted" />
             )}

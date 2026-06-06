@@ -1,5 +1,13 @@
 import { Link } from "@tanstack/react-router";
-import { BarChart3, ChefHat, ClipboardCheck, Flame, Timer, Utensils, type LucideIcon } from "lucide-react";
+import {
+  BarChart3,
+  ChefHat,
+  ClipboardCheck,
+  Flame,
+  Timer,
+  Utensils,
+  type LucideIcon,
+} from "lucide-react";
 
 type QuickAction =
   | { label: string; icon: LucideIcon; to: "/food" | "/recommendations" | "/fasting" }

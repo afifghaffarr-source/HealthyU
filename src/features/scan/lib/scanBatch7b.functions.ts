@@ -1,3 +1,4 @@
+// Re-exports from consolidated scan modules
 export {
   gachaPull,
   listPetAccessories,
@@ -5,11 +6,15 @@ export {
   equipPetAccessory,
   listHabitStacks,
   createHabitStack,
-} from "./scanBatch7b1.functions";
+} from "./scanGamification.functions";
 export {
   voteFamilyMeal,
   getFamilyMealVotes,
+} from "./scanPlan.functions";
+export {
   generateRecipeVideoScript,
   coachInterview,
+} from "./scanMisc.functions";
+export {
   listFollowers,
-} from "./scanBatch7b2.functions";
+} from "./scanDiscovery.functions";

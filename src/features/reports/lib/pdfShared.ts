@@ -1,9 +1,6 @@
 import type { TranslationKey } from "@/lib/i18n";
 
-export type Translator = (
-  key: TranslationKey,
-  vars?: Record<string, string | number>,
-) => string;
+export type Translator = (key: TranslationKey, vars?: Record<string, string | number>) => string;
 
 export type WeeklyData = {
   meals: Array<{ logged_at: string; calories: number | string; meal_type: string }>;
@@ -51,9 +48,7 @@ export function exportWeeklyCsv(data: WeeklyData) {
     ),
   );
   data.fasting.forEach((f) =>
-    lines.push(
-      `fasting,${f.start_time},${f.protocol},${f.completed ? "completed" : "incomplete"}`,
-    ),
+    lines.push(`fasting,${f.start_time},${f.protocol},${f.completed ? "completed" : "incomplete"}`),
   );
   triggerDownload(
     new Blob([lines.join("\n")], { type: "text/csv" }),

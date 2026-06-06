@@ -66,10 +66,8 @@ export type OnboardingForm = {
   health_conditions: string[];
 };
 
-export const primaryBtn =
-  "bg-primary text-primary-foreground font-semibold py-4 rounded-2xl";
-export const secondaryBtn =
-  "bg-card outline-1 outline-black/10 font-semibold py-4 rounded-2xl";
+export const primaryBtn = "bg-primary text-primary-foreground font-semibold py-4 rounded-2xl";
+export const secondaryBtn = "bg-card outline-1 outline-black/10 font-semibold py-4 rounded-2xl";
 
 export function NumberField({
   label,
@@ -123,9 +121,7 @@ export function WhyAskDisclosure({ children }: { children: React.ReactNode }) {
         />
       </button>
       {open && (
-        <div className="mt-1.5 text-[12px] leading-relaxed text-muted-foreground">
-          {children}
-        </div>
+        <div className="mt-1.5 text-[12px] leading-relaxed text-muted-foreground">{children}</div>
       )}
     </div>
   );

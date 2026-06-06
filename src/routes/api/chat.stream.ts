@@ -137,10 +137,7 @@ export const Route = createFileRoute("/api/chat/stream")({
             model: decision.model,
             cacheHit: true,
           });
-          return staticReplyStream(
-            { emergency: false, tier: decision.tier, cached: true },
-            cached,
-          );
+          return staticReplyStream({ emergency: false, tier: decision.tier, cached: true }, cached);
         }
 
         // Budget gate: only enforced for actual AI calls (tier 2/3 + image).
@@ -157,10 +154,10 @@ export const Route = createFileRoute("/api/chat/stream")({
         } catch (e) {
           console.error("chat.stream enforceAiBudget failed", (e as Error).message);
           // Fail-closed: chat (esp. with images) is expensive.
-          return new Response(
-            JSON.stringify({ error: "ai_budget_unavailable" }),
-            { status: 503, headers: { "Content-Type": "application/json" } },
-          );
+          return new Response(JSON.stringify({ error: "ai_budget_unavailable" }), {
+            status: 503,
+            headers: { "Content-Type": "application/json" },
+          });
         }
         if (!budget.allowed) {
           return new Response(

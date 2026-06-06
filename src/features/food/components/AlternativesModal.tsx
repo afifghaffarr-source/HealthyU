@@ -44,10 +44,7 @@ export function AlternativesModal({
   });
 
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-end justify-center bg-black/50"
-      onClick={onClose}
-    >
+    <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/50" onClick={onClose}>
       <div
         className="w-full max-w-md bg-card rounded-t-3xl p-5 max-h-[80vh] overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
@@ -89,9 +86,8 @@ export function AlternativesModal({
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-semibold truncate">{a.name}</p>
                 <p className="text-[11px] text-muted-foreground">
-                  {Math.round(Number(a.calories))} kcal · P
-                  {Math.round(Number(a.protein_g ?? 0))} K{Math.round(Number(a.carbs_g ?? 0))} L
-                  {Math.round(Number(a.fat_g ?? 0))}
+                  {Math.round(Number(a.calories))} kcal · P{Math.round(Number(a.protein_g ?? 0))} K
+                  {Math.round(Number(a.carbs_g ?? 0))} L{Math.round(Number(a.fat_g ?? 0))}
                 </p>
                 {a.reason && (
                   <p className="text-[10px] text-emerald-700 mt-0.5 line-clamp-2">{a.reason}</p>

@@ -41,16 +41,16 @@ Untuk development lokal, copy `.env.example` → `.env` dan isi nilai yang sesua
 cp .env.example .env
 ```
 
-| Var | Scope | Sumber |
-|---|---|---|
-| `VITE_SUPABASE_URL` | client | auto (Lovable Cloud) |
-| `VITE_SUPABASE_PUBLISHABLE_KEY` | client | auto (Lovable Cloud) |
-| `SUPABASE_URL` / `SUPABASE_PUBLISHABLE_KEY` | server | auto (Lovable Cloud) |
-| `SUPABASE_SERVICE_ROLE_KEY` | server only | auto (Lovable Cloud) |
-| `LOVABLE_API_KEY` | server only | auto (Lovable Cloud) |
-| `CRON_SECRET` | server only | **manual** — min 32 chars, via Cloud secret (`openssl rand -hex 32`) |
-| `VAPID_PRIVATE_KEY` / `VAPID_SUBJECT` | server only | manual (web push) |
-| `GOOGLE_FIT_CLIENT_ID` / `GOOGLE_FIT_CLIENT_SECRET` | server only | manual (Google Cloud Console) |
+| Var                                                 | Scope       | Sumber                                                               |
+| --------------------------------------------------- | ----------- | -------------------------------------------------------------------- |
+| `VITE_SUPABASE_URL`                                 | client      | auto (Lovable Cloud)                                                 |
+| `VITE_SUPABASE_PUBLISHABLE_KEY`                     | client      | auto (Lovable Cloud)                                                 |
+| `SUPABASE_URL` / `SUPABASE_PUBLISHABLE_KEY`         | server      | auto (Lovable Cloud)                                                 |
+| `SUPABASE_SERVICE_ROLE_KEY`                         | server only | auto (Lovable Cloud)                                                 |
+| `LOVABLE_API_KEY`                                   | server only | auto (Lovable Cloud)                                                 |
+| `CRON_SECRET`                                       | server only | **manual** — min 32 chars, via Cloud secret (`openssl rand -hex 32`) |
+| `VAPID_PRIVATE_KEY` / `VAPID_SUBJECT`               | server only | manual (web push)                                                    |
+| `GOOGLE_FIT_CLIENT_ID` / `GOOGLE_FIT_CLIENT_SECRET` | server only | manual (Google Cloud Console)                                        |
 
 ## Cron & webhook auth
 
@@ -61,12 +61,14 @@ memvalidasi `x-cron-secret` / `Authorization: Bearer <CRON_SECRET>` via
 ## AI Gateway
 
 Semua call AI lewat `src/features/ai/lib/aiGateway.server.ts`:
+
 - `callAiWithGuards()` — per-user budget (hourly + daily token) + timeout 30s + usage logging.
 - `callAiJsonWithSchema({ schema, fallback })` — JSON-mode + Zod validation + typed fallback.
 - `failClosed: true` — untuk expensive ops (scan, weekly report), error budget/rate-limit = deny.
 - `LOVABLE_API_KEY` hanya dibaca di helper, tidak boleh di callsite.
 
 Rate limit:
+
 - `src/lib/rateLimit.server.ts` — Supabase RPC-based sliding window, `failClosed` option.
 - Chat: 30 msg/min. AI scan: 20/hour. Reports: 10/day.
 - Scan callers (`scanCallAi.server.ts`) — rate limit + budget enforcement sebelum AI call.
@@ -76,37 +78,38 @@ Chat stream melakukan sendiri: auth → rate limit → budget → safety guard �
 
 ## Scripts
 
-| Command | Fungsi |
-|---|---|
-| `bun run dev` | Vite dev server |
-| `bun run build` | Production build (Worker) |
-| `bun run test` | Vitest unit tests |
-| `bun run lint` | ESLint full project |
+| Command                  | Fungsi                            |
+| ------------------------ | --------------------------------- |
+| `bun run dev`            | Vite dev server                   |
+| `bun run build`          | Production build (Worker)         |
+| `bun run test`           | Vitest unit tests                 |
+| `bun run lint`           | ESLint full project               |
 | `bun run lint:constants` | Lint hanya `src/lib/constants.ts` |
-| `bun run e2e` | Playwright smoke tests |
-| `bun run i18n:scan` | Cek hardcoded strings untuk i18n |
-| `bunx tsc --noEmit` | Typecheck |
+| `bun run e2e`            | Playwright smoke tests            |
+| `bun run i18n:scan`      | Cek hardcoded strings untuk i18n  |
+| `bunx tsc --noEmit`      | Typecheck                         |
 
 ## Deploy
 
 Lovable mengelola deploy otomatis. URL stabil:
+
 - Production: `project--<id>.lovable.app`
 - Preview: `project--<id>-dev.lovable.app`
 
 ## Production readiness
 
-| Area | Status | Detail |
-|---|---|---|
-| Build | ✅ | `bun run build` + `bunx tsc --noEmit` clean |
-| Tests | ✅ | 42 files, 271 tests, vitest 70% threshold |
-| `.env` hygiene | ✅ | Not tracked in git, `.env.example` as template |
-| Cron auth | ✅ | `requireCronSecret()` — timing-safe, fail-closed |
-| OAuth state | ✅ | Crypto nonce, DB-persisted, single-use, 10 min TTL |
-| XSS prevention | ✅ | `rehype-sanitize` on all markdown, no `dangerouslySetInnerHTML` |
-| AI rate limit | ✅ | Per-user budget + sliding-window rate limit on all AI calls |
-| AI fail-closed | ✅ | Expensive ops deny on infra error (budget/rate-limit RPC failure) |
-| PDP export | ✅ | 91 tables mapped, 6 excluded with documented reasons |
-| RLS | ✅ | Row-Level Security on all user tables |
+| Area           | Status | Detail                                                            |
+| -------------- | ------ | ----------------------------------------------------------------- |
+| Build          | ✅     | `bun run build` + `bunx tsc --noEmit` clean                       |
+| Tests          | ✅     | 42 files, 271 tests, vitest 70% threshold                         |
+| `.env` hygiene | ✅     | Not tracked in git, `.env.example` as template                    |
+| Cron auth      | ✅     | `requireCronSecret()` — timing-safe, fail-closed                  |
+| OAuth state    | ✅     | Crypto nonce, DB-persisted, single-use, 10 min TTL                |
+| XSS prevention | ✅     | `rehype-sanitize` on all markdown, no `dangerouslySetInnerHTML`   |
+| AI rate limit  | ✅     | Per-user budget + sliding-window rate limit on all AI calls       |
+| AI fail-closed | ✅     | Expensive ops deny on infra error (budget/rate-limit RPC failure) |
+| PDP export     | ✅     | 91 tables mapped, 6 excluded with documented reasons              |
+| RLS            | ✅     | Row-Level Security on all user tables                             |
 
 ## Known limits
 

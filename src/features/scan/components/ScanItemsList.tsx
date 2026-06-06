@@ -49,10 +49,7 @@ export function ScanItemsList({
           logPending={logPending}
         />
       ))}
-      <button
-        onClick={onDone}
-        className="w-full py-2 text-xs font-semibold text-primary"
-      >
+      <button onClick={onDone} className="w-full py-2 text-xs font-semibold text-primary">
         Selesai
       </button>
     </div>

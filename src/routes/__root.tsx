@@ -43,7 +43,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { property: "og:image", content: "https://healthyu.id/icon-512.svg" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:title", content: "HealthyU — Sahabat Sehat Berbasis AI" },
-      { name: "twitter:description", content: "Diet, puasa, dan kesehatan holistik berbasis AI untuk Indonesia." },
+      {
+        name: "twitter:description",
+        content: "Diet, puasa, dan kesehatan holistik berbasis AI untuk Indonesia.",
+      },
       { name: "twitter:image", content: "https://healthyu.id/icon-512.svg" },
       { name: "theme-color", content: "#6B8E5A" },
       { name: "apple-mobile-web-app-capable", content: "yes" },
@@ -59,8 +62,16 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
       // Preconnect ke Supabase storage/API → kurangi handshake TLS untuk request awal
-      { rel: "preconnect", href: "https://tpyckpdlzpbfguyrgeuy.supabase.co", crossOrigin: "anonymous" },
-      { rel: "dns-prefetch", href: "https://tpyckpdlzpbfguyrgeuy.supabase.co" },
+      ...(import.meta.env.VITE_SUPABASE_URL
+        ? [
+            {
+              rel: "preconnect",
+              href: import.meta.env.VITE_SUPABASE_URL,
+              crossOrigin: "anonymous" as const,
+            },
+            { rel: "dns-prefetch", href: import.meta.env.VITE_SUPABASE_URL },
+          ]
+        : []),
       {
         rel: "stylesheet",
         href: "https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap",

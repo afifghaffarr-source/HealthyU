@@ -43,13 +43,28 @@ export function PersonInputs({
   return (
     <>
       <Field label="Berat (kg)">
-        <input type="number" value={w} onChange={(e) => setW(+e.target.value)} className={inputCls} />
+        <input
+          type="number"
+          value={w}
+          onChange={(e) => setW(+e.target.value)}
+          className={inputCls}
+        />
       </Field>
       <Field label="Tinggi (cm)">
-        <input type="number" value={h} onChange={(e) => setH(+e.target.value)} className={inputCls} />
+        <input
+          type="number"
+          value={h}
+          onChange={(e) => setH(+e.target.value)}
+          className={inputCls}
+        />
       </Field>
       <Field label="Usia (tahun)">
-        <input type="number" value={age} onChange={(e) => setAge(+e.target.value)} className={inputCls} />
+        <input
+          type="number"
+          value={age}
+          onChange={(e) => setAge(+e.target.value)}
+          className={inputCls}
+        />
       </Field>
       <Field label="Jenis kelamin">
         <select

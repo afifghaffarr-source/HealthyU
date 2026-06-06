@@ -3,7 +3,8 @@ import { sendWebPushTo } from "@/features/notifications/lib/push.server";
 import { requireCronSecret } from "@/lib/cronAuth.server";
 
 // Daily AI Coach push notification dispatcher.
-// Called by pg_cron daily (e.g. 07:00 WIB). Auth via Supabase anon key.
+// Called by pg_cron daily (e.g. 07:00 WIB). Auth via CRON_SECRET.
+// Only sends to users with system_enabled = true in notification_preferences.
 
 export const Route = createFileRoute("/api/public/hooks/daily-coach")({
   server: {
@@ -13,9 +14,31 @@ export const Route = createFileRoute("/api/public/hooks/daily-coach")({
         if (unauthorized) return unauthorized;
 
         const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+
+        // Fetch users who have system notifications enabled
+        const { data: prefs, error: prefErr } = await supabaseAdmin
+          .from("notification_preferences")
+          .select("user_id")
+          .eq("system_enabled", true);
+        if (prefErr) {
+          return new Response(JSON.stringify({ error: prefErr.message }), { status: 500 });
+        }
+
+        const allowedUserIds = new Set((prefs ?? []).map((p) => p.user_id));
+        if (allowedUserIds.size === 0) {
+          return Response.json({
+            ok: true,
+            sent: 0,
+            failed: 0,
+            pruned: 0,
+            timestamp: new Date().toISOString(),
+          });
+        }
+
         const { data: subs, error } = await supabaseAdmin
           .from("push_subscriptions")
-          .select("id, user_id, endpoint, p256dh, auth");
+          .select("id, user_id, endpoint, p256dh, auth")
+          .in("user_id", [...allowedUserIds]);
         if (error) {
           return new Response(JSON.stringify({ error: error.message }), { status: 500 });
         }

@@ -18,7 +18,8 @@ export function OfflineQueueBanner() {
       <CloudOff className="size-4 shrink-0" aria-hidden />
       <span className="flex-1 min-w-0">
         {!online && pending === 0 && "Kamu sedang offline. Catatan baru akan tersimpan lokal."}
-        {!online && pending > 0 &&
+        {!online &&
+          pending > 0 &&
           `Offline · ${pending} catatan menunggu sinkron saat koneksi kembali.`}
         {online && pending > 0 && `${pending} catatan menunggu sinkron…`}
       </span>

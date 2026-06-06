@@ -35,7 +35,13 @@ function Page() {
               className="rounded-2xl bg-card border overflow-hidden"
             >
               {r.image_url && (
-                <img loading="lazy" decoding="async" src={r.image_url} alt="" className="w-full aspect-square object-cover" />
+                <img
+                  loading="lazy"
+                  decoding="async"
+                  src={r.image_url}
+                  alt=""
+                  className="w-full aspect-square object-cover"
+                />
               )}
               <div className="p-2">
                 <div className="text-xs font-medium line-clamp-2">{r.title}</div>

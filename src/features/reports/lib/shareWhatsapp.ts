@@ -23,11 +23,7 @@ export function shareWeeklyToWhatsapp(args: {
     ]
       .filter(Boolean)
       .join("\n");
-    window.open(
-      `https://wa.me/?text=${encodeURIComponent(text)}`,
-      "_blank",
-      "noopener,noreferrer",
-    );
+    window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, "_blank", "noopener,noreferrer");
     return;
   }
   const s = summary!;
@@ -46,9 +42,5 @@ export function shareWeeklyToWhatsapp(args: {
   ]
     .filter(Boolean)
     .join("\n");
-  window.open(
-    `https://wa.me/?text=${encodeURIComponent(lines)}`,
-    "_blank",
-    "noopener,noreferrer",
-  );
+  window.open(`https://wa.me/?text=${encodeURIComponent(lines)}`, "_blank", "noopener,noreferrer");
 }

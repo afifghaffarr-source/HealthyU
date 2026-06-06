@@ -128,22 +128,23 @@ export const weeklyAiAnalysis = createServerFn({ method: "POST" })
       group_challenges: groupChallenges,
     };
 
-    const report = (await callAiWithGuards({
-      userId,
-      feature: "report.weekly.ai",
-      model: "google/gemini-2.5-flash",
-      failClosed: true,
-      messages: [
-        {
-          role: "system",
-          content: `Kamu adalah HealthyU AI Coach, AI health coach. Buat laporan analisis mingguan dalam Bahasa Indonesia berdasarkan data user. Format markdown ringkas dengan section:\n## 📊 Ringkasan\n## ✅ Yang Berjalan Baik\n## ⚠️ Area Perlu Perbaikan\n## 🔗 Korelasi & Insight\n(hubungkan tidur dengan kalori/olahraga, puasa dengan pola makan, hidrasi dengan aktivitas)\n## 👥 Progress Challenge Grup\n(jika field group_challenges tidak kosong: sebutkan rank user di tiap grup, streak, dan beri dorongan; lewati section ini jika kosong)\n## 🎯 Rekomendasi Minggu Depan\n(3-5 action items konkret)\n\nJangan diagnosis medis. Selalu beri disclaimer jika ada metrik di luar normal.`,
-        },
-        {
-          role: "user",
-          content: `Data ${d} hari terakhir:\n${JSON.stringify(summary, null, 2)}`,
-        },
-      ],
-    })) || "Tidak ada analisis.";
+    const report =
+      (await callAiWithGuards({
+        userId,
+        feature: "report.weekly.ai",
+        model: "google/gemini-2.5-flash",
+        failClosed: true,
+        messages: [
+          {
+            role: "system",
+            content: `Kamu adalah HealthyU AI Coach, AI health coach. Buat laporan analisis mingguan dalam Bahasa Indonesia berdasarkan data user. Format markdown ringkas dengan section:\n## 📊 Ringkasan\n## ✅ Yang Berjalan Baik\n## ⚠️ Area Perlu Perbaikan\n## 🔗 Korelasi & Insight\n(hubungkan tidur dengan kalori/olahraga, puasa dengan pola makan, hidrasi dengan aktivitas)\n## 👥 Progress Challenge Grup\n(jika field group_challenges tidak kosong: sebutkan rank user di tiap grup, streak, dan beri dorongan; lewati section ini jika kosong)\n## 🎯 Rekomendasi Minggu Depan\n(3-5 action items konkret)\n\nJangan diagnosis medis. Selalu beri disclaimer jika ada metrik di luar normal.`,
+          },
+          {
+            role: "user",
+            content: `Data ${d} hari terakhir:\n${JSON.stringify(summary, null, 2)}`,
+          },
+        ],
+      })) || "Tidak ada analisis.";
 
     const end = new Date();
     const start = new Date(end.getTime() - d * 86400000);

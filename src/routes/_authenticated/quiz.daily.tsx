@@ -3,7 +3,11 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { BottomNav } from "@/components/bottom-nav";
-import { getDailyQuiz, answerDailyQuiz, getDailyQuote } from "@/features/scan/lib/scanBatch7.functions";
+import {
+  getDailyQuiz,
+  answerDailyQuiz,
+  getDailyQuote,
+} from "@/features/scan/lib/scanBatch7.functions";
 import { Brain, Sparkles, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 

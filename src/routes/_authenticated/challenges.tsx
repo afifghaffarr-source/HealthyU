@@ -167,9 +167,7 @@ function ChallengesPage() {
               joining={joinM.isPending}
               logging={logM.isPending}
               onJoin={() => joinM.mutate(c.id)}
-              onLog={(participant_id, day_number) =>
-                logM.mutate({ participant_id, day_number })
-              }
+              onLog={(participant_id, day_number) => logM.mutate({ participant_id, day_number })}
               onLeave={(participant_id) => leaveM.mutate(participant_id)}
               onToggleLeaderboard={() => setOpenLb(openLb === c.id ? null : c.id)}
             />

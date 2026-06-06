@@ -45,7 +45,8 @@ export const Route = createFileRoute("/")({
       { property: "og:title", content: "HealthyU — AI Nutrition Coach untuk Indonesia" },
       {
         property: "og:description",
-        content: "Diet personal, puasa terencana, jadwal sholat, dan AI coach HealthyU AI Coach. Gratis.",
+        content:
+          "Diet personal, puasa terencana, jadwal sholat, dan AI coach HealthyU AI Coach. Gratis.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -74,7 +75,6 @@ export const Route = createFileRoute("/")({
   }),
   component: Index,
 });
-
 
 function Index() {
   const [hasSession, setHasSession] = useState<boolean | null>(null);

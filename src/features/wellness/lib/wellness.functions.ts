@@ -91,8 +91,7 @@ export const claimWeeklyFreeze = createServerFn({ method: "POST" })
       .eq("user_id", userId)
       .is("used_at", null);
     if (ue) throw new Error(ue.message);
-    if ((unused?.length ?? 0) >= 2)
-      return { ok: false, reason: "max_reached" as const };
+    if ((unused?.length ?? 0) >= 2) return { ok: false, reason: "max_reached" as const };
 
     // Already claimed this week?
     const weekStart = isoWeekStart();
@@ -103,8 +102,7 @@ export const claimWeeklyFreeze = createServerFn({ method: "POST" })
       .eq("source", "weekly_bonus")
       .gte("earned_at", `${weekStart}T00:00:00Z`);
     if (we) throw new Error(we.message);
-    if ((thisWeek?.length ?? 0) > 0)
-      return { ok: false, reason: "already_claimed" as const };
+    if ((thisWeek?.length ?? 0) > 0) return { ok: false, reason: "already_claimed" as const };
 
     // Check mood consistency (≥5 distinct days in last 7)
     const since = new Date();

@@ -69,7 +69,9 @@ export function CoachPromptChips({
       const cardStep = 208;
       setCanScrollPrev(scroller.scrollLeft > 8);
       setCanScrollNext(scroller.scrollLeft < maxScrollLeft - 8);
-      setActiveIndex(Math.max(0, Math.min(prompts.length - 1, Math.round(scroller.scrollLeft / cardStep))));
+      setActiveIndex(
+        Math.max(0, Math.min(prompts.length - 1, Math.round(scroller.scrollLeft / cardStep))),
+      );
     };
 
     updateState();
@@ -99,7 +101,11 @@ export function CoachPromptChips({
         <div
           ref={scrollerRef}
           className="flex min-w-0 gap-2 overflow-x-auto overflow-y-hidden overscroll-x-contain px-0.5 pb-1 pt-1 snap-x snap-mandatory no-scrollbar [scrollbar-width:none]"
-          style={{ WebkitOverflowScrolling: "touch", touchAction: "pan-x", scrollPaddingLeft: "0.25rem" }}
+          style={{
+            WebkitOverflowScrolling: "touch",
+            touchAction: "pan-x",
+            scrollPaddingLeft: "0.25rem",
+          }}
           role="group"
           aria-label="Ide pertanyaan untuk AI Coach"
         >

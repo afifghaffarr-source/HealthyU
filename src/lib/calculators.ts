@@ -35,11 +35,7 @@ export function calcTDEE(bmr: number, activity: keyof typeof ACTIVITY): number {
   return bmr * ACTIVITY[activity].factor;
 }
 
-export function calcBodyFat(
-  bmi: number,
-  age: number,
-  sex: "male" | "female",
-): number {
+export function calcBodyFat(bmi: number, age: number, sex: "male" | "female"): number {
   // Deurenberg formula
   const s = sex === "male" ? 1 : 0;
   return 1.2 * bmi + 0.23 * age - 10.8 * s - 5.4;
@@ -68,8 +64,7 @@ export function calcMacros(
   tdee: number,
   goal: "cut" | "maintain" | "bulk",
 ): { calories: number; macros: Macros } {
-  const calories =
-    goal === "cut" ? tdee - 500 : goal === "bulk" ? tdee + 300 : tdee;
+  const calories = goal === "cut" ? tdee - 500 : goal === "bulk" ? tdee + 300 : tdee;
   // 30/40/30 protein/carb/fat
   const protein = (calories * 0.3) / 4;
   const carbs = (calories * 0.4) / 4;

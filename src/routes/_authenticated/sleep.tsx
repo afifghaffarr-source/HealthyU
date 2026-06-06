@@ -117,9 +117,7 @@ function SleepPage() {
               Tren 7 hari
             </p>
             <div className="h-32">
-              <Suspense
-                fallback={<div className="size-full animate-pulse rounded-lg bg-muted" />}
-              >
+              <Suspense fallback={<div className="size-full animate-pulse rounded-lg bg-muted" />}>
                 <SleepAreaChart data={chartData} />
               </Suspense>
             </div>

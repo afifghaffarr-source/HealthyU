@@ -65,11 +65,7 @@ export function ScanItemCard({
           )}
           {!editing && (
             <p className="text-xs text-muted-foreground mt-0.5">
-              {it.portion_g
-                ? `~${it.portion_g}g`
-                : it.portion_ml
-                  ? `~${it.portion_ml}ml`
-                  : ""}
+              {it.portion_g ? `~${it.portion_g}g` : it.portion_ml ? `~${it.portion_ml}ml` : ""}
               {" · "}P {Math.round(it.protein_g)}g · K {Math.round(it.carbs_g)}g · L{" "}
               {Math.round(it.fat_g)}g
             </p>

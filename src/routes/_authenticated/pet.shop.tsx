@@ -3,7 +3,11 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { BottomNav } from "@/components/bottom-nav";
-import { listPetAccessories, buyPetAccessory, equipPetAccessory } from "@/features/scan/lib/scanBatch7.functions";
+import {
+  listPetAccessories,
+  buyPetAccessory,
+  equipPetAccessory,
+} from "@/features/scan/lib/scanBatch7.functions";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/pet/shop")({ component: Page });

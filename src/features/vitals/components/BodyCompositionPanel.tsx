@@ -107,30 +107,104 @@ export function BodyCompositionPanel() {
           <div>
             <p className="text-[10px] font-bold uppercase text-muted-foreground mb-2">Komposisi</p>
             <div className="grid grid-cols-2 gap-2">
-              <VitalInput label="Berat" value={body.weight_kg} onChange={(v) => setVal("weight_kg", v)} suffix="kg" />
-              <VitalInput label="Lemak" value={body.body_fat_pct} onChange={(v) => setVal("body_fat_pct", v)} suffix="%" />
-              <VitalInput label="Otot" value={body.muscle_mass_kg} onChange={(v) => setVal("muscle_mass_kg", v)} suffix="kg" />
-              <VitalInput label="Air" value={body.water_pct} onChange={(v) => setVal("water_pct", v)} suffix="%" />
-              <VitalInput label="Visceral fat" value={body.visceral_fat} onChange={(v) => setVal("visceral_fat", v)} suffix="" />
+              <VitalInput
+                label="Berat"
+                value={body.weight_kg}
+                onChange={(v) => setVal("weight_kg", v)}
+                suffix="kg"
+              />
+              <VitalInput
+                label="Lemak"
+                value={body.body_fat_pct}
+                onChange={(v) => setVal("body_fat_pct", v)}
+                suffix="%"
+              />
+              <VitalInput
+                label="Otot"
+                value={body.muscle_mass_kg}
+                onChange={(v) => setVal("muscle_mass_kg", v)}
+                suffix="kg"
+              />
+              <VitalInput
+                label="Air"
+                value={body.water_pct}
+                onChange={(v) => setVal("water_pct", v)}
+                suffix="%"
+              />
+              <VitalInput
+                label="Visceral fat"
+                value={body.visceral_fat}
+                onChange={(v) => setVal("visceral_fat", v)}
+                suffix=""
+              />
             </div>
           </div>
           <div>
-            <p className="text-[10px] font-bold uppercase text-muted-foreground mb-2">Lingkar tubuh</p>
+            <p className="text-[10px] font-bold uppercase text-muted-foreground mb-2">
+              Lingkar tubuh
+            </p>
             <div className="grid grid-cols-2 gap-2">
-              <VitalInput label="Pinggang" value={body.waist_cm} onChange={(v) => setVal("waist_cm", v)} suffix="cm" />
-              <VitalInput label="Pinggul" value={body.hip_cm} onChange={(v) => setVal("hip_cm", v)} suffix="cm" />
-              <VitalInput label="Dada" value={body.chest_cm} onChange={(v) => setVal("chest_cm", v)} suffix="cm" />
-              <VitalInput label="Leher" value={body.neck_cm} onChange={(v) => setVal("neck_cm", v)} suffix="cm" />
-              <VitalInput label="Betis" value={body.calf_cm} onChange={(v) => setVal("calf_cm", v)} suffix="cm" />
+              <VitalInput
+                label="Pinggang"
+                value={body.waist_cm}
+                onChange={(v) => setVal("waist_cm", v)}
+                suffix="cm"
+              />
+              <VitalInput
+                label="Pinggul"
+                value={body.hip_cm}
+                onChange={(v) => setVal("hip_cm", v)}
+                suffix="cm"
+              />
+              <VitalInput
+                label="Dada"
+                value={body.chest_cm}
+                onChange={(v) => setVal("chest_cm", v)}
+                suffix="cm"
+              />
+              <VitalInput
+                label="Leher"
+                value={body.neck_cm}
+                onChange={(v) => setVal("neck_cm", v)}
+                suffix="cm"
+              />
+              <VitalInput
+                label="Betis"
+                value={body.calf_cm}
+                onChange={(v) => setVal("calf_cm", v)}
+                suffix="cm"
+              />
             </div>
           </div>
           <div>
-            <p className="text-[10px] font-bold uppercase text-muted-foreground mb-2">Lengan & paha</p>
+            <p className="text-[10px] font-bold uppercase text-muted-foreground mb-2">
+              Lengan & paha
+            </p>
             <div className="grid grid-cols-2 gap-2">
-              <VitalInput label="Bisep kiri" value={body.bicep_left_cm} onChange={(v) => setVal("bicep_left_cm", v)} suffix="cm" />
-              <VitalInput label="Bisep kanan" value={body.bicep_right_cm} onChange={(v) => setVal("bicep_right_cm", v)} suffix="cm" />
-              <VitalInput label="Paha kiri" value={body.thigh_left_cm} onChange={(v) => setVal("thigh_left_cm", v)} suffix="cm" />
-              <VitalInput label="Paha kanan" value={body.thigh_right_cm} onChange={(v) => setVal("thigh_right_cm", v)} suffix="cm" />
+              <VitalInput
+                label="Bisep kiri"
+                value={body.bicep_left_cm}
+                onChange={(v) => setVal("bicep_left_cm", v)}
+                suffix="cm"
+              />
+              <VitalInput
+                label="Bisep kanan"
+                value={body.bicep_right_cm}
+                onChange={(v) => setVal("bicep_right_cm", v)}
+                suffix="cm"
+              />
+              <VitalInput
+                label="Paha kiri"
+                value={body.thigh_left_cm}
+                onChange={(v) => setVal("thigh_left_cm", v)}
+                suffix="cm"
+              />
+              <VitalInput
+                label="Paha kanan"
+                value={body.thigh_right_cm}
+                onChange={(v) => setVal("thigh_right_cm", v)}
+                suffix="cm"
+              />
             </div>
           </div>
           <button

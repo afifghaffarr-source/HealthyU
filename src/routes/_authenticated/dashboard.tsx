@@ -1,11 +1,6 @@
 import { createFileRoute, redirect } from "@tanstack/react-router";
 import { useState } from "react";
-import {
-  queryOptions,
-  useQuery,
-  useSuspenseQuery,
-  useQueryClient,
-} from "@tanstack/react-query";
+import { queryOptions, useQuery, useSuspenseQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { getProfile } from "@/features/profile/lib/profile.functions";
 import { getDailyTip } from "@/features/daily-tips/lib/dailyTips.functions";
@@ -29,10 +24,7 @@ import {
   DashboardHeader,
   dashboardGreeting,
 } from "@/features/dashboard/components/DashboardHeader";
-import {
-  HeroStatsRow,
-  MacroBreakdown,
-} from "@/features/dashboard/components/HeroStatsRow";
+import { HeroStatsRow, MacroBreakdown } from "@/features/dashboard/components/HeroStatsRow";
 import { TodaysBalanceCard } from "@/features/dashboard/components/TodaysBalanceCard";
 import { SmartNextStepCard } from "@/features/dashboard/components/SmartNextStepCard";
 import { MacroGapInsightCard } from "@/features/dashboard/components/MacroGapInsightCard";
@@ -49,6 +41,8 @@ import { ActionRow } from "@/features/dashboard/components/ActionRow";
 import { usePullToRefresh } from "@/hooks/use-pull-to-refresh";
 import { useFastClock } from "@/features/dashboard/hooks/useFastClock";
 import { useDashboardMutations } from "@/features/dashboard/hooks/useDashboardMutations";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { ChevronDown } from "lucide-react";
 
 const profileQueryOptions = queryOptions({
   queryKey: ["profile"],
@@ -96,8 +90,8 @@ function Dashboard() {
   const fetchGroupChallenges = useServerFn(myGroupChallengeSummary);
   const fetchUnlinked = useServerFn(myUnlinkedJoinedChallenges);
   const [freezeOpen, setFreezeOpen] = useState(false);
-  const { bonusClaimed, claimBonusMut, waterMutation, moodMutation } =
-    useDashboardMutations();
+  const [showMore, setShowMore] = useState(false);
+  const { bonusClaimed, claimBonusMut, waterMutation, moodMutation } = useDashboardMutations();
 
   const { data: profile } = useSuspenseQuery(profileQueryOptions);
   const { data: dailyTip } = useQuery(dailyTipQueryOptions);
@@ -169,13 +163,6 @@ function Dashboard() {
 
         <OfflineQueueBanner />
 
-        <MorningCheckInCard />
-        <EveningReflectionCard />
-        <WeeklyReviewCard />
-
-        <WeeklyGoalCard />
-        <StreakFreezeBadge />
-
         <Coachmark
           flagKey="dashboard-v1"
           title="Selamat datang di Healthy U"
@@ -185,28 +172,6 @@ function Dashboard() {
         <TodaysBalanceCard totals={totals} calTarget={calTarget} />
 
         <ActionRow />
-
-        <SmartNextStepCard
-          hour={new Date().getHours()}
-          timezone={profile?.timezone ?? undefined}
-          mealCount={meals.length}
-          waterMl={waterMl}
-          waterTarget={waterTarget}
-          fastActive={!!fast}
-          remainingKcal={Math.max(0, calTarget - totals.cal)}
-        />
-
-        <MacroGapInsightCard totals={totals} calTarget={calTarget} />
-
-        <LocalFoodHintCard hour={new Date().getHours()} />
-
-        <HydrationSuggestCard
-          waterMl={waterMl}
-          targetMl={waterTarget}
-          hour={new Date().getHours()}
-          onLog={(ml) => waterMutation.mutate(ml)}
-          disabled={waterMutation.isPending}
-        />
 
         <HeroStatsRow
           totals={totals}
@@ -226,27 +191,66 @@ function Dashboard() {
           disabled={waterMutation.isPending}
         />
 
-        <MoodQuickLog
-          onPick={(m) => moodMutation.mutate(m)}
-          disabled={moodMutation.isPending}
-        />
-
         <TodaysMeals meals={meals} />
 
-        {dailyTip && <DailyTipCard category={dailyTip.category} tip={dailyTip.tip} />}
+        <Collapsible open={showMore} onOpenChange={setShowMore}>
+          <CollapsibleTrigger className="flex items-center justify-center gap-1.5 w-full py-3 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+            {showMore ? "Sembunyikan" : "Lihat Semua"}
+            <ChevronDown
+              className={`h-4 w-4 transition-transform ${showMore ? "rotate-180" : ""}`}
+            />
+          </CollapsibleTrigger>
+          <CollapsibleContent className="space-y-5">
+            <SmartNextStepCard
+              hour={new Date().getHours()}
+              timezone={profile?.timezone ?? undefined}
+              mealCount={meals.length}
+              waterMl={waterMl}
+              waterTarget={waterTarget}
+              fastActive={!!fast}
+              remainingKcal={Math.max(0, calTarget - totals.cal)}
+            />
 
-        <GamificationCard
-          streak={game?.stats?.current_streak ?? 0}
-          level={game?.stats?.level ?? 1}
-          xp={game?.stats?.xp ?? 0}
-          onFreeze={() => setFreezeOpen(true)}
-        />
+            <MacroGapInsightCard totals={totals} calTarget={calTarget} />
+
+            <LocalFoodHintCard hour={new Date().getHours()} />
+
+            <HydrationSuggestCard
+              waterMl={waterMl}
+              targetMl={waterTarget}
+              hour={new Date().getHours()}
+              onLog={(ml) => waterMutation.mutate(ml)}
+              disabled={waterMutation.isPending}
+            />
+
+            <MoodQuickLog
+              onPick={(m) => moodMutation.mutate(m)}
+              disabled={moodMutation.isPending}
+            />
+
+            <MorningCheckInCard />
+            <EveningReflectionCard />
+            <WeeklyReviewCard />
+
+            <WeeklyGoalCard />
+            <StreakFreezeBadge />
+
+            {dailyTip && <DailyTipCard category={dailyTip.category} tip={dailyTip.tip} />}
+
+            <GamificationCard
+              streak={game?.stats?.current_streak ?? 0}
+              level={game?.stats?.level ?? 1}
+              xp={game?.stats?.xp ?? 0}
+              onFreeze={() => setFreezeOpen(true)}
+            />
+
+            <GroupChallengeSummaryCard groupSummary={groupSummary} />
+
+            <UnlinkedChallengesCard challenges={unlinkedChallenges} />
+          </CollapsibleContent>
+        </Collapsible>
 
         <FreezeDialog open={freezeOpen} onClose={() => setFreezeOpen(false)} />
-
-        <GroupChallengeSummaryCard groupSummary={groupSummary} />
-
-        <UnlinkedChallengesCard challenges={unlinkedChallenges} />
       </div>
       <BottomNav />
     </main>

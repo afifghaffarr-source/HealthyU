@@ -45,7 +45,13 @@ function Page() {
             >
               <div className="size-10 rounded-full bg-muted overflow-hidden flex items-center justify-center text-sm">
                 {u.avatar_url ? (
-                  <img loading="lazy" decoding="async" src={u.avatar_url} alt="" className="size-full object-cover" />
+                  <img
+                    loading="lazy"
+                    decoding="async"
+                    src={u.avatar_url}
+                    alt=""
+                    className="size-full object-cover"
+                  />
                 ) : (
                   (u.full_name?.[0] ?? "?")
                 )}

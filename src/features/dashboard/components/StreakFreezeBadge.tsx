@@ -3,10 +3,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { Snowflake, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import {
-  getStreakFreezes,
-  claimWeeklyFreeze,
-} from "@/features/wellness/lib/wellness.functions";
+import { getStreakFreezes, claimWeeklyFreeze } from "@/features/wellness/lib/wellness.functions";
 
 const REASON_MSG: Record<string, string> = {
   max_reached: "Sudah maksimal 2 freeze tersimpan.",

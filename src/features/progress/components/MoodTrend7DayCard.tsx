@@ -45,8 +45,7 @@ export function MoodTrend7DayCard() {
           const date = new Date(d.date + "T00:00:00");
           const dow = date.getDay();
           const isToday = new Date().toISOString().slice(0, 10) === d.date;
-          const heightPct =
-            d.avg !== null ? Math.max(15, (d.avg / 5) * 100) : 6;
+          const heightPct = d.avg !== null ? Math.max(15, (d.avg / 5) * 100) : 6;
           const colorClass =
             d.avg === null
               ? "bg-muted"

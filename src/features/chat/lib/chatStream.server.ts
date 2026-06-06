@@ -67,9 +67,7 @@ export function proxyUpstreamStream(
         if (fullText) {
           if (extraTail) {
             fullText += extraTail;
-            controller.enqueue(
-              encoder.encode(`data: ${JSON.stringify({ delta: extraTail })}\n\n`),
-            );
+            controller.enqueue(encoder.encode(`data: ${JSON.stringify({ delta: extraTail })}\n\n`));
           }
           await handlers.onComplete(fullText);
         }

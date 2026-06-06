@@ -3,19 +3,16 @@ import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { callAiWithGuards, callAiJsonWithSchema } from "@/features/ai/lib/aiGateway.server";
 
-const RemixSchema = z
-  .object({
-    title: z.string().default(""),
-    ingredients: z.array(z.string()).default([]),
-    instructions: z.array(z.string()).default([]),
-    calories: z.number().optional(),
-    protein_g: z.number().optional(),
-    carbs_g: z.number().optional(),
-    fat_g: z.number().optional(),
-    notes: z.string().optional(),
-  })
-  ;
-
+const RemixSchema = z.object({
+  title: z.string().default(""),
+  ingredients: z.array(z.string()).default([]),
+  instructions: z.array(z.string()).default([]),
+  calories: z.number().optional(),
+  protein_g: z.number().optional(),
+  carbs_g: z.number().optional(),
+  fat_g: z.number().optional(),
+  notes: z.string().optional(),
+});
 export const completeDailyChallenge = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: { id: string }) => z.object({ id: z.string().uuid() }).parse(d))
@@ -147,4 +144,3 @@ export const doctorChat = createServerFn({ method: "POST" })
     });
     return { reply };
   });
-

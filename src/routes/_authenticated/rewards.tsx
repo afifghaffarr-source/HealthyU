@@ -55,7 +55,13 @@ function RewardsPage() {
               >
                 <div className="size-16 bg-secondary/40 rounded-2xl grid place-items-center overflow-hidden flex-shrink-0">
                   {r.image_url ? (
-                    <img loading="lazy" decoding="async" src={r.image_url} alt={r.name} className="size-full object-cover" />
+                    <img
+                      loading="lazy"
+                      decoding="async"
+                      src={r.image_url}
+                      alt={r.name}
+                      className="size-full object-cover"
+                    />
                   ) : (
                     <Gift className="size-6 text-muted-foreground" />
                   )}

@@ -1,5 +1,8 @@
 // Simple IndexedDB queue for offline-first logging.
 // Items dequeue when navigator.onLine and the sync function succeeds.
+// Items auto-expire after TTL_MS to prevent stale health data lingering in IndexedDB.
+
+export const TTL_MS = 7 * 24 * 60 * 60 * 1000; // 7 days
 
 export type QueueKind = "water" | "weight" | "meal" | "mood" | "vitals" | "workout";
 export type QueueItem = {
@@ -7,6 +10,7 @@ export type QueueItem = {
   kind: QueueKind;
   payload: unknown;
   created_at: number;
+  expires_at: number;
   attempts?: number;
   next_attempt_at?: number;
   last_error?: string;
@@ -16,10 +20,11 @@ export type QueueItem = {
 const DB_NAME = "sehatify-offline";
 const STORE = "queue";
 const DEAD_STORE = "dead";
+const DB_VERSION = 3;
 
 function openDb(): Promise<IDBDatabase> {
   return new Promise((resolve, reject) => {
-    const req = indexedDB.open(DB_NAME, 2);
+    const req = indexedDB.open(DB_NAME, DB_VERSION);
     req.onupgradeneeded = () => {
       const db = req.result;
       if (!db.objectStoreNames.contains(STORE)) {
@@ -49,11 +54,13 @@ async function tx<T>(
 }
 
 export async function enqueue(kind: QueueKind, payload: unknown): Promise<void> {
+  await cleanupExpired();
   await tx(STORE, "readwrite", (s) => {
     s.add({
       kind,
       payload,
       created_at: Date.now(),
+      expires_at: Date.now() + TTL_MS,
       attempts: 0,
       next_attempt_at: 0,
     } satisfies QueueItem);
@@ -146,6 +153,48 @@ export async function clearDead(): Promise<void> {
   window.dispatchEvent(new CustomEvent("offline-queue:changed"));
 }
 
+/** Remove expired items from both queue and dead-letter stores. */
+export async function cleanupExpired(): Promise<void> {
+  const now = Date.now();
+  // Clean main queue
+  await tx(STORE, "readwrite", (s) => {
+    const req = s.openCursor();
+    req.onsuccess = () => {
+      const cursor = req.result;
+      if (!cursor) return;
+      const item = cursor.value as QueueItem;
+      if (item.expires_at && item.expires_at < now) {
+        cursor.delete();
+      }
+      cursor.continue();
+    };
+  });
+  // Clean dead-letter store
+  await tx(DEAD_STORE, "readwrite", (s) => {
+    const req = s.openCursor();
+    req.onsuccess = () => {
+      const cursor = req.result;
+      if (!cursor) return;
+      const item = cursor.value as QueueItem;
+      if (item.expires_at && item.expires_at < now) {
+        cursor.delete();
+      }
+      cursor.continue();
+    };
+  });
+}
+
+/** Clear all queue data — call on user logout to purge health data from IndexedDB. */
+export async function clearAll(): Promise<void> {
+  await tx(STORE, "readwrite", (s) => {
+    s.clear();
+  });
+  await tx(DEAD_STORE, "readwrite", (s) => {
+    s.clear();
+  });
+  window.dispatchEvent(new CustomEvent("offline-queue:changed"));
+}
+
 type Syncer = (item: QueueItem) => Promise<void>;
 
 const MAX_ATTEMPTS = 6;
@@ -156,11 +205,13 @@ export async function flush(
   syncers: Record<QueueKind, Syncer>,
 ): Promise<{ synced: number; failed: number }> {
   if (!navigator.onLine) return { synced: 0, failed: 0 };
+  await cleanupExpired();
   const items = await listAll();
   const now = Date.now();
   let synced = 0;
   let failed = 0;
   for (const item of items) {
+    if (item.expires_at && item.expires_at < now) continue;
     if ((item.next_attempt_at ?? 0) > now) continue;
     try {
       await syncers[item.kind](item);

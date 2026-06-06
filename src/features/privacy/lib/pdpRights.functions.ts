@@ -14,13 +14,7 @@ export const exportMyData = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     const { supabase, userId } = context;
-    type JsonValue =
-      | string
-      | number
-      | boolean
-      | null
-      | JsonValue[]
-      | { [key: string]: JsonValue };
+    type JsonValue = string | number | boolean | null | JsonValue[] | { [key: string]: JsonValue };
     const dump: Record<string, JsonValue> = {
       exported_at: new Date().toISOString(),
       user_id: userId,

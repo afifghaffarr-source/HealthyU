@@ -26,7 +26,9 @@ export function validateOAuthState(
   return { ok: true, userId: row.user_id, stateId: row.id };
 }
 
-export function oauthStateErrorMessage(reason: Exclude<OAuthStateValidation, { ok: true }>["reason"]): string {
+export function oauthStateErrorMessage(
+  reason: Exclude<OAuthStateValidation, { ok: true }>["reason"],
+): string {
   switch (reason) {
     case "missing":
       return "State OAuth tidak valid";

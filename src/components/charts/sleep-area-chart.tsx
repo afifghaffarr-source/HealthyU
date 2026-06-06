@@ -20,9 +20,7 @@ export default function SleepAreaChart({ data }: { data: Point[] }) {
             border: "none",
             boxShadow: "0 4px 14px rgba(0,0,0,0.1)",
           }}
-          formatter={(v: number, n: string) =>
-            n === "hours" ? [`${v}j`, "Durasi"] : [v, "Skor"]
-          }
+          formatter={(v: number, n: string) => (n === "hours" ? [`${v}j`, "Durasi"] : [v, "Skor"])}
         />
         <Area
           type="monotone"

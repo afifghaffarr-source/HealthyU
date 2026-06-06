@@ -63,7 +63,12 @@ export const Route = createFileRoute("/artikel/$slug")({
                 "@type": "BreadcrumbList",
                 itemListElement: [
                   { "@type": "ListItem", position: 1, name: "Beranda", item: canonical("/") },
-                  { "@type": "ListItem", position: 2, name: "Artikel", item: canonical("/artikel") },
+                  {
+                    "@type": "ListItem",
+                    position: 2,
+                    name: "Artikel",
+                    item: canonical("/artikel"),
+                  },
                   { "@type": "ListItem", position: 3, name: a.title, item: url },
                 ],
               }),
@@ -74,7 +79,9 @@ export const Route = createFileRoute("/artikel/$slug")({
   },
   errorComponent: ({ error }) => (
     <main className="mx-auto max-w-3xl px-4 py-8">
-      <p role="alert" className="text-destructive">Gagal memuat: {error.message}</p>
+      <p role="alert" className="text-destructive">
+        Gagal memuat: {error.message}
+      </p>
     </main>
   ),
   notFoundComponent: () => (
@@ -93,7 +100,9 @@ function ArtikelDetail() {
   return (
     <main className="mx-auto max-w-3xl px-4 py-8">
       <nav aria-label="Breadcrumb" className="mb-4 text-sm text-muted-foreground">
-        <Link to="/artikel" className="hover:text-foreground">Artikel</Link>
+        <Link to="/artikel" className="hover:text-foreground">
+          Artikel
+        </Link>
         <span className="mx-2">/</span>
         <span className="text-foreground">{a.title}</span>
       </nav>

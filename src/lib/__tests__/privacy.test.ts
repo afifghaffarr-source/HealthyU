@@ -37,6 +37,45 @@ describe("maskPublicProfile", () => {
   it("returns null for null input", () => {
     expect(maskPublicProfile(null, viewer)).toBeNull();
   });
+
+  it("strips sensitive fields for non-owners even when public_profile=true", () => {
+    const profileWithSensitive = {
+      ...baseProfile,
+      email: "budi@example.com",
+      health_conditions: "diabetes",
+      allergies: "peanuts",
+      medications: "metformin",
+    };
+    const masked = maskPublicProfile(profileWithSensitive, viewer);
+    expect(masked?.full_name).toBe("Budi");
+    expect(masked?.id).toBe(owner);
+    expect((masked as Record<string, unknown>)?.email).toBeUndefined();
+    expect((masked as Record<string, unknown>)?.health_conditions).toBeUndefined();
+    expect((masked as Record<string, unknown>)?.allergies).toBeUndefined();
+    expect((masked as Record<string, unknown>)?.medications).toBeUndefined();
+  });
+
+  it("owner sees all fields including sensitive ones", () => {
+    const profileWithSensitive = {
+      ...baseProfile,
+      email: "budi@example.com",
+      health_conditions: "diabetes",
+    };
+    const masked = maskPublicProfile(profileWithSensitive, owner);
+    expect(masked?.full_name).toBe("Budi");
+    expect((masked as Record<string, unknown>)?.email).toBe("budi@example.com");
+    expect((masked as Record<string, unknown>)?.health_conditions).toBe("diabetes");
+  });
+
+  it("unauthenticated viewer gets stripped fields on public profile", () => {
+    const profileWithSensitive = {
+      ...baseProfile,
+      email: "budi@example.com",
+    };
+    const masked = maskPublicProfile(profileWithSensitive, null);
+    expect(masked?.full_name).toBe("Budi");
+    expect((masked as Record<string, unknown>)?.email).toBeUndefined();
+  });
 });
 
 describe("canShowProfileMetric", () => {

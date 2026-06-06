@@ -176,11 +176,7 @@ export function ChatPage() {
                 }`}
                 aria-label="Toggle suara balasan"
               >
-                {speech.ttsOn ? (
-                  <Volume2 className="size-4" />
-                ) : (
-                  <VolumeX className="size-4" />
-                )}
+                {speech.ttsOn ? <Volume2 className="size-4" /> : <VolumeX className="size-4" />}
               </button>
               <button
                 onClick={handleClear}
@@ -195,10 +191,7 @@ export function ChatPage() {
         />
       </div>
 
-      <div
-        className={shellClassName}
-        style={{ paddingBottom: `calc(${dockHeight}px + 2rem)` }}
-      >
+      <div className={shellClassName} style={{ paddingBottom: `calc(${dockHeight}px + 2rem)` }}>
         <section className="overflow-hidden rounded-[1.6rem] border border-border/60 bg-background/70 px-2 py-2 shadow-sm backdrop-blur-sm supports-[backdrop-filter]:bg-background/60">
           <ChatQuickActions
             onPrompt={(t) => handleSend(t)}
@@ -210,11 +203,7 @@ export function ChatPage() {
         {messages.length === 0 && !mutation.isPending && (
           <ChatEmptyState onPick={(t) => handleSend(t)} />
         )}
-        <ChatMessages
-          messages={messages}
-          pending={mutation.isPending}
-          streaming={streaming}
-        />
+        <ChatMessages messages={messages} pending={mutation.isPending} streaming={streaming} />
         <div ref={endRef} className="h-1" aria-hidden="true" />
       </div>
 
@@ -228,7 +217,9 @@ export function ChatPage() {
               <div className="flex items-center justify-between gap-3 px-1">
                 <div>
                   <p className="text-xs font-semibold text-foreground">Saran cepat</p>
-                  <p className="text-[11px] text-muted-foreground">Geser kartu atau pakai tombol panah</p>
+                  <p className="text-[11px] text-muted-foreground">
+                    Geser kartu atau pakai tombol panah
+                  </p>
                 </div>
               </div>
               <CoachPromptChips

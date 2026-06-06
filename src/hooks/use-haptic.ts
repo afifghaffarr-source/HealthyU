@@ -19,8 +19,7 @@ export function useHaptic() {
   return useCallback((pattern: Pattern = "light") => {
     if (typeof window === "undefined") return;
     try {
-      const reduced =
-        window.matchMedia?.("(prefers-reduced-motion: reduce)").matches ?? false;
+      const reduced = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches ?? false;
       if (reduced) return;
       const nav = window.navigator as Navigator & {
         vibrate?: (p: number | number[]) => boolean;

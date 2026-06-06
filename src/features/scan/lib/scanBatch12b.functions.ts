@@ -3,14 +3,11 @@ import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { callAiWithGuards, callAiJsonWithSchema } from "@/features/ai/lib/aiGateway.server";
 
-const FormCheckSchema = z
-  .object({
-    score: z.number().optional(),
-    mistakes: z.array(z.string()).default([]),
-    tips: z.array(z.string()).default([]),
-  })
-  ;
-
+const FormCheckSchema = z.object({
+  score: z.number().optional(),
+  mistakes: z.array(z.string()).default([]),
+  tips: z.array(z.string()).default([]),
+});
 const NutritionLabelSchema = z.record(z.union([z.string(), z.number()]));
 
 // 14. Weekly podcast script

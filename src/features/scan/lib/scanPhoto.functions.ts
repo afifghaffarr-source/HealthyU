@@ -6,17 +6,15 @@ import { callAiJsonWithSchema } from "@/features/ai/lib/aiGateway.server";
 const VoiceMealSchema = z.object({
   items: z
     .array(
-      z
-        .object({
-          name: z.string().default(""),
-          portion_g: z.number().optional(),
-          calories: z.number().optional(),
-          protein_g: z.number().optional(),
-          carbs_g: z.number().optional(),
-          fat_g: z.number().optional(),
-          confidence: z.number().optional(),
-        })
-        ,
+      z.object({
+        name: z.string().default(""),
+        portion_g: z.number().optional(),
+        calories: z.number().optional(),
+        protein_g: z.number().optional(),
+        carbs_g: z.number().optional(),
+        fat_g: z.number().optional(),
+        confidence: z.number().optional(),
+      }),
     )
     .default([]),
 });

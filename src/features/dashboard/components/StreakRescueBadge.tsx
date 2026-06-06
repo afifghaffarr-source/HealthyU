@@ -37,15 +37,9 @@ export function StreakRescueBadge({ currentStreak }: { currentStreak: number }) 
         setUsed(true);
       }}
       className={`inline-flex items-center gap-1.5 text-[11px] font-semibold px-2.5 py-1 rounded-full transition ${
-        used
-          ? "bg-muted text-muted-foreground"
-          : "bg-primary/10 text-primary hover:bg-primary/15"
+        used ? "bg-muted text-muted-foreground" : "bg-primary/10 text-primary hover:bg-primary/15"
       }`}
-      aria-label={
-        used
-          ? "Rescue minggu ini sudah dipakai"
-          : "Streak rescue tersedia minggu ini"
-      }
+      aria-label={used ? "Rescue minggu ini sudah dipakai" : "Streak rescue tersedia minggu ini"}
     >
       <LifeBuoy className="size-3" aria-hidden />
       {used ? "Rescue dipakai" : "Rescue tersedia"}

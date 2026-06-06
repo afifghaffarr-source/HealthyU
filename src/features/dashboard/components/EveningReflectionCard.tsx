@@ -59,14 +59,15 @@ export function EveningReflectionCard() {
   return (
     <section className="bg-card p-4 rounded-3xl outline-1 outline-black/5 dark:outline-white/10 space-y-3 animate-fade-up">
       <div className="flex items-center gap-2">
-        <span className="size-8 rounded-xl bg-indigo-100 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-200 grid place-items-center" aria-hidden>
+        <span
+          className="size-8 rounded-xl bg-indigo-100 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-200 grid place-items-center"
+          aria-hidden
+        >
           <Moon className="size-4" />
         </span>
         <div className="min-w-0">
           <p className="text-sm font-semibold leading-tight">Refleksi singkat</p>
-          <p className="text-[11px] text-muted-foreground">
-            Apa kemenangan kecilmu hari ini?
-          </p>
+          <p className="text-[11px] text-muted-foreground">Apa kemenangan kecilmu hari ini?</p>
         </div>
       </div>
       <div className="flex flex-wrap gap-1.5">

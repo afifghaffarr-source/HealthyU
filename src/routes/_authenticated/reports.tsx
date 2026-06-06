@@ -1,7 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { weeklyReport, weeklyAiAnalysis, listAiReports } from "@/features/reports/lib/reports.functions";
+import {
+  weeklyReport,
+  weeklyAiAnalysis,
+  listAiReports,
+} from "@/features/reports/lib/reports.functions";
 import { BottomNav } from "@/components/bottom-nav";
 import { Download, FileText, Sparkles, Loader2, Share2 } from "lucide-react";
 import { TopAppBar } from "@/components/healthyu/top-app-bar";
@@ -97,9 +101,6 @@ function ReportsPage() {
   });
 
   const summary = useMemo(() => buildWeeklySummary(data), [data]);
-
-
-
 
   const shareWhatsapp = (override?: { text: string; periodStart?: string; periodEnd?: string }) =>
     shareWeeklyToWhatsapp({
