@@ -2,6 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
+import { maskPublicProfile, ANON_NAME } from "@/lib/privacy";
 
 export const getChallengeLeaderboard = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
@@ -71,18 +72,23 @@ export const getChallengeLeaderboard = createServerFn({ method: "GET" })
     const ids = (parts ?? []).map((p) => p.user_id);
     const { data: profs } = await supabaseAdmin
       .from("profiles")
-      .select("id, full_name, avatar_url")
+      .select("id, full_name, avatar_url, public_profile")
       .in("id", ids.length ? ids : ["00000000-0000-0000-0000-000000000000"]);
     const pmap = new Map((profs ?? []).map((p) => [p.id, p]));
-    return (parts ?? []).map((p, i) => ({
-      rank: i + 1,
-      user_id: p.user_id,
-      is_me: p.user_id === userId,
-      full_name: pmap.get(p.user_id)?.full_name ?? "Pengguna",
-      avatar_url: pmap.get(p.user_id)?.avatar_url ?? null,
-      current_day: p.current_day ?? 0,
-      streak: p.streak ?? 0,
-      xp_earned: p.xp_earned ?? 0,
-      coins_earned: p.coins_earned ?? 0,
-    }));
+    return (parts ?? []).map((p, i) => {
+      const prof = pmap.get(p.user_id);
+      const masked = maskPublicProfile(prof ?? null, userId);
+      const isPrivate = prof?.public_profile === false && p.user_id !== userId;
+      return {
+        rank: i + 1,
+        user_id: p.user_id,
+        is_me: p.user_id === userId,
+        full_name: masked?.full_name ?? ANON_NAME,
+        avatar_url: masked?.avatar_url ?? null,
+        current_day: isPrivate ? 0 : (p.current_day ?? 0),
+        streak: isPrivate ? 0 : (p.streak ?? 0),
+        xp_earned: isPrivate ? 0 : (p.xp_earned ?? 0),
+        coins_earned: isPrivate ? 0 : (p.coins_earned ?? 0),
+      };
+    });
   });

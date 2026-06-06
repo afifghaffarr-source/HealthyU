@@ -20,6 +20,7 @@ import { GlobalErrorBoundary } from "@/components/healthyu/global-error-boundary
 import { RouteError, RouteNotFound } from "@/components/healthyu/route-boundaries";
 import { ScrollToTopButton } from "@/components/healthyu/scroll-to-top-button";
 import { RouteProgressBar } from "@/components/healthyu/route-progress-bar";
+import { APP_CONFIG } from "@/config/app";
 
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
   head: () => ({
@@ -102,7 +103,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
               publisher: { "@id": "https://healthyu.id/#organization" },
               potentialAction: {
                 "@type": "SearchAction",
-                target: "https://healthyu.id/cari?q={search_term_string}",
+                target: `${APP_CONFIG.siteUrl}/cari?q={search_term_string}`,
                 "query-input": "required name=search_term_string",
               },
             },

@@ -18,7 +18,7 @@ import {
 
 async function resetIdb() {
   // Clear both stores without deleting the DB (deleteDatabase blocks on open connections).
-  const open = indexedDB.open("sehatify-offline", 3);
+  const open = indexedDB.open("healthyu-offline", 3);
   await new Promise<void>((resolve, reject) => {
     open.onsuccess = () => resolve();
     open.onerror = () => reject(open.error);

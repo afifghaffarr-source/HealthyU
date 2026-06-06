@@ -7,20 +7,9 @@ import { BottomNav } from "@/components/bottom-nav";
 import { parseMenuImage } from "@/features/scan/lib/scanExtras.functions";
 import { Camera, Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import { validateImageFile, fileToDataUrl } from "@/lib/image-utils";
 
 export const Route = createFileRoute("/_authenticated/scan/menu")({ component: Page });
-
-async function fileToDataUrl(file: File, maxSize = 1280): Promise<string> {
-  const bm = await createImageBitmap(file);
-  const s = Math.min(1, maxSize / Math.max(bm.width, bm.height));
-  const w = Math.round(bm.width * s);
-  const h = Math.round(bm.height * s);
-  const c = document.createElement("canvas");
-  c.width = w;
-  c.height = h;
-  c.getContext("2d")!.drawImage(bm, 0, 0, w, h);
-  return c.toDataURL("image/jpeg", 0.8);
-}
 
 function Page() {
   const ref = useRef<HTMLInputElement>(null);
@@ -43,6 +32,12 @@ function Page() {
           onChange={async (e) => {
             const f = e.target.files?.[0];
             if (!f) return;
+            try {
+              validateImageFile(f);
+            } catch (err) {
+              toast.error((err as Error).message);
+              return;
+            }
             const url = await fileToDataUrl(f);
             setImg(url);
             m.mutate(url);

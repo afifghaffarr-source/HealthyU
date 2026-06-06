@@ -1,8 +1,12 @@
 import { enforceAiBudget, logAiUsage } from "./aiBudget.server";
 import type { z, ZodTypeAny } from "zod";
 
-const LOVABLE_AI = "https://ai.gateway.lovable.dev/v1/chat/completions";
+const GEMINI_AI = "https://generativelanguage.googleapis.com/v1beta/chat/completions";
 const DEFAULT_TIMEOUT_MS = 30_000;
+
+function stripModelPrefix(model: string): string {
+  return model.replace(/^google\//, "");
+}
 
 export type AiMessage = { role: "system" | "user" | "assistant"; content: string };
 
@@ -50,15 +54,15 @@ export class AiGatewayError extends Error {
 }
 
 /**
- * Centralised Lovable AI Gateway call.
- * - Fail-closed if LOVABLE_API_KEY missing.
+ * Centralised Gemini AI Gateway call.
+ * - Fail-closed if GEMINI_API_KEY missing.
  * - Per-user rate limit via enforceAiBudget (skip with skipBudget).
  * - AbortController timeout (default 30s).
  * - Logs usage to ai_usage_logs (fire-and-forget).
  * - Maps 429/402/timeout to typed AiGatewayError.
  */
 export async function callAiWithGuards(opts: CallAiOptions): Promise<string> {
-  const apiKey = process.env.LOVABLE_API_KEY;
+  const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) throw new AiGatewayError("AI gateway tidak dikonfigurasi", 500);
 
   const model = opts.model ?? "google/gemini-2.5-flash";
@@ -89,14 +93,14 @@ export async function callAiWithGuards(opts: CallAiOptions): Promise<string> {
 
   let res: Response;
   try {
-    res = await fetch(LOVABLE_AI, {
+    res = await fetch(GEMINI_AI, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${apiKey}`,
       },
       body: JSON.stringify({
-        model,
+        model: stripModelPrefix(model),
         messages: opts.messages,
         ...(opts.maxTokens ? { max_tokens: opts.maxTokens } : {}),
         ...(opts.responseFormat ? { response_format: { type: opts.responseFormat } } : {}),

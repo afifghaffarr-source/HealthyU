@@ -2,6 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { callAiJsonWithSchema } from "@/features/ai/lib/aiGateway.server";
+import { ALLOWED_MIME_TYPES } from "@/lib/image-utils";
 
 const VoiceMealSchema = z.object({
   items: z
@@ -36,6 +37,9 @@ export const attachScanPhoto = createServerFn({ method: "POST" })
     const match = data.image_data_url.match(/^data:(image\/[^;]+);base64,(.+)$/);
     if (!match) throw new Error("Invalid image data");
     const contentType = match[1];
+    if (!ALLOWED_MIME_TYPES.includes(contentType as (typeof ALLOWED_MIME_TYPES)[number])) {
+      throw new Error("Format gambar tidak didukung");
+    }
     const ext = contentType.split("/")[1] || "jpg";
     const bytes = Uint8Array.from(atob(match[2]), (c) => c.charCodeAt(0));
     const path = `${userId}/${data.scan_id}.${ext}`;

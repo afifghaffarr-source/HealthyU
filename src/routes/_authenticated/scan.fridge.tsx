@@ -5,6 +5,7 @@ import { useState } from "react";
 import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { BottomNav } from "@/components/bottom-nav";
 import { recipeFromFridge } from "@/features/scan/lib/scanBatch11.functions";
+import { validateImageFile, fileToDataUrl } from "@/lib/image-utils";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/scan/fridge")({ component: Page });
@@ -19,9 +20,15 @@ function Page() {
   });
   const onPick = async (f: File | null) => {
     if (!f) return;
-    setPreview(URL.createObjectURL(f));
-    const buf = await f.arrayBuffer();
-    setB64(btoa(String.fromCharCode(...new Uint8Array(buf))));
+    try {
+      validateImageFile(f);
+    } catch (err) {
+      toast.error((err as Error).message);
+      return;
+    }
+    const dataUrl = await fileToDataUrl(f);
+    setPreview(dataUrl);
+    setB64(dataUrl.split(",")[1] ?? "");
   };
   type FridgeRecipe = { name: string; steps?: string[] };
   type FridgeResult = { ingredients?: string[]; recipes?: FridgeRecipe[] };

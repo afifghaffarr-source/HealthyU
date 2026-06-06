@@ -106,7 +106,7 @@ const FridgeRecipesSchema = z.object({
 
 export const recipeFromFridge = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d) => z.object({ imageBase64: z.string().min(10) }).parse(d))
+  .inputValidator((d) => z.object({ imageBase64: z.string().min(10).max(8_000_000) }).parse(d))
   .handler(async ({ data, context }) => {
     const result = await callAiJsonWithSchema({
       userId: context.userId,
@@ -138,7 +138,7 @@ const NutritionLabelSchema = z.record(z.union([z.string(), z.number()]));
 
 export const ocrNutritionLabel = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d) => z.object({ imageBase64: z.string().min(50) }).parse(d))
+  .inputValidator((d) => z.object({ imageBase64: z.string().min(50).max(8_000_000) }).parse(d))
   .handler(async ({ data, context }) => {
     let nutrition: Record<string, string | number> = {};
     try {

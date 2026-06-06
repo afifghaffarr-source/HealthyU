@@ -1,8 +1,12 @@
 import { AiGatewayError, type AiMultimodalMessage } from "./aiGateway.server";
 export { AiGatewayError };
 
-const LOVABLE_AI = "https://ai.gateway.lovable.dev/v1/chat/completions";
+const GEMINI_AI = "https://generativelanguage.googleapis.com/v1beta/chat/completions";
 const DEFAULT_TIMEOUT_MS = 60_000;
+
+function stripModelPrefix(model: string): string {
+  return model.replace(/^google\//, "");
+}
 
 export type StreamAiOptions = {
   model: string;
@@ -20,7 +24,7 @@ export type StreamAiOptions = {
 export async function streamAiChat(opts: StreamAiOptions): Promise<{
   body: ReadableStream<Uint8Array>;
 }> {
-  const apiKey = process.env.LOVABLE_API_KEY;
+  const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) throw new AiGatewayError("AI gateway tidak dikonfigurasi", 500);
 
   const ctrl = new AbortController();
@@ -30,14 +34,14 @@ export async function streamAiChat(opts: StreamAiOptions): Promise<{
 
   let res: Response;
   try {
-    res = await fetch(LOVABLE_AI, {
+    res = await fetch(GEMINI_AI, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${apiKey}`,
       },
       body: JSON.stringify({
-        model: opts.model,
+        model: stripModelPrefix(opts.model),
         messages: opts.messages,
         stream: true,
         ...(opts.maxTokens ? { max_tokens: opts.maxTokens } : {}),

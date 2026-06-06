@@ -16,6 +16,7 @@ import { Route as KaloriRouteImport } from './routes/kalori'
 import { Route as KalkulatorRouteImport } from './routes/kalkulator'
 import { Route as FaqRouteImport } from './routes/faq'
 import { Route as DietRouteImport } from './routes/diet'
+import { Route as CariRouteImport } from './routes/cari'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as ArtikelRouteImport } from './routes/artikel'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
@@ -34,6 +35,7 @@ import { Route as KalkulatorSlugRouteImport } from './routes/kalkulator.$slug'
 import { Route as FaqSlugRouteImport } from './routes/faq.$slug'
 import { Route as DietSlugRouteImport } from './routes/diet.$slug'
 import { Route as ArtikelSlugRouteImport } from './routes/artikel.$slug'
+import { Route as ApiHealthRouteImport } from './routes/api/health'
 import { Route as AuthenticatedWorkoutRouteImport } from './routes/_authenticated/workout'
 import { Route as AuthenticatedWeightRouteImport } from './routes/_authenticated/weight'
 import { Route as AuthenticatedWearableRouteImport } from './routes/_authenticated/wearable'
@@ -208,6 +210,11 @@ const DietRoute = DietRouteImport.update({
   path: '/diet',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CariRoute = CariRouteImport.update({
+  id: '/cari',
+  path: '/cari',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
@@ -296,6 +303,11 @@ const ArtikelSlugRoute = ArtikelSlugRouteImport.update({
   id: '/$slug',
   path: '/$slug',
   getParentRoute: () => ArtikelRoute,
+} as any)
+const ApiHealthRoute = ApiHealthRouteImport.update({
+  id: '/api/health',
+  path: '/api/health',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedWorkoutRoute = AuthenticatedWorkoutRouteImport.update({
   id: '/workout',
@@ -1067,6 +1079,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/artikel': typeof ArtikelRouteWithChildren
   '/auth': typeof AuthRoute
+  '/cari': typeof CariRoute
   '/diet': typeof DietRouteWithChildren
   '/faq': typeof FaqRouteWithChildren
   '/kalkulator': typeof KalkulatorRouteWithChildren
@@ -1128,6 +1141,7 @@ export interface FileRoutesByFullPath {
   '/wearable': typeof AuthenticatedWearableRoute
   '/weight': typeof AuthenticatedWeightRouteWithChildren
   '/workout': typeof AuthenticatedWorkoutRouteWithChildren
+  '/api/health': typeof ApiHealthRoute
   '/artikel/$slug': typeof ArtikelSlugRoute
   '/diet/$slug': typeof DietSlugRoute
   '/faq/$slug': typeof FaqSlugRoute
@@ -1230,6 +1244,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/cari': typeof CariRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/achievements': typeof AuthenticatedAchievementsRoute
   '/alarms': typeof AuthenticatedAlarmsRoute
@@ -1285,6 +1300,7 @@ export interface FileRoutesByTo {
   '/wearable': typeof AuthenticatedWearableRoute
   '/weight': typeof AuthenticatedWeightRouteWithChildren
   '/workout': typeof AuthenticatedWorkoutRouteWithChildren
+  '/api/health': typeof ApiHealthRoute
   '/artikel/$slug': typeof ArtikelSlugRoute
   '/diet/$slug': typeof DietSlugRoute
   '/faq/$slug': typeof FaqSlugRoute
@@ -1390,6 +1406,7 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/artikel': typeof ArtikelRouteWithChildren
   '/auth': typeof AuthRoute
+  '/cari': typeof CariRoute
   '/diet': typeof DietRouteWithChildren
   '/faq': typeof FaqRouteWithChildren
   '/kalkulator': typeof KalkulatorRouteWithChildren
@@ -1451,6 +1468,7 @@ export interface FileRoutesById {
   '/_authenticated/wearable': typeof AuthenticatedWearableRoute
   '/_authenticated/weight': typeof AuthenticatedWeightRouteWithChildren
   '/_authenticated/workout': typeof AuthenticatedWorkoutRouteWithChildren
+  '/api/health': typeof ApiHealthRoute
   '/artikel/$slug': typeof ArtikelSlugRoute
   '/diet/$slug': typeof DietSlugRoute
   '/faq/$slug': typeof FaqSlugRoute
@@ -1556,6 +1574,7 @@ export interface FileRouteTypes {
     | '/'
     | '/artikel'
     | '/auth'
+    | '/cari'
     | '/diet'
     | '/faq'
     | '/kalkulator'
@@ -1617,6 +1636,7 @@ export interface FileRouteTypes {
     | '/wearable'
     | '/weight'
     | '/workout'
+    | '/api/health'
     | '/artikel/$slug'
     | '/diet/$slug'
     | '/faq/$slug'
@@ -1719,6 +1739,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/auth'
+    | '/cari'
     | '/sitemap.xml'
     | '/achievements'
     | '/alarms'
@@ -1774,6 +1795,7 @@ export interface FileRouteTypes {
     | '/wearable'
     | '/weight'
     | '/workout'
+    | '/api/health'
     | '/artikel/$slug'
     | '/diet/$slug'
     | '/faq/$slug'
@@ -1878,6 +1900,7 @@ export interface FileRouteTypes {
     | '/_authenticated'
     | '/artikel'
     | '/auth'
+    | '/cari'
     | '/diet'
     | '/faq'
     | '/kalkulator'
@@ -1939,6 +1962,7 @@ export interface FileRouteTypes {
     | '/_authenticated/wearable'
     | '/_authenticated/weight'
     | '/_authenticated/workout'
+    | '/api/health'
     | '/artikel/$slug'
     | '/diet/$slug'
     | '/faq/$slug'
@@ -2044,6 +2068,7 @@ export interface RootRouteChildren {
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   ArtikelRoute: typeof ArtikelRouteWithChildren
   AuthRoute: typeof AuthRoute
+  CariRoute: typeof CariRoute
   DietRoute: typeof DietRouteWithChildren
   FaqRoute: typeof FaqRouteWithChildren
   KalkulatorRoute: typeof KalkulatorRouteWithChildren
@@ -2051,6 +2076,7 @@ export interface RootRouteChildren {
   OlahragaRoute: typeof OlahragaRouteWithChildren
   ResepRoute: typeof ResepRouteWithChildren
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
+  ApiHealthRoute: typeof ApiHealthRoute
   ApiChatStreamRoute: typeof ApiChatStreamRoute
   ApiImgSplatRoute: typeof ApiImgSplatRoute
   ApiPublicHooksDailyCoachRoute: typeof ApiPublicHooksDailyCoachRoute
@@ -2111,6 +2137,13 @@ declare module '@tanstack/react-router' {
       path: '/diet'
       fullPath: '/diet'
       preLoaderRoute: typeof DietRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/cari': {
+      id: '/cari'
+      path: '/cari'
+      fullPath: '/cari'
+      preLoaderRoute: typeof CariRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth': {
@@ -2238,6 +2271,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/artikel/$slug'
       preLoaderRoute: typeof ArtikelSlugRouteImport
       parentRoute: typeof ArtikelRoute
+    }
+    '/api/health': {
+      id: '/api/health'
+      path: '/api/health'
+      fullPath: '/api/health'
+      preLoaderRoute: typeof ApiHealthRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/_authenticated/workout': {
       id: '/_authenticated/workout'
@@ -3788,6 +3828,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   ArtikelRoute: ArtikelRouteWithChildren,
   AuthRoute: AuthRoute,
+  CariRoute: CariRoute,
   DietRoute: DietRouteWithChildren,
   FaqRoute: FaqRouteWithChildren,
   KalkulatorRoute: KalkulatorRouteWithChildren,
@@ -3795,6 +3836,7 @@ const rootRouteChildren: RootRouteChildren = {
   OlahragaRoute: OlahragaRouteWithChildren,
   ResepRoute: ResepRouteWithChildren,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
+  ApiHealthRoute: ApiHealthRoute,
   ApiChatStreamRoute: ApiChatStreamRoute,
   ApiImgSplatRoute: ApiImgSplatRoute,
   ApiPublicHooksDailyCoachRoute: ApiPublicHooksDailyCoachRoute,

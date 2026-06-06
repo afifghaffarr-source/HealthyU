@@ -100,12 +100,13 @@ export const getGroupScanLeaderboard = createServerFn({ method: "POST" })
         m.profiles ? { ...m.profiles, id: m.profiles.id ?? m.user_id } : null,
         userId,
       );
+      const isPrivate = m.profiles?.public_profile === false && m.user_id !== userId;
       rows.push({
         userId: m.user_id,
         name: masked?.full_name ?? ANON_NAME,
         avatar: masked?.avatar_url ?? null,
-        streak: m.profiles?.scan_streak_current ?? 0,
-        scans: count ?? 0,
+        streak: isPrivate ? 0 : (m.profiles?.scan_streak_current ?? 0),
+        scans: isPrivate ? 0 : (count ?? 0),
       });
     }
     rows.sort((a, b) => b.scans - a.scans || b.streak - a.streak);

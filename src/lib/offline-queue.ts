@@ -17,12 +17,27 @@ export type QueueItem = {
   failed_at?: number;
 };
 
-const DB_NAME = "sehatify-offline";
+const DB_NAME = "healthyu-offline";
+const LEGACY_DB_NAME = "sehatify-offline";
 const STORE = "queue";
 const DEAD_STORE = "dead";
 const DB_VERSION = 3;
 
+function deleteLegacyDb(): void {
+  try {
+    indexedDB.deleteDatabase(LEGACY_DB_NAME);
+  } catch {
+    // best-effort; ignore errors
+  }
+}
+
+let legacyCleanupDone = false;
+
 function openDb(): Promise<IDBDatabase> {
+  if (!legacyCleanupDone) {
+    legacyCleanupDone = true;
+    deleteLegacyDb();
+  }
   return new Promise((resolve, reject) => {
     const req = indexedDB.open(DB_NAME, DB_VERSION);
     req.onupgradeneeded = () => {

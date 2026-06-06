@@ -17,7 +17,7 @@ import {
   AiSchemaError,
 } from "@/features/ai/lib/aiGateway.server";
 
-const origKey = process.env.LOVABLE_API_KEY;
+const origKey = process.env.GEMINI_API_KEY;
 const origFetch = globalThis.fetch;
 
 function mkFetch(impl: (input: RequestInfo | URL, init?: RequestInit) => Promise<Response>) {
@@ -25,13 +25,13 @@ function mkFetch(impl: (input: RequestInfo | URL, init?: RequestInit) => Promise
 }
 
 beforeEach(() => {
-  process.env.LOVABLE_API_KEY = "test-key";
+  process.env.GEMINI_API_KEY = "test-key";
   enforceMock.mockReset();
   logMock.mockReset();
   enforceMock.mockResolvedValue({ allowed: true });
 });
 afterEach(() => {
-  process.env.LOVABLE_API_KEY = origKey;
+  process.env.GEMINI_API_KEY = origKey;
   globalThis.fetch = origFetch;
 });
 
@@ -39,7 +39,7 @@ const msgs = [{ role: "user" as const, content: "hi" }];
 
 describe("callAiWithGuards", () => {
   it("fails closed when API key missing", async () => {
-    delete process.env.LOVABLE_API_KEY;
+    delete process.env.GEMINI_API_KEY;
     await expect(
       callAiWithGuards({ userId: null, feature: "f", messages: msgs }),
     ).rejects.toBeInstanceOf(AiGatewayError);

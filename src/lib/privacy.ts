@@ -58,10 +58,11 @@ export function maskPublicProfile<T extends PrivacyAwareProfile>(
 
   if (profile.public_profile === false) {
     return {
-      ...profile,
+      id: profile.id,
       full_name: ANON_NAME,
       avatar_url: null,
-    };
+      public_profile: false,
+    } as T;
   }
 
   // Public profile — strip all non-whitelisted fields

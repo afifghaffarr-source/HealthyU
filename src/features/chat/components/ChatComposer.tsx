@@ -1,6 +1,7 @@
 import { useRef } from "react";
 import { ImagePlus, Mic, MicOff, Send, X } from "lucide-react";
 import { toast } from "sonner";
+import { validateImageFile, fileToDataUrl } from "@/lib/image-utils";
 
 export type ImageData = { base64: string; mime: string; preview: string };
 
@@ -30,12 +31,15 @@ export function ChatComposer({
       toast.error("Ukuran foto maks 5MB");
       return;
     }
-    const buf = await file.arrayBuffer();
-    const bytes = new Uint8Array(buf);
-    let binary = "";
-    for (let i = 0; i < bytes.length; i++) binary += String.fromCharCode(bytes[i]);
-    const base64 = btoa(binary);
-    setImageData({ base64, mime: file.type || "image/jpeg", preview: URL.createObjectURL(file) });
+    try {
+      validateImageFile(file);
+    } catch (err) {
+      toast.error((err as Error).message);
+      return;
+    }
+    const dataUrl = await fileToDataUrl(file);
+    const base64 = dataUrl.split(",")[1] ?? "";
+    setImageData({ base64, mime: "image/jpeg", preview: dataUrl });
   };
 
   return (

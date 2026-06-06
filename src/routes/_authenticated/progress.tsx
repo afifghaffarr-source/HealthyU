@@ -12,6 +12,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { BottomNav } from "@/components/bottom-nav";
 import { toast } from "sonner";
 import { toastError } from "@/lib/toast-config";
+import { validateImageFile, fileToDataUrl, dataUrlToBlob } from "@/lib/image-utils";
 import { getProfile } from "@/features/profile/lib/profile.functions";
 import { todaysMeals } from "@/features/meals/lib/meals.functions";
 import { todaysWater } from "@/features/water/lib/water.functions";
@@ -71,14 +72,16 @@ function ProgressPage() {
   const handleUpload = async (file: File) => {
     setUploading(true);
     try {
+      validateImageFile(file);
+      const dataUrl = await fileToDataUrl(file);
+      const blob = await dataUrlToBlob(dataUrl);
       const {
         data: { user },
       } = await supabase.auth.getUser();
       if (!user) throw new Error("Tidak login");
-      const ext = file.name.split(".").pop()?.toLowerCase() || "jpg";
-      const path = `${user.id}/${Date.now()}.${ext}`;
-      const { error: upErr } = await supabase.storage.from("progress-photos").upload(path, file, {
-        contentType: file.type,
+      const path = `${user.id}/${Date.now()}.jpg`;
+      const { error: upErr } = await supabase.storage.from("progress-photos").upload(path, blob, {
+        contentType: "image/jpeg",
         upsert: false,
       });
       if (upErr) throw upErr;

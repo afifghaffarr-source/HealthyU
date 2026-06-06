@@ -123,7 +123,7 @@ export const Route = createFileRoute("/api/chat/stream")({
               question: body.message,
               profileHash: profile.hash,
             });
-        const cached = key ? await getCached(key) : null;
+        const cached = key ? await getCached(key).catch(() => null) : null;
         if (cached) {
           await supabase.from("chat_messages").insert({
             user_id: userId,
@@ -153,11 +153,8 @@ export const Route = createFileRoute("/api/chat/stream")({
           budget = await enforceAiBudget(userId, isPremium);
         } catch (e) {
           console.error("chat.stream enforceAiBudget failed", (e as Error).message);
-          // Fail-closed: chat (esp. with images) is expensive.
-          return new Response(JSON.stringify({ error: "ai_budget_unavailable" }), {
-            status: 503,
-            headers: { "Content-Type": "application/json" },
-          });
+          // Fail-open: allow the request with downgrade flag when budget service unavailable.
+          budget = { allowed: true, shouldDowngrade: true };
         }
         if (!budget.allowed) {
           return new Response(

@@ -27,6 +27,45 @@ describe("maskPublicProfile", () => {
     const masked = maskPublicProfile({ ...baseProfile, public_profile: false }, viewer);
     expect(masked?.full_name).toBe(ANON_NAME);
     expect(masked?.avatar_url).toBeNull();
+    expect(masked?.public_profile).toBe(false);
+  });
+
+  it("private profile does not leak sensitive fields to non-owner", () => {
+    const sensitiveProfile = {
+      ...baseProfile,
+      public_profile: false,
+      email: "budi@example.com",
+      health_conditions: "diabetes",
+      allergies: "peanuts",
+      medications: "metformin",
+      weight: 80,
+      birth_date: "1990-01-01",
+    };
+    const masked = maskPublicProfile(sensitiveProfile, viewer) as Record<string, unknown>;
+    expect(masked?.email).toBeUndefined();
+    expect(masked?.health_conditions).toBeUndefined();
+    expect(masked?.allergies).toBeUndefined();
+    expect(masked?.medications).toBeUndefined();
+    expect(masked?.weight).toBeUndefined();
+    expect(masked?.birth_date).toBeUndefined();
+    expect(masked?.show_weight).toBeUndefined();
+    expect(masked?.show_meals).toBeUndefined();
+    expect(Object.keys(masked!).sort()).toEqual(["avatar_url", "full_name", "id", "public_profile"]);
+  });
+
+  it("owner sees all fields even when public_profile is false", () => {
+    const sensitiveProfile = {
+      ...baseProfile,
+      public_profile: false,
+      email: "budi@example.com",
+      health_conditions: "diabetes",
+      weight: 80,
+    };
+    const masked = maskPublicProfile(sensitiveProfile, owner) as Record<string, unknown>;
+    expect(masked?.full_name).toBe("Budi");
+    expect(masked?.email).toBe("budi@example.com");
+    expect(masked?.health_conditions).toBe("diabetes");
+    expect(masked?.weight).toBe(80);
   });
 
   it("keeps public profile visible to other viewers", () => {

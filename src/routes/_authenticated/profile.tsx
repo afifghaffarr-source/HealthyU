@@ -7,6 +7,7 @@ import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { HealthCard } from "@/components/healthyu/health-card";
 import { HealthScoreCard } from "@/components/healthyu/health-score-card";
 import { supabase } from "@/integrations/supabase/client";
+import { clearAll } from "@/lib/offline-queue";
 import { calcAge, calcBMI, bmiCategory, calcBMR, calcTDEE, type ActivityLevel } from "@/lib/health";
 import { LogOut, Settings, Trophy, Scale, HeartPulse, Activity } from "lucide-react";
 import { useTheme } from "@/components/theme-provider";
@@ -39,6 +40,11 @@ function ProfilePage() {
   });
 
   const handleLogout = async () => {
+    try {
+      await clearAll();
+    } catch (err) {
+      console.error("[logout] Failed to clear offline queue:", err);
+    }
     await supabase.auth.signOut();
     navigate({ to: "/" });
   };

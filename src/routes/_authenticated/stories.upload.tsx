@@ -7,6 +7,7 @@ import { BottomNav } from "@/components/bottom-nav";
 import { createStoryPhotoUploadUrl } from "@/features/scan/lib/scanBatch10.functions";
 import { recordStoryPhoto } from "@/features/scan/lib/scanBatch9.functions";
 import { supabase } from "@/integrations/supabase/client";
+import { validateImageFile, fileToDataUrl, dataUrlToBlob } from "@/lib/image-utils";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/stories/upload")({ component: Page });
@@ -20,11 +21,14 @@ function Page() {
   const mut = useMutation({
     mutationFn: async () => {
       if (!file) throw new Error("Pilih foto");
+      validateImageFile(file);
+      const dataUrl = await fileToDataUrl(file);
+      const blob = await dataUrlToBlob(dataUrl);
       const safe = file.name.replace(/[^a-zA-Z0-9._-]/g, "_");
       const { path, token } = await signFn({ data: { filename: safe } });
       const { error } = await supabase.storage
         .from("scan-photos")
-        .uploadToSignedUrl(path, token, file);
+        .uploadToSignedUrl(path, token, blob);
       if (error) throw error;
       await recFn({ data: { storagePath: path, caption: caption || undefined } });
     },

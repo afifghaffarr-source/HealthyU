@@ -50,7 +50,7 @@ BEGIN
   SELECT EXISTS (SELECT 1 FROM vault.secrets WHERE name = 'field_encryption_key') INTO v_exists;
   IF NOT v_exists THEN
     PERFORM vault.create_secret(
-      encode(gen_random_bytes(32), 'hex'),
+      encode(extensions.gen_random_bytes(32), 'hex'),
       'field_encryption_key',
       'Field-level encryption key for sensitive health data'
     );
