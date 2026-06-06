@@ -54,7 +54,7 @@ export function CoachPromptChips({
   const prompts = buildPersonalizedPrompts({ hour, remainingKcal, proteinGap });
   return (
     <div
-      className="-mx-1 flex gap-2 overflow-x-auto overscroll-x-contain px-1 pr-4 pb-1 snap-x snap-mandatory touch-pan-x"
+      className="-mx-1 flex gap-2 overflow-x-auto overscroll-x-contain px-1 pr-4 pb-1 snap-x snap-mandatory touch-pan-x [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
       role="group"
       aria-label="Ide pertanyaan untuk AI Coach"
     >
@@ -64,9 +64,9 @@ export function CoachPromptChips({
           type="button"
           onClick={() => onPick(p)}
           disabled={disabled}
-          className="snap-start shrink-0 w-[12.5rem] rounded-2xl border border-border/60 bg-card px-3.5 py-3 text-left text-xs font-medium leading-4 hover:bg-secondary/40 transition disabled:opacity-50"
+          className="snap-start shrink-0 w-[13.5rem] rounded-2xl border border-border/60 bg-card px-3.5 py-3 text-left text-xs font-medium leading-4 shadow-sm hover:bg-secondary/40 transition disabled:opacity-50"
         >
-          <span className="line-clamp-2 block">{p}</span>
+          <span className="line-clamp-3 block">{p}</span>
         </button>
       ))}
     </div>
