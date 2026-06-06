@@ -8,9 +8,9 @@ type Item = {
 };
 
 const ITEMS: Item[] = [
-  { to: "/scan", label: "Scan", Icon: Camera },
-  { to: "/recommendations", label: "Meal Plan", Icon: Sparkles },
-  { to: "/chat", label: "HealthyU AI Coach", Icon: MessageCircle },
+  { to: "/scan", label: "Scan makanan", Icon: Camera },
+  { to: "/recommendations", label: "Meal Plan AI", Icon: Sparkles },
+  { to: "/chat", label: "AI Coach", Icon: MessageCircle },
 ];
 
 export function ActionRow() {
