@@ -19,6 +19,8 @@ export const getDailyQuote = createServerFn({ method: "POST" })
     const text = await callAI(
       "Buat 1 quote pendek (max 20 kata) tentang nutrisi/kesehatan dalam Bahasa Indonesia. Hanya teks quote, tanpa tanda kutip.",
       "Kamu coach nutrisi.",
+      context.userId,
+      supabase,
     );
     const { data: inserted } = await supabase
       .from("daily_quotes")
@@ -44,6 +46,8 @@ export const getDailyQuiz = createServerFn({ method: "POST" })
     const raw = await callAI(
       "Buat 1 soal pilihan ganda nutrisi (4 opsi). Format JSON: {question, options:[..4], correct_index}. Bahasa Indonesia. Hanya JSON.",
       "Kamu pembuat kuis nutrisi.",
+      userId,
+      supabase,
     );
     type QuizParsed = { question: string; options: string[]; correct_index: number };
     let parsed: QuizParsed;
@@ -157,10 +161,12 @@ export const getMealHeatmap = createServerFn({ method: "POST" })
 export const estimateBodyComposition = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: { photoUrl: string }) => z.object({ photoUrl: z.string().url() }).parse(d))
-  .handler(async ({ data }) => {
+  .handler(async ({ data, context }) => {
     const text = await callAI(
       `Analisis foto progress ini: ${data.photoUrl}. Estimasi: body fat %, muscle mass tier (low/med/high), posture. JSON only.`,
       "Kamu fitness analyst.",
+      context.userId,
+      context.supabase,
     );
     return { analysis: text };
   });

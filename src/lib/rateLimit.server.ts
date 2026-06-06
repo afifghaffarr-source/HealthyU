@@ -13,6 +13,7 @@ export async function checkRateLimit(
   bucket: string,
   maxRequests: number,
   windowSeconds: number,
+  opts?: { failClosed?: boolean },
 ): Promise<boolean> {
   const { data, error } = await supabase.rpc("check_rate_limit", {
     _bucket: bucket,
@@ -21,8 +22,7 @@ export async function checkRateLimit(
   });
   if (error) {
     console.error("[rateLimit] RPC error:", error.message);
-    // Fail-open on infra error to avoid blocking legit traffic, but log it.
-    return true;
+    return opts?.failClosed ? false : true;
   }
   return data === true;
 }

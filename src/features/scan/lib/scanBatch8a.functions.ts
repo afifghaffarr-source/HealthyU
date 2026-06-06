@@ -79,10 +79,12 @@ export const transcribeMoodVoice = createServerFn({ method: "POST" })
   .inputValidator((d: { audioBase64: string }) =>
     z.object({ audioBase64: z.string().min(10) }).parse(d),
   )
-  .handler(async ({ data }) => {
+  .handler(async ({ data, context }) => {
     const text = await callAI(
       `Transkrip dan analisis mood dari rekaman ini (base64): ${data.audioBase64.slice(0, 100)}... Ringkas: transkrip + 1 kata mood (happy/sad/anxious/calm/neutral). Format JSON.`,
       "Kamu transcriber dan psychology analyst.",
+      context.userId,
+      context.supabase,
     );
     return { result: text };
   });
@@ -132,6 +134,8 @@ export const generateWeeklyReport = createServerFn({ method: "POST" })
     const content = await callAI(
       `Buat laporan mingguan kesehatan (Bahasa Indonesia, max 400 kata) dari data: ${JSON.stringify(stats)}. Sertakan: ringkasan, highlight, area perbaikan, target minggu depan.`,
       "Kamu health coach personal.",
+      userId,
+      supabase,
     );
     const { data: inserted } = await supabase
       .from("ai_weekly_reports")

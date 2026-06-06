@@ -71,6 +71,8 @@ export const createDoctorReferral = createServerFn({ method: "POST" })
     const analysis = await callAI(
       `Pasien: "${data.reason}". Tentukan urgency (low/medium/high) dan spesialis yang direkomendasikan. Format JSON: {urgency, specialist, notes}.`,
       "Kamu triage assistant.",
+      userId,
+      supabase,
     );
     type ReferralParsed = { urgency?: string; specialist?: string; notes?: string };
     let parsed: ReferralParsed = {};
@@ -98,10 +100,12 @@ export const smartShoppingList = createServerFn({ method: "POST" })
   .inputValidator((d: { ingredients: string[] }) =>
     z.object({ ingredients: z.array(z.string().min(1).max(80)).min(1).max(40) }).parse(d),
   )
-  .handler(async ({ data }) => {
+  .handler(async ({ data, context }) => {
     const text = await callAI(
       `Estimasi harga pasar Indonesia (IDR) untuk: ${data.ingredients.join(", ")}. Format JSON array: [{item, qty, price_idr}]. Hanya JSON.`,
       "Kamu shopping assistant Indonesia.",
+      context.userId,
+      context.supabase,
     );
     type ShopItem = { item: string; qty: string | number; price_idr: number };
     let items: ShopItem[] = [];

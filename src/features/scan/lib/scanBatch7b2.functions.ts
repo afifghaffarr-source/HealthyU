@@ -45,10 +45,12 @@ export const generateRecipeVideoScript = createServerFn({ method: "POST" })
   .inputValidator((d: { recipeName: string }) =>
     z.object({ recipeName: z.string().min(1).max(100) }).parse(d),
   )
-  .handler(async ({ data }) => {
+  .handler(async ({ data, context }) => {
     const script = await callAI(
       `Buat storyboard video pendek (5 scene, masing-masing 1 kalimat) untuk masak ${data.recipeName}. Bahasa Indonesia.`,
       "Kamu food video director.",
+      context.userId,
+      context.supabase,
     );
     return { script };
   });
@@ -58,10 +60,12 @@ export const coachInterview = createServerFn({ method: "POST" })
   .inputValidator((d: { answers: Record<string, string> }) =>
     z.object({ answers: z.record(z.string(), z.string().max(500)) }).parse(d),
   )
-  .handler(async ({ data }) => {
+  .handler(async ({ data, context }) => {
     const summary = await callAI(
       `Berdasarkan jawaban onboarding: ${JSON.stringify(data.answers)}. Buat ringkasan profil & 3 rekomendasi awal. Bahasa Indonesia.`,
       "Kamu coach holistik.",
+      context.userId,
+      context.supabase,
     );
     return { summary };
   });
