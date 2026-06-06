@@ -9,7 +9,7 @@ import { ArrowUp } from "lucide-react";
 export function ScrollToTopButton() {
   const location = useLocation();
   const [isVisible, setIsVisible] = useState(false);
-  const hideOn = ["/", "/auth"];
+  const hideOn = ["/auth"];
   const isHiddenRoute = hideOn.some(
     (path) => location.pathname === path || location.pathname.startsWith(`${path}/`),
   );
