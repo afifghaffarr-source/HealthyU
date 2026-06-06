@@ -33,7 +33,7 @@ export function ChatPage() {
   const dockRef = useRef<HTMLDivElement>(null);
   const [dockHeight, setDockHeight] = useState(224);
   const shellClassName = "mx-auto w-full max-w-md px-4 sm:px-5";
-  const pageGutterClassName = "pb-[12.5rem] lg:pb-8";
+  const pageGutterClassName = "pb-[11rem] lg:pb-8";
 
   const mutation = useMutation({
     mutationFn: async (payload: { message: string; imageBase64?: string; imageMime?: string }) => {
@@ -191,7 +191,7 @@ export function ChatPage() {
 
       <div
         className={shellClassName}
-        style={{ paddingBottom: `calc(${dockHeight}px + 1.5rem)` }}
+        style={{ paddingBottom: `calc(${dockHeight}px + 2rem)` }}
       >
         <section className="overflow-hidden pt-1">
           <ChatQuickActions
@@ -237,16 +237,18 @@ export function ChatPage() {
             <SafetyChip variant="not-medical" className="shadow-none" />
           </div>
 
-          <ChatComposer
-            input={input}
-            setInput={setInput}
-            imageData={imageData}
-            setImageData={setImageData}
-            onSend={() => handleSend()}
-            pending={mutation.isPending}
-            listening={speech.listening}
-            onToggleMic={speech.toggleMic}
-          />
+          <div className="rounded-[1.75rem] border border-border/60 bg-background/80 p-2 shadow-sm backdrop-blur-sm supports-[backdrop-filter]:bg-background/70">
+            <ChatComposer
+              input={input}
+              setInput={setInput}
+              imageData={imageData}
+              setImageData={setImageData}
+              onSend={() => handleSend()}
+              pending={mutation.isPending}
+              listening={speech.listening}
+              onToggleMic={speech.toggleMic}
+            />
+          </div>
         </div>
       </div>
 
