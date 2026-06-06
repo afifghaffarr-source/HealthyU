@@ -215,7 +215,7 @@ export function ChatPage() {
               <div className="flex items-center justify-between gap-3 px-1">
                 <div>
                   <p className="text-xs font-semibold text-foreground">Saran cepat</p>
-                  <p className="text-[11px] text-muted-foreground">Geser ke samping untuk lihat lainnya</p>
+                  <p className="text-[11px] text-muted-foreground">Geser kartu atau pakai tombol panah</p>
                 </div>
               </div>
               <CoachPromptChips
