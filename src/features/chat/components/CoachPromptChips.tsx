@@ -95,18 +95,10 @@ export function CoachPromptChips({
 
   return (
     <div className="space-y-2">
-      <div className="relative">
-        <div
-          className="pointer-events-none absolute inset-y-0 left-0 z-10 w-5 bg-gradient-to-r from-background via-background/90 to-transparent"
-          aria-hidden="true"
-        />
-        <div
-          className="pointer-events-none absolute inset-y-0 right-0 z-10 w-10 bg-gradient-to-l from-background via-background/90 to-transparent"
-          aria-hidden="true"
-        />
+      <div className="relative overflow-hidden rounded-[1.5rem]">
         <div
           ref={scrollerRef}
-          className="-mx-1 flex gap-2 overflow-x-auto overflow-y-hidden overscroll-x-contain px-1 pr-8 pb-1 pt-1 snap-x snap-mandatory no-scrollbar [scrollbar-width:none]"
+          className="flex gap-2 overflow-x-auto overflow-y-hidden overscroll-x-contain px-0.5 pb-1 pt-1 snap-x snap-mandatory no-scrollbar [scrollbar-width:none]"
           style={{ WebkitOverflowScrolling: "touch", touchAction: "pan-x", scrollPaddingLeft: "0.25rem" }}
           role="group"
           aria-label="Ide pertanyaan untuk AI Coach"

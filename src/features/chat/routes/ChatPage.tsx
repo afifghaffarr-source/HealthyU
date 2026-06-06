@@ -188,7 +188,10 @@ export function ChatPage() {
         />
       </div>
 
-      <div className={shellClassName} style={{ paddingBottom: `calc(${dockHeight}px + 2.5rem)` }}>
+      <div
+        className={shellClassName}
+        style={{ paddingBottom: `calc(${dockHeight}px + 3.75rem)` }}
+      >
         <ChatQuickActions
           onPrompt={(t) => handleSend(t)}
           onReport={() => reportMut.mutate()}
@@ -208,11 +211,11 @@ export function ChatPage() {
 
       <div
         ref={dockRef}
-        className="fixed inset-x-0 bottom-0 z-30 border-t border-border/50 bg-background/98 backdrop-blur supports-[backdrop-filter]:bg-background/92 lg:left-64"
+        className="fixed inset-x-0 bottom-0 z-30 border-t border-border/50 bg-background/95 shadow-[0_-10px_30px_-24px_color-mix(in_oklab,var(--foreground)_24%,transparent)] backdrop-blur supports-[backdrop-filter]:bg-background/90 lg:left-64"
       >
-        <div className={`${shellClassName} space-y-3 pt-3 pb-24 lg:pb-6`}>
+        <div className={`${shellClassName} space-y-3 pt-3 pb-28 lg:pb-6`}>
           {messages.length > 0 && (
-            <section className="space-y-2 rounded-[1.6rem] border border-border/60 bg-muted/20 px-3 py-3">
+            <section className="space-y-2 rounded-[1.6rem] border border-border/60 bg-background/88 px-3 py-3 shadow-sm backdrop-blur-sm supports-[backdrop-filter]:bg-background/78">
               <div className="flex items-center justify-between gap-3 px-1">
                 <div>
                   <p className="text-xs font-semibold text-foreground">Saran cepat</p>
