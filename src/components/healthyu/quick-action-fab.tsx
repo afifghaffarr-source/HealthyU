@@ -27,9 +27,8 @@ export function QuickActionFab() {
           onClick={() => setOpen(false)}
         />
       )}
-      <div
-        className="fixed bottom-[5.75rem] right-4 z-50 flex flex-col items-end gap-2 lg:bottom-6"
-      >
+      <div className="pointer-events-none fixed inset-x-0 bottom-[5.75rem] z-50 px-4 lg:bottom-6">
+        <div className="mx-auto flex max-w-md flex-col items-end gap-2 pointer-events-auto">
         {open && (
           <button
             type="button"
@@ -75,6 +74,7 @@ export function QuickActionFab() {
         >
           {open ? <X className="size-6" /> : <Plus className="size-6" />}
         </button>
+        </div>
       </div>
       <QuickLogSheet open={sheetOpen} onOpenChange={setSheetOpen} />
     </>
