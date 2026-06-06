@@ -5,12 +5,14 @@ import { CoinPill } from "@/components/healthyu/coin-pill";
 export function DashboardHeader({
   greeting,
   fullName,
+  subtitle,
   bonusAvailable,
   onClaimBonus,
   claiming,
 }: {
   greeting: string;
   fullName?: string | null;
+  subtitle?: string;
   bonusAvailable?: boolean;
   onClaimBonus?: () => void;
   claiming?: boolean;
@@ -22,6 +24,9 @@ export function DashboardHeader({
           {greeting}
         </p>
         <h1 className="text-2xl font-bold">Halo, {fullName?.split(" ")[0] ?? "Sahabat"}!</h1>
+        {subtitle && (
+          <p className="text-[13px] text-muted-foreground mt-1 leading-snug">{subtitle}</p>
+        )}
       </div>
       <div className="flex items-center gap-2">
         {bonusAvailable && onClaimBonus && (
