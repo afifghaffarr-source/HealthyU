@@ -27,8 +27,8 @@ export function QuickActionFab() {
           onClick={() => setOpen(false)}
         />
       )}
-      <div className="pointer-events-none fixed inset-x-0 bottom-[5.75rem] z-50 px-4 lg:bottom-6">
-        <div className="mx-auto flex max-w-md flex-col items-end gap-2 pointer-events-auto">
+      <div className="pointer-events-none fixed bottom-[5.75rem] right-4 z-50 lg:bottom-6 lg:right-6">
+        <div className="flex flex-col items-end gap-2 pointer-events-auto">
         {open && (
           <button
             type="button"
