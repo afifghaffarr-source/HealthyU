@@ -1,6 +1,7 @@
 import { useMutation } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
+import { toastError } from "@/lib/toast-config";
 import { recognizeFood, submitScanCorrection } from "@/features/food/lib/foodScan.functions";
 import { attachScanPhoto } from "@/features/scan/lib/scanPhoto.functions";
 import { recordScanGameify, classifyMealTags } from "@/features/scan/lib/scanMore.functions";
@@ -50,7 +51,7 @@ export function useScanRecognizeMutation(opts: ScanMutOpts) {
       if (res.items.length === 0) toast.error("Tidak ada makanan terdeteksi");
       else toast.success(`${res.items.length} makanan dikenali`);
     },
-    onError: (e: Error) => toast.error(e.message),
+    onError: (e: Error) => toastError(e, "Scan gagal"),
   });
 }
 
@@ -101,6 +102,6 @@ export function useScanLogMutation(opts: LogMutOpts) {
       opts.setOriginals((prev) => prev.filter((_, i) => i !== payload.idx));
       if (opts.editIdx === payload.idx) opts.setEditIdx(null);
     },
-    onError: (e: Error) => toast.error(e.message),
+    onError: (e: Error) => toastError(e, "Gagal menyimpan"),
   });
 }
