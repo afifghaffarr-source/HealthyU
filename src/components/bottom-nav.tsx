@@ -30,7 +30,13 @@ export function BottomNav() {
   return (
     <>
       {(!online || pending > 0) && (
-        <div className={isChat ? "fixed bottom-[10.5rem] left-1/2 -translate-x-1/2 z-40 shadow-lg rounded-full lg:bottom-6 lg:left-28" : "fixed bottom-24 left-1/2 -translate-x-1/2 z-40 shadow-lg rounded-full lg:bottom-6 lg:left-28">
+        <div
+          className={
+            isChat
+              ? "fixed bottom-[10.75rem] left-1/2 -translate-x-1/2 z-40 shadow-lg rounded-full lg:bottom-6 lg:left-28"
+              : "fixed bottom-24 left-1/2 -translate-x-1/2 z-40 shadow-lg rounded-full lg:bottom-6 lg:left-28"
+          }
+        >
           <SyncPill online={online} pending={pending} onSync={() => sync()} />
         </div>
       )}

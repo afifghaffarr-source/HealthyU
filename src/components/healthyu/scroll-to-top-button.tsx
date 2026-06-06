@@ -10,8 +10,11 @@ import { cn } from "@/lib/utils";
  */
 export function ScrollToTopButton() {
   const location = useLocation();
-  const isChat = location.pathname.startsWith("/chat");
-  if (isChat) return null;
+  const hideOn = ["/chat", "/scan", "/food", "/foods"];
+  const isHiddenRoute = hideOn.some(
+    (path) => location.pathname === path || location.pathname.startsWith(`${path}/`),
+  );
+  if (isHiddenRoute) return null;
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
@@ -29,7 +32,7 @@ export function ScrollToTopButton() {
       aria-label="Kembali ke atas"
       onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
       className={cn(
-        "fixed bottom-24 right-4 z-40 h-11 w-11 rounded-full shadow-lg border border-border/60 backdrop-blur transition-all duration-300 lg:bottom-6",
+        "fixed bottom-28 right-4 z-40 h-11 w-11 rounded-full shadow-lg border border-border/60 backdrop-blur transition-all duration-300 lg:bottom-6",
         visible
           ? "opacity-100 translate-y-0 pointer-events-auto"
           : "opacity-0 translate-y-4 pointer-events-none",

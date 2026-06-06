@@ -174,7 +174,7 @@ export function ChatPage() {
         />
       </div>
 
-      <div ref={scrollRef} className="flex-1 overflow-y-auto max-w-md w-full mx-auto px-5 pb-72">
+      <div ref={scrollRef} className="flex-1 overflow-y-auto max-w-md w-full mx-auto px-5 pb-[17.5rem]">
         <ChatQuickActions
           onPrompt={(t) => handleSend(t)}
           onReport={() => reportMut.mutate()}
@@ -191,33 +191,28 @@ export function ChatPage() {
         />
       </div>
 
-      <ChatComposer
-        input={input}
-        setInput={setInput}
-        imageData={imageData}
-        setImageData={setImageData}
-        onSend={() => handleSend()}
-        pending={mutation.isPending}
-        listening={speech.listening}
-        onToggleMic={speech.toggleMic}
-      />
-
-      {/* Stack di atas composer (composer ada di bottom-24 ≈ 96px, tinggi ~70px).
-          Anchor di bottom-[13rem] supaya tidak ketabrak composer & BottomNav. */}
-      <div className="fixed bottom-[13rem] inset-x-0 z-20 px-3 pointer-events-none">
-        <div className="max-w-md mx-auto space-y-2">
+      <div className="fixed bottom-24 inset-x-0 z-30 px-4 pb-2 pointer-events-none">
+        <div className="max-w-md mx-auto space-y-2 pointer-events-auto">
           {messages.length > 0 && (
-            <div className="pointer-events-auto">
-              <CoachPromptChips
-                onPick={(t) => handleSend(t)}
-                disabled={mutation.isPending}
-                hour={new Date().getHours()}
-              />
-            </div>
+            <CoachPromptChips
+              onPick={(t) => handleSend(t)}
+              disabled={mutation.isPending}
+              hour={new Date().getHours()}
+            />
           )}
           <div className="flex justify-center">
-            <SafetyChip variant="not-medical" className="shadow-sm pointer-events-auto" />
+            <SafetyChip variant="not-medical" className="shadow-sm" />
           </div>
+          <ChatComposer
+            input={input}
+            setInput={setInput}
+            imageData={imageData}
+            setImageData={setImageData}
+            onSend={() => handleSend()}
+            pending={mutation.isPending}
+            listening={speech.listening}
+            onToggleMic={speech.toggleMic}
+          />
         </div>
       </div>
 
