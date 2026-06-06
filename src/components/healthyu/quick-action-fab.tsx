@@ -1,10 +1,7 @@
 import { useState } from "react";
 import { Link, useLocation } from "@tanstack/react-router";
 import { Plus, Camera, Utensils, Droplet, Dumbbell, X, Zap } from "lucide-react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useServerFn } from "@tanstack/react-start";
-import { logMeal } from "@/features/meals/lib/meals.functions";
-import { toast } from "sonner";
+import { QuickLogSheet } from "@/components/healthyu/quick-log-sheet";
 
 const ACTIONS = [
   { to: "/scan", label: "Scan", icon: Camera, color: "from-primary to-accent" },
@@ -16,34 +13,6 @@ const ACTIONS = [
 export function QuickActionFab() {
   const [open, setOpen] = useState(false);
   const [sheetOpen, setSheetOpen] = useState(false);
-  const [name, setName] = useState("");
-  const [cal, setCal] = useState("");
-  const [mealType, setMealType] = useState<"breakfast" | "lunch" | "dinner" | "snack">("snack");
-  const qc = useQueryClient();
-  const logFn = useServerFn(logMeal);
-  const mut = useMutation({
-    mutationFn: () =>
-      logFn({
-        data: {
-          food_item_id: null,
-          custom_name: name.trim() || "Snack cepat",
-          meal_type: mealType,
-          serving_qty: 1,
-          calories: Number(cal || 0),
-          protein_g: 0,
-          carbs_g: 0,
-          fat_g: 0,
-        },
-      }),
-    onSuccess: () => {
-      toast.success("Makanan tercatat");
-      qc.invalidateQueries({ queryKey: ["meals", "today"] });
-      setSheetOpen(false);
-      setName("");
-      setCal("");
-    },
-    onError: (e: Error) => toast.error(e.message),
-  });
   const loc = useLocation();
   // Sembunyikan di halaman yang sudah punya composer/aksi bawah sendiri
   // (chat, scan, food, foods) supaya FAB tidak menabrak input/CTA.
@@ -104,59 +73,7 @@ export function QuickActionFab() {
           {open ? <X className="size-6" /> : <Plus className="size-6" />}
         </button>
       </div>
-
-      {sheetOpen && (
-        <div
-          className="fixed inset-0 z-50 bg-black/50 flex items-end"
-          onClick={() => setSheetOpen(false)}
-        >
-          <div
-            className="w-full bg-card rounded-t-3xl p-5 space-y-3 animate-fade-up max-w-md mx-auto"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="mx-auto h-1.5 w-12 rounded-full bg-muted" />
-            <h3 className="font-bold text-base">Log makanan cepat</h3>
-            <input
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="Nama makanan (mis. Nasi goreng)"
-              className="w-full bg-background rounded-xl px-3 py-2.5 outline-1 outline-black/10 text-sm"
-            />
-            <input
-              value={cal}
-              onChange={(e) => setCal(e.target.value)}
-              type="number"
-              inputMode="numeric"
-              placeholder="Kalori (kcal)"
-              className="w-full bg-background rounded-xl px-3 py-2.5 outline-1 outline-black/10 text-sm"
-            />
-            <div className="flex gap-2">
-              {(["breakfast", "lunch", "dinner", "snack"] as const).map((m) => (
-                <button
-                  key={m}
-                  onClick={() => setMealType(m)}
-                  className={`flex-1 text-xs py-2 rounded-lg ${mealType === m ? "bg-primary text-primary-foreground" : "bg-muted"}`}
-                >
-                  {m === "breakfast"
-                    ? "Pagi"
-                    : m === "lunch"
-                      ? "Siang"
-                      : m === "dinner"
-                        ? "Malam"
-                        : "Snack"}
-                </button>
-              ))}
-            </div>
-            <button
-              onClick={() => mut.mutate()}
-              disabled={mut.isPending || !cal}
-              className="w-full bg-primary text-primary-foreground rounded-xl py-3 font-semibold disabled:opacity-50"
-            >
-              {mut.isPending ? "Menyimpan…" : "Simpan"}
-            </button>
-          </div>
-        </div>
-      )}
+      <QuickLogSheet open={sheetOpen} onOpenChange={setSheetOpen} />
     </>
   );
 }
