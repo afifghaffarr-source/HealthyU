@@ -6,6 +6,7 @@ import {
   type OnboardingForm,
   primaryBtn,
   secondaryBtn,
+  WhyAskDisclosure,
 } from "./onboardingShared";
 
 export function StepHealth({
@@ -30,6 +31,11 @@ export function StepHealth({
         </p>
       </div>
       <DisclaimerCard />
+      <WhyAskDisclosure>
+        Info kondisi & alergi hanya dipakai supaya saran makanan lebih aman & relevan untukmu.
+        HealthyU bukan pengganti dokter — untuk kondisi serius (diabetes, jantung, hamil/menyusui,
+        gangguan makan), tetap konsultasi ke tenaga medis.
+      </WhyAskDisclosure>
       <div>
         <p className="text-sm font-medium mb-2">Kondisi kesehatan</p>
         <div className="flex flex-wrap gap-2">
