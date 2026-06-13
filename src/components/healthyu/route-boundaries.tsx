@@ -1,6 +1,6 @@
 import { Link, useRouter } from "@tanstack/react-router";
 import { useEffect } from "react";
-import { reportLovableError } from "@/lib/lovable-error-reporting";
+import { reportLovableError as reportError } from "@/lib/errorReporting";
 
 export function RouteNotFound() {
   return (
@@ -28,7 +28,7 @@ export function RouteError({ error, reset }: { error: Error; reset: () => void }
   const router = useRouter();
   useEffect(() => {
     console.error(error);
-    reportLovableError(error, { boundary: "tanstack_default_error_component" });
+    reportError(error, { boundary: "tanstack_default_error_component" });
   }, [error]);
 
   return (

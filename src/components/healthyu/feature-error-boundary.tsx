@@ -1,6 +1,6 @@
 import { Component, type ReactNode } from "react";
 import { AlertTriangle } from "lucide-react";
-import { reportLovableError } from "@/lib/lovable-error-reporting";
+import { reportLovableError as reportError } from "@/lib/errorReporting";
 
 interface Props {
   /** Nama fitur untuk log + microcopy (mis. "AI Coach", "Scan makanan"). */
@@ -25,7 +25,7 @@ export class FeatureErrorBoundary extends Component<Props, State> {
   }
 
   componentDidCatch(error: Error) {
-    reportLovableError(error, { boundary: "feature_error_boundary", feature: this.props.feature });
+    reportError(error, { boundary: "feature_error_boundary", feature: this.props.feature });
     console.error(`[feature:${this.props.feature}]`, error);
   }
 
