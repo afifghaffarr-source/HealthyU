@@ -5,18 +5,19 @@
   "type": "module",
   "scripts": {
     "dev": "vite dev",
-    "build": "vite build",
-    "build:dev": "vite build --mode development",
+    "build": "NODE_OPTIONS=--max-old-space-size=4096 vite build",
+    "build:dev": "NODE_OPTIONS=--max-old-space-size=4096 vite build --mode development",
     "preview": "vite preview",
     "lint": "eslint .",
     "lint:constants": "eslint src/lib/constants.ts",
-    "precommit": "bun run lint:constants && bun run lint",
-    "test": "vitest run",
+    "typecheck": "NODE_OPTIONS=--max-old-space-size=4096 tsc --noEmit",
+    "precommit": "bun run lint:constants && bun run lint && bun run typecheck",
+    "test": "NODE_OPTIONS=--max-old-space-size=4096 vitest run",
     "format": "prettier --write .",
     "i18n:scan": "node scripts/i18n-scan.mjs",
     "e2e": "playwright test",
     "e2e:ui": "playwright test --ui",
-    "analyze": "ANALYZE=1 vite build && echo '\\n📊 Open dist/bundle-stats.html in your browser'"
+    "analyze": "NODE_OPTIONS=--max-old-space-size=4096 ANALYZE=1 vite build && echo '\\n📊 Open dist/bundle-stats.html in your browser'"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
