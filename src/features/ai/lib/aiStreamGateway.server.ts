@@ -1,12 +1,11 @@
-import { AiGatewayError, type AiMultimodalMessage } from "./aiGateway.server";
+import {
+  AiGatewayError,
+  type AiMultimodalMessage,
+} from "./aiGateway.server";
+import { callVexoApi, flattenMessages } from "./vexoAdapter";
 export { AiGatewayError };
 
-const GEMINI_AI = "https://generativelanguage.googleapis.com/v1beta/chat/completions";
 const DEFAULT_TIMEOUT_MS = 60_000;
-
-function stripModelPrefix(model: string): string {
-  return model.replace(/^google\//, "");
-}
 
 export type StreamAiOptions = {
   model: string;
@@ -17,57 +16,49 @@ export type StreamAiOptions = {
 };
 
 /**
- * Centralised streaming AI call. Caller is responsible for parsing SSE
- * `data:` lines from the returned body. Throws AiGatewayError for
- * misconfig / timeout / 429 / 402 / non-OK responses.
+ * Streaming AI call — VexoAPI doesn't expose SSE, so we buffer the full
+ * response and emit it as a single chunk. The chunked TextDecoder stream
+ * still gives the UI something to consume chunk-by-chunk from the server
+ * side, and we still expose a `body: ReadableStream<Uint8Array>` for
+ * caller compatibility (the chat route just iterates deltas).
+ *
+ * If VexoAPI ever ships SSE, replace this with a real stream forwarder.
  */
 export async function streamAiChat(opts: StreamAiOptions): Promise<{
   body: ReadableStream<Uint8Array>;
 }> {
-  const apiKey = process.env.GEMINI_API_KEY;
-  if (!apiKey) throw new AiGatewayError("AI gateway tidak dikonfigurasi", 500);
+  // Run the full call (uses the same auth/budget/timeout path as the
+  // non-streaming gateway via the shared adapter). Throw the same way.
+  const flat = flattenMessages(opts.messages);
 
-  const ctrl = new AbortController();
-  const timer = setTimeout(() => ctrl.abort(), opts.timeoutMs ?? DEFAULT_TIMEOUT_MS);
-  const onUserAbort = () => ctrl.abort();
-  if (opts.signal) opts.signal.addEventListener("abort", onUserAbort, { once: true });
+  // We don't have a streaming endpoint, so we resolve to one chunk.
+  // We still respect the abort signal — if the client disconnects, we
+  // abort the upstream fetch.
+  const { data } = await callVexoApi({
+    endpoint: opts.model?.includes("pro") ? "gptoss120b" : "gptoss120b",
+    text: flat.text,
+    system: flat.system,
+    imageUrl: flat.imageUrl,
+    timeoutMs: opts.timeoutMs ?? DEFAULT_TIMEOUT_MS,
+    signal: opts.signal,
+  });
 
-  let res: Response;
-  try {
-    res = await fetch(GEMINI_AI, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${apiKey}`,
-      },
-      body: JSON.stringify({
-        model: stripModelPrefix(opts.model),
-        messages: opts.messages,
-        stream: true,
-        ...(opts.maxTokens ? { max_tokens: opts.maxTokens } : {}),
-      }),
-      signal: ctrl.signal,
-    });
-  } catch (e) {
-    clearTimeout(timer);
-    const isAbort = (e as Error)?.name === "AbortError";
-    throw new AiGatewayError(
-      isAbort ? "AI gateway timeout" : `AI gateway error: ${(e as Error).message}`,
-      isAbort ? 504 : 502,
-    );
-  }
-  // Don't clearTimeout here — let it run until stream ends (caller consumes body).
-  // The signal aborts will propagate to the underlying connection.
-  void timer;
+  // Emit the full text as a single delta in a tiny SSE-shaped body.
+  // We use the same `data: {...}\n\n` shape the existing parseSseChunk
+  // already understands, so callers don't have to change.
+  const ssePayload =
+    `data: ${JSON.stringify({ choices: [{ delta: { content: data } }] })}\n\n` +
+    `data: [DONE]\n\n`;
 
-  if (res.status === 429) throw new AiGatewayError("AI gateway rate-limited", 429);
-  if (res.status === 402) throw new AiGatewayError("Kredit AI habis", 402);
-  if (!res.ok || !res.body) {
-    const body = res.body ? await res.text().catch(() => "") : "";
-    throw new AiGatewayError(`AI gateway ${res.status}: ${body.slice(0, 200)}`, res.status);
-  }
+  const encoder = new TextEncoder();
+  const body = new ReadableStream<Uint8Array>({
+    start(controller) {
+      controller.enqueue(encoder.encode(ssePayload));
+      controller.close();
+    },
+  });
 
-  return { body: res.body };
+  return { body };
 }
 
 /**

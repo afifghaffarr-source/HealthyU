@@ -1,7 +1,14 @@
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 
-// Rough per-1k-token prices (USD). Update as Lovable pricing changes.
+// Rough per-1k-token prices (USD). Update as VexoAPI pricing changes.
+// These are estimates — VexoAPI's free tier doesn't bill per token, but
+// we still record cost for budget visualization. Values are conservative.
 const MODEL_PRICE: Record<string, { in: number; out: number }> = {
+  // VexoAPI endpoint names (canonical going forward)
+  gptoss120b: { in: 0.0001, out: 0.0003 },
+  glm47flash: { in: 0.00005, out: 0.00015 },
+  gemini: { in: 0.000075, out: 0.0003 },
+  // Legacy names still used by call sites — keep the same prices
   "google/gemini-2.5-flash": { in: 0.000075, out: 0.0003 },
   "google/gemini-2.5-flash-lite": { in: 0.00004, out: 0.00015 },
   "google/gemini-2.5-pro": { in: 0.00125, out: 0.005 },
