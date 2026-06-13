@@ -17,7 +17,7 @@ import {
   AiSchemaError,
 } from "@/features/ai/lib/aiGateway.server";
 
-const origKey = process.env.GEMINI_API_KEY;
+const origKey = process.env.VEXO_API_KEY;
 const origFetch = globalThis.fetch;
 
 function mkFetch(impl: (input: RequestInfo | URL, init?: RequestInit) => Promise<Response>) {
@@ -25,70 +25,87 @@ function mkFetch(impl: (input: RequestInfo | URL, init?: RequestInit) => Promise
 }
 
 beforeEach(() => {
-  process.env.GEMINI_API_KEY = "test-key";
+  process.env.VEXO_API_KEY = "test-key";
   enforceMock.mockReset();
   logMock.mockReset();
   enforceMock.mockResolvedValue({ allowed: true });
 });
+
 afterEach(() => {
-  process.env.GEMINI_API_KEY = origKey;
+  if (origKey === undefined) delete process.env.VEXO_API_KEY;
+  else process.env.VEXO_API_KEY = origKey;
   globalThis.fetch = origFetch;
 });
 
 const msgs = [{ role: "user" as const, content: "hi" }];
 
+/**
+ * VexoAPI returns { status, data, timestamp } where data is a string
+ * (or an object with result/text/response/output fields).
+ */
+function vexoResponse(data: string | object, init?: ResponseInit) {
+  return new Response(JSON.stringify({ status: true, data, timestamp: "x" }), {
+    status: 200,
+    ...init,
+  });
+}
+
 describe("callAiWithGuards", () => {
-  it("fails closed when API key missing", async () => {
-    delete process.env.GEMINI_API_KEY;
+  it("fails closed when VEXO_API_KEY missing", async () => {
+    delete process.env.VEXO_API_KEY;
     await expect(
       callAiWithGuards({ userId: null, feature: "f", messages: msgs }),
     ).rejects.toBeInstanceOf(AiGatewayError);
   });
 
-  it("returns content + logs usage on success", async () => {
-    mkFetch(
-      async () =>
-        new Response(
-          JSON.stringify({
-            choices: [{ message: { content: "hello" } }],
-            usage: { prompt_tokens: 5, completion_tokens: 3 },
-          }),
-          { status: 200 },
-        ),
-    );
-    const out = await callAiWithGuards({ userId: "u1", feature: "chat", messages: msgs });
+  it("returns string content + logs estimated usage on success", async () => {
+    mkFetch(async () => vexoResponse("hello"));
+    const out = await callAiWithGuards({
+      userId: "u1",
+      feature: "chat",
+      messages: msgs,
+    });
     expect(out).toBe("hello");
-    expect(logMock).toHaveBeenCalledWith(
-      expect.objectContaining({
-        userId: "u1",
-        feature: "chat",
-        promptTokens: 5,
-        completionTokens: 3,
-      }),
-    );
+    expect(logMock).toHaveBeenCalledTimes(1);
+    // Token counts are estimated from char length (VexoAPI doesn't surface usage)
+    const logged = logMock.mock.calls[0][0];
+    expect(logged.userId).toBe("u1");
+    expect(logged.feature).toBe("chat");
+    expect(logged.promptTokens).toBeGreaterThan(0);
+    expect(logged.completionTokens).toBeGreaterThan(0);
   });
 
-  it("sends max_tokens and response_format when provided", async () => {
-    let captured: { max_tokens?: number; response_format?: { type: string } } | undefined;
-    mkFetch(async (_url, init) => {
-      captured = JSON.parse(init!.body as string);
-      return new Response(JSON.stringify({ choices: [{ message: { content: "{}" } }] }), {
-        status: 200,
-      });
+  it("unwraps {data: {result: '...'}} response shape", async () => {
+    mkFetch(async () => vexoResponse({ result: "from-result-field" }));
+    const out = await callAiWithGuards({
+      userId: null,
+      feature: "f",
+      messages: msgs,
+    });
+    expect(out).toBe("from-result-field");
+  });
+
+  it("sends a GET to vexoapi.dev with ?key=&text= query params", async () => {
+    let capturedUrl: string | undefined;
+    let capturedMethod: string | undefined;
+    mkFetch(async (input, init) => {
+      capturedUrl = typeof input === "string" ? input : input.toString();
+      capturedMethod = init?.method ?? "GET";
+      return vexoResponse("ok");
     });
     await callAiWithGuards({
       userId: null,
       feature: "f",
-      messages: msgs,
-      maxTokens: 99,
-      responseFormat: "json_object",
+      messages: [{ role: "user", content: "ping" }],
     });
-    expect(captured!.max_tokens).toBe(99);
-    expect(captured!.response_format).toEqual({ type: "json_object" });
+    expect(capturedMethod).toBe("GET");
+    expect(capturedUrl).toContain("https://vexoapi.dev/api/");
+    expect(capturedUrl).toContain("key=test-key");
+    expect(decodeURIComponent(capturedUrl ?? "")).toContain("ping");
   });
 
   it("maps 429 to AiGatewayError(429)", async () => {
-    mkFetch(async () => new Response("rl", { status: 429 }));
+    mkFetch(async () => new Response("", { status: 429 }));
     await expect(
       callAiWithGuards({ userId: null, feature: "f", messages: msgs }),
     ).rejects.toMatchObject({ status: 429 });
@@ -99,6 +116,15 @@ describe("callAiWithGuards", () => {
     await expect(
       callAiWithGuards({ userId: null, feature: "f", messages: msgs }),
     ).rejects.toMatchObject({ status: 402 });
+  });
+
+  it("maps 403 (upstream denied) to AiGatewayError(503)", async () => {
+    // VexoAPI returns 403 when upstream model provider is denying access.
+    // We surface this as 503 so callers know it's a transient infra issue.
+    mkFetch(async () => new Response("", { status: 403 }));
+    await expect(
+      callAiWithGuards({ userId: null, feature: "f", messages: msgs }),
+    ).rejects.toMatchObject({ status: 503 });
   });
 
   it("maps non-ok to AiGatewayError with status", async () => {
@@ -133,6 +159,16 @@ describe("callAiWithGuards", () => {
     ).rejects.toMatchObject({ status: 502 });
   });
 
+  it("treats {status: false} envelope as error", async () => {
+    mkFetch(
+      async () =>
+        new Response(JSON.stringify({ status: false, error: "upstream denied" }), { status: 200 }),
+    );
+    await expect(
+      callAiWithGuards({ userId: null, feature: "f", messages: msgs }),
+    ).rejects.toBeInstanceOf(AiGatewayError);
+  });
+
   it("blocks via budget rate_hour as 429", async () => {
     enforceMock.mockResolvedValue({ allowed: false, reason: "rate_hour" });
     await expect(
@@ -148,23 +184,34 @@ describe("callAiWithGuards", () => {
   });
 
   it("skipBudget bypasses enforceAiBudget", async () => {
-    mkFetch(
-      async () =>
-        new Response(JSON.stringify({ choices: [{ message: { content: "x" } }] }), { status: 200 }),
-    );
+    mkFetch(async () => vexoResponse("x"));
     await callAiWithGuards({ userId: "u1", feature: "f", messages: msgs, skipBudget: true });
     expect(enforceMock).not.toHaveBeenCalled();
+  });
+
+  it("JSON mode appends hint to text and routes to JSON-extractable response", async () => {
+    let capturedUrl: string | undefined;
+    mkFetch(async (input) => {
+      capturedUrl = typeof input === "string" ? input : input.toString();
+      return vexoResponse('{"a":1}');
+    });
+    await callAiWithGuards({
+      userId: null,
+      feature: "f",
+      messages: msgs,
+      responseFormat: "json_object",
+    });
+    // Hint should be appended to the prompt (URL-encoded + is space in
+    // query strings; URLSearchParams parses it correctly for us).
+    const url = new URL(capturedUrl ?? "");
+    const text = url.searchParams.get("text") ?? "";
+    expect(text).toContain("Respond with valid JSON");
   });
 });
 
 describe("callAiJsonWithGuards", () => {
   it("parses JSON content", async () => {
-    mkFetch(
-      async () =>
-        new Response(JSON.stringify({ choices: [{ message: { content: '{"a":1}' } }] }), {
-          status: 200,
-        }),
-    );
+    mkFetch(async () => vexoResponse('{"a":1}'));
     const out = await callAiJsonWithGuards<{ a: number }>({
       userId: null,
       feature: "f",
@@ -173,12 +220,7 @@ describe("callAiJsonWithGuards", () => {
     expect(out).toEqual({ a: 1 });
   });
   it("returns {} on parse failure", async () => {
-    mkFetch(
-      async () =>
-        new Response(JSON.stringify({ choices: [{ message: { content: "not json" } }] }), {
-          status: 200,
-        }),
-    );
+    mkFetch(async () => vexoResponse("not json"));
     const out = await callAiJsonWithGuards({ userId: null, feature: "f", messages: msgs });
     expect(out).toEqual({});
   });
@@ -202,22 +244,12 @@ describe("extractJsonFromResponse", () => {
 describe("callAiJsonWithSchema", () => {
   const schema = z.object({ a: z.number() });
   it("validates and returns typed data", async () => {
-    mkFetch(
-      async () =>
-        new Response(JSON.stringify({ choices: [{ message: { content: '{"a":1}' } }] }), {
-          status: 200,
-        }),
-    );
+    mkFetch(async () => vexoResponse('{"a":1}'));
     const out = await callAiJsonWithSchema({ userId: null, feature: "f", messages: msgs, schema });
     expect(out).toEqual({ a: 1 });
   });
   it("returns fallback on invalid JSON", async () => {
-    mkFetch(
-      async () =>
-        new Response(JSON.stringify({ choices: [{ message: { content: "garbage" } }] }), {
-          status: 200,
-        }),
-    );
+    mkFetch(async () => vexoResponse("garbage"));
     const out = await callAiJsonWithSchema({
       userId: null,
       feature: "f",
@@ -228,12 +260,7 @@ describe("callAiJsonWithSchema", () => {
     expect(out).toEqual({ a: 0 });
   });
   it("returns fallback on schema mismatch", async () => {
-    mkFetch(
-      async () =>
-        new Response(JSON.stringify({ choices: [{ message: { content: '{"a":"nope"}' } }] }), {
-          status: 200,
-        }),
-    );
+    mkFetch(async () => vexoResponse('{"a":"nope"}'));
     const out = await callAiJsonWithSchema({
       userId: null,
       feature: "f",
@@ -244,25 +271,9 @@ describe("callAiJsonWithSchema", () => {
     expect(out).toEqual({ a: -1 });
   });
   it("throws AiSchemaError without fallback on invalid JSON", async () => {
-    mkFetch(
-      async () =>
-        new Response(JSON.stringify({ choices: [{ message: { content: "garbage" } }] }), {
-          status: 200,
-        }),
-    );
+    mkFetch(async () => vexoResponse("garbage"));
     await expect(
       callAiJsonWithSchema({ userId: null, feature: "f", messages: msgs, schema }),
     ).rejects.toBeInstanceOf(AiSchemaError);
-  });
-  it("forwards default max_tokens=2048", async () => {
-    let captured: { max_tokens?: number } | undefined;
-    mkFetch(async (_u, init) => {
-      captured = JSON.parse(init!.body as string);
-      return new Response(JSON.stringify({ choices: [{ message: { content: '{"a":1}' } }] }), {
-        status: 200,
-      });
-    });
-    await callAiJsonWithSchema({ userId: null, feature: "f", messages: msgs, schema });
-    expect(captured!.max_tokens).toBe(2048);
   });
 });

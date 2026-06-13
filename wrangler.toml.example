@@ -1,0 +1,41 @@
+name = "healthyu"
+compatibility_date = "2024-09-23"
+compatibility_flags = ["nodejs_compat"]
+pages_build_output_dir = "./dist"
+
+# Build configuration (overridden by Cloudflare Pages dashboard).
+# Default values shown; the dashboard Build settings take precedence.
+[build]
+command = "bun run build"
+
+# ──────────────────────────────────────────────────────────────────────
+# Environment variables (production + preview)
+# Set these in the Cloudflare Pages dashboard:
+#   Settings → Environment variables
+#   - Production
+#   - Preview
+#
+# Names must match the keys expected by src/integrations/supabase/*.ts,
+# src/features/ai/lib/aiGateway.server.ts, and the cron auth helper.
+# ──────────────────────────────────────────────────────────────────────
+
+# Production secrets (set in dashboard; values NOT committed)
+#   VITE_SUPABASE_URL=https://<new-ref>.supabase.co
+#   VITE_SUPABASE_PUBLISHABLE_KEY=<anon-key>
+#   VITE_SUPABASE_PROJECT_ID=<new-ref>
+#   SUPABASE_URL=https://<new-ref>.supabase.co
+#   SUPABASE_PUBLISHABLE_KEY=<anon-key>
+#   SUPABASE_SERVICE_ROLE_KEY=<service-role-key>
+#   VEXO_API_KEY=<vexo-vip-key>
+#   VEXO_BASE_URL=https://vexoapi.dev
+#   CRON_SECRET=<openssl-rand-hex-32>
+#   VAPID_SUBJECT=mailto:<your-email>
+#   VAPID_PRIVATE_KEY=<vapid-private-key>
+#   GOOGLE_FIT_CLIENT_ID=<...>
+#   GOOGLE_FIT_CLIENT_SECRET=<...>
+
+# Build-time vars (set as "Build environment variables" in dashboard so
+# they're inlined into the client bundle):
+#   VITE_SUPABASE_URL
+#   VITE_SUPABASE_PUBLISHABLE_KEY
+#   VITE_SUPABASE_PROJECT_ID

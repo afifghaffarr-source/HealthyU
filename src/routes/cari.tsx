@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { canonical } from "@/lib/seo";
 import { TopAppBar } from "@/components/healthyu/top-app-bar";
@@ -7,25 +8,21 @@ const searchSchema = z.object({
   q: z.string().max(100).optional().default(""),
 });
 
-export const Route = createFileRoute("/cari")({
-  validateSearch: (search) => searchSchema.parse(search),
-  head: () => ({
-    meta: [
-      { title: "Cari — HealthyU" },
-      {
-        name: "description",
-        content: "Cari artikel, resep, dan panduan diet sehat di HealthyU.",
-      },
-      { property: "og:title", content: "Cari — HealthyU" },
-      { property: "og:url", content: canonical("/cari") },
-    ],
-    links: [{ rel: "canonical", href: canonical("/cari") }],
-  }),
-  loaderDeps: ({ search }) => ({ q: search.q }),
-  loader: async ({ deps }) => {
-    const q = (deps.q ?? "").trim();
-    if (!q.length) return { articles: [], recipes: [], query: "" };
+/**
+ * Server-only search RPC. Wraps the Supabase query in createServerFn so the
+ * `*.server.ts` import never leaks into the client bundle (the import-
+ * protection plugin blocks `client.server` from any client-rendered file).
+ *
+ * Replaces the previous `loader` which did a dynamic `await import("client.server")`.
+ * That pattern is unsafe with strict import-protection (e.g. on Cloudflare
+ * Pages where the bundler enforces file-pattern denials).
+ */
+const searchCariFn = createServerFn({ method: "GET" })
+  .inputValidator(z.object({ q: z.string().max(100).default("") }))
+  .handler(async ({ data }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const q = data.q.trim();
+    if (!q.length) return { articles: [], recipes: [], query: "" };
     const pattern = `%${q}%`;
     const [artRes, recRes] = await Promise.all([
       supabaseAdmin
@@ -48,7 +45,24 @@ export const Route = createFileRoute("/cari")({
       recipes: recRes.data ?? [],
       query: q,
     };
-  },
+  });
+
+export const Route = createFileRoute("/cari")({
+  validateSearch: (search) => searchSchema.parse(search),
+  head: () => ({
+    meta: [
+      { title: "Cari — HealthyU" },
+      {
+        name: "description",
+        content: "Cari artikel, resep, dan panduan diet sehat di HealthyU.",
+      },
+      { property: "og:title", content: "Cari — HealthyU" },
+      { property: "og:url", content: canonical("/cari") },
+    ],
+    links: [{ rel: "canonical", href: canonical("/cari") }],
+  }),
+  loaderDeps: ({ search }) => ({ q: search.q }),
+  loader: ({ deps }) => searchCariFn({ data: { q: deps.q ?? "" } }),
   component: CariPage,
 });
 
@@ -60,7 +74,11 @@ function CariPage() {
   return (
     <main className="min-h-dvh bg-background pb-8">
       <div className="max-w-2xl mx-auto px-4 pt-2 space-y-6">
-        <TopAppBar title="Cari" subtitle={query ? `Hasil untuk "${query}"` : "Temukan artikel & resep"} showBack />
+        <TopAppBar
+          title="Cari"
+          subtitle={query ? `Hasil untuk "${query}"` : "Temukan artikel & resep"}
+          showBack
+        />
 
         <form method="GET" action="/cari" className="flex gap-2">
           <input
@@ -95,23 +113,34 @@ function CariPage() {
           <section>
             <h2 className="text-lg font-bold mb-3">Artikel ({articles.length})</h2>
             <ul className="space-y-2">
-              {articles.map((a: { slug: string; title: string; excerpt: string | null; category: string | null }) => (
-                <li key={a.slug}>
-                  <Link
-                    to="/artikel/$slug"
-                    params={{ slug: a.slug }}
-                    className="block rounded-xl border bg-card p-4 hover:bg-accent transition"
-                  >
-                    {a.category && (
-                      <span className="text-xs font-medium uppercase text-primary">{a.category}</span>
-                    )}
-                    <h3 className="font-semibold mt-1">{a.title}</h3>
-                    {a.excerpt && (
-                      <p className="text-sm text-muted-foreground line-clamp-2 mt-1">{a.excerpt}</p>
-                    )}
-                  </Link>
-                </li>
-              ))}
+              {articles.map(
+                (a: {
+                  slug: string;
+                  title: string;
+                  excerpt: string | null;
+                  category: string | null;
+                }) => (
+                  <li key={a.slug}>
+                    <Link
+                      to="/artikel/$slug"
+                      params={{ slug: a.slug }}
+                      className="block rounded-xl border bg-card p-4 hover:bg-accent transition"
+                    >
+                      {a.category && (
+                        <span className="text-xs font-medium uppercase text-primary">
+                          {a.category}
+                        </span>
+                      )}
+                      <h3 className="font-semibold mt-1">{a.title}</h3>
+                      {a.excerpt && (
+                        <p className="text-sm text-muted-foreground line-clamp-2 mt-1">
+                          {a.excerpt}
+                        </p>
+                      )}
+                    </Link>
+                  </li>
+                ),
+              )}
             </ul>
           </section>
         )}
@@ -120,24 +149,34 @@ function CariPage() {
           <section>
             <h2 className="text-lg font-bold mb-3">Resep ({recipes.length})</h2>
             <ul className="space-y-2">
-              {recipes.map((r: { slug: string; title: string; description: string | null; category: string | null; calories: number | null }) => (
-                <li key={r.slug}>
-                  <Link
-                    to="/resep/$slug"
-                    params={{ slug: r.slug }}
-                    className="block rounded-xl border bg-card p-4 hover:bg-accent transition"
-                  >
-                    {r.category && (
-                      <span className="text-xs font-medium uppercase text-primary">{r.category}</span>
-                    )}
-                    <h3 className="font-semibold mt-1">{r.title}</h3>
-                    <div className="flex items-center gap-3 mt-1 text-sm text-muted-foreground">
-                      {r.description && <span className="line-clamp-1">{r.description}</span>}
-                      {r.calories != null && <span className="shrink-0">{r.calories} kkal</span>}
-                    </div>
-                  </Link>
-                </li>
-              ))}
+              {recipes.map(
+                (r: {
+                  slug: string;
+                  title: string;
+                  description: string | null;
+                  category: string | null;
+                  calories: number | null;
+                }) => (
+                  <li key={r.slug}>
+                    <Link
+                      to="/resep/$slug"
+                      params={{ slug: r.slug }}
+                      className="block rounded-xl border bg-card p-4 hover:bg-accent transition"
+                    >
+                      {r.category && (
+                        <span className="text-xs font-medium uppercase text-primary">
+                          {r.category}
+                        </span>
+                      )}
+                      <h3 className="font-semibold mt-1">{r.title}</h3>
+                      <div className="flex items-center gap-3 mt-1 text-sm text-muted-foreground">
+                        {r.description && <span className="line-clamp-1">{r.description}</span>}
+                        {r.calories != null && <span className="shrink-0">{r.calories} kkal</span>}
+                      </div>
+                    </Link>
+                  </li>
+                ),
+              )}
             </ul>
           </section>
         )}

@@ -1,7 +1,6 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { lovable } from "@/integrations/lovable";
 import { toast } from "sonner";
 import { toastError } from "@/lib/toast-config";
 import { Sparkles } from "lucide-react";
@@ -53,16 +52,18 @@ function AuthPage() {
   const handleGoogle = async () => {
     setLoading(true);
     try {
-      const result = await lovable.auth.signInWithOAuth("google", {
-        redirect_uri: window.location.origin,
+      // Supabase OAuth always initiates a browser redirect to the provider
+      // and back to `redirectTo`. Configure the same URL in the Supabase
+      // dashboard (Authentication → URL Configuration → Redirect URLs).
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: "google",
+        options: { redirectTo: window.location.origin },
       });
-      if (result.error) {
+      if (error) {
         toast.error("Gagal masuk dengan Google");
         setLoading(false);
-        return;
       }
-      if (result.redirected) return;
-      navigate({ to: "/dashboard" });
+      // On success the browser navigates away — no need to do anything else.
     } catch {
       setLoading(false);
     }

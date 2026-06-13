@@ -1,5 +1,4 @@
 /** PDF page layout, fonts, dividers. See `src/lib/constants.ts` barrel. */
-/* eslint-disable no-restricted-syntax -- listed in header table */
 
 export const PDF_PAGE_FOOTER_Y = 820;
 export const PDF_MARGIN_X = 40;

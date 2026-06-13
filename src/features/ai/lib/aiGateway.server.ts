@@ -1,12 +1,36 @@
 import { enforceAiBudget, logAiUsage } from "./aiBudget.server";
+import {
+  callVexoApi,
+  flattenMessages,
+  resolveVexoEndpoint,
+  endpointSupportsImage,
+  VexoApiCallError,
+} from "./vexoAdapter";
 import type { z, ZodTypeAny } from "zod";
 
-const GEMINI_AI = "https://generativelanguage.googleapis.com/v1beta/chat/completions";
-const DEFAULT_TIMEOUT_MS = 30_000;
+/**
+ * VexoAPI-backed AI gateway.
+ *
+ * Replaces the previous Google Gemini gateway. Public API is unchanged so all
+ * call sites keep working:
+ *   - callAiWithGuards(opts)              → string
+ *   - callAiJsonWithGuards(opts)          → T (parsed JSON, {} on failure)
+ *   - callAiJsonWithSchema(opts)          → typed via Zod (with optional fallback)
+ *
+ * VexoAPI specifics:
+ *   - GET requests, ?key=API_KEY in query
+ *   - Response: { status: bool, data: string|object, timestamp: string }
+ *   - Multi-turn: flatten messages — last user → text, all system → system,
+ *     older messages prepended to user text for context.
+ *   - JSON mode: no native flag; we ask for JSON in the prompt and parse
+ *     with extractJsonFromResponse (forgiving extractor, already used).
+ *
+ * IMPORTANT: The current VexoAPI VIP key may return 403 ("upstream denied")
+ * during upstream model outages. We surface this as a 503 AiGatewayError so
+ * callers can retry; not a code defect.
+ */
 
-function stripModelPrefix(model: string): string {
-  return model.replace(/^google\//, "");
-}
+const DEFAULT_TIMEOUT_MS = 30_000;
 
 export type AiMessage = { role: "system" | "user" | "assistant"; content: string };
 
@@ -37,9 +61,14 @@ export type CallAiOptions = {
    * Use for expensive features (image scan, weekly reports, long generations).
    */
   failClosed?: boolean;
-  /** If "json_object", asks the gateway to return strict JSON. */
+  /**
+   * VexoAPI doesn't have a native `response_format: json_object` flag.
+   * When true, we add a JSON-only instruction to the prompt and use the
+   * forgiving extractor on the response. Same effective behavior.
+   */
   responseFormat?: "json_object";
-  /** Optional max_tokens cap forwarded to the gateway. */
+  /** Optional max_tokens cap. VexoAPI doesn't surface this on free tier; we
+   *  still pass `temperature=0.3` for deterministic output. */
   maxTokens?: number;
 };
 
@@ -54,18 +83,42 @@ export class AiGatewayError extends Error {
 }
 
 /**
- * Centralised Gemini AI Gateway call.
- * - Fail-closed if GEMINI_API_KEY missing.
- * - Per-user rate limit via enforceAiBudget (skip with skipBudget).
- * - AbortController timeout (default 30s).
- * - Logs usage to ai_usage_logs (fire-and-forget).
- * - Maps 429/402/timeout to typed AiGatewayError.
+ * Centralised AI call.
+ *
+ * Sends a multi-turn conversation to VexoAPI (via {@link callVexoApi})
+ * and returns the model's text response. Handles the cross-cutting
+ * concerns every AI call needs:
+ *   - Per-user rate limit via `enforceAiBudget` (skip with `skipBudget`)
+ *   - AbortController timeout (default 30s, override with `timeoutMs`)
+ *   - Usage logging to `ai_usage_logs` (fire-and-forget)
+ *   - Error mapping to typed `AiGatewayError` (4xx/5xx + 502 for
+ *     upstream failures)
+ *
+ * @param opts - Call configuration
+ * @returns The model's text response, or empty string on a parse
+ *   failure of a non-streaming call
+ * @throws {AiGatewayError} On rate limit (429), missing config (500),
+ *   upstream denial (503), or timeout (504)
+ *
+ * @example
+ * ```ts
+ * const reply = await callAiWithGuards({
+ *   userId: user.id,
+ *   feature: "chat.text",
+ *   messages: [
+ *     { role: "system", content: "You are a helpful nutrition coach." },
+ *     { role: "user", content: "Berapa kalori dalam nasi goreng?" },
+ *   ],
+ * });
+ * ```
  */
 export async function callAiWithGuards(opts: CallAiOptions): Promise<string> {
-  const apiKey = process.env.GEMINI_API_KEY;
-  if (!apiKey) throw new AiGatewayError("AI gateway tidak dikonfigurasi", 500);
+  if (!process.env.VEXO_API_KEY) {
+    throw new AiGatewayError("AI gateway tidak dikonfigurasi", 500);
+  }
 
   const model = opts.model ?? "google/gemini-2.5-flash";
+  const endpoint = resolveVexoEndpoint(model);
 
   if (opts.userId && !opts.skipBudget) {
     let decision: Awaited<ReturnType<typeof enforceAiBudget>>;
@@ -88,62 +141,82 @@ export async function callAiWithGuards(opts: CallAiOptions): Promise<string> {
     }
   }
 
-  const ctrl = new AbortController();
-  const timer = setTimeout(() => ctrl.abort(), opts.timeoutMs ?? DEFAULT_TIMEOUT_MS);
+  const flat = flattenMessages(opts.messages);
+  let text = flat.text;
+  if (opts.responseFormat === "json_object") {
+    const jsonHint = flat.system
+      ? `\n\n${flat.system}\n\nRespond with valid JSON only. No markdown fences, no prose, no explanation.`
+      : "Respond with valid JSON only. No markdown fences, no prose, no explanation.";
+    text = flat.text + jsonHint;
+  }
 
-  let res: Response;
+  // If caller wants an image-capable model but no image, still use the
+  // text endpoint. If image attached but endpoint is text-only, fall
+  // back to gemini (the image-capable VexoAPI endpoint).
+  const targetEndpoint = endpointSupportsImage(endpoint)
+    ? endpoint
+    : flat.imageUrl
+      ? "gemini"
+      : endpoint;
+
+  let data: string;
   try {
-    res = await fetch(GEMINI_AI, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${apiKey}`,
-      },
-      body: JSON.stringify({
-        model: stripModelPrefix(model),
-        messages: opts.messages,
-        ...(opts.maxTokens ? { max_tokens: opts.maxTokens } : {}),
-        ...(opts.responseFormat ? { response_format: { type: opts.responseFormat } } : {}),
-      }),
-      signal: ctrl.signal,
+    const result = await callVexoApi({
+      endpoint: targetEndpoint,
+      text,
+      system: flat.system,
+      imageUrl: flat.imageUrl,
+      timeoutMs: opts.timeoutMs ?? DEFAULT_TIMEOUT_MS,
     });
+    data = result.data;
   } catch (e) {
-    clearTimeout(timer);
-    const isAbort = (e as Error)?.name === "AbortError";
-    throw new AiGatewayError(
-      isAbort ? "AI gateway timeout" : `AI gateway error: ${(e as Error).message}`,
-      isAbort ? 504 : 502,
-    );
-  }
-  clearTimeout(timer);
-
-  if (res.status === 429) throw new AiGatewayError("AI gateway rate-limited", 429);
-  if (res.status === 402) throw new AiGatewayError("Kredit AI habis", 402);
-  if (!res.ok) {
-    const body = await res.text().catch(() => "");
-    throw new AiGatewayError(`AI gateway ${res.status}: ${body.slice(0, 200)}`, res.status);
+    if (e instanceof VexoApiCallError) {
+      throw new AiGatewayError(e.message, e.status);
+    }
+    throw e;
   }
 
-  const json = (await res.json().catch(() => null)) as {
-    choices?: { message?: { content?: string } }[];
-    usage?: { prompt_tokens?: number; completion_tokens?: number };
-  } | null;
-  const content = json?.choices?.[0]?.message?.content ?? "";
+  // VexoAPI doesn't surface token counts. Estimate from input text length
+  // (~4 chars per token) and output text length. This is good enough for
+  // budget tracking; we mark `model` so the price table applies.
+  const promptTokens = Math.ceil((text.length + flat.system.length) / 4);
+  const completionTokens = Math.ceil(data.length / 4);
 
   void logAiUsage({
     userId: opts.userId,
     feature: opts.feature,
     model,
-    promptTokens: json?.usage?.prompt_tokens,
-    completionTokens: json?.usage?.completion_tokens,
+    promptTokens,
+    completionTokens,
   });
 
-  return content;
+  return data;
 }
 
 /**
- * Same as callAiWithGuards but parses JSON response.
- * Forces response_format: json_object. Returns {} on parse failure.
+ * Same as {@link callAiWithGuards} but parses the response as JSON.
+ *
+ * VexoAPI doesn't have a native JSON mode, so this function:
+ *   1. Asks the model for JSON in the prompt
+ *   2. Parses the response with `JSON.parse` first
+ *   3. Falls back to `extractJsonFromResponse` (forgiving) if that fails
+ *   4. Returns `{}` if both parsers fail (caller should check truthiness)
+ *
+ * For schema-validated calls, prefer {@link callAiJsonWithSchema}.
+ *
+ * @param opts - Same as `callAiWithGuards` minus `responseFormat`
+ *   (always forces JSON)
+ * @returns The parsed JSON object, or `{}` on parse failure
+ *
+ * @example
+ * ```ts
+ * const data = await callAiJsonWithGuards<{ score: number }>({
+ *   userId: user.id,
+ *   feature: "scan.quote",
+ *   messages: [{ role: "user", content: "Rate this meal 1-10" }],
+ * });
+ * if (data.score) console.log("Score:", data.score);
+ * ```
  */
 export async function callAiJsonWithGuards<T = Record<string, unknown>>(
   opts: Omit<CallAiOptions, "responseFormat">,
@@ -157,22 +230,31 @@ export async function callAiJsonWithGuards<T = Record<string, unknown>>(
 }
 
 /**
- * Strip ```json fences / control chars and pull the first balanced {...} or [...]
- * out of a model response so JSON.parse stops dying on stray prose.
+ * Strips markdown ```json fences and control characters, then pulls
+ * the first balanced `{...}` or `[...]` block out of a model response.
+ * Useful when the model wraps JSON in explanatory prose despite being
+ * told to respond in JSON.
+ *
+ * @param raw - The model's raw text response
+ * @returns A JSON-parseable string (possibly empty if no JSON found)
+ *
+ * @example
+ * ```ts
+ * const raw = await callAiWithGuards({...});
+ * const json = JSON.parse(extractJsonFromResponse(raw));
+ * ```
  */
 export function extractJsonFromResponse(raw: string): string {
   if (!raw) return "";
   let s = raw.trim();
-  // strip code fences
   s = s
     .replace(/^```(?:json)?\s*/i, "")
     .replace(/```\s*$/i, "")
     .trim();
-  // remove control chars (except \n \r \t)
-  s = s.replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F]/g, "");
-  // already starts with { or [
+  // Strip control characters (except \t, \n, \r) that can break JSON.parse.
+  // eslint-disable-next-line no-control-regex, no-irregular-whitespace
+  s = s.replace(/[ --]/g, "");
   if (s.startsWith("{") || s.startsWith("[")) return s;
-  // find first balanced object/array
   const start = s.search(/[{[]/);
   if (start === -1) return s;
   const open = s[start];
@@ -209,15 +291,41 @@ export class AiSchemaError extends Error {
 }
 
 /**
- * Like callAiJsonWithGuards but validates against a Zod schema and returns a
- * typed fallback when parsing/validation fails (no exceptions to the UI).
- * Pass `fallback` for the safe default; omit to throw AiSchemaError on failure.
+ * Type-safe JSON call with Zod schema validation.
+ *
+ * Like {@link callAiJsonWithGuards} but validates the parsed JSON
+ * against a Zod schema. The return type is fully inferred from the
+ * schema, so no manual casting is needed in the caller.
+ *
+ * @param opts - Same as `callAiJsonWithGuards` plus:
+ *   - `schema`: Zod schema for the expected response shape
+ *   - `fallback`: Optional value to return on parse/validation failure
+ *     (otherwise throws `AiSchemaError`)
+ * @returns The validated data, typed as `z.infer<S>`
+ * @throws {AiSchemaError} If the response is unparseable and no
+ *   fallback is provided
+ *
+ * @example
+ * ```ts
+ * const MealSchema = z.object({
+ *   name: z.string(),
+ *   calories: z.number().int().nonnegative(),
+ * });
+ *
+ * const meal = await callAiJsonWithSchema({
+ *   userId: user.id,
+ *   feature: "scan.quote",
+ *   messages: [{ role: "user", content: "Estimate: nasi goreng" }],
+ *   schema: MealSchema,
+ *   fallback: { name: "Unknown", calories: 0 },
+ * });
+ * console.log(meal.calories); // typed as number
+ * ```
  */
 export async function callAiJsonWithSchema<S extends ZodTypeAny>(
   opts: Omit<CallAiOptions, "responseFormat"> & {
     schema: S;
     fallback?: z.infer<S>;
-    /** Default 2048. Pushed to the gateway as max_tokens to reduce truncation. */
     maxTokens?: number;
   },
 ): Promise<z.infer<S>> {

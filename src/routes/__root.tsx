@@ -185,20 +185,15 @@ function AuthListener() {
 }
 
 function ManifestLinkManager() {
+  // Cloudflare Pages serves /manifest.json as a static asset, no token needed.
+  // (Previously we read ?__lovable_token to authenticate preview deploys on
+  // Lovable's static CDN — that auth mechanism is gone with the platform.)
   useEffect(() => {
-    const url = new URL(window.location.href);
-    const previewToken = url.searchParams.get("__lovable_token");
-    const manifestHref = previewToken
-      ? `/manifest.json?__lovable_token=${encodeURIComponent(previewToken)}`
-      : "/manifest.json";
-
-    let link = document.querySelector('link[rel="manifest"]') as HTMLLinkElement | null;
-    if (!link) {
-      link = document.createElement("link");
-      link.rel = "manifest";
-      document.head.appendChild(link);
-    }
-    link.href = manifestHref;
+    const link =
+      (document.querySelector('link[rel="manifest"]') as HTMLLinkElement | null) ??
+      Object.assign(document.createElement("link"), { rel: "manifest" });
+    if (!link.isConnected) document.head.appendChild(link);
+    link.href = "/manifest.json";
   }, []);
 
   return null;

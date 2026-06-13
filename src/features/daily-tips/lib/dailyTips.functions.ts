@@ -21,7 +21,7 @@ export const getDailyTip = createServerFn({ method: "GET" })
     const conditions = ((profile?.health_conditions ?? []) as string[]).map((s) => s.toLowerCase());
     const diet = (profile?.dietary_preference as string | null | undefined)?.toLowerCase() ?? null;
 
-    let query = supabase
+    const query = supabase
       .from("daily_tips_pool")
       .select("id, category, tip, target_conditions, target_tags, weight, min_age, max_age")
       .eq("lang", "id")

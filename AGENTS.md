@@ -3,8 +3,9 @@
 ## Project Overview
 
 HealthyU adalah aplikasi diet & kesehatan Indonesia.
-Stack: **TanStack Start v1 + React 19 + TypeScript + Tailwind v4 + Supabase + PWA**.
-Runtime: Cloudflare Workers. Package manager: **Bun** (bukan npm/yarn/pnpm).
+Stack: **TanStack Start v1 + React 19 + TypeScript + Tailwind v4 + Supabase (self-managed) + PWA**.
+Runtime: Cloudflare Pages + Workers. Package manager: **Bun** (bukan npm/yarn/pnpm).
+AI: **VexoAPI** (gpt-oss-120b / glm-4.7-flash / multimodal gemini).
 
 ## Perintah Penting
 
@@ -26,7 +27,7 @@ Runtime: Cloudflare Workers. Package manager: **Bun** (bukan npm/yarn/pnpm).
 3. Jangan edit `.env` asli. Gunakan `.env.example` sebagai template.
 4. Jangan hardcode API key, token, secret, atau service role key.
 5. Jangan pakai `dangerouslySetInnerHTML` untuk konten dari DB/user/AI tanpa sanitizer.
-6. Semua AI call wajib lewat `src/features/ai/lib/aiGateway.server.ts`.
+6. Semua AI call wajib lewat `src/features/ai/lib/aiGateway.server.ts` (VexoAPI-backed). API key: `VEXO_API_KEY`.
 7. Semua cron/hook wajib pakai `CRON_SECRET`.
 8. Data kesehatan user = data sensitif. Hormati privacy flags.
 9. Jangan tambah dependency besar tanpa alasan jelas.
@@ -42,10 +43,12 @@ Runtime: Cloudflare Workers. Package manager: **Bun** (bukan npm/yarn/pnpm).
 - Server function: `createServerFn` dari `@tanstack/react-start`
 - File server-only: rename jadi `*.server.ts` (bukan `import "server-only"`)
 - Route: file-based di `src/routes/`
-- AI: semua lewat gateway, jangan direct call ke Gemini/OpenAI
+- AI: VexoAPI lewat adapter, jangan direct call ke VexoAPI dari feature code
 - UI: shadcn/ui + Tailwind v4 + `class-variance-authority`
 - State: TanStack Query + React Hook Form + Zod validation
-- Auth: Supabase Auth via Lovable Cloud
+- Auth: Supabase Auth (self-managed project) — `supabase.auth.signInWithOAuth(...)` di client
+- Error reporting: `src/lib/errorReporting.ts` (fire-and-forget POST ke `/api/log-error`)
+- Deploy: Cloudflare Pages + Workers; env vars di CF dashboard, bukan di repo
 
 ## Definition of Done
 
