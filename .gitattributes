@@ -1,0 +1,13 @@
+# Force text diffs for files that contain control characters.
+# The .ts files in src/features/ai/lib/ contain regexes with \x00–\x1f
+# (intentional, for sanitizing model output). Without this, git
+# treats them as binary and shows no diff.
+*.ts text eol=lf
+*.tsx text eol=lf
+*.js text eol=lf
+*.cjs text eol=lf
+*.mjs text eol=lf
+*.json text eol=lf
+*.md text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
