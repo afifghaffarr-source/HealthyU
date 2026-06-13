@@ -1,26 +1,13 @@
+// Server-only scan helpers. AI calling + rate limiting.
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@/integrations/supabase/types";
 import { callAiWithGuards, AiGatewayError } from "@/features/ai/lib/aiGateway.server";
 import { checkRateLimit, RATE_LIMITS } from "@/lib/rateLimit.server";
 
-export const MEAL_TYPES = [
-  { v: "breakfast", l: "Sarapan" },
-  { v: "lunch", l: "Makan Siang" },
-  { v: "dinner", l: "Makan Malam" },
-  { v: "snack", l: "Camilan" },
-] as const;
-
-export type MealTypeValue = (typeof MEAL_TYPES)[number]["v"];
-
-export function pickDefaultMealType(): MealTypeValue {
-  const h = new Date().getHours();
-  if (h < 10) return "breakfast";
-  if (h < 15) return "lunch";
-  if (h < 21) return "dinner";
-  return "snack";
-}
-
-export { fileToDataUrl } from "@/lib/image-utils";
+// Re-export client-safe primitives for backward compatibility with code
+// that already imported them from this file. Route components should
+// import from `./scanCore` directly.
+export { MEAL_TYPES, type MealTypeValue, pickDefaultMealType, fileToDataUrl } from "./scanCore";
 
 export function makeScanAiCaller(feature: string) {
   return async function callAI(

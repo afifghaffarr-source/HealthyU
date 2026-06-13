@@ -1,4 +1,4 @@
-# Self-managed Supabase client (no longer Lovable-generated).
+// Self-managed Supabase client (no longer Lovable-generated).
 import { createClient } from "@supabase/supabase-js";
 import type { Database } from "./types";
 

@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { canonical } from "@/lib/seo";
 import { TopAppBar } from "@/components/healthyu/top-app-bar";
@@ -7,25 +8,21 @@ const searchSchema = z.object({
   q: z.string().max(100).optional().default(""),
 });
 
-export const Route = createFileRoute("/cari")({
-  validateSearch: (search) => searchSchema.parse(search),
-  head: () => ({
-    meta: [
-      { title: "Cari — HealthyU" },
-      {
-        name: "description",
-        content: "Cari artikel, resep, dan panduan diet sehat di HealthyU.",
-      },
-      { property: "og:title", content: "Cari — HealthyU" },
-      { property: "og:url", content: canonical("/cari") },
-    ],
-    links: [{ rel: "canonical", href: canonical("/cari") }],
-  }),
-  loaderDeps: ({ search }) => ({ q: search.q }),
-  loader: async ({ deps }) => {
-    const q = (deps.q ?? "").trim();
-    if (!q.length) return { articles: [], recipes: [], query: "" };
+/**
+ * Server-only search RPC. Wraps the Supabase query in createServerFn so the
+ * `*.server.ts` import never leaks into the client bundle (the import-
+ * protection plugin blocks `client.server` from any client-rendered file).
+ *
+ * Replaces the previous `loader` which did a dynamic `await import("client.server")`.
+ * That pattern is unsafe with strict import-protection (e.g. on Cloudflare
+ * Pages where the bundler enforces file-pattern denials).
+ */
+const searchCariFn = createServerFn({ method: "GET" })
+  .inputValidator(z.object({ q: z.string().max(100).default("") }))
+  .handler(async ({ data }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const q = data.q.trim();
+    if (!q.length) return { articles: [], recipes: [], query: "" };
     const pattern = `%${q}%`;
     const [artRes, recRes] = await Promise.all([
       supabaseAdmin
@@ -48,7 +45,24 @@ export const Route = createFileRoute("/cari")({
       recipes: recRes.data ?? [],
       query: q,
     };
-  },
+  });
+
+export const Route = createFileRoute("/cari")({
+  validateSearch: (search) => searchSchema.parse(search),
+  head: () => ({
+    meta: [
+      { title: "Cari — HealthyU" },
+      {
+        name: "description",
+        content: "Cari artikel, resep, dan panduan diet sehat di HealthyU.",
+      },
+      { property: "og:title", content: "Cari — HealthyU" },
+      { property: "og:url", content: canonical("/cari") },
+    ],
+    links: [{ rel: "canonical", href: canonical("/cari") }],
+  }),
+  loaderDeps: ({ search }) => ({ q: search.q }),
+  loader: ({ deps }) => searchCariFn({ data: { q: deps.q ?? "" } }),
   component: CariPage,
 });
 

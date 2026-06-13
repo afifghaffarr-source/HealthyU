@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { createClient } from "@supabase/supabase-js";
 import type { Database } from "@/integrations/supabase/types";
-import { buildChatPayload, persistUserMessage } from "@/features/chat/lib/chat.functions";
+import { buildChatPayload, persistUserMessage } from "@/features/chat/lib/chatContext.server";
 import { classifyMessage, buildCompactProfile } from "@/features/ai/lib/aiRouter.server";
 import { cacheKey, getCached, setCached } from "@/features/ai/lib/aiCache.server";
 import { enforceAiBudget, logAiUsage } from "@/features/ai/lib/aiBudget.server";

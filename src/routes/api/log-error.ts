@@ -76,7 +76,7 @@ export const Route = createFileRoute("/api/log-error")({
           boundary: row.boundary,
           message: row.message.slice(0, 2000),
           stack: row.stack?.slice(0, 20000) ?? null,
-          context: row.context,
+          context: row.context as never, // Zod Record<string, unknown> → Supabase Json cast
           route: row.route ?? null,
           handled: row.handled,
           severity: row.severity,

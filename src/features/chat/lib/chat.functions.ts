@@ -1,12 +1,13 @@
+// Server functions callable from client code via RPC (createServerFn).
+// Server-only helpers (`persistUserMessage`, `buildChatPayload`) live in
+// `./chatContext.server` and are imported directly by server routes like
+// `routes/api/chat.stream.ts`.
+
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { callAiWithGuards, type AiMultimodalMessage } from "@/features/ai/lib/aiGateway.server";
-import { SYSTEM_PROMPT, persistUserMessage, buildChatPayload } from "./chatContext.server";
 
-// Re-export server-only helpers so server routes that previously imported
-// from chat.functions keep working.
-export { persistUserMessage, buildChatPayload };
 
 export const getChatHistory = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])

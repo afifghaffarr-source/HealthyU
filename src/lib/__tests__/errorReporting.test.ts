@@ -16,7 +16,7 @@ describe("reportError", () => {
   it("calls POST /api/log-error in production with the error payload", async () => {
     vi.stubEnv("DEV", false);
     const err = new Error("boom");
-    reportError(err, { extra: "v" }, { mechanism: "react_error_boundary" });
+    reportError(err, { boundary: "react_error_boundary", extra: "v" });
     // give microtask queue a tick
     await Promise.resolve();
     expect(globalThis.fetch).toHaveBeenCalledTimes(1);

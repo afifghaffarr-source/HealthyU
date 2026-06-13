@@ -1894,6 +1894,53 @@ export type Database = {
           },
         ];
       };
+      // error_reports: locally-maintained table (replaces Lovable's
+      // __lovableEvents.captureException). Added in migration
+      // 20260613000000_error_reports.sql. When the project's Supabase DB
+      // is regenerated via `supabase gen types typescript`, this manual
+      // block will be replaced with the auto-generated shape (same fields).
+      error_reports: {
+        Row: {
+          boundary: string;
+          context: Json;
+          created_at: string;
+          handled: boolean;
+          id: string;
+          message: string;
+          route: string | null;
+          severity: string;
+          source: string;
+          stack: string | null;
+          user_id: string | null;
+        };
+        Insert: {
+          boundary: string;
+          context?: Json;
+          created_at?: string;
+          handled?: boolean;
+          id?: string;
+          message: string;
+          route?: string | null;
+          severity?: string;
+          source: string;
+          stack?: string | null;
+          user_id?: string | null;
+        };
+        Update: {
+          boundary?: string;
+          context?: Json;
+          created_at?: string;
+          handled?: boolean;
+          id?: string;
+          message?: string;
+          route?: string | null;
+          severity?: string;
+          source?: string;
+          stack?: string | null;
+          user_id?: string | null;
+        };
+        Relationships: [];
+      };
       family_plans: {
         Row: {
           created_at: string;

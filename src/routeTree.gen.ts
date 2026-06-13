@@ -35,6 +35,7 @@ import { Route as KalkulatorSlugRouteImport } from './routes/kalkulator.$slug'
 import { Route as FaqSlugRouteImport } from './routes/faq.$slug'
 import { Route as DietSlugRouteImport } from './routes/diet.$slug'
 import { Route as ArtikelSlugRouteImport } from './routes/artikel.$slug'
+import { Route as ApiLogErrorRouteImport } from './routes/api/log-error'
 import { Route as ApiHealthRouteImport } from './routes/api/health'
 import { Route as AuthenticatedWorkoutRouteImport } from './routes/_authenticated/workout'
 import { Route as AuthenticatedWeightRouteImport } from './routes/_authenticated/weight'
@@ -303,6 +304,11 @@ const ArtikelSlugRoute = ArtikelSlugRouteImport.update({
   id: '/$slug',
   path: '/$slug',
   getParentRoute: () => ArtikelRoute,
+} as any)
+const ApiLogErrorRoute = ApiLogErrorRouteImport.update({
+  id: '/api/log-error',
+  path: '/api/log-error',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const ApiHealthRoute = ApiHealthRouteImport.update({
   id: '/api/health',
@@ -1142,6 +1148,7 @@ export interface FileRoutesByFullPath {
   '/weight': typeof AuthenticatedWeightRouteWithChildren
   '/workout': typeof AuthenticatedWorkoutRouteWithChildren
   '/api/health': typeof ApiHealthRoute
+  '/api/log-error': typeof ApiLogErrorRoute
   '/artikel/$slug': typeof ArtikelSlugRoute
   '/diet/$slug': typeof DietSlugRoute
   '/faq/$slug': typeof FaqSlugRoute
@@ -1301,6 +1308,7 @@ export interface FileRoutesByTo {
   '/weight': typeof AuthenticatedWeightRouteWithChildren
   '/workout': typeof AuthenticatedWorkoutRouteWithChildren
   '/api/health': typeof ApiHealthRoute
+  '/api/log-error': typeof ApiLogErrorRoute
   '/artikel/$slug': typeof ArtikelSlugRoute
   '/diet/$slug': typeof DietSlugRoute
   '/faq/$slug': typeof FaqSlugRoute
@@ -1469,6 +1477,7 @@ export interface FileRoutesById {
   '/_authenticated/weight': typeof AuthenticatedWeightRouteWithChildren
   '/_authenticated/workout': typeof AuthenticatedWorkoutRouteWithChildren
   '/api/health': typeof ApiHealthRoute
+  '/api/log-error': typeof ApiLogErrorRoute
   '/artikel/$slug': typeof ArtikelSlugRoute
   '/diet/$slug': typeof DietSlugRoute
   '/faq/$slug': typeof FaqSlugRoute
@@ -1637,6 +1646,7 @@ export interface FileRouteTypes {
     | '/weight'
     | '/workout'
     | '/api/health'
+    | '/api/log-error'
     | '/artikel/$slug'
     | '/diet/$slug'
     | '/faq/$slug'
@@ -1796,6 +1806,7 @@ export interface FileRouteTypes {
     | '/weight'
     | '/workout'
     | '/api/health'
+    | '/api/log-error'
     | '/artikel/$slug'
     | '/diet/$slug'
     | '/faq/$slug'
@@ -1963,6 +1974,7 @@ export interface FileRouteTypes {
     | '/_authenticated/weight'
     | '/_authenticated/workout'
     | '/api/health'
+    | '/api/log-error'
     | '/artikel/$slug'
     | '/diet/$slug'
     | '/faq/$slug'
@@ -2077,6 +2089,7 @@ export interface RootRouteChildren {
   ResepRoute: typeof ResepRouteWithChildren
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   ApiHealthRoute: typeof ApiHealthRoute
+  ApiLogErrorRoute: typeof ApiLogErrorRoute
   ApiChatStreamRoute: typeof ApiChatStreamRoute
   ApiImgSplatRoute: typeof ApiImgSplatRoute
   ApiPublicHooksDailyCoachRoute: typeof ApiPublicHooksDailyCoachRoute
@@ -2271,6 +2284,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/artikel/$slug'
       preLoaderRoute: typeof ArtikelSlugRouteImport
       parentRoute: typeof ArtikelRoute
+    }
+    '/api/log-error': {
+      id: '/api/log-error'
+      path: '/api/log-error'
+      fullPath: '/api/log-error'
+      preLoaderRoute: typeof ApiLogErrorRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/api/health': {
       id: '/api/health'
@@ -3837,6 +3857,7 @@ const rootRouteChildren: RootRouteChildren = {
   ResepRoute: ResepRouteWithChildren,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   ApiHealthRoute: ApiHealthRoute,
+  ApiLogErrorRoute: ApiLogErrorRoute,
   ApiChatStreamRoute: ApiChatStreamRoute,
   ApiImgSplatRoute: ApiImgSplatRoute,
   ApiPublicHooksDailyCoachRoute: ApiPublicHooksDailyCoachRoute,

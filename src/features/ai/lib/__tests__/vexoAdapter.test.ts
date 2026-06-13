@@ -1,5 +1,9 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { flattenMessages, resolveVexoEndpoint, endpointSupportsImage } from "../vexoAdapter";
+import {
+  flattenMessages,
+  resolveVexoEndpoint,
+  endpointSupportsImage,
+} from "@/features/ai/lib/vexoAdapter";
 
 describe("flattenMessages", () => {
   it("returns empty system when only user text", () => {
