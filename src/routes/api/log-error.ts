@@ -39,13 +39,9 @@ export const Route = createFileRoute("/api/log-error")({
             const SUPABASE_URL = process.env.SUPABASE_URL;
             const SUPABASE_PUBLISHABLE_KEY = process.env.SUPABASE_PUBLISHABLE_KEY;
             if (SUPABASE_URL && SUPABASE_PUBLISHABLE_KEY) {
-              const supabase = createClient<Database>(
-                SUPABASE_URL,
-                SUPABASE_PUBLISHABLE_KEY,
-                {
-                  auth: { persistSession: false, autoRefreshToken: false },
-                },
-              );
+              const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
+                auth: { persistSession: false, autoRefreshToken: false },
+              });
               const { data } = await supabase.auth.getClaims(token);
               userId = data?.claims?.sub ?? null;
             }

@@ -9,7 +9,6 @@ import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { callAiWithGuards, type AiMultimodalMessage } from "@/features/ai/lib/aiGateway.server";
 
-
 export const getChatHistory = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
@@ -49,9 +48,7 @@ export const sendChatMessage = createServerFn({ method: "POST" })
     // Dynamic import keeps `.server` boundary intact: chat.functions is
     // importable from client routes, but the handler body runs on the
     // server only, so loading chatContext.server at call-time is safe.
-    const { persistUserMessage, buildChatPayload } = await import(
-      "./chatContext.server"
-    );
+    const { persistUserMessage, buildChatPayload } = await import("./chatContext.server");
     await persistUserMessage(supabase, userId, data.message, data.imageBase64);
     const { messages, isEmergency } = await buildChatPayload(
       supabase,

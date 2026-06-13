@@ -1,5 +1,4 @@
 /** PDF TOC / link / table tunables. See `src/lib/constants.ts` barrel. */
-/* eslint-disable no-restricted-syntax -- listed in header table */
 
 export const PDF_LINK_RGB: [number, number, number] = [80, 80, 200];
 export const PDF_TOC_ROWS_PER_PAGE = 40;

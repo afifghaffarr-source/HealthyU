@@ -20,7 +20,14 @@ export const listLeaderboard = createServerFn({ method: "GET" })
           .from("profiles")
           .select("id, full_name, avatar_url, public_profile")
           .in("id", ids)
-      : { data: [] as { id: string; full_name: string | null; avatar_url: string | null; public_profile: boolean | null }[] };
+      : {
+          data: [] as {
+            id: string;
+            full_name: string | null;
+            avatar_url: string | null;
+            public_profile: boolean | null;
+          }[],
+        };
     const profMap = new Map((profiles ?? []).map((p) => [p.id, p]));
     return (stats ?? []).map((s, i) => {
       const prof = profMap.get(s.user_id);
@@ -54,10 +61,7 @@ export const listComments = createServerFn({ method: "GET" })
     if (error) throw new Error(error.message);
     const ids = Array.from(new Set((comments ?? []).map((c) => c.user_id)));
     const { data: profiles } = ids.length
-      ? await supabaseAdmin
-          .from("profiles")
-          .select("id, full_name, public_profile")
-          .in("id", ids)
+      ? await supabaseAdmin.from("profiles").select("id, full_name, public_profile").in("id", ids)
       : { data: [] as { id: string; full_name: string | null; public_profile: boolean | null }[] };
     const profMap = new Map((profiles ?? []).map((p) => [p.id, p]));
     return (comments ?? []).map((c) => {

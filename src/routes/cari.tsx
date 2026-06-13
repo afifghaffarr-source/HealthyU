@@ -74,7 +74,11 @@ function CariPage() {
   return (
     <main className="min-h-dvh bg-background pb-8">
       <div className="max-w-2xl mx-auto px-4 pt-2 space-y-6">
-        <TopAppBar title="Cari" subtitle={query ? `Hasil untuk "${query}"` : "Temukan artikel & resep"} showBack />
+        <TopAppBar
+          title="Cari"
+          subtitle={query ? `Hasil untuk "${query}"` : "Temukan artikel & resep"}
+          showBack
+        />
 
         <form method="GET" action="/cari" className="flex gap-2">
           <input
@@ -109,23 +113,34 @@ function CariPage() {
           <section>
             <h2 className="text-lg font-bold mb-3">Artikel ({articles.length})</h2>
             <ul className="space-y-2">
-              {articles.map((a: { slug: string; title: string; excerpt: string | null; category: string | null }) => (
-                <li key={a.slug}>
-                  <Link
-                    to="/artikel/$slug"
-                    params={{ slug: a.slug }}
-                    className="block rounded-xl border bg-card p-4 hover:bg-accent transition"
-                  >
-                    {a.category && (
-                      <span className="text-xs font-medium uppercase text-primary">{a.category}</span>
-                    )}
-                    <h3 className="font-semibold mt-1">{a.title}</h3>
-                    {a.excerpt && (
-                      <p className="text-sm text-muted-foreground line-clamp-2 mt-1">{a.excerpt}</p>
-                    )}
-                  </Link>
-                </li>
-              ))}
+              {articles.map(
+                (a: {
+                  slug: string;
+                  title: string;
+                  excerpt: string | null;
+                  category: string | null;
+                }) => (
+                  <li key={a.slug}>
+                    <Link
+                      to="/artikel/$slug"
+                      params={{ slug: a.slug }}
+                      className="block rounded-xl border bg-card p-4 hover:bg-accent transition"
+                    >
+                      {a.category && (
+                        <span className="text-xs font-medium uppercase text-primary">
+                          {a.category}
+                        </span>
+                      )}
+                      <h3 className="font-semibold mt-1">{a.title}</h3>
+                      {a.excerpt && (
+                        <p className="text-sm text-muted-foreground line-clamp-2 mt-1">
+                          {a.excerpt}
+                        </p>
+                      )}
+                    </Link>
+                  </li>
+                ),
+              )}
             </ul>
           </section>
         )}
@@ -134,24 +149,34 @@ function CariPage() {
           <section>
             <h2 className="text-lg font-bold mb-3">Resep ({recipes.length})</h2>
             <ul className="space-y-2">
-              {recipes.map((r: { slug: string; title: string; description: string | null; category: string | null; calories: number | null }) => (
-                <li key={r.slug}>
-                  <Link
-                    to="/resep/$slug"
-                    params={{ slug: r.slug }}
-                    className="block rounded-xl border bg-card p-4 hover:bg-accent transition"
-                  >
-                    {r.category && (
-                      <span className="text-xs font-medium uppercase text-primary">{r.category}</span>
-                    )}
-                    <h3 className="font-semibold mt-1">{r.title}</h3>
-                    <div className="flex items-center gap-3 mt-1 text-sm text-muted-foreground">
-                      {r.description && <span className="line-clamp-1">{r.description}</span>}
-                      {r.calories != null && <span className="shrink-0">{r.calories} kkal</span>}
-                    </div>
-                  </Link>
-                </li>
-              ))}
+              {recipes.map(
+                (r: {
+                  slug: string;
+                  title: string;
+                  description: string | null;
+                  category: string | null;
+                  calories: number | null;
+                }) => (
+                  <li key={r.slug}>
+                    <Link
+                      to="/resep/$slug"
+                      params={{ slug: r.slug }}
+                      className="block rounded-xl border bg-card p-4 hover:bg-accent transition"
+                    >
+                      {r.category && (
+                        <span className="text-xs font-medium uppercase text-primary">
+                          {r.category}
+                        </span>
+                      )}
+                      <h3 className="font-semibold mt-1">{r.title}</h3>
+                      <div className="flex items-center gap-3 mt-1 text-sm text-muted-foreground">
+                        {r.description && <span className="line-clamp-1">{r.description}</span>}
+                        {r.calories != null && <span className="shrink-0">{r.calories} kkal</span>}
+                      </div>
+                    </Link>
+                  </li>
+                ),
+              )}
             </ul>
           </section>
         )}

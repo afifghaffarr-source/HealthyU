@@ -57,7 +57,7 @@ export function reportError(
   const source = (context.source as string) ?? mechanism;
 
   // Always log to console for local dev visibility.
-  // eslint-disable-next-line no-console
+
   console.error(`[${source}]`, error, context);
 
   // Dev: don't write to DB (would flood the table during iteration).

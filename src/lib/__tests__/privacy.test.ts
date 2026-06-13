@@ -50,7 +50,12 @@ describe("maskPublicProfile", () => {
     expect(masked?.birth_date).toBeUndefined();
     expect(masked?.show_weight).toBeUndefined();
     expect(masked?.show_meals).toBeUndefined();
-    expect(Object.keys(masked!).sort()).toEqual(["avatar_url", "full_name", "id", "public_profile"]);
+    expect(Object.keys(masked!).sort()).toEqual([
+      "avatar_url",
+      "full_name",
+      "id",
+      "public_profile",
+    ]);
   });
 
   it("owner sees all fields even when public_profile is false", () => {

@@ -51,18 +51,24 @@ export function flattenMessages(messages: AiMultimodalMessage[]): {
   for (let i = 0; i < messages.length; i++) {
     const m = messages[i];
     const isLast = i === messages.length - 1;
-    const text = typeof m.content === "string"
-      ? m.content
-      : m.content
-          .filter((p) => p.type === "text")
-          .map((p) => (p as { type: "text"; text: string }).text)
-          .join("\n");
-    const imageUrl = typeof m.content === "string"
-      ? undefined
-      : m.content.find((p) => p.type === "image_url")?.type === "image_url"
-        ? (m.content.find((p) => p.type === "image_url") as { type: "image_url"; image_url: { url: string } })
-            .image_url.url
-        : undefined;
+    const text =
+      typeof m.content === "string"
+        ? m.content
+        : m.content
+            .filter((p) => p.type === "text")
+            .map((p) => (p as { type: "text"; text: string }).text)
+            .join("\n");
+    const imageUrl =
+      typeof m.content === "string"
+        ? undefined
+        : m.content.find((p) => p.type === "image_url")?.type === "image_url"
+          ? (
+              m.content.find((p) => p.type === "image_url") as {
+                type: "image_url";
+                image_url: { url: string };
+              }
+            ).image_url.url
+          : undefined;
 
     if (m.role === "system") {
       systemParts.push(text);
@@ -77,9 +83,8 @@ export function flattenMessages(messages: AiMultimodalMessage[]): {
     }
   }
 
-  const prompt = historyParts.length > 0
-    ? historyParts.join("\n") + `\n[user] ${lastUserText}`
-    : lastUserText;
+  const prompt =
+    historyParts.length > 0 ? historyParts.join("\n") + `\n[user] ${lastUserText}` : lastUserText;
 
   return {
     text: prompt,
@@ -154,10 +159,7 @@ export async function callVexoApi(opts: {
   }
   if (!res.ok) {
     const body = await res.text().catch(() => "");
-    throw new VexoApiCallError(
-      `AI gateway ${res.status}: ${body.slice(0, 200)}`,
-      res.status,
-    );
+    throw new VexoApiCallError(`AI gateway ${res.status}: ${body.slice(0, 200)}`, res.status);
   }
 
   const json = (await res.json().catch(() => null)) as {

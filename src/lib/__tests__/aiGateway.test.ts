@@ -20,9 +20,7 @@ import {
 const origKey = process.env.VEXO_API_KEY;
 const origFetch = globalThis.fetch;
 
-function mkFetch(
-  impl: (input: RequestInfo | URL, init?: RequestInit) => Promise<Response>,
-) {
+function mkFetch(impl: (input: RequestInfo | URL, init?: RequestInit) => Promise<Response>) {
   globalThis.fetch = vi.fn(impl) as unknown as typeof fetch;
 }
 
@@ -162,11 +160,9 @@ describe("callAiWithGuards", () => {
   });
 
   it("treats {status: false} envelope as error", async () => {
-    mkFetch(async () =>
-      new Response(
-        JSON.stringify({ status: false, error: "upstream denied" }),
-        { status: 200 },
-      ),
+    mkFetch(
+      async () =>
+        new Response(JSON.stringify({ status: false, error: "upstream denied" }), { status: 200 }),
     );
     await expect(
       callAiWithGuards({ userId: null, feature: "f", messages: msgs }),

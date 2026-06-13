@@ -1,7 +1,4 @@
-import {
-  AiGatewayError,
-  type AiMultimodalMessage,
-} from "./aiGateway.server";
+import { AiGatewayError, type AiMultimodalMessage } from "./aiGateway.server";
 import { callVexoApi, flattenMessages } from "./vexoAdapter";
 export { AiGatewayError };
 
@@ -47,8 +44,7 @@ export async function streamAiChat(opts: StreamAiOptions): Promise<{
   // We use the same `data: {...}\n\n` shape the existing parseSseChunk
   // already understands, so callers don't have to change.
   const ssePayload =
-    `data: ${JSON.stringify({ choices: [{ delta: { content: data } }] })}\n\n` +
-    `data: [DONE]\n\n`;
+    `data: ${JSON.stringify({ choices: [{ delta: { content: data } }] })}\n\n` + `data: [DONE]\n\n`;
 
   const encoder = new TextEncoder();
   const body = new ReadableStream<Uint8Array>({
