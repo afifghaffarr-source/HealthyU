@@ -7,6 +7,9 @@ export default defineConfig({
     environment: "jsdom",
     globals: false,
     include: ["src/**/*.test.{ts,tsx}"],
+    // Injects stub VITE_* env vars before any test runs. Needed for
+    // modules that validate env at import time (see src/lib/env.ts).
+    setupFiles: ["./src/test-setup.ts"],
     coverage: {
       provider: "v8",
       reporter: ["text", "json-summary"],
