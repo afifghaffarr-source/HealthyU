@@ -13,11 +13,14 @@
     "typecheck": "NODE_OPTIONS=--max-old-space-size=4096 tsc --noEmit",
     "precommit": "bun run lint:constants && bun run lint && bun run typecheck",
     "test": "NODE_OPTIONS=--max-old-space-size=4096 vitest run",
+    "test:watch": "NODE_OPTIONS=--max-old-space-size=4096 vitest",
+    "verify": "bun run typecheck && bun run test && bun run build",
     "format": "prettier --write .",
     "i18n:scan": "node scripts/i18n-scan.mjs",
     "e2e": "playwright test",
     "e2e:ui": "playwright test --ui",
-    "analyze": "NODE_OPTIONS=--max-old-space-size=4096 ANALYZE=1 vite build && echo '\\n📊 Open dist/bundle-stats.html in your browser'"
+    "analyze": "NODE_OPTIONS=--max-old-space-size=4096 ANALYZE=1 vite build && echo '\\n📊 Open dist/bundle-stats.html in your browser'",
+    "prepare": "husky"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
@@ -87,6 +90,8 @@
     "zod": "^3.24.2"
   },
   "devDependencies": {
+    "@commitlint/cli": "^21.0.2",
+    "@commitlint/config-conventional": "^21.0.2",
     "@eslint/js": "^9.32.0",
     "@playwright/test": "^1.60.0",
     "@testing-library/jest-dom": "^6.9.1",
@@ -105,7 +110,9 @@
     "eslint-plugin-react-refresh": "^0.4.20",
     "fake-indexeddb": "^6.2.5",
     "globals": "^15.15.0",
+    "husky": "^9.1.7",
     "jsdom": "^29.1.1",
+    "lint-staged": "^17.0.7",
     "nitro": "3.0.260429-beta",
     "prettier": "^3.7.3",
     "rollup-plugin-visualizer": "^7.0.1",
