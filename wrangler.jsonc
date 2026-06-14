@@ -3,7 +3,7 @@
   "name": "healthyu",
   "compatibility_date": "2024-09-23",
   "compatibility_flags": ["nodejs_compat"],
-  "main": "@tanstack/react-start/server-entry",
+  "main": "./src/server-entry.ts",
   "vars": {
     "NODE_ENV": "production",
     "VITE_SUPABASE_URL": "https://lezbpzpkvkdpbjvtvoei.supabase.co",

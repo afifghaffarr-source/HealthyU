@@ -32,10 +32,14 @@ export default defineConfig({
     tsConfigPaths(),
     tailwindcss(),
     tanstackStart({
-      // We render through src/server.ts (custom SSR + error handler + CSP).
+      // We use src/start.ts for the SSR render entry (start instance,
+      // middleware chain, CSP/security headers). This is the runtime
+      // config for createStart() — NOT the worker entry.
+      // The actual worker entry is configured separately in wrangler.jsonc
+      // (`main: "./src/server-entry.ts"`).
       // See https://tanstack.com/start/latest/docs/framework/react/guide/deploying
       server: {
-        entry: "src/server.ts",
+        entry: "start",
       },
     }),
     react(),
@@ -50,6 +54,14 @@ export default defineConfig({
         })
       : null,
   ].filter(Boolean),
+  environments: {
+    // The worker entry is set via wrangler.jsonc `main: "./src/server-entry.ts"`.
+    // The @cloudflare/vite-plugin bundles that file as the actual worker.
+    // We do NOT override ssr.rollupOptions.input here because:
+    //  (a) The TanStack Start plugin uses its own entry for the SSR render.
+    //  (b) The CF worker entry is independent — vite outputs it to
+    //      dist/server/ based on the `main` field.
+  },
   server: {
     // Defaults that work well locally without the Lovable sandbox.
     port: 8080,

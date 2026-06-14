@@ -2,6 +2,39 @@ import { createStart, createMiddleware } from "@tanstack/react-start";
 
 import { renderErrorPage } from "./lib/error-page";
 import { attachSupabaseAuth } from "@/integrations/supabase/auth-attacher";
+import { withEnv, type CloudflareEnv } from "@/lib/cloudflare-env.server";
+
+/**
+ * Inject CF Workers env bindings into AsyncLocalStorage so `getEnv()` works
+ * inside route handlers, server functions, and loaders.
+ *
+ * Why: CF Workers pass vars+secrets as the 2nd arg (`env`) to the fetch
+ * handler. TanStack Start exposes this through the request middleware's
+ * `context` (typed via `createStart({ requestContext })`). We capture it
+ * here once per request so downstream code can read secrets via `getEnv()`
+ * without prop-drilling.
+ */
+const envInjectionMiddleware = createMiddleware().server(async ({ context, next }) => {
+  // DEBUG: trace what context actually contains
+  const ctx = context as Record<string, unknown> | undefined;
+  const ctxKeys = ctx ? Object.keys(ctx) : [];
+  const ctxIsEnv = ctx && ("SUPABASE_URL" in ctx || "VEXO_API_KEY" in ctx);
+  const ctxHasNestedContext = ctx && "context" in ctx && typeof ctx.context === "object";
+  const nestedKeys =
+    ctx && "context" in ctx && ctx.context && typeof ctx.context === "object"
+      ? Object.keys(ctx.context as Record<string, unknown>)
+      : [];
+  console.log(
+    `[DEBUG envInjection] keys=[${ctxKeys.join(",")}] isEnv=${!!ctxIsEnv} hasNestedContext=${!!ctxHasNestedContext} nestedKeys=[${nestedKeys.join(",")}]`,
+  );
+  // Unwrap if needed: if context is {context: env}, use ctx.context
+  const envToInject = ctxHasNestedContext
+    ? (ctx.context as unknown as CloudflareEnv)
+    : (context as unknown as CloudflareEnv);
+  return withEnv(envToInject, async () => {
+    return await next();
+  });
+});
 
 const errorMiddleware = createMiddleware().server(async ({ next }) => {
   try {
@@ -69,5 +102,5 @@ const securityHeadersMiddleware = createMiddleware().server(async ({ next }) => 
 
 export const startInstance = createStart(() => ({
   functionMiddleware: [attachSupabaseAuth],
-  requestMiddleware: [errorMiddleware, securityHeadersMiddleware],
+  requestMiddleware: [envInjectionMiddleware, errorMiddleware, securityHeadersMiddleware],
 }));
