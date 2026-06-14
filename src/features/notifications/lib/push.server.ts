@@ -2,6 +2,7 @@
 // Bekerja di Cloudflare Workers runtime.
 
 import { VAPID_PUBLIC_KEY } from "@/lib/push-config";
+import { getEnv } from "@/lib/cloudflare-env.server";
 
 type PushSub = { endpoint: string; p256dh: string; auth: string };
 type PushPayload = { title: string; body: string; url?: string; tag?: string; icon?: string };
@@ -141,8 +142,10 @@ export async function sendWebPushTo(
   sub: PushSub,
   payload: PushPayload,
 ): Promise<{ ok: boolean; status: number }> {
-  const privKeyB64 = process.env.VAPID_PRIVATE_KEY;
-  const subject = process.env.VAPID_SUBJECT || "mailto:support@healthyu.id";
+  // Read VAPID keys from CF env (AsyncLocalStorage) → process.env fallback.
+  const env = getEnv();
+  const privKeyB64 = env.VAPID_PRIVATE_KEY;
+  const subject = env.VAPID_SUBJECT || "mailto:support@healthyu.id";
   if (!privKeyB64) {
     throw new Error("VAPID_PRIVATE_KEY belum dikonfigurasi sebagai secret");
   }

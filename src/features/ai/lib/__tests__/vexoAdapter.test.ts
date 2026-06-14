@@ -60,27 +60,31 @@ describe("flattenMessages", () => {
 });
 
 describe("resolveVexoEndpoint", () => {
-  it("maps legacy gemini names to VexoAPI endpoints", () => {
-    expect(resolveVexoEndpoint("google/gemini-2.5-flash")).toBe("gptoss120b");
-    expect(resolveVexoEndpoint("google/gemini-2.5-flash-lite")).toBe("glm47flash");
-    expect(resolveVexoEndpoint("google/gemini-2.5-pro")).toBe("gemini");
+  it("maps legacy gemini names to current Vexo model names", () => {
+    expect(resolveVexoEndpoint("google/gemini-2.5-flash")).toBe("openai/gpt-oss-120b:free");
+    expect(resolveVexoEndpoint("google/gemini-2.5-flash-lite")).toBe("llama-3.1-8b-instant");
+    expect(resolveVexoEndpoint("google/gemini-2.5-pro")).toBe("qwen/qwen3-32b");
   });
-  it("passes through canonical VexoAPI names", () => {
-    expect(resolveVexoEndpoint("gptoss120b")).toBe("gptoss120b");
-    expect(resolveVexoEndpoint("glm47flash")).toBe("glm47flash");
-    expect(resolveVexoEndpoint("gemini")).toBe("gemini");
+  it("passes through new Vexo model names", () => {
+    expect(resolveVexoEndpoint("openai/gpt-oss-120b:free")).toBe("openai/gpt-oss-120b:free");
+    expect(resolveVexoEndpoint("llama-3.1-8b-instant")).toBe("llama-3.1-8b-instant");
+    expect(resolveVexoEndpoint("qwen/qwen3-32b")).toBe("qwen/qwen3-32b");
   });
-  it("falls back to gptoss120b for unknown models", () => {
-    expect(resolveVexoEndpoint("gpt-5")).toBe("gptoss120b");
-    expect(resolveVexoEndpoint("")).toBe("gptoss120b");
+  it("falls back to gpt-oss-120b:free for unknown models", () => {
+    expect(resolveVexoEndpoint("gpt-5")).toBe("openai/gpt-oss-120b:free");
+    expect(resolveVexoEndpoint("")).toBe("openai/gpt-oss-120b:free");
+  });
+  it("still supports legacy short names for back-compat", () => {
+    expect(resolveVexoEndpoint("gptoss120b")).toBe("openai/gpt-oss-120b:free");
+    expect(resolveVexoEndpoint("glm47flash")).toBe("llama-3.1-8b-instant");
   });
 });
 
 describe("endpointSupportsImage", () => {
-  it("only gemini endpoint supports image", () => {
-    expect(endpointSupportsImage("gemini")).toBe(true);
-    expect(endpointSupportsImage("gptoss120b")).toBe(false);
-    expect(endpointSupportsImage("glm47flash")).toBe(false);
+  it("returns false for all current free models (no vision)", () => {
+    expect(endpointSupportsImage("openai/gpt-oss-120b:free")).toBe(false);
+    expect(endpointSupportsImage("llama-3.1-8b-instant")).toBe(false);
+    expect(endpointSupportsImage("qwen/qwen3-32b")).toBe(false);
   });
 });
 
@@ -99,20 +103,20 @@ describe("callVexoApi — input validation", () => {
   it("rejects when VEXO_API_KEY is missing", async () => {
     delete process.env.VEXO_API_KEY;
     await expect(
-      callVexoApi({ endpoint: "gptoss120b", text: "hi", timeoutMs: 1000 }),
+      callVexoApi({ endpoint: "openai/gpt-oss-120b:free", text: "hi", timeoutMs: 1000 }),
     ).rejects.toMatchObject({ status: 500, message: /VEXO_API_KEY missing/ });
   });
 
   it("rejects empty text with 400", async () => {
     await expect(
-      callVexoApi({ endpoint: "gptoss120b", text: "", timeoutMs: 1000 }),
+      callVexoApi({ endpoint: "openai/gpt-oss-120b:free", text: "", timeoutMs: 1000 }),
     ).rejects.toMatchObject({ status: 400 });
   });
 
   it("rejects text longer than MAX_TEXT_CHARS with 413", async () => {
     await expect(
       callVexoApi({
-        endpoint: "gptoss120b",
+        endpoint: "openai/gpt-oss-120b:free",
         text: "x".repeat(MAX_TEXT_CHARS + 1),
         timeoutMs: 1000,
       }),
@@ -122,7 +126,7 @@ describe("callVexoApi — input validation", () => {
   it("rejects system prompt longer than MAX_SYSTEM_CHARS with 413", async () => {
     await expect(
       callVexoApi({
-        endpoint: "gptoss120b",
+        endpoint: "openai/gpt-oss-120b:free",
         text: "hi",
         system: "x".repeat(MAX_SYSTEM_CHARS + 1),
         timeoutMs: 1000,
@@ -130,10 +134,10 @@ describe("callVexoApi — input validation", () => {
     ).rejects.toMatchObject({ status: 413 });
   });
 
-  it("rejects imageUrl on non-image endpoint with 400", async () => {
+  it("rejects imageUrl on non-image model with 400", async () => {
     await expect(
       callVexoApi({
-        endpoint: "gptoss120b",
+        endpoint: "openai/gpt-oss-120b:free",
         text: "hi",
         imageUrl: "https://x.com/y.jpg",
         timeoutMs: 1000,
@@ -152,12 +156,18 @@ describe("callVexoApi — happy path", () => {
     vi.unstubAllGlobals();
   });
 
-  it("sends key + text + temperature, returns data and metadata", async () => {
+  it("sends Bearer auth + OpenAI body, returns data and metadata", async () => {
     (fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce(
-      new Response(JSON.stringify({ status: true, data: "hello back" }), { status: 200 }),
+      new Response(
+        JSON.stringify({
+          id: "test",
+          choices: [{ message: { role: "assistant", content: "hello back" } }],
+        }),
+        { status: 200 },
+      ),
     );
     const result = await callVexoApi({
-      endpoint: "gptoss120b",
+      endpoint: "openai/gpt-oss-120b:free",
       text: "halo",
       timeoutMs: 5000,
     });
@@ -167,28 +177,40 @@ describe("callVexoApi — happy path", () => {
 
     const called = (fetch as ReturnType<typeof vi.fn>).mock.calls[0];
     const url = called[0] as string;
-    expect(url).toContain("key=VEXO_TEST_KEY");
-    expect(url).toContain("text=halo");
-    expect(url).toContain("temperature=0.3");
+    expect(url).toBe("https://vexoapi.dev/api/v1/chat/completions");
 
-    const headers = called[1].headers as Record<string, string>;
+    const init = called[1];
+    expect(init.method).toBe("POST");
+    const headers = init.headers as Record<string, string>;
+    expect(headers["Authorization"]).toBe("Bearer VEXO_TEST_KEY");
+    expect(headers["Content-Type"]).toBe("application/json");
     expect(headers["x-request-id"]).toBe(result.requestId);
     expect(headers["x-attempt"]).toBe("1");
+
+    const body = JSON.parse(init.body);
+    expect(body.model).toBe("openai/gpt-oss-120b:free");
+    expect(body.messages).toEqual([{ role: "user", content: "halo" }]);
+    expect(body.temperature).toBe(0.3);
+    expect(body.stream).toBe(false);
+    expect(body.max_tokens).toBe(2048);
   });
 
-  it("uses promptSystem for gemini endpoint, system for others", async () => {
+  it("includes system message in messages array when provided", async () => {
     (fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce(
-      new Response(JSON.stringify({ status: true, data: "ok" }), { status: 200 }),
+      new Response(JSON.stringify({ choices: [{ message: { content: "ok" } }] }), { status: 200 }),
     );
     await callVexoApi({
-      endpoint: "gemini",
+      endpoint: "openai/gpt-oss-120b:free",
       text: "q",
       system: "be helpful",
       timeoutMs: 5000,
     });
-    const url = (fetch as ReturnType<typeof vi.fn>).mock.calls[0][0] as string;
-    expect(url).toContain("promptSystem=be+helpful");
-    expect(url).not.toContain("system=be+helpful");
+    const init = (fetch as ReturnType<typeof vi.fn>).mock.calls[0][1];
+    const body = JSON.parse(init.body);
+    expect(body.messages).toEqual([
+      { role: "system", content: "be helpful" },
+      { role: "user", content: "q" },
+    ]);
   });
 });
 
@@ -206,13 +228,15 @@ describe("callVexoApi — retries", () => {
     (fetch as ReturnType<typeof vi.fn>)
       .mockResolvedValueOnce(new Response("forbidden", { status: 403 }))
       .mockResolvedValueOnce(
-        new Response(JSON.stringify({ status: true, data: "recovered" }), { status: 200 }),
+        new Response(JSON.stringify({ choices: [{ message: { content: "recovered" } }] }), {
+          status: 200,
+        }),
       );
     const result = await callVexoApi({
-      endpoint: "gptoss120b",
+      endpoint: "openai/gpt-oss-120b:free",
       text: "q",
       timeoutMs: 5000,
-      baseBackoffMs: 1, // speed up test
+      baseBackoffMs: 1,
     });
     expect(result.data).toBe("recovered");
     expect(result.attempts).toBe(2);
@@ -223,7 +247,12 @@ describe("callVexoApi — retries", () => {
       new Response("payload too large", { status: 413 }),
     );
     await expect(
-      callVexoApi({ endpoint: "gptoss120b", text: "q", timeoutMs: 5000, baseBackoffMs: 1 }),
+      callVexoApi({
+        endpoint: "openai/gpt-oss-120b:free",
+        text: "q",
+        timeoutMs: 5000,
+        baseBackoffMs: 1,
+      }),
     ).rejects.toMatchObject({ status: 413 });
     expect(fetch as ReturnType<typeof vi.fn>).toHaveBeenCalledTimes(1);
   });
@@ -234,7 +263,7 @@ describe("callVexoApi — retries", () => {
     );
     await expect(
       callVexoApi({
-        endpoint: "gptoss120b",
+        endpoint: "openai/gpt-oss-120b:free",
         text: "q",
         timeoutMs: 5000,
         maxAttempts: 3,
@@ -249,7 +278,7 @@ describe("callVexoApi — retries", () => {
     ctrl.abort();
     await expect(
       callVexoApi({
-        endpoint: "gptoss120b",
+        endpoint: "openai/gpt-oss-120b:free",
         text: "q",
         timeoutMs: 5000,
         signal: ctrl.signal,
@@ -274,7 +303,12 @@ describe("callVexoApi — error response shapes", () => {
       new Response("rate-limited", { status: 429 }),
     );
     await expect(
-      callVexoApi({ endpoint: "gptoss120b", text: "q", timeoutMs: 5000, maxAttempts: 1 }),
+      callVexoApi({
+        endpoint: "openai/gpt-oss-120b:free",
+        text: "q",
+        timeoutMs: 5000,
+        maxAttempts: 1,
+      }),
     ).rejects.toMatchObject({ status: 429 });
   });
 
@@ -283,30 +317,42 @@ describe("callVexoApi — error response shapes", () => {
       new Response("out of credits", { status: 402 }),
     );
     await expect(
-      callVexoApi({ endpoint: "gptoss120b", text: "q", timeoutMs: 5000, maxAttempts: 1 }),
+      callVexoApi({
+        endpoint: "openai/gpt-oss-120b:free",
+        text: "q",
+        timeoutMs: 5000,
+        maxAttempts: 1,
+      }),
     ).rejects.toMatchObject({ status: 402 });
   });
 
-  it("parses VexoAPI envelope { status: false, error } as 502", async () => {
+  it("parses OpenAI error envelope { error: { message } } as 502", async () => {
     (fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce(
-      new Response(JSON.stringify({ status: false, error: "model overloaded" }), { status: 200 }),
-    );
-    await expect(
-      callVexoApi({ endpoint: "gptoss120b", text: "q", timeoutMs: 5000, maxAttempts: 1 }),
-    ).rejects.toMatchObject({ status: 502, message: /model overloaded/ });
-  });
-
-  it("handles object-shaped data with .result / .text / .response / .output", async () => {
-    (fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce(
-      new Response(JSON.stringify({ status: true, data: { text: "nested-text" } }), {
+      new Response(JSON.stringify({ error: { message: "model overloaded" } }), {
         status: 200,
       }),
     );
-    const result = await callVexoApi({
-      endpoint: "gptoss120b",
-      text: "q",
-      timeoutMs: 5000,
-    });
-    expect(result.data).toBe("nested-text");
+    await expect(
+      callVexoApi({
+        endpoint: "openai/gpt-oss-120b:free",
+        text: "q",
+        timeoutMs: 5000,
+        maxAttempts: 1,
+      }),
+    ).rejects.toMatchObject({ status: 502, message: /model overloaded/ });
+  });
+
+  it("throws on missing choices/content/text in response", async () => {
+    (fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce(
+      new Response(JSON.stringify({ status: true, data: "ok" }), { status: 200 }),
+    );
+    await expect(
+      callVexoApi({
+        endpoint: "openai/gpt-oss-120b:free",
+        text: "q",
+        timeoutMs: 5000,
+        maxAttempts: 1,
+      }),
+    ).rejects.toMatchObject({ status: 502, message: /unexpected shape/ });
   });
 });

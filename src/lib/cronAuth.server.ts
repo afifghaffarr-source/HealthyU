@@ -13,8 +13,11 @@
  *
  * Fail-closed: if `CRON_SECRET` is unset, every request is rejected with 500.
  */
+import { getEnv } from "@/lib/cloudflare-env.server";
+
 export function requireCronSecret(request: Request): Response | null {
-  const expected = process.env.CRON_SECRET;
+  // CF env first (AsyncLocalStorage) → process.env fallback (local dev/tests).
+  const expected = getEnv().CRON_SECRET;
   if (!expected || expected.length < 16) {
     return new Response(JSON.stringify({ error: "CRON_SECRET not configured on server" }), {
       status: 500,

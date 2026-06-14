@@ -6,6 +6,7 @@ import {
   endpointSupportsImage,
   VexoApiCallError,
 } from "./vexoAdapter";
+import { getEnv } from "@/lib/cloudflare-env.server";
 import type { z, ZodTypeAny } from "zod";
 
 /**
@@ -113,7 +114,7 @@ export class AiGatewayError extends Error {
  * ```
  */
 export async function callAiWithGuards(opts: CallAiOptions): Promise<string> {
-  if (!process.env.VEXO_API_KEY) {
+  if (!getEnv().VEXO_API_KEY) {
     throw new AiGatewayError("AI gateway tidak dikonfigurasi", 500);
   }
 

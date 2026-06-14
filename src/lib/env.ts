@@ -19,6 +19,7 @@
 //      blow up at boot, not on the first user request.
 
 import { z } from "zod";
+import { getEnv } from "./cloudflare-env.server";
 
 // ──────────────────────────────────────────────────────────────────────
 // Schemas
@@ -114,33 +115,53 @@ if (!_clientResult.ok) {
 }
 export const clientEnv = _clientResult.data;
 
-// Server — only validate when running server-side (no `window`).
-// In jsdom test envs the server validation is skipped; unit tests
-// can call `validateServerEnv` directly to test the schema.
+// Server — lazy validation. We don't validate at module load because in CF
+// Workers the env bindings aren't available until request time (they're passed
+// via the `env` parameter to the fetch handler, then propagated through
+// AsyncLocalStorage by `server.ts`). Instead, `serverEnv` is a Proxy that
+// validates on first access. This preserves the "fail-fast on misconfigured
+// deploys" guarantee — the first read in a handler throws a clear error.
+//
+// In jsdom test envs the server validation is skipped (window is defined);
+// unit tests call `validateServerEnv` directly to test the schema.
 let _serverData: ServerEnv | undefined;
-if (typeof window === "undefined") {
-  if (typeof process === "undefined" || !process.env) {
-    throw new Error("[env] Server runtime without process.env — cannot validate.");
-  }
+let _serverValidated = false;
+
+function getValidatedServerEnv(): ServerEnv {
+  if (_serverValidated && _serverData) return _serverData;
+  _serverValidated = true;
+
+  // Read from CF env first (AsyncLocalStorage), then process.env fallback.
+  // This is the single entry point — never use process.env directly in
+  // server code (it doesn't see CF secrets in production).
+  const env = getEnv();
+
   const _serverResult = validateServerEnv({
-    SUPABASE_URL: process.env.SUPABASE_URL ?? process.env.VITE_SUPABASE_URL,
-    SUPABASE_PUBLISHABLE_KEY:
-      process.env.SUPABASE_PUBLISHABLE_KEY ?? process.env.VITE_SUPABASE_PUBLISHABLE_KEY,
-    SUPABASE_SERVICE_ROLE_KEY: process.env.SUPABASE_SERVICE_ROLE_KEY,
-    VEXO_API_KEY: process.env.VEXO_API_KEY,
-    VEXO_BASE_URL: process.env.VEXO_BASE_URL,
-    CRON_SECRET: process.env.CRON_SECRET,
+    SUPABASE_URL: env.SUPABASE_URL ?? env.VITE_SUPABASE_URL,
+    SUPABASE_PUBLISHABLE_KEY: env.SUPABASE_PUBLISHABLE_KEY ?? env.VITE_SUPABASE_PUBLISHABLE_KEY,
+    SUPABASE_SERVICE_ROLE_KEY: env.SUPABASE_SERVICE_ROLE_KEY,
+    VEXO_API_KEY: env.VEXO_API_KEY,
+    VEXO_BASE_URL: env.VEXO_BASE_URL,
+    CRON_SECRET: env.CRON_SECRET,
   });
   if (!_serverResult.ok) {
     throw new Error(
       `[env] Invalid server environment variables:\n${formatIssues(_serverResult.error)}\n` +
-        `Set these in Cloudflare Pages → Settings → Environment variables, ` +
+        `Set these in Cloudflare Workers → Settings → Variables/Secrets, ` +
         `or in .env (local dev — never commit).`,
     );
   }
   _serverData = _serverResult.data;
+  return _serverData;
 }
-export const serverEnv = _serverData as ServerEnv;
+
+// Lazy Proxy: first access triggers validation, subsequent reads return cached.
+export const serverEnv: ServerEnv = new Proxy({} as ServerEnv, {
+  get(_target, prop: string | symbol) {
+    const data = getValidatedServerEnv();
+    return data[prop as keyof ServerEnv];
+  },
+});
 
 // ──────────────────────────────────────────────────────────────────────
 // Optional server env (read at call time, not boot)
@@ -148,15 +169,18 @@ export const serverEnv = _serverData as ServerEnv;
 
 export const serverEnvOptional = {
   get VAPID_SUBJECT(): string {
-    return process.env?.VAPID_SUBJECT || "mailto:support@healthyu.id";
+    return getEnv().VAPID_SUBJECT || "mailto:support@healthyu.id";
   },
   get VAPID_PRIVATE_KEY(): string | undefined {
-    return process.env?.VAPID_PRIVATE_KEY;
+    const v = getEnv().VAPID_PRIVATE_KEY;
+    return typeof v === "string" ? v : undefined;
   },
   get GOOGLE_FIT_CLIENT_ID(): string | undefined {
-    return process.env?.GOOGLE_FIT_CLIENT_ID;
+    const v = getEnv().GOOGLE_FIT_CLIENT_ID;
+    return typeof v === "string" ? v : undefined;
   },
   get GOOGLE_FIT_CLIENT_SECRET(): string | undefined {
-    return process.env?.GOOGLE_FIT_CLIENT_SECRET;
+    const v = getEnv().GOOGLE_FIT_CLIENT_SECRET;
+    return typeof v === "string" ? v : undefined;
   },
 } as const;

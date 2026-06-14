@@ -15,24 +15,56 @@
  *     and is logged with its endpoint + latency for traceability.
  */
 
-const VEXO_BASE_URL = process.env.VEXO_BASE_URL || "https://vexoapi.dev";
+import { getEnv } from "@/lib/cloudflare-env.server";
 
-const MODEL_TO_VEXO_ENDPOINT: Record<string, string> = {
-  "google/gemini-2.5-flash": "gptoss120b",
-  "google/gemini-2.5-flash-lite": "glm47flash",
-  "google/gemini-2.5-pro": "gemini",
-  "google/gemini-3-flash-preview": "gptoss120b",
-  gptoss120b: "gptoss120b",
-  glm47flash: "glm47flash",
-  gemini: "gemini",
+function readVexoBaseUrl(): string {
+  // CF env first (AsyncLocalStorage) → process.env fallback. Default to
+  // official VexoAPI host if neither is configured.
+  return getEnv().VEXO_BASE_URL || "https://vexoapi.dev";
+}
+
+// New Vexo API (2026-06+): OpenAI-compatible
+// POST /api/v1/chat/completions with Bearer auth + {model, messages, ...}
+// Previously used GET /api/{endpoint}?key=... (DEPRECATED, returns 405)
+//
+// Tested free-tier working models (see docs/vexo-api-notes.md):
+//   - openai/gpt-oss-120b:free        (general, 120B, default)
+//   - llama-3.1-8b-instant            (fast, 8B, low-latency)
+//   - qwen/qwen3-32b                  (reasoning, 32B)
+//   - meta-llama/llama-3.3-70b-instruct:free (70B, free)
+//   - google/gemma-4-31b-it:free       (31B)
+const MODEL_TO_VEXO_MODEL: Record<string, string> = {
+  // Original Gemini-style identifiers used by callers
+  "google/gemini-2.5-flash": "openai/gpt-oss-120b:free",
+  "google/gemini-2.5-flash-lite": "llama-3.1-8b-instant",
+  "google/gemini-2.5-pro": "qwen/qwen3-32b",
+  "google/gemini-3-flash-preview": "openai/gpt-oss-120b:free",
+  // New direct names
+  "openai/gpt-oss-120b:free": "openai/gpt-oss-120b:free",
+  "llama-3.1-8b-instant": "llama-3.1-8b-instant",
+  "qwen/qwen3-32b": "qwen/qwen3-32b",
+  "meta-llama/llama-3.3-70b-instruct:free": "meta-llama/llama-3.3-70b-instruct:free",
+  "google/gemma-4-31b-it:free": "google/gemma-4-31b-it:free",
+  // Legacy short names (back-compat)
+  gptoss120b: "openai/gpt-oss-120b:free",
+  glm47flash: "llama-3.1-8b-instant",
+  gemini: "openai/gpt-oss-120b:free",
 };
 
 export function resolveVexoEndpoint(model: string): string {
-  return MODEL_TO_VEXO_ENDPOINT[model] ?? "gptoss120b";
+  return MODEL_TO_VEXO_MODEL[model] ?? "openai/gpt-oss-120b:free";
 }
 
-export function endpointSupportsImage(endpoint: string): boolean {
-  return endpoint === "gemini";
+// Models that have vision (image) capability on the new Vexo API.
+// None of the current free-tier models in /api/v1/models expose vision
+// (anthropic/claude-fable-5 likely does but is paid). Until we
+// subscribe to a vision model, image scans fall back to text-only.
+const VISION_MODELS = new Set<string>([
+  // Add vision-capable models here when subscribed
+]);
+
+export function endpointSupportsImage(model: string): boolean {
+  return VISION_MODELS.has(model);
 }
 
 export type AiMessage = { role: "system" | "user" | "assistant"; content: string };
@@ -147,8 +179,10 @@ export async function callVexoApi(opts: {
   temperature?: number;
   /** Override base backoff (ms). Doubles each attempt. */
   baseBackoffMs?: number;
+  /** Override max_tokens (default 2048). */
+  maxTokens?: number;
 }): Promise<{ data: string; latencyMs: number; attempts: number; requestId: string }> {
-  const apiKey = process.env.VEXO_API_KEY;
+  const apiKey = getEnv().VEXO_API_KEY;
   if (!apiKey) throw new VexoApiCallError("VEXO_API_KEY missing", 500);
 
   // Input validation — fail fast, don't hit the API with garbage.
@@ -169,7 +203,7 @@ export async function callVexoApi(opts: {
   }
   if (opts.imageUrl && !endpointSupportsImage(opts.endpoint)) {
     throw new VexoApiCallError(
-      `callVexoApi: imageUrl provided but endpoint "${opts.endpoint}" doesn't support images`,
+      `callVexoApi: imageUrl provided but model "${opts.endpoint}" doesn't support images`,
       400,
     );
   }
@@ -177,29 +211,39 @@ export async function callVexoApi(opts: {
   const maxAttempts = Math.min(Math.max(opts.maxAttempts ?? DEFAULT_MAX_ATTEMPTS, 1), 3);
   const baseBackoffMs = opts.baseBackoffMs ?? DEFAULT_BASE_BACKOFF_MS;
   const temperature = clamp01(opts.temperature ?? DEFAULT_TEMPERATURE);
+  const maxTokens = opts.maxTokens ?? 2048;
   const requestId = makeRequestId();
 
-  const params = new URLSearchParams();
-  params.set("key", apiKey);
-  if (opts.endpoint === "gemini" && opts.system) {
-    params.set("promptSystem", opts.system);
-  } else if (opts.system) {
-    params.set("system", opts.system);
-  }
-  params.set("text", opts.text);
-  if (opts.endpoint === "gemini" && opts.imageUrl) {
-    params.set("imageUrl", opts.imageUrl);
-  }
-  params.set("temperature", String(temperature));
+  // Build OpenAI-compatible messages array
+  const messages: { role: string; content: string }[] = [];
+  if (opts.system) messages.push({ role: "system", content: opts.system });
+  messages.push({ role: "user", content: opts.text });
 
-  const url = `${VEXO_BASE_URL}/api/${opts.endpoint}?${params.toString()}`;
+  const body = JSON.stringify({
+    model: opts.endpoint,
+    messages,
+    max_tokens: maxTokens,
+    temperature,
+    stream: false,
+  });
+
+  // New Vexo API: POST /api/v1/chat/completions with Bearer auth
+  const url = `${readVexoBaseUrl()}/api/v1/chat/completions`;
 
   let lastError: VexoApiCallError | null = null;
   const start = Date.now();
 
   for (let attempt = 1; attempt <= maxAttempts; attempt++) {
     try {
-      const result = await attemptOnce(url, opts.timeoutMs, opts.signal, requestId, attempt);
+      const result = await attemptOnce(
+        url,
+        body,
+        opts.timeoutMs,
+        opts.signal,
+        requestId,
+        attempt,
+        apiKey,
+      );
       return { ...result, attempts: attempt, requestId };
     } catch (e) {
       if (e instanceof VexoApiCallError) {
@@ -235,10 +279,12 @@ export async function callVexoApi(opts: {
 
 async function attemptOnce(
   url: string,
+  body: string,
   timeoutMs: number,
   parentSignal: AbortSignal | undefined,
   requestId: string,
   attempt: number,
+  apiKey: string,
 ): Promise<{ data: string; latencyMs: number }> {
   const ctrl = new AbortController();
   const timer = setTimeout(() => ctrl.abort("timeout"), timeoutMs);
@@ -254,9 +300,15 @@ async function attemptOnce(
   let res: Response;
   try {
     res = await fetch(url, {
-      method: "GET",
+      method: "POST",
+      body,
       signal: ctrl.signal,
-      headers: { "x-request-id": requestId, "x-attempt": String(attempt) },
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + apiKey,
+        "x-request-id": requestId,
+        "x-attempt": String(attempt),
+      },
     });
   } catch (e) {
     clearTimeout(timer);
@@ -280,41 +332,36 @@ async function attemptOnce(
     );
   }
   if (!res.ok) {
-    const body = await res.text().catch(() => "");
-    throw new VexoApiCallError(`AI gateway ${res.status}: ${body.slice(0, 200)}`, res.status);
+    const errBody = await res.text().catch(() => "");
+    throw new VexoApiCallError(`AI gateway ${res.status}: ${errBody.slice(0, 200)}`, res.status);
   }
 
+  // OpenAI-compatible response: { choices: [{ message: { content } }] }
   const json = (await res.json().catch(() => null)) as {
-    status?: boolean | number;
-    data?: string | { result?: string; text?: string; response?: string; output?: string };
-    error?: string;
+    choices?: Array<{ message?: { content?: string } }>;
+    content?: string;
+    text?: string;
+    error?: { message?: string };
     message?: string;
   } | null;
 
   if (!json) throw new VexoApiCallError("AI gateway returned invalid JSON", 502);
-  if (json.status === false || json.status === 0) {
-    throw new VexoApiCallError(
-      json.error || json.message || "AI gateway returned status:false",
-      502,
-    );
+
+  // Try OpenAI format first
+  if (json.choices && json.choices[0]?.message?.content) {
+    return { data: json.choices[0].message.content, latencyMs };
+  }
+  // Legacy / fallback formats
+  if (typeof json.content === "string") return { data: json.content, latencyMs };
+  if (typeof json.text === "string") return { data: json.text, latencyMs };
+  if (json.error?.message) {
+    throw new VexoApiCallError("AI gateway error: " + json.error.message, 502);
+  }
+  if (json.message) {
+    throw new VexoApiCallError("AI gateway error: " + json.message, 502);
   }
 
-  let text: string;
-  if (typeof json.data === "string") {
-    text = json.data;
-  } else if (json.data && typeof json.data === "object") {
-    const d = json.data as Record<string, unknown>;
-    text =
-      (typeof d.result === "string" ? d.result : null) ??
-      (typeof d.text === "string" ? d.text : null) ??
-      (typeof d.response === "string" ? d.response : null) ??
-      (typeof d.output === "string" ? d.output : null) ??
-      "";
-  } else {
-    text = "";
-  }
-
-  return { data: text, latencyMs };
+  throw new VexoApiCallError("AI gateway returned unexpected shape (no choices/content/text)", 502);
 }
 
 function sleep(ms: number, signal?: AbortSignal): Promise<void> {

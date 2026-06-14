@@ -11,6 +11,7 @@ import { checkChatSafety } from "@/features/chat/lib/chatSafety";
 import { moderateImage } from "@/features/moderation/lib/imageModeration.server";
 import { streamAiChat, AiGatewayError } from "@/features/ai/lib/aiStreamGateway.server";
 import { staticReplyStream, proxyUpstreamStream } from "@/features/chat/lib/chatStream.server";
+import { getEnv } from "@/lib/cloudflare-env.server";
 
 export const Route = createFileRoute("/api/chat/stream")({
   server: {
@@ -21,8 +22,10 @@ export const Route = createFileRoute("/api/chat/stream")({
           return new Response("Unauthorized", { status: 401 });
         }
         const token = auth.slice(7);
-        const SUPABASE_URL = process.env.SUPABASE_URL!;
-        const SUPABASE_PUBLISHABLE_KEY = process.env.SUPABASE_PUBLISHABLE_KEY!;
+        const env = getEnv();
+        const SUPABASE_URL = env.SUPABASE_URL ?? env.VITE_SUPABASE_URL ?? "";
+        const SUPABASE_PUBLISHABLE_KEY =
+          env.SUPABASE_PUBLISHABLE_KEY ?? env.VITE_SUPABASE_PUBLISHABLE_KEY ?? "";
 
         const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
           global: { headers: { Authorization: `Bearer ${token}` } },

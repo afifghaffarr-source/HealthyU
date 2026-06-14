@@ -16,6 +16,7 @@ import {
   AiGatewayError,
   AiSchemaError,
 } from "@/features/ai/lib/aiGateway.server";
+import { withMockedEnv } from "../cloudflare-env.server";
 
 const origKey = process.env.VEXO_API_KEY;
 const origFetch = globalThis.fetch;
@@ -40,14 +41,19 @@ afterEach(() => {
 const msgs = [{ role: "user" as const, content: "hi" }];
 
 /**
- * VexoAPI returns { status, data, timestamp } where data is a string
- * (or an object with result/text/response/output fields).
+ * VexoAPI (new OpenAI-compatible endpoint) returns
+ * { id, object, model, choices: [{ message: { content } }] }.
  */
-function vexoResponse(data: string | object, init?: ResponseInit) {
-  return new Response(JSON.stringify({ status: true, data, timestamp: "x" }), {
-    status: 200,
-    ...init,
-  });
+function vexoResponse(content: string, init?: ResponseInit) {
+  return new Response(
+    JSON.stringify({
+      id: "test-id",
+      object: "chat.completion",
+      model: "openai/gpt-oss-120b:free",
+      choices: [{ index: 0, message: { role: "assistant", content } }],
+    }),
+    { status: 200, ...init },
+  );
 }
 
 describe("callAiWithGuards", () => {
@@ -56,6 +62,22 @@ describe("callAiWithGuards", () => {
     await expect(
       callAiWithGuards({ userId: null, feature: "f", messages: msgs }),
     ).rejects.toBeInstanceOf(AiGatewayError);
+  });
+
+  // New env pattern: withMockedEnv sets a CF env context. This is the
+  // production-style mock; the other tests use process.env for legacy compat.
+  it("fails closed when VEXO_API_KEY missing in withMockedEnv", async () => {
+    await expect(
+      withMockedEnv({}, () => callAiWithGuards({ userId: null, feature: "f", messages: msgs })),
+    ).rejects.toBeInstanceOf(AiGatewayError);
+  });
+
+  it("succeeds when VEXO_API_KEY is in withMockedEnv", async () => {
+    mkFetch(async () => vexoResponse("ok"));
+    const out = await withMockedEnv({ VEXO_API_KEY: "test-key" }, () =>
+      callAiWithGuards({ userId: null, feature: "f", messages: msgs }),
+    );
+    expect(out).toBe("ok");
   });
 
   it("returns string content + logs estimated usage on success", async () => {
@@ -75,22 +97,34 @@ describe("callAiWithGuards", () => {
     expect(logged.completionTokens).toBeGreaterThan(0);
   });
 
-  it("unwraps {data: {result: '...'}} response shape", async () => {
-    mkFetch(async () => vexoResponse({ result: "from-result-field" }));
+  it("unwraps OpenAI choices[0].message.content response", async () => {
+    mkFetch(
+      async () =>
+        new Response(
+          JSON.stringify({
+            choices: [{ message: { content: "from-choices-field" } }],
+          }),
+          { status: 200 },
+        ),
+    );
     const out = await callAiWithGuards({
       userId: null,
       feature: "f",
       messages: msgs,
     });
-    expect(out).toBe("from-result-field");
+    expect(out).toBe("from-choices-field");
   });
 
-  it("sends a GET to vexoapi.dev with ?key=&text= query params", async () => {
+  it("sends POST to /api/v1/chat/completions with Bearer auth", async () => {
     let capturedUrl: string | undefined;
     let capturedMethod: string | undefined;
+    let capturedHeaders: Record<string, string> | undefined;
+    let capturedBody: string | undefined;
     mkFetch(async (input, init) => {
       capturedUrl = typeof input === "string" ? input : input.toString();
       capturedMethod = init?.method ?? "GET";
+      capturedHeaders = init?.headers as Record<string, string>;
+      capturedBody = init?.body as string;
       return vexoResponse("ok");
     });
     await callAiWithGuards({
@@ -98,10 +132,14 @@ describe("callAiWithGuards", () => {
       feature: "f",
       messages: [{ role: "user", content: "ping" }],
     });
-    expect(capturedMethod).toBe("GET");
-    expect(capturedUrl).toContain("https://vexoapi.dev/api/");
-    expect(capturedUrl).toContain("key=test-key");
-    expect(decodeURIComponent(capturedUrl ?? "")).toContain("ping");
+    expect(capturedMethod).toBe("POST");
+    expect(capturedUrl).toBe("https://vexoapi.dev/api/v1/chat/completions");
+    expect(capturedHeaders?.["Authorization"]).toBe("Bearer test-key");
+    expect(capturedHeaders?.["Content-Type"]).toBe("application/json");
+    const body = JSON.parse(capturedBody ?? "{}");
+    expect(body.model).toBe("openai/gpt-oss-120b:free");
+    expect(body.messages).toEqual([{ role: "user", content: "ping" }]);
+    expect(body.stream).toBe(false);
   });
 
   it("maps 429 to AiGatewayError(429)", async () => {
@@ -190,9 +228,9 @@ describe("callAiWithGuards", () => {
   });
 
   it("JSON mode appends hint to text and routes to JSON-extractable response", async () => {
-    let capturedUrl: string | undefined;
-    mkFetch(async (input) => {
-      capturedUrl = typeof input === "string" ? input : input.toString();
+    let capturedBody: string | undefined;
+    mkFetch(async (_input, init) => {
+      capturedBody = init?.body as string;
       return vexoResponse('{"a":1}');
     });
     await callAiWithGuards({
@@ -201,11 +239,10 @@ describe("callAiWithGuards", () => {
       messages: msgs,
       responseFormat: "json_object",
     });
-    // Hint should be appended to the prompt (URL-encoded + is space in
-    // query strings; URLSearchParams parses it correctly for us).
-    const url = new URL(capturedUrl ?? "");
-    const text = url.searchParams.get("text") ?? "";
-    expect(text).toContain("Respond with valid JSON");
+    // Hint should be appended to the user message in the request body.
+    const body = JSON.parse(capturedBody ?? "{}");
+    const userMessage = body.messages.find((m: { role: string }) => m.role === "user");
+    expect(userMessage.content).toContain("Respond with valid JSON");
   });
 });
 

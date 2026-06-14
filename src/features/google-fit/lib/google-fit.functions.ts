@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { getEnv } from "@/lib/cloudflare-env.server";
 
 type QueryableClient = {
   from: (table: string) => {
@@ -56,7 +57,7 @@ export const startGoogleFit = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((i: unknown) => z.object({ origin: z.string().url() }).parse(i))
   .handler(async ({ data, context }) => {
-    const clientId = process.env.GOOGLE_FIT_CLIENT_ID;
+    const clientId = getEnv().GOOGLE_FIT_CLIENT_ID;
     if (!clientId) throw new Error("GOOGLE_FIT_CLIENT_ID belum di-set");
     // Generate signed nonce, persist via service role
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
@@ -117,8 +118,9 @@ async function refreshIfNeeded(supabase: QueryableClient, userId: string): Promi
   const expires = new Date(row.expires_at as string).getTime();
   if (expires - Date.now() > 60_000) return row.access_token as string;
 
-  const clientId = process.env.GOOGLE_FIT_CLIENT_ID!;
-  const clientSecret = process.env.GOOGLE_FIT_CLIENT_SECRET!;
+  const env = getEnv();
+  const clientId = env.GOOGLE_FIT_CLIENT_ID!;
+  const clientSecret = env.GOOGLE_FIT_CLIENT_SECRET!;
   const res = await fetch("https://oauth2.googleapis.com/token", {
     method: "POST",
     headers: { "Content-Type": "application/x-www-form-urlencoded" },

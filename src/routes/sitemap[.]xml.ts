@@ -32,6 +32,9 @@ export const Route = createFileRoute("/sitemap.xml")({
     handlers: {
       GET: async () => {
         const today = new Date().toISOString().split("T")[0];
+        // supabaseAdmin is a Proxy in client.server.ts that resolves CF env
+        // (AsyncLocalStorage) on first access. Works in both CF Workers
+        // (production) and local dev (process.env fallback).
         const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
         const [foods, exercises, diets, articles, recipes] = await Promise.all([
           supabaseAdmin.from("seo_foods").select("slug").eq("published", true),

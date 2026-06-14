@@ -1,7 +1,8 @@
 // Kunci publik VAPID — aman ditampilkan di client.
 // Pasangan privatnya disimpan sebagai secret server (VAPID_PRIVATE_KEY).
+// Generated 2026-06-14 via `bunx web-push generate-vapid-keys`
 export const VAPID_PUBLIC_KEY =
-  "BEEsUyrtTajRuRuFKX16qJcf1C9HE27ZBnKCaee00lkaUjVxFJURW0Bfny6_jaJW9w3ZXrrf8be9b64j-slXaJk";
+  "BEEW2-_Ozvcuye-VtIMl3ui-0HU5lCg_jAoFIPQEh33FaqKaPSkTfccTHIWpTA-AHqpLIc-VURMq_wVe4UlklV4";
 
 export function urlBase64ToUint8Array(base64String: string): Uint8Array {
   const padding = "=".repeat((4 - (base64String.length % 4)) % 4);

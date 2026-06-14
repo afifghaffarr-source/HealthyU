@@ -2,6 +2,7 @@ import "./lib/error-capture";
 
 import { consumeLastCapturedError } from "./lib/error-capture";
 import { renderErrorPage } from "./lib/error-page";
+import { withEnv, type CloudflareEnv } from "./lib/cloudflare-env.server";
 
 type ServerEntry = {
   fetch: (request: Request, env: unknown, ctx: unknown) => Promise<Response> | Response;
@@ -80,19 +81,23 @@ function withSecurityHeaders(response: Response): Response {
 
 export default {
   async fetch(request: Request, env: unknown, ctx: unknown) {
-    try {
-      const handler = await getServerEntry();
-      const response = await handler.fetch(request, env, ctx);
-      const normalized = await normalizeCatastrophicSsrResponse(response);
-      return withSecurityHeaders(normalized);
-    } catch (error) {
-      console.error(error);
-      return withSecurityHeaders(
-        new Response(renderErrorPage(), {
-          status: 500,
-          headers: { "content-type": "text/html; charset=utf-8" },
-        }),
-      );
-    }
+    // Wrap the entire request lifecycle in an AsyncLocalStorage scope so that
+    // getEnv() inside any handler/loader can read CF bindings (vars + secrets).
+    return withEnv(env as CloudflareEnv, async () => {
+      try {
+        const handler = await getServerEntry();
+        const response = await handler.fetch(request, env, ctx);
+        const normalized = await normalizeCatastrophicSsrResponse(response);
+        return withSecurityHeaders(normalized);
+      } catch (error) {
+        console.error(error);
+        return withSecurityHeaders(
+          new Response(renderErrorPage(), {
+            status: 500,
+            headers: { "content-type": "text/html; charset=utf-8" },
+          }),
+        );
+      }
+    });
   },
 };

@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { oauthStateErrorMessage, validateOAuthState } from "@/lib/oauthState";
+import { getEnv } from "@/lib/cloudflare-env.server";
 
 export const Route = createFileRoute("/api/wearable/google-fit/callback")({
   server: {
@@ -12,8 +13,9 @@ export const Route = createFileRoute("/api/wearable/google-fit/callback")({
         if (err) return redirectBack(url.origin, `Google Fit: ${err}`);
         if (!code || !state) return redirectBack(url.origin, "Parameter OAuth tidak lengkap");
 
-        const clientId = process.env.GOOGLE_FIT_CLIENT_ID;
-        const clientSecret = process.env.GOOGLE_FIT_CLIENT_SECRET;
+        const env = getEnv();
+        const clientId = env.GOOGLE_FIT_CLIENT_ID;
+        const clientSecret = env.GOOGLE_FIT_CLIENT_SECRET;
         if (!clientId || !clientSecret) {
           return redirectBack(url.origin, "Server belum di-set GOOGLE_FIT credentials");
         }

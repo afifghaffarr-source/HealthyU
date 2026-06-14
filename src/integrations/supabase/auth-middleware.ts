@@ -3,18 +3,22 @@ import { createMiddleware } from "@tanstack/react-start";
 import { getRequest } from "@tanstack/react-start/server";
 import { createClient } from "@supabase/supabase-js";
 import type { Database } from "./types";
+import { getEnv } from "@/lib/cloudflare-env.server";
 
 export const requireSupabaseAuth = createMiddleware({ type: "function" }).server(
   async ({ next }) => {
-    const SUPABASE_URL = process.env.SUPABASE_URL;
-    const SUPABASE_PUBLISHABLE_KEY = process.env.SUPABASE_PUBLISHABLE_KEY;
+    // Read from CF env first (AsyncLocalStorage), then VITE_* fallback for SSR/build.
+    const env = getEnv();
+    const SUPABASE_URL = env.SUPABASE_URL ?? env.VITE_SUPABASE_URL;
+    const SUPABASE_PUBLISHABLE_KEY =
+      env.SUPABASE_PUBLISHABLE_KEY ?? env.VITE_SUPABASE_PUBLISHABLE_KEY;
 
     if (!SUPABASE_URL || !SUPABASE_PUBLISHABLE_KEY) {
       const missing = [
         ...(!SUPABASE_URL ? ["SUPABASE_URL"] : []),
         ...(!SUPABASE_PUBLISHABLE_KEY ? ["SUPABASE_PUBLISHABLE_KEY"] : []),
       ];
-      const message = `Missing Supabase environment variable(s): ${missing.join(", ")}. Set them in .env (see .env.example).`;
+      const message = `Missing Supabase environment variable(s): ${missing.join(", ")}. Set them in Cloudflare Workers → Settings → Variables/Secrets (production) or .env (local dev).`;
       console.error(`[Supabase] ${message}`);
       throw new Error(message);
     }

@@ -5,7 +5,23 @@
   "compatibility_flags": ["nodejs_compat"],
   "main": "@tanstack/react-start/server-entry",
   "vars": {
-    "NODE_ENV": "production"
+    "NODE_ENV": "production",
+    "VITE_SUPABASE_URL": "https://lezbpzpkvkdpbjvtvoei.supabase.co",
+    "VITE_SUPABASE_PUBLISHABLE_KEY": "sb_publishable_66jMJijY4c8mdbHJxXaqnA_VzS7r-1D",
+    "VITE_SUPABASE_PROJECT_ID": "lezbpzpkvkdpbjvtvoei",
+    "VITE_VAPID_PUBLIC_KEY": "BEEW2-_Ozvcuye-VtIMl3ui-0HU5lCg_jAoFIPQEh33FaqKaPSkTfccTHIWpTA-AHqpLIc-VURMq_wVe4UlklV4",
+    "VAPID_SUBJECT": "mailto:support@healthyu.id"
+  },
+  "secrets": {
+    "required": [
+      "SUPABASE_URL",
+      "SUPABASE_SERVICE_ROLE_KEY",
+      "VEXO_API_KEY",
+      "VEXO_BASE_URL",
+      "CRON_SECRET",
+      "VAPID_PRIVATE_KEY",
+      "VAPID_PUBLIC_KEY"
+    ]
   },
   "observability": {
     "enabled": true

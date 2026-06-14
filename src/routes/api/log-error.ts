@@ -3,6 +3,7 @@ import { createClient } from "@supabase/supabase-js";
 import { z } from "zod";
 import type { Database } from "@/integrations/supabase/types";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
+import { getEnv } from "@/lib/cloudflare-env.server";
 
 const ErrorPayloadSchema = z.object({
   source: z.string().min(1).max(64),
@@ -36,8 +37,10 @@ export const Route = createFileRoute("/api/log-error")({
           const auth = request.headers.get("authorization");
           if (auth?.startsWith("Bearer ")) {
             const token = auth.slice(7);
-            const SUPABASE_URL = process.env.SUPABASE_URL;
-            const SUPABASE_PUBLISHABLE_KEY = process.env.SUPABASE_PUBLISHABLE_KEY;
+            const env = getEnv();
+            const SUPABASE_URL = env.SUPABASE_URL ?? env.VITE_SUPABASE_URL;
+            const SUPABASE_PUBLISHABLE_KEY =
+              env.SUPABASE_PUBLISHABLE_KEY ?? env.VITE_SUPABASE_PUBLISHABLE_KEY;
             if (SUPABASE_URL && SUPABASE_PUBLISHABLE_KEY) {
               const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
                 auth: { persistSession: false, autoRefreshToken: false },
