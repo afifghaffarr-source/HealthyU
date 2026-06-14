@@ -9,5 +9,9 @@
   },
   "observability": {
     "enabled": true
-  }
+  },
+  "routes": [
+    { "pattern": "healthyu.web.id/*", "zone_name": "healthyu.web.id" },
+    { "pattern": "www.healthyu.web.id/*", "zone_name": "healthyu.web.id" }
+  ]
 }
