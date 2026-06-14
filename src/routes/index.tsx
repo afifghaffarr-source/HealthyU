@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
+import { APP_CONFIG } from "@/config/app";
 import { supabase } from "@/integrations/supabase/client";
 import { BmrQuiz } from "@/features/landing/components/BmrQuiz";
 import { FloatingChat } from "@/features/landing/components/FloatingChat";
@@ -56,7 +57,7 @@ export const Route = createFileRoute("/")({
         content: "Diet personal, puasa, jadwal sholat, dan AI coach.",
       },
     ],
-    links: [{ rel: "canonical", href: "https://healthyu.id/" }],
+    links: [{ rel: "canonical", href: `${APP_CONFIG.siteUrl}/` }],
     scripts: [
       {
         type: "application/ld+json",

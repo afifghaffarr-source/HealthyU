@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import { Link } from "@tanstack/react-router";
+import { APP_CONFIG } from "@/config/app";
 
 interface BreadcrumbItem {
   name: string;
@@ -70,7 +71,7 @@ export function breadcrumbSchema(items: BreadcrumbItem[]) {
       "@type": "ListItem",
       position: i + 1,
       name: b.name,
-      item: `https://healthyu.id${b.to === "/" ? "" : b.to}`,
+      item: `${APP_CONFIG.siteUrl}${b.to === "/" ? "" : b.to}`,
     })),
   };
 }

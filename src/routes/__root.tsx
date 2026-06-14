@@ -41,14 +41,14 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { property: "og:type", content: "website" },
       { property: "og:site_name", content: "HealthyU" },
       { property: "og:locale", content: "id_ID" },
-      { property: "og:image", content: "https://healthyu.id/icon-512.svg" },
+      { property: "og:image", content: `${APP_CONFIG.siteUrl}/icon-512.svg` },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:title", content: "HealthyU — Sahabat Sehat Berbasis AI" },
       {
         name: "twitter:description",
         content: "Diet, puasa, dan kesehatan holistik berbasis AI untuk Indonesia.",
       },
-      { name: "twitter:image", content: "https://healthyu.id/icon-512.svg" },
+      { name: "twitter:image", content: `${APP_CONFIG.siteUrl}/icon-512.svg` },
       { name: "theme-color", content: "#6B8E5A" },
       { name: "apple-mobile-web-app-capable", content: "yes" },
       { name: "apple-mobile-web-app-status-bar-style", content: "default" },
@@ -86,21 +86,21 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
           "@graph": [
             {
               "@type": "Organization",
-              "@id": "https://healthyu.id/#organization",
+              "@id": `${APP_CONFIG.siteUrl}/#organization`,
               name: "HealthyU",
-              url: "https://healthyu.id",
-              logo: "https://healthyu.id/icon-512.svg",
+              url: APP_CONFIG.siteUrl,
+              logo: `${APP_CONFIG.siteUrl}/icon-512.svg`,
               description:
                 "Aplikasi diet, puasa, dan kesehatan holistik berbasis AI untuk Indonesia.",
               sameAs: [],
             },
             {
               "@type": "WebSite",
-              "@id": "https://healthyu.id/#website",
-              url: "https://healthyu.id",
+              "@id": `${APP_CONFIG.siteUrl}/#website`,
+              url: APP_CONFIG.siteUrl,
               name: "HealthyU",
               inLanguage: "id-ID",
-              publisher: { "@id": "https://healthyu.id/#organization" },
+              publisher: { "@id": `${APP_CONFIG.siteUrl}/#organization` },
               potentialAction: {
                 "@type": "SearchAction",
                 target: `${APP_CONFIG.siteUrl}/cari?q={search_term_string}`,
@@ -110,7 +110,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
             {
               "@type": "WebApplication",
               name: "HealthyU",
-              url: "https://healthyu.id",
+              url: APP_CONFIG.siteUrl,
               applicationCategory: "HealthApplication",
               operatingSystem: "Web, iOS, Android",
               offers: { "@type": "Offer", price: "0", priceCurrency: "IDR" },
