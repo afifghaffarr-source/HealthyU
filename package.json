@@ -7,6 +7,7 @@
     "dev": "vite dev",
     "build": "NODE_OPTIONS=--max-old-space-size=4096 vite build",
     "build:dev": "NODE_OPTIONS=--max-old-space-size=4096 vite build --mode development",
+    "deploy": "bun run build && wrangler deploy",
     "preview": "vite preview",
     "lint": "eslint .",
     "lint:constants": "eslint src/lib/constants.ts",
@@ -90,6 +91,7 @@
     "zod": "^3.24.2"
   },
   "devDependencies": {
+    "@cloudflare/vite-plugin": "^1.40.2",
     "@commitlint/cli": "^21.0.2",
     "@commitlint/config-conventional": "^21.0.2",
     "@eslint/js": "^9.32.0",

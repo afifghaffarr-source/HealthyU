@@ -1,0 +1,107 @@
+#!/usr/bin/env node
+// Postbuild: convert @cloudflare/vite-plugin output into CF Pages format.
+//
+// The plugin outputs:
+//   dist/server/server.js    <- Worker source (imports ./assets/...)
+//   dist/server/assets/*      <- Server-side chunks (imported by server.js)
+//   dist/client/assets/*      <- Client-side chunks (referenced by client HTML)
+//   dist/client/{manifest,robots,push-sw}  <- Other static files
+//   dist/{server,client}/wrangler.json     <- Auto-generated, conflicts with pages_build_output_dir
+//
+// CF Pages expects:
+//   dist/_worker.js           <- Worker at the root
+//   dist/assets/*             <- All static chunks (client + server, same dir)
+//   dist/{manifest.json,...}  <- Other static files
+//
+// The Worker's `import "./assets/..."` is resolved at deploy time by wrangler
+// (which inlines the module into the Worker bundle). The same files are also
+// served by Pages' static asset handler when the browser requests /assets/...
+//
+// This script:
+//   1. Removes auto-generated wrangler.json (conflicts with pages_build_output_dir)
+//   2. Copies dist/server/server.js -> dist/_worker.js
+//   3. Merges dist/server/assets/ + dist/client/assets/ -> dist/assets/
+//   4. Copies dist/client/{manifest.json, robots.txt, push-sw.js, .assetsignore, icon-*.svg}
+//      to dist/ root
+//   5. Removes dist/server/ and dist/client/ (not needed in final output)
+
+import { rmSync, cpSync, existsSync, mkdirSync, readdirSync } from "node:fs";
+import { join } from "node:path";
+
+const root = process.cwd();
+const dist = join(root, "dist");
+
+console.log("[postbuild-cf] Converting @cloudflare/vite-plugin output to CF Pages format...");
+
+// 1. Remove the auto-generated wrangler.json (it conflicts with pages_build_output_dir)
+const autoWranglerLocations = [
+  join(dist, "server", "wrangler.json"),
+  join(dist, "client", "wrangler.json"),
+];
+for (const loc of autoWranglerLocations) {
+  if (existsSync(loc)) {
+    rmSync(loc);
+    console.log(`  ✓ Removed ${loc.replace(root + "/", "")}`);
+  }
+}
+
+// 2. Copy dist/server/server.js -> dist/_worker.js
+const serverIndex = join(dist, "server", "server.js");
+const workerTarget = join(dist, "_worker.js");
+if (existsSync(serverIndex)) {
+  cpSync(serverIndex, workerTarget);
+  console.log("  ✓ Copied dist/server/server.js -> dist/_worker.js");
+} else {
+  console.error("  ✗ dist/server/server.js not found — was the build successful?");
+  process.exit(1);
+}
+
+// 3. Merge dist/server/assets/ + dist/client/assets/ -> dist/assets/
+const rootAssets = join(dist, "assets");
+if (existsSync(rootAssets)) rmSync(rootAssets, { recursive: true });
+mkdirSync(rootAssets, { recursive: true });
+
+const serverAssets = join(dist, "server", "assets");
+const clientAssets = join(dist, "client", "assets");
+
+if (existsSync(serverAssets)) {
+  for (const file of readdirSync(serverAssets)) {
+    cpSync(join(serverAssets, file), join(rootAssets, file));
+  }
+  console.log(`  ✓ Copied dist/server/assets/* -> dist/assets/ (${readdirSync(serverAssets).length} files)`);
+}
+if (existsSync(clientAssets)) {
+  let copied = 0;
+  for (const file of readdirSync(clientAssets)) {
+    const target = join(rootAssets, file);
+    if (!existsSync(target)) {
+      cpSync(join(clientAssets, file), target);
+      copied++;
+    }
+  }
+  console.log(`  ✓ Copied dist/client/assets/* -> dist/assets/ (${copied} new files, server assets take precedence)`);
+}
+
+// 4. Copy dist/client/{manifest.json, robots.txt, push-sw.js, .assetsignore, icon-*.svg} to dist/
+const clientDir = join(dist, "client");
+if (existsSync(clientDir)) {
+  for (const entry of readdirSync(clientDir)) {
+    const src = join(clientDir, entry);
+    const dst = join(dist, entry);
+    if (entry === "assets" || entry === "wrangler.json") continue; // already handled
+    if (existsSync(dst)) rmSync(dst, { recursive: true });
+    cpSync(src, dst, { recursive: true });
+  }
+  console.log("  ✓ Copied dist/client/* -> dist/");
+}
+
+// 5. Remove dist/server/ and dist/client/ (no longer needed in final output)
+rmSync(join(dist, "server"), { recursive: true });
+rmSync(join(dist, "client"), { recursive: true });
+console.log("  ✓ Cleaned up dist/server/ and dist/client/");
+
+console.log("[postbuild-cf] Done. dist/ is now CF Pages-compatible.");
+console.log("[postbuild-cf] Final structure:");
+const finalFiles = readdirSync(dist).slice(0, 20);
+for (const f of finalFiles) console.log("   " + f);
+if (readdirSync(dist).length > 20) console.log(`   ... and ${readdirSync(dist).length - 20} more`);

@@ -21,9 +21,14 @@ import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
 import tsConfigPaths from "vite-tsconfig-paths";
 import { visualizer } from "rollup-plugin-visualizer";
+import { cloudflare } from "@cloudflare/vite-plugin";
 
 export default defineConfig({
   plugins: [
+    // @cloudflare/vite-plugin required for Cloudflare Workers deployment per
+    // official TanStack Start docs:
+    // https://tanstack.com/start/latest/docs/framework/react/guide/hosting#cloudflare-workers
+    cloudflare({ viteEnvironment: { name: "ssr" } }),
     tsConfigPaths(),
     tailwindcss(),
     tanstackStart({
