@@ -15,19 +15,11 @@ import { withEnv, type CloudflareEnv } from "@/lib/cloudflare-env.server";
  * without prop-drilling.
  */
 const envInjectionMiddleware = createMiddleware().server(async ({ context, next }) => {
-  // DEBUG: trace what context actually contains
+  // Unwrap if needed: if context is {context: env}, use ctx.context.
+  // This handles the custom server-entry.ts wrapper (passes env as requestOpts.context)
+  // AND the default TanStack entry (passes env directly as context).
   const ctx = context as Record<string, unknown> | undefined;
-  const ctxKeys = ctx ? Object.keys(ctx) : [];
-  const ctxIsEnv = ctx && ("SUPABASE_URL" in ctx || "VEXO_API_KEY" in ctx);
   const ctxHasNestedContext = ctx && "context" in ctx && typeof ctx.context === "object";
-  const nestedKeys =
-    ctx && "context" in ctx && ctx.context && typeof ctx.context === "object"
-      ? Object.keys(ctx.context as Record<string, unknown>)
-      : [];
-  console.log(
-    `[DEBUG envInjection] keys=[${ctxKeys.join(",")}] isEnv=${!!ctxIsEnv} hasNestedContext=${!!ctxHasNestedContext} nestedKeys=[${nestedKeys.join(",")}]`,
-  );
-  // Unwrap if needed: if context is {context: env}, use ctx.context
   const envToInject = ctxHasNestedContext
     ? (ctx.context as unknown as CloudflareEnv)
     : (context as unknown as CloudflareEnv);

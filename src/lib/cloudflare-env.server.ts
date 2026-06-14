@@ -75,11 +75,6 @@ export function withEnv<T>(env: CloudflareEnv, fn: () => T): T {
 export function getEnv(): CloudflareEnv {
   const stored = envStorage.getStore();
   const fromProcess = readProcessEnv();
-  const storedKeys = stored ? Object.keys(stored) : [];
-  const processKeys = Object.keys(fromProcess);
-  console.log(
-    `[DEBUG getEnv] stored=${!!stored}, storedKeys=[${storedKeys.join(",")}], processKeys=[${processKeys.join(",")}]`,
-  );
   if (stored) {
     return { ...fromProcess, ...stored };
   }
