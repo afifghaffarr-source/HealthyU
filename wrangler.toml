@@ -3,27 +3,16 @@ compatibility_date = "2024-09-23"
 compatibility_flags = ["nodejs_compat"]
 pages_build_output_dir = "./dist"
 
-# Build configuration (set via CF Pages dashboard; mirror here for reference)
-[build]
-command = "bun run build"
-
-# These must also be set in CF Pages dashboard:
-#   Settings → Build & deployments → Build configurations
+# These MUST be set in CF Pages dashboard (Build & deployments section):
 #   - Build command: bun run build
 #   - Build output directory: dist
 #   - Root directory: (empty)
-#   - Build comments on PRs: enabled
+# The wrangler.toml Pages schema doesn't accept [build] section (Workers only).
+# Set via dashboard or first push will use Cloudflare's auto-detection.
 
-# Production secrets (set via CF Pages dashboard or wrangler pages secret put)
-# Runtime secrets:
-#   SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, SUPABASE_SERVICE_ROLE_KEY
-#   VEXO_API_KEY, VEXO_BASE_URL
-#   CRON_SECRET, VAPID_SUBJECT, VAPID_PRIVATE_KEY
-#   GOOGLE_FIT_CLIENT_ID, GOOGLE_FIT_CLIENT_SECRET
-# Build env vars (VITE_*, inlined at build time):
-#   VITE_SUPABASE_URL
-#   VITE_SUPABASE_PUBLISHABLE_KEY
-#   VITE_SUPABASE_PROJECT_ID
+# Production secrets are managed via:
+#   wrangler pages secret put <KEY> --project-name healthyu
+# Build env vars (VITE_*) are managed via CF dashboard or PATCH /pages/projects.
 
 [vars]
 # Public, non-secret build-time constants
