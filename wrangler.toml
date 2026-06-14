@@ -3,16 +3,26 @@ compatibility_date = "2024-09-23"
 compatibility_flags = ["nodejs_compat"]
 pages_build_output_dir = "./dist"
 
-# These MUST be set in CF Pages dashboard (Build & deployments section):
-#   - Build command: bun run build
-#   - Build output directory: dist
-#   - Root directory: (empty)
-# The wrangler.toml Pages schema doesn't accept [build] section (Workers only).
-# Set via dashboard or first push will use Cloudflare's auto-detection.
+# Cloudflare Pages build config (set via dashboard, mirrored here for reference).
+# Actual command in CF Pages dashboard is:
+#   bun install --frozen-lockfile && bun run build
+# Output dir: dist
+# Root dir: (empty)
+# - bun install needed first because Cloudflare Pages doesn't auto-install deps
+#   when Bun is the package manager
+# - bun run build sets NODE_OPTIONS=--max-old-space-size=4096 to avoid V8 OOM
+#   (45 .functions.ts + 130 routes bundle to single Cloudflare Worker)
 
-# Production secrets are managed via:
-#   wrangler pages secret put <KEY> --project-name healthyu
-# Build env vars (VITE_*) are managed via CF dashboard or PATCH /pages/projects.
+# Build env vars (set in CF dashboard, see deployment_configs.production.env_vars):
+#   - NODE_OPTIONS=--max-old-space-size=4096
+#   - VITE_SUPABASE_URL, VITE_SUPABASE_PUBLISHABLE_KEY, VITE_SUPABASE_PROJECT_ID
+#     (inlined at build time into the client bundle)
+
+# Runtime secrets (set via wrangler pages secret put, see wrangler pages secret list):
+#   - SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, SUPABASE_SERVICE_ROLE_KEY
+#   - VEXO_API_KEY, VEXO_BASE_URL
+#   - CRON_SECRET, VAPID_SUBJECT, VAPID_PRIVATE_KEY
+#   - GOOGLE_FIT_CLIENT_ID, GOOGLE_FIT_CLIENT_SECRET
 
 [vars]
 # Public, non-secret build-time constants
