@@ -34,8 +34,8 @@ function ArticlesPage() {
     onError: (e: Error) => toast.error(e.message),
   });
 
-  const articles = data?.articles ?? [];
-  const bookmarks = new Set(data?.bookmarks ?? []);
+  const articles = useMemo(() => data?.articles ?? [], [data]);
+  const bookmarks = useMemo(() => new Set(data?.bookmarks ?? []), [data]);
 
   const categories = useMemo(() => {
     const map = new Map<string, number>();
