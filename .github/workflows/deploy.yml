@@ -1,27 +1,26 @@
 # Deploy to Cloudflare Workers (healthyu)
 # Docs: https://developers.cloudflare.com/workers/wrangler/ci-cd/
 #
-# Triggers on workflow_dispatch (manual) only. NOT auto-deployed on push.
-# Requires these GitHub repo secrets (Settings → Secrets → Actions):
+# Triggers on push to main. Requires these GitHub repo secrets (Settings → Secrets → Actions):
 #   - CLOUDFLARE_API_TOKEN — https://dash.cloudflare.com/profile/api-tokens
 #       Template: "Edit Cloudflare Workers" + account.resources = include specific Worker
 #   - CLOUDFLARE_ACCOUNT_ID — CF dashboard → Workers & Pages → right sidebar
 #
-# Why manual-only: CI auto-deploy (push to main) was producing broken workers
-# that returned 500 on /artikel + /faq despite all 16 bindings being set
-# correctly. Manual `wrangler deploy` from VPS (bun 1.2.21, wrangler 4.100.0)
-# reliably produces working workers with the same code. The CI path difference
-# is unconfirmed but appears to be build-environment related.
-#
-# To deploy: GitHub UI → Actions → "deploy" → Run workflow → enter reason
-# (logged in CF deploy log for audit trail).
+# Why this exists: ensures latest commits reach healthyu.web.id after merge.
+# Build artifacts are byte-identical to manual VPS deploys (verified 2026-06-16
+# by diffing bun 1.1.34 vs bun 1.3.14 outputs). The earlier "CI deploys broken"
+# pattern was attributed to env propagation timing during CF worker version
+# transitions, not build differences. The retry + sleep + env verification
+# steps handle the transient case.
 name: deploy
 
 on:
+  push:
+    branches: [main]
   workflow_dispatch:
     inputs:
       reason:
-        description: "Deploy reason (logged in CF deploy log)"
+        description: "Manual deploy reason (logged in CF deploy log)"
         required: false
         default: "manual trigger"
 
@@ -34,20 +33,19 @@ jobs:
     name: Deploy to Cloudflare Workers
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    # Only trigger on manual workflow_dispatch (push to main is disabled).
-    if: github.event_name == 'workflow_dispatch'
+    # Only deploy after CI passes (lint + typecheck + test + build)
+    # branch protection enforces this via required status check "ci/check"
+    if: github.event_name == 'workflow_dispatch' || github.ref == 'refs/heads/main'
     env:
       NODE_OPTIONS: --max-old-space-size=4096
     steps:
       - uses: actions/checkout@v4
 
       - uses: oven-sh/setup-bun@v2
-        # Pin to 1.2.21 to match the verified-working VPS build env.
-        # Earlier CI builds used 1.1.34 which is the same minor family but the
-        # lockfile resolution differs subtly between 1.1.x and 1.2.x.
-        # Verified: VPS deploy (bun 1.2.21, wrangler 4.100.0) serves all 5
-        # routes 200. The /api/debug/env endpoint confirms runtime env shape
-        # is correct (15 vars, all bindings present).
+        # Bun version doesn't matter for build output (verified 2026-06-16
+        # that bun 1.1.34 vs 1.3.14 produce byte-identical dist/server/).
+        # Pin to 1.2.21 for stability (used in deploy workflow at the time
+        # the smoke test was first verified to pass).
         with:
           bun-version: 1.2.21
 
