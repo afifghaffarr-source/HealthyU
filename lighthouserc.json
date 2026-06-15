@@ -1,7 +1,7 @@
 {
   "ci": {
     "collect": {
-      "startServerCommand": "set -a && . ./.dev.vars && set +a && exec bunx vite preview --port 4173 --strictPort",
+      "startServerCommand": "bunx vite preview --port 4173 --strictPort",
       "startServerReadyPattern": "Local:",
       "url": [
         "http://localhost:4173/",
