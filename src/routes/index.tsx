@@ -104,7 +104,7 @@ function Index() {
   };
 
   return (
-    <main className="min-h-dvh bg-background text-foreground relative overflow-x-clip">
+    <main role="main" className="min-h-dvh bg-background text-foreground relative overflow-x-clip">
       {confetti && <ConfettiBurst />}
       <LandingBackdrop />
 

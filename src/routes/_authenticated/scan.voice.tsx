@@ -119,7 +119,7 @@ function VoicePage() {
   return (
     <div className="min-h-dvh pb-24 bg-background">
       <TopAppBar title="Catat via Suara" showBack />
-      <main className="max-w-md mx-auto px-4 pt-2 space-y-4">
+      <main role="main" className="max-w-md mx-auto px-4 pt-2 space-y-4">
         {!supported && (
           <div className="rounded-xl bg-destructive/10 text-destructive text-xs p-3">
             Browser tidak mendukung speech recognition. Coba Chrome/Edge.

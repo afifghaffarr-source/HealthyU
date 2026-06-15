@@ -56,7 +56,7 @@ export function LandingHero({
           <Link
             to={ctaPrimary}
             onClick={onCtaClick}
-            className="group relative overflow-hidden text-center bg-gradient-to-r from-primary to-primary-dark text-primary-foreground font-semibold py-4 px-6 rounded-2xl shadow-xl shadow-primary/30 hover:shadow-2xl hover:shadow-primary/40 hover:-translate-y-0.5 transition-all"
+            className="group relative overflow-hidden text-center bg-primary-dark text-primary-foreground font-semibold py-4 px-6 rounded-2xl shadow-xl shadow-primary/30 hover:shadow-2xl hover:shadow-primary/40 hover:-translate-y-0.5 transition-all"
           >
             <span className="relative z-10 inline-flex items-center gap-2 justify-center">
               {ctaPrimaryLabel}
