@@ -1,10 +1,9 @@
 import { Camera, Film, Loader2, Trash2 } from "lucide-react";
-import { Suspense, lazy, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { toast } from "sonner";
 import { toastError } from "@/lib/toast-config";
 import { generateTimelapse } from "@/lib/timelapse";
-
-const ProgressRadialChart = lazy(() => import("@/components/charts/progress-radial-chart"));
+import { ClientChart } from "@/components/ClientChart";
 
 type GoalDatum = { name: string; value: number; fill: string };
 
@@ -15,9 +14,15 @@ export function GoalRadialCard({ data }: { data: GoalDatum[] }) {
         Goal Harian
       </p>
       <div className="h-44">
-        <Suspense fallback={<div className="size-full animate-pulse rounded-lg bg-muted" />}>
-          <ProgressRadialChart data={data} />
-        </Suspense>
+        <ClientChart
+          loader={() =>
+            import("@/components/charts/progress-radial-chart").then((m) => ({
+              Component: m.default,
+            }))
+          }
+          props={{ data }}
+          fallback={<div className="size-full animate-pulse rounded-lg bg-muted" />}
+        />
       </div>
       <div className="grid grid-cols-3 gap-2 text-center text-[10px] mt-1">
         {data.map((g) => (

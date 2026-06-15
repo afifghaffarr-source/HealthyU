@@ -5,9 +5,7 @@ import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { BottomNav } from "@/components/bottom-nav";
 import { getGroupScanLeaderboard } from "@/features/scan/lib/scanSocial.functions";
 import { Flame, Trophy } from "lucide-react";
-import { lazy, Suspense } from "react";
-
-const LeaderboardLineChart = lazy(() => import("@/components/charts/leaderboard-line-chart"));
+import { ClientChart } from "@/components/ClientChart";
 
 export const Route = createFileRoute("/_authenticated/groups/$id/leaderboard")({
   component: Page,
@@ -30,13 +28,19 @@ function Page() {
               Scan 7 hari · top {Math.min(5, data.rows.length)}
             </p>
             <div className="h-32">
-              <Suspense fallback={<div className="size-full animate-pulse rounded-lg bg-muted" />}>
-                <LeaderboardLineChart
-                  data={data.rows
+              <ClientChart
+                loader={() =>
+                  import("@/components/charts/leaderboard-line-chart").then((m) => ({
+                    Component: m.default,
+                  }))
+                }
+                props={{
+                  data: data.rows
                     .slice(0, 5)
-                    .map((r) => ({ name: r.name.slice(0, 8), scans: r.scans }))}
-                />
-              </Suspense>
+                    .map((r) => ({ name: r.name.slice(0, 8), scans: r.scans })),
+                }}
+                fallback={<div className="size-full animate-pulse rounded-lg bg-muted" />}
+              />
             </div>
           </div>
         )}

@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState, lazy, Suspense } from "react";
+import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { logSleep, recentSleep, deleteSleep } from "@/features/sleep/lib/sleep.functions";
@@ -8,8 +8,7 @@ import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { Moon, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { toastError } from "@/lib/toast-config";
-
-const SleepAreaChart = lazy(() => import("@/components/charts/sleep-area-chart"));
+import { ClientChart } from "@/components/ClientChart";
 
 export const Route = createFileRoute("/_authenticated/sleep")({
   component: SleepPage,
@@ -117,9 +116,15 @@ function SleepPage() {
               Tren 7 hari
             </p>
             <div className="h-32">
-              <Suspense fallback={<div className="size-full animate-pulse rounded-lg bg-muted" />}>
-                <SleepAreaChart data={chartData} />
-              </Suspense>
+              <ClientChart
+                loader={() =>
+                  import("@/components/charts/sleep-area-chart").then((m) => ({
+                    Component: m.default,
+                  }))
+                }
+                props={{ data: chartData }}
+                fallback={<div className="size-full animate-pulse rounded-lg bg-muted" />}
+              />
             </div>
           </section>
         )}

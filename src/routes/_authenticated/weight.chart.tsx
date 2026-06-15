@@ -1,13 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { lazy, Suspense } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useServerFn } from "@tanstack/react-start";
 import { getWeightGoal } from "@/features/scan/lib/scanBatch9.functions";
 import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { BottomNav } from "@/components/bottom-nav";
-
-const WeightAreaChart = lazy(() => import("@/components/charts/weight-area-chart"));
+import { ClientChart } from "@/components/ClientChart";
 
 export const Route = createFileRoute("/_authenticated/weight/chart")({ component: Page });
 
@@ -34,9 +32,16 @@ function Page() {
       <TopAppBar title="Grafik Berat" showBack />
       <main className="max-w-md mx-auto px-4 pt-4 space-y-3">
         <div className="rounded-xl border bg-card p-3 h-64">
-          <Suspense fallback={<div className="size-full animate-pulse rounded-lg bg-muted" />}>
-            <WeightAreaChart data={logs ?? []} target={target} />
-          </Suspense>
+          {/* AUDIT-009: ClientChart keeps recharts out of SSR bundle */}
+          <ClientChart
+            loader={() =>
+              import("@/components/charts/weight-area-chart").then((m) => ({
+                Component: m.default,
+              }))
+            }
+            props={{ data: logs ?? [], target }}
+            fallback={<div className="size-full animate-pulse rounded-lg bg-muted" />}
+          />
         </div>
         {goal?.prediction && (
           <p className="text-xs text-muted-foreground">
