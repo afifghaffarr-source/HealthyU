@@ -57,22 +57,32 @@ jobs:
           ls -la dist/ | head -10
           echo "✅ Build output present"
 
-      - name: Deploy to Cloudflare (CLI)
+      - name: Install wrangler (pinned to match VPS verified-working version)
+        # Pin to 4.100.0 — same as the global install on our deploy VPS.
+        # Reason: `bunx wrangler` (resolves @latest) sometimes gets a newer
+        # minor that subtly changes how vars from wrangler.jsonc are pushed.
+        # Verified: wrangler@4.100.0 deployed `5f3647dc` which serves all 5
+        # routes 200. CI was using `@latest` (resolves to whatever npm serves)
+        # and produced broken versions like `ad3dcbc8` that 500 on /artikel + /faq.
+        run: npm install -g wrangler@4.100.0
+      - name: Verify wrangler version
+        run: wrangler --version
+
+      - name: Deploy to Cloudflare (CLI, wrangler 4.100.0)
         # Using direct `wrangler deploy` CLI instead of cloudflare/wrangler-action@v3
-        # because the action silently drops vars from wrangler.jsonc on deploy
-        # (vars are re-read from wrangler.jsonc but the bindings get re-applied
-        # differently than a direct CLI deploy, causing "Missing env var" 500s).
-        # Verified 2026-06-15: manual `wrangler deploy` from VPS keeps vars; the
-        # action does not. Using the CLI here is the same command that worked manually.
+        # because the action silently drops vars from wrangler.jsonc on deploy.
+        # Wrangler version is pinned to 4.100.0 (see install step above) so CI
+        # produces byte-identical config to the verified-working VPS deploy.
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          WRANGLER_LOG_LEVEL: info
         run: |
           # GIT_SHA + DEPLOYED_BY vars surface in the CF dashboard for audit
-          bunx wrangler deploy \
+          wrangler deploy \
             --var "GIT_SHA=${{ github.sha }}" \
             --var "DEPLOYED_BY=${{ github.actor }}" \
-            --message "Deploy ${{ github.sha }} via GitHub Actions"
+            --message "Deploy ${{ github.sha }} via GitHub Actions (wrangler 4.100.0)"
 
       - name: Smoke test production
         # Verify the deployment actually works end-to-end

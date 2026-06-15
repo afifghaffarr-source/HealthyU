@@ -19,10 +19,29 @@ const envInjectionMiddleware = createMiddleware().server(async ({ context, next 
   // This handles the custom server-entry.ts wrapper (passes env as requestOpts.context)
   // AND the default TanStack entry (passes env directly as context).
   const ctx = context as Record<string, unknown> | undefined;
-  const ctxHasNestedContext = ctx && "context" in ctx && typeof ctx.context === "object";
+  const ctxHasNestedContext =
+    !!ctx && "context" in ctx && typeof ctx.context === "object" && ctx.context !== null;
   const envToInject = ctxHasNestedContext
     ? (ctx.context as unknown as CloudflareEnv)
     : (context as unknown as CloudflareEnv);
+
+  // DEBUG-INJECT-START: temporary diag to trace why CI deploys return empty env
+  // Toggle via DEBUG_ENV_TRACE=1 (will be removed once CI deploy is confirmed working)
+  if (
+    typeof (globalThis as { DEBUG_ENV_TRACE?: unknown }).DEBUG_ENV_TRACE === "string" ||
+    (envToInject && (envToInject as Record<string, unknown>).DEBUG_ENV_TRACE === "1")
+  ) {
+    const keys = envToInject ? Object.keys(envToInject).slice(0, 8) : [];
+    const hasSupabaseUrl = !!(envToInject as Record<string, unknown> | null)?.SUPABASE_URL;
+    const hasPubKey = !!(envToInject as Record<string, unknown> | null)?.SUPABASE_PUBLISHABLE_KEY;
+    console.log(
+      `[env-trace] ctxHasNestedContext=${ctxHasNestedContext} ctxKeys=${keys.join(",")} ` +
+        `hasSupabaseUrl=${hasSupabaseUrl} hasPubKey=${hasPubKey} ` +
+        `contextType=${typeof context} contextKeys=${ctx ? Object.keys(ctx).join(",") : "null"}`,
+    );
+  }
+  // DEBUG-INJECT-END
+
   return withEnv(envToInject, async () => {
     return await next();
   });

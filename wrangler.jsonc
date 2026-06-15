@@ -13,7 +13,8 @@
     "VITE_SUPABASE_PUBLISHABLE_KEY": "sb_publishable_66jMJijY4c8mdbHJxXaqnA_VzS7r-1D",
     "VITE_SUPABASE_PROJECT_ID": "lezbpzpkvkdpbjvtvoei",
     "VITE_SITE_URL": "https://healthyu.web.id",
-    "VAPID_SUBJECT": "mailto:support@healthyu.id"
+    "VAPID_SUBJECT": "mailto:support@healthyu.id",
+    "DEBUG_ENV_TRACE": "1"
   },
   "observability": {
     "enabled": true
