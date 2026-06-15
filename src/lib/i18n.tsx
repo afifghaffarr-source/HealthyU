@@ -38,6 +38,7 @@ export type TranslationKey =
 /** Template string `{page}` → page number. */
 export type TranslationBundle = Record<TranslationKey, string>;
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const bundles = {
   id: {
     "pdf.footer.pageLabel": DEFAULT_PDF_FOOTER_PAGE_LABEL,
@@ -79,6 +80,7 @@ export const bundles = {
 
 export type Locale = keyof typeof bundles;
 export const defaultLocale: Locale = "id";
+// eslint-disable-next-line react-refresh/only-export-components
 export const defaultBundle: TranslationBundle = bundles[defaultLocale];
 
 type I18nCtx = {
@@ -125,11 +127,13 @@ export function I18nProvider({ children }: { children: ReactNode }) {
   return <I18nContext.Provider value={value}>{children}</I18nContext.Provider>;
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function useLocale() {
   const { locale, setLocale } = useContext(I18nContext);
   return { locale, setLocale };
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function useTranslation() {
   const { bundle } = useContext(I18nContext);
   return {
