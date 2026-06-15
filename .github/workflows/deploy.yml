@@ -80,13 +80,12 @@ jobs:
         # Wrangler version is pinned to 4.100.0 (see install step above) so CI
         # produces byte-identical config to the verified-working VPS deploy.
         #
-        # Retry + keep-vars + idempotency-key:
+        # Retry + keep-vars:
         # - 3 attempts with exponential backoff (transient API errors)
         # - --keep-vars: tell wrangler explicitly to preserve vars from
         #   wrangler.jsonc on deploy (defensive — vars should already be kept,
         #   but this guards against future wrangler behavior changes)
-        # - --idempotency-key: dedupe deploys from same SHA, prevents partial
-        #   uploads that can leave worker in inconsistent state
+        # - --message includes attempt number for CF dashboard audit trail
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
@@ -98,7 +97,6 @@ jobs:
             echo "::group::Deploy attempt $attempt/3 (sha=${{ github.sha }})"
             wrangler deploy \
               --keep-vars \
-              --idempotency-key "gh-${{ github.run_id }}-${{ github.sha }}" \
               --var "GIT_SHA=${{ github.sha }}" \
               --var "DEPLOYED_BY=${{ github.actor }}" \
               --message "Deploy ${{ github.sha }} via GitHub Actions (wrangler 4.100.0) attempt $attempt"
