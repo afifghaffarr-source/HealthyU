@@ -63,6 +63,7 @@ export function CalculatorShell({
   );
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function breadcrumbSchema(items: BreadcrumbItem[]) {
   return {
     "@context": "https://schema.org",

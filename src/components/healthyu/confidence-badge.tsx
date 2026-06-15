@@ -2,6 +2,7 @@ import { CheckCircle2, AlertCircle, HelpCircle } from "lucide-react";
 
 export type ConfidenceTier = "high" | "medium" | "low";
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function tierFromScore(score: number | null | undefined): ConfidenceTier {
   const n = Number(score ?? 0);
   if (n >= 0.8) return "high";
