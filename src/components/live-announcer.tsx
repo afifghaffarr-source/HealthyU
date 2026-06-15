@@ -51,6 +51,7 @@ export function LiveAnnouncerProvider({ children }: { children: ReactNode }) {
   );
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function useAnnounce(): AnnounceFn {
   const ctx = useContext(LiveAnnouncerContext);
   // No-op fallback if used outside provider (e.g. unit tests).

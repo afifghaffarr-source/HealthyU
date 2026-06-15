@@ -76,6 +76,7 @@ export function AchievementIcon({
   return <Medal className={className} aria-hidden="true" />;
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function getAchievementToastPrefix(icon: string | null | undefined) {
   const raw = (icon ?? "").trim();
   const mapped = ICON_MAP[normalizeIconName(raw)];
