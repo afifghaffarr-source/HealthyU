@@ -35,8 +35,7 @@ jobs:
       - name: Typecheck
         run: bun run typecheck
 
-      - name: Lint (warnings only, see .kilo/plans/lint-cleanup.md)
-        continue-on-error: true
+      - name: Lint
         run: bun run lint
 
       - name: Test
