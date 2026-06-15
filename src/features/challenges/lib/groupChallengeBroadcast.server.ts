@@ -1,5 +1,6 @@
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { sendWebPushTo } from "@/features/notifications/lib/push.server";
+import { logServerError } from "@/lib/logger.server";
 
 type PushSub = { endpoint: string; p256dh: string; auth: string };
 
@@ -84,7 +85,7 @@ export async function broadcastGroupChallengeJoin(args: { userId: string; challe
         });
         sent++;
       } catch (e) {
-        console.error("push fail", (e as Error).message);
+        logServerError("groupChallengeBroadcast.push", e);
       }
     }),
   );
@@ -146,7 +147,7 @@ export async function broadcastGroupBonusClaim(args: {
         });
         sent++;
       } catch (e) {
-        console.error("push fail", (e as Error).message);
+        logServerError("groupChallengeBroadcast.push", e);
       }
     }),
   );

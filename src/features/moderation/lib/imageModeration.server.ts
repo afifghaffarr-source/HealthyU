@@ -7,6 +7,7 @@
  */
 
 import { callAiWithGuards, AiGatewayError } from "@/features/ai/lib/aiGateway.server";
+import { logServerError } from "@/lib/logger.server";
 
 export type ModerationLabel = "safe" | "nudity" | "violence" | "spam" | "medical_graphic" | "other";
 
@@ -56,9 +57,9 @@ export async function moderateImage(
     return { label, confidence, blocked, reason: parsed.reason };
   } catch (err) {
     if (err instanceof AiGatewayError) {
-      console.error("[imageMod] gateway", err.status, err.message);
+      logServerError("imageMod.gateway", err, { status: err.status });
     } else {
-      console.error("[imageMod] error", (err as Error).message);
+      logServerError("imageMod.error", err);
     }
     // Fail-closed: block the image when moderation is unavailable
     return { label: "other", confidence: 1, blocked: true, reason: "moderation_error" };

@@ -3,6 +3,7 @@
 import { createClient } from "@supabase/supabase-js";
 import type { Database } from "./types";
 import { getEnv } from "@/lib/cloudflare-env.server";
+import { logServerError } from "@/lib/logger.server";
 
 function createSupabaseAdminClient() {
   // Read from CF env (AsyncLocalStorage) first, then process.env fallback.
@@ -18,7 +19,7 @@ function createSupabaseAdminClient() {
       ...(!SUPABASE_SERVICE_ROLE_KEY ? ["SUPABASE_SERVICE_ROLE_KEY"] : []),
     ];
     const message = `Missing Supabase environment variable(s): ${missing.join(", ")}. Set them in Cloudflare Workers → Settings → Variables/Secrets (production) or .env (local dev).`;
-    console.error(`[Supabase] ${message}`);
+    logServerError("supabase.client.init", new Error(message));
     throw new Error(message);
   }
 

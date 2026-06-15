@@ -2,6 +2,7 @@ import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { sendWebPushTo } from "@/features/notifications/lib/push.server";
 import { computeGroupChallengeSummary } from "@/features/reports/lib/reportsGroupChallenges.server";
 import { callAiWithGuards } from "@/features/ai/lib/aiGateway.server";
+import { logServerError } from "@/lib/logger.server";
 
 type PushSub = { endpoint: string; p256dh: string; auth: string };
 
@@ -202,7 +203,7 @@ export async function sendWeeklyReportPush(
         tag: "weekly-report",
       });
     } catch (e) {
-      console.error("weekly push fail", (e as Error).message);
+      logServerError("weeklyReportRunner.push", e);
     }
   }
 }
