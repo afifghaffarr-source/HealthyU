@@ -3,12 +3,7 @@
     "collect": {
       "startServerCommand": "bunx vite preview --port 4173 --strictPort",
       "startServerReadyPattern": "Local:",
-      "url": [
-        "http://localhost:4173/",
-        "http://localhost:4173/auth",
-        "http://localhost:4173/artikel",
-        "http://localhost:4173/faq"
-      ],
+      "url": ["http://localhost:4173/", "http://localhost:4173/auth", "http://localhost:4173/scan"],
       "numberOfRuns": 1,
       "settings": {
         "preset": "desktop",

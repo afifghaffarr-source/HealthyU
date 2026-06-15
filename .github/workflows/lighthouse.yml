@@ -28,3 +28,8 @@ jobs:
         run: npx --yes @lhci/cli@0.14.x autorun
         env:
           LHCI_GITHUB_APP_TOKEN: ${{ secrets.LHCI_GITHUB_APP_TOKEN }}
+          # NOTE: SSR runtime env (SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY) is
+          # NOT passed here. @cloudflare/vite-plugin's vite preview does not
+          # inject .dev.vars env into the SSR fetch handler, so /artikel &
+          # /faq return 500 in lhci. We scope lhci to routes that don't need
+          # SSR data fetch. See audit/01-findings.md (known limitation).
