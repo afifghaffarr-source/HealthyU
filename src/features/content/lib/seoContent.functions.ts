@@ -2,13 +2,21 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { getEnvVar } from "@/lib/cloudflare-env.server";
 
-// LIGHTHOUSE-001 fallback: when Supabase env is not configured (lhci with
-// placeholder values, fresh dev clone without .dev.vars), return empty data
-// with HTTP 200 so route loaders don't 500 → lhci fails. Production env is
-// always set in CF Workers, so this branch is unreachable there. Real DB
-// errors (env set, query fails) still surface via the throw in the handlers.
+// LIGHTHOUSE-001 fallback: when Supabase env is not configured OR uses the
+// CI placeholder values (lhci with placeholder URLs, no real DB), return
+// empty data with HTTP 200 so route loaders don't 500 → lhci fails.
+// Production env is always set with real values in CF Workers, so this
+// branch is unreachable there. Real DB errors (env set, query fails) still
+// surface via the throw in the handlers.
 function supabaseConfigured(): boolean {
-  return Boolean(getEnvVar("SUPABASE_URL") && getEnvVar("SUPABASE_SERVICE_ROLE_KEY"));
+  const url = getEnvVar("SUPABASE_URL");
+  const key = getEnvVar("SUPABASE_SERVICE_ROLE_KEY");
+  if (!url || !key) return false;
+  // Detect CI placeholder values (e.g. "https://placeholder.supabase.co"
+  // + "sb_secret_placeholder"). Real Supabase URLs are https://*.supabase.co
+  // with real project IDs, not "placeholder".
+  if (url.includes("placeholder") || key.includes("placeholder")) return false;
+  return true;
 }
 
 const slugSchema = z.object({
