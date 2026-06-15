@@ -22,6 +22,7 @@ import tailwindcss from "@tailwindcss/vite";
 import tsConfigPaths from "vite-tsconfig-paths";
 import { visualizer } from "rollup-plugin-visualizer";
 import { cloudflare } from "@cloudflare/vite-plugin";
+import { cfDevVarsInjector } from "./vite-plugins/cf-dev-vars-injector";
 
 export default defineConfig({
   plugins: [
@@ -43,6 +44,11 @@ export default defineConfig({
       },
     }),
     react(),
+    // Bridge dist/server/.dev.vars into globalThis for vite preview SSR.
+    // See vite-plugins/cf-dev-vars-injector.ts for the rationale. No-op
+    // in production (CF Workers reads env from the fetch handler's 2nd
+    // arg) and in vite dev (getPlatformProxy handles env injection).
+    cfDevVarsInjector(),
     // Bundle analyzer (optional; enable with `ANALYZE=1 bun run build`)
     process.env.ANALYZE
       ? visualizer({
