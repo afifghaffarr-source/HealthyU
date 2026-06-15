@@ -205,29 +205,54 @@ ls -la dist/client/assets/scan.barcode-*.js
 
 ---
 
-## Fase 4 — UI/UX, Performance & Maintainability (Sprint 4-5, ~7 hari)
+## Fase 4 — UI/UX, Performance & Maintainability (Sprint 4-5, ~7 hari) — ⚠️ IN PROGRESS
 
 **Tujuan:** Long-term debt, accessibility, observability, dependency.
 
+**Sub-status:**
+
+| Sub-fase                                              | Status                                  | Ref                                                                    |
+| ----------------------------------------------------- | --------------------------------------- | ---------------------------------------------------------------------- |
+| LIGHTHOUSE-001 env injection investigation (prereq)   | ✅ DONE                                 | `04-fase-4-env-injection.md`, PR #5, skill `vite-cf-ssr-env-isolation` |
+| LIGHTHOUSE-002 home page a11y/perf + bundle lazy-load | ⚠️ TODO (deferred to Fase 5 fix-prompt) | `05-fase-5-ux-a11y-perf.md`                                            |
+| AUDIT-016 API route tests                             | ⚠️ TODO                                 | (part of Fase 5)                                                       |
+| AUDIT-012 chatSafety quarterly review                 | ⚠️ TODO (low priority)                  | —                                                                      |
+| Top-3 god-file refactor (types, sidebar, scanMisc)    | ⚠️ TODO                                 | (optional)                                                             |
+| Dependency audit (bun outdated, Dependabot)           | ⚠️ TODO                                 | (part of Fase 5)                                                       |
+| Lighthouse CI run (proper)                            | ⚠️ TODO (post-a11y fix)                 | `05-fase-5-ux-a11y-perf.md` step 4                                     |
+| Playwright e2e suite                                  | ⚠️ TODO                                 | (part of Fase 5)                                                       |
+| Code coverage baseline                                | ⚠️ TODO                                 | (optional, post-Fase 5)                                                |
+| A11y axe scan (axe-core)                              | ⚠️ TODO                                 | `05-fase-5-ux-a11y-perf.md` step 1-5                                   |
+
 **Findings yang diperbaiki (planned):**
-| ID | Priority | Lokasi | Effort |
-|---|---|---|---|
-| AUDIT-016 | Improvement | API route tests | S |
-| AUDIT-012 | Low | chatSafety quarterly review | S |
-| Top-3 god-file refactor | Improvement | types.ts, sidebar.tsx, scanMisc.functions.ts | L |
-| (Planned) Dependency audit | Improvement | `bun outdated`, set Dependabot | S |
-| (Planned) Lighthouse CI run | Improvement | `bunx lhci autorun` | S |
-| (Planned) Playwright e2e | Improvement | `bunx playwright test` | M |
-| (Planned) Code coverage | Improvement | `bunx vitest --coverage` | S |
-| (Planned) A11y axe scan | Improvement | Playwright + axe-core | M |
+
+| ID                          | Priority    | Lokasi                                                   | Effort |
+| --------------------------- | ----------- | -------------------------------------------------------- | ------ |
+| AUDIT-016                   | Improvement | API route tests                                          | S      |
+| AUDIT-012                   | Low         | chatSafety quarterly review                              | S      |
+| LIGHTHOUSE-002 a11y         | Medium      | home page (`src/routes/index.tsx`, `src/components/...`) | L      |
+| LIGHTHOUSE-002 perf         | Medium      | home page (jspdf, chart, html2canvas)                    | L      |
+| LIGHTHOUSE-002 bundle       | Medium      | scan.barcode routes, reports export                      | M      |
+| Top-3 god-file refactor     | Improvement | types.ts, sidebar.tsx, scanMisc.functions.ts             | L      |
+| (Planned) Dependency audit  | Improvement | `bun outdated`, set Dependabot                           | S      |
+| (Planned) Lighthouse CI run | Improvement | `bunx lhci autorun` (post-a11y fix)                      | S      |
+| (Planned) Playwright e2e    | Improvement | `bunx playwright test`                                   | M      |
+| (Planned) Code coverage     | Improvement | `bunx vitest --coverage`                                 | S      |
+| (Planned) A11y axe scan     | Improvement | Playwright + axe-core                                    | M      |
 
 **File yang disentuh:** Depends on actual findings dari Fase 3 evaluation.
 
 **Risiko perubahan:** Variabel. Bisa Medium-High untuk refactor.
 
-**Acceptance criteria:** TBD setelah Fase 3 complete.
+**Acceptance criteria:**
 
-**Prompt implementasi:** TBD.
+- Home page Lighthouse a11y score ≥0.9
+- Home page Lighthouse perf score ≥0.7
+- scan.barcode client chunk < 1 MB
+- 0 axe-core violations di e2e tests
+- lhci CI gate restored to strict mode (categories:accessibility = "error")
+
+**Prompt implementasi:** `audit/05-fix-prompts/05-fase-5-ux-a11y-perf.md` (4 sub-PR: a11y → perf → bundle → ci-revert).
 
 ---
 
