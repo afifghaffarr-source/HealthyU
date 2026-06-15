@@ -8,6 +8,7 @@ const ALLOWED_PROXY_HOSTS = new Set<string>(["tpyckpdlzpbfguyrgeuy.supabase.co"]
  * width resize, CDN cache). Returns the original URL untouched if the host
  * isn't in the allow-list, or if `src` isn't absolute https.
  */
+// eslint-disable-next-line react-refresh/only-export-components
 export function proxiedImg(src: string, opts?: { w?: number; q?: number }): string {
   try {
     const u = new URL(src);
