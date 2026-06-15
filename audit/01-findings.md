@@ -49,7 +49,7 @@ HealthyU adalah project **mature dan security-conscious** (bukan "0/10 kacau"). 
 | AUDIT-014      | Improvement | Convention     | `*.functions.ts` pattern tanpa `.server`                                                   | 25+ file (scan, meals, coach, dll)                                   | Confirmed            | High       | Convention tidak enforced, risk manusia                                                                                                                | S      | Audit + rename bertahap, atau tambah lint rule                                                                                                                                                                     |
 | AUDIT-015      | Improvement | Performance    | `cloudflare-env.server` chunk 716KB                                                        | `dist/server/assets/cloudflare-env.server-*.js`                      | Unknown              | Medium     | Tidak bocor ke client (perlu verify) tapi ukuran besar                                                                                                 | M      | Verify tree-shake, atau split                                                                                                                                                                                      |
 | AUDIT-016      | Improvement | Test           | Beberapa API routes tanpa test                                                             | `chat.stream.ts`, `health.ts`                                        | Unknown              | Medium     | Coverage gap di critical path                                                                                                                          | S      | Tambah integration test                                                                                                                                                                                            |
-| LIGHTHOUSE-001 | Medium      | CI/Lighthouse  | `/artikel` & `/faq` 500 di `vite preview` SSR — env vars unreachable in worker isolate     | `dist/server/assets/client-*.js`, `lighthouserc.json`                | **DEFERRED**         | High       | Lighthouse CI tidak bisa audit SSR routes; production tidak terpengaruh (worker runtime normal)                                                        | M      | Lihat skill `vite-cf-ssr-env-isolation`. Workaround aktif: lhci URL scope = `[/, /auth, /scan]`. Fix proper: custom PreviewServer middleware + server-entry bridge, atau migrasi ke `wrangler pages dev`.          |
+| LIGHTHOUSE-001 | Medium      | CI/Lighthouse  | `/artikel` & `/faq` 500 di `vite preview` SSR — env vars unreachable in worker isolate     | `dist/server/assets/client-*.js`, `lighthouserc.json`                | **✅ PROPER FIX APPLIED (PR #13)** | High       | Lighthouse CI sekarang audit 5 routes (incl. `/artikel`, `/faq`). Production tetap tidak terpengaruh. | M      | lhci `startServerCommand` prefix `set -a && . ./.dev.vars && set +a`. CI workflow materialize placeholder `.dev.vars` sebelum lhci run. |
 | LIGHTHOUSE-002 | High        | A11y           | Color-contrast 2.38:1, landmark, region, focus, valid-source-maps di `/`, `/auth`, `/scan` | `src/styles.css`, `scroll-to-top-button.tsx`, `LandingSections2.tsx` | **✅ FIXED** (PR #9) | High       | 186+ `text-primary` + semua `bg-primary` button (white on light green 2.52:1) + muted-foreground 2.96:1 + scrollable-region-focusable di mobile Safari | S      | PR #9 fix: darken oklch tokens + 2 utility overrides outside @layer (Tailwind v4 cascade trick) + role="main" + tabIndex/inert + tabIndex=0 di scrollable table. E2E: 6/6 axe-core tests pass (chromium + webkit). |
 
 ---
@@ -141,7 +141,7 @@ src/routes/_authenticated/restaurants.nearby.tsx
 **Akar masalah:** Belum tahu apakah `.github/workflows/ci.yml` jalankan `lint` — perlu baca.
 **Rekomendasi:** Verify ci.yml. Tambahkan `bun run lint` ke CI matrix. Set branch protection supaya lint wajib pass.
 
-### LIGHTHOUSE-001 — `vite preview` SSR env isolation (MEDIUM, CI/Lighthouse) — ✅ WORKAROUND APPLIED
+### LIGHTHOUSE-001 — `vite preview` SSR env isolation (MEDIUM, CI/Lighthouse) — ✅ WORKAROUND + PROPER FIX APPLIED
 
 **Bukti (from `bunx vite preview --port 4173 --strictPort`):**
 
@@ -174,14 +174,25 @@ GET /faq 500 Internal Server Error
 - `wrangler.jsonc`: tambah `SUPABASE_PUBLISHABLE_KEY` ke `secrets.required` (production fail-fast)
 - `.github/workflows/lighthouse.yml`: cleanup env placeholder lines
 
-**Proper fix (DEFERRED → Fase 5, see LIGHTHOUSE-002):**
+**Proper fix (APPLIED 2026-06-15 in PR #13, 2-file change):**
 
-1. Option A: Custom PreviewServer middleware (re-wrap worker-entry `fetch()` dgn env dari disk) — effort M
-2. Option B: Migrate lhci ke `wrangler pages dev` (runtime identik production) — effort XS (30 menit), **RECOMMENDED**
+LIGHTHOUSE-001 proper fix = materialize `.dev.vars` di CI + lhci sources it via `startServerCommand`.
+Bukan migrate ke `wrangler pages dev` (Option B di Fase 4) — lebih simple dan surgical:
 
-**Arsitektur knowledge**: Skill `vite-cf-ssr-env-isolation` di `~/.hermes/skills/` (276 lines: root cause + smoke-gun debug + decision matrix).
+1. **`.github/workflows/lighthouse.yml`**: tambah step "Create .dev.vars for LHCI SSR" yang heredoc placeholder SSR env ke `.dev.vars` (gitignored, so safe). Cleanup step `rm -f .dev.vars` runs `if: always()` jadi cleanup tetep happen kalau lhci fail.
+2. **`lighthouserc.json`**: `startServerCommand` prefix `set -a && . ./.dev.vars && set +a && exec bunx vite preview --port 4173 --strictPort`. POSIX sh syntax works di GitHub Actions runner (default `/bin/sh`). `set -a` auto-exports semua vars defined setelahnya. `. ./.dev.vars` sources the file. `exec` replaces shell dengan vite preview (cleaner process tree).
+3. **`lighthouserc.json`**: tambah `/artikel` dan `/faq` ke URL list (5 routes total sekarang). LIGHTHOUSE-001 was previously DEFERRED because these routes 500'd — now they load (with placeholder Supabase returning empty data, route loader handles gracefully).
 
-**Status:** ✅ Workaround applied (PR #5 merged), proper fix deferred to Fase 5 (LIGHTHOUSE-002).
+**Why not Option B (migrate to `wrangler pages dev`)?** Considered but skipped:
+- `wrangler pages dev` requires CF auth + project setup in CI
+- Output structure assumption (`dist/client` + `dist/server` + `_worker.js`) varies by TanStack Start version
+- Sourced `.dev.vars` approach is 4 lines of YAML + 1 line of lhci config vs. full pipeline swap
+
+**Production safety**: `.dev.vars` placeholder values are gitignored + never touch `dist/` (lhci uses them at preview runtime only, not embed in build). CF Workers production uses real secrets from CF dashboard, untouched by this change.
+
+**Arsitektur knowledge**: Skill `vite-cf-ssr-env-isolation` di `~/.hermes/skills/` (276 lines: root cause + smoke-gun debug + decision matrix). LIGHTHOUSE-001 evidence (V8 ModuleRunner worker isolate) confirms why `process.env` mutations from main process never reach SSR runtime.
+
+**Status:** ✅ Workaround applied (PR #5 merged), **PROPER FIX APPLIED (PR #13)** — `/artikel` and `/faq` now audited by lhci. Future a11y/perf regression on these SSR pages will be caught.
 
 ---
 

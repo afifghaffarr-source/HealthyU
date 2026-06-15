@@ -214,6 +214,7 @@ ls -la dist/client/assets/scan.barcode-*.js
 | Sub-fase                                              | Status                                  | Ref                                                                    |
 | ----------------------------------------------------- | --------------------------------------- | ---------------------------------------------------------------------- |
 | LIGHTHOUSE-001 env injection investigation (prereq)   | ✅ DONE                                 | `04-fase-4-env-injection.md`, PR #5, skill `vite-cf-ssr-env-isolation` |
+| LIGHTHOUSE-001 proper fix (lhci sources .dev.vars)   | ✅ DONE (PR #13)                        | lhci URL scope = 5 routes (incl. `/artikel`, `/faq`). CI step materializes placeholder `.dev.vars`. |
 | LIGHTHOUSE-002 a11y + perf + bundle (3 sub-PRs)       | ✅ DONE                                 | PR #9 (a11y) + PR #10 (perf) + PR #11 (bundle). Skill `bundle-lazy-load-pattern` saved. |
 | AUDIT-016 API route tests                             | ⚠️ TODO                                 | (part of Fase 5)                                                       |
 | AUDIT-012 chatSafety quarterly review                 | ⚠️ TODO (low priority)                  | —                                                                      |
