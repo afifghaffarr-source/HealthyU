@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import type { Reminder, ReminderCategory } from "@/lib/reminders-store";
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const CATEGORY_META: Record<ReminderCategory, { icon: typeof Bell; label: string }> = {
   water: { icon: Droplet, label: "Air" },
   meal: { icon: Utensils, label: "Makan" },
@@ -24,6 +25,7 @@ export const CATEGORY_META: Record<ReminderCategory, { icon: typeof Bell; label:
   custom: { icon: Sparkles, label: "Lain" },
 };
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const DAY_LABELS = ["M", "S", "S", "R", "K", "J", "S"];
 
 export function NextReminderSummary({

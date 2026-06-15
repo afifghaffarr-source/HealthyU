@@ -52,6 +52,7 @@ export function DashboardHeader({
   );
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function dashboardGreeting(): string {
   const h = new Date().getHours();
   if (h < 11) return "Selamat pagi";
