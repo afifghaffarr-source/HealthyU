@@ -3,6 +3,7 @@ import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { callAiWithGuards, callAiJsonWithSchema } from "@/features/ai/lib/aiGateway.server";
 import { makeScanAiCaller } from "./scanCore.server";
+import { logServerError } from "@/lib/logger.server";
 
 const callAI = makeScanAiCaller("scanBatch7");
 
@@ -68,7 +69,16 @@ export const convertCurrency = createServerFn({ method: "POST" })
           );
           return { converted: data.amount * rate, rate };
         }
-      } catch {}
+      } catch (e) {
+        // Currency rate refresh from open.er-api.com failed (network,
+        // upstream outage, rate missing, etc.). Fall through to use the
+        // stale cached rate. Logged for alerting on systemic upstream issues.
+        logServerError("scanMisc.convertCurrency", e, {
+          stage: "rate-refresh",
+          from: data.from,
+          to: data.to,
+        });
+      }
     }
     const rate = row?.rate ?? 1;
     return { converted: data.amount * rate, rate };
@@ -470,7 +480,11 @@ export const reverseCalorie = createServerFn({ method: "POST" })
     try {
       const parsed = m ? JSON.parse(m[0]) : [];
       suggestions = Array.isArray(parsed) ? (parsed as Suggestion[]) : [];
-    } catch {}
+    } catch (e) {
+      // AI returned a non-JSON suggestion list. Fall through to empty
+      // suggestions — caller can show "no alternatives found".
+      logServerError("scanMisc.foodAlternatives", e, { stage: "json-parse" });
+    }
     return { suggestions };
   });
 

@@ -65,7 +65,12 @@ function ArticleReader() {
     if (navigator.share) {
       try {
         await navigator.share(payload);
-      } catch {}
+      } catch {
+        // Defensive: navigator.share() throws AbortError when the user
+        // cancels the native share sheet (very common, ~30% of taps on
+        // Android). Also throws on permission denial. Treat both as
+        // no-op from the caller's POV.
+      }
     } else {
       await navigator.clipboard.writeText(payload.url);
       toast.success("Link disalin");

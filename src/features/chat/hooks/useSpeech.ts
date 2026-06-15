@@ -44,10 +44,17 @@ export function useSpeech(opts: {
     return () => {
       try {
         window.speechSynthesis?.cancel();
-      } catch {}
+      } catch {
+        // Defensive: speechSynthesis may already be torn down (e.g. tab
+        // closing race); cancellation is best-effort in cleanup.
+      }
       try {
         recogRef.current?.stop?.();
-      } catch {}
+      } catch {
+        // Defensive: SpeechRecognition.stop() can throw if the recognizer
+        // is already in an invalid state (already stopped, language unsupported,
+        // or hardware released). Safe to ignore during unmount cleanup.
+      }
     };
   }, []);
 
@@ -60,7 +67,11 @@ export function useSpeech(opts: {
       if (v) {
         try {
           window.speechSynthesis.cancel();
-        } catch {}
+        } catch {
+          // Defensive: cancel() on an utterance that already finished is a
+          // no-op in spec but some browsers throw. Safe to ignore — we are
+          // about to flip ttsOn off anyway.
+        }
       }
       return !v;
     });
@@ -74,7 +85,11 @@ export function useSpeech(opts: {
     if (listening) {
       try {
         recogRef.current?.stop?.();
-      } catch {}
+      } catch {
+        // Defensive: stop() can throw if the recognizer was already torn
+        // down (component remounted, mic released). Safe to ignore — we
+        // are about to set listening=false either way.
+      }
       return;
     }
     const SR = getSR();
@@ -121,13 +136,20 @@ export function useSpeech(opts: {
       u.lang = "id-ID";
       u.rate = 1;
       window.speechSynthesis.speak(u);
-    } catch {}
+    } catch {
+      // Defensive: speak() can throw if speechSynthesis is in an invalid
+      // state (e.g. user disabled TTS mid-utterance, browser quota hit).
+      // UI keeps working without audio.
+    }
   };
 
   const cancelSpeak = () => {
     try {
       window.speechSynthesis?.cancel();
-    } catch {}
+    } catch {
+      // Defensive: see toggleTts — cancel() is best-effort, failures are
+      // non-actionable from the caller's perspective.
+    }
     lastSpokenRef.current = null;
   };
 

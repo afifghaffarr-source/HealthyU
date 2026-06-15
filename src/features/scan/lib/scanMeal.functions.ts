@@ -2,6 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { callAiWithGuards, callAiJsonWithSchema } from "@/features/ai/lib/aiGateway.server";
+import { logServerError } from "@/lib/logger.server";
 
 const MealTagsSchema = z.object({
   halal: z.union([z.boolean(), z.null()]).optional(),
@@ -228,7 +229,12 @@ export const remixRecipe = createServerFn({ method: "POST" })
           },
         ],
       });
-    } catch {}
+    } catch (e) {
+      // Recipe remix fell through to AI parsing but the response was
+      // malformed. We still return { remix } (possibly empty/undefined)
+      // so the UI can show a friendly fallback. Logged for debugging.
+      logServerError("scanMeal.remixRecipe", e, { stage: "ai-parse" });
+    }
     return { remix };
   });
 

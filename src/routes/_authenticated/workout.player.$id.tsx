@@ -28,7 +28,11 @@ function WorkoutPlayer() {
       const u = new SpeechSynthesisUtterance(text);
       u.lang = "id-ID";
       window.speechSynthesis.speak(u);
-    } catch {}
+    } catch {
+      // Defensive: speak() can throw if speechSynthesis is mid-cancel
+      // (workout pause/resume race). Workout timer keeps running without
+      // voice countdown.
+    }
   };
 
   useEffect(() => {
