@@ -52,7 +52,12 @@ export function ScrollToTopButton() {
       <button
         type="button"
         aria-label="Kembali ke atas"
+        // LIGHTHOUSE-002 aria-hidden-focus fix: hide from a11y tree AND
+        // remove from tab order when not visible (was aria-hidden=true but
+        // still focusable → axe serious violation).
         aria-hidden={!isVisible}
+        tabIndex={isVisible ? 0 : -1}
+        inert={!isVisible}
         onClick={() => {
           const activeScroller = activeScrollerRef.current;
           if (activeScroller instanceof Element) {
