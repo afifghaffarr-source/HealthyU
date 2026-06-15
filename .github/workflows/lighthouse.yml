@@ -24,12 +24,28 @@ jobs:
           VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL || 'https://placeholder.supabase.co' }}
           VITE_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.VITE_SUPABASE_PUBLISHABLE_KEY || 'placeholder' }}
           VITE_SUPABASE_PROJECT_ID: ${{ secrets.VITE_SUPABASE_PROJECT_ID || 'placeholder' }}
+      # LIGHTHOUSE-001 proper fix: lhci's vite preview runs as plain Node, so
+      # the @cloudflare/vite-plugin's .dev.vars auto-bridge (workerd isolate)
+      # doesn't apply. We materialize a .dev.vars with placeholder SSR env so
+      # the lhci startServerCommand can `set -a && . ./.dev.vars && set +a`.
+      # Real production secrets are still only in the CF dashboard. SSR calls
+      # to placeholder Supabase will fail gracefully via route errorComponent.
+      - name: Create .dev.vars for LHCI SSR
+        run: |
+          cat > .dev.vars <<'EOF'
+          SUPABASE_URL=https://placeholder.supabase.co
+          SUPABASE_PUBLISHABLE_KEY=sb_publishable_placeholder
+          SUPABASE_SERVICE_ROLE_KEY=sb_secret_placeholder
+          VEXO_API_KEY=placeholder
+          VEXO_BASE_URL=https://placeholder.vexo.ai
+          CRON_SECRET=placeholder-cron-secret
+          VAPID_PRIVATE_KEY=placeholder
+          VAPID_PUBLIC_KEY=placeholder
+          EOF
       - name: Run Lighthouse CI
         run: npx --yes @lhci/cli@0.14.x autorun
         env:
           LHCI_GITHUB_APP_TOKEN: ${{ secrets.LHCI_GITHUB_APP_TOKEN }}
-          # NOTE: SSR runtime env (SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY) is
-          # NOT passed here. @cloudflare/vite-plugin's vite preview does not
-          # inject .dev.vars env into the SSR fetch handler, so /artikel &
-          # /faq return 500 in lhci. We scope lhci to routes that don't need
-          # SSR data fetch. See audit/01-findings.md (known limitation).
+      - name: Cleanup .dev.vars
+        if: always()
+        run: rm -f .dev.vars
