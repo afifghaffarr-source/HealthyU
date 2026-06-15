@@ -7,7 +7,7 @@ import {
   MAX_TEXT_CHARS,
   resolveVexoEndpoint,
   VexoApiCallError,
-} from "@/features/ai/lib/vexoAdapter";
+} from "@/features/ai/lib/vexoAdapter.server";
 
 describe("flattenMessages", () => {
   it("returns empty system when only user text", () => {

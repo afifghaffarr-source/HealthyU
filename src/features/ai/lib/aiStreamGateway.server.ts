@@ -1,5 +1,5 @@
 import { AiGatewayError, type AiMultimodalMessage } from "./aiGateway.server";
-import { callVexoApi, flattenMessages } from "./vexoAdapter";
+import { callVexoApi, flattenMessages } from "./vexoAdapter.server";
 export { AiGatewayError };
 
 const DEFAULT_TIMEOUT_MS = 60_000;
