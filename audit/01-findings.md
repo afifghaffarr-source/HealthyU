@@ -25,7 +25,7 @@ HealthyU adalah project **mature dan security-conscious** (bukan "0/10 kacau"). 
 **Fase 2 status: ✅ COMPLETE** — 4 commits (29aa5ecf, 260b699a, c42a06e8, 5c54a99e), all static gates green, **AUDIT-015 critical check PASSED** (no secrets in client bundle), branch protection set.
 **Fase 4 status: ✅ COMPLETE** — lhci workaround applied (PR #5), env-injection documented as impossible (PR #7 + skill `vite-cf-ssr-env-isolation`).
 **Fase 5 status: ✅ COMPLETE** — PR #9 a11y (color-contrast, landmark, focus, scrollable region) + PR #10 perf (lazy landing, preload hero, aurora composited) + PR #11 bundle (scan.barcode 437K→3.3K via dynamic `@zxing/browser`, CI budget 1.5MB→1MB) all MERGED. Skor 9.0+/10.
-**Fase 6 status: 🚧 IN PROGRESS** — PR #12 (lhci strict a11y error ≥ 0.9, perf/bp/seo warn ≥ 0.7/0.8/0.8, 4 skipAudits removed) + skill `bundle-lazy-load-pattern` saved. |
+**Fase 6 status: ✅ COMPLETE** — PR #12 MERGED 2026-06-15. lhci strict a11y `error` ≥ 0.9 PASSED on real CI (proves Fase 5a fixes hold). 4 fixed skipAudits removed (`color-contrast`, `aria-hidden-focus`, `valid-source-maps`, `non-composited-animations`). 3 kept (CF free tier / known SSR env limit). Perf/bp/seo on `warn` tier (don't churn CI on dep bumps). Skill `bundle-lazy-load-pattern` saved (6 KB, reusable for future heavy-dep lazy-load). |
 
 ---
 
