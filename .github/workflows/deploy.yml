@@ -57,17 +57,22 @@ jobs:
           ls -la dist/ | head -10
           echo "✅ Build output present"
 
-      - name: Deploy to Cloudflare
-        uses: cloudflare/wrangler-action@v3
-        with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          workingDirectory: "."
-          # Don't bust CF cache: serve stale during deploy (zero-downtime)
-          # Wrangler 3.x does this by default for Workers
-          command: deploy
-          # Pass through deploy metadata for audit trail
-          deployCommand: deploy --var "GIT_SHA=${{ github.sha }}" --var "DEPLOYED_BY=${{ github.actor }}" --message "Deploy ${{ github.sha }} via GitHub Actions"
+      - name: Deploy to Cloudflare (CLI)
+        # Using direct `wrangler deploy` CLI instead of cloudflare/wrangler-action@v3
+        # because the action silently drops vars from wrangler.jsonc on deploy
+        # (vars are re-read from wrangler.jsonc but the bindings get re-applied
+        # differently than a direct CLI deploy, causing "Missing env var" 500s).
+        # Verified 2026-06-15: manual `wrangler deploy` from VPS keeps vars; the
+        # action does not. Using the CLI here is the same command that worked manually.
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          # GIT_SHA + DEPLOYED_BY vars surface in the CF dashboard for audit
+          bunx wrangler deploy \
+            --var "GIT_SHA=${{ github.sha }}" \
+            --var "DEPLOYED_BY=${{ github.actor }}" \
+            --message "Deploy ${{ github.sha }} via GitHub Actions"
 
       - name: Smoke test production
         # Verify the deployment actually works end-to-end
