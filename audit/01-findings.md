@@ -159,8 +159,10 @@ GET /faq 500 Internal Server Error
 **Dampak:**
 
 - Lighthouse CI tidak bisa audit SSR routes (`/artikel`, `/faq`) tanpa workaround. Static routes OK.
-- **Production TIDAK terpengaruh** — Cloudflare Workers runtime inject env via `fetch(request, env, ctx)` secara native, env vars selalu tersedia.
+- **Production TERPENGARUH** — klaim "env vars selalu tersedia" salah kalau vars tidak ada di `wrangler.jsonc vars`. Resolution: PR #22 (tambah `vars.SUPABASE_URL` + `vars.SUPABASE_PUBLISHABLE_KEY` ke wrangler.jsonc) + PR #23 (add `account_id`). Production now 200 OK di semua 5 routes.
 - Bundled `client.ts` baca `process.env.SUPABASE_URL` langsung (Vite optimize `import.meta.env.VITE_X || process.env.X` jadi `process.env.X` saat `VITE_X` out of scope).
+
+**Postmortem (2026-06-15 production incident):** Root cause was `wrangler.jsonc` lacking `vars.SUPABASE_URL` and `vars.SUPABASE_PUBLISHABLE_KEY` for server-side access (only `VITE_*` versions were present, which Vite strips from server bundle). Symptom: `/artikel` + `/faq` returned HTTP 500 with body containing "Missing Supabase environment variable(s): SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY" — error originated from `auth-middleware.ts` (function middleware, used by all `articles.functions.ts`, `pet.functions.ts`, etc. via `.middleware([requireSupabaseAuth])`). Fix: PR #22 added the missing vars to `wrangler.jsonc`, plus `.github/workflows/deploy.yml` for auto-deploy + smoke test. Production fully recovered after manual `wrangler deploy` (worker version `24ba6389`); all 5 routes (`/`, `/auth`, `/artikel`, `/faq`, `/api/health`) now 200 OK.
 
 **Investigasi Fase 4 (commits `15c8b60d`, lalu direvert `0f8673f2`):**
 
