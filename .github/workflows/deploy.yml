@@ -1,23 +1,27 @@
 # Deploy to Cloudflare Workers (healthyu)
 # Docs: https://developers.cloudflare.com/workers/wrangler/ci-cd/
 #
-# Triggers on push to main. Requires these GitHub repo secrets (Settings → Secrets → Actions):
+# Triggers on workflow_dispatch (manual) only. NOT auto-deployed on push.
+# Requires these GitHub repo secrets (Settings → Secrets → Actions):
 #   - CLOUDFLARE_API_TOKEN — https://dash.cloudflare.com/profile/api-tokens
 #       Template: "Edit Cloudflare Workers" + account.resources = include specific Worker
 #   - CLOUDFLARE_ACCOUNT_ID — CF dashboard → Workers & Pages → right sidebar
 #
-# Why this exists: The old workflow was manual `wrangler deploy` after each PR merge,
-# which led to production drift (latest commits never reached healthyu.web.id).
-# This makes deploy automatic on every main merge, after CI passes.
+# Why manual-only: CI auto-deploy (push to main) was producing broken workers
+# that returned 500 on /artikel + /faq despite all 16 bindings being set
+# correctly. Manual `wrangler deploy` from VPS (bun 1.2.21, wrangler 4.100.0)
+# reliably produces working workers with the same code. The CI path difference
+# is unconfirmed but appears to be build-environment related.
+#
+# To deploy: GitHub UI → Actions → "deploy" → Run workflow → enter reason
+# (logged in CF deploy log for audit trail).
 name: deploy
 
 on:
-  push:
-    branches: [main]
   workflow_dispatch:
     inputs:
       reason:
-        description: "Manual deploy reason (logged in CF deploy log)"
+        description: "Deploy reason (logged in CF deploy log)"
         required: false
         default: "manual trigger"
 
@@ -30,9 +34,8 @@ jobs:
     name: Deploy to Cloudflare Workers
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    # Only deploy after CI passes (lint + typecheck + test + build)
-    # branch protection enforces this via required status check "ci/check"
-    if: github.event_name == 'workflow_dispatch' || github.ref == 'refs/heads/main'
+    # Only trigger on manual workflow_dispatch (push to main is disabled).
+    if: github.event_name == 'workflow_dispatch'
     env:
       NODE_OPTIONS: --max-old-space-size=4096
     steps:
