@@ -1,5 +1,15 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
+import { getEnvVar } from "@/lib/cloudflare-env.server";
+
+// LIGHTHOUSE-001 fallback: when Supabase env is not configured (lhci with
+// placeholder values, fresh dev clone without .dev.vars), return empty data
+// with HTTP 200 so route loaders don't 500 → lhci fails. Production env is
+// always set in CF Workers, so this branch is unreachable there. Real DB
+// errors (env set, query fails) still surface via the throw in the handlers.
+function supabaseConfigured(): boolean {
+  return Boolean(getEnvVar("SUPABASE_URL") && getEnvVar("SUPABASE_SERVICE_ROLE_KEY"));
+}
 
 const slugSchema = z.object({
   slug: z
@@ -85,6 +95,7 @@ export const getDiet = createServerFn({ method: "GET" })
   });
 
 export const listSeoArticles = createServerFn({ method: "GET" }).handler(async () => {
+  if (!supabaseConfigured()) return [];
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
   const { data, error } = await supabaseAdmin
     .from("seo_articles")
@@ -135,6 +146,7 @@ export const getSeoRecipe = createServerFn({ method: "GET" })
   });
 
 export const listSeoFaqs = createServerFn({ method: "GET" }).handler(async () => {
+  if (!supabaseConfigured()) return [];
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
   const { data, error } = await supabaseAdmin
     .from("seo_faqs")
