@@ -446,15 +446,21 @@
 @keyframes aurora {
   0%,
   100% {
-    background-position: 0% 50%;
+    transform: translate3d(0, 0, 0);
   }
   50% {
-    background-position: 100% 50%;
+    transform: translate3d(-50%, 0, 0);
   }
 }
 .animate-aurora {
-  background-size: 200% 200%;
+  /* PERF (Fase 5 sub-PR 2) non-composited-animations fix:
+   * Was: background-position 0%↔100% (forces PAINT, not composited).
+   * Now: transform translateX (composited, GPU-only — no layout/paint).
+   * Visual effect preserved via background-size 200% + horizontal slide.
+   * Must use a wrapper for the gradient since the parent has the bg. */
+  background-size: 200% 100%;
   animation: aurora 8s ease-in-out infinite;
+  will-change: transform;
 }
 
 /* Shimmer sweep for badges/buttons */
