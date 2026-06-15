@@ -1,4 +1,5 @@
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
+import { logServerError } from "@/lib/logger.server";
 
 // Rough per-1k-token prices (USD). Update as VexoAPI pricing changes.
 // These are estimates — VexoAPI's free tier doesn't bill per token, but
@@ -51,7 +52,7 @@ export async function logAiUsage(rec: AiUsageRecord): Promise<void> {
       was_downgraded: !!rec.wasDowngraded,
     });
   } catch (e) {
-    console.error("logAiUsage failed", (e as Error).message);
+    logServerError("aiBudget.logAiUsage", e);
   }
 }
 

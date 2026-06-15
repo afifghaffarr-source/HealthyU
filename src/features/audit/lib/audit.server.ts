@@ -1,5 +1,6 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@/integrations/supabase/types";
+import { logServerError } from "@/lib/logger.server";
 
 /**
  * Write an audit-log entry for the currently authenticated user.
@@ -24,6 +25,6 @@ export async function logAudit(
     _meta: (options?.meta ?? {}) as never,
   });
   if (error) {
-    console.error("[audit] log failed:", action, error.message);
+    logServerError("audit.logFailed", error, { action });
   }
 }

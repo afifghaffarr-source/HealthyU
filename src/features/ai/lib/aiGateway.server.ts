@@ -5,7 +5,7 @@ import {
   resolveVexoEndpoint,
   endpointSupportsImage,
   VexoApiCallError,
-} from "./vexoAdapter";
+} from "./vexoAdapter.server";
 import { getEnv } from "@/lib/cloudflare-env.server";
 import type { z, ZodTypeAny } from "zod";
 

@@ -1,5 +1,6 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@/integrations/supabase/types";
+import { logServerError } from "@/lib/logger.server";
 
 /**
  * Server-side rate limiter backed by `public.check_rate_limit` RPC.
@@ -24,7 +25,7 @@ export async function checkRateLimit(
     _window_seconds: windowSeconds,
   });
   if (error) {
-    console.error("[rateLimit] RPC error:", error.message);
+    logServerError("rateLimit.rpc", error);
     return opts?.failOpen ? true : false;
   }
   return data === true;
