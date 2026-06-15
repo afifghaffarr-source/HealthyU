@@ -40,6 +40,7 @@ export const DIETARY = [
 export type Pace = "gentle" | "steady" | "ambitious";
 
 // Calorie delta (negative = deficit for lose, positive = surplus for gain).
+// eslint-disable-next-line react-refresh/only-export-components
 export function paceDelta(goal: "lose" | "maintain" | "gain", pace: Pace): number {
   if (goal === "maintain") return 0;
   const map: Record<Pace, number> = { gentle: 200, steady: 400, ambitious: 600 };
@@ -48,6 +49,7 @@ export function paceDelta(goal: "lose" | "maintain" | "gain", pace: Pace): numbe
 }
 
 // Convert a calorie delta to estimated kg/week (≈7700 kcal/kg fat).
+// eslint-disable-next-line react-refresh/only-export-components
 export function paceKgPerWeek(deltaKcal: number): number {
   return Math.round(((Math.abs(deltaKcal) * 7) / 7700) * 100) / 100;
 }
