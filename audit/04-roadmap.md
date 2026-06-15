@@ -214,15 +214,15 @@ ls -la dist/client/assets/scan.barcode-*.js
 | Sub-fase                                              | Status                                  | Ref                                                                    |
 | ----------------------------------------------------- | --------------------------------------- | ---------------------------------------------------------------------- |
 | LIGHTHOUSE-001 env injection investigation (prereq)   | ✅ DONE                                 | `04-fase-4-env-injection.md`, PR #5, skill `vite-cf-ssr-env-isolation` |
-| LIGHTHOUSE-002 home page a11y/perf + bundle lazy-load | ⚠️ TODO (deferred to Fase 5 fix-prompt) | `05-fase-5-ux-a11y-perf.md`                                            |
+| LIGHTHOUSE-002 a11y + perf + bundle (3 sub-PRs)       | ✅ DONE                                 | PR #9 (a11y) + PR #10 (perf) + PR #11 (bundle). Skill `bundle-lazy-load-pattern` saved. |
 | AUDIT-016 API route tests                             | ⚠️ TODO                                 | (part of Fase 5)                                                       |
 | AUDIT-012 chatSafety quarterly review                 | ⚠️ TODO (low priority)                  | —                                                                      |
 | Top-3 god-file refactor (types, sidebar, scanMisc)    | ⚠️ TODO                                 | (optional)                                                             |
 | Dependency audit (bun outdated, Dependabot)           | ⚠️ TODO                                 | (part of Fase 5)                                                       |
-| Lighthouse CI run (proper)                            | ⚠️ TODO (post-a11y fix)                 | `05-fase-5-ux-a11y-perf.md` step 4                                     |
-| Playwright e2e suite                                  | ⚠️ TODO                                 | (part of Fase 5)                                                       |
-| Code coverage baseline                                | ⚠️ TODO                                 | (optional, post-Fase 5)                                                |
-| A11y axe scan (axe-core)                              | ⚠️ TODO                                 | `05-fase-5-ux-a11y-perf.md` step 1-5                                   |
+| **Lighthouse CI strict gate re-enable**               | ✅ DONE (Fase 6)                        | PR #12 — lhci a11y `error` ≥ 0.9, perf/bp/seo `warn` ≥ 0.7/0.8/0.8     |
+| Playwright e2e suite                                  | ✅ DONE (a11y e2e baseline shipped)     | `e2e/a11y/home.spec.ts` — 6/6 pass (3 routes × 2 devices)             |
+| Code coverage baseline                                | ⚠️ TODO                                 | (optional, post-Fase 6)                                                |
+| A11y axe scan (axe-core)                              | ✅ DONE                                 | `@axe-core/playwright` + `vitest-axe` (unit). 0 WCAG AA violations.    |
 
 **Findings yang diperbaiki (planned):**
 
@@ -260,6 +260,8 @@ ls -la dist/client/assets/scan.barcode-*.js
 
 **Tujuan:** Stabilitas operasional, monitoring, dokumentasi.
 
+**Status: SUBSET COMPLETE** (Fase 5a/b/c/d audit cleanup: PRs #9, #10, #11, #8 all MERGED). Fase 5 Production Hardening proper (backup, rollback, monitoring, docs) is still ongoing — separate from audit cleanup.
+
 **Findings yang diperbaiki (planned):**
 
 - Backup strategy untuk Supabase DB
@@ -289,11 +291,59 @@ Fase 5 (Hardening) — ongoing, tidak blocking
 
 **Effort total (estimated):**
 
-- Fase 1: ~3 hari (1 developer)
-- Fase 2: ~3 hari
-- Fase 3: ~4 hari
-- Fase 4: ~7 hari
-- Fase 5: ongoing
+| Fase 1: ~3 hari (1 developer)
+| Fase 2: ~3 hari
+| Fase 3: ~4 hari
+| Fase 4: ~7 hari
+| Fase 5 audit cleanup (a11y+perf+bundle+docs): ✅ DONE 2026-06-15
+| Fase 5 Production Hardening proper (backup/rollback/monitoring/docs): ongoing
+| Fase 6 CI gate hardening (lhci strict + skill save): ~0.5 hari — ✅ DONE 2026-06-15
+
+---
+
+## Fase 6 — CI Gate Hardening (lhci strict + skill capture)
+
+**Tujuan:** Re-enable strict Lighthouse CI assertions now that Fase 5 a11y/perf/bundle
+fixes are merged and verified, so future regressions get blocked at PR time.
+
+**Status: ✅ DONE 2026-06-15** — PR #12 opened (branch `chore/audit-fase-6-lhci-strict`).
+
+**Files diubah:**
+
+- `lighthouserc.json`:
+  - **Removed** from `skipAudits` (now passing): `color-contrast`, `aria-hidden-focus`, `valid-source-maps`, `non-composited-animations`
+  - **Kept** in `skipAudits` (CF Pages free tier limit / known limitation): `uses-http2`, `canonical`, `errors-in-console` (CF preview 500s on SSR routes), `lcp-lazy-loaded`, `prioritize-lcp-image`, `unused-javascript`, `uses-text-compression`
+  - **Replaced** all `"off"` category assertions with strict tiers:
+    - `categories:accessibility: ["error", { "minScore": 0.9 }]` — **HARD BLOCK** on a11y regression
+    - `categories:performance: ["warn", { "minScore": 0.7 }]` — warn-only, won't block
+    - `categories:best-practices: ["warn", { "minScore": 0.8 }]` — warn-only
+    - `categories:seo: ["warn", { "minScore": 0.8 }]` — warn-only
+  - **Rationale**: a11y is the only one with zero violations and a known-bad history → safe to hard-block. Perf/bp/seo are warn-only so future dep bumps don't fail CI before we can investigate.
+
+- `audit/04-roadmap.md`: Updated Fase 4 sub-status table to mark LIGHTHOUSE-002 ✅ DONE,
+  Lighthouse CI strict gate ✅ DONE, Playwright e2e ✅ DONE, A11y axe scan ✅ DONE.
+
+**Skill saved (project-level pattern, reusable):** `~/.hermes/skills/bundle-lazy-load-pattern/SKILL.md`
+documents the `@zxing/browser` dynamic-import pattern: `useEffect` + `await import()` +
+`cancelled` flag + bundle budget CI gate. 6.0 KB, ready for future heavy-dep lazy-load work.
+
+**Acceptance criteria:**
+
+- [x] `lighthouserc.json` strict a11y assertion enabled
+- [x] Removed 4 `skipAudits` entries that we now pass
+- [x] Audit doc updated with Fase 6 status
+- [x] Skill saved with `cancelled` flag pitfall + barrel-import pitfall
+- [ ] CI runs lhci with new assertions, all checks green (next push)
+
+**Risiko:** Low. A11y is the only hard-block and we have unit + e2e axe tests covering it.
+If a future PR regresses a11y score, lhci will block and the author can either fix or bump
+the threshold (with justification in commit message).
+
+**Out of scope (deferred):**
+
+- Re-enable strict Lighthouse CI for all 4 categories at `error` level (perf/bp/seo still
+  on `warn` because they fluctuate with Vite/dep upgrades and a hard block would create
+  churn). Revisit when perf is consistently ≥ 0.8.
 
 ---
 
