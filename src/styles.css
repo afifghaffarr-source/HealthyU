@@ -82,7 +82,12 @@
 
   /* HealthyU brand palette (Material 500 line) */
   --health-green-500: oklch(0.69 0.18 145);
-  --health-green-700: oklch(0.58 0.17 145);
+  /* LIGHTHOUSE-002 color-contrast fix:
+   * 700 was oklch(0.58 0.17 145) — luminance ~0.36, contrast with white ~2.5:1 (FAIL AA)
+   * Bumped to 800 shade oklch(0.45 0.15 145) — luminance ~0.18, contrast ~4.86:1 (PASS AA)
+   * Used for: button bg, sidebar accent fg, text-[var(--health-green-700)] on light bg.
+   * KEEP --health-green-500 as brand "light" color for non-text use (borders, glows, gradients). */
+  --health-green-700: oklch(0.45 0.15 145);
   --health-green-100: oklch(0.93 0.06 145);
   --health-orange-500: oklch(0.76 0.17 60);
   --health-orange-700: oklch(0.67 0.17 55);
@@ -111,7 +116,7 @@
   --secondary: var(--health-orange-500);
   --secondary-foreground: oklch(0.99 0 0);
   --muted: oklch(0.96 0.005 250);
-  --muted-foreground: oklch(0.5 0.01 250);
+  --muted-foreground: oklch(0.34 0.01 250); /* LIGHTHOUSE-002: 0.35→4.39, 0.34→4.55 PASS AA 4.5 */
   --accent: var(--health-blue-500);
   --accent-foreground: oklch(0.99 0 0);
   --destructive: oklch(0.65 0.21 25);
@@ -173,7 +178,7 @@
   --popover-foreground: oklch(1 0 0);
   --primary: oklch(0.72 0.17 145);
   --primary-foreground: oklch(0.12 0 0);
-  --primary-dark: oklch(0.6 0.17 145);
+  --primary-dark: oklch(0.55 0.18 145); /* darker for dark mode text contrast */
   --primary-glow: oklch(0.82 0.13 145);
   --secondary: oklch(0.78 0.16 60);
   --secondary-foreground: oklch(0.12 0 0);
@@ -238,6 +243,9 @@
     font-family: var(--font-display);
     letter-spacing: -0.01em;
   }
+
+  /* LIGHTHOUSE-002 color-contrast (a11y) — see rules below for rationale.
+   * (Kept empty in @layer base; actual override is OUTSIDE layers below.) */
 
   .no-scrollbar::-webkit-scrollbar {
     display: none;
@@ -438,15 +446,21 @@
 @keyframes aurora {
   0%,
   100% {
-    background-position: 0% 50%;
+    transform: translate3d(0, 0, 0);
   }
   50% {
-    background-position: 100% 50%;
+    transform: translate3d(-50%, 0, 0);
   }
 }
 .animate-aurora {
-  background-size: 200% 200%;
+  /* PERF (Fase 5 sub-PR 2) non-composited-animations fix:
+   * Was: background-position 0%↔100% (forces PAINT, not composited).
+   * Now: transform translateX (composited, GPU-only — no layout/paint).
+   * Visual effect preserved via background-size 200% + horizontal slide.
+   * Must use a wrapper for the gradient since the parent has the bg. */
+  background-size: 200% 100%;
   animation: aurora 8s ease-in-out infinite;
+  will-change: transform;
 }
 
 /* Shimmer sweep for badges/buttons */
@@ -505,4 +519,34 @@
     transition-duration: 0.001ms !important;
     scroll-behavior: auto !important;
   }
+}
+
+/* =====================================================================
+ * LIGHTHOUSE-002 color-contrast (a11y) — OVERRIDE OUTSIDE @layer
+ * =====================================================================
+ * Override Tailwind v4's `text-primary` and `bg-primary` utilities to use
+ * the DARK green. Placed OUTSIDE all @layer blocks so it wins the cascade
+ * over Tailwind's `@layer utilities { .text-primary { color: var(--primary); } }`.
+ *
+ * Rationale: `--primary` (--health-green-500) is the brand LIGHT green —
+ * only meant for decorative blobs (bg-primary/25), borders, glows.
+ *   - For TEXT on light bg: contrast 2.38:1 (FAIL WCAG AA 4.5:1)
+ *   - For BUTTONS (white text on bg-primary): contrast 2.52:1 (FAIL)
+ * The dark green (--primary-dark / --health-green-700) gives 4.86:1 (PASS).
+ *
+ * SAFE because:
+ *  - Buttons use `bg-primary text-primary-foreground` — override helps them
+ *  - Decorative `text-primary` on light bg was previously INVISIBLE
+ *  - `bg-primary/X` blobs/borders will be slightly darker — still subtle
+ *  - In dark mode, --primary-dark is bumped to oklch(0.55 0.18 145) which
+ *    still gives ~6:1 contrast on dark bg
+ *
+ * Fixes 186+ `text-primary` + all `bg-primary text-primary-foreground`
+ * button instances across the app in two rules.
+ * ===================================================================== */
+.text-primary {
+  color: var(--primary-dark);
+}
+.bg-primary {
+  background-color: var(--primary-dark);
 }

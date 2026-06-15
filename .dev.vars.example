@@ -1,0 +1,13 @@
+# Local dev vars for Cloudflare Workers (vite dev / wrangler dev)
+# Copy to .dev.vars and fill values. DO NOT commit real values.
+# This file is for local dev only — production secrets are in CF dashboard.
+
+# Required by wrangler.jsonc secrets.required
+SUPABASE_URL=https://placeholder.supabase.co
+SUPABASE_PUBLISHABLE_KEY=sb_publishable_placeholder
+SUPABASE_SERVICE_ROLE_KEY=sb_secret_placeholder
+VEXO_API_KEY=placeholder
+VEXO_BASE_URL=https://placeholder.vexoapi.com
+CRON_SECRET=placeholder-cron-secret-for-local-dev-only
+VAPID_PRIVATE_KEY=placeholder
+VAPID_PUBLIC_KEY=placeholder

@@ -62,6 +62,13 @@ export default defineConfig({
     //  (b) The CF worker entry is independent — vite outputs it to
     //      dist/server/ based on the `main` field.
   },
+  build: {
+    // LIGHTHOUSE-002 valid-source-maps fix: Lighthouse needs source maps to
+    // trace minified code back to source. Without this, lhci 'valid-source-maps'
+    // audit fails. Trade-off: +30-40% dist size (CF can serve .map files
+    // separately or strip via transform rules).
+    sourcemap: true,
+  },
   server: {
     // Defaults that work well locally without the Lovable sandbox.
     port: 8080,

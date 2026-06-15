@@ -70,7 +70,7 @@ function AuthPage() {
   };
 
   return (
-    <main className="min-h-dvh bg-background flex flex-col">
+    <main role="main" className="min-h-dvh bg-background flex flex-col">
       <div className="max-w-md w-full mx-auto px-6 pt-12 pb-8 flex-1 flex flex-col">
         <Link
           to="/"
@@ -136,7 +136,7 @@ function AuthPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-primary text-primary-foreground font-semibold py-3.5 rounded-2xl shadow-md shadow-primary/20 disabled:opacity-50"
+            className="w-full bg-primary-dark text-primary-foreground font-semibold py-3.5 rounded-2xl shadow-md shadow-primary/20 disabled:opacity-50"
           >
             {loading ? "Memproses..." : mode === "login" ? "Masuk" : "Daftar"}
           </button>

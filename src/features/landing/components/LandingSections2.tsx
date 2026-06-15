@@ -91,7 +91,16 @@ export function ComparisonTable() {
           Kenapa ribuan orang Indonesia pindah ke HealthyU.
         </p>
       </div>
-      <div className="glass rounded-2xl border border-white/15 overflow-x-auto">
+      <div
+        className="glass rounded-2xl border border-white/15 overflow-x-auto"
+        // LIGHTHOUSE-002 scrollable-region-focusable (Safari a11y):
+        // Mobile Safari requires keyboard focus on horizontally scrollable
+        // containers so users can swipe-scroll with keyboard. tabIndex=0
+        // makes the region focusable while preserving wheel/touch scroll.
+        tabIndex={0}
+        role="region"
+        aria-label="Perbandingan fitur HealthyU dengan aplikasi lain"
+      >
         <table className="w-full text-sm">
           <thead className="bg-card/60">
             <tr className="text-left">

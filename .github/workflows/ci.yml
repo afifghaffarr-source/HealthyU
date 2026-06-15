@@ -68,18 +68,20 @@ jobs:
       - name: Build and check size
         run: |
           bun run build
-          # TODO(Fase-5): revert to 1 MB after lazy-loading scan.barcode + dynamic import jspdf
-          # Currently scan.barcode chunks at ~1.01 MB just over the 1 MB budget.
-          # Lazy-load plan: src/routes/scan.barcode-{camera,live}.tsx + dynamic import jspdf.
-          # See audit/04-roadmap.md Fase 5.
-          BUDGET_KB=1536
+          # PERF (Fase 5 sub-PR 3 + 4): bundle budget reverted to 1 MB.
+          # Sub-PR 3 lazy-loaded @zxing/browser from scan.barcode route
+          # (437K → 3.3K route shell; zxing loads on demand when user
+          # grants camera). jspdf + html2canvas were already await-import
+          # in achievements/reports routes. Now biggest client chunk is
+          # the main index bundle (758K), well under 1 MB.
+          BUDGET_KB=1024
           LARGEST=$(find dist/client/assets -name "*.js" -size +${BUDGET_KB}k | head -1)
           if [ -n "$LARGEST" ]; then
-            echo "::error::Client chunk $LARGEST exceeds ${BUDGET_KB} KB budget (${BUDGET_KB}KB = temporary raised from 1MB for Fase 5 unblock)"
+            echo "::error::Client chunk $LARGEST exceeds ${BUDGET_KB} KB budget"
             find dist/client/assets -name "*.js" -size +${BUDGET_KB}k -exec ls -lh {} \;
             exit 1
           fi
-          echo "✅ All client chunks under ${BUDGET_KB} KB (temporary budget, revert to 1 MB after Fase 5 lazy-load fix)"
+          echo "✅ All client chunks under ${BUDGET_KB} KB (reverted from 1.5 MB temporary budget)"
 
   secrets-scan:
     name: Secret scan
