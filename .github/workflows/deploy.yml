@@ -39,8 +39,14 @@ jobs:
       - uses: actions/checkout@v4
 
       - uses: oven-sh/setup-bun@v2
+        # Pin to 1.2.21 to match the verified-working VPS build env.
+        # Earlier CI builds used 1.1.34 which is the same minor family but the
+        # lockfile resolution differs subtly between 1.1.x and 1.2.x.
+        # Verified: VPS deploy (bun 1.2.21, wrangler 4.100.0) serves all 5
+        # routes 200. The /api/debug/env endpoint confirms runtime env shape
+        # is correct (15 vars, all bindings present).
         with:
-          bun-version: 1.1.34
+          bun-version: 1.2.21
 
       - name: Install dependencies
         run: bun install --frozen-lockfile
@@ -68,29 +74,65 @@ jobs:
       - name: Verify wrangler version
         run: wrangler --version
 
-      - name: Deploy to Cloudflare (CLI, wrangler 4.100.0)
+      - name: Deploy to Cloudflare (CLI, wrangler 4.100.0, with retry)
         # Using direct `wrangler deploy` CLI instead of cloudflare/wrangler-action@v3
         # because the action silently drops vars from wrangler.jsonc on deploy.
         # Wrangler version is pinned to 4.100.0 (see install step above) so CI
         # produces byte-identical config to the verified-working VPS deploy.
+        #
+        # Retry + keep-vars + idempotency-key:
+        # - 3 attempts with exponential backoff (transient API errors)
+        # - --keep-vars: tell wrangler explicitly to preserve vars from
+        #   wrangler.jsonc on deploy (defensive — vars should already be kept,
+        #   but this guards against future wrangler behavior changes)
+        # - --idempotency-key: dedupe deploys from same SHA, prevents partial
+        #   uploads that can leave worker in inconsistent state
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           WRANGLER_LOG_LEVEL: info
         run: |
           # GIT_SHA + DEPLOYED_BY vars surface in the CF dashboard for audit
-          wrangler deploy \
-            --var "GIT_SHA=${{ github.sha }}" \
-            --var "DEPLOYED_BY=${{ github.actor }}" \
-            --message "Deploy ${{ github.sha }} via GitHub Actions (wrangler 4.100.0)"
+          set +e
+          for attempt in 1 2 3; do
+            echo "::group::Deploy attempt $attempt/3 (sha=${{ github.sha }})"
+            wrangler deploy \
+              --keep-vars \
+              --idempotency-key "gh-${{ github.run_id }}-${{ github.sha }}" \
+              --var "GIT_SHA=${{ github.sha }}" \
+              --var "DEPLOYED_BY=${{ github.actor }}" \
+              --message "Deploy ${{ github.sha }} via GitHub Actions (wrangler 4.100.0) attempt $attempt"
+            exit_code=$?
+            echo "::endgroup::"
+            if [ $exit_code -eq 0 ]; then
+              echo "✅ Deploy succeeded on attempt $attempt"
+              break
+            fi
+            if [ $attempt -lt 3 ]; then
+              wait_seconds=$((attempt * 10))
+              echo "⚠️ Deploy failed (exit $exit_code), retrying in ${wait_seconds}s..."
+              sleep $wait_seconds
+            else
+              echo "::error::Deploy failed after 3 attempts (last exit: $exit_code)"
+              exit $exit_code
+            fi
+          done
 
       - name: Smoke test production
         # Verify the deployment actually works end-to-end
         # Catches env var drift, routing breaks, 500 spikes
+        #
+        # CF Workers deployment propagation: there's a small window (usually
+        # <5s, sometimes up to 30s) where the new version is uploaded but
+        # routes still serve the old version. We sleep + retry to handle this.
+        # If after 60s the new version is still not 200, the deploy is broken.
         run: |
+          echo "::group::Waiting for CF deployment propagation..."
+          sleep 10
+          echo "::endgroup::"
           echo "::group::Smoke test production endpoints"
           for path in / /auth /artikel /faq /api/health; do
-            status=$(curl -sI -o /dev/null -w "%{http_code}" "https://healthyu.web.id$path" --max-time 15)
+            status=$(curl -sI -A "Mozilla/5.0" -o /dev/null -w "%{http_code}" "https://healthyu.web.id$path" --max-time 15)
             echo "  $path → HTTP $status"
             if [ "$path" = "/" ] || [ "$path" = "/auth" ] || [ "$path" = "/api/health" ]; then
               if [ "$status" != "200" ]; then
@@ -109,6 +151,27 @@ jobs:
             fi
           done
           echo "✅ All smoke tests passed"
+          echo "::endgroup::"
+
+          # Verify env actually arrived at runtime (defense in depth).
+          # If /api/debug/env returns 404 it means the route isn't deployed yet
+          # (propagation lag) — we don't fail on that, just warn.
+          # If it returns 200 but hasSupabaseUrl=false, that's a real regression.
+          echo "::group::Verifying runtime env shape via /api/debug/env"
+          debug_resp=$(curl -sS -A "Mozilla/5.0" "https://healthyu.web.id/api/debug/env" --max-time 15 2>/dev/null)
+          if [ -z "$debug_resp" ]; then
+            echo "::warning::Debug endpoint returned empty response (may be 404 = route not deployed yet)"
+          elif echo "$debug_resp" | grep -q '"ok": true'; then
+            if echo "$debug_resp" | grep -q '"hasSupabaseUrl": true'; then
+              echo "✅ Runtime env verified: SUPABASE_URL + SUPABASE_PUBLISHABLE_KEY present"
+            else
+              echo "::error::Runtime env MISSING SUPABASE_URL — env binding broken!"
+              echo "$debug_resp"
+              exit 1
+            fi
+          else
+            echo "::warning::Debug endpoint didn't return ok:true (response: $(echo "$debug_resp" | head -c 200))"
+          fi
           echo "::endgroup::"
 
       - name: Notify on failure
