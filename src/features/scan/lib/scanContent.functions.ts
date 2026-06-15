@@ -3,6 +3,7 @@ import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { callAiWithGuards, callAiJsonWithSchema } from "@/features/ai/lib/aiGateway.server";
 import { makeScanAiCaller } from "./scanCore.server";
+import { logServerError } from "@/lib/logger.server";
 
 const callAI = makeScanAiCaller("scanBatch7");
 
@@ -155,7 +156,12 @@ export const getDailyChallenge = createServerFn({ method: "POST" })
         ],
       });
       if (!parsed?.title) parsed = fallback;
-    } catch {}
+    } catch (e) {
+      // AI returned a response that didn't match DailyChallengeSchema.
+      // We fall through with the local `fallback` so the user still gets
+      // a usable challenge. Surface the parse failure for observability.
+      logServerError("scanContent.dailyChallenge", e, { stage: "schema-parse" });
+    }
     const { data: created } = await supabase
       .from("ai_daily_challenges")
       .insert({

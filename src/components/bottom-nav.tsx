@@ -17,9 +17,17 @@ const items = [
 
 export function BottomNav() {
   const location = useLocation();
-  const isChat = location.pathname.startsWith("/chat");
-  if (isChat) return null;
+  if (location.pathname.startsWith("/chat")) return null;
+  return <BottomNavContent />;
+}
 
+/**
+ * Inner content for BottomNav — kept in a separate component so all
+ * hooks (useOfflineQueue, useServerFn, useQuery) are called unconditionally.
+ * Rendering this is decided by the parent, so hook order is stable across
+ * renders per the Rules of Hooks (react-hooks/rules-of-hooks).
+ */
+function BottomNavContent() {
   const { online, pending, sync } = useOfflineQueue();
   const fetchNotifs = useServerFn(listNotifications);
   const { data: notif } = useQuery({
@@ -32,13 +40,7 @@ export function BottomNav() {
   return (
     <>
       {(!online || pending > 0) && (
-        <div
-          className={
-            isChat
-              ? "fixed bottom-[10.75rem] left-1/2 -translate-x-1/2 z-40 shadow-lg rounded-full lg:bottom-6 lg:left-28"
-              : "fixed bottom-24 left-1/2 -translate-x-1/2 z-40 shadow-lg rounded-full lg:bottom-6 lg:left-28"
-          }
-        >
+        <div className="fixed bottom-24 left-1/2 -translate-x-1/2 z-40 shadow-lg rounded-full lg:bottom-6 lg:left-28">
           <SyncPill online={online} pending={pending} onSync={() => sync()} />
         </div>
       )}

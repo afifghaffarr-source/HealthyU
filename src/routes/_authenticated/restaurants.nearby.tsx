@@ -11,10 +11,14 @@ export const Route = createFileRoute("/_authenticated/restaurants/nearby")({ com
 
 function Page() {
   const fn = useServerFn(restaurantsNearby);
-  const [list, setList] = useState<any[]>([]);
+  // Shape inferred from JSX usage (id, name, address). Server returns a
+  // superset — we only consume these three fields, so narrowing is safe
+  // and removes the previous `any[]` escape hatch.
+  type Restaurant = { id: string; name: string; address: string };
+  const [list, setList] = useState<Restaurant[]>([]);
   const mut = useMutation({
     mutationFn: (loc: { lat: number; lng: number }) => fn({ data: loc }),
-    onSuccess: (r) => setList(r.restaurants),
+    onSuccess: (r) => setList(r.restaurants as Restaurant[]),
   });
   const locate = () => {
     navigator.geolocation.getCurrentPosition((pos) =>

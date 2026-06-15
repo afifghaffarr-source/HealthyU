@@ -3,6 +3,7 @@ import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { callAiWithGuards, callAiJsonWithSchema } from "@/features/ai/lib/aiGateway.server";
 import { makeScanAiCaller } from "./scanCore.server";
+import { logServerError } from "@/lib/logger.server";
 
 const callAI = makeScanAiCaller("scanBatch8");
 
@@ -219,7 +220,11 @@ export const estimateGroceryCost = createServerFn({ method: "POST" })
     let estimates: Array<{ item: string; estimatedIdr: number; note?: string }> = [];
     try {
       estimates = m ? JSON.parse(m[0]) : [];
-    } catch {}
+    } catch (e) {
+      // AI returned a non-JSON estimate list. Fall through to zero
+      // estimates so caller can still compute a partial total.
+      logServerError("scanPlan.budgetEstimate", e, { stage: "json-parse" });
+    }
     const totalIdr = estimates.reduce((s, e) => s + Number(e.estimatedIdr || 0), 0);
     return { estimates, totalIdr };
   });
