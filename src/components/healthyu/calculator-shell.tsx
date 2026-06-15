@@ -1,11 +1,6 @@
 import type { ReactNode } from "react";
 import { Link } from "@tanstack/react-router";
-import { APP_CONFIG } from "@/config/app";
-
-interface BreadcrumbItem {
-  name: string;
-  to: string;
-}
+import { type BreadcrumbItem } from "./calculator-shell.utils";
 
 interface CalculatorShellProps {
   title: string;
@@ -61,18 +56,4 @@ export function CalculatorShell({
       )}
     </main>
   );
-}
-
-// eslint-disable-next-line react-refresh/only-export-components
-export function breadcrumbSchema(items: BreadcrumbItem[]) {
-  return {
-    "@context": "https://schema.org",
-    "@type": "BreadcrumbList",
-    itemListElement: items.map((b, i) => ({
-      "@type": "ListItem",
-      position: i + 1,
-      name: b.name,
-      item: `${APP_CONFIG.siteUrl}${b.to === "/" ? "" : b.to}`,
-    })),
-  };
 }

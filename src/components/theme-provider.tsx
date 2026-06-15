@@ -1,10 +1,7 @@
-import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
+import { ThemeCtx } from "./theme-provider.hook";
 
 type Theme = "light" | "dark";
-const ThemeCtx = createContext<{ theme: Theme; toggle: () => void }>({
-  theme: "light",
-  toggle: () => {},
-});
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
   const [theme, setTheme] = useState<Theme>("light");
@@ -27,6 +24,3 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     </ThemeCtx.Provider>
   );
 }
-
-// eslint-disable-next-line react-refresh/only-export-components
-export const useTheme = () => useContext(ThemeCtx);

@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { GROUP_BONUS_BADGE_TTL_MS } from "@/lib/constants";
 import { useMiniFocusTrap } from "@/hooks/useMiniFocusTrap";
-import { useAnnounce } from "@/components/live-announcer";
+import { useAnnounce } from "@/components/live-announcer.hook";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
 
 export function GroupBonusBadge({

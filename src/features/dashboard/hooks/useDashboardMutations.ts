@@ -5,7 +5,7 @@ import { logWater } from "@/features/water/lib/water.functions";
 import { addMood } from "@/features/mood/lib/mood.functions";
 import { claimDailyLoginBonus } from "@/features/scan/lib/scanBatch9.functions";
 import { getAchievementToastPrefix } from "@/lib/achievement-icons";
-import { useAnnounce } from "@/components/live-announcer";
+import { useAnnounce } from "@/components/live-announcer.hook";
 import { useState } from "react";
 
 export function useDashboardMutations() {

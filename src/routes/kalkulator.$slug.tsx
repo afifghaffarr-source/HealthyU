@@ -1,6 +1,7 @@
 import { createFileRoute, notFound } from "@tanstack/react-router";
 import { canonical } from "@/lib/seo";
-import { CalculatorShell, breadcrumbSchema } from "@/components/healthyu/calculator-shell";
+import { CalculatorShell } from "@/components/healthyu/calculator-shell";
+import { breadcrumbSchema } from "@/components/healthyu/calculator-shell.utils";
 import {
   BMIForm,
   BMRForm,

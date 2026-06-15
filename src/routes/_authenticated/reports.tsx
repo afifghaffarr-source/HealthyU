@@ -16,7 +16,7 @@ import { fallback, zodValidator } from "@tanstack/zod-adapter";
 import { useNavigate } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 import { useTranslation } from "@/lib/i18n";
-import { useAnnounce } from "@/components/live-announcer";
+import { useAnnounce } from "@/components/live-announcer.hook";
 import { exportWeeklyCsv, exportWeeklyPdf } from "@/features/reports/lib/reportsPdf";
 import { Stat } from "@/features/reports/components/Stat";
 import { WeeklyChart } from "@/features/reports/components/WeeklyChart";

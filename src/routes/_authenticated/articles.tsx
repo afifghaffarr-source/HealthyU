@@ -44,7 +44,11 @@ function ArticlesPage() {
       map.set(a.category, (map.get(a.category) ?? 0) + 1);
     });
     return Array.from(map.entries());
-  }, [articles]);
+    // AUDIT-007 fix: depend on `data` (source of truth) not the derived
+    // `articles` ref — otherwise `categories` recomputes every render even
+    // when the underlying array content is unchanged.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [data]);
 
   const [filter, setFilter] = useState<string>("all");
   const visible =

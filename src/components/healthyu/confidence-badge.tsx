@@ -1,14 +1,7 @@
 import { CheckCircle2, AlertCircle, HelpCircle } from "lucide-react";
+import { type ConfidenceTier, tierFromScore } from "./confidence-badge.utils";
 
-export type ConfidenceTier = "high" | "medium" | "low";
-
-// eslint-disable-next-line react-refresh/only-export-components
-export function tierFromScore(score: number | null | undefined): ConfidenceTier {
-  const n = Number(score ?? 0);
-  if (n >= 0.8) return "high";
-  if (n >= 0.5) return "medium";
-  return "low";
-}
+export type { ConfidenceTier };
 
 const STYLE: Record<ConfidenceTier, { label: string; Icon: typeof CheckCircle2; cls: string }> = {
   high: {
