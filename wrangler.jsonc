@@ -1,6 +1,7 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "healthyu",
+  "account_id": "dafde0a6ca2b2983b71bb371260286ca",
   "compatibility_date": "2024-09-23",
   "compatibility_flags": ["nodejs_compat"],
   "main": "./src/server-entry.ts",
