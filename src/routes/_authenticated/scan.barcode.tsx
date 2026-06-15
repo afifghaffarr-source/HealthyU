@@ -2,7 +2,6 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { BrowserMultiFormatReader } from "@zxing/browser";
 import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { BottomNav } from "@/components/bottom-nav";
 import { lookupBarcode, relogMeal } from "@/features/scan/lib/scanExtras.functions";
@@ -53,11 +52,17 @@ function Page() {
   });
 
   useEffect(() => {
-    const reader = new BrowserMultiFormatReader();
+    // PERF (Fase 5 sub-PR 3): lazy-load @zxing/browser (≈150K minified) only
+    // when the user actually opens the scan page AND grants camera permission.
+    // Saves the entire zxing bundle from the route's initial chunk (scan.barcode
+    // 437K → ~280K route + ~150K zxing on demand).
+    let reader: import("@zxing/browser").BrowserMultiFormatReader | null = null;
     let stopped = false;
     let controls: { stop: () => void } | null = null;
     (async () => {
       try {
+        const { BrowserMultiFormatReader } = await import("@zxing/browser");
+        reader = new BrowserMultiFormatReader();
         controls = await reader.decodeFromVideoDevice(undefined, videoRef.current!, (result) => {
           if (stopped || !result) return;
           const text = result.getText();
@@ -75,6 +80,7 @@ function Page() {
     return () => {
       stopped = true;
       controls?.stop();
+      reader = null;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
