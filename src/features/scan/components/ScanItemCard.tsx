@@ -1,6 +1,7 @@
 import { Check, Pencil } from "lucide-react";
 import { recognizeFood } from "@/features/food/lib/foodScan.functions";
-import { ConfidenceBadge, tierFromScore } from "@/components/healthyu/confidence-badge";
+import { ConfidenceBadge } from "@/components/healthyu/confidence-badge";
+import { tierFromScore } from "@/components/healthyu/confidence-badge.utils";
 
 type Item = Awaited<ReturnType<typeof recognizeFood>>["items"][number];
 

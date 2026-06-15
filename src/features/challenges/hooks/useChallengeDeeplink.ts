@@ -2,7 +2,7 @@ import { useEffect, useRef, useState, type RefObject } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { toast } from "sonner";
 import { CHALLENGE_HIGHLIGHT_MS, CHALLENGE_HIGHLIGHT_FADE_MS } from "@/lib/constants";
-import { useAnnounce } from "@/components/live-announcer";
+import { useAnnounce } from "@/components/live-announcer.hook";
 
 type Challenge = { id: string; title?: string | null };
 type Participation = {

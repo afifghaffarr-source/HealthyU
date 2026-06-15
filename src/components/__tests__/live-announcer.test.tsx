@@ -1,6 +1,7 @@
 import { describe, it, expect, afterEach, vi, beforeEach } from "vitest";
 import { render, cleanup, screen, act } from "@testing-library/react";
-import { LiveAnnouncerProvider, useAnnounce } from "../live-announcer";
+import { LiveAnnouncerProvider } from "../live-announcer";
+import { useAnnounce } from "../live-announcer.hook";
 
 function Trigger({ message }: { message: string }) {
   const announce = useAnnounce();

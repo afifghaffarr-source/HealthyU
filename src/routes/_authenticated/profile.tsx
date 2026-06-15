@@ -10,7 +10,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { clearAll } from "@/lib/offline-queue";
 import { calcAge, calcBMI, bmiCategory, calcBMR, calcTDEE, type ActivityLevel } from "@/lib/health";
 import { LogOut, Settings, Trophy, Scale, HeartPulse, Activity } from "lucide-react";
-import { useTheme } from "@/components/theme-provider";
+import { useTheme } from "@/components/theme-provider.hook";
 import { LocaleSwitcher } from "@/components/locale-switcher";
 import { ProfileNavGrid } from "@/features/profile/components/ProfileNavGrid";
 import { DisclaimerCard } from "@/components/healthyu/disclaimer-card";

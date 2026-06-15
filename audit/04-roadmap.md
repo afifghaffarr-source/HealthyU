@@ -211,35 +211,35 @@ ls -la dist/client/assets/scan.barcode-*.js
 
 **Sub-status:**
 
-| Sub-fase                                              | Status                                  | Ref                                                                    |
-| ----------------------------------------------------- | --------------------------------------- | ---------------------------------------------------------------------- |
-| LIGHTHOUSE-001 env injection investigation (prereq)   | ✅ DONE                                 | `04-fase-4-env-injection.md`, PR #5, skill `vite-cf-ssr-env-isolation` |
-| LIGHTHOUSE-001 proper fix (lhci sources .dev.vars)   | ✅ DONE (PR #13)                        | lhci URL scope = 5 routes (incl. `/artikel`, `/faq`). CI step materializes placeholder `.dev.vars`. |
-| LIGHTHOUSE-002 a11y + perf + bundle (3 sub-PRs)       | ✅ DONE                                 | PR #9 (a11y) + PR #10 (perf) + PR #11 (bundle). Skill `bundle-lazy-load-pattern` saved. |
-| AUDIT-016 API route tests                             | ⚠️ TODO                                 | (part of Fase 5)                                                       |
-| AUDIT-012 chatSafety quarterly review                 | ⚠️ TODO (low priority)                  | —                                                                      |
-| Top-3 god-file refactor (types, sidebar, scanMisc)    | ⚠️ TODO                                 | (optional)                                                             |
-| Dependency audit (bun outdated, Dependabot)           | ⚠️ TODO                                 | (part of Fase 5)                                                       |
-| **Lighthouse CI strict gate re-enable**               | ✅ DONE (Fase 6)                        | PR #12 — lhci a11y `error` ≥ 0.9, perf/bp/seo `warn` ≥ 0.7/0.8/0.8     |
-| Playwright e2e suite                                  | ✅ DONE (a11y e2e baseline shipped)     | `e2e/a11y/home.spec.ts` — 6/6 pass (3 routes × 2 devices)             |
-| Code coverage baseline                                | ⚠️ TODO                                 | (optional, post-Fase 6)                                                |
-| A11y axe scan (axe-core)                              | ✅ DONE                                 | `@axe-core/playwright` + `vitest-axe` (unit). 0 WCAG AA violations.    |
+| Sub-fase                                            | Status                              | Ref                                                                                                 |
+| --------------------------------------------------- | ----------------------------------- | --------------------------------------------------------------------------------------------------- |
+| LIGHTHOUSE-001 env injection investigation (prereq) | ✅ DONE                             | `04-fase-4-env-injection.md`, PR #5, skill `vite-cf-ssr-env-isolation`                              |
+| LIGHTHOUSE-001 proper fix (lhci sources .dev.vars)  | ✅ DONE (PR #13)                    | lhci URL scope = 5 routes (incl. `/artikel`, `/faq`). CI step materializes placeholder `.dev.vars`. |
+| LIGHTHOUSE-002 a11y + perf + bundle (3 sub-PRs)     | ✅ DONE                             | PR #9 (a11y) + PR #10 (perf) + PR #11 (bundle). Skill `bundle-lazy-load-pattern` saved.             |
+| AUDIT-016 API route tests                           | ⚠️ TODO                             | (part of Fase 5)                                                                                    |
+| AUDIT-012 chatSafety quarterly review               | ⚠️ TODO (low priority)              | —                                                                                                   |
+| Top-3 god-file refactor (types, sidebar, scanMisc)  | ⚠️ TODO                             | (optional)                                                                                          |
+| Dependency audit (bun outdated, Dependabot)         | ✅ DONE (Fase 7)                    | PR #15 — `bun update` 38 pkgs + overrides (esbuild/brace-expansion) + Dependabot weekly             |
+| **Lighthouse CI strict gate re-enable**             | ✅ DONE (Fase 6)                    | PR #12 — lhci a11y `error` ≥ 0.9, perf/bp/seo `warn` ≥ 0.7/0.8/0.8                                  |
+| Playwright e2e suite                                | ✅ DONE (a11y e2e baseline shipped) | `e2e/a11y/home.spec.ts` — 6/6 pass (3 routes × 2 devices)                                           |
+| Code coverage baseline                              | ⚠️ TODO                             | (optional, post-Fase 6)                                                                             |
+| A11y axe scan (axe-core)                            | ✅ DONE                             | `@axe-core/playwright` + `vitest-axe` (unit). 0 WCAG AA violations.                                 |
 
 **Findings yang diperbaiki (planned):**
 
-| ID                          | Priority    | Lokasi                                                   | Effort |
-| --------------------------- | ----------- | -------------------------------------------------------- | ------ |
-| AUDIT-016                   | Improvement | API route tests                                          | S      |
-| AUDIT-012                   | Low         | chatSafety quarterly review                              | S      |
-| LIGHTHOUSE-002 a11y         | Medium      | home page (`src/routes/index.tsx`, `src/components/...`) | L      |
-| LIGHTHOUSE-002 perf         | Medium      | home page (jspdf, chart, html2canvas)                    | L      |
-| LIGHTHOUSE-002 bundle       | Medium      | scan.barcode routes, reports export                      | M      |
-| Top-3 god-file refactor     | Improvement | types.ts, sidebar.tsx, scanMisc.functions.ts             | L      |
-| (Planned) Dependency audit  | Improvement | `bun outdated`, set Dependabot                           | S      |
-| (Planned) Lighthouse CI run | Improvement | `bunx lhci autorun` (post-a11y fix)                      | S      |
-| (Planned) Playwright e2e    | Improvement | `bunx playwright test`                                   | M      |
-| (Planned) Code coverage     | Improvement | `bunx vitest --coverage`                                 | S      |
-| (Planned) A11y axe scan     | Improvement | Playwright + axe-core                                    | M      |
+| ID                          | Priority    | Lokasi                                                   | Effort                          |
+| --------------------------- | ----------- | -------------------------------------------------------- | ------------------------------- |
+| AUDIT-016                   | Improvement | API route tests                                          | S                               |
+| AUDIT-012                   | Low         | chatSafety quarterly review                              | S                               |
+| LIGHTHOUSE-002 a11y         | Medium      | home page (`src/routes/index.tsx`, `src/components/...`) | L                               |
+| LIGHTHOUSE-002 perf         | Medium      | home page (jspdf, chart, html2canvas)                    | L                               |
+| LIGHTHOUSE-002 bundle       | Medium      | scan.barcode routes, reports export                      | M                               |
+| Top-3 god-file refactor     | Improvement | types.ts, sidebar.tsx, scanMisc.functions.ts             | L                               |
+| (Planned) Dependency audit  | Improvement | `bun outdated`, set Dependabot                           | ✅ DONE (Fase 7, PR #15)        |
+| (Planned) Lighthouse CI run | Improvement | `bunx lhci autorun` (post-a11y fix)                      | ✅ DONE (Fase 6, PR #12)        |
+| (Planned) Playwright e2e    | Improvement | `bunx playwright test`                                   | ✅ DONE (Fase 5, a11y baseline) |
+| (Planned) Code coverage     | Improvement | `bunx vitest --coverage`                                 | S                               |
+| (Planned) A11y axe scan     | Improvement | Playwright + axe-core                                    | ✅ DONE (Fase 5)                |
 
 **File yang disentuh:** Depends on actual findings dari Fase 3 evaluation.
 
@@ -345,6 +345,79 @@ the threshold (with justification in commit message).
 - Re-enable strict Lighthouse CI for all 4 categories at `error` level (perf/bp/seo still
   on `warn` because they fluctuate with Vite/dep upgrades and a hard block would create
   churn). Revisit when perf is consistently ≥ 0.8.
+
+---
+
+## Fase 7 — Dependency Audit & Dependabot (S, 2026-06-15)
+
+**Tujuan:** Eliminate known security vulnerabilities, prevent future dep drift
+di luar kendali, dan catch transitive issues early.
+
+**Status: ✅ DONE 2026-06-15** — PR #15 merged (branch `chore/audit-fase-7-deps`).
+
+**Baseline (pre-Fase 7):**
+
+| Metric            | Value                                                                                   |
+| ----------------- | --------------------------------------------------------------------------------------- |
+| `bun audit` vulns | 4 (1 high esbuild, 1 mod @tanstack server-fn, 1 mod brace-expansion, 1 low esbuild Win) |
+| Outdated packages | 50+ (mostly Radix UI minor + @tanstack patch)                                           |
+| Dependabot        | ❌ not configured                                                                       |
+| Last dep update   | unknown (no record)                                                                     |
+
+**Perubahan yang dilakukan:**
+
+1. **`bun update`** (compatible, no breaking): 38 packages upgraded ke versi aman
+   - Radix UI: 22 packages dari `1.x.12/15/16/17` → `1.x.13/16/17` (minor + patch)
+   - @tanstack: `1.167.x → 1.168.x` (react-start server-core fix → closed 1 vuln)
+   - Supabase: `2.106 → 2.108`
+   - Tailwind CSS: `4.2.4 → 4.3.1`
+   - React: `19.2.5 → 19.2.7`
+   - Recharts/zod/vite/typescript/eslint: **not upgraded** (major jumps deferred)
+
+2. **`package.json` overrides** (transitive dep force-upgrade):
+   - `esbuild: "^0.28.1"` — close 1 high (Deno RCE) + 1 low (Win file read) vuln
+   - `brace-expansion: "^5.0.6"` — close 1 moderate (ReDoS) vuln
+   - Bun supports `overrides` natively (npm-style syntax)
+   - Verified: TSC ✓, lint ✓, 336/336 tests ✓, build ✓
+
+3. **`.github/dependabot.yml`** created (2.4 KB):
+   - Schedule: **weekly Monday 09:00 WIB** (Asia/Jakarta TZ)
+   - Open PR limit: 5
+   - **Groups** (reduce PR noise): `radix-ui`, `tanstack`, `react`, `dev-tooling`
+   - **Ignore** major updates for: `recharts`, `zod`, `vite`, `vitest`, `typescript`,
+     `eslint`, `globals`, `@vitejs/plugin-react`, `@vitest/coverage-v8`
+     (all have known breaking changes — require manual review)
+   - **Labels**: `dependencies`, `automated-pr`
+   - **Commit prefix**: `deps` (prod) / `deps(dev)` (devDeps) — commitlint-friendly
+   - **No auto-merge** — manual review per team policy (per AGENTS.md)
+
+**Audit result (post-Fase 7):**
+
+| Metric                | Before       | After                                          |
+| --------------------- | ------------ | ---------------------------------------------- |
+| `bun audit` vulns     | 4 (1H/2M/1L) | **0** ✓                                        |
+| Outdated packages     | 50+          | 12 (all major, deferred per Dependabot config) |
+| Dependabot configured | ❌           | ✅ weekly + grouped                            |
+| TSC                   | ✓            | ✓                                              |
+| Lint                  | ✓            | ✓                                              |
+| Unit tests            | 336/336      | 336/336                                        |
+| Build                 | ✓            | ✓                                              |
+
+**Risiko:** Very low. `bun update` (compatible) hanya naikin patch + minor. Overrides
+untuk transitive deps di-batasi hanya untuk 2 package yang ada vulns. Dependabot major
+ignored untuk mencegah breaking PRs masuk tanpa review.
+
+**Out of scope (deferred):**
+
+- Major version bumps (recharts 2→3, zod 3→4, vite 7→8, typescript 5→6, eslint 9→10) —
+  all require manual migration + test runs.
+- Renovate bot — Dependabot cukup untuk saat ini.
+- Auto-merge Dependabot PRs — nonaktif per AGENTS.md rule "Jangan lanjut ke langkah
+  berikut sebelum user approve".
+
+**Commits in PR #15:**
+
+- (TBD) `chore(deps): audit + upgrade via bun update + overrides + dependabot`
 
 ---
 

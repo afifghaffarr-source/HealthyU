@@ -17,7 +17,7 @@ import {
   leaveChallenge,
 } from "@/features/challenges/lib/challenges.functions";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
-import { useAnnounce } from "@/components/live-announcer";
+import { useAnnounce } from "@/components/live-announcer.hook";
 import { ChallengeCard } from "@/features/challenges/components/ChallengeCard";
 import { useChallengeDeeplink } from "@/features/challenges/hooks/useChallengeDeeplink";
 

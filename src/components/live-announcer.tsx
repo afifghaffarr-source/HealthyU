@@ -1,20 +1,12 @@
-import {
-  createContext,
-  useCallback,
-  useContext,
-  useEffect,
-  useRef,
-  useState,
-  type ReactNode,
-} from "react";
+import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
+import { LiveAnnouncerContext, type AnnounceFn } from "./live-announcer.context";
 
-type AnnounceFn = (message: string, politeness?: "polite" | "assertive") => void;
-
-const LiveAnnouncerContext = createContext<AnnounceFn | null>(null);
+export type { AnnounceFn };
 
 /**
  * Global aria-live announcer. Mount once in __root.tsx; consumer components
- * call `useAnnounce()` to push messages to a shared SR-only region.
+ * call `useAnnounce()` from `./live-announcer.hook` to push messages to
+ * a shared SR-only region.
  */
 export function LiveAnnouncerProvider({ children }: { children: ReactNode }) {
   const [polite, setPolite] = useState("");
@@ -49,11 +41,4 @@ export function LiveAnnouncerProvider({ children }: { children: ReactNode }) {
       </span>
     </LiveAnnouncerContext.Provider>
   );
-}
-
-// eslint-disable-next-line react-refresh/only-export-components
-export function useAnnounce(): AnnounceFn {
-  const ctx = useContext(LiveAnnouncerContext);
-  // No-op fallback if used outside provider (e.g. unit tests).
-  return ctx ?? (() => {});
 }
