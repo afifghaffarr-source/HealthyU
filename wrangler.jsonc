@@ -8,6 +8,7 @@
   "vars": {
     "NODE_ENV": "production",
     "SUPABASE_URL": "https://lezbpzpkvkdpbjvtvoei.supabase.co",
+    "SUPABASE_PUBLISHABLE_KEY": "sb_publishable_66jMJijY4c8mdbHJxXaqnA_VzS7r-1D",
     "VITE_SUPABASE_URL": "https://lezbpzpkvkdpbjvtvoei.supabase.co",
     "VITE_SUPABASE_PUBLISHABLE_KEY": "sb_publishable_66jMJijY4c8mdbHJxXaqnA_VzS7r-1D",
     "VITE_SUPABASE_PROJECT_ID": "lezbpzpkvkdpbjvtvoei",
