@@ -63,6 +63,26 @@ export function withEnv<T>(env: CloudflareEnv, fn: () => T): T {
 }
 
 /**
+ * Async version of withEnv. Required when the wrapped function returns a
+ * Promise that needs to preserve the AsyncLocalStorage context across
+ * `await` boundaries. CF Workers' AsyncLocalStorage implementation
+ * (node:async_hooks via nodejs_compat) requires the callback to either
+ * be sync or returned as a Promise from within the run() call.
+ */
+export async function withEnvAsync<T>(env: CloudflareEnv, fn: () => Promise<T> | T): Promise<T> {
+  let resolve!: (v: T) => void;
+  let reject!: (err: unknown) => void;
+  const promise = new Promise<T>((res, rej) => {
+    resolve = res;
+    reject = rej;
+  });
+  envStorage.run(env, () => {
+    Promise.resolve(fn()).then(resolve, reject);
+  });
+  return promise;
+}
+
+/**
  * Read the current env object. Prefers the CF Workers env (from AsyncLocalStorage)
  * and merges in process.env as a fallback so local dev + tests still work.
  *

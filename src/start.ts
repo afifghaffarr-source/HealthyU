@@ -2,7 +2,7 @@ import { createStart, createMiddleware } from "@tanstack/react-start";
 
 import { renderErrorPage } from "./lib/error-page";
 import { attachSupabaseAuth } from "@/integrations/supabase/auth-attacher";
-import { withEnv, type CloudflareEnv } from "@/lib/cloudflare-env.server";
+import { withEnvAsync, type CloudflareEnv } from "@/lib/cloudflare-env.server";
 
 /**
  * Inject CF Workers env bindings into AsyncLocalStorage so `getEnv()` works
@@ -42,7 +42,7 @@ const envInjectionMiddleware = createMiddleware().server(async ({ context, next 
   }
   // DEBUG-INJECT-END
 
-  return withEnv(envToInject, async () => {
+  return withEnvAsync(envToInject, async () => {
     return await next();
   });
 });
