@@ -66,9 +66,16 @@ describe("callAiWithGuards", () => {
 
   // New env pattern: withMockedEnv sets a CF env context. This is the
   // production-style mock; the other tests use process.env for legacy compat.
+  // Note: withMockedEnv merges process.env (production-like behavior), so
+  // passing {} does NOT clear VEXO_API_KEY=test-key set by beforeEach. We
+  // must explicitly override the key to undefined to exercise the
+  // "missing key → fail closed" path. This mirrors production where the
+  // CF Workers env overrides build-time-injected values.
   it("fails closed when VEXO_API_KEY missing in withMockedEnv", async () => {
     await expect(
-      withMockedEnv({}, () => callAiWithGuards({ userId: null, feature: "f", messages: msgs })),
+      withMockedEnv({ VEXO_API_KEY: undefined as unknown as string }, () =>
+        callAiWithGuards({ userId: null, feature: "f", messages: msgs }),
+      ),
     ).rejects.toBeInstanceOf(AiGatewayError);
   });
 
