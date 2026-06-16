@@ -263,6 +263,8 @@ ls -la dist/client/assets/scan.barcode-*.js
 
 **Status: SUBSET COMPLETE** (Fase 5a/b/c/d audit cleanup: PRs #9, #10, #11, #8 all MERGED). Fase 5 Production Hardening proper (backup, rollback, monitoring, docs) is still ongoing — separate from audit cleanup.
 
+**CI deploy bug resolution (2026-06-16):** Production-deploy dari CI auto-deploy sebelumnya gak reliable — commits `74387af5` (disable push trigger) → `8badc892` (re-enable for testing) → manual VPS recovery x3. Final fix di commit `a9aa33fc` (pass VITE\_\* env vars to build step). Postmortem lengkap di [`docs/incident-2026-06-16-ci-deploy.md`](../docs/incident-2026-06-16-ci-deploy.md). CI auto-deploy sekarang green, smoke test 5/5 routes 200. Skill `devops/healthyu-ci-deploy-debug` saved untuk reference.
+
 **Findings yang diperbaiki (planned):**
 
 - Backup strategy untuk Supabase DB

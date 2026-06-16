@@ -28,6 +28,8 @@ HealthyU adalah project **mature dan security-conscious** (bukan "0/10 kacau"). 
 **Fase 6 status: ✅ COMPLETE** — PR #12 MERGED 2026-06-15. lhci strict a11y `error` ≥ 0.9 PASSED on real CI (proves Fase 5a fixes hold). 4 fixed skipAudits removed (`color-contrast`, `aria-hidden-focus`, `valid-source-maps`, `non-composited-animations`). 3 kept (CF free tier / known SSR env limit). Perf/bp/seo on `warn` tier (don't churn CI on dep bumps). Skill `bundle-lazy-load-pattern` saved (6 KB, reusable for future heavy-dep lazy-load). |
 **Fase 7 status: ✅ COMPLETE** — PR #15 MERGED 2026-06-15. `bun audit` 4→0 vulns (1 high esbuild Deno RCE + 1 mod brace-expansion ReDoS + 1 mod @tanstack server-fn + 1 low esbuild Win) all fixed via `bun update` (38 pkgs) + `package.json overrides` untuk transitive esbuild + brace-expansion. Dependabot config added: weekly Monday 09:00 WIB, grouped (radix/tanstack/react/dev-tooling), auto-label `dependencies` + `automated-pr`, commit prefix `deps`/`deps(dev)`, major version updates blocked untuk breaking deps (recharts, zod, vite, typescript, eslint). |
 
+**CI deploy debug resolution status: ✅ COMPLETE** (2026-06-16) — Commits `401a11c6` (withEnvAsync defensive fix) + `a9aa33fc` (real fix: pass VITE\_\* to build step). Postmortem di `docs/incident-2026-06-16-ci-deploy.md`. Skill `devops/healthyu-ci-deploy-debug` saved. CI auto-deploy sekarang reliable. |
+
 ---
 
 ## 2. Tabel Ringkas (Section 10 plan)
