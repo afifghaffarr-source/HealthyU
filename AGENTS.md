@@ -20,6 +20,21 @@ AI: **VexoAPI** (gpt-oss-120b / glm-4.7-flash / multimodal gemini).
 
 **Wajib jalankan `bunx tsc --noEmit` dan `bun run test` setelah edit file `.ts`/`.tsx`.**
 
+## Bun Version Pin (PENTING)
+
+**Wajib pakai bun 1.2.21** (sesuai `packageManager` di `package.json`). Bun 1.3.x:
+
+- v8 coverage **broken** (`@vitest/coverage-v8` returns "Coverage APIs are not supported" → laporan 0% padahal CI bilang 70%+)
+- node:inspector **not implemented** di bun 1.3.x (track: https://github.com/oven-sh/bun/issues/2445)
+
+Cara pin lokal:
+
+```bash
+curl -fsSL https://bun.sh/install | bash -s "bun-v1.2.21"
+```
+
+Atau pakai `corepack`/`nix`/`asdf` untuk manage versi. CI sudah pin eksplisit (`.github/workflows/lint-constants.yml`) supaya gak kena drift.
+
 ## Aturan Wajib (dari healthyu-project-rules.md)
 
 1. Jangan rewrite seluruh project. Perubahan harus kecil & bertahap.
