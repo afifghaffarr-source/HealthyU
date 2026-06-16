@@ -30,7 +30,18 @@ const mocks = vi.hoisted(() => ({
 vi.mock("@supabase/supabase-js", () => ({
   createClient: vi.fn(() => ({
     auth: { getClaims: mocks.getClaims },
-    from: vi.fn(() => ({ insert: vi.fn().mockResolvedValue({ error: null }) })),
+    from: vi.fn(() => ({
+      insert: vi.fn().mockResolvedValue({ error: null }),
+      // .select(...).eq(...).maybeSingle() chain for profile lookups
+      select: vi.fn(() => ({
+        eq: vi.fn(() => ({
+          maybeSingle: vi.fn().mockResolvedValue({
+            data: { premium_status: "free" },
+            error: null,
+          }),
+        })),
+      })),
+    })),
     rpc: vi.fn().mockResolvedValue({ error: null }),
   })),
 }));

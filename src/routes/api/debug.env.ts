@@ -12,11 +12,6 @@ import { getEnv } from "@/lib/cloudflare-env.server";
  * Gated by DEBUG_ENV_TRACE=1 in wrangler.jsonc vars. When that env is NOT set,
  * returns 404. This is safe to leave in place (no-op unless explicitly enabled).
  */
-// @ts-expect-error - route path /api/debug/env will be picked up by vite build
-// and added to src/routeTree.gen.ts. The typegen hasn't been run yet for this
-// new file; tsc complains because the path isn't in FileRoutesByPath yet.
-// After first `vite build`, routeTree.gen.ts will include the route and
-// tsc will pass cleanly.
 export const Route = createFileRoute("/api/debug/env")({
   server: {
     handlers: {
