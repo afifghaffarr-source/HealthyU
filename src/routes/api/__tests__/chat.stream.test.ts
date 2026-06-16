@@ -335,7 +335,17 @@ describe("POST /api/chat/stream", () => {
       // and the route wraps the call in try/catch as a second
       // line of defense — so the chat must always respond 200
       // even if the audit backend explodes.
+      //
+      // We short-circuit on safety:crisis to avoid exercising the
+      // AI stream (which would need a real ReadableStream mock).
+      // The crisis gate returns a 200 SSE response via staticReplyStream
+      // before the AI stream is reached, so we can isolate the
+      // audit error path.
       mocks.auditPii.mockRejectedValue(new Error("audit backend exploded"));
+      mocks.checkChatSafety.mockReturnValue({
+        kind: "crisis",
+        response: "Hubungi 119",
+      });
       const consoleErrorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
       const handler = getHandler();
       const res = await handler({
