@@ -3,4 +3,4 @@ export { getDailyQuote, getDailyQuiz, answerDailyQuiz } from "./scanContent.func
 export { discoverUsers, searchUsers } from "./scanDiscovery.functions";
 export { getMealHeatmap } from "./scanReports.functions";
 export { estimateBodyComposition, syncWorkoutBurn } from "./scanWellness.functions";
-export { smartMealReminderPattern } from "./scanMisc.functions";
+export { smartMealReminderPattern } from "./scanAICoach.functions";

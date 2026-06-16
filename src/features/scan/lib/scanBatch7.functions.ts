@@ -3,7 +3,7 @@ export { getDailyQuote, getDailyQuiz, answerDailyQuiz } from "./scanContent.func
 export { discoverUsers, searchUsers } from "./scanDiscovery.functions";
 export { getMealHeatmap } from "./scanReports.functions";
 export { estimateBodyComposition, syncWorkoutBurn } from "./scanWellness.functions";
-export { smartMealReminderPattern } from "./scanMisc.functions";
+export { smartMealReminderPattern } from "./scanAICoach.functions";
 export {
   gachaPull,
   listPetAccessories,
@@ -13,5 +13,5 @@ export {
   createHabitStack,
 } from "./scanGamification.functions";
 export { voteFamilyMeal, getFamilyMealVotes } from "./scanPlan.functions";
-export { generateRecipeVideoScript, coachInterview } from "./scanMisc.functions";
+export { generateRecipeVideoScript, coachInterview } from "./scanAICoach.functions";
 export { listFollowers } from "./scanDiscovery.functions";

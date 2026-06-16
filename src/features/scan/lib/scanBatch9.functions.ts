@@ -1,5 +1,5 @@
 // Re-exports from consolidated scan modules
-export { addRecipeReview, listRecipeReviews } from "./scanMisc.functions";
+export { addRecipeReview, listRecipeReviews } from "./scanGamification2.functions";
 export {
   setWeightGoal,
   getWeightGoal,

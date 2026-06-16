@@ -4,7 +4,7 @@ export {
   redeemFriendInvite,
   upsertThemePref,
   getThemePref,
-  transcribeVoice,
-} from "./scanMisc.functions";
+} from "./scanThemeInvite.functions";
+export { transcribeVoice } from "./scanAICoach.functions";
 export { recommendExercises } from "./scanWellness.functions";
 export { createStoryPhotoUploadUrl } from "./scanSocial.functions";

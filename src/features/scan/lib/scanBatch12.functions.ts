@@ -1,11 +1,7 @@
 // Re-exports from consolidated scan modules
-export {
-  getWeeklyLeaderboard,
-  upsertWeeklyScore,
-  getSubscription,
-  upgradeSubscription,
-  analyzeFormCheck,
-} from "./scanMisc.functions";
+export { getWeeklyLeaderboard, upsertWeeklyScore } from "./scanGamification2.functions";
+export { getSubscription, upgradeSubscription } from "./scanSubscription.functions";
+export { analyzeFormCheck } from "./scanAICoach.functions";
 export { importRecipeFromUrl, generateGroceryList } from "./scanPlan.functions";
 export { generateWeeklyPodcast } from "./scanContent.functions";
 export { ocrNutritionLabel } from "./scanVision.functions";

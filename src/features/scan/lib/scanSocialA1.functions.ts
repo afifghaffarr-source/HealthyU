@@ -1,4 +1,5 @@
 // Re-exports from consolidated scan modules
-export { useStreakFreeze, reverseCalorie } from "./scanMisc.functions";
+export { useStreakFreeze } from "./scanGamification2.functions";
+export { reverseCalorie } from "./scanAICoach.functions";
 export { getGroupScanLeaderboard } from "./scanDiscovery.functions";
 export { getDailyChallenge } from "./scanContent.functions";

@@ -33,7 +33,12 @@
 - `src/features/chat/hooks/useSpeech.ts` (+ logger/errorReporting wiring)
 - `src/features/scan/lib/scanContent.functions.ts`
 - `src/features/scan/lib/scanMeal.functions.ts`
-- `src/features/scan/lib/scanMisc.functions.ts`
+- `src/features/scan/lib/scanLocation.functions.ts` (NEW)
+- `src/features/scan/lib/scanAICoach.functions.ts` (NEW)
+- `src/features/scan/lib/scanGamification2.functions.ts` (NEW)
+- `src/features/scan/lib/scanSubscription.functions.ts` (NEW)
+- `src/features/scan/lib/scanThemeInvite.functions.ts` (NEW)
+- 19 batch re-export files updated (`scanBatch{7,8,9,10,11,12,12a,12b}*.functions.ts`, `scanSocial{A,A1}*.functions.ts`, `scanExtras{,2}.functions.ts`, `scanBatch8b{1,2}.functions.ts`, `scanBatch9a.functions.ts`, `scanBatch7b{1,2}.functions.ts`)
 - `src/features/scan/lib/scanPlan.functions.ts`
 - `src/routes/_authenticated/articles.$id.tsx`
 - `src/routes/_authenticated/workout.player.$id.tsx`
@@ -220,7 +225,7 @@ ls -la dist/client/assets/scan.barcode-*.js
 | AUDIT-012 chatSafety quarterly review               | ✅ DONE (2026-06-16)                | `docs/chatSafety-review-2026-06-16.md`. 5 findings: 0 P0, 1 medium (ED→crisis, defer to next quarterly), 1 PII (open as AUDIT-017), 3 minor. Test coverage 60% → 90%+. 25 new parametrized tests added.                                                   |
 | AUDIT-017 PII detection (Phase 1)                   | ✅ DONE (2026-06-16)                | `docs/audit-017-pii-detection-scoping.md` + `src/lib/pii.ts` (4 categories: phone, email, ktp, credit_card) + 14 unit tests. Phase 2-4 deferred to UX/data decisions.                                                                                     |
 | 4 deferred Fast Refresh files                       | ✅ DONE (2026-06-16)                | DashboardHeader + SmartNextStepCard extracted helpers to `lib/`. onboardingShared (barrel, no warning) + CalcFormsShared (constants + components, allowConstantExport:true, no warning) were false positives. 0 react-refresh warnings in `bun run lint`. |
-| Top-3 god-file refactor (types, sidebar, scanMisc)  | ⚠️ TODO                             | (optional)                                                                                                                                                                                                                                                |
+| Top-3 god-file refactor (types, sidebar)            | ⚠️ TODO                             | (optional) — `scanMisc.functions.ts` DONE 2026-06-16, split into 5 domain files (Location, AICoach, Gamification2, Subscription, ThemeInvite)                                                                                                             |
 | Dependency audit (bun outdated, Dependabot)         | ✅ DONE (Fase 7)                    | PR #15 — `bun update` 38 pkgs + overrides (esbuild/brace-expansion) + Dependabot weekly                                                                                                                                                                   |
 | **Lighthouse CI strict gate re-enable**             | ✅ DONE (Fase 6)                    | PR #12 — lhci a11y `error` ≥ 0.9, perf/bp/seo `warn` ≥ 0.7/0.8/0.8                                                                                                                                                                                        |
 | Playwright e2e suite                                | ✅ DONE (a11y e2e baseline shipped) | `e2e/a11y/home.spec.ts` — 6/6 pass (3 routes × 2 devices)                                                                                                                                                                                                 |
@@ -229,19 +234,19 @@ ls -la dist/client/assets/scan.barcode-*.js
 
 **Findings yang diperbaiki (planned):**
 
-| ID                          | Priority    | Lokasi                                                   | Effort                          |
-| --------------------------- | ----------- | -------------------------------------------------------- | ------------------------------- |
-| AUDIT-016                   | Improvement | API route tests                                          | S                               |
-| AUDIT-012                   | Low         | chatSafety quarterly review                              | S                               |
-| LIGHTHOUSE-002 a11y         | Medium      | home page (`src/routes/index.tsx`, `src/components/...`) | L                               |
-| LIGHTHOUSE-002 perf         | Medium      | home page (jspdf, chart, html2canvas)                    | L                               |
-| LIGHTHOUSE-002 bundle       | Medium      | scan.barcode routes, reports export                      | M                               |
-| Top-3 god-file refactor     | Improvement | types.ts, sidebar.tsx, scanMisc.functions.ts             | L                               |
-| (Planned) Dependency audit  | Improvement | `bun outdated`, set Dependabot                           | ✅ DONE (Fase 7, PR #15)        |
-| (Planned) Lighthouse CI run | Improvement | `bunx lhci autorun` (post-a11y fix)                      | ✅ DONE (Fase 6, PR #12)        |
-| (Planned) Playwright e2e    | Improvement | `bunx playwright test`                                   | ✅ DONE (Fase 5, a11y baseline) |
-| (Planned) Code coverage     | Improvement | `bunx vitest --coverage`                                 | S                               |
-| (Planned) A11y axe scan     | Improvement | Playwright + axe-core                                    | ✅ DONE (Fase 5)                |
+| ID                                             | Priority    | Lokasi                                                   | Effort                          |
+| ---------------------------------------------- | ----------- | -------------------------------------------------------- | ------------------------------- |
+| AUDIT-016                                      | Improvement | API route tests                                          | S                               |
+| AUDIT-012                                      | Low         | chatSafety quarterly review                              | S                               |
+| LIGHTHOUSE-002 a11y                            | Medium      | home page (`src/routes/index.tsx`, `src/components/...`) | L                               |
+| LIGHTHOUSE-002 perf                            | Medium      | home page (jspdf, chart, html2canvas)                    | L                               |
+| LIGHTHOUSE-002 bundle                          | Medium      | scan.barcode routes, reports export                      | M                               |
+| God-file refactor (scanMisc split, 2026-06-16) | Improvement | scanMisc.functions.ts → 5 domain files                   | M                               |
+| (Planned) Dependency audit                     | Improvement | `bun outdated`, set Dependabot                           | ✅ DONE (Fase 7, PR #15)        |
+| (Planned) Lighthouse CI run                    | Improvement | `bunx lhci autorun` (post-a11y fix)                      | ✅ DONE (Fase 6, PR #12)        |
+| (Planned) Playwright e2e                       | Improvement | `bunx playwright test`                                   | ✅ DONE (Fase 5, a11y baseline) |
+| (Planned) Code coverage                        | Improvement | `bunx vitest --coverage`                                 | S                               |
+| (Planned) A11y axe scan                        | Improvement | Playwright + axe-core                                    | ✅ DONE (Fase 5)                |
 
 **File yang disentuh:** Depends on actual findings dari Fase 3 evaluation.
 
