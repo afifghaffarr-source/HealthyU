@@ -20,10 +20,8 @@ import { FreezeDialog } from "@/features/dashboard/components/FreezeDialog";
 import { TodaysMeals } from "@/features/dashboard/components/TodaysMeals";
 import { GroupChallengeSummaryCard } from "@/features/dashboard/components/GroupChallengeSummaryCard";
 import { UnlinkedChallengesCard } from "@/features/dashboard/components/UnlinkedChallengesCard";
-import {
-  DashboardHeader,
-  dashboardGreeting,
-} from "@/features/dashboard/components/DashboardHeader";
+import { DashboardHeader } from "@/features/dashboard/components/DashboardHeader";
+import { dashboardGreeting } from "@/features/dashboard/lib/dashboardGreeting";
 import { HeroStatsRow, MacroBreakdown } from "@/features/dashboard/components/HeroStatsRow";
 import { TodaysBalanceCard } from "@/features/dashboard/components/TodaysBalanceCard";
 import { SmartNextStepCard } from "@/features/dashboard/components/SmartNextStepCard";
