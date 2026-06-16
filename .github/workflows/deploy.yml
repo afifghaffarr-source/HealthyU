@@ -53,6 +53,17 @@ jobs:
         run: bun install --frozen-lockfile
 
       - name: Build (Cloudflare Workers target)
+        # Vite inlines VITE_* env vars into the client bundle at build time.
+        # CI runs without the local .env file (it's gitignored for secrets safety),
+        # so we MUST pass production VITE_* values explicitly here. Values are
+        # public (already in wrangler.jsonc vars block which is committed) — these
+        # are publishable keys + URLs designed to ship in the client bundle.
+        # Source of truth: wrangler.jsonc vars.VITE_*.
+        env:
+          VITE_SUPABASE_URL: "https://lezbpzpkvkdpbjvtvoei.supabase.co"
+          VITE_SUPABASE_PUBLISHABLE_KEY: "sb_publishable_66jMJijY4c8mdbHJxXaqnA_VzS7r-1D"
+          VITE_SUPABASE_PROJECT_ID: "lezbpzpkvkdpbjvtvoei"
+          VITE_SITE_URL: "https://healthyu.web.id"
         run: bun run build
 
       - name: Verify build output exists
