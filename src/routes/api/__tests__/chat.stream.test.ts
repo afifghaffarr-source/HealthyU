@@ -331,24 +331,23 @@ describe("POST /api/chat/stream", () => {
     });
 
     it("returns 500-free response even if audit helper throws (best-effort)", async () => {
-      // auditPiiOnServer is supposed to swallow its own errors,
-      // but if it leaks one, the chat must still respond.
+      // auditPiiOnServer is documented to swallow its own errors,
+      // and the route wraps the call in try/catch as a second
+      // line of defense — so the chat must always respond 200
+      // even if the audit backend explodes.
       mocks.auditPii.mockRejectedValue(new Error("audit backend exploded"));
+      const consoleErrorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
       const handler = getHandler();
-      // The handler awaits the call, so a reject would propagate
-      // as 500. This test documents the desired behavior — if
-      // this test ever changes, that's a regression we want to
-      // see in CI.
       const res = await handler({
         request: makeRequest({ message: "halo" }, "Bearer valid-token"),
       });
-      // Even on internal failure, the user should get a response,
-      // not a network error.
-      expect([200, 500]).toContain(res.status);
-      // If status is 500, that's the documented fragility — fix
-      // would be to wrap auditPiiOnServer call in try/catch in
-      // the route. We log it but don't fail the test so the
-      // current behavior is captured.
+      expect(res.status).toBe(200);
+      // The error should be logged for ops visibility.
+      expect(consoleErrorSpy).toHaveBeenCalledWith(
+        "chat.stream auditPiiOnServer threw — continuing",
+        "audit backend exploded",
+      );
+      consoleErrorSpy.mockRestore();
     });
   });
 });

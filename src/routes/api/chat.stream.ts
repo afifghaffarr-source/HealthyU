@@ -63,7 +63,14 @@ export const Route = createFileRoute("/api/chat/stream")({
         // the server still records the detection event to audit_log.
         // We do NOT block or redact — the client already gave the
         // user the choice. This is audit-only.
-        await auditPiiOnServer(supabase, userId, body.message);
+        // auditPiiOnServer is documented to swallow its own errors,
+        // but we wrap defensively: a logging failure must never
+        // break the chat stream.
+        try {
+          await auditPiiOnServer(supabase, userId, body.message);
+        } catch (e) {
+          console.error("chat.stream auditPiiOnServer threw — continuing", (e as Error).message);
+        }
 
         // Image moderation: block unsafe uploads before persisting/sending to AI.
         if (body.imageBase64) {
