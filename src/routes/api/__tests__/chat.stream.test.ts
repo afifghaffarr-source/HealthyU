@@ -47,7 +47,7 @@ vi.mock("@supabase/supabase-js", () => ({
 }));
 
 vi.mock("@/features/chat/lib/chatContext.server", () => ({
-  buildChatPayload: vi.fn(),
+  buildChatPayload: vi.fn(async () => ({ messages: [], isEmergency: false })),
   persistUserMessage: mocks.persistUserMessage,
 }));
 
