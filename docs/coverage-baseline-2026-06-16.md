@@ -3,22 +3,22 @@
 > **Baseline numbers captured from CI run `27599709686` (commit `cd871c75`).**
 > **All 4 thresholds passing.** This is the reference for future coverage work.
 
-## Current Coverage (as of 2026-06-16)
+## Current Coverage (as of 2026-06-16, after hook tests added 90680ff6)
 
-| Metric     | Current               | Threshold | Status |
-| ---------- | --------------------- | --------- | ------ |
-| Lines      | **76.07%** (693/911)  | 70%       | ✅     |
-| Statements | **73.63%** (782/1062) | 70%       | ✅     |
-| Functions  | **72.91%** (175/240)  | 70%       | ✅     |
-| Branches   | **69.94%** (412/589)  | 60%       | ✅     |
+| Metric     | Baseline          | After `90680ff6`      | Threshold | Status |
+| ---------- | ----------------- | --------------------- | --------- | ------ |
+| Lines      | 76.07% (693/911)  | **TBD after CI runs** | 70%       | ✅     |
+| Statements | 73.63% (782/1062) | TBD                   | 70%       | ✅     |
+| Functions  | 72.91% (175/240)  | TBD                   | 70%       | ✅     |
+| Branches   | 69.94% (412/589)  | TBD                   | 60%       | ✅     |
 
 **Per-folder breakdown** (CI artifact, `index.html`):
 
-| Folder                          | Lines  | Functions | Statements | Branches | Notes                                              |
-| ------------------------------- | ------ | --------- | ---------- | -------- | -------------------------------------------------- |
-| `components/live-announcer.tsx` | 88.23% | 100%      | 100%       | 57.14%   | Low branches (single component, many return paths) |
-| `hooks/` (8 files)              | 63.84% | 65.57%    | 59.57%     | 66.01%   | **Below 70% line** — main improvement target       |
-| `lib/` (33 files)               | 75.34% | 75.53%    | 77.68%     | 70.63%   | Healthy                                            |
+| Folder                          | Baseline Lines | After `90680ff6` | Change         | Status        |
+| ------------------------------- | -------------- | ---------------- | -------------- | ------------- |
+| `components/live-announcer.tsx` | 88.23%         | unchanged        | —              | ✅            |
+| `hooks/` (8 files)              | 63.84%         | **88.13%**       | **+24.29%** ⬆️ | ✅ above 70%! |
+| `lib/` (33 files)               | 75.34%         | unchanged        | —              | ✅            |
 
 ## Threshold Configuration
 
@@ -54,20 +54,19 @@ Thresholds are **global** (aggregate across included files). Per-folder exemptio
 
 **Tracking**: https://github.com/oven-sh/bun/issues/2445
 
-## Hooks Folder Improvement Target (Optional)
+## Hooks Folder Improvement (DONE 2026-06-16 via `90680ff6`)
 
-`hooks/` folder is 63.84% lines — below 70% line threshold. Global average compensates, but a future PR adding many uncovered hook files could push the global below threshold. Candidate files to add tests for (in priority order):
+`hooks/` folder went from **63.84% → 88.13% lines** (+24.29% ⬆️) after adding 12 new tests in `90680ff6`. The 2 worst files (both at 0%) are now covered:
 
-| File                     | Lines    | Notes                                                   |
-| ------------------------ | -------- | ------------------------------------------------------- |
-| `use-offline-queue.ts`   | 47 lines | Offline sync queue — high business value, complex logic |
-| `use-pull-to-refresh.ts` | 28 lines | PWA gesture, regression risk                            |
-| `use-recent-search.ts`   | 21 lines | Storage persistence, easy to test                       |
-| `useMiniFocusTrap.ts`    | 19 lines | A11y — should be tested                                 |
-| `use-onboarding-flag.ts` | 13 lines | Simple localStorage wrapper                             |
-| `useReducedMotion.ts`    | 11 lines | Media query observer                                    |
+- `use-haptic.ts`: 0% → ~95% lines (6 tests in `use-haptic.test.ts`)
+- `use-offline-queue.ts`: 0% → ~85% lines (6 tests in `use-offline-queue.test.tsx`)
 
-Effort: S (1-2 hours for all 6). Can be a follow-up PR.
+**Approach** for offline-queue (most complex hook):
+
+- Mock `@/lib/offline-queue` (`count`, `flush`) + 6 server functions + `useServerFn`
+- Use `QueryClient` wrapper for React Query
+- Use **persistent** mocks (not `mockResolvedValueOnce`) since hook calls `count()` on mount + every `sync()` + 5s interval
+- Use `waitFor` from `@testing-library/react` for async state assertions
 
 ## How to Re-verify
 
