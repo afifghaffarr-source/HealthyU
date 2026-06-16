@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { detectPII, containsPII, piiKinds } from "../pii";
+import { detectPII, containsPII, piiKinds, formatPiiKindsForDialog } from "../pii";
 
 describe("detectPII", () => {
   it("returns empty for empty text", () => {
@@ -87,5 +87,37 @@ describe("piiKinds", () => {
 
   it("returns empty array for clean text", () => {
     expect(piiKinds("Halo!")).toEqual([]);
+  });
+});
+
+describe("formatPiiKindsForDialog", () => {
+  it("returns empty string for empty input", () => {
+    expect(formatPiiKindsForDialog([])).toBe("");
+  });
+
+  it("renders single kind with Indonesian label", () => {
+    expect(formatPiiKindsForDialog(["phone"])).toBe("nomor telepon");
+    expect(formatPiiKindsForDialog(["email"])).toBe("email");
+    expect(formatPiiKindsForDialog(["ktp"])).toBe("KTP/NIK");
+    expect(formatPiiKindsForDialog(["credit_card"])).toBe("nomor kartu kredit");
+  });
+
+  it("joins two kinds with 'dan'", () => {
+    expect(formatPiiKindsForDialog(["phone", "email"])).toBe("nomor telepon dan email");
+  });
+
+  it("joins three+ kinds with Oxford comma + 'dan'", () => {
+    expect(formatPiiKindsForDialog(["phone", "email", "ktp"])).toBe(
+      "nomor telepon, email, dan KTP/NIK",
+    );
+  });
+
+  it("preserves input order regardless of detection order", () => {
+    expect(formatPiiKindsForDialog(["ktp", "phone"])).toBe("KTP/NIK dan nomor telepon");
+  });
+
+  it("filters out unknown kinds defensively", () => {
+    // Cast to bypass TS — simulating a future PiiKind not yet mapped
+    expect(formatPiiKindsForDialog(["phone", "future_unknown" as never])).toBe("nomor telepon");
   });
 });

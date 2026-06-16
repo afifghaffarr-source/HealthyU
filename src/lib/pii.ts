@@ -109,3 +109,35 @@ export function piiKinds(text: string): PiiKind[] {
   }
   return result;
 }
+
+/**
+ * Indonesian labels for PII kinds. Used by the warning dialog so the
+ * UI never leaks the internal "ktp" / "credit_card" jargon to users.
+ * Order in the returned string matches the order of `kinds` input.
+ */
+const PII_KIND_LABEL_ID: Record<PiiKind, string> = {
+  phone: "nomor telepon",
+  email: "email",
+  ktp: "KTP/NIK",
+  credit_card: "nomor kartu kredit",
+};
+
+/**
+ * Render PII kinds as a human-readable Indonesian string for the
+ * submit-time warning dialog. Examples:
+ *   formatPiiKindsForDialog(["phone"]) → "nomor telepon"
+ *   formatPiiKindsForDialog(["phone","email"]) → "nomor telepon dan email"
+ *   formatPiiKindsForDialog(["phone","email","ktp"]) → "nomor telepon, email, dan KTP/NIK"
+ *
+ * Defensive: filters out unknown kinds so a future `PiiKind` doesn't
+ * crash the dialog.
+ */
+export function formatPiiKindsForDialog(kinds: PiiKind[]): string {
+  const labels = kinds
+    .map((k) => PII_KIND_LABEL_ID[k])
+    .filter((s): s is string => typeof s === "string");
+  if (labels.length === 0) return "";
+  if (labels.length === 1) return labels[0];
+  if (labels.length === 2) return `${labels[0]} dan ${labels[1]}`;
+  return `${labels.slice(0, -1).join(", ")}, dan ${labels[labels.length - 1]}`;
+}

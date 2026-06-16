@@ -18,6 +18,8 @@ import { ChatEmptyState, ChatMessages } from "@/features/chat/components/ChatMes
 import { ChatComposer, type ImageData } from "@/features/chat/components/ChatComposer";
 import { SafetyChip } from "@/components/healthyu/safety-chip";
 import { CoachPromptChips } from "@/features/chat/components/CoachPromptChips";
+import { ConfirmDialog } from "@/components/healthyu/confirm-dialog";
+import { piiKinds, formatPiiKindsForDialog, type PiiKind } from "@/lib/pii";
 
 export function ChatPage() {
   const qc = useQueryClient();
@@ -32,6 +34,15 @@ export function ChatPage() {
   const endRef = useRef<HTMLDivElement>(null);
   const dockRef = useRef<HTMLDivElement>(null);
   const [dockHeight, setDockHeight] = useState(224);
+  // AUDIT-017 Phase 2A: when PII is detected in a draft, freeze the
+  // send and ask the user to confirm. Stash the pending payload so
+  // the confirmation handler can submit it verbatim.
+  const [piiWarning, setPiiWarning] = useState<{
+    kinds: PiiKind[];
+    message: string;
+    imageBase64?: string;
+    imageMime?: string;
+  } | null>(null);
   const shellClassName = "mx-auto w-full max-w-md px-4 sm:px-5";
   const pageGutterClassName = "pb-6 lg:pb-8";
 
@@ -90,22 +101,65 @@ export function ChatPage() {
     },
   });
 
-  const handleSend = (text?: string) => {
-    const msg = (text ?? input).trim();
-    if (!msg && !imageData) return;
+  // Shared send helper. Used by all 4 entry points (composer button,
+  // quick actions, empty state chips, prompt chips) AND by voice
+  // input's onFinal. Centralizes the PII check so no path bypasses
+  // it.
+  const sendMessage = (text: string, img?: ImageData | null) => {
+    const msg = text.trim();
+    if (!msg && !img) return;
+
+    // PII check: only on the text portion. Image-only sends skip it.
+    if (msg) {
+      const kinds = piiKinds(msg);
+      if (kinds.length > 0) {
+        setPiiWarning({
+          kinds,
+          message: msg,
+          imageBase64: img?.base64,
+          imageMime: img?.mime,
+        });
+        return;
+      }
+    }
+
     setInput("");
     mutation.mutate({
       message: msg || "Tolong analisis foto ini.",
-      imageBase64: imageData?.base64,
-      imageMime: imageData?.mime,
+      imageBase64: img?.base64,
+      imageMime: img?.mime,
     });
   };
+
+  // User confirmed via the PII warning dialog. Submit the stashed
+  // payload exactly as captured — the warning is a one-time consent,
+  // we don't re-scan on submit (would be hostile UX).
+  const confirmPiiSend = () => {
+    if (!piiWarning) return;
+    const { message, imageBase64, imageMime } = piiWarning;
+    setPiiWarning(null);
+    setInput("");
+    mutation.mutate({
+      message,
+      imageBase64,
+      imageMime,
+    });
+  };
+
+  const cancelPiiSend = () => setPiiWarning(null);
+
+  // handleSend stays for back-compat with the JSX call sites
+  // (onSend={() => handleSend()}). Quick actions and chips use
+  // sendMessage(t, imageData) directly so they can pass the current
+  // image attachment through.
+  const handleSend = (text?: string) => sendMessage(text ?? input, imageData);
 
   const speech = useSpeech({
     onInterim: (t) => setInput(t),
     onFinal: (t) => {
-      setInput("");
-      mutation.mutate({ message: t });
+      // Voice messages must go through the same PII check as typed
+      // messages — don't call mutation.mutate directly here.
+      sendMessage(t, null);
     },
   });
 
@@ -250,6 +304,18 @@ export function ChatPage() {
       </div>
 
       <BottomNav />
+
+      {piiWarning && (
+        <ConfirmDialog
+          open={true}
+          title="Data sensitif terdeteksi"
+          description={`Pesan ini mengandung ${formatPiiKindsForDialog(piiWarning.kinds)}. Data akan disimpan permanen di akun Anda. Kirim juga?`}
+          confirmLabel="Kirim juga"
+          cancelLabel="Sunting pesan"
+          onConfirm={confirmPiiSend}
+          onCancel={cancelPiiSend}
+        />
+      )}
     </main>
   );
 }
