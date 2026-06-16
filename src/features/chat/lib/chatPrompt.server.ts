@@ -60,4 +60,11 @@ export async function persistUserMessage(
     role: "user",
     content: storedContent,
   });
+
+  // AUDIT-017 Phase 3: on-write retention check. If the user has
+  // set a retention period, this purges their old messages in the
+  // background. Errors are swallowed inside the helper so a purge
+  // failure cannot break the chat send.
+  const { enforceRetentionAfterWrite } = await import("./chatRetention.server");
+  await enforceRetentionAfterWrite(supabase, userId);
 }

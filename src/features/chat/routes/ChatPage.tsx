@@ -13,6 +13,7 @@ import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { toast } from "sonner";
 import { toastError } from "@/lib/toast-config";
 import { useSpeech } from "@/features/chat/hooks/useSpeech";
+import { Link } from "@tanstack/react-router";
 import { ChatQuickActions } from "@/features/chat/components/ChatQuickActions";
 import { ChatEmptyState, ChatMessages } from "@/features/chat/components/ChatMessages";
 import { ChatComposer, type ImageData } from "@/features/chat/components/ChatComposer";
@@ -287,8 +288,15 @@ export function ChatPage() {
             </section>
           )}
 
-          <div className="flex justify-center">
+          <div className="flex justify-center items-center gap-2">
             <SafetyChip variant="not-medical" className="shadow-none" />
+            <Link
+              to="/pengaturan/chat"
+              className="text-[10px] text-muted-foreground hover:text-foreground underline-offset-2 hover:underline"
+              aria-label="Pengaturan chat"
+            >
+              Pengaturan
+            </Link>
           </div>
 
           <div className="rounded-[1.75rem] border border-border/60 bg-background/80 p-2 shadow-sm backdrop-blur-sm supports-[backdrop-filter]:bg-background/70">

@@ -8,6 +8,11 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { callAiWithGuards, type AiMultimodalMessage } from "@/features/ai/lib/aiGateway.server";
+import { validateChatRetentionDays } from "@/features/chat/lib/chatRetention";
+import {
+  getChatRetention as getChatRetentionServer,
+  setChatRetention as setChatRetentionServer,
+} from "@/features/chat/lib/chatRetention.server";
 
 export const getChatHistory = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
@@ -213,4 +218,42 @@ export const weeklyHealthReport = createServerFn({ method: "POST" })
     });
 
     return { report, data };
+  });
+
+// AUDIT-017 Phase 3: chat retention toggles.
+// "null" is encoded as 0 in the wire format so the input validator
+// can require a real number for the retention setting; the actual
+// `null` semantics ("keep forever") is represented by sentinel
+// value 0, then converted back inside the handler.
+const retentionInputSchema = z.object({
+  days: z.number().int().min(0).max(3650),
+});
+
+function inputToRetentionDays(days: number): number | null {
+  // Sentinel 0 = null (keep forever)
+  if (days === 0) return null;
+  return days;
+}
+
+function retentionDaysToInput(days: number | null): number {
+  if (days === null) return 0;
+  return days;
+}
+
+export const getChatRetention = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { supabase, userId } = context;
+    const days = await getChatRetentionServer(supabase, userId);
+    return { days: retentionDaysToInput(days) };
+  });
+
+export const setChatRetention = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => retentionInputSchema.parse(input))
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    const validated = validateChatRetentionDays(inputToRetentionDays(data.days));
+    const saved = await setChatRetentionServer(supabase, userId, validated);
+    return { days: retentionDaysToInput(saved) };
   });

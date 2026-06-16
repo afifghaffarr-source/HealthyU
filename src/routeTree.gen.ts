@@ -140,6 +140,7 @@ import { Route as AuthenticatedPodcastWeeklyRouteImport } from './routes/_authen
 import { Route as AuthenticatedPetSvgRouteImport } from './routes/_authenticated/pet.svg'
 import { Route as AuthenticatedPetShopRouteImport } from './routes/_authenticated/pet.shop'
 import { Route as AuthenticatedPetEvolutionRouteImport } from './routes/_authenticated/pet.evolution'
+import { Route as AuthenticatedPengaturanChatRouteImport } from './routes/_authenticated/pengaturan.chat'
 import { Route as AuthenticatedOnboardingStepsRouteImport } from './routes/_authenticated/onboarding.steps'
 import { Route as AuthenticatedOnboardingAiRouteImport } from './routes/_authenticated/onboarding.ai'
 import { Route as AuthenticatedNotificationsFeedRouteImport } from './routes/_authenticated/notifications.feed'
@@ -873,6 +874,12 @@ const AuthenticatedPetEvolutionRoute =
     path: '/evolution',
     getParentRoute: () => AuthenticatedPetRoute,
   } as any)
+const AuthenticatedPengaturanChatRoute =
+  AuthenticatedPengaturanChatRouteImport.update({
+    id: '/pengaturan/chat',
+    path: '/pengaturan/chat',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedOnboardingStepsRoute =
   AuthenticatedOnboardingStepsRouteImport.update({
     id: '/steps',
@@ -1191,6 +1198,7 @@ export interface FileRoutesByFullPath {
   '/notifications/feed': typeof AuthenticatedNotificationsFeedRoute
   '/onboarding/ai': typeof AuthenticatedOnboardingAiRoute
   '/onboarding/steps': typeof AuthenticatedOnboardingStepsRoute
+  '/pengaturan/chat': typeof AuthenticatedPengaturanChatRoute
   '/pet/evolution': typeof AuthenticatedPetEvolutionRoute
   '/pet/shop': typeof AuthenticatedPetShopRoute
   '/pet/svg': typeof AuthenticatedPetSvgRoute
@@ -1352,6 +1360,7 @@ export interface FileRoutesByTo {
   '/notifications/feed': typeof AuthenticatedNotificationsFeedRoute
   '/onboarding/ai': typeof AuthenticatedOnboardingAiRoute
   '/onboarding/steps': typeof AuthenticatedOnboardingStepsRoute
+  '/pengaturan/chat': typeof AuthenticatedPengaturanChatRoute
   '/pet/evolution': typeof AuthenticatedPetEvolutionRoute
   '/pet/shop': typeof AuthenticatedPetShopRoute
   '/pet/svg': typeof AuthenticatedPetSvgRoute
@@ -1522,6 +1531,7 @@ export interface FileRoutesById {
   '/_authenticated/notifications/feed': typeof AuthenticatedNotificationsFeedRoute
   '/_authenticated/onboarding/ai': typeof AuthenticatedOnboardingAiRoute
   '/_authenticated/onboarding/steps': typeof AuthenticatedOnboardingStepsRoute
+  '/_authenticated/pengaturan/chat': typeof AuthenticatedPengaturanChatRoute
   '/_authenticated/pet/evolution': typeof AuthenticatedPetEvolutionRoute
   '/_authenticated/pet/shop': typeof AuthenticatedPetShopRoute
   '/_authenticated/pet/svg': typeof AuthenticatedPetSvgRoute
@@ -1692,6 +1702,7 @@ export interface FileRouteTypes {
     | '/notifications/feed'
     | '/onboarding/ai'
     | '/onboarding/steps'
+    | '/pengaturan/chat'
     | '/pet/evolution'
     | '/pet/shop'
     | '/pet/svg'
@@ -1853,6 +1864,7 @@ export interface FileRouteTypes {
     | '/notifications/feed'
     | '/onboarding/ai'
     | '/onboarding/steps'
+    | '/pengaturan/chat'
     | '/pet/evolution'
     | '/pet/shop'
     | '/pet/svg'
@@ -2022,6 +2034,7 @@ export interface FileRouteTypes {
     | '/_authenticated/notifications/feed'
     | '/_authenticated/onboarding/ai'
     | '/_authenticated/onboarding/steps'
+    | '/_authenticated/pengaturan/chat'
     | '/_authenticated/pet/evolution'
     | '/_authenticated/pet/shop'
     | '/_authenticated/pet/svg'
@@ -3033,6 +3046,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedPetEvolutionRouteImport
       parentRoute: typeof AuthenticatedPetRoute
     }
+    '/_authenticated/pengaturan/chat': {
+      id: '/_authenticated/pengaturan/chat'
+      path: '/pengaturan/chat'
+      fullPath: '/pengaturan/chat'
+      preLoaderRoute: typeof AuthenticatedPengaturanChatRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/onboarding/steps': {
       id: '/_authenticated/onboarding/steps'
       path: '/steps'
@@ -3684,6 +3704,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedHabitsStackRoute: typeof AuthenticatedHabitsStackRoute
   AuthenticatedHydrationGroupRoute: typeof AuthenticatedHydrationGroupRoute
   AuthenticatedMealDetailIdRoute: typeof AuthenticatedMealDetailIdRoute
+  AuthenticatedPengaturanChatRoute: typeof AuthenticatedPengaturanChatRoute
   AuthenticatedPodcastWeeklyRoute: typeof AuthenticatedPodcastWeeklyRoute
   AuthenticatedPushAlarmRoute: typeof AuthenticatedPushAlarmRoute
   AuthenticatedQuizDailyRoute: typeof AuthenticatedQuizDailyRoute
@@ -3759,6 +3780,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedHabitsStackRoute: AuthenticatedHabitsStackRoute,
   AuthenticatedHydrationGroupRoute: AuthenticatedHydrationGroupRoute,
   AuthenticatedMealDetailIdRoute: AuthenticatedMealDetailIdRoute,
+  AuthenticatedPengaturanChatRoute: AuthenticatedPengaturanChatRoute,
   AuthenticatedPodcastWeeklyRoute: AuthenticatedPodcastWeeklyRoute,
   AuthenticatedPushAlarmRoute: AuthenticatedPushAlarmRoute,
   AuthenticatedQuizDailyRoute: AuthenticatedQuizDailyRoute,
