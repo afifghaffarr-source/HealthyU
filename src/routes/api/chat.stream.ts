@@ -12,6 +12,7 @@ import { moderateImage } from "@/features/moderation/lib/imageModeration.server"
 import { streamAiChat, AiGatewayError } from "@/features/ai/lib/aiStreamGateway.server";
 import { staticReplyStream, proxyUpstreamStream } from "@/features/chat/lib/chatStream.server";
 import { getEnv } from "@/lib/cloudflare-env.server";
+import { auditPiiOnServer } from "@/features/chat/lib/piiAudit";
 
 export const Route = createFileRoute("/api/chat/stream")({
   server: {
@@ -55,6 +56,14 @@ export const Route = createFileRoute("/api/chat/stream")({
         } catch {
           return new Response("Invalid request payload", { status: 400 });
         }
+
+        // AUDIT-017 Phase 2E: defense-in-depth PII detection on the
+        // server. Even if the client bypasses the warning dialog
+        // (older app version, direct API call, modified client),
+        // the server still records the detection event to audit_log.
+        // We do NOT block or redact — the client already gave the
+        // user the choice. This is audit-only.
+        await auditPiiOnServer(supabase, userId, body.message);
 
         // Image moderation: block unsafe uploads before persisting/sending to AI.
         if (body.imageBase64) {

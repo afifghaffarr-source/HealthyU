@@ -20,6 +20,7 @@ import { SafetyChip } from "@/components/healthyu/safety-chip";
 import { CoachPromptChips } from "@/features/chat/components/CoachPromptChips";
 import { ConfirmDialog } from "@/components/healthyu/confirm-dialog";
 import { piiKinds, formatPiiKindsForDialog, type PiiKind } from "@/lib/pii";
+import { auditPiiOnClient } from "@/features/chat/lib/piiAudit";
 
 export function ChatPage() {
   const qc = useQueryClient();
@@ -139,6 +140,8 @@ export function ChatPage() {
     const { message, imageBase64, imageMime } = piiWarning;
     setPiiWarning(null);
     setInput("");
+    // Audit-log the explicit consent (kinds only, no PII value).
+    auditPiiOnClient(message);
     mutation.mutate({
       message,
       imageBase64,

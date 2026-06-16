@@ -92,6 +92,7 @@ import { Route as AuthenticatedArticlesRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedAlarmsRouteImport } from './routes/_authenticated/alarms'
 import { Route as AuthenticatedAchievementsRouteImport } from './routes/_authenticated/achievements'
 import { Route as ApiImgSplatRouteImport } from './routes/api/img.$'
+import { Route as ApiDebugEnvRouteImport } from './routes/api/debug.env'
 import { Route as ApiChatStreamRouteImport } from './routes/api/chat.stream'
 import { Route as AuthenticatedWorkoutTimerRouteImport } from './routes/_authenticated/workout.timer'
 import { Route as AuthenticatedWeightGoalRouteImport } from './routes/_authenticated/weight.goal'
@@ -597,6 +598,11 @@ const AuthenticatedAchievementsRoute =
 const ApiImgSplatRoute = ApiImgSplatRouteImport.update({
   id: '/api/img/$',
   path: '/api/img/$',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiDebugEnvRoute = ApiDebugEnvRouteImport.update({
+  id: '/api/debug/env',
+  path: '/api/debug/env',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiChatStreamRoute = ApiChatStreamRouteImport.update({
@@ -1232,6 +1238,7 @@ export interface FileRoutesByFullPath {
   '/weight/goal': typeof AuthenticatedWeightGoalRoute
   '/workout/timer': typeof AuthenticatedWorkoutTimerRoute
   '/api/chat/stream': typeof ApiChatStreamRoute
+  '/api/debug/env': typeof ApiDebugEnvRoute
   '/api/img/$': typeof ApiImgSplatRoute
   '/groups/$id/leaderboard': typeof AuthenticatedGroupsIdLeaderboardRoute
   '/groups/$id/meals': typeof AuthenticatedGroupsIdMealsRoute
@@ -1392,6 +1399,7 @@ export interface FileRoutesByTo {
   '/weight/goal': typeof AuthenticatedWeightGoalRoute
   '/workout/timer': typeof AuthenticatedWorkoutTimerRoute
   '/api/chat/stream': typeof ApiChatStreamRoute
+  '/api/debug/env': typeof ApiDebugEnvRoute
   '/api/img/$': typeof ApiImgSplatRoute
   '/groups/$id/leaderboard': typeof AuthenticatedGroupsIdLeaderboardRoute
   '/groups/$id/meals': typeof AuthenticatedGroupsIdMealsRoute
@@ -1561,6 +1569,7 @@ export interface FileRoutesById {
   '/_authenticated/weight/goal': typeof AuthenticatedWeightGoalRoute
   '/_authenticated/workout/timer': typeof AuthenticatedWorkoutTimerRoute
   '/api/chat/stream': typeof ApiChatStreamRoute
+  '/api/debug/env': typeof ApiDebugEnvRoute
   '/api/img/$': typeof ApiImgSplatRoute
   '/_authenticated/groups/$id/leaderboard': typeof AuthenticatedGroupsIdLeaderboardRoute
   '/_authenticated/groups/$id/meals': typeof AuthenticatedGroupsIdMealsRoute
@@ -1730,6 +1739,7 @@ export interface FileRouteTypes {
     | '/weight/goal'
     | '/workout/timer'
     | '/api/chat/stream'
+    | '/api/debug/env'
     | '/api/img/$'
     | '/groups/$id/leaderboard'
     | '/groups/$id/meals'
@@ -1890,6 +1900,7 @@ export interface FileRouteTypes {
     | '/weight/goal'
     | '/workout/timer'
     | '/api/chat/stream'
+    | '/api/debug/env'
     | '/api/img/$'
     | '/groups/$id/leaderboard'
     | '/groups/$id/meals'
@@ -2058,6 +2069,7 @@ export interface FileRouteTypes {
     | '/_authenticated/weight/goal'
     | '/_authenticated/workout/timer'
     | '/api/chat/stream'
+    | '/api/debug/env'
     | '/api/img/$'
     | '/_authenticated/groups/$id/leaderboard'
     | '/_authenticated/groups/$id/meals'
@@ -2091,6 +2103,7 @@ export interface RootRouteChildren {
   ApiHealthRoute: typeof ApiHealthRoute
   ApiLogErrorRoute: typeof ApiLogErrorRoute
   ApiChatStreamRoute: typeof ApiChatStreamRoute
+  ApiDebugEnvRoute: typeof ApiDebugEnvRoute
   ApiImgSplatRoute: typeof ApiImgSplatRoute
   ApiPublicHooksDailyCoachRoute: typeof ApiPublicHooksDailyCoachRoute
   ApiPublicHooksDailyContentRoute: typeof ApiPublicHooksDailyContentRoute
@@ -2682,6 +2695,13 @@ declare module '@tanstack/react-router' {
       path: '/api/img/$'
       fullPath: '/api/img/$'
       preLoaderRoute: typeof ApiImgSplatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/debug/env': {
+      id: '/api/debug/env'
+      path: '/api/debug/env'
+      fullPath: '/api/debug/env'
+      preLoaderRoute: typeof ApiDebugEnvRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/chat/stream': {
@@ -3859,6 +3879,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiHealthRoute: ApiHealthRoute,
   ApiLogErrorRoute: ApiLogErrorRoute,
   ApiChatStreamRoute: ApiChatStreamRoute,
+  ApiDebugEnvRoute: ApiDebugEnvRoute,
   ApiImgSplatRoute: ApiImgSplatRoute,
   ApiPublicHooksDailyCoachRoute: ApiPublicHooksDailyCoachRoute,
   ApiPublicHooksDailyContentRoute: ApiPublicHooksDailyContentRoute,
