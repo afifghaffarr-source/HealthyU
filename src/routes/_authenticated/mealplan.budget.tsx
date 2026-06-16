@@ -5,7 +5,7 @@ import { useState, useMemo } from "react";
 import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { BottomNav } from "@/components/bottom-nav";
 import { generateBudgetMealPlan } from "@/features/scan/lib/scanBatch11.functions";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast-config";
 
 export const Route = createFileRoute("/_authenticated/mealplan/budget")({ component: Page });
 

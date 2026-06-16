@@ -11,7 +11,7 @@ import {
 import { BottomNav } from "@/components/bottom-nav";
 import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { Clock, Flame, Users, Star, Bookmark } from "lucide-react";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast-config";
 
 export const Route = createFileRoute("/_authenticated/recipes/$id")({
   component: RecipeDetail,

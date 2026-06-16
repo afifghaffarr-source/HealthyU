@@ -6,7 +6,7 @@ import { Trophy } from "lucide-react";
 import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { EmptyState } from "@/components/healthyu/empty-state";
 import { ListSkeleton } from "@/components/healthyu/skeletons";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast-config";
 import { z } from "zod";
 import { fallback, zodValidator } from "@tanstack/zod-adapter";
 import { BottomNav } from "@/components/bottom-nav";

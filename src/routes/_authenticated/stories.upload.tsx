@@ -8,7 +8,7 @@ import { createStoryPhotoUploadUrl } from "@/features/scan/lib/scanBatch10.funct
 import { recordStoryPhoto } from "@/features/scan/lib/scanBatch9.functions";
 import { supabase } from "@/integrations/supabase/client";
 import { validateImageFile, fileToDataUrl, dataUrlToBlob } from "@/lib/image-utils";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast-config";
 
 export const Route = createFileRoute("/_authenticated/stories/upload")({ component: Page });
 

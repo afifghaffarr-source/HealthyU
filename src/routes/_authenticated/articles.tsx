@@ -7,7 +7,7 @@ import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { EmptyState } from "@/components/healthyu/empty-state";
 import { ListSkeleton } from "@/components/healthyu/skeletons";
 import { LazyImage } from "@/components/healthyu/lazy-image";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast-config";
 import { BottomNav } from "@/components/bottom-nav";
 import { listArticles, toggleBookmark } from "@/features/articles/lib/articles.functions";
 

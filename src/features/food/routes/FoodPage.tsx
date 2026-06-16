@@ -13,7 +13,7 @@ import { BottomNav } from "@/components/bottom-nav";
 import { WifiOff, RefreshCw, Camera, PenLine, Utensils } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { TopAppBar } from "@/components/healthyu/top-app-bar";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast-config";
 import { toastError } from "@/lib/toast-config";
 import { enqueue } from "@/lib/offline-queue";
 import { useOfflineQueue } from "@/hooks/use-offline-queue";

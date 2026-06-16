@@ -7,7 +7,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { listMyGroups, createGroup, joinGroup } from "@/features/groups/lib/groups.functions";
 import { BottomNav } from "@/components/bottom-nav";
 import { Plus, LogIn } from "lucide-react";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast-config";
 import { toastError } from "@/lib/toast-config";
 import { GroupCard } from "@/features/groups/components/GroupCard";
 

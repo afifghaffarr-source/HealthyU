@@ -5,7 +5,7 @@ import { useState } from "react";
 import { exportAllData } from "@/features/export/lib/export.functions";
 import { BottomNav } from "@/components/bottom-nav";
 import { Download, FileJson, FileSpreadsheet, Loader2 } from "lucide-react";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast-config";
 import { toastError } from "@/lib/toast-config";
 
 export const Route = createFileRoute("/_authenticated/backup")({

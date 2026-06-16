@@ -6,7 +6,7 @@ import { weekPlan, addPlan, deletePlan } from "@/features/mealplan/lib/mealplan.
 import { searchFoods } from "@/features/meals/lib/meals.functions";
 import { BottomNav } from "@/components/bottom-nav";
 import { TopAppBar } from "@/components/healthyu/top-app-bar";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast-config";
 import {
   MEAL_TYPES,
   type MealTypeId,

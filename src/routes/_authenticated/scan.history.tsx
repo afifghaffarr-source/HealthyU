@@ -6,7 +6,7 @@ import { BottomNav } from "@/components/bottom-nav";
 import { listScanHistory } from "@/features/scan/lib/scanHistory.functions";
 import { relogMeal } from "@/features/scan/lib/scanExtras.functions";
 import { Camera, RotateCw } from "lucide-react";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast-config";
 
 const opts = queryOptions({ queryKey: ["scan-history"], queryFn: () => listScanHistory() });
 

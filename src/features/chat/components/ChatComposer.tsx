@@ -1,6 +1,6 @@
 import { useRef } from "react";
 import { ImagePlus, Mic, MicOff, Send, X } from "lucide-react";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast-config";
 import { validateImageFile, fileToDataUrl } from "@/lib/image-utils";
 
 export type ImageData = { base64: string; mime: string; preview: string };

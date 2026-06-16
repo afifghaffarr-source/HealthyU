@@ -12,7 +12,7 @@ import { getFastingSchedule, saveFastingSchedule } from "@/features/fasting/lib/
 import { getAchievementToastPrefix } from "@/lib/achievement-icons";
 import { BottomNav } from "@/components/bottom-nav";
 import { TopAppBar } from "@/components/healthyu/top-app-bar";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast-config";
 import { toastError } from "@/lib/toast-config";
 import {
   ActiveFastCard,

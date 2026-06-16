@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast-config";
 import { Gift } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useMiniFocusTrap } from "@/hooks/useMiniFocusTrap";

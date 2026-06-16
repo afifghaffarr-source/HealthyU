@@ -5,7 +5,7 @@ import { listRewards, redeemReward } from "@/features/rewards/lib/rewards.functi
 import { BottomNav } from "@/components/bottom-nav";
 import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { Coins, Gift } from "lucide-react";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast-config";
 import { toastError } from "@/lib/toast-config";
 
 export const Route = createFileRoute("/_authenticated/rewards")({

@@ -9,7 +9,7 @@ import {
   useStreakFreeze,
 } from "@/features/scan/lib/scanSocial.functions";
 import { Sparkles, Check, Snowflake, Loader2 } from "lucide-react";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast-config";
 
 export const Route = createFileRoute("/_authenticated/challenges/daily")({
   component: Page,

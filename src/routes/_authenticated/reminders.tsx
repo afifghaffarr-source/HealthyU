@@ -4,7 +4,7 @@ import { PushNotifications } from "@/components/push-notifications";
 import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { Bell, Plus } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast-config";
 import {
   DEFAULT_REMINDERS,
   loadReminders,

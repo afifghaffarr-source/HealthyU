@@ -4,7 +4,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { Target, Check, Pencil } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast-config";
 import {
   getCurrentWeeklyGoal,
   setWeeklyGoal,

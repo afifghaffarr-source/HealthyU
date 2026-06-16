@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast-config";
 
 type SpeechRecognitionResultLike = { 0: { transcript: string }; isFinal: boolean };
 type SpeechRecognitionEventLike = {

@@ -2,7 +2,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { Snowflake, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast-config";
 import { getStreakFreezes, claimWeeklyFreeze } from "@/features/wellness/lib/wellness.functions";
 
 const REASON_MSG: Record<string, string> = {

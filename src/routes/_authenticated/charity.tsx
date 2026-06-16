@@ -5,7 +5,7 @@ import { useState } from "react";
 import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { BottomNav } from "@/components/bottom-nav";
 import { donateCoins } from "@/features/scan/lib/scanBatch11.functions";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast-config";
 import { Heart } from "lucide-react";
 
 const CHARITIES = ["Yayasan Anak Sehat", "Bank Sampah Hijau", "Pemberdayaan Petani"];

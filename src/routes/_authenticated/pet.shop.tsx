@@ -8,7 +8,7 @@ import {
   buyPetAccessory,
   equipPetAccessory,
 } from "@/features/scan/lib/scanBatch7.functions";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast-config";
 
 export const Route = createFileRoute("/_authenticated/pet/shop")({ component: Page });
 

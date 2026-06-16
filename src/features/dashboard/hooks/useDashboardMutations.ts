@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast-config";
 import { logWater } from "@/features/water/lib/water.functions";
 import { addMood } from "@/features/mood/lib/mood.functions";
 import { claimDailyLoginBonus } from "@/features/scan/lib/scanBatch9.functions";

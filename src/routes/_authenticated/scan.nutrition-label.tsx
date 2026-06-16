@@ -6,7 +6,7 @@ import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { BottomNav } from "@/components/bottom-nav";
 import { ocrNutritionLabel } from "@/features/scan/lib/scanBatch12.functions";
 import { validateImageFile, fileToDataUrl } from "@/lib/image-utils";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast-config";
 
 export const Route = createFileRoute("/_authenticated/scan/nutrition-label")({ component: Page });
 

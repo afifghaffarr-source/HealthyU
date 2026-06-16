@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast-config";
 import { logMeal } from "@/features/meals/lib/meals.functions";
 
 type MealType = "breakfast" | "lunch" | "dinner" | "snack";

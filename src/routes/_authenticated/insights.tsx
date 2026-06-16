@@ -5,7 +5,7 @@ import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { BottomNav } from "@/components/bottom-nav";
 import { getDailyInsights, copyYesterdayMeals } from "@/features/scan/lib/scanHistory.functions";
 import { Sparkles, Copy, Share2, Lightbulb, RefreshCw } from "lucide-react";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast-config";
 
 const opts = queryOptions({ queryKey: ["daily-insights"], queryFn: () => getDailyInsights() });
 

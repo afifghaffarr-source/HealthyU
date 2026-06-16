@@ -3,7 +3,7 @@ import { useRef, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { Camera, Loader2, Sparkles, X, History, Zap } from "lucide-react";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast-config";
 import { FeatureErrorBoundary } from "@/components/healthyu/feature-error-boundary";
 import { BottomNav } from "@/components/bottom-nav";
 import { recognizeFood } from "@/features/food/lib/foodScan.functions";

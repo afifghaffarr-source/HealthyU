@@ -6,7 +6,7 @@ import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { BottomNav } from "@/components/bottom-nav";
 import { remixRecipe } from "@/features/scan/lib/scanSocial.functions";
 import { Sparkles, Loader2 } from "lucide-react";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast-config";
 
 export const Route = createFileRoute("/_authenticated/recipes/$id/remix")({
   component: Page,

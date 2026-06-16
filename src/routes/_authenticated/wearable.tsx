@@ -3,7 +3,7 @@ import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect } from "react";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast-config";
 import { toastError } from "@/lib/toast-config";
 import { Activity, RefreshCw, Plug, Unplug, Loader2 } from "lucide-react";
 import { BottomNav } from "@/components/bottom-nav";

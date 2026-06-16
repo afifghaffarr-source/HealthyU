@@ -4,7 +4,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { getProfile, updateProfile } from "@/features/profile/lib/profile.functions";
 import { calcAge, calcBMR, calcTDEE, type ActivityLevel } from "@/lib/health";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast-config";
 import { toastError } from "@/lib/toast-config";
 import {
   type Goal,

@@ -6,7 +6,7 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { setAuditOptIn } from "@/features/scan/lib/scanExtras.functions";
 import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { BottomNav } from "@/components/bottom-nav";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast-config";
 
 const getPrivacy = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])

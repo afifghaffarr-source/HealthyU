@@ -7,7 +7,7 @@ import { BottomNav } from "@/components/bottom-nav";
 import { parseVoiceMeal } from "@/features/scan/lib/scanPhoto.functions";
 import { logMeal } from "@/features/meals/lib/meals.functions";
 import { Mic, MicOff, Check, Loader2 } from "lucide-react";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast-config";
 
 export const Route = createFileRoute("/_authenticated/scan/voice")({
   component: VoicePage,

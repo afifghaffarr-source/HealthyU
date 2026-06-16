@@ -5,7 +5,7 @@ import { useState } from "react";
 import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { BottomNav } from "@/components/bottom-nav";
 import { listSleepDiary, upsertSleepDiary } from "@/features/scan/lib/scanBatch11.functions";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast-config";
 import { Moon, Sunrise, Star } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/sleep/diary")({ component: Page });

@@ -6,7 +6,7 @@ import { logSleep, recentSleep, deleteSleep } from "@/features/sleep/lib/sleep.f
 import { BottomNav } from "@/components/bottom-nav";
 import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { Moon, Trash2 } from "lucide-react";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast-config";
 import { toastError } from "@/lib/toast-config";
 import { ClientChart } from "@/components/ClientChart";
 

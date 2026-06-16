@@ -5,7 +5,7 @@ import { useState } from "react";
 import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { BottomNav } from "@/components/bottom-nav";
 import { createFriendInvite, redeemFriendInvite } from "@/features/scan/lib/scanBatch10.functions";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast-config";
 import { z } from "zod";
 
 export const Route = createFileRoute("/_authenticated/friends/invite")({

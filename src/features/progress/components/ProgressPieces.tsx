@@ -1,6 +1,6 @@
 import { Camera, Film, Loader2, Trash2 } from "lucide-react";
 import { useRef, useState } from "react";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast-config";
 import { toastError } from "@/lib/toast-config";
 import { generateTimelapse } from "@/lib/timelapse";
 import { ClientChart } from "@/components/ClientChart";

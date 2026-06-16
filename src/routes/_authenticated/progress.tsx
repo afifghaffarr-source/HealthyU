@@ -10,7 +10,7 @@ import {
 } from "@/features/progress/lib/progress.functions";
 import { supabase } from "@/integrations/supabase/client";
 import { BottomNav } from "@/components/bottom-nav";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast-config";
 import { toastError } from "@/lib/toast-config";
 import { validateImageFile, fileToDataUrl, dataUrlToBlob } from "@/lib/image-utils";
 import { getProfile } from "@/features/profile/lib/profile.functions";

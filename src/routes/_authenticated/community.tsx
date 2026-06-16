@@ -11,7 +11,7 @@ import {
 } from "@/features/groups/lib/community.functions";
 import { BottomNav } from "@/components/bottom-nav";
 import { Heart, Flame, Clock, Users } from "lucide-react";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast-config";
 import { toastError } from "@/lib/toast-config";
 import { PostCard } from "@/features/groups/components/PostCard";
 import { COMMUNITY_CATS, CommunityComposer } from "@/features/groups/components/CommunityComposer";

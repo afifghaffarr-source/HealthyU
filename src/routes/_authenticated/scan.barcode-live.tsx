@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { BottomNav } from "@/components/bottom-nav";
 import { scanBarcode } from "@/features/scan/lib/scanBatch9.functions";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast-config";
 import { Camera, CameraOff } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/scan/barcode-live")({ component: Page });

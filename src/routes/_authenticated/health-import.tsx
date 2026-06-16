@@ -12,7 +12,7 @@ import {
   type ParsedHealth,
 } from "@/features/health-import/lib/parsers";
 import { SourceCard, MiniStat } from "@/features/health-import/components/SourceCard";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast-config";
 import { toastError } from "@/lib/toast-config";
 
 export const Route = createFileRoute("/_authenticated/health-import")({

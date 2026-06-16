@@ -1,22 +1,51 @@
-import { toast as sonnerToast } from "sonner";
+/**
+ * Toast wrapper.
+ *
+ * Backend: `react-hot-toast` (SSR-safe, no module-singleton store,
+ * no hydration-mismatch issues).
+ *
+ * We re-export a Sonner-shaped API (`toast.success/error/...`, `toastError`)
+ * so all 100+ call-sites keep working unchanged.
+ *
+ * Note: Sonner supported a `description` field on each toast;
+ * `react-hot-toast` does not. We compose `title\n\ndescription` into the
+ * primary message for the few places that need a two-line message
+ * (AI-gateway error variants in `toastError` below).
+ */
+import toastLib, { type ToastOptions, type Renderable } from "react-hot-toast";
 
-const defaults = { duration: 2500 } as const;
+const DEFAULT_DURATION = 2500;
+const ERROR_DURATION = 3500;
+
+function withDefaults(
+  options: ToastOptions | undefined,
+  overrides: ToastOptions = {},
+): ToastOptions {
+  return { duration: DEFAULT_DURATION, ...options, ...overrides };
+}
 
 export const toast = Object.assign(
-  (message: string, opts?: Parameters<typeof sonnerToast>[1]) =>
-    sonnerToast(message, { ...defaults, ...opts }),
+  (message: Renderable, options?: ToastOptions) => toastLib(message, withDefaults(options)),
   {
-    success: (m: string, o?: Parameters<typeof sonnerToast.success>[1]) =>
-      sonnerToast.success(m, { ...defaults, ...o }),
-    error: (m: string, o?: Parameters<typeof sonnerToast.error>[1]) =>
-      sonnerToast.error(m, { ...defaults, ...o, duration: 3500 }),
-    info: (m: string, o?: Parameters<typeof sonnerToast.info>[1]) =>
-      sonnerToast.info(m, { ...defaults, ...o }),
-    warning: (m: string, o?: Parameters<typeof sonnerToast.warning>[1]) =>
-      sonnerToast.warning(m, { ...defaults, ...o }),
-    loading: sonnerToast.loading,
-    dismiss: sonnerToast.dismiss,
-    promise: sonnerToast.promise,
+    success: (message: Renderable, options?: ToastOptions) =>
+      toastLib.success(message, withDefaults(options)),
+    error: (message: Renderable, options?: ToastOptions) =>
+      toastLib.error(message, withDefaults(options, { duration: ERROR_DURATION })),
+    info: (message: Renderable, options?: ToastOptions) => toastLib(message, withDefaults(options)),
+    warning: (message: Renderable, options?: ToastOptions) =>
+      toastLib(message, withDefaults(options)),
+    loading: (message: Renderable, options?: ToastOptions) =>
+      toastLib.loading(message, withDefaults(options)),
+    dismiss: (id?: string) => toastLib.dismiss(id),
+    promise: <T>(
+      promise: Promise<T> | (() => Promise<T>),
+      msgs: {
+        loading: Renderable;
+        success: Renderable | ((value: T) => Renderable);
+        error: Renderable | ((err: unknown) => Renderable);
+      },
+      options?: ToastOptions,
+    ): Promise<T> => toastLib.promise(promise, msgs, withDefaults(options)),
   },
 );
 
@@ -40,18 +69,18 @@ export function toastError(e: unknown, fallback = "Gagal"): void {
     lower.includes("terlalu banyak") ||
     lower.includes(" 429")
   ) {
-    sonnerToast.warning(final, {
-      description: "Progress kecil tetap progress — istirahat sebentar ya.",
-      duration: 4000,
-    });
+    toastLib(
+      `${final}\nProgress kecil tetap progress — istirahat sebentar ya.`,
+      withDefaults(undefined, { duration: 4000 }),
+    );
     return;
   }
   // Credit habis (402)
   if (lower.includes("kredit ai") || lower.includes(" 402")) {
-    sonnerToast.error("Kredit AI sedang habis", {
-      description: "Tim kami sudah diberi tahu. Coba lagi nanti.",
-      duration: 4500,
-    });
+    toastLib.error(
+      "Kredit AI sedang habis\nTim kami sudah diberi tahu. Coba lagi nanti.",
+      withDefaults(undefined, { duration: 4500 }),
+    );
     return;
   }
   // Busy / timeout (503 / 504)
@@ -61,11 +90,11 @@ export function toastError(e: unknown, fallback = "Gagal"): void {
     lower.includes(" 503") ||
     lower.includes(" 504")
   ) {
-    sonnerToast.error("Layanan AI sedang sibuk", {
-      description: "Coba lagi sebentar lagi.",
-      duration: 4000,
-    });
+    toastLib.error(
+      "Layanan AI sedang sibuk\nCoba lagi sebentar lagi.",
+      withDefaults(undefined, { duration: 4000 }),
+    );
     return;
   }
-  sonnerToast.error(final, { duration: 3500 });
+  toastLib.error(final, withDefaults(undefined, { duration: ERROR_DURATION }));
 }

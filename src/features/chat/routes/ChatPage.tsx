@@ -10,7 +10,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { BottomNav } from "@/components/bottom-nav";
 import { Trash2, Volume2, VolumeX } from "lucide-react";
 import { TopAppBar } from "@/components/healthyu/top-app-bar";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast-config";
 import { toastError } from "@/lib/toast-config";
 import { useSpeech } from "@/features/chat/hooks/useSpeech";
 import { Link } from "@tanstack/react-router";

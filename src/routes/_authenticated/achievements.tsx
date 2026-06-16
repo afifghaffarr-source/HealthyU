@@ -11,7 +11,7 @@ import {
 import { AchievementIcon } from "@/lib/achievement-icons";
 import { BottomNav } from "@/components/bottom-nav";
 import { Flame, Trophy, Star, Share2 } from "lucide-react";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast-config";
 
 export const Route = createFileRoute("/_authenticated/achievements")({
   component: AchievementsPage,

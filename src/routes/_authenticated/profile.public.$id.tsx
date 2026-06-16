@@ -6,7 +6,7 @@ import { BottomNav } from "@/components/bottom-nav";
 import { getPublicProfile } from "@/features/scan/lib/scanFinal.functions";
 import { followUser, unfollowUser } from "@/features/scan/lib/scanSocial.functions";
 import { Flame, Trophy, UserPlus, UserMinus } from "lucide-react";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast-config";
 
 export const Route = createFileRoute("/_authenticated/profile/public/$id")({
   component: Page,

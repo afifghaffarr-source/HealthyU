@@ -4,7 +4,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { BottomNav } from "@/components/bottom-nav";
 import { claimDailyLoginBonus } from "@/features/scan/lib/scanBatch9.functions";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast-config";
 import { Gift } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/login-bonus")({ component: Page });

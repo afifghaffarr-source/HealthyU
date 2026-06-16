@@ -6,7 +6,7 @@ import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { BottomNav } from "@/components/bottom-nav";
 import { logMeditation, listMeditations } from "@/features/scan/lib/scanBatch8.functions";
 import { Play, Pause, RotateCcw } from "lucide-react";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast-config";
 
 export const Route = createFileRoute("/_authenticated/meditation")({ component: Page });
 

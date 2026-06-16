@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { BottomNav } from "@/components/bottom-nav";
 import { useState } from "react";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast-config";
 
 export const Route = createFileRoute("/_authenticated/push/alarm")({ component: Page });
 

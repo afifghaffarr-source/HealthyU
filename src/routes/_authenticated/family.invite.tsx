@@ -5,7 +5,7 @@ import { useState } from "react";
 import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { BottomNav } from "@/components/bottom-nav";
 import { createFamilyInvite, redeemFamilyInvite } from "@/features/scan/lib/scanBatch8.functions";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast-config";
 import { z } from "zod";
 import { Users, Copy, QrCode, Ticket, Share2 } from "lucide-react";
 

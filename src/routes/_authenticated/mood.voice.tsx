@@ -6,7 +6,7 @@ import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { BottomNav } from "@/components/bottom-nav";
 import { transcribeVoice } from "@/features/scan/lib/scanBatch10.functions";
 import { Mic, Square } from "lucide-react";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast-config";
 
 export const Route = createFileRoute("/_authenticated/mood/voice")({ component: Page });
 

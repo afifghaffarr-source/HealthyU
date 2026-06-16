@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, type RefObject } from "react";
 import { useNavigate } from "@tanstack/react-router";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast-config";
 import { CHALLENGE_HIGHLIGHT_MS, CHALLENGE_HIGHLIGHT_FADE_MS } from "@/lib/constants";
 import { useAnnounce } from "@/components/live-announcer.hook";
 
@@ -68,17 +68,13 @@ export function useChallengeDeeplink({
       }
     };
     if (parts.length === 0) {
-      toast.info("Belum ada streak — gabung challenge dulu", {
-        action: { label: "Lihat challenge", onClick: scrollToFirstUnjoined },
-      });
+      toast.info("Belum ada streak — gabung challenge dulu");
       navigate({ to: "/challenges", search: {}, replace: true });
       return;
     }
     const active = parts.filter((p) => !p.status || p.status === "active");
     if (active.length === 0) {
-      toast.info("Semua streak sudah selesai — mulai challenge baru", {
-        action: { label: "Lihat challenge", onClick: scrollToFirstUnjoined },
-      });
+      toast.info("Semua streak sudah selesai — mulai challenge baru");
       navigate({ to: "/challenges", search: {}, replace: true });
       return;
     }

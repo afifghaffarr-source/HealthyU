@@ -6,7 +6,7 @@ import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { BottomNav } from "@/components/bottom-nav";
 import { parseMenuImage } from "@/features/scan/lib/scanExtras.functions";
 import { Camera, Loader2 } from "lucide-react";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast-config";
 import { validateImageFile, fileToDataUrl } from "@/lib/image-utils";
 
 export const Route = createFileRoute("/_authenticated/scan/menu")({ component: Page });

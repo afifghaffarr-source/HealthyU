@@ -10,7 +10,7 @@ import { BottomNav } from "@/components/bottom-nav";
 import { Download, FileText, Sparkles, Loader2, Share2 } from "lucide-react";
 import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { useEffect, useMemo, useState } from "react";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast-config";
 import { z } from "zod";
 import { fallback, zodValidator } from "@tanstack/zod-adapter";
 import { useNavigate } from "@tanstack/react-router";

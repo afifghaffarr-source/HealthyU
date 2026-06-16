@@ -2,7 +2,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { getGroupLeaderboard, leaveGroup } from "@/features/groups/lib/groups.functions";
 import { Users, Copy, Share2, Trophy, Flame, LogOut, Loader2 } from "lucide-react";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast-config";
 
 export function GroupCard({
   group,

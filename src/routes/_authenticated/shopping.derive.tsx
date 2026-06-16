@@ -3,7 +3,7 @@ import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { BottomNav } from "@/components/bottom-nav";
 import { useMemo, useState } from "react";
 import { Check, ShoppingBag, Sparkles } from "lucide-react";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast-config";
 
 export const Route = createFileRoute("/_authenticated/shopping/derive")({
   component: ShoppingDerivePage,

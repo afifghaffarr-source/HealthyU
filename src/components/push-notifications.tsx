@@ -8,7 +8,7 @@ import {
 } from "@/features/notifications/lib/push.functions";
 import { VAPID_PUBLIC_KEY, urlBase64ToUint8Array } from "@/lib/push-config";
 import { Bell, BellOff, Send, Loader2 } from "lucide-react";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast-config";
 import { toastError } from "@/lib/toast-config";
 
 type Status = "unsupported" | "denied" | "granted" | "default" | "loading";

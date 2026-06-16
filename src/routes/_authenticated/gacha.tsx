@@ -5,7 +5,7 @@ import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { BottomNav } from "@/components/bottom-nav";
 import { gachaPull } from "@/features/scan/lib/scanBatch7.functions";
 import { Gift } from "lucide-react";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast-config";
 import { useState } from "react";
 
 export const Route = createFileRoute("/_authenticated/gacha")({ component: Page });

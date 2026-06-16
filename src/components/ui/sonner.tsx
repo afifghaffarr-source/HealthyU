@@ -1,40 +1,62 @@
-import { useState, useEffect } from "react";
-import { Toaster as Sonner } from "sonner";
+import { Toaster as HotToaster } from "react-hot-toast";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
 
-type ToasterProps = React.ComponentProps<typeof Sonner>;
+/**
+ * Toaster container.
+ *
+ * Replaces the Sonner-based Toaster. `react-hot-toast` is SSR-safe
+ * (it uses an event-emitter + React context, not a module-singleton store),
+ * and renders toasts via a portal with no hydration-mismatch issues.
+ *
+ * The container is forced to client-side only rendering because
+ * `react-hot-toast` measures viewport width on mount to position toasts.
+ * Rendering an empty placeholder on the server is fine; the real toaster
+ * mounts after hydration via `useEffect`.
+ */
+import { useState, useEffect } from "react";
 
-const Toaster = ({ ...props }: ToasterProps) => {
+const Toaster = (props: {
+  position?:
+    | "top-center"
+    | "top-left"
+    | "top-right"
+    | "bottom-center"
+    | "bottom-left"
+    | "bottom-right";
+}) => {
   const prefersReducedMotion = useReducedMotion();
-  // Force client-side only rendering to avoid SSR hydration issues with
-  // Sonner's internal store subscription. The toaster container will
-  // only mount after hydration, ensuring toast() calls are properly received.
   const [mounted, setMounted] = useState(false);
   useEffect(() => {
     setMounted(true);
   }, []);
   if (!mounted) return null;
   return (
-    <Sonner
-      className="toaster group"
-      richColors
-      expand
-      visibleToasts={3}
-      // Saat prefers-reduced-motion aktif: matikan slide/swipe, hanya fade.
-      duration={prefersReducedMotion ? 4000 : undefined}
+    <HotToaster
+      position={props.position ?? "top-center"}
+      gutter={8}
       toastOptions={{
-        classNames: {
-          toast: `group toast group-[.toaster]:bg-background group-[.toaster]:text-foreground group-[.toaster]:border-border group-[.toaster]:shadow-lg${
-            prefersReducedMotion
-              ? " motion-reduce:transition-opacity motion-reduce:!transform-none"
-              : ""
-          }`,
-          description: "group-[.toast]:text-muted-foreground",
-          actionButton: "group-[.toast]:bg-primary group-[.toast]:text-primary-foreground",
-          cancelButton: "group-[.toast]:bg-muted group-[.toast]:text-muted-foreground",
+        // Slightly longer than DEFAULT_DURATION (2500) for readability.
+        duration: prefersReducedMotion ? 4000 : 2500,
+        // Use project theme tokens so toasts blend with the design system.
+        style: {
+          background: "var(--background, #fff)",
+          color: "var(--foreground, #0a0a0a)",
+          border: "1px solid var(--border, #e5e5e5)",
+          boxShadow: "0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)",
+          fontSize: "0.875rem",
+          borderRadius: "0.5rem",
+          padding: "0.75rem 1rem",
+          maxWidth: "420px",
+        },
+        // Success / error variants get their own colors that still match
+        // the design system (success = green-500, error = red-500).
+        success: {
+          iconTheme: { primary: "#10b981", secondary: "#fff" },
+        },
+        error: {
+          iconTheme: { primary: "#ef4444", secondary: "#fff" },
         },
       }}
-      {...props}
     />
   );
 };

@@ -6,7 +6,7 @@ import { getReferralInfo, applyReferralCode } from "@/features/referrals/lib/ref
 import { BottomNav } from "@/components/bottom-nav";
 import { Copy, Share2, Gift, Users } from "lucide-react";
 import { useState } from "react";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast-config";
 import { toastError } from "@/lib/toast-config";
 
 export const Route = createFileRoute("/_authenticated/referrals")({

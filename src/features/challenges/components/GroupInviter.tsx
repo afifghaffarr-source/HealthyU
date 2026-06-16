@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast-config";
 import { UserPlus } from "lucide-react";
 import { useMiniFocusTrap } from "@/hooks/useMiniFocusTrap";
 import {
@@ -42,16 +42,7 @@ export function GroupInviter({
       return group_id;
     },
     onSuccess: (group_id) => {
-      toast.success("Grup diundang ke challenge", {
-        action: {
-          label: "Lihat",
-          onClick: () =>
-            navigate({
-              to: "/challenges",
-              search: { challenge: challengeId, group: group_id },
-            }),
-        },
-      });
+      toast.success("Grup diundang ke challenge");
       qc.invalidateQueries({ queryKey: ["my-groups-for-challenge", challengeId] });
       qc.invalidateQueries({ queryKey: ["challenge-groups", challengeId] });
     },

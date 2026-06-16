@@ -1,6 +1,6 @@
 import { useMutation } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast-config";
 import { toastError } from "@/lib/toast-config";
 import { recognizeFood, submitScanCorrection } from "@/features/food/lib/foodScan.functions";
 import { attachScanPhoto } from "@/features/scan/lib/scanPhoto.functions";

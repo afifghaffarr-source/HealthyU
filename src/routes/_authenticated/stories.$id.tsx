@@ -10,7 +10,7 @@ import {
   toggleStoryLike,
 } from "@/features/scan/lib/scanFinal.functions";
 import { Heart, Send } from "lucide-react";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast-config";
 
 export const Route = createFileRoute("/_authenticated/stories/$id")({
   component: Page,

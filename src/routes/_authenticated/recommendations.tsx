@@ -18,7 +18,7 @@ import {
   Check,
   type LucideIcon,
 } from "lucide-react";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast-config";
 import { toastError } from "@/lib/toast-config";
 
 export const Route = createFileRoute("/_authenticated/recommendations")({

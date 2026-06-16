@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast-config";
 import { supabase } from "@/integrations/supabase/client";
 import {
   GROUP_BONUS_AGGREGATE_MS,
@@ -66,15 +66,11 @@ export function useGroupBonusClaims() {
     const flush = () => {
       flushTimer = null;
       for (const [groupId, { groupName, names }] of buffer.entries()) {
-        const action = {
-          label: "Lihat",
-          onClick: () => navigate({ to: "/challenges", search: { group: groupId } }),
-        };
         if (names.size === 1) {
           const [only] = Array.from(names);
-          toast.success(`🎉 ${only} klaim bonus di ${groupName}`, { action });
+          toast.success(`🎉 ${only} klaim bonus di ${groupName}`);
         } else if (names.size > 1) {
-          toast.success(`🎉 ${names.size} anggota klaim bonus di ${groupName}`, { action });
+          toast.success(`🎉 ${names.size} anggota klaim bonus di ${groupName}`);
         }
       }
       buffer.clear();

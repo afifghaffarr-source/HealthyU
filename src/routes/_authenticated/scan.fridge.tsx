@@ -6,7 +6,7 @@ import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { BottomNav } from "@/components/bottom-nav";
 import { recipeFromFridge } from "@/features/scan/lib/scanBatch11.functions";
 import { validateImageFile, fileToDataUrl } from "@/lib/image-utils";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast-config";
 
 export const Route = createFileRoute("/_authenticated/scan/fridge")({ component: Page });
 

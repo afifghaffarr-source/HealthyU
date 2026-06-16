@@ -1,4 +1,4 @@
-import { toast } from "sonner";
+import { toast } from "@/lib/toast-config";
 import { useState } from "react";
 
 export function FreezeDialog({ open, onClose }: { open: boolean; onClose: () => void }) {

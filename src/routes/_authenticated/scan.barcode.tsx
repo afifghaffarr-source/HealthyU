@@ -5,7 +5,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { BottomNav } from "@/components/bottom-nav";
 import { lookupBarcode, relogMeal } from "@/features/scan/lib/scanExtras.functions";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast-config";
 import { Loader2 } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/scan/barcode")({

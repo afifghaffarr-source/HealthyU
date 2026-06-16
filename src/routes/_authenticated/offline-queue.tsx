@@ -3,7 +3,7 @@ import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { useEffect, useState, useCallback } from "react";
 import { BottomNav } from "@/components/bottom-nav";
 import { RefreshCw, Trash2, AlertTriangle } from "lucide-react";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast-config";
 import {
   listDead,
   removeDead,

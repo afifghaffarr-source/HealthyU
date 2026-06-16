@@ -5,7 +5,7 @@ import { useState } from "react";
 import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { BottomNav } from "@/components/bottom-nav";
 import { addRecipeReview, listRecipeReviews } from "@/features/scan/lib/scanBatch9.functions";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast-config";
 import { Star } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/recipes/$id/reviews")({ component: Page });

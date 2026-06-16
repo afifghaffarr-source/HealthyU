@@ -9,7 +9,7 @@ import {
   getDailyQuote,
 } from "@/features/scan/lib/scanBatch7.functions";
 import { Brain, Sparkles, Loader2 } from "lucide-react";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast-config";
 
 export const Route = createFileRoute("/_authenticated/quiz/daily")({ component: Page });
 

@@ -8,7 +8,7 @@ import { getProfile } from "@/features/profile/lib/profile.functions";
 import { BottomNav } from "@/components/bottom-nav";
 import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { SyncPill } from "@/components/healthyu/sync-pill";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast-config";
 import { enqueue } from "@/lib/offline-queue";
 import { useOfflineQueue } from "@/hooks/use-offline-queue";
 import { bpCategory, glucoseCategory } from "@/features/vitals/lib/vitalsCalc";

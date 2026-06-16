@@ -11,7 +11,7 @@ import { CardSkeleton, ListSkeleton } from "@/components/healthyu/skeletons";
 import { LazyImage } from "@/components/healthyu/lazy-image";
 import { EmptyState } from "@/components/healthyu/empty-state";
 import { BookOpen } from "lucide-react";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast-config";
 import { getArticle, toggleBookmark } from "@/features/articles/lib/articles.functions";
 import { SafeMarkdown } from "@/components/SafeMarkdown";
 

@@ -6,7 +6,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { getProfile } from "@/features/profile/lib/profile.functions";
 import { BottomNav } from "@/components/bottom-nav";
 import { MapPin } from "lucide-react";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast-config";
 import {
   loadPrayerPrefs,
   savePrayerContext,

@@ -4,7 +4,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { getNotifPrefs, updateNotifPrefs } from "@/features/notifications/lib/notifPrefs.functions";
 import { BottomNav } from "@/components/bottom-nav";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast-config";
 import { toastError } from "@/lib/toast-config";
 
 export const Route = createFileRoute("/_authenticated/notifications")({
