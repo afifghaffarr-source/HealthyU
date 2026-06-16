@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import { Toaster as Sonner } from "sonner";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
 
@@ -5,6 +6,14 @@ type ToasterProps = React.ComponentProps<typeof Sonner>;
 
 const Toaster = ({ ...props }: ToasterProps) => {
   const prefersReducedMotion = useReducedMotion();
+  // Force client-side only rendering to avoid SSR hydration issues with
+  // Sonner's internal store subscription. The toaster container will
+  // only mount after hydration, ensuring toast() calls are properly received.
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+  if (!mounted) return null;
   return (
     <Sonner
       className="toaster group"
