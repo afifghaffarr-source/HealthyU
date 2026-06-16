@@ -8,6 +8,9 @@ const Toaster = ({ ...props }: ToasterProps) => {
   return (
     <Sonner
       className="toaster group"
+      richColors
+      expand
+      visibleToasts={3}
       // Saat prefers-reduced-motion aktif: matikan slide/swipe, hanya fade.
       duration={prefersReducedMotion ? 4000 : undefined}
       toastOptions={{
