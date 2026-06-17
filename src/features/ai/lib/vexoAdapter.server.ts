@@ -20,7 +20,9 @@ import { getEnv } from "@/lib/cloudflare-env.server";
 function readVexoBaseUrl(): string {
   // CF env first (AsyncLocalStorage) → process.env fallback. Default to
   // official VexoAPI host if neither is configured.
-  return getEnv().VEXO_BASE_URL || "https://vexoapi.dev";
+  // 2026-06-17: VexoAPI migrated from vexoapi.dev (NXDOMAIN) to vexoapi.site.
+  // See https://github.com/AzzamCyber/VexoAPI for migration context.
+  return getEnv().VEXO_BASE_URL || "https://vexoapi.site";
 }
 
 // New Vexo API (2026-06+): OpenAI-compatible

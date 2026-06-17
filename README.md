@@ -41,27 +41,29 @@ bunx tsc --noEmit  # typecheck
 ## Environment variables
 
 `.env` **tidak di-track di git**. Secrets at runtime are managed via:
+
 - **Local dev**: `.env` file (copy from `.env.example`)
 - **Production**: Cloudflare Pages → Settings → Environment variables
 
 For local development:
+
 ```bash
 cp .env.example .env
 # Then fill the values. See docs/supabase-migration.md for sourcing each one.
 ```
 
-| Var                                                 | Scope       | Sumber                                                               |
-| --------------------------------------------------- | ----------- | -------------------------------------------------------------------- |
-| `VITE_SUPABASE_URL`                                 | client      | Self-managed Supabase project → Settings → API                       |
-| `VITE_SUPABASE_PUBLISHABLE_KEY`                     | client      | Same (publishable/anon key)                                          |
-| `VITE_SUPABASE_PROJECT_ID`                          | client      | Same                                                                 |
-| `SUPABASE_URL` / `SUPABASE_PUBLISHABLE_KEY`         | server      | Same                                                                 |
-| `SUPABASE_SERVICE_ROLE_KEY`                         | server only | Same (service_role key, NEVER expose to client)                      |
-| `VEXO_API_KEY`                                      | server only | https://vexoapi.dev/server/login (PRO account)                       |
-| `VEXO_BASE_URL`                                     | server only | Default `https://vexoapi.dev` — override for self-hosted proxy       |
-| `CRON_SECRET`                                       | server only | `openssl rand -hex 32` — min 32 chars, Cloudflare Pages env var      |
-| `VAPID_PRIVATE_KEY` / `VAPID_SUBJECT`               | server only | Manual (web push)                                                    |
-| `GOOGLE_FIT_CLIENT_ID` / `GOOGLE_FIT_CLIENT_SECRET` | server only | Google Cloud Console                                                 |
+| Var                                                 | Scope       | Sumber                                                          |
+| --------------------------------------------------- | ----------- | --------------------------------------------------------------- |
+| `VITE_SUPABASE_URL`                                 | client      | Self-managed Supabase project → Settings → API                  |
+| `VITE_SUPABASE_PUBLISHABLE_KEY`                     | client      | Same (publishable/anon key)                                     |
+| `VITE_SUPABASE_PROJECT_ID`                          | client      | Same                                                            |
+| `SUPABASE_URL` / `SUPABASE_PUBLISHABLE_KEY`         | server      | Same                                                            |
+| `SUPABASE_SERVICE_ROLE_KEY`                         | server only | Same (service_role key, NEVER expose to client)                 |
+| `VEXO_API_KEY`                                      | server only | https://vexoapi.site (free tier, no login) — 16-char nanoid key |
+| `VEXO_BASE_URL`                                     | server only | Default `https://vexoapi.site` — override for self-hosted proxy |
+| `CRON_SECRET`                                       | server only | `openssl rand -hex 32` — min 32 chars, Cloudflare Pages env var |
+| `VAPID_PRIVATE_KEY` / `VAPID_SUBJECT`               | server only | Manual (web push)                                               |
+| `GOOGLE_FIT_CLIENT_ID` / `GOOGLE_FIT_CLIENT_SECRET` | server only | Google Cloud Console                                            |
 
 ## Cron & webhook auth
 
@@ -80,11 +82,11 @@ Semua call AI lewat `src/features/ai/lib/aiGateway.server.ts` (VexoAPI-backed):
 
 VexoAPI endpoint map (dari `src/features/ai/lib/vexoAdapter.ts`):
 
-| Caller model                  | VexoAPI endpoint | Use case                          |
-| ----------------------------- | ---------------- | --------------------------------- |
-| `google/gemini-2.5-flash`     | `gptoss120b`     | default chat / scan text          |
-| `google/gemini-2.5-flash-lite`| `glm47flash`     | cheap text                        |
-| `google/gemini-2.5-pro`       | `gemini`         | multimodal (text + imageUrl)      |
+| Caller model                   | VexoAPI endpoint | Use case                     |
+| ------------------------------ | ---------------- | ---------------------------- |
+| `google/gemini-2.5-flash`      | `gptoss120b`     | default chat / scan text     |
+| `google/gemini-2.5-flash-lite` | `glm47flash`     | cheap text                   |
+| `google/gemini-2.5-pro`        | `gemini`         | multimodal (text + imageUrl) |
 
 Rate limit:
 

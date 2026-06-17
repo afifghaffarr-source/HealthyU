@@ -140,7 +140,7 @@ describe("callAiWithGuards", () => {
       messages: [{ role: "user", content: "ping" }],
     });
     expect(capturedMethod).toBe("POST");
-    expect(capturedUrl).toBe("https://vexoapi.dev/api/v1/chat/completions");
+    expect(capturedUrl).toBe("https://vexoapi.site/api/v1/chat/completions");
     expect(capturedHeaders?.["Authorization"]).toBe("Bearer test-key");
     expect(capturedHeaders?.["Content-Type"]).toBe("application/json");
     const body = JSON.parse(capturedBody ?? "{}");

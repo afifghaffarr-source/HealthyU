@@ -19,17 +19,18 @@ Total: ~1.5 jam kerjaan aktif + propagate DNS. Bisa lebih cepet kalau token + pr
 
 ---
 
-## Step 0 — VexoAPI Key Rotation (5 min)
+## Step 0 — VexoAPI Key Rotation (5 min, only if needed)
 
 **Alasan:** Key yang sekarang `[REDACTED]` return `403 — upstream access denied` per audit 2026-06-13. Endpoint udah recovery (test 2026-06-13 malam: HTTP 429 = rate limit normal, bukan 403), tapi key perlu rotasi karena upstream pernah nge-block.
 
+**Catatan 2026-06-17:** VexoAPI pindah dari `vexoapi.dev` (NXDOMAIN) ke `vexoapi.site`. Free tier sekarang 16-char nanoid, **no registration**. Lihat `docs/vexo-api-notes.md` untuk detail.
+
 **Manual path:**
 
-1. Login ke https://vexoapi.dev/server/login (PRO account)
-2. Dashboard → Keys → Generate new VIP key
-3. Copy key (format `VEXO_*`, 32+ chars)
-4. Test: `curl "https://vexoapi.dev/api/gptoss120b?key=<NEW_KEY>" -G --data-urlencode "text=ping"` → harus return `{"status":true,"data":"...","timestamp":"..."}`
-5. Simpen key — bakal dipake di Step 1 (env var) dan Step 3 (CF Pages env)
+1. Buka https://vexoapi.site (klik "Generate Key", no registration)
+2. Copy key (16-char nanoid, contoh: `GZlX5vCq-aKtz4M-`)
+3. Test: `curl -X POST -H "Authorization: Bearer *** -H "Content-Type: application/json" -d '{"model":"openai/gpt-oss-120b:free","messages":[{"role":"user","content":"ping"}],"max_tokens":5}' "https://vexoapi.site/api/v1/chat/completions"` → harus return `{"choices":[{"message":{"content":"..."}}]}`
+4. Simpen key — bakal dipake di Step 1 (env var) dan Step 3 (CF Pages env)
 
 **Automated path:** kasih key baru ke gw, gw test + simpan di local env + commit ke git history (jangan di-commit, cuma di-`.env` local + CF dashboard).
 
@@ -188,7 +189,7 @@ Di Pages project → Settings → Environment variables, set untuk **Production*
 | `SUPABASE_PUBLISHABLE_KEY`      | `<anon key>`                        | Runtime only             |
 | `SUPABASE_SERVICE_ROLE_KEY`     | `<service role>`                    | Runtime only (encrypted) |
 | `VEXO_API_KEY`                  | `<new vexo vip key>`                | Runtime only (encrypted) |
-| `VEXO_BASE_URL`                 | `https://vexoapi.dev`               | Runtime only             |
+| `VEXO_BASE_URL`                 | `https://vexoapi.site`              | Runtime only             |
 | `CRON_SECRET`                   | `<64-char hex>`                     | Runtime only (encrypted) |
 | `VAPID_SUBJECT`                 | `mailto:support@healthyu.id`        | Runtime only             |
 | `VAPID_PRIVATE_KEY`             | `<vapid private>`                   | Runtime only (encrypted) |
@@ -308,13 +309,13 @@ Kalau ada yang broke post-deploy:
 
 ## Quick Reference
 
-| Tool         | Command                                                                                       | Source                                   |
-| ------------ | --------------------------------------------------------------------------------------------- | ---------------------------------------- |
-| Supabase CLI | `supabase --version` (2.106.0)                                                                | Just installed                           |
-| Wrangler     | `wrangler --version` (4.100.0)                                                                | Just installed                           |
-| VexoAPI test | `curl "https://vexoapi.dev/api/gptoss120b?key=$VEXO_API_KEY" -G --data-urlencode "text=ping"` | Just verified (HTTP 429 = rate limit OK) |
-| DNS check    | `dig healthyu.id +short`                                                                      | DNS provider                             |
-| Health check | `curl https://healthyu.id/api/log-error -X POST`                                              | After deploy                             |
+| Tool         | Command                                                                                                                                                                                            | Source                        |
+| ------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------- |
+| Supabase CLI | `supabase --version` (2.106.0)                                                                                                                                                                     | Just installed                |
+| Wrangler     | `wrangler --version` (4.100.0)                                                                                                                                                                     | Just installed                |
+| VexoAPI test | `curl -X POST -H "Authorization: Bearer *** -d '{"model":"openai/gpt-oss-120b:free","messages":[{"role":"user","content":"ping"}],"max_tokens":5}' "https://vexoapi.site/api/v1/chat/completions"` | Just verified (HTTP 200 = OK) |
+| DNS check    | `dig healthyu.id +short`                                                                                                                                                                           | DNS provider                  |
+| Health check | `curl https://healthyu.id/api/log-error -X POST`                                                                                                                                                   | After deploy                  |
 
 ---
 
@@ -329,7 +330,7 @@ Kalau ada yang broke post-deploy:
 Yang butuh lo:
 
 - Akses ke https://supabase.com/dashboard + https://dash.cloudflare.com (atau kasih tokens)
-- Akses ke https://vexoapi.dev/server/login (atau kasih key baru)
+- Akses ke https://vexoapi.site (klik "Generate Key", no registration)
 - DNS provider (kalau bukan di Cloudflare)
 - Confirmation kapan mau mulai
 

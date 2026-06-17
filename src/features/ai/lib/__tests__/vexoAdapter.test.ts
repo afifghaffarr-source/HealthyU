@@ -177,7 +177,7 @@ describe("callVexoApi — happy path", () => {
 
     const called = (fetch as ReturnType<typeof vi.fn>).mock.calls[0];
     const url = called[0] as string;
-    expect(url).toBe("https://vexoapi.dev/api/v1/chat/completions");
+    expect(url).toBe("https://vexoapi.site/api/v1/chat/completions");
 
     const init = called[1];
     expect(init.method).toBe("POST");

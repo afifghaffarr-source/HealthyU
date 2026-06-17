@@ -68,7 +68,9 @@ export const serverSchema = z.object({
   SUPABASE_PUBLISHABLE_KEY: supabaseKey,
   SUPABASE_SERVICE_ROLE_KEY: trimmedNonEmpty,
   VEXO_API_KEY: vexoKey,
-  VEXO_BASE_URL: url.default("https://vexoapi.dev"),
+  // 2026-06-17: VexoAPI migrated to vexoapi.site (vexoapi.dev domain is DEAD/NXDOMAIN).
+  // OpenAI-compatible API lives at ${VEXO_BASE_URL}/api/v1/chat/completions.
+  VEXO_BASE_URL: url.default("https://vexoapi.site"),
   CRON_SECRET: cronSecret,
 });
 

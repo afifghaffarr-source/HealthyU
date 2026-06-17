@@ -67,7 +67,7 @@ describe("validateServerEnv — happy path", () => {
     expect(result.ok).toBe(true);
     if (result.ok) {
       // VEXO_BASE_URL has a default
-      expect(result.data.VEXO_BASE_URL).toBe("https://vexoapi.dev");
+      expect(result.data.VEXO_BASE_URL).toBe("https://vexoapi.site");
     }
   });
 });
