@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { queryOptions, useSuspenseQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { createServerFn } from "@tanstack/react-start";
@@ -7,6 +7,8 @@ import { setAuditOptIn } from "@/features/scan/lib/scanExtras.functions";
 import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { BottomNav } from "@/components/bottom-nav";
 import { toast } from "@/lib/toast-config";
+import { Download, ExternalLink } from "lucide-react";
+import { DeleteAccountSection } from "@/features/privacy/components/delete-account-section";
 
 const getPrivacy = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
@@ -63,6 +65,36 @@ function Page() {
             />
           </button>
         </div>
+
+        <Link
+          to="/backup"
+          className="rounded-2xl bg-card border p-4 flex items-start gap-3 hover:bg-muted/50 transition"
+        >
+          <Download className="size-5 text-primary shrink-0 mt-0.5" />
+          <div className="min-w-0 flex-1">
+            <div className="font-medium text-sm">Unduh data saya</div>
+            <div className="text-xs text-muted-foreground mt-1">
+              Ekspor semua data pribadi Anda dalam format JSON atau CSV.
+            </div>
+          </div>
+          <ExternalLink className="size-4 text-muted-foreground shrink-0 mt-0.5" />
+        </Link>
+
+        <Link
+          to="/privacy"
+          className="rounded-2xl bg-card border p-4 flex items-start gap-3 hover:bg-muted/50 transition"
+        >
+          <ExternalLink className="size-5 text-primary shrink-0 mt-0.5" />
+          <div className="min-w-0 flex-1">
+            <div className="font-medium text-sm">Kebijakan Privasi</div>
+            <div className="text-xs text-muted-foreground mt-1">
+              Data apa saja yang kami kumpulkan dan hak-hak Anda sebagai pengguna (UU PDP No.
+              27/2022).
+            </div>
+          </div>
+        </Link>
+
+        <DeleteAccountSection />
       </div>
       <BottomNav />
     </div>

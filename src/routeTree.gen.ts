@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as ResepRouteImport } from './routes/resep'
+import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as OlahragaRouteImport } from './routes/olahraga'
 import { Route as KaloriRouteImport } from './routes/kalori'
 import { Route as KalkulatorRouteImport } from './routes/kalkulator'
@@ -186,6 +187,11 @@ const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
 const ResepRoute = ResepRouteImport.update({
   id: '/resep',
   path: '/resep',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PrivacyRoute = PrivacyRouteImport.update({
+  id: '/privacy',
+  path: '/privacy',
   getParentRoute: () => rootRouteImport,
 } as any)
 const OlahragaRoute = OlahragaRouteImport.update({
@@ -1104,6 +1110,7 @@ export interface FileRoutesByFullPath {
   '/kalkulator': typeof KalkulatorRouteWithChildren
   '/kalori': typeof KaloriRouteWithChildren
   '/olahraga': typeof OlahragaRouteWithChildren
+  '/privacy': typeof PrivacyRoute
   '/resep': typeof ResepRouteWithChildren
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/achievements': typeof AuthenticatedAchievementsRoute
@@ -1267,6 +1274,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/cari': typeof CariRoute
+  '/privacy': typeof PrivacyRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/achievements': typeof AuthenticatedAchievementsRoute
   '/alarms': typeof AuthenticatedAlarmsRoute
@@ -1437,6 +1445,7 @@ export interface FileRoutesById {
   '/kalkulator': typeof KalkulatorRouteWithChildren
   '/kalori': typeof KaloriRouteWithChildren
   '/olahraga': typeof OlahragaRouteWithChildren
+  '/privacy': typeof PrivacyRoute
   '/resep': typeof ResepRouteWithChildren
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/_authenticated/achievements': typeof AuthenticatedAchievementsRoute
@@ -1608,6 +1617,7 @@ export interface FileRouteTypes {
     | '/kalkulator'
     | '/kalori'
     | '/olahraga'
+    | '/privacy'
     | '/resep'
     | '/sitemap.xml'
     | '/achievements'
@@ -1771,6 +1781,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/cari'
+    | '/privacy'
     | '/sitemap.xml'
     | '/achievements'
     | '/alarms'
@@ -1940,6 +1951,7 @@ export interface FileRouteTypes {
     | '/kalkulator'
     | '/kalori'
     | '/olahraga'
+    | '/privacy'
     | '/resep'
     | '/sitemap.xml'
     | '/_authenticated/achievements'
@@ -2111,6 +2123,7 @@ export interface RootRouteChildren {
   KalkulatorRoute: typeof KalkulatorRouteWithChildren
   KaloriRoute: typeof KaloriRouteWithChildren
   OlahragaRoute: typeof OlahragaRouteWithChildren
+  PrivacyRoute: typeof PrivacyRoute
   ResepRoute: typeof ResepRouteWithChildren
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   ApiHealthRoute: typeof ApiHealthRoute
@@ -2141,6 +2154,13 @@ declare module '@tanstack/react-router' {
       path: '/resep'
       fullPath: '/resep'
       preLoaderRoute: typeof ResepRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/privacy': {
+      id: '/privacy'
+      path: '/privacy'
+      fullPath: '/privacy'
+      preLoaderRoute: typeof PrivacyRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/olahraga': {
@@ -3896,6 +3916,7 @@ const rootRouteChildren: RootRouteChildren = {
   KalkulatorRoute: KalkulatorRouteWithChildren,
   KaloriRoute: KaloriRouteWithChildren,
   OlahragaRoute: OlahragaRouteWithChildren,
+  PrivacyRoute: PrivacyRoute,
   ResepRoute: ResepRouteWithChildren,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   ApiHealthRoute: ApiHealthRoute,

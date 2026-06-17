@@ -205,6 +205,7 @@ export function LandingFooter() {
         <p>© {new Date().getFullYear()} HealthyU · Dirancang khusus untuk Indonesia</p>
         <div className="flex gap-4">
           <Link to="/auth">Masuk</Link>
+          <Link to="/privacy">Privasi</Link>
           <a href="#faq">FAQ</a>
         </div>
       </div>
