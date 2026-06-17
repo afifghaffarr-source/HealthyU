@@ -1,5 +1,5 @@
 import { AiGatewayError, type AiMultimodalMessage } from "./aiGateway.server";
-import { callVexoApi, flattenMessages } from "./vexoAdapter.server";
+import { callVexoApi, flattenMessages, resolveVexoEndpoint } from "./vexoAdapter.server";
 export { AiGatewayError };
 
 const DEFAULT_TIMEOUT_MS = 60_000;
@@ -32,7 +32,7 @@ export async function streamAiChat(opts: StreamAiOptions): Promise<{
   // We still respect the abort signal — if the client disconnects, we
   // abort the upstream fetch.
   const { data } = await callVexoApi({
-    endpoint: opts.model?.includes("pro") ? "gptoss120b" : "gptoss120b",
+    endpoint: resolveVexoEndpoint(opts.model ?? "gptoss120b"),
     text: flat.text,
     system: flat.system,
     imageUrl: flat.imageUrl,
