@@ -113,8 +113,21 @@ export const Route = createFileRoute("/api/chat/stream")({
           );
         }
 
+        // ED-disclosure analytics (AUDIT-012 Finding 4 follow-up 2026-06-17):
+        // log de-identified event so clinical team has data for next quarterly
+        // review. NOT PII (no message text), only message length + category.
+        // Auto-escalation to crisis is a clinical decision — deferred.
+        if (safety.kind === "disclaimer-ed") {
+          await supabase.rpc("log_audit_event", {
+            _action: "chat.safety.ed_disclosure",
+            _entity: "chat",
+            _meta: { message_length: body.message.length, category: safety.category },
+          });
+        }
+
         const decision = classifyMessage(body.message, !!body.imageBase64);
-        const safetyDisclaimer = safety.kind === "disclaimer" ? safety.response : "";
+        const safetyDisclaimer =
+          safety.kind === "disclaimer" || safety.kind === "disclaimer-ed" ? safety.response : "";
 
         // TIER 1 — local rule-based answer, no AI call.
         if (decision.tier === 1 && decision.localAnswer) {

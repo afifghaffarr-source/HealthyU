@@ -62,7 +62,6 @@ describe("checkChatSafety", () => {
     "which drug should I take", // PRESCRIPTION (EN)
     "aku gagal ginjal", // MEDICAL_CONDITIONS
     "penyakit jantung koroner", // MEDICAL_CONDITIONS
-    "aku eating disorder", // MEDICAL_CONDITIONS
     "sedang menyusui", // MEDICAL_CONDITIONS
   ])("appends disclaimer: %s", (msg) => {
     expect(checkChatSafety(msg).kind).toBe("disclaimer");
@@ -75,5 +74,53 @@ describe("checkChatSafety", () => {
   it("is case-insensitive", () => {
     expect(checkChatSafety("SUICIDE").kind).toBe("crisis");
     expect(checkChatSafety("Kill MySeLF").kind).toBe("crisis");
+  });
+
+  // AUDIT-012 Finding 4 (2026-06-16, 2026-06-17 follow-up): eating-disorder
+  // disclosures fall under a more specific disclaimer path. Auto-escalating
+  // ED → crisis is a clinical decision deferred to next quarterly review
+  // (psychologist/nutritionist sign-off required). Engineering action:
+  // detect ED keywords separately, return ED-specific resources appended
+  // to the regular AI response, fire analytics event. Caller handles
+  // `disclaimer-ed` like `disclaimer` (append to AI reply).
+  it.each([
+    "aku anoreksia",
+    "saya bulimia",
+    "aku eating disorder",
+    "I have binge eating",
+    "kena eating disorder",
+  ])("returns disclaimer-ed for ED disclosure: %s", (msg) => {
+    const r = checkChatSafety(msg);
+    expect(r.kind).toBe("disclaimer-ed");
+    if (r.kind === "disclaimer-ed") {
+      expect(r.response).toContain("Yayasan Pulih");
+      expect(r.response).toMatch(/ahli g(i|ı)zi|psikolog/i);
+    }
+  });
+
+  it("prioritizes crisis over disclaimer-ed", () => {
+    const r = checkChatSafety("aku anoreksia dan ingin mati");
+    expect(r.kind).toBe("crisis");
+  });
+
+  it("prioritizes blocked over disclaimer-ed", () => {
+    const r = checkChatSafety("aku anoreksia dan mau purge after eating");
+    expect(r.kind).toBe("blocked");
+  });
+
+  it("ED disclosure still beats generic diagnosis/prescription disclaimer", () => {
+    // "anoreksia" exists in both MEDICAL_CONDITIONS and ED_DISCLOSURE.
+    // ED should win for richer resources.
+    const r = checkChatSafety("didiagnosa anoreksia");
+    expect(r.kind).toBe("disclaimer-ed");
+  });
+
+  it("does not log or leak the message text in the result", () => {
+    const r = checkChatSafety("aku anoreksia");
+    // The response should contain resources, not the user's words.
+    expect(r.kind).toBe("disclaimer-ed");
+    if (r.kind === "disclaimer-ed") {
+      expect(r.response).not.toContain("anoreksia");
+    }
   });
 });
