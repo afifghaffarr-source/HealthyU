@@ -91,12 +91,16 @@ export async function withEnvAsync<T>(env: CloudflareEnv, fn: () => Promise<T> |
  *   2. process.env (local dev, tests, build-time) — set via .env or vi.stubEnv
  *
  * Returns a merged object. Values from AsyncLocalStorage take precedence.
+ *
+ * The CF env is normalized first (see normalizeCfEnv) to defend against
+ * wrangler --var edge cases that store keys as the literal "KEY=VALUE"
+ * string instead of { KEY: "VALUE" }.
  */
 export function getEnv(): CloudflareEnv {
   const stored = envStorage.getStore();
   const fromProcess = readProcessEnv();
   if (stored) {
-    return { ...fromProcess, ...stored };
+    return { ...fromProcess, ...normalizeCfEnv(stored) };
   }
   return fromProcess;
 }
@@ -124,6 +128,55 @@ export function withMockedEnv<T>(env: Partial<CloudflareEnv>, fn: () => T): T {
 // ──────────────────────────────────────────────────────────────────────
 // Internal helpers
 // ──────────────────────────────────────────────────────────────────────
+
+/**
+ * Normalize a CF Workers env object to handle wrangler --var edge cases.
+ *
+ * Background: wrangler 4.100.0 with `--var "KEY=VALUE"` does NOT parse
+ * the "=" — it stores the literal string "KEY=VALUE" as a key (with a
+ * truthy placeholder value). Result: env has keys like
+ *   { "GIT_SHA=abc123": true, "GIT_SHA=def456": true, ... }
+ * instead of { "GIT_SHA": "abc123" }. This accumulates across deploys
+ * (one weird key per deploy) because each new --var adds a new entry
+ * with a different SHA, instead of overwriting the previous value.
+ *
+ * Workaround at the reader side:
+ *   1. Keep clean keys (no '=') as-is.
+ *   2. For weird keys ('KEY=VALUE...'), strip the '=value' suffix to get
+ *      the real key name. Only set if no clean key with that name exists
+ *      (clean wins). For multiple weird keys for the same name, keep the
+ *      first occurrence (preserves wrangler's iteration order).
+ *
+ * The deploy workflow should ALSO be fixed to use the canonical wrangler
+ * syntax `--var "KEY:VALUE"` (colon, not equals) so future deploys do not
+ * accumulate. This helper is defense in depth for the existing accumulation
+ * (18+ orphan keys observed in production as of 2026-06-17) AND for any
+ * future regression where someone re-introduces the '=' syntax.
+ *
+ * Exported for testability. Not part of the public API.
+ */
+export function normalizeCfEnv(env: CloudflareEnv | undefined | null): CloudflareEnv {
+  if (!env) return {};
+  // First pass: copy clean keys (no '=') as-is.
+  const result: CloudflareEnv = {};
+  for (const [key, value] of Object.entries(env)) {
+    if (!key.includes("=")) {
+      result[key] = value;
+    }
+  }
+  // Second pass: add weird keys (with '='), but only if the clean
+  // version is absent. First occurrence wins (JS Object iteration
+  // preserves insertion order for string keys).
+  for (const [rawKey, value] of Object.entries(env)) {
+    if (rawKey.includes("=")) {
+      const key = rawKey.split("=")[0];
+      if (!(key in result)) {
+        result[key] = value;
+      }
+    }
+  }
+  return result;
+}
 
 function readProcessEnv(): CloudflareEnv {
   if (typeof process === "undefined" || !process.env) return {};

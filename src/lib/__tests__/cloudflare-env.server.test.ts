@@ -1,5 +1,11 @@
 import { describe, it, expect, beforeEach, afterEach } from "vitest";
-import { getEnv, withEnv, withMockedEnv, type CloudflareEnv } from "../cloudflare-env.server";
+import {
+  getEnv,
+  withEnv,
+  withMockedEnv,
+  normalizeCfEnv,
+  type CloudflareEnv,
+} from "../cloudflare-env.server";
 
 describe("cloudflare-env", () => {
   const origFetch = globalThis.fetch;
@@ -134,6 +140,116 @@ describe("cloudflare-env", () => {
       const [urlA, urlB] = await Promise.all([taskA, taskB]);
       expect(urlA).toBe("https://a.test");
       expect(urlB).toBe("https://b.test");
+    });
+  });
+
+  /**
+   * BUG FIX: wrangler 4.100.0 --var "KEY=VALUE" stores the literal
+   * "KEY=VALUE" string as a key, accumulating across deploys. The
+   * normalizeCfEnv helper defends against this at read time.
+   *
+   * See src/lib/cloudflare-env.server.ts normalizeCfEnv() for the
+   * full background on the wrangler quirk.
+   */
+  describe("normalizeCfEnv()", () => {
+    it("returns empty object for null/undefined input", () => {
+      expect(normalizeCfEnv(null)).toEqual({});
+      expect(normalizeCfEnv(undefined)).toEqual({});
+    });
+
+    it("preserves clean keys unchanged", () => {
+      const env: CloudflareEnv = {
+        SUPABASE_URL: "https://x.supabase.co",
+        SUPABASE_PUBLISHABLE_KEY: "sb_pub_abc",
+      };
+      expect(normalizeCfEnv(env)).toEqual({
+        SUPABASE_URL: "https://x.supabase.co",
+        SUPABASE_PUBLISHABLE_KEY: "sb_pub_abc",
+      });
+    });
+
+    it("strips '=' suffix from weird keys", () => {
+      // Simulates wrangler --var "GIT_SHA=abc123" producing a literal
+      // "GIT_SHA=abc123" key.
+      const env = {
+        "GIT_SHA=abc123": true,
+        "DEPLOYED_BY=afifghaffarr-source": true,
+      } as unknown as CloudflareEnv;
+      const result = normalizeCfEnv(env);
+      expect(result).toEqual({
+        GIT_SHA: true,
+        DEPLOYED_BY: true,
+      });
+    });
+
+    it("prefers clean key over weird key for same name", () => {
+      const env = {
+        GIT_SHA: "clean-value",
+        "GIT_SHA=weird-value": true,
+      } as unknown as CloudflareEnv;
+      const result = normalizeCfEnv(env);
+      expect(result.GIT_SHA).toBe("clean-value");
+    });
+
+    it("keeps first occurrence when multiple weird keys share a name", () => {
+      // Simulates 18 deploys each adding a new "GIT_SHA=<sha>" entry.
+      const env = {
+        "GIT_SHA=deploy-1": "v1",
+        "GIT_SHA=deploy-2": "v2",
+        "GIT_SHA=deploy-3": "v3",
+      } as unknown as CloudflareEnv;
+      const result = normalizeCfEnv(env);
+      expect(result.GIT_SHA).toBe("v1");
+    });
+
+    it("mixes clean and weird keys correctly", () => {
+      const env = {
+        CRON_SECRET: "secret",
+        "GIT_SHA=abc": "v1",
+        "GIT_SHA=def": "v2",
+        DEBUG_ENV_TRACE: "1",
+        "DEPLOYED_BY=afif": "actor",
+      } as unknown as CloudflareEnv;
+      const result = normalizeCfEnv(env);
+      expect(result).toEqual({
+        CRON_SECRET: "secret",
+        GIT_SHA: "v1",
+        DEBUG_ENV_TRACE: "1",
+        DEPLOYED_BY: "actor",
+      });
+    });
+  });
+
+  /**
+   * Integration: getEnv() must surface normalized values to callers,
+   * even when the underlying AsyncLocalStorage env has the wrangler
+   * weirdness.
+   */
+  describe("getEnv() with wrangler weird keys", () => {
+    it("returns the parsed key for getEnvVar('GIT_SHA') when env has 'GIT_SHA=<sha>'", () => {
+      withEnv(
+        {
+          "GIT_SHA=abc123": "v1",
+          "DEPLOYED_BY=afif": "actor",
+        } as unknown as CloudflareEnv,
+        () => {
+          const env = getEnv();
+          expect(env.GIT_SHA).toBe("v1");
+          expect(env.DEPLOYED_BY).toBe("actor");
+        },
+      );
+    });
+
+    it("clean GIT_SHA wins over weird GIT_SHA=<sha> when both are present", () => {
+      withEnv(
+        {
+          GIT_SHA: "clean-sha",
+          "GIT_SHA=weird": "ignored",
+        } as unknown as CloudflareEnv,
+        () => {
+          expect(getEnv().GIT_SHA).toBe("clean-sha");
+        },
+      );
     });
   });
 });

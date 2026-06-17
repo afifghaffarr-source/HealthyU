@@ -103,14 +103,22 @@ jobs:
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           WRANGLER_LOG_LEVEL: info
         run: |
-          # GIT_SHA + DEPLOYED_BY vars surface in the CF dashboard for audit
+          # GIT_SHA + DEPLOYED_BY vars surface in the CF dashboard for audit.
+          # IMPORTANT: wrangler --var uses 'KEY:VALUE' syntax (colon), NOT 'KEY=VALUE'.
+          # The '=' form is silently misinterpreted by wrangler 4.100.0 — it stores
+          # the literal "KEY=VALUE" string as a key (with a truthy placeholder value),
+          # which then ACCUMULATES across deploys (one new weird key per deploy)
+          # instead of overwriting the previous value. Verified 2026-06-17 in prod
+          # debug endpoint output (18 duplicate-looking "GIT_SHA=<sha>" entries).
+          # The cloudflare-env.server.ts reader also defends against this at runtime
+          # (see normalizeCfEnv), but using ':' here is the root-cause fix.
           set +e
           for attempt in 1 2 3; do
             echo "::group::Deploy attempt $attempt/3 (sha=${{ github.sha }})"
             wrangler deploy \
               --keep-vars \
-              --var "GIT_SHA=${{ github.sha }}" \
-              --var "DEPLOYED_BY=${{ github.actor }}" \
+              --var "GIT_SHA:${{ github.sha }}" \
+              --var "DEPLOYED_BY:${{ github.actor }}" \
               --message "Deploy ${{ github.sha }} via GitHub Actions (wrangler 4.100.0) attempt $attempt"
             exit_code=$?
             echo "::endgroup::"
