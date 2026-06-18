@@ -45,21 +45,31 @@ function ResepHub() {
             <Link
               to="/resep/$slug"
               params={{ slug: r.slug }}
-              className="block h-full rounded-xl border bg-card p-5 hover:bg-accent"
+              className="block h-full overflow-hidden rounded-xl border bg-card hover:bg-accent"
             >
-              {r.category && (
-                <p className="text-[10px] uppercase tracking-wide text-muted-foreground">
-                  {r.category}
-                </p>
+              {r.image_url && (
+                <img
+                  src={r.image_url}
+                  alt={r.title}
+                  loading="lazy"
+                  className="aspect-[4/3] w-full object-cover"
+                />
               )}
-              <h2 className="mt-1 font-semibold leading-tight">{r.title}</h2>
-              {r.description && (
-                <p className="mt-2 text-sm text-muted-foreground line-clamp-2">{r.description}</p>
-              )}
-              <div className="mt-3 flex flex-wrap gap-3 text-xs text-muted-foreground">
-                {r.calories != null && <span>{r.calories} kcal</span>}
-                {r.protein_g != null && <span>{r.protein_g}g protein</span>}
-                {r.total_min != null && <span>{r.total_min} mnt</span>}
+              <div className="p-5">
+                {r.category && (
+                  <p className="text-[10px] uppercase tracking-wide text-muted-foreground">
+                    {r.category}
+                  </p>
+                )}
+                <h2 className="mt-1 font-semibold leading-tight">{r.title}</h2>
+                {r.description && (
+                  <p className="mt-2 text-sm text-muted-foreground line-clamp-2">{r.description}</p>
+                )}
+                <div className="mt-3 flex flex-wrap gap-3 text-xs text-muted-foreground">
+                  {r.calories != null && <span>{r.calories} kcal</span>}
+                  {r.protein_g != null && <span>{r.protein_g}g protein</span>}
+                  {r.total_min != null && <span>{r.total_min} mnt</span>}
+                </div>
               </div>
             </Link>
           </li>

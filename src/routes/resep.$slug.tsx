@@ -124,6 +124,17 @@ function ResepDetail() {
         {r.description && <p className="mt-2 text-lg text-muted-foreground">{r.description}</p>}
       </header>
 
+      {r.image_url && (
+        <figure className="mb-8 overflow-hidden rounded-2xl">
+          <img
+            src={r.image_url}
+            alt={r.title}
+            loading="eager"
+            className="aspect-[16/10] w-full object-cover"
+          />
+        </figure>
+      )}
+
       <section className="mb-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
         {r.calories != null && (
           <div className="rounded-lg border bg-card p-3 text-center">
