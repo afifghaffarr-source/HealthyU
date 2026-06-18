@@ -60,9 +60,9 @@ jobs:
         # are publishable keys + URLs designed to ship in the client bundle.
         # Source of truth: wrangler.jsonc vars.VITE_*.
         env:
-          VITE_SUPABASE_URL: "https://lezbpzpkvkdpbjvtvoei.supabase.co"
-          VITE_SUPABASE_PUBLISHABLE_KEY: "sb_publishable_66jMJijY4c8mdbHJxXaqnA_VzS7r-1D"
-          VITE_SUPABASE_PROJECT_ID: "lezbpzpkvkdpbjvtvoei"
+          VITE_SUPABASE_URL: "https://ohkfcldkuzfcxnpqvdvc.supabase.co"
+          VITE_SUPABASE_PUBLISHABLE_KEY: "sb_publishable_HVxped5shOOdF80dWbdQTQ_rwt3jTq8"
+          VITE_SUPABASE_PROJECT_ID: "ohkfcldkuzfcxnpqvdvc"
           VITE_SITE_URL: "https://healthyu.web.id"
         run: bun run build
 
