@@ -16,6 +16,16 @@ dist-ssr
 .nitro
 *.local
 
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+
+# Generated images (regenerable via scripts/gen_recipe_image.py)
+public/images/recipes/*.png
+public/images/recipes/*.jpg
+
 # Wrangler / Cloudflare
 .wrangler/
 .dev.vars

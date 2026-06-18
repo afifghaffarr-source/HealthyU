@@ -34,6 +34,14 @@ import time
 from datetime import datetime, timezone
 from pathlib import Path
 
+# Optional image-gen integration (loaded lazily)
+_gen_recipe_image = None
+try:
+    from gen_recipe_image import gen_recipe_image as _gen_recipe_image
+except ImportError:
+    pass
+_HAS_IMAGE_GEN = _gen_recipe_image is not None
+
 # ===== Config loading =====
 def load_config():
     """Load API keys from ~/.config/healthyu/production.env + dedicated files."""
@@ -256,6 +264,12 @@ def main():
                     help='URL template for image_url. {slug} substituted. Default matches existing recipe convention. '
                          'Set to empty string "" to skip image_url. Use https://picsum.photos/seed/{slug}/800/600 '
                          'for random placeholder images (free, no API key).')
+    ap.add_argument('--generate-image', action='store_true',
+                    help='Actually call VexoAPI editimg to generate a real PNG hero image per recipe '
+                         '(~50s/image, ~2MB PNG saved to public/images/recipes/{slug}.png). '
+                         'Off by default — cron stays fast by using template URL. '
+                         'Requires --image-template not to be the default jpg template, OR '
+                         'will be auto-switched to /images/recipes/{slug}.png.')
     args = ap.parse_args()
 
     cfg = load_config()
@@ -353,7 +367,28 @@ Output ONLY the JSON array. No markdown fences, no explanation, no preamble.
         raw['slug'] = slug
 
         # Apply image URL template (matches existing /images/recipes/{slug}.jpg convention)
-        if args.image_template and '{slug}' in args.image_template:
+        if args.generate_image:
+            # Real image generation via VexoAPI editimg
+            if not _HAS_IMAGE_GEN:
+                print(f"  [{i}/{len(recipes_raw)}] ⚠️  --generate-image requested but gen_recipe_image.py not importable. Falling back to template.")
+                if args.image_template and '{slug}' in args.image_template:
+                    raw['image_url'] = args.image_template.replace('{slug}', slug)
+            else:
+                title_safe = raw.get('title', '')
+                desc_safe = raw.get('description', '')
+                print(f"  [{i}/{len(recipes_raw)}] 🎨 Generating image for '{title_safe[:40]}'...")
+                if _HAS_IMAGE_GEN and _gen_recipe_image is not None:
+                    saved = _gen_recipe_image(slug, title_safe, desc_safe, api_key)
+                else:
+                    saved = None
+                if saved:
+                    raw['image_url'] = '/images/recipes/' + Path(saved).name
+                    print(f"            ✓ Image saved: {raw['image_url']}")
+                else:
+                    print(f"            ⚠️  Image gen failed, falling back to template")
+                    if args.image_template and '{slug}' in args.image_template:
+                        raw['image_url'] = args.image_template.replace('{slug}', slug)
+        elif args.image_template and '{slug}' in args.image_template:
             raw['image_url'] = args.image_template.replace('{slug}', slug)
         else:
             raw['image_url'] = None
