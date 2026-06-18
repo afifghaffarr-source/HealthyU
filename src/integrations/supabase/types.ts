@@ -6327,6 +6327,12 @@ export type Database = {
         };
         Returns: undefined;
       };
+      // AUDIT-020: hard-delete user data + auth.users. service_role only.
+      // Regenerate via `supabase gen types` after re-deploying the migration.
+      process_account_deletion: {
+        Args: { p_user_id: string; p_tables?: string[] };
+        Returns: Json;
+      };
       redeem_friend_invite: { Args: { _token: string }; Returns: string };
       report_content: {
         Args: {

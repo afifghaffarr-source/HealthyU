@@ -53,6 +53,24 @@ select cron.schedule(
   );
   $$
 );
+
+-- AUDIT-020: right-to-erasure cron. Picks up pending account deletion
+-- requests >24h old and hard-deletes the user from auth.users + 86
+-- user-owned tables. See docs/audit-020-account-deletion-cron.md.
+select cron.schedule(
+  'process-account-deletions-daily',
+  '0 3 * * *',  -- 03:00 UTC daily
+  $$
+  select net.http_post(
+    url := 'https://healthyu.id/api/public/hooks/process-account-deletions',
+    headers := jsonb_build_object(
+      'Content-Type', 'application/json',
+      'x-cron-secret', '__CRON_SECRET__'
+    ),
+    body := '{}'::jsonb
+  );
+  $$
+);
 ```
 
 ### Vault alternative (recommended for production)

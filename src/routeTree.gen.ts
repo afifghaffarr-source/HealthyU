@@ -167,6 +167,7 @@ import { Route as AuthenticatedArticlesIdRouteImport } from './routes/_authentic
 import { Route as ApiWearableGoogleFitCallbackRouteImport } from './routes/api/wearable.google-fit.callback'
 import { Route as ApiPublicHooksWeeklyAiReportRouteImport } from './routes/api/public/hooks/weekly-ai-report'
 import { Route as ApiPublicHooksRecipesTrendingSnapshotRouteImport } from './routes/api/public/hooks/recipes-trending-snapshot'
+import { Route as ApiPublicHooksProcessAccountDeletionsRouteImport } from './routes/api/public/hooks/process-account-deletions'
 import { Route as ApiPublicHooksNotificationSchedulerRouteImport } from './routes/api/public/hooks/notification-scheduler'
 import { Route as ApiPublicHooksDataRetentionRouteImport } from './routes/api/public/hooks/data-retention'
 import { Route as ApiPublicHooksDailyContentRouteImport } from './routes/api/public/hooks/daily-content'
@@ -1033,6 +1034,12 @@ const ApiPublicHooksRecipesTrendingSnapshotRoute =
     path: '/api/public/hooks/recipes-trending-snapshot',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicHooksProcessAccountDeletionsRoute =
+  ApiPublicHooksProcessAccountDeletionsRouteImport.update({
+    id: '/api/public/hooks/process-account-deletions',
+    path: '/api/public/hooks/process-account-deletions',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicHooksNotificationSchedulerRoute =
   ApiPublicHooksNotificationSchedulerRouteImport.update({
     id: '/api/public/hooks/notification-scheduler',
@@ -1266,6 +1273,7 @@ export interface FileRoutesByFullPath {
   '/api/public/hooks/daily-content': typeof ApiPublicHooksDailyContentRoute
   '/api/public/hooks/data-retention': typeof ApiPublicHooksDataRetentionRoute
   '/api/public/hooks/notification-scheduler': typeof ApiPublicHooksNotificationSchedulerRoute
+  '/api/public/hooks/process-account-deletions': typeof ApiPublicHooksProcessAccountDeletionsRoute
   '/api/public/hooks/recipes-trending-snapshot': typeof ApiPublicHooksRecipesTrendingSnapshotRoute
   '/api/public/hooks/weekly-ai-report': typeof ApiPublicHooksWeeklyAiReportRoute
   '/api/wearable/google-fit/callback': typeof ApiWearableGoogleFitCallbackRoute
@@ -1429,6 +1437,7 @@ export interface FileRoutesByTo {
   '/api/public/hooks/daily-content': typeof ApiPublicHooksDailyContentRoute
   '/api/public/hooks/data-retention': typeof ApiPublicHooksDataRetentionRoute
   '/api/public/hooks/notification-scheduler': typeof ApiPublicHooksNotificationSchedulerRoute
+  '/api/public/hooks/process-account-deletions': typeof ApiPublicHooksProcessAccountDeletionsRoute
   '/api/public/hooks/recipes-trending-snapshot': typeof ApiPublicHooksRecipesTrendingSnapshotRoute
   '/api/public/hooks/weekly-ai-report': typeof ApiPublicHooksWeeklyAiReportRoute
   '/api/wearable/google-fit/callback': typeof ApiWearableGoogleFitCallbackRoute
@@ -1601,6 +1610,7 @@ export interface FileRoutesById {
   '/api/public/hooks/daily-content': typeof ApiPublicHooksDailyContentRoute
   '/api/public/hooks/data-retention': typeof ApiPublicHooksDataRetentionRoute
   '/api/public/hooks/notification-scheduler': typeof ApiPublicHooksNotificationSchedulerRoute
+  '/api/public/hooks/process-account-deletions': typeof ApiPublicHooksProcessAccountDeletionsRoute
   '/api/public/hooks/recipes-trending-snapshot': typeof ApiPublicHooksRecipesTrendingSnapshotRoute
   '/api/public/hooks/weekly-ai-report': typeof ApiPublicHooksWeeklyAiReportRoute
   '/api/wearable/google-fit/callback': typeof ApiWearableGoogleFitCallbackRoute
@@ -1773,6 +1783,7 @@ export interface FileRouteTypes {
     | '/api/public/hooks/daily-content'
     | '/api/public/hooks/data-retention'
     | '/api/public/hooks/notification-scheduler'
+    | '/api/public/hooks/process-account-deletions'
     | '/api/public/hooks/recipes-trending-snapshot'
     | '/api/public/hooks/weekly-ai-report'
     | '/api/wearable/google-fit/callback'
@@ -1936,6 +1947,7 @@ export interface FileRouteTypes {
     | '/api/public/hooks/daily-content'
     | '/api/public/hooks/data-retention'
     | '/api/public/hooks/notification-scheduler'
+    | '/api/public/hooks/process-account-deletions'
     | '/api/public/hooks/recipes-trending-snapshot'
     | '/api/public/hooks/weekly-ai-report'
     | '/api/wearable/google-fit/callback'
@@ -2107,6 +2119,7 @@ export interface FileRouteTypes {
     | '/api/public/hooks/daily-content'
     | '/api/public/hooks/data-retention'
     | '/api/public/hooks/notification-scheduler'
+    | '/api/public/hooks/process-account-deletions'
     | '/api/public/hooks/recipes-trending-snapshot'
     | '/api/public/hooks/weekly-ai-report'
     | '/api/wearable/google-fit/callback'
@@ -2135,6 +2148,7 @@ export interface RootRouteChildren {
   ApiPublicHooksDailyContentRoute: typeof ApiPublicHooksDailyContentRoute
   ApiPublicHooksDataRetentionRoute: typeof ApiPublicHooksDataRetentionRoute
   ApiPublicHooksNotificationSchedulerRoute: typeof ApiPublicHooksNotificationSchedulerRoute
+  ApiPublicHooksProcessAccountDeletionsRoute: typeof ApiPublicHooksProcessAccountDeletionsRoute
   ApiPublicHooksRecipesTrendingSnapshotRoute: typeof ApiPublicHooksRecipesTrendingSnapshotRoute
   ApiPublicHooksWeeklyAiReportRoute: typeof ApiPublicHooksWeeklyAiReportRoute
   ApiWearableGoogleFitCallbackRoute: typeof ApiWearableGoogleFitCallbackRoute
@@ -3248,6 +3262,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicHooksRecipesTrendingSnapshotRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/hooks/process-account-deletions': {
+      id: '/api/public/hooks/process-account-deletions'
+      path: '/api/public/hooks/process-account-deletions'
+      fullPath: '/api/public/hooks/process-account-deletions'
+      preLoaderRoute: typeof ApiPublicHooksProcessAccountDeletionsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/hooks/notification-scheduler': {
       id: '/api/public/hooks/notification-scheduler'
       path: '/api/public/hooks/notification-scheduler'
@@ -3929,6 +3950,8 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicHooksDataRetentionRoute: ApiPublicHooksDataRetentionRoute,
   ApiPublicHooksNotificationSchedulerRoute:
     ApiPublicHooksNotificationSchedulerRoute,
+  ApiPublicHooksProcessAccountDeletionsRoute:
+    ApiPublicHooksProcessAccountDeletionsRoute,
   ApiPublicHooksRecipesTrendingSnapshotRoute:
     ApiPublicHooksRecipesTrendingSnapshotRoute,
   ApiPublicHooksWeeklyAiReportRoute: ApiPublicHooksWeeklyAiReportRoute,
