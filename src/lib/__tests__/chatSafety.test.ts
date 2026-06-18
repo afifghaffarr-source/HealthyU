@@ -28,6 +28,22 @@ describe("checkChatSafety", () => {
     expect(checkChatSafety(msg).kind).toBe("crisis");
   });
 
+  // AUDIT-012 Finding 3 (2026-06-16, follow-up 2026-06-18): informal /
+  // colloquial Indonesian expressions that the original 17-keyword list
+  // missed. Conservative additions only — see chatSafety.ts CRISIS list
+  // for what we deliberately did NOT add (e.g. "aku depresi" is a
+  // clinical decision: depression disclosure is not necessarily crisis,
+  // so adding it to CRISIS would over-trigger the existing CRISIS_REPLY
+  // for non-suicidal users. Defer to next quarterly review with
+  // psychologist input).
+  it.each([
+    ["aku pengen mati", "ID `pengen mati` (colloquial)"],
+    ["mau ngilang aja", "ID `mau ngilang` (pre-crisis)"],
+    ["cape hidup", "ID `cape hidup` (tired of life)"],
+  ])("detects colloquial crisis: %s (%s)", (msg) => {
+    expect(checkChatSafety(msg).kind).toBe("crisis");
+  });
+
   it("blocks dangerous behavior", () => {
     expect(checkChatSafety("aku puasa ekstrim 7 hari").kind).toBe("blocked");
     expect(checkChatSafety("I want to starve myself").kind).toBe("blocked");

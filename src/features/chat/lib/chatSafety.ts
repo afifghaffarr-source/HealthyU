@@ -17,6 +17,9 @@ const CRISIS = [
   "bunuh diri",
   "ingin mati",
   "mau mati",
+  "pengen mati", // AUDIT-012 Finding 3 (2026-06-16 follow-up): colloquial for "ingin mati"
+  "mau ngilang", // often pre-crisis; "want to disappear"
+  "cape hidup", // "tired of life" — colloquial; conservative trigger
   "akhiri hidup",
   "mengakhiri hidup",
   "menyakiti diri",

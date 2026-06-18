@@ -152,7 +152,19 @@ The chat is logged to `chat_messages` table for support/audit. If a user pastes 
 
 - [ ] Verify crisis hotline numbers still correct
 - [ ] Add informal/colloquial Indonesian crisis keywords (4 candidates)
-- [ ] Reconsider ED → crisis escalation (Finding 4)
+  - ✅ **Done (2026-06-18 follow-up)** — `pengen mati`, `mau ngilang`, `cape hidup`
+    added to CRISIS list with 3 parametrized tests. Conservative
+    additions only — see comments in `chatSafety.ts` for what was
+    deliberately NOT added.
+  - ⏸️ **`aku depresi` (depression disclosure) still deferred** — clinical
+    decision. Adding it to CRISIS would over-trigger the existing
+    CRISIS_REPLY (with crisis hotline numbers) for non-suicidal
+    depression disclosures. Needs psychologist input on whether
+    depression alone should escalate, or get a separate
+    `disclaimer-depression` response with depression-specific
+    resources. Track for next quarterly review.
+- [ ] Reconsider ED → crisis escalation (Finding 4) — still clinical,
+      needs psychologist sign-off
 - [ ] Schedule cron job to remind reviewer 90 days from now
 
 ## References
