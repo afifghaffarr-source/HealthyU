@@ -173,6 +173,7 @@ def insert_recipe(recipe_data, key):
         'description': recipe_data.get('description'),
         'category': recipe_data.get('category'),
         'cuisine': recipe_data.get('cuisine', 'Indonesia'),
+        'image_url': recipe_data.get('image_url'),
         'prep_min': recipe_data.get('prep_min'),
         'cook_min': recipe_data.get('cook_min'),
         'total_min': (recipe_data.get('prep_min') or 0) + (recipe_data.get('cook_min') or 0),
@@ -251,6 +252,10 @@ def main():
     ap.add_argument('--focus', type=str, default=None, help='Nutritional focus (e.g., "high protein", "low carb")')
     ap.add_argument('--model', type=str, default='openai/gpt-oss-120b:free', help='Vexo model ID')
     ap.add_argument('--dry-run', action='store_true', help='Show what would be inserted without writing')
+    ap.add_argument('--image-template', type=str, default='/images/recipes/{slug}.jpg',
+                    help='URL template for image_url. {slug} substituted. Default matches existing recipe convention. '
+                         'Set to empty string "" to skip image_url. Use https://picsum.photos/seed/{slug}/800/600 '
+                         'for random placeholder images (free, no API key).')
     args = ap.parse_args()
 
     cfg = load_config()
@@ -346,6 +351,12 @@ Output ONLY the JSON array. No markdown fences, no explanation, no preamble.
                 continue
 
         raw['slug'] = slug
+
+        # Apply image URL template (matches existing /images/recipes/{slug}.jpg convention)
+        if args.image_template and '{slug}' in args.image_template:
+            raw['image_url'] = args.image_template.replace('{slug}', slug)
+        else:
+            raw['image_url'] = None
 
         if args.dry_run:
             print(f"  [{i}/{len(recipes_raw)}] DRY — would insert: {title[:40]:<40} | slug={slug}")
