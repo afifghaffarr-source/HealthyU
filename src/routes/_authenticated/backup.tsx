@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
-import { exportAllData } from "@/features/export/lib/export.functions";
+import { exportMyData } from "@/features/privacy/lib/pdpRights.functions";
 import { BottomNav } from "@/components/bottom-nav";
 import { Download, FileJson, FileSpreadsheet, Loader2 } from "lucide-react";
 import { toast } from "@/lib/toast-config";
@@ -41,27 +41,38 @@ function toCSV(rows: Record<string, unknown>[]): string {
 }
 
 function BackupPage() {
-  const exportFn = useServerFn(exportAllData);
+  const exportFn = useServerFn(exportMyData);
   const [busy, setBusy] = useState<"json" | "csv" | null>(null);
 
   const handle = async (format: "json" | "csv") => {
     setBusy(format);
     try {
-      const res = await exportFn();
-      const tables = JSON.parse(res.json) as Record<string, Record<string, unknown>[]>;
+      // exportMyData is audit-logged server-side (see pdpRights.functions.ts).
+      // The dump object has { exported_at, user_id, ...tables } — separate
+      // metadata from per-table data so the CSV branch can skip error markers.
+      const dump = (await exportFn()) as Record<string, unknown>;
+      const exported_at = dump.exported_at as string;
+      const user_id = dump.user_id as string;
+      const tables: Record<string, unknown> = {};
+      for (const [k, v] of Object.entries(dump)) {
+        if (k === "exported_at" || k === "user_id") continue;
+        tables[k] = v;
+      }
       const stamp = new Date().toISOString().slice(0, 10);
       if (format === "json") {
         download(
           `healthyu-backup-${stamp}.json`,
-          JSON.stringify({ exported_at: res.exported_at, user_id: res.user_id, tables }, null, 2),
+          JSON.stringify({ exported_at, user_id, tables }, null, 2),
           "application/json",
         );
       } else {
         const parts: string[] = [];
-        for (const [name, rows] of Object.entries(tables)) {
-          if (!rows.length) continue;
+        for (const [name, value] of Object.entries(tables)) {
+          // CSV branch can only serialize row arrays. Skip { error: "unavailable" }
+          // markers (logged server-side) and empty tables.
+          if (!Array.isArray(value) || value.length === 0) continue;
           parts.push(`# ${name}`);
-          parts.push(toCSV(rows));
+          parts.push(toCSV(value as Record<string, unknown>[]));
           parts.push("");
         }
         download(`healthyu-backup-${stamp}.csv`, parts.join("\n"), "text/csv");

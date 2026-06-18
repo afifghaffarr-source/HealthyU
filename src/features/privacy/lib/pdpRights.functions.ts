@@ -3,40 +3,63 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { z } from "zod";
 import { parseInput } from "@/lib/validation";
 import { USER_DATA_TABLES } from "@/lib/userDataTables";
+import type { SupabaseClient } from "@supabase/supabase-js";
+import type { Database } from "@/integrations/supabase/types";
 
 /**
  * UU PDP (Pelindungan Data Pribadi) — user rights.
  * - exportMyData: returns JSON of all rows belonging to the user (Right to Portability).
+ *   Audit-logs every call as `pdp.export` so privacy team can answer "who exported what when".
  * - requestAccountDeletion: queues an account-deletion request (Right to Erasure).
  */
+type AppSupabase = SupabaseClient<Database>;
+type JsonValue = string | number | boolean | null | JsonValue[] | { [key: string]: JsonValue };
+
+/**
+ * Pure function — fetches every row owned by `userId` from USER_DATA_TABLES.
+ * Extracted from `exportMyData` so it can be unit-tested without invoking
+ * the auth middleware chain.
+ *
+ * Behavior on table errors:
+ * - optional + error  → table value is `[]` (skip the error)
+ * - required + error  → table value is `{ error: "unavailable" }` (NEVER throw —
+ *                        one broken table must not block the whole export)
+ *
+ * Raw error details are logged server-side via `console.error` and never leak
+ * to the user.
+ */
+export async function buildExportDump(
+  supabase: AppSupabase,
+  userId: string,
+): Promise<Record<string, JsonValue>> {
+  const dump: Record<string, JsonValue> = {
+    exported_at: new Date().toISOString(),
+    user_id: userId,
+  };
+  for (const { table, ownerColumn, optional } of USER_DATA_TABLES) {
+    // Dynamic table name — Supabase's `.from()` is typed against the union
+    // of literal table names, which can't be satisfied at runtime here.
+    const { data, error } = await supabase
+      .from(table as never)
+      .select("*")
+      .eq(ownerColumn, userId);
+    if (!error) {
+      dump[table] = (data ?? []) as JsonValue;
+    } else if (optional) {
+      dump[table] = [];
+    } else {
+      console.error(`[pdp.export] ${table}:`, error);
+      dump[table] = { error: "unavailable" };
+    }
+  }
+  return dump;
+}
 
 export const exportMyData = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     const { supabase, userId } = context;
-    type JsonValue = string | number | boolean | null | JsonValue[] | { [key: string]: JsonValue };
-    const dump: Record<string, JsonValue> = {
-      exported_at: new Date().toISOString(),
-      user_id: userId,
-    };
-    for (const { table, ownerColumn, optional } of USER_DATA_TABLES) {
-      // Dynamic table name — Supabase's `.from()` is typed against the union
-      // of literal table names, which can't be satisfied at runtime here.
-      const { data, error } = await supabase
-        .from(table as never)
-        .select("*")
-        .eq(ownerColumn, userId);
-      if (!error) {
-        dump[table] = (data ?? []) as JsonValue;
-      } else if (optional) {
-        dump[table] = [];
-      } else {
-        // Never leak raw DB errors to the user. Log full error server-side
-        // (Supabase logs already capture it) and surface a generic marker.
-        console.error(`[pdp.export] ${table}:`, error);
-        dump[table] = { error: "unavailable" };
-      }
-    }
+    const dump = await buildExportDump(supabase, userId);
     await supabase.rpc("log_audit_event", {
       _action: "pdp.export",
       _entity: "user",
