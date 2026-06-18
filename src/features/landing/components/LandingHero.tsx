@@ -23,10 +23,10 @@ export function LandingHero({
           className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-balance leading-[1.05]"
           style={{ fontFamily: "var(--font-display)" }}
         >
-          Hidup sehat, dengan{" "}
+          Hidup sehat,{" "}
           <span className="relative inline-block">
             <span className="bg-clip-text text-transparent bg-gradient-to-r from-primary via-accent to-primary-glow animate-aurora">
-              AI-nya
+              AI-nya.
             </span>
             <svg
               className="absolute -bottom-2 left-0 w-full"
@@ -43,8 +43,7 @@ export function LandingHero({
                 className="text-primary/60"
               />
             </svg>
-          </span>{" "}
-          orang Indonesia.
+          </span>
         </h1>
         <p className="text-muted-foreground text-lg text-balance max-w-md">
           Scan piring, atur puasa, jadwal sholat. Tanya AI coach kapan saja.
