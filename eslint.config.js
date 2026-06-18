@@ -7,7 +7,7 @@ import tseslint from "typescript-eslint";
 import constantsOverride from "./eslint.constants.config.js";
 
 export default tseslint.config(
-  { ignores: ["dist", ".output", ".vinxi"] },
+  { ignores: ["dist", ".output", ".vinxi", ".wrangler"] },
   {
     extends: [js.configs.recommended, ...tseslint.configs.recommended],
     files: ["**/*.{ts,tsx}"],
