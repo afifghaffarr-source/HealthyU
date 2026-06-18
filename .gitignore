@@ -22,9 +22,12 @@ __pycache__/
 *.pyo
 .pytest_cache/
 
-# Generated images (regenerable via scripts/gen_recipe_image.py)
-public/images/recipes/*.png
-public/images/recipes/*.jpg
+# Generated images: hero images are produced locally and must be committed so
+# the production deploy includes them (CF serves /public/* from the bundle).
+# To regenerate the entire set: `python3 scripts/backfill_images.py` (slow,
+# VexoAPI editimg ~70s per image). Individual images: `python3 scripts/gen_recipe_image.py --slug X --title Y`.
+# public/images/recipes/*.png
+# public/images/recipes/*.jpg
 
 # Wrangler / Cloudflare
 .wrangler/
