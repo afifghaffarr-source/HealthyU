@@ -13,6 +13,8 @@ import { streamAiChat, AiGatewayError } from "@/features/ai/lib/aiStreamGateway.
 import { staticReplyStream, proxyUpstreamStream } from "@/features/chat/lib/chatStream.server";
 import { getEnv } from "@/lib/cloudflare-env.server";
 import { auditPiiOnServer } from "@/features/chat/lib/piiAudit";
+import { redactPII, containsPII } from "@/lib/pii";
+import { getPiiRedactEnabled } from "@/features/privacy/lib/piiRedactToggle.functions";
 
 export const Route = createFileRoute("/api/chat/stream")({
   server: {
@@ -70,6 +72,30 @@ export const Route = createFileRoute("/api/chat/stream")({
           await auditPiiOnServer(supabase, userId, body.message);
         } catch (e) {
           console.error("chat.stream auditPiiOnServer threw — continuing", (e as Error).message);
+        }
+
+        // AUDIT-019: PII redaction toggle. If the user has opted in, run
+        // the message through redactPII() before it leaves for the AI.
+        // The original is still persisted by `persistUserMessage` below
+        // and still feeds the safety classifier — only the AI boundary
+        // sees the redacted text. Fail-safe: any error here (DB read,
+        // RLS blip) keeps the original message so the chat keeps working.
+        let messageForAi = body.message;
+        try {
+          const piiRedactEnabled = await getPiiRedactEnabled(supabase, userId);
+          if (piiRedactEnabled && containsPII(body.message)) {
+            messageForAi = redactPII(body.message);
+            await supabase.rpc("log_audit_event", {
+              _action: "chat.pii.redacted",
+              _entity: "chat",
+              _meta: { message_length: body.message.length } as never,
+            });
+          }
+        } catch (e) {
+          console.error(
+            "chat.stream pii redact check failed — continuing with original",
+            (e as Error).message,
+          );
         }
 
         // Image moderation: block unsafe uploads before persisting/sending to AI.
@@ -152,7 +178,11 @@ export const Route = createFileRoute("/api/chat/stream")({
           : await cacheKey({
               model: decision.model,
               tier: decision.tier,
-              question: body.message,
+              // AUDIT-019: use the redacted version for the cache key so
+              // different-redaction-state users don't collide on the same
+              // key, and a user with redaction on gets cache hits for
+              // their own repeated questions.
+              question: messageForAi,
               profileHash: profile.hash,
             });
         const cached = key ? await getCached(key).catch(() => null) : null;
@@ -206,7 +236,10 @@ export const Route = createFileRoute("/api/chat/stream")({
         const { messages, isEmergency } = await buildChatPayload(
           supabase,
           userId,
-          body.message,
+          // AUDIT-019: pass the redacted version when the toggle is on.
+          // The user message in the AI's history shows [REDACTED:phone]
+          // etc. instead of the actual PII.
+          messageForAi,
           body.imageBase64,
           body.imageMime,
           decision.tier,

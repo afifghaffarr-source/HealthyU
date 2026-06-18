@@ -4,6 +4,10 @@ import { useServerFn } from "@tanstack/react-start";
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { setAuditOptIn } from "@/features/scan/lib/scanExtras.functions";
+import {
+  getPiiRedactEnabledFn,
+  setPiiRedactEnabledFn,
+} from "@/features/privacy/lib/piiRedactToggle.functions";
 import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { BottomNav } from "@/components/bottom-nav";
 import { toast } from "@/lib/toast-config";
@@ -16,10 +20,13 @@ const getPrivacy = createServerFn({ method: "GET" })
     const { supabase, userId } = context;
     const { data } = await supabase
       .from("profiles")
-      .select("scan_audit_opt_in")
+      .select("scan_audit_opt_in, pii_redact_enabled")
       .eq("id", userId)
       .maybeSingle();
-    return { auditOptIn: data?.scan_audit_opt_in ?? true };
+    return {
+      auditOptIn: data?.scan_audit_opt_in ?? true,
+      piiRedactEnabled: data?.pii_redact_enabled ?? false,
+    };
   });
 
 const opts = queryOptions({ queryKey: ["privacy"], queryFn: () => getPrivacy() });
@@ -34,9 +41,18 @@ export const Route = createFileRoute("/_authenticated/profile/privacy")({
 function Page() {
   const { data } = useSuspenseQuery(opts);
   const qc = useQueryClient();
-  const fn = useServerFn(setAuditOptIn);
-  const m = useMutation({
-    mutationFn: (enabled: boolean) => fn({ data: { enabled } }),
+  const auditFn = useServerFn(setAuditOptIn);
+  const redactionFn = useServerFn(setPiiRedactEnabledFn);
+  const auditMut = useMutation({
+    mutationFn: (enabled: boolean) => auditFn({ data: { enabled } }),
+    onSuccess: () => {
+      toast.success("Tersimpan");
+      qc.invalidateQueries({ queryKey: ["privacy"] });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+  const redactionMut = useMutation({
+    mutationFn: (enabled: boolean) => redactionFn({ data: { enabled } }),
     onSuccess: () => {
       toast.success("Tersimpan");
       qc.invalidateQueries({ queryKey: ["privacy"] });
@@ -55,13 +71,33 @@ function Page() {
             </div>
           </div>
           <button
-            onClick={() => m.mutate(!data.auditOptIn)}
-            disabled={m.isPending}
+            onClick={() => auditMut.mutate(!data.auditOptIn)}
+            disabled={auditMut.isPending}
             className={`shrink-0 w-12 h-7 rounded-full relative transition ${data.auditOptIn ? "bg-primary" : "bg-muted"}`}
             aria-label="Toggle audit"
           >
             <span
               className={`absolute top-0.5 size-6 rounded-full bg-white transition ${data.auditOptIn ? "left-[22px]" : "left-0.5"}`}
+            />
+          </button>
+        </div>
+
+        <div className="rounded-2xl bg-card border p-4 flex items-start justify-between gap-3">
+          <div className="min-w-0">
+            <div className="font-medium text-sm">Redaksi otomatis data sensitif</div>
+            <div className="text-xs text-muted-foreground mt-1">
+              Saat aktif, nomor telepon, email, KTP/NIK, dan nomor kartu kredit di pesan chat akan
+              otomatis disembunyikan sebelum dikirim ke AI. Pesan di riwayat chat kamu tetap utuh.
+            </div>
+          </div>
+          <button
+            onClick={() => redactionMut.mutate(!data.piiRedactEnabled)}
+            disabled={redactionMut.isPending}
+            className={`shrink-0 w-12 h-7 rounded-full relative transition ${data.piiRedactEnabled ? "bg-primary" : "bg-muted"}`}
+            aria-label="Toggle PII redaction"
+          >
+            <span
+              className={`absolute top-0.5 size-6 rounded-full bg-white transition ${data.piiRedactEnabled ? "left-[22px]" : "left-0.5"}`}
             />
           </button>
         </div>

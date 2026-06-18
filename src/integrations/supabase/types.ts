@@ -3843,6 +3843,11 @@ export type Database = {
           referral_code: string | null;
           referred_by: string | null;
           scan_audit_opt_in: boolean;
+          // AUDIT-019: pii_redact_enabled added by migration 20260618012154.
+          // Mirrored here so the Database type stays in sync with the
+          // schema. Regenerate via `supabase gen types` after applying
+          // the migration to a real Supabase project.
+          pii_redact_enabled: boolean;
           scan_streak_current: number;
           scan_streak_longest: number;
           show_meals: boolean;
@@ -3908,6 +3913,7 @@ export type Database = {
           referral_code?: string | null;
           referred_by?: string | null;
           scan_audit_opt_in?: boolean;
+          pii_redact_enabled?: boolean;
           scan_streak_current?: number;
           scan_streak_longest?: number;
           show_meals?: boolean;
@@ -3973,6 +3979,7 @@ export type Database = {
           referral_code?: string | null;
           referred_by?: string | null;
           scan_audit_opt_in?: boolean;
+          pii_redact_enabled?: boolean;
           scan_streak_current?: number;
           scan_streak_longest?: number;
           show_meals?: boolean;
