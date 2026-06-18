@@ -93,6 +93,8 @@ import { Route as AuthenticatedBackupRouteImport } from './routes/_authenticated
 import { Route as AuthenticatedArticlesRouteImport } from './routes/_authenticated/articles'
 import { Route as AuthenticatedAlarmsRouteImport } from './routes/_authenticated/alarms'
 import { Route as AuthenticatedAchievementsRouteImport } from './routes/_authenticated/achievements'
+import { Route as AuthenticatedAdminRouteRouteImport } from './routes/_authenticated/admin/route'
+import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin/index'
 import { Route as ApiImgSplatRouteImport } from './routes/api/img.$'
 import { Route as ApiDebugEnvRouteImport } from './routes/api/debug.env'
 import { Route as ApiChatStreamRouteImport } from './routes/api/chat.stream'
@@ -165,7 +167,12 @@ import { Route as AuthenticatedChallengesDailyRouteImport } from './routes/_auth
 import { Route as AuthenticatedCalendarGoogleRouteImport } from './routes/_authenticated/calendar.google'
 import { Route as AuthenticatedBonusAutoClaimRouteImport } from './routes/_authenticated/bonus.auto-claim'
 import { Route as AuthenticatedArticlesIdRouteImport } from './routes/_authenticated/articles.$id'
+import { Route as AuthenticatedAdminUsersRouteImport } from './routes/_authenticated/admin/users'
+import { Route as AuthenticatedAdminSystemRouteImport } from './routes/_authenticated/admin/system'
 import { Route as AuthenticatedAdminSeedRecipesRouteImport } from './routes/_authenticated/admin/seed-recipes'
+import { Route as AuthenticatedAdminRecipesRouteImport } from './routes/_authenticated/admin/recipes'
+import { Route as AuthenticatedAdminAuditRouteImport } from './routes/_authenticated/admin/audit'
+import { Route as AuthenticatedAdminArticlesRouteImport } from './routes/_authenticated/admin/articles'
 import { Route as ApiWearableGoogleFitCallbackRouteImport } from './routes/api/wearable.google-fit.callback'
 import { Route as ApiPublicHooksWeeklyAiReportRouteImport } from './routes/api/public/hooks/weekly-ai-report'
 import { Route as ApiPublicHooksRecipesTrendingSnapshotRouteImport } from './routes/api/public/hooks/recipes-trending-snapshot'
@@ -610,6 +617,16 @@ const AuthenticatedAchievementsRoute =
     path: '/achievements',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedAdminRouteRoute = AuthenticatedAdminRouteRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AuthenticatedAdminRouteRoute,
+} as any)
 const ApiImgSplatRoute = ApiImgSplatRouteImport.update({
   id: '/api/img/$',
   path: '/api/img/$',
@@ -1023,11 +1040,39 @@ const AuthenticatedArticlesIdRoute = AuthenticatedArticlesIdRouteImport.update({
   path: '/$id',
   getParentRoute: () => AuthenticatedArticlesRoute,
 } as any)
+const AuthenticatedAdminUsersRoute = AuthenticatedAdminUsersRouteImport.update({
+  id: '/users',
+  path: '/users',
+  getParentRoute: () => AuthenticatedAdminRouteRoute,
+} as any)
+const AuthenticatedAdminSystemRoute =
+  AuthenticatedAdminSystemRouteImport.update({
+    id: '/system',
+    path: '/system',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
 const AuthenticatedAdminSeedRecipesRoute =
   AuthenticatedAdminSeedRecipesRouteImport.update({
-    id: '/admin/seed-recipes',
-    path: '/admin/seed-recipes',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/seed-recipes',
+    path: '/seed-recipes',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
+const AuthenticatedAdminRecipesRoute =
+  AuthenticatedAdminRecipesRouteImport.update({
+    id: '/recipes',
+    path: '/recipes',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
+const AuthenticatedAdminAuditRoute = AuthenticatedAdminAuditRouteImport.update({
+  id: '/audit',
+  path: '/audit',
+  getParentRoute: () => AuthenticatedAdminRouteRoute,
+} as any)
+const AuthenticatedAdminArticlesRoute =
+  AuthenticatedAdminArticlesRouteImport.update({
+    id: '/articles',
+    path: '/articles',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
   } as any)
 const ApiWearableGoogleFitCallbackRoute =
   ApiWearableGoogleFitCallbackRouteImport.update({
@@ -1133,6 +1178,7 @@ export interface FileRoutesByFullPath {
   '/privacy': typeof PrivacyRoute
   '/resep': typeof ResepRouteWithChildren
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/admin': typeof AuthenticatedAdminRouteRouteWithChildren
   '/achievements': typeof AuthenticatedAchievementsRoute
   '/alarms': typeof AuthenticatedAlarmsRoute
   '/articles': typeof AuthenticatedArticlesRouteWithChildren
@@ -1204,7 +1250,12 @@ export interface FileRoutesByFullPath {
   '/olahraga/': typeof OlahragaIndexRoute
   '/recipes/': typeof RecipesIndexRoute
   '/resep/': typeof ResepIndexRoute
+  '/admin/articles': typeof AuthenticatedAdminArticlesRoute
+  '/admin/audit': typeof AuthenticatedAdminAuditRoute
+  '/admin/recipes': typeof AuthenticatedAdminRecipesRoute
   '/admin/seed-recipes': typeof AuthenticatedAdminSeedRecipesRoute
+  '/admin/system': typeof AuthenticatedAdminSystemRoute
+  '/admin/users': typeof AuthenticatedAdminUsersRoute
   '/articles/$id': typeof AuthenticatedArticlesIdRoute
   '/bonus/auto-claim': typeof AuthenticatedBonusAutoClaimRoute
   '/calendar/google': typeof AuthenticatedCalendarGoogleRoute
@@ -1277,6 +1328,7 @@ export interface FileRoutesByFullPath {
   '/api/chat/stream': typeof ApiChatStreamRoute
   '/api/debug/env': typeof ApiDebugEnvRoute
   '/api/img/$': typeof ApiImgSplatRoute
+  '/admin/': typeof AuthenticatedAdminIndexRoute
   '/groups/$id/leaderboard': typeof AuthenticatedGroupsIdLeaderboardRoute
   '/groups/$id/meals': typeof AuthenticatedGroupsIdMealsRoute
   '/profile/followers/$id': typeof AuthenticatedProfileFollowersIdRoute
@@ -1369,7 +1421,12 @@ export interface FileRoutesByTo {
   '/kalori': typeof KaloriIndexRoute
   '/olahraga': typeof OlahragaIndexRoute
   '/resep': typeof ResepIndexRoute
+  '/admin/articles': typeof AuthenticatedAdminArticlesRoute
+  '/admin/audit': typeof AuthenticatedAdminAuditRoute
+  '/admin/recipes': typeof AuthenticatedAdminRecipesRoute
   '/admin/seed-recipes': typeof AuthenticatedAdminSeedRecipesRoute
+  '/admin/system': typeof AuthenticatedAdminSystemRoute
+  '/admin/users': typeof AuthenticatedAdminUsersRoute
   '/articles/$id': typeof AuthenticatedArticlesIdRoute
   '/bonus/auto-claim': typeof AuthenticatedBonusAutoClaimRoute
   '/calendar/google': typeof AuthenticatedCalendarGoogleRoute
@@ -1442,6 +1499,7 @@ export interface FileRoutesByTo {
   '/api/chat/stream': typeof ApiChatStreamRoute
   '/api/debug/env': typeof ApiDebugEnvRoute
   '/api/img/$': typeof ApiImgSplatRoute
+  '/admin': typeof AuthenticatedAdminIndexRoute
   '/groups/$id/leaderboard': typeof AuthenticatedGroupsIdLeaderboardRoute
   '/groups/$id/meals': typeof AuthenticatedGroupsIdMealsRoute
   '/profile/followers/$id': typeof AuthenticatedProfileFollowersIdRoute
@@ -1473,6 +1531,7 @@ export interface FileRoutesById {
   '/privacy': typeof PrivacyRoute
   '/resep': typeof ResepRouteWithChildren
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/_authenticated/admin': typeof AuthenticatedAdminRouteRouteWithChildren
   '/_authenticated/achievements': typeof AuthenticatedAchievementsRoute
   '/_authenticated/alarms': typeof AuthenticatedAlarmsRoute
   '/_authenticated/articles': typeof AuthenticatedArticlesRouteWithChildren
@@ -1544,7 +1603,12 @@ export interface FileRoutesById {
   '/olahraga/': typeof OlahragaIndexRoute
   '/recipes/': typeof RecipesIndexRoute
   '/resep/': typeof ResepIndexRoute
+  '/_authenticated/admin/articles': typeof AuthenticatedAdminArticlesRoute
+  '/_authenticated/admin/audit': typeof AuthenticatedAdminAuditRoute
+  '/_authenticated/admin/recipes': typeof AuthenticatedAdminRecipesRoute
   '/_authenticated/admin/seed-recipes': typeof AuthenticatedAdminSeedRecipesRoute
+  '/_authenticated/admin/system': typeof AuthenticatedAdminSystemRoute
+  '/_authenticated/admin/users': typeof AuthenticatedAdminUsersRoute
   '/_authenticated/articles/$id': typeof AuthenticatedArticlesIdRoute
   '/_authenticated/bonus/auto-claim': typeof AuthenticatedBonusAutoClaimRoute
   '/_authenticated/calendar/google': typeof AuthenticatedCalendarGoogleRoute
@@ -1617,6 +1681,7 @@ export interface FileRoutesById {
   '/api/chat/stream': typeof ApiChatStreamRoute
   '/api/debug/env': typeof ApiDebugEnvRoute
   '/api/img/$': typeof ApiImgSplatRoute
+  '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/_authenticated/groups/$id/leaderboard': typeof AuthenticatedGroupsIdLeaderboardRoute
   '/_authenticated/groups/$id/meals': typeof AuthenticatedGroupsIdMealsRoute
   '/_authenticated/profile/followers/$id': typeof AuthenticatedProfileFollowersIdRoute
@@ -1648,6 +1713,7 @@ export interface FileRouteTypes {
     | '/privacy'
     | '/resep'
     | '/sitemap.xml'
+    | '/admin'
     | '/achievements'
     | '/alarms'
     | '/articles'
@@ -1719,7 +1785,12 @@ export interface FileRouteTypes {
     | '/olahraga/'
     | '/recipes/'
     | '/resep/'
+    | '/admin/articles'
+    | '/admin/audit'
+    | '/admin/recipes'
     | '/admin/seed-recipes'
+    | '/admin/system'
+    | '/admin/users'
     | '/articles/$id'
     | '/bonus/auto-claim'
     | '/calendar/google'
@@ -1792,6 +1863,7 @@ export interface FileRouteTypes {
     | '/api/chat/stream'
     | '/api/debug/env'
     | '/api/img/$'
+    | '/admin/'
     | '/groups/$id/leaderboard'
     | '/groups/$id/meals'
     | '/profile/followers/$id'
@@ -1884,7 +1956,12 @@ export interface FileRouteTypes {
     | '/kalori'
     | '/olahraga'
     | '/resep'
+    | '/admin/articles'
+    | '/admin/audit'
+    | '/admin/recipes'
     | '/admin/seed-recipes'
+    | '/admin/system'
+    | '/admin/users'
     | '/articles/$id'
     | '/bonus/auto-claim'
     | '/calendar/google'
@@ -1957,6 +2034,7 @@ export interface FileRouteTypes {
     | '/api/chat/stream'
     | '/api/debug/env'
     | '/api/img/$'
+    | '/admin'
     | '/groups/$id/leaderboard'
     | '/groups/$id/meals'
     | '/profile/followers/$id'
@@ -1987,6 +2065,7 @@ export interface FileRouteTypes {
     | '/privacy'
     | '/resep'
     | '/sitemap.xml'
+    | '/_authenticated/admin'
     | '/_authenticated/achievements'
     | '/_authenticated/alarms'
     | '/_authenticated/articles'
@@ -2058,7 +2137,12 @@ export interface FileRouteTypes {
     | '/olahraga/'
     | '/recipes/'
     | '/resep/'
+    | '/_authenticated/admin/articles'
+    | '/_authenticated/admin/audit'
+    | '/_authenticated/admin/recipes'
     | '/_authenticated/admin/seed-recipes'
+    | '/_authenticated/admin/system'
+    | '/_authenticated/admin/users'
     | '/_authenticated/articles/$id'
     | '/_authenticated/bonus/auto-claim'
     | '/_authenticated/calendar/google'
@@ -2131,6 +2215,7 @@ export interface FileRouteTypes {
     | '/api/chat/stream'
     | '/api/debug/env'
     | '/api/img/$'
+    | '/_authenticated/admin/'
     | '/_authenticated/groups/$id/leaderboard'
     | '/_authenticated/groups/$id/meals'
     | '/_authenticated/profile/followers/$id'
@@ -2768,6 +2853,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAchievementsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/admin': {
+      id: '/_authenticated/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AuthenticatedAdminRouteRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/admin/': {
+      id: '/_authenticated/admin/'
+      path: '/'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AuthenticatedAdminIndexRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
     '/api/img/$': {
       id: '/api/img/$'
       path: '/api/img/$'
@@ -3272,12 +3371,47 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedArticlesIdRouteImport
       parentRoute: typeof AuthenticatedArticlesRoute
     }
+    '/_authenticated/admin/users': {
+      id: '/_authenticated/admin/users'
+      path: '/users'
+      fullPath: '/admin/users'
+      preLoaderRoute: typeof AuthenticatedAdminUsersRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_authenticated/admin/system': {
+      id: '/_authenticated/admin/system'
+      path: '/system'
+      fullPath: '/admin/system'
+      preLoaderRoute: typeof AuthenticatedAdminSystemRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
     '/_authenticated/admin/seed-recipes': {
       id: '/_authenticated/admin/seed-recipes'
-      path: '/admin/seed-recipes'
+      path: '/seed-recipes'
       fullPath: '/admin/seed-recipes'
       preLoaderRoute: typeof AuthenticatedAdminSeedRecipesRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_authenticated/admin/recipes': {
+      id: '/_authenticated/admin/recipes'
+      path: '/recipes'
+      fullPath: '/admin/recipes'
+      preLoaderRoute: typeof AuthenticatedAdminRecipesRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_authenticated/admin/audit': {
+      id: '/_authenticated/admin/audit'
+      path: '/audit'
+      fullPath: '/admin/audit'
+      preLoaderRoute: typeof AuthenticatedAdminAuditRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_authenticated/admin/articles': {
+      id: '/_authenticated/admin/articles'
+      path: '/articles'
+      fullPath: '/admin/articles'
+      preLoaderRoute: typeof AuthenticatedAdminArticlesRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
     }
     '/api/wearable/google-fit/callback': {
       id: '/api/wearable/google-fit/callback'
@@ -3386,6 +3520,32 @@ declare module '@tanstack/react-router' {
     }
   }
 }
+
+interface AuthenticatedAdminRouteRouteChildren {
+  AuthenticatedAdminArticlesRoute: typeof AuthenticatedAdminArticlesRoute
+  AuthenticatedAdminAuditRoute: typeof AuthenticatedAdminAuditRoute
+  AuthenticatedAdminRecipesRoute: typeof AuthenticatedAdminRecipesRoute
+  AuthenticatedAdminSeedRecipesRoute: typeof AuthenticatedAdminSeedRecipesRoute
+  AuthenticatedAdminSystemRoute: typeof AuthenticatedAdminSystemRoute
+  AuthenticatedAdminUsersRoute: typeof AuthenticatedAdminUsersRoute
+  AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
+}
+
+const AuthenticatedAdminRouteRouteChildren: AuthenticatedAdminRouteRouteChildren =
+  {
+    AuthenticatedAdminArticlesRoute: AuthenticatedAdminArticlesRoute,
+    AuthenticatedAdminAuditRoute: AuthenticatedAdminAuditRoute,
+    AuthenticatedAdminRecipesRoute: AuthenticatedAdminRecipesRoute,
+    AuthenticatedAdminSeedRecipesRoute: AuthenticatedAdminSeedRecipesRoute,
+    AuthenticatedAdminSystemRoute: AuthenticatedAdminSystemRoute,
+    AuthenticatedAdminUsersRoute: AuthenticatedAdminUsersRoute,
+    AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
+  }
+
+const AuthenticatedAdminRouteRouteWithChildren =
+  AuthenticatedAdminRouteRoute._addFileChildren(
+    AuthenticatedAdminRouteRouteChildren,
+  )
 
 interface AuthenticatedArticlesRouteChildren {
   AuthenticatedArticlesIdRoute: typeof AuthenticatedArticlesIdRoute
@@ -3720,6 +3880,7 @@ const AuthenticatedWorkoutRouteWithChildren =
   AuthenticatedWorkoutRoute._addFileChildren(AuthenticatedWorkoutRouteChildren)
 
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedAdminRouteRoute: typeof AuthenticatedAdminRouteRouteWithChildren
   AuthenticatedAchievementsRoute: typeof AuthenticatedAchievementsRoute
   AuthenticatedAlarmsRoute: typeof AuthenticatedAlarmsRoute
   AuthenticatedArticlesRoute: typeof AuthenticatedArticlesRouteWithChildren
@@ -3774,7 +3935,6 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedWearableRoute: typeof AuthenticatedWearableRoute
   AuthenticatedWeightRoute: typeof AuthenticatedWeightRouteWithChildren
   AuthenticatedWorkoutRoute: typeof AuthenticatedWorkoutRouteWithChildren
-  AuthenticatedAdminSeedRecipesRoute: typeof AuthenticatedAdminSeedRecipesRoute
   AuthenticatedBonusAutoClaimRoute: typeof AuthenticatedBonusAutoClaimRoute
   AuthenticatedCalendarGoogleRoute: typeof AuthenticatedCalendarGoogleRoute
   AuthenticatedExercisesLibraryRoute: typeof AuthenticatedExercisesLibraryRoute
@@ -3797,6 +3957,7 @@ interface AuthenticatedRouteRouteChildren {
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedAdminRouteRoute: AuthenticatedAdminRouteRouteWithChildren,
   AuthenticatedAchievementsRoute: AuthenticatedAchievementsRoute,
   AuthenticatedAlarmsRoute: AuthenticatedAlarmsRoute,
   AuthenticatedArticlesRoute: AuthenticatedArticlesRouteWithChildren,
@@ -3851,7 +4012,6 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedWearableRoute: AuthenticatedWearableRoute,
   AuthenticatedWeightRoute: AuthenticatedWeightRouteWithChildren,
   AuthenticatedWorkoutRoute: AuthenticatedWorkoutRouteWithChildren,
-  AuthenticatedAdminSeedRecipesRoute: AuthenticatedAdminSeedRecipesRoute,
   AuthenticatedBonusAutoClaimRoute: AuthenticatedBonusAutoClaimRoute,
   AuthenticatedCalendarGoogleRoute: AuthenticatedCalendarGoogleRoute,
   AuthenticatedExercisesLibraryRoute: AuthenticatedExercisesLibraryRoute,
