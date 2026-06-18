@@ -20,13 +20,13 @@ export function LandingHero({
           <span className="pointer-events-none absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-primary/20 to-transparent animate-shimmer" />
         </div>
         <h1
-          className="text-4xl md:text-6xl font-bold tracking-tight text-balance leading-[1.05]"
+          className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-balance leading-[1.05]"
           style={{ fontFamily: "var(--font-display)" }}
         >
-          Hidup sehat,{" "}
+          Hidup sehat, dengan{" "}
           <span className="relative inline-block">
             <span className="bg-clip-text text-transparent bg-gradient-to-r from-primary via-accent to-primary-glow animate-aurora">
-              ditemani AI
+              AI-nya
             </span>
             <svg
               className="absolute -bottom-2 left-0 w-full"
@@ -43,14 +43,11 @@ export function LandingHero({
                 className="text-primary/60"
               />
             </svg>
-          </span>
-          <br />
-          yang ngerti Indonesia.
+          </span>{" "}
+          orang Indonesia.
         </h1>
         <p className="text-muted-foreground text-lg text-balance max-w-md">
-          Scan piring, atur puasa, lihat jadwal sholat, dan tanya{" "}
-          <span className="font-semibold text-foreground">HealthyU AI Coach</span> kapan saja, bantu
-          jawab. semua dalam satu app yang ringan & gratis.
+          Scan piring, atur puasa, jadwal sholat. Tanya AI coach kapan saja.
         </p>
         <div className="flex flex-col sm:flex-row gap-3 pt-2">
           <Link

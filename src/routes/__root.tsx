@@ -60,8 +60,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         href: appCss,
       },
       { rel: "apple-touch-icon", href: "/icon-192.svg" },
-      { rel: "preconnect", href: "https://fonts.googleapis.com" },
-      { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
+      // Fonts (Geist Variable + Geist Mono) self-hosted at /fonts/*.woff2 — no Google Fonts <link>.
       // Preconnect ke Supabase storage/API → kurangi handshake TLS untuk request awal
       ...(import.meta.env.VITE_SUPABASE_URL
         ? [
@@ -73,10 +72,6 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
             { rel: "dns-prefetch", href: import.meta.env.VITE_SUPABASE_URL },
           ]
         : []),
-      {
-        rel: "stylesheet",
-        href: "https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap",
-      },
     ],
     scripts: [
       {
