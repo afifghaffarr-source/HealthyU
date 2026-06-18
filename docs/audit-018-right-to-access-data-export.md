@@ -161,4 +161,11 @@ audit and from Vexo model short-name work).
 1. **AUDIT-019** — redaction toggle (above)
 2. **Fase 5** — backup/rollback/monitoring for the right-to-erasure cron
 3. **Manual security cleanup** (Afif's task) — revoke old GH PAT + CF token
-4. **Optional cleanup** — `wrangler.jsonc` `VITE_VAPID_PUBLIC_KEY` is dead config
+4. ✅ **Done (2026-06-18)** — `wrangler.jsonc` `VITE_VAPID_PUBLIC_KEY` was already
+   removed in `00c79e79` (lighthouse audit fix). Followed up by also
+   removing the related dead CF secret `VAPID_PUBLIC_KEY` (never read
+   by code — the public key is hardcoded in `src/lib/push-config.ts`),
+   the dead `VAPID_PUBLIC_KEY?:` type field in
+   `src/lib/cloudflare-env.server.ts`, and the stale entry in
+   `wrangler-secrets.md`. See commit message of the next audit
+   followup for full detail.

@@ -36,7 +36,6 @@ export interface CloudflareEnv {
   CRON_SECRET?: string;
   VAPID_SUBJECT?: string;
   VAPID_PRIVATE_KEY?: string;
-  VAPID_PUBLIC_KEY?: string;
   GOOGLE_FIT_CLIENT_ID?: string;
   GOOGLE_FIT_CLIENT_SECRET?: string;
   // Client-side vars (VITE_*) — also available in browser bundle

@@ -218,8 +218,8 @@ src/routes/sitemap[.]xml.ts                   # 16 static + 6 dynamic URLs from 
 
 **CF Worker bindings** (after deploy):
 
-- 7 secrets: SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, VEXO_API_KEY, VEXO_BASE_URL, CRON_SECRET, VAPID_PRIVATE_KEY, VAPID_PUBLIC_KEY
-- 6 vars (VITE\_\* and VAPID_SUBJECT): NODE_ENV, VITE_SUPABASE_URL, VITE_SUPABASE_PUBLISHABLE_KEY, VITE_SUPABASE_PROJECT_ID, VITE_VAPID_PUBLIC_KEY, VITE_SITE_URL, VAPID_SUBJECT
+- 6 secrets: SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, VEXO_API_KEY, VEXO_BASE_URL, CRON_SECRET, VAPID_PRIVATE_KEY
+- 6 vars (VITE\_\* and VAPID_SUBJECT): NODE_ENV, VITE_SUPABASE_URL, VITE_SUPABASE_PUBLISHABLE_KEY, VITE_SUPABASE_PROJECT_ID, VITE_SITE_URL, VAPID_SUBJECT
 
 **Routes**: `healthyu.web.id/*` + `www.healthyu.web.id/*`
 
@@ -250,11 +250,17 @@ src/routes/sitemap[.]xml.ts                   # 16 static + 6 dynamic URLs from 
 
 **Result**: Push services verify JWT signature against the header public key → mismatch → push rejected with 401/403.
 
-**Fix**: Update `push-config.ts` to `BEBt6a...` (same as wrangler.jsonc + CF secret). Also `VITE_VAPID_PUBLIC_KEY` in wrangler.jsonc is dead config (no source uses it) — can be removed.
+**Fix**: Update `push-config.ts` to `BEBt6a...` (same as wrangler.jsonc + CF secret).
 
-### DEAD: `VITE_VAPID_PUBLIC_KEY` in wrangler.jsonc
+### ✅ DEAD config cleaned up (2026-06-18)
 
-Set as a build-time env var, but no source file references `import.meta.env.VITE_VAPID_PUBLIC_KEY`. The actual public key is hardcoded in `src/lib/push-config.ts` (and bundled into the JS). Can be removed for clarity, but harmless.
+Both the `VITE_VAPID_PUBLIC_KEY` in `wrangler.jsonc` (already removed in
+`00c79e79`) and the related CF Worker secret `VAPID_PUBLIC_KEY` (never
+read by code) have been addressed. The public key is hardcoded in
+`src/lib/push-config.ts` and bundled into the client JS. The CF
+secret was removed, the `VAPID_PUBLIC_KEY?:` type field in
+`src/lib/cloudflare-env.server.ts` was removed, and the stale entry
+in `wrangler-secrets.md` was cleaned up.
 
 ## Working Commits (most recent first)
 
