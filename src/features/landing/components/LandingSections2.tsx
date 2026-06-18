@@ -1,4 +1,4 @@
-import { Star, Check, Users } from "lucide-react";
+import { Star, Check, Minus, Users } from "lucide-react";
 import { BeforeAfter } from "./BeforeAfter";
 import { TESTIMONIALS, FAQ_ITEMS, COMPARE, AUDIENCES, MEDIA_LOGOS } from "./landingData";
 
@@ -119,7 +119,7 @@ export function ComparisonTable() {
                     {v === true ? (
                       <Check className="size-4 text-primary" />
                     ) : v === false ? (
-                      <span className="text-muted-foreground">—</span>
+                      <Minus className="size-4 text-muted-foreground" />
                     ) : (
                       <span className="text-xs text-muted-foreground">{v}</span>
                     )}

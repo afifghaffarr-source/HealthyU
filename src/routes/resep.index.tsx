@@ -12,7 +12,7 @@ export const Route = createFileRoute("/resep/")({
         content:
           "Kumpulan resep makanan sehat Indonesia lengkap dengan kalori, protein, dan langkah memasak. Cocok untuk diet & gaya hidup sehat.",
       },
-      { property: "og:title", content: "Resep Sehat — HealthyU" },
+      { property: "og:title", content: "Resep Sehat · HealthyU" },
       { property: "og:description", content: "Resep diet Indonesia dengan info nutrisi lengkap." },
       { property: "og:url", content: canonical("/resep") },
     ],

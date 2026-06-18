@@ -93,7 +93,7 @@ const SectionSkeleton = () => (
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "HealthyU — AI Nutrition Coach untuk Indonesia" },
+      { title: "HealthyU · AI Nutrition Coach untuk Indonesia" },
       {
         name: "description",
         content:
@@ -104,7 +104,7 @@ export const Route = createFileRoute("/")({
         content:
           "diet, puasa, intermittent fasting, nutrisi, AI coach, makanan Indonesia, jadwal sholat, kalori",
       },
-      { property: "og:title", content: "HealthyU — AI Nutrition Coach untuk Indonesia" },
+      { property: "og:title", content: "HealthyU · AI Nutrition Coach untuk Indonesia" },
       {
         property: "og:description",
         content:
@@ -112,7 +112,7 @@ export const Route = createFileRoute("/")({
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:title", content: "HealthyU — AI Nutrition Coach untuk Indonesia" },
+      { name: "twitter:title", content: "HealthyU · AI Nutrition Coach untuk Indonesia" },
       {
         name: "twitter:description",
         content: "Diet personal, puasa, jadwal sholat, dan AI coach.",

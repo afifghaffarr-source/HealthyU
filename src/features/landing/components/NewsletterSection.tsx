@@ -11,7 +11,7 @@ export function NewsletterSection() {
           Dapat <span className="text-primary">ebook Meal Plan 7 hari</span> gratis
         </h3>
         <p className="text-sm text-muted-foreground mt-2">
-          Masukkan email — kirim PDF langsung ke inbox.
+          Masukkan email, kirim PDF langsung ke inbox.
         </p>
         {subscribed ? (
           <p className="mt-4 text-primary font-semibold inline-flex items-center gap-2">

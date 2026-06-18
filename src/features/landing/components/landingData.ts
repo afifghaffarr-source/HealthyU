@@ -17,13 +17,13 @@ export const FEATURES = [
   {
     icon: Camera,
     title: "Scan makanan AI",
-    desc: "Foto piringmu — kalori & makro muncul instan.",
+    desc: "Foto piringmu, kalori & makro muncul instan.",
     tint: "from-primary/15 to-primary/0",
   },
   {
     icon: Utensils,
     title: "Database lokal Indonesia",
-    desc: "Nasi padang, soto, gado-gado — ribuan menu lengkap.",
+    desc: "Nasi padang, soto, gado-gado, ribuan menu lengkap.",
     tint: "from-accent/15 to-accent/0",
   },
   {
@@ -53,7 +53,7 @@ export const FEATURES = [
   {
     icon: Trophy,
     title: "Streak & gamifikasi",
-    desc: "Level up, koin, achievement — konsisten jadi seru.",
+    desc: "Level up, koin, achievement, konsisten jadi seru.",
     tint: "from-amber-300/20 to-amber-300/0",
   },
   {
