@@ -78,6 +78,55 @@ export function detectPII(text: string): PiiFinding[] {
 }
 
 /**
+ * Replace every PII finding in `text` with `[REDACTED:<kind>]` placeholders.
+ *
+ * The placeholders are machine-parseable (kind tag) so downstream code can
+ * detect that redaction happened, and human-readable so a confused user
+ * reading their own export understands what was hidden.
+ *
+ * Idempotent: redacting an already-redacted string is a no-op because the
+ * placeholders do not match any PII pattern.
+ *
+ * Design: replace from the end backward so earlier indices stay valid as
+ * we mutate the string. This avoids the more error-prone "build an array
+ * of segments and join" pattern.
+ *
+ * AUDIT-019: used by the chat stream when the user has the
+ * `pii_redact_enabled` profile flag turned on. The redacted version is
+ * what we send to the AI — the original is still persisted in
+ * `chat_messages` (the user's history is intact, only the AI boundary
+ * sees the redacted text).
+ */
+export function redactPII(text: string): string {
+  if (!text) return text;
+  const findings = detectPII(text);
+  if (findings.length === 0) return text;
+  // Deduplicate overlapping matches. The patterns array is ordered
+  // [phone, email, ktp, credit_card] — earlier patterns are more
+  // specific, so they win. A 16-digit number matches BOTH `ktp` and
+  // `credit_card`; we want it tagged as `ktp`.
+  //
+  // detectPII already sorts by start index ascending, and the patterns
+  // run in priority order, so the first finding at a given start is
+  // the highest-priority one. Drop later duplicates.
+  const claimedStarts = new Set<number>();
+  const deduped: PiiFinding[] = [];
+  for (const f of findings) {
+    if (claimedStarts.has(f.start)) continue;
+    claimedStarts.add(f.start);
+    deduped.push(f);
+  }
+  // Sort by start index ASCENDING then process from the END so each
+  // replacement doesn't shift indices we haven't visited yet.
+  const sorted = [...deduped].sort((a, b) => b.start - a.start);
+  let out = text;
+  for (const f of sorted) {
+    out = out.slice(0, f.start) + `[REDACTED:${f.kind}]` + out.slice(f.end);
+  }
+  return out;
+}
+
+/**
  * High-level helper: returns true if text contains ANY PII.
  * Cheaper than `detectPII(text).length > 0` for the common "should I
  * warn the user?" check.
