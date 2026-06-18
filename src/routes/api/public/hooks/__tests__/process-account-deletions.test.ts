@@ -49,17 +49,50 @@ function makeRequest(): Request {
   });
 }
 
+/**
+ * Build a `from(table)` mock that handles both the stuck-processing
+ * reset call (update chain) and the pending-queue fetch (select
+ * chain). Each test customises these via the returned builder.
+ */
+function makeFromBuilder(overrides?: {
+  resetData?: { id: string }[] | null;
+  resetError?: { message: string } | null;
+  pendingData?: unknown[] | null;
+  pendingError?: { message: string } | null;
+}) {
+  return (table: string) => {
+    if (table !== "account_deletion_requests") return {};
+    return {
+      // stuck-processing reset chain: update().eq().lt().select()
+      update: () => ({
+        eq: () => ({
+          lt: () => ({
+            select: () =>
+              Promise.resolve({
+                data: overrides?.resetData ?? [],
+                error: overrides?.resetError ?? null,
+              }),
+          }),
+        }),
+      }),
+      // pending-queue fetch chain: select().eq().lt()
+      select: () => ({
+        eq: () => ({
+          lt: () =>
+            Promise.resolve({
+              data: overrides?.pendingData ?? [],
+              error: overrides?.pendingError ?? null,
+            }),
+        }),
+      }),
+    };
+  };
+}
+
 beforeEach(() => {
   vi.clearAllMocks();
-  // Default: no pending requests (avoids surprise calls in tests that
-  // don't override the mock).
-  mocks.from.mockReturnValue({
-    select: () => ({
-      eq: () => ({
-        lt: () => Promise.resolve({ data: [], error: null }),
-      }),
-    }),
-  });
+  // Default: no stuck processing, no pending requests.
+  mocks.from.mockImplementation(makeFromBuilder());
   mocks.rpc.mockResolvedValue({ data: null, error: null });
 });
 
@@ -83,12 +116,58 @@ describe("POST /api/public/hooks/process-account-deletions", () => {
       ok: boolean;
       processed: unknown[];
       errors: unknown[];
-      counts: { processed: number; errors: number };
+      counts: { processed: number; errors: number; reset: number };
     };
     expect(body.ok).toBe(true);
     expect(body.processed).toEqual([]);
     expect(body.errors).toEqual([]);
-    expect(body.counts).toEqual({ processed: 0, errors: 0 });
+    expect(body.counts).toEqual({ processed: 0, errors: 0, reset: 0 });
+  });
+
+  it("auto-recovers stuck 'processing' requests older than 60 minutes", async () => {
+    const stuckRows = [{ id: "stuck-1" }, { id: "stuck-2" }];
+    mocks.from.mockImplementation(makeFromBuilder({ resetData: stuckRows, pendingData: [] }));
+    const handler = getHandler();
+    const res = await handler({ request: makeRequest() });
+    expect(res.status).toBe(200);
+    const body = (await res.json()) as {
+      counts: { reset: number; processed: number };
+    };
+    // The reset count in the response is the source of truth — the
+    // worker sets it from the number of rows the .update() returned.
+    expect(body.counts.reset).toBe(2);
+    expect(body.counts.processed).toBe(0);
+    // The reset call must have targeted the right table.
+    expect(mocks.from).toHaveBeenCalledWith("account_deletion_requests");
+  });
+
+  it("auto-recovery is a no-op when no rows are stuck", async () => {
+    // Default mock returns empty arrays, which is the "nothing stuck" case.
+    const handler = getHandler();
+    const res = await handler({ request: makeRequest() });
+    expect(res.status).toBe(200);
+    const body = (await res.json()) as {
+      counts: { reset: number };
+    };
+    expect(body.counts.reset).toBe(0);
+  });
+
+  it("does not fail the cron when the stuck-processing reset errors (non-fatal)", async () => {
+    mocks.from.mockImplementation(
+      makeFromBuilder({ resetError: { message: "db connection lost" } }),
+    );
+    const consoleErrorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+    const handler = getHandler();
+    const res = await handler({ request: makeRequest() });
+    consoleErrorSpy.mockRestore();
+    // Cron should still 200 — reset failure is logged but non-fatal,
+    // and there are no pending requests to process.
+    expect(res.status).toBe(200);
+    const body = (await res.json()) as {
+      counts: { reset: number; processed: number };
+    };
+    expect(body.counts.reset).toBe(0);
+    expect(body.counts.processed).toBe(0);
   });
 
   it("calls process_account_deletion RPC for each pending request", async () => {
@@ -96,13 +175,7 @@ describe("POST /api/public/hooks/process-account-deletions", () => {
       { user_id: "u-1", requested_at: "2026-06-16T03:00:00Z", reason: null },
       { user_id: "u-2", requested_at: "2026-06-15T10:00:00Z", reason: "mau berhenti" },
     ];
-    mocks.from.mockReturnValue({
-      select: () => ({
-        eq: () => ({
-          lt: () => Promise.resolve({ data: pendingUsers, error: null }),
-        }),
-      }),
-    });
+    mocks.from.mockImplementation(makeFromBuilder({ pendingData: pendingUsers }));
     mocks.rpc.mockResolvedValue({
       data: { processed: true, user_id: "x", tables: { profiles: 1 } },
       error: null,
@@ -126,44 +199,49 @@ describe("POST /api/public/hooks/process-account-deletions", () => {
   });
 
   it("queries account_deletion_requests with status=pending AND requested_at < cutoff", async () => {
+    // Build spies only for the PENDING-fetch chain (the second call
+    // to from()). The first call (the stuck-processing reset) gets a
+    // no-op chain — we just need it not to throw.
     const ltMock = vi.fn((_column: string, _cutoff: string) =>
       Promise.resolve({ data: [], error: null }),
     );
     const eqMock = vi.fn((_col: string, _val: string) => ({ lt: ltMock }));
     const selectMock = vi.fn((_cols: string) => ({ eq: eqMock }));
-    mocks.from.mockReturnValue({ select: selectMock });
+    mocks.from.mockImplementation((table: string) => {
+      if (table !== "account_deletion_requests") return {};
+      return {
+        update: () => ({
+          eq: () => ({ lt: () => ({ select: () => Promise.resolve({ data: [], error: null }) }) }),
+        }),
+        select: selectMock,
+      };
+    });
     const handler = getHandler();
     await handler({ request: makeRequest() });
-    // The chain must target the right table and the right status filter.
-    expect(mocks.from).toHaveBeenCalledWith("account_deletion_requests");
+    // The pending-fetch chain must target the right table and the right
+    // status filter. lt() is also called by the reset branch, so we
+    // check that the requested_at filter appeared SOMEWHERE in the calls.
     expect(selectMock).toHaveBeenCalledWith("user_id, requested_at, reason");
-    expect(eqMock).toHaveBeenCalledWith("status", "pending");
-    // The cutoff is "now - 24h" — assert it's a valid ISO string within
-    // a few seconds of `now - 24h`. Supabase .lt(column, value) — column first.
-    expect(ltMock).toHaveBeenCalledTimes(1);
-    const ltArgs = ltMock.mock.calls[0] as unknown as [string, string];
-    expect(ltArgs[0]).toBe("requested_at");
-    const cutoffMs = new Date(ltArgs[1]).getTime();
+    const allEqCalls = eqMock.mock.calls as Array<[string, string]>;
+    expect(allEqCalls.some(([col, val]) => col === "status" && val === "pending")).toBe(true);
+    const allLtCalls = ltMock.mock.calls as Array<[string, string]>;
+    const requestedAtCalls = allLtCalls.filter(([col]) => col === "requested_at");
+    expect(requestedAtCalls.length).toBeGreaterThanOrEqual(1);
+    const cutoffMs = new Date(requestedAtCalls[0][1]).getTime();
     const expected = Date.now() - 24 * 60 * 60 * 1000;
     expect(Math.abs(cutoffMs - expected)).toBeLessThan(5_000);
   });
 
   it("continues processing after a per-user failure (does not abort the queue)", async () => {
-    mocks.from.mockReturnValue({
-      select: () => ({
-        eq: () => ({
-          lt: () =>
-            Promise.resolve({
-              data: [
-                { user_id: "u-ok", requested_at: "2026-06-16T03:00:00Z", reason: null },
-                { user_id: "u-bad", requested_at: "2026-06-16T03:00:00Z", reason: null },
-                { user_id: "u-also-ok", requested_at: "2026-06-16T03:00:00Z", reason: null },
-              ],
-              error: null,
-            }),
-        }),
+    mocks.from.mockImplementation(
+      makeFromBuilder({
+        pendingData: [
+          { user_id: "u-ok", requested_at: "2026-06-16T03:00:00Z", reason: null },
+          { user_id: "u-bad", requested_at: "2026-06-16T03:00:00Z", reason: null },
+          { user_id: "u-also-ok", requested_at: "2026-06-16T03:00:00Z", reason: null },
+        ],
       }),
-    });
+    );
     // 1st call: ok. 2nd: throws. 3rd: ok.
     mocks.rpc
       .mockResolvedValueOnce({ data: { processed: true }, error: null })
@@ -187,13 +265,9 @@ describe("POST /api/public/hooks/process-account-deletions", () => {
   });
 
   it("returns 500 if the initial pending-request fetch fails", async () => {
-    mocks.from.mockReturnValue({
-      select: () => ({
-        eq: () => ({
-          lt: () => Promise.resolve({ data: null, error: { message: "table not found" } }),
-        }),
-      }),
-    });
+    mocks.from.mockImplementation(
+      makeFromBuilder({ pendingError: { message: "table not found" } }),
+    );
     const handler = getHandler();
     const res = await handler({ request: makeRequest() });
     expect(res.status).toBe(500);

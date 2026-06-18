@@ -16,7 +16,7 @@ import { requireCronSecret } from "@/lib/cronAuth.server";
  * Schedule: daily at 03:00 UTC. See `docs/cron.md` for the SQL.
  *
  * Response shape:
- *   { ok, processed: [{user_id, result}], skipped, errors, timestamp }
+ *   { ok, processed: [{user_id, result}], skipped, errors, reset, timestamp }
  *
  *   - `processed` is the per-user SQL function return (counts per table).
  *   - `skipped` is requests that had no `pending` row at processing time
@@ -25,6 +25,9 @@ import { requireCronSecret } from "@/lib/cronAuth.server";
  *   - `errors` is per-user failures that didn't roll back; the cron
  *     continues with the next user so one bad apple doesn't block the
  *     queue.
+ *   - `reset` is the count of stuck 'processing' requests we auto-
+ *     recovered at the start of this run (see STUCK_PROCESSING
+ *     constant below).
  */
 export const Route = createFileRoute("/api/public/hooks/process-account-deletions")({
   server: {
@@ -39,6 +42,56 @@ export const Route = createFileRoute("/api/public/hooks/process-account-deletion
         // ("you can cancel within 24h"). Anything older than that
         // gets processed.
         const cutoff = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+
+        // 0. Auto-recover stuck 'processing' requests before fetching
+        //    the pending queue. A request can get stuck in 'processing'
+        //    if a previous cron run's worker died mid-call after the
+        //    SQL function committed the status update but before
+        //    completing the deletions (e.g. CF Worker evicted, network
+        //    drop, OOM). Without this reset those rows would never
+        //    move to 'pending' and the user's data would sit in the
+        //    DB indefinitely — a UU PDP gap.
+        //
+        //    Threshold is 1 hour. The SQL function itself is atomic
+        //    and should complete in seconds; an hour is comfortably
+        //    longer than the legitimate worst case (a deletion with
+        //    very large per-table row counts might take a few minutes
+        //    on a slow day). Anything still in 'processing' after
+        //    an hour is, by definition, stuck.
+        //
+        //    We set processed_at = NULL on reset so the next run's
+        //    pending-query doesn't accidentally re-flag it as a
+        //    fresh stuck-processing (the .lt filter is on the
+        //    processed_at timestamp, not on status alone).
+        const STUCK_PROCESSING_MINUTES = 60;
+        const stuckThreshold = new Date(
+          Date.now() - STUCK_PROCESSING_MINUTES * 60 * 1000,
+        ).toISOString();
+        const { data: resetRows, error: resetError } = await supabaseAdmin
+          .from("account_deletion_requests")
+          .update({ status: "pending", processed_at: null })
+          .eq("status", "processing")
+          .lt("processed_at", stuckThreshold)
+          .select("id");
+
+        let reset = 0;
+        if (resetError) {
+          // Non-fatal: log and continue with the pending queue. The
+          // stuck requests will get another chance in the next cron
+          // run. We'd rather process new pending requests than fail
+          // the whole cron over a recovery step.
+          console.error(
+            "process-account-deletions: stuck-processing reset failed:",
+            resetError.message,
+          );
+        } else if (resetRows) {
+          reset = resetRows.length;
+          if (reset > 0) {
+            console.log(
+              `process-account-deletions: auto-recovered ${reset} stuck 'processing' request(s) older than ${STUCK_PROCESSING_MINUTES}min`,
+            );
+          }
+        }
 
         // 1. Find all pending requests past the grace window.
         const { data: requests, error: fetchError } = await supabaseAdmin
@@ -80,9 +133,11 @@ export const Route = createFileRoute("/api/public/hooks/process-account-deletion
           ok: true,
           processed,
           errors,
+          reset,
           counts: {
             processed: processed.length,
             errors: errors.length,
+            reset,
           },
           timestamp: new Date().toISOString(),
         });

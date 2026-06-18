@@ -97,6 +97,17 @@ select cron.schedule(
 );
 ```
 
+## 3. Stuck-processing auto-recovery (AUDIT-020 cron)
+
+`process-account-deletions` (the right-to-erasure cron) auto-recovers
+rows stuck in `status='processing'` for more than **60 minutes** at the
+start of every run. See `docs/audit-020-stuck-processing-recovery.md`
+for the design rationale.
+
+The recovery is non-fatal — if it errors, the cron logs and continues
+with the normal pending-queue flow. The reset count surfaces in the
+response as `counts.reset` (and at the top level as `reset`).
+
 ## 4. Inspect
 
 ```sql
