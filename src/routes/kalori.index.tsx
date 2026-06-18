@@ -6,13 +6,13 @@ export const Route = createFileRoute("/kalori/")({
   loader: () => listFoods(),
   head: () => ({
     meta: [
-      { title: "Kalori Makanan Indonesia — Database Lengkap | HealthyU" },
+      { title: "Kalori Makanan Indonesia · Database Lengkap | HealthyU" },
       {
         name: "description",
         content:
           "Database kalori 100+ makanan Indonesia: nasi, lauk, sayur, cemilan. Lengkap dengan protein, karbo, dan lemak per porsi.",
       },
-      { property: "og:title", content: "Kalori Makanan Indonesia — HealthyU" },
+      { property: "og:title", content: "Kalori Makanan Indonesia · HealthyU" },
       {
         property: "og:description",
         content: "Cari kalori makanan favoritmu: rendang, nasi goreng, gado-gado, dan lainnya.",

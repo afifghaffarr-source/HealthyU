@@ -4,7 +4,7 @@ type Variant = "ai-estimate" | "not-medical" | "review-first";
 
 const COPY: Record<Variant, { text: string; Icon: typeof Info }> = {
   "ai-estimate": {
-    text: "Estimasi AI — periksa porsi & kalori sebelum simpan",
+    text: "Estimasi AI · periksa porsi & kalori sebelum simpan",
     Icon: Info,
   },
   "not-medical": {

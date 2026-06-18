@@ -10,7 +10,7 @@ export const Route = createFileRoute("/diet/$slug")({
   },
   head: ({ loaderData, params }) => {
     const d = loaderData;
-    const title = d ? `${d.name} — Panduan Lengkap | HealthyU` : "Diet | HealthyU";
+    const title = d ? `${d.name} · Panduan Lengkap | HealthyU` : "Diet | HealthyU";
     const desc = d?.short_description ?? "Panduan diet sehat.";
     const url = canonical(`/diet/${params.slug}`);
     return {
@@ -30,7 +30,7 @@ export const Route = createFileRoute("/diet/$slug")({
               children: JSON.stringify({
                 "@context": "https://schema.org",
                 "@type": "Article",
-                headline: `${d.name} — Panduan Lengkap`,
+                headline: `${d.name} · Panduan Lengkap`,
                 description: desc,
                 author: { "@type": "Organization", name: "HealthyU" },
               }),

@@ -25,20 +25,20 @@ type Slug =
 
 const META: Record<Slug, { title: string; description: string; h1: string; intro: string }> = {
   bmi: {
-    title: "Kalkulator BMI Online Gratis — Indeks Massa Tubuh | HealthyU",
+    title: "Kalkulator BMI Online Gratis · Indeks Massa Tubuh | HealthyU",
     description:
       "Hitung BMI (Indeks Massa Tubuh) Anda secara gratis. Akurat sesuai standar WHO untuk dewasa Indonesia.",
     h1: "Kalkulator BMI",
     intro: "Masukkan berat dan tinggi badan untuk mengetahui Indeks Massa Tubuh Anda.",
   },
   bmr: {
-    title: "Kalkulator BMR — Basal Metabolic Rate | HealthyU",
-    description: "Hitung BMR (kalori istirahat) dengan rumus Mifflin-St Jeor — paling akurat.",
+    title: "Kalkulator BMR · Basal Metabolic Rate | HealthyU",
+    description: "Hitung BMR (kalori istirahat) dengan rumus Mifflin-St Jeor, paling akurat.",
     h1: "Kalkulator BMR",
     intro: "Hitung jumlah kalori yang dibakar tubuh saat istirahat total.",
   },
   tdee: {
-    title: "Kalkulator TDEE — Kebutuhan Kalori Harian | HealthyU",
+    title: "Kalkulator TDEE · Kebutuhan Kalori Harian | HealthyU",
     description:
       "Hitung TDEE (total kalori harian) berdasarkan aktivitas. Untuk diet, bulking, atau maintenance.",
     h1: "Kalkulator TDEE",
@@ -64,7 +64,7 @@ const META: Record<Slug, { title: string; description: string; h1: string; intro
     intro: "Berapa banyak air yang harus Anda minum tiap hari.",
   },
   macro: {
-    title: "Kalkulator Makro — Protein, Karbo, Lemak | HealthyU",
+    title: "Kalkulator Makro · Protein, Karbo, Lemak | HealthyU",
     description: "Hitung kebutuhan makro harian untuk diet, maintenance, atau bulking.",
     h1: "Kalkulator Makronutrien",
     intro: "Pecah kalori harian Anda menjadi protein, karbohidrat, dan lemak.",

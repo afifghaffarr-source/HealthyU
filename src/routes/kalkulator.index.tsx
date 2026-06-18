@@ -5,13 +5,13 @@ import { CALCS } from "./kalkulator";
 export const Route = createFileRoute("/kalkulator/")({
   head: () => ({
     meta: [
-      { title: "8 Kalkulator Kesehatan Gratis — HealthyU" },
+      { title: "8 Kalkulator Kesehatan Gratis | HealthyU" },
       {
         name: "description",
         content:
           "Kalkulator BMI, BMR, TDEE, body fat, berat ideal, kebutuhan air, makro, dan zona detak jantung. Gratis, akurat, dalam Bahasa Indonesia.",
       },
-      { property: "og:title", content: "8 Kalkulator Kesehatan Gratis — HealthyU" },
+      { property: "og:title", content: "8 Kalkulator Kesehatan Gratis | HealthyU" },
       {
         property: "og:description",
         content: "Lengkap: BMI, BMR, TDEE, body fat, makro, dan lainnya.",
@@ -47,7 +47,7 @@ function KalkulatorHub() {
           8 Kalkulator Kesehatan Gratis
         </h1>
         <p className="mt-3 text-muted-foreground">
-          Hitung BMI, kalori harian, lemak tubuh, dan lainnya — akurat, cepat, tanpa daftar.
+          Hitung BMI, kalori harian, lemak tubuh, dan lainnya. Akurat, cepat, tanpa daftar.
         </p>
       </header>
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">

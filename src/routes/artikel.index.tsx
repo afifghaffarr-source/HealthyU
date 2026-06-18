@@ -12,7 +12,7 @@ export const Route = createFileRoute("/artikel/")({
         content:
           "Baca artikel terbaru seputar diet sehat, olahraga, nutrisi, tidur, dan gaya hidup. Tips berbasis sains dari tim HealthyU.",
       },
-      { property: "og:title", content: "Artikel Kesehatan — HealthyU" },
+      { property: "og:title", content: "Artikel Kesehatan · HealthyU" },
       { property: "og:description", content: "Tips diet, olahraga, dan kesehatan berbasis sains." },
       { property: "og:url", content: canonical("/artikel") },
     ],
