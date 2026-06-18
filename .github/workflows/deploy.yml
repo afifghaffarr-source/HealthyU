@@ -113,6 +113,11 @@ jobs:
           # The cloudflare-env.server.ts reader also defends against this at runtime
           # (see normalizeCfEnv), but using ':' here is the root-cause fix.
           set +e
+          # Retry backoff is 5min/10min (NOT 10s/20s) because CF rate limit
+          # (code 10429) window is 5min — short retries all hit the same
+          # throttled window. Real fix: don't push deploys >1/hour (642 file
+          # uploads each = CF API call per file). Symptom of 4× consecutive
+          # failures with 10s backoff = rate limit, not token issue.
           for attempt in 1 2 3; do
             echo "::group::Deploy attempt $attempt/3 (sha=${{ github.sha }})"
             wrangler deploy \
@@ -127,11 +132,17 @@ jobs:
               break
             fi
             if [ $attempt -lt 3 ]; then
-              wait_seconds=$((attempt * 10))
+              if [ $attempt -eq 1 ]; then
+                wait_seconds=300   # 5 min — exits the CF 5-min rate limit window
+              else
+                wait_seconds=600   # 10 min — fallback if still throttled
+              fi
               echo "⚠️ Deploy failed (exit $exit_code), retrying in ${wait_seconds}s..."
               sleep $wait_seconds
             else
               echo "::error::Deploy failed after 3 attempts (last exit: $exit_code)"
+              echo "::error::If code 10429 (rate limit): wait 15+ min, do NOT push again immediately."
+              echo "::error::If other error: check https://dash.cloudflare.com → Workers → healthyu → Deployments"
               exit $exit_code
             fi
           done
