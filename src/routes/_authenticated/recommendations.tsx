@@ -16,6 +16,8 @@ import {
   Moon,
   Cookie,
   Check,
+  BookOpen,
+  Info,
   type LucideIcon,
 } from "lucide-react";
 import { toast } from "@/lib/toast-config";
@@ -106,9 +108,31 @@ function RecommendationsPage() {
 
         {gen.data && (
           <>
-            <section className="bg-card p-4 rounded-3xl outline-1 outline-black/5 animate-fade-up">
+            <section className="bg-card p-4 rounded-3xl outline-1 outline-black/5 animate-fade-up space-y-3">
+              <div className="flex items-center gap-2">
+                {gen.data.mode === "ai" ? (
+                  <span className="inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider bg-primary/10 text-primary px-2 py-1 rounded-full">
+                    <Sparkles className="size-3" />
+                    AI Personal
+                  </span>
+                ) : (
+                  <span className="inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider bg-muted text-muted-foreground px-2 py-1 rounded-full">
+                    <BookOpen className="size-3" />
+                    Template
+                  </span>
+                )}
+              </div>
               <p className="text-sm leading-relaxed">{gen.data.summary}</p>
-              <div className="mt-3 flex items-center justify-between text-xs">
+              {gen.data.mode === "template" && (
+                <div className="flex gap-2 items-start text-xs text-muted-foreground bg-muted/50 rounded-2xl px-3 py-2">
+                  <Info className="size-3.5 shrink-0 mt-0.5" />
+                  <p>
+                    AI tidak tersedia — rekomendasi ini dari template yang sesuai profil Anda. Coba
+                    lagi nanti untuk versi AI personal.
+                  </p>
+                </div>
+              )}
+              <div className="flex items-center justify-between text-xs">
                 <span className="text-muted-foreground">
                   Sisa budget:{" "}
                   <b className="text-foreground">{gen.data.remaining_budget_kcal} kcal</b>
