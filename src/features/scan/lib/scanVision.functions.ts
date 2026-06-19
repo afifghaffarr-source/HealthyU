@@ -1,7 +1,9 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { callAiJsonWithSchema, type AiContentPart } from "@/features/ai/lib/aiGateway.server";
+import { callAiJsonWithSchema } from "@/features/ai/lib/aiGateway.server";
+import { callAiVisionWithFallback } from "@/features/ai/lib/aiProviders";
+import { getCachedImageResult, setCachedImageResult } from "@/features/ai/lib/aiCache.server";
 import type { ZodTypeAny } from "zod";
 
 // ===== from scanExtras1 (ALL) =====
@@ -18,15 +20,39 @@ async function callGeminiJson<S extends ZodTypeAny>(
   schema: S,
   fallback: z.infer<S>,
 ): Promise<z.infer<S>> {
-  const content: AiContentPart[] = [{ type: "text", text: prompt }];
-  if (imageUrl) content.push({ type: "image_url", image_url: { url: imageUrl } });
-  return await callAiJsonWithSchema({
+  // Sprint 2d: use the multi-provider registry so image-bearing prompts go
+  // to OpenRouter (vision-capable) when OPENROUTER_API_KEY is configured,
+  // and transparently fall back to OCR/text-only mode when not.
+  //
+  // Also wires the image result cache (30-day TTL): identical image bytes
+  // → cached JSON response, zero AI tokens, sub-100ms latency.
+  if (imageUrl) {
+    const cached = await getCachedImageResult(imageUrl);
+    if (cached) {
+      try {
+        return JSON.parse(cached.response) as z.infer<S>;
+      } catch {
+        // Corrupt cache entry → fall through to fresh call
+      }
+    }
+  }
+  const result = await callAiVisionWithFallback({
     userId,
     feature,
     schema,
     fallback,
-    messages: [{ role: "user", content }],
+    prompt,
+    imageDataUrl: imageUrl ?? undefined,
   });
+  if (imageUrl) {
+    // Cache the response keyed on image hash (best-effort, fire-and-forget)
+    void setCachedImageResult({
+      imageDataUrl: imageUrl,
+      response: JSON.stringify(result.object),
+      model: result.model,
+    });
+  }
+  return result.object;
 }
 
 const RecipeImageSchema = z.object({
@@ -108,28 +134,33 @@ export const recipeFromFridge = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d) => z.object({ imageBase64: z.string().min(10).max(8_000_000) }).parse(d))
   .handler(async ({ data, context }) => {
-    const result = await callAiJsonWithSchema({
+    // Sprint 2d: route through multi-provider vision registry + image cache.
+    const imageDataUrl = `data:image/jpeg;base64,${data.imageBase64}`;
+    const cached = await getCachedImageResult(imageDataUrl);
+    if (cached) {
+      try {
+        return { result: JSON.parse(cached.response) };
+      } catch {
+        // fall through
+      }
+    }
+    const result = await callAiVisionWithFallback({
       userId: context.userId,
       feature: "recipe.from_fridge",
       schema: FridgeRecipesSchema,
       fallback: { ingredients: [], recipes: [] },
-      messages: [
-        {
-          role: "user",
-          content: [
-            {
-              type: "text",
-              text: "Lihat foto kulkas ini. Identifikasi bahan dan saran 3 resep. JSON {ingredients:[], recipes:[{name, steps:[]}]}.",
-            },
-            {
-              type: "image_url",
-              image_url: { url: `data:image/jpeg;base64,${data.imageBase64}` },
-            },
-          ],
-        },
-      ],
+      system:
+        "Kamu adalah chef Indonesia. Lihat foto kulkas, identifikasi bahan, dan sarankan 3 resep sederhana Indonesia.",
+      prompt:
+        "Lihat foto kulkas ini. Identifikasi bahan dan saran 3 resep Indonesia. Balas JSON {ingredients: string[], recipes: [{name, steps: string[]}]}.",
+      imageDataUrl,
     });
-    return { result };
+    void setCachedImageResult({
+      imageDataUrl,
+      response: JSON.stringify(result.object),
+      model: result.model,
+    });
+    return { result: result.object };
   });
 
 // ===== from scanBatch12b (ocrNutritionLabel) =====

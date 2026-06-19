@@ -33,6 +33,12 @@ export interface CloudflareEnv {
   SUPABASE_PUBLISHABLE_KEY?: string;
   VEXO_API_KEY?: string;
   VEXO_BASE_URL?: string;
+  // OpenRouter — free tier vision models (gemini-2.0-flash-exp, llama-3.2-vision, qwen-2-vl)
+  // Used when image-bearing prompts need a model that supports images.
+  // VexoAPI free tier is text-only (verified 2026-06-19); OpenRouter free tier
+  // has 50 req/day shared limit, or 1000/day with $10 top-up.
+  OPENROUTER_API_KEY?: string;
+  OPENROUTER_BASE_URL?: string;
   CRON_SECRET?: string;
   VAPID_SUBJECT?: string;
   VAPID_PRIVATE_KEY?: string;
@@ -44,6 +50,7 @@ export interface CloudflareEnv {
   VITE_SUPABASE_PROJECT_ID?: string;
   VITE_VEXO_API_KEY?: string;
   VITE_APP_URL?: string;
+  VITE_SITE_URL?: string;
   // Allow extra bindings (KV, D1, R2, Durable Objects, etc.) without TS errors
   [key: string]: unknown;
 }

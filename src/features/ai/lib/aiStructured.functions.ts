@@ -26,7 +26,7 @@
 
 import { generateObject, NoObjectGeneratedError } from "ai";
 import type { z, ZodTypeAny } from "zod";
-import { vexoModel } from "./vexoProvider";
+import { getModelInstance } from "./aiProviders";
 import { AiGatewayError } from "./aiGateway.server";
 import { enforceAiBudget, logAiUsage } from "./aiBudget.server";
 
@@ -119,7 +119,7 @@ export async function callAiStructured<S extends ZodTypeAny>(
   let result: Awaited<ReturnType<typeof generateObject>>;
   try {
     result = await generateObject({
-      model: vexoModel(opts.model ?? "google/gemini-2.5-flash"),
+      model: getModelInstance(opts.model ?? "google/gemini-2.5-flash"),
       system: opts.system,
       prompt: opts.prompt,
       schema: opts.schema,

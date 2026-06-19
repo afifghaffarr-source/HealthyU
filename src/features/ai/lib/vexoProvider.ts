@@ -81,6 +81,14 @@ export function vexoChatModel() {
 }
 
 /**
+ * Whether VexoAPI is configured. Used by `aiProviders.ts` registry to
+ * skip VexoAPI and route to other providers when key is missing.
+ */
+export function isVexoConfigured(): boolean {
+  return Boolean(getEnv().VEXO_API_KEY);
+}
+
+/**
  * Resolve a model name to its upstream Vexo endpoint string.
  * Re-export so SDK-based callers don't have to import from vexoAdapter.
  */
