@@ -271,8 +271,13 @@ export async function callAiVisionWithFallback<S extends ZodTypeAny>(
   );
 
   // ─── Branch 1: image + OpenRouter vision ──────────────────────────────
+  // Use pickVisionModel so caller-provided preferredModel is respected ONLY
+  // if it explicitly opts into OpenRouter vision. This mirrors the fix in
+  // callAiTextWithVision — otherwise a VexoAPI model passed as preferredModel
+  // would 400 on image inputs and we'd silently fall to the OCR branch.
   if (hasImage && isOpenRouterConfigured()) {
-    const model = opts.preferredModel ?? "openrouter/nvidia/nemotron-nano-12b-v2-vl:free";
+    const model =
+      pickVisionModel(opts.preferredModel) ?? "openrouter/nvidia/nemotron-nano-12b-v2-vl:free";
     try {
       const { generateText: genText } = await import("ai");
       // We can't use generateObject directly with multimodal messages from
