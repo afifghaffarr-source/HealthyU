@@ -28,6 +28,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { APP_CONFIG } from "@/config/app";
 import { Button } from "@/components/ui/button";
+import { HijriWidget } from "@/features/hijri/components/HijriWidget";
 import {
   Scan,
   Calendar,
@@ -414,6 +415,9 @@ function PrismPage() {
                   iklan. Tidak ada jual data.
                 </div>
               </div>
+
+              {/* Hijri date + Ramadhan countdown */}
+              <HijriWidget variant="feature" />
             </div>
           </div>
         </section>

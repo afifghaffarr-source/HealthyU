@@ -40,6 +40,7 @@ import { usePullToRefresh } from "@/hooks/use-pull-to-refresh";
 import { markFirstAction } from "@/lib/first-action";
 import { useFastClock } from "@/features/dashboard/hooks/useFastClock";
 import { useDashboardMutations } from "@/features/dashboard/hooks/useDashboardMutations";
+import { HijriWidget } from "@/features/hijri/components/HijriWidget";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { ChevronDown } from "lucide-react";
 
@@ -218,6 +219,8 @@ function Dashboard() {
             <MacroGapInsightCard totals={totals} calTarget={calTarget} />
 
             <LocalFoodHintCard hour={new Date().getHours()} />
+
+            <HijriWidget variant="compact" />
 
             <HydrationSuggestCard
               waterMl={waterMl}
