@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "vite dev",
     "build": "NODE_OPTIONS=--max-old-space-size=4096 vite build && bun run build:sw",
-    "build:sw": "bunx esbuild src/sw.ts --bundle --format=iife --minify --target=es2020 --define:__SW_CACHE_VERSION__=\\\"v2-sprint5a\\\" --outfile=dist/client/sw.js",
+    "build:sw": "bunx esbuild src/sw.ts --bundle --format=iife --minify --target=es2020 --outfile=dist/client/sw.js",
     "build:dev": "NODE_OPTIONS=--max-old-space-size=4096 vite build --mode development",
     "deploy": "bun run build && wrangler deploy",
     "preview": "vite preview",

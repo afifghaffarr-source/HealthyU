@@ -1,8 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { callAiJsonWithSchema } from "@/features/ai/lib/aiGateway.server";
-import { getTemplateMealPlan } from "@/features/mealplan/lib/mealplanTemplate.functions";
+import { callAiWithGuards } from "@/features/ai/lib/aiGateway.server";
 
 /**
  * Lightweight content personalization: score published articles & recipes
@@ -126,74 +125,9 @@ type PlanResult = {
   summary: string;
   remaining_budget_kcal: number;
   meals: PlanMeal[];
-  /** Source of the recommendation: "ai" = fresh AI generation, "template" = fell back to curated template (AI failed). */
-  mode: "ai" | "template";
 };
 
-export const PlanMealSchema = z.object({
-  meal_type: z.enum(["breakfast", "lunch", "dinner", "snack"]),
-  name: z.string().min(1).max(200),
-  calories: z.number().int().nonnegative().max(5000),
-  protein_g: z.number().nonnegative().optional(),
-  carbs_g: z.number().nonnegative().optional(),
-  fat_g: z.number().nonnegative().optional(),
-  planned_qty: z.number().min(0.1).max(20).default(1),
-  reason: z.string().max(200).default(""),
-});
-
-export const PlanResultSchema = z.object({
-  summary: z.string().min(1).max(500),
-  meals: z.array(PlanMealSchema).min(1).max(8),
-});
-
 const GenInput = z.object({ notes: z.string().max(500).optional() });
-
-/**
- * Adapt a `meal_plan_templates` row into the canonical `PlanMeal[]` shape.
- * Templates have different structure (meals[] with name+calories), so we
- * normalize. Filters out invalid entries silently. Exported for unit testing.
- *
- * Supabase types declare `meals: Json` (generic) — we cast to unknown[] and
- * validate shape manually because template authors can introduce any field.
- */
-export function adaptTemplateMeals(tplMeals: unknown): PlanMeal[] {
-  if (!Array.isArray(tplMeals)) return [];
-  const rawMeals: unknown[] = tplMeals;
-  return rawMeals
-    .filter((m): m is { meal_type: PlanMeal["meal_type"]; name: string; calories: number } => {
-      if (!m || typeof m !== "object") return false;
-      const r = m as Record<string, unknown>;
-      return (
-        typeof r.meal_type === "string" &&
-        (r.meal_type === "breakfast" ||
-          r.meal_type === "lunch" ||
-          r.meal_type === "dinner" ||
-          r.meal_type === "snack") &&
-        typeof r.name === "string" &&
-        r.name.length > 0 &&
-        typeof r.calories === "number" &&
-        r.calories >= 0
-      );
-    })
-    .map((m) => ({
-      meal_type: m.meal_type,
-      name: m.name,
-      calories: m.calories,
-      planned_qty: 1,
-      reason: "Rekomendasi template (AI tidak tersedia)",
-    }));
-}
-
-/**
- * Pure helper: returns true if the AI returned a usable plan (>=1 meal).
- * Exported so the success vs fallback branch logic can be unit tested without
- * going through the createServerFn transport layer.
- */
-export function isUsablePlan(
-  parsed: { meals: unknown[] } | null | undefined,
-): parsed is { meals: PlanMeal[] } {
-  return !!parsed && Array.isArray(parsed.meals) && parsed.meals.length > 0;
-}
 
 export const generateMealPlan = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
@@ -224,9 +158,9 @@ export const generateMealPlan = createServerFn({ method: "POST" })
 
     const system =
       "Anda ahli gizi HealthyU. Susun rencana 3-4 menu Indonesia untuk sisa hari ini. " +
-      "Pertimbangkan preferensi diet, kondisi kesehatan (diabetes/hipertensi/dll), dan kategori BMI. " +
-      "Total kalori semua meals harus ≤ budget. Berikan estimasi makro (protein/carbs/fat) realistis. " +
-      "Output HANYA JSON valid sesuai schema.";
+      "Output HANYA JSON valid: " +
+      '{"summary":"...","meals":[{"meal_type":"breakfast|lunch|dinner|snack","name":"...","calories":<int>,"protein_g":<num>,"carbs_g":<num>,"fat_g":<num>,"planned_qty":1,"reason":"singkat"}]}. ' +
+      "Total kalori meals harus ≤ budget. Pertimbangkan preferensi diet & kondisi kesehatan.";
     const user =
       `Sisa budget kalori: ${remaining} kcal\n` +
       `Preferensi diet: ${profile?.dietary_preference ?? "tidak ada"}\n` +
@@ -234,53 +168,28 @@ export const generateMealPlan = createServerFn({ method: "POST" })
       `Kategori BMI: ${profile?.bmi_category ?? "-"}\n` +
       (data.notes ? `Catatan user: ${data.notes}\n` : "");
 
-    // Sprint 5a: route through callAiJsonWithSchema (Zod-validated) instead
-    // of prompt-hack regex. The previous implementation threw whenever the
-    // model wrapped JSON in prose or returned invalid format. Zod parse now
-    // either validates successfully OR returns the fallback. Caller no longer
-    // has to handle raw parse errors.
-    const parsed = await callAiJsonWithSchema({
+    const text = await callAiWithGuards({
       userId,
       feature: "mealplan.generate",
-      maxTokens: 1200,
-      schema: PlanResultSchema,
-      // Empty fallback signals "no usable AI output" → trigger template fallback below
-      fallback: { summary: "", meals: [] },
+      maxTokens: 900,
       messages: [
         { role: "system", content: system },
         { role: "user", content: user },
       ],
     });
-
-    // ── AI succeeded → return enriched result ─────────────────────────────
-    if (isUsablePlan(parsed)) {
-      return {
-        summary: parsed.summary,
-        remaining_budget_kcal: remaining,
-        meals: parsed.meals,
-        mode: "ai",
-      };
+    const match = text.match(/\{[\s\S]*\}/);
+    if (!match) throw new Error("AI response tidak valid");
+    let parsed: { summary?: string; meals?: PlanMeal[] };
+    try {
+      parsed = JSON.parse(match[0]);
+    } catch {
+      throw new Error("AI response gagal diparse");
     }
-
-    // ── AI returned empty/invalid → fall back to template ─────────────────
-    console.warn(
-      `[recommendations.generateMealPlan] AI returned empty/invalid, falling back to template for userId=${userId}`,
-    );
-    const tpl = await getTemplateMealPlan();
-    if (!tpl.template) {
-      throw new Error(
-        "Layanan AI sedang sibuk dan template tidak tersedia. Coba lagi sebentar lagi.",
-      );
-    }
-    const adaptedMeals = adaptTemplateMeals(tpl.template.meals);
-    if (adaptedMeals.length === 0) {
-      throw new Error("Template kosong. Coba lagi sebentar lagi.");
-    }
+    const meals = Array.isArray(parsed.meals) ? parsed.meals : [];
     return {
-      summary: `Rekomendasi template (${tpl.template.name}) — AI tidak tersedia.`,
+      summary: parsed.summary ?? "Rekomendasi siap.",
       remaining_budget_kcal: remaining,
-      meals: adaptedMeals,
-      mode: "template",
+      meals,
     };
   });
 
