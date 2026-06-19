@@ -9,27 +9,35 @@ AI nutrition coach untuk Indonesia: diet, puasa, jadwal sholat, dan HealthyU AI 
 
 ## Landing pages
 
-Tiga versi landing page tersedia, masing-masing dengan karakter visual sendiri
-dan menu pattern yang berbeda (mobile tidak menumpuk, desktop tidak kepotong):
+HealthyU punya **satu landing page primary** di `/` dengan mobile + desktop dua-duanya
+ready (responsive). Mobile dapat bottom-sheet nav (4 item + FAB CTA, anti-numpuk di
+viewport kecil), desktop dapat top sticky nav dengan menu lengkap. Section, hero,
+CTA sama di kedua viewport — layout yang berbeda per breakpoint.
 
-| Route    | Karakter                                                                                         | Menu mobile                         | Menu desktop                   |
-| -------- | ------------------------------------------------------------------------------------------------ | ----------------------------------- | ------------------------------ |
-| `/`      | Legacy marketing — glassmorphism, hero + bento + pricing                                         | Top sticky bar                      | Top sticky bar                 |
-| `/flow`  | **Mobile-first.** Soft structuralism, white + emerald, generous whitespace, single column scroll | Bottom sheet nav (4 item + FAB CTA) | Top sticky bar                 |
-| `/prism` | **Desktop-first.** Ethereal glass di warm cream + amber, left sidebar nav, asymmetric bento grid | Top sticky bar + drawer             | Left sidebar (fixed 256-288px) |
+| Route    | Tipe                     | Keterangan                                                                                                                                                                                            |
+| -------- | ------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `/`      | **Primary** (responsive) | Single canonical landing. Mobile: bottom-sheet nav + top bar drawer. Desktop: top sticky nav dengan Fitur/Cara kerja/Testimoni/FAQ + Masuk button. CTA ke `/auth` dari hero + sticky + final section. |
+| `/prism` | Design experiment        | Desktop-first alternative layout (sidebar nav + asymmetric bento). Dipromosikan dari primary nav ke footer link. Keep untuk reference & A/B testing.                                                  |
 
-Semua halaman: SEO-friendly (canonical, OG tags, JSON-LD ready), accessibility
-(WCAG AA contrast, focus rings, ARIA labels), responsive, dan punya CTA ke `/auth`.
-
-### Visual rules yang dijaga di kedua design
+### Visual rules yang dijaga
 
 - Zero em-dash (`—`) di semua copy visible
-- 1 CTA per intent (no "Mulai gratis" + "Daftar" + "Coba sekarang" di tempat berbeda)
-- Single accent color per halaman (emerald di Flow, amber di Prism)
-- Statistik pake animasi count-up trigger via `IntersectionObserver` (cuma sekali per mount)
+- 1 CTA intent per section (no "Mulai gratis" + "Daftar" + "Coba sekarang" di tempat berbeda)
+- Single accent color (`primary` = emerald) di seluruh landing
+- Mobile bottom-sheet nav: 4 item (Scan, Resep, BMI, Coach) + center FAB "Mulai"
+  untuk cegah nav menumpuk di mobile bottom strip
+- Desktop nav: max 4 link + 1 CTA button dalam 80px height (no agency-portfolio navbars)
+- Hero responsive: typography scale 40px mobile → 7xl desktop
+- Stats counter pake animasi `IntersectionObserver` trigger (1x per mount)
 - Bentuk konsisten: `rounded-2xl` (card) / `rounded-full` (CTA pill) / `rounded-3xl` (panel besar)
 
-Lihat design rationale di header comment `src/routes/flow.tsx` dan `src/routes/prism.tsx`.
+Component mobile-specific di `src/features/landing/components/MobileNav.tsx`:
+
+- `<header>` top bar dengan logo + hamburger (lg:hidden)
+- `<aside>` drawer overlay dengan section links + Mulai CTA
+- `<nav>` bottom sheet dengan 4 item + FAB CTA (lg:hidden, fixed bottom-4)
+
+Lihat design rationale di header comment `MobileNav.tsx`.
 
 ## Fitur utama
 

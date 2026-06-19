@@ -16,7 +16,6 @@ import { Route as PrismRouteImport } from './routes/prism'
 import { Route as OlahragaRouteImport } from './routes/olahraga'
 import { Route as KaloriRouteImport } from './routes/kalori'
 import { Route as KalkulatorRouteImport } from './routes/kalkulator'
-import { Route as FlowRouteImport } from './routes/flow'
 import { Route as FaqRouteImport } from './routes/faq'
 import { Route as DietRouteImport } from './routes/diet'
 import { Route as CariRouteImport } from './routes/cari'
@@ -224,11 +223,6 @@ const KaloriRoute = KaloriRouteImport.update({
 const KalkulatorRoute = KalkulatorRouteImport.update({
   id: '/kalkulator',
   path: '/kalkulator',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const FlowRoute = FlowRouteImport.update({
-  id: '/flow',
-  path: '/flow',
   getParentRoute: () => rootRouteImport,
 } as any)
 const FaqRoute = FaqRouteImport.update({
@@ -1184,7 +1178,6 @@ export interface FileRoutesByFullPath {
   '/cari': typeof CariRoute
   '/diet': typeof DietRouteWithChildren
   '/faq': typeof FaqRouteWithChildren
-  '/flow': typeof FlowRoute
   '/kalkulator': typeof KalkulatorRouteWithChildren
   '/kalori': typeof KaloriRouteWithChildren
   '/olahraga': typeof OlahragaRouteWithChildren
@@ -1363,7 +1356,6 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/cari': typeof CariRoute
-  '/flow': typeof FlowRoute
   '/prism': typeof PrismRoute
   '/privacy': typeof PrivacyRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -1541,7 +1533,6 @@ export interface FileRoutesById {
   '/cari': typeof CariRoute
   '/diet': typeof DietRouteWithChildren
   '/faq': typeof FaqRouteWithChildren
-  '/flow': typeof FlowRoute
   '/kalkulator': typeof KalkulatorRouteWithChildren
   '/kalori': typeof KaloriRouteWithChildren
   '/olahraga': typeof OlahragaRouteWithChildren
@@ -1725,7 +1716,6 @@ export interface FileRouteTypes {
     | '/cari'
     | '/diet'
     | '/faq'
-    | '/flow'
     | '/kalkulator'
     | '/kalori'
     | '/olahraga'
@@ -1904,7 +1894,6 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/cari'
-    | '/flow'
     | '/prism'
     | '/privacy'
     | '/sitemap.xml'
@@ -2081,7 +2070,6 @@ export interface FileRouteTypes {
     | '/cari'
     | '/diet'
     | '/faq'
-    | '/flow'
     | '/kalkulator'
     | '/kalori'
     | '/olahraga'
@@ -2265,7 +2253,6 @@ export interface RootRouteChildren {
   CariRoute: typeof CariRoute
   DietRoute: typeof DietRouteWithChildren
   FaqRoute: typeof FaqRouteWithChildren
-  FlowRoute: typeof FlowRoute
   KalkulatorRoute: typeof KalkulatorRouteWithChildren
   KaloriRoute: typeof KaloriRouteWithChildren
   OlahragaRoute: typeof OlahragaRouteWithChildren
@@ -2338,13 +2325,6 @@ declare module '@tanstack/react-router' {
       path: '/kalkulator'
       fullPath: '/kalkulator'
       preLoaderRoute: typeof KalkulatorRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/flow': {
-      id: '/flow'
-      path: '/flow'
-      fullPath: '/flow'
-      preLoaderRoute: typeof FlowRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/faq': {
@@ -4174,7 +4154,6 @@ const rootRouteChildren: RootRouteChildren = {
   CariRoute: CariRoute,
   DietRoute: DietRouteWithChildren,
   FaqRoute: FaqRouteWithChildren,
-  FlowRoute: FlowRoute,
   KalkulatorRoute: KalkulatorRouteWithChildren,
   KaloriRoute: KaloriRouteWithChildren,
   OlahragaRoute: OlahragaRouteWithChildren,

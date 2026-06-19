@@ -16,6 +16,7 @@ import {
   LandingFooter,
   StickyCta,
 } from "@/features/landing/components/LandingChrome";
+import { MobileNav } from "@/features/landing/components/MobileNav";
 import { LandingHero } from "@/features/landing/components/LandingHero";
 
 // PERF (Fase 5 sub-PR 2): lazy-load below-fold landing sections so the
@@ -165,11 +166,15 @@ function Index() {
   };
 
   return (
-    <main role="main" className="min-h-dvh bg-background text-foreground relative overflow-x-clip">
+    <main
+      role="main"
+      className="min-h-dvh bg-background text-foreground relative overflow-x-clip pb-24 md:pb-0"
+    >
       {confetti && <ConfettiBurst />}
       <LandingBackdrop />
 
       <LandingNav hasSession={hasSession} ctaPrimary={ctaPrimary} />
+      <MobileNav />
 
       <LandingHero
         ctaPrimary={ctaPrimary}

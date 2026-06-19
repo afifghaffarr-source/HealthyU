@@ -44,7 +44,7 @@ export function LandingNav({
   ctaPrimary: string;
 }) {
   return (
-    <nav className="sticky top-0 z-30 glass border-b border-white/10">
+    <nav className="sticky top-0 z-30 glass border-b border-white/10 hidden md:block">
       <div className="max-w-6xl mx-auto px-5 md:px-8 h-14 flex items-center justify-between">
         <Link
           to="/"
@@ -70,15 +70,6 @@ export function LandingNav({
           <a href="#faq" className="hover:text-foreground">
             FAQ
           </a>
-          <span className="inline-flex items-center gap-1 text-[10px] font-mono uppercase tracking-[0.18em] border border-white/15 rounded-full px-2 py-0.5 bg-white/5">
-            Coba desain lain
-          </span>
-          <Link to="/flow" className="text-foreground hover:text-primary transition-colors">
-            Flow
-          </Link>
-          <Link to="/prism" className="text-foreground hover:text-primary transition-colors">
-            Prism
-          </Link>
         </div>
         <Link
           to={ctaPrimary}
@@ -216,6 +207,13 @@ export function LandingFooter() {
           <Link to="/auth">Masuk</Link>
           <Link to="/privacy">Privasi</Link>
           <a href="#faq">FAQ</a>
+          <Link
+            to="/prism"
+            className="text-muted-foreground/70 hover:text-foreground transition-colors"
+            title="Design experiment: desktop-first layout"
+          >
+            Prism
+          </Link>
         </div>
       </div>
     </footer>
