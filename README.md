@@ -172,6 +172,25 @@ VexoAPI free tier tidak expose SSE, jadi kita buffer full response lalu emit seb
 single SSE-shaped chunk (caller tetap bisa parse dengan `parseSseChunk`).
 Chat stream melakukan sendiri: auth → rate limit → budget → safety guard → cache → AI call.
 
+### Vercel AI SDK layer (Sprint 1c, additive)
+
+`src/features/ai/lib/` punya **3 layer** — pilih sesuai use case:
+
+| Layer | File | Function | Use case |
+|---|---|---|---|
+| Legacy (prompt-hack JSON) | `aiGateway.server.ts` | `callAiJsonWithSchema` | Existing 19 call sites (unchanged) |
+| SDK structured | `aiStructured.functions.ts` | `callAiStructured<S>` | New code yang butuh Zod-native output |
+| SDK streaming | `aiStreamSdk.server.ts` | `streamChatWithSdk` | New code yang butuh real chunk-by-chunk SSE |
+
+**Provider wrapper**: `vexoProvider.ts` — `createOpenAICompatible` over VexoAPI.
+Gampang swap ke OpenAI/Anthropic nanti: ganti `baseURL` + `apiKey` doang.
+
+**Migrasi call sites** dilakukan gradual (per-feature) karena 19 call sites.
+Mulai dari fitur yang paling benefit dari schema enforcement (scan, recipes).
+
+Bundle impact: server-only (`*.server.ts`) — tree-shaken dari client bundle.
++50KB server-side (gzip), verified via build output.
+
 ## Scripts
 
 | Command                  | Fungsi                            |
