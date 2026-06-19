@@ -39,6 +39,47 @@ Component mobile-specific di `src/features/landing/components/MobileNav.tsx`:
 
 Lihat design rationale di header comment `MobileNav.tsx`.
 
+## PWA (Progressive Web App)
+
+HealthyU installable sebagai aplikasi native di Android/iOS lewat home screen.
+Service worker cache app shell + asset pihak ketiga untuk reliability di 3G/Ramadhan.
+
+| Aspek            | Detail                                                                                                      |
+| ---------------- | ----------------------------------------------------------------------------------------------------------- |
+| Plugin           | `vite-plugin-pwa@1.3.0` (manifest emission + virtual:pwa-register/react)                                    |
+| Service Worker   | `src/sw.ts` (custom Workbox runtime), di-bundle via esbuild postbuild → `dist/client/sw.js` (24.9 kB)       |
+| Manifest         | `/manifest.webmanifest` (645 B, generated dari VitePWA config di `vite.config.ts`)                          |
+| Install prompt   | `src/components/install-prompt.tsx` — UX pakai `beforeinstallprompt` event                                  |
+| Update prompt    | `src/components/sw-update-toast.tsx` — `useRegisterSW` dari `virtual:pwa-register/react`                    |
+| Offline strategy | NetworkOnly untuk `/api/*` + `/auth/*` + mutations; CacheFirst untuk Google Fonts + Supabase Storage images |
+| Precache         | Empty (workaround workbox-build ESM bug di bun 1.2.21). Browser HTTP cache handles app shell                |
+
+### Kenapa `build:sw` script pisah?
+
+`vite-plugin-pwa@1.3.0` punya 2 blocker di stack HealthyU (Vite 7 + TanStack Start + bun 1.2.21):
+
+1. Internal `vite.build()` untuk SW silently no-op
+2. `workbox-build` ESM/CJS interop bug dengan `brace-expansion@2.x`
+
+**Solusi**: Tetap pakai VitePWA untuk manifest + virtual modules, tapi build `sw.js` terpisah via:
+
+```json
+"build": "... vite build && bun run build:sw",
+"build:sw": "bunx esbuild src/sw.ts --bundle --format=iife --minify --target=es2020 --outfile=dist/client/sw.js"
+```
+
+Untuk fix permanen (pakai precache), migrate ke Node + npm saat workbox-build fix bug, atau upgrade ke workbox-build@8.
+
+### Verifikasi production
+
+```bash
+curl -sI https://healthyu.web.id/manifest.webmanifest  # → 200, application/manifest+json
+curl -sI https://healthyu.web.id/sw.js                  # → 200, text/javascript
+# Lighthouse PWA category di CI workflow (.github/workflows/lighthouse.yml)
+```
+
+Lihat `docs/HEALTHYU_MASTER_REKOMENDASI_REPO_2026-06-19.md` (Sprint 1a) untuk research lengkap.
+
 ## Fitur utama
 
 - **Dashboard harian** — kalori budget, macro ring, hydration suggest, weekly goal, streak freeze.
