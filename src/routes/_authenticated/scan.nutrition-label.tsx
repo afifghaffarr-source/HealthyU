@@ -53,8 +53,15 @@ type Phase =
   | { kind: "idle" }
   | { kind: "preview"; src: string; base64: string }
   | { kind: "scanning"; src: string; progress: number; status: string }
-  | { kind: "parsed"; src: string; parsed: ParseResult }
-  | { kind: "ai-scanning"; src: string };
+  | {
+      kind: "parsed";
+      src: string;
+      parsed: ParseResult;
+      /** OCR text + confidence — needed for AI fallback (text-only path). */
+      ocrText: string;
+      ocrConfidence: number;
+    }
+  | { kind: "ai-scanning"; src: string; ocrText: string; ocrConfidence: number };
 
 function Page() {
   const aiFn = useServerFn(ocrNutritionLabel);
@@ -63,7 +70,9 @@ function Page() {
   const [ocrSupported] = useState(isClientOcrSupported);
 
   const aiMut = useMutation({
-    mutationFn: (dataUrl: string) => aiFn({ data: { imageBase64: dataUrl.split(",")[1] ?? "" } }),
+    // Sprint 2b fix: send OCR text (not image) — VexoAPI has no vision models.
+    mutationFn: (p: { ocrText: string; ocrConfidence: number }) =>
+      aiFn({ data: { ocrText: p.ocrText, ocrConfidence: p.ocrConfidence } }),
     onSuccess: (data) => {
       // Show AI result as parsed-style card
       const nutrition: NutritionLabelData = {
@@ -80,12 +89,18 @@ function Page() {
         salt_g: null,
         cholesterol_mg: null,
       };
-      setPhase({
-        kind: "parsed",
-        src: phase.kind === "ai-scanning" ? phase.src : "",
-        parsed: { nutrition, confidence: 90, matchedFields: 6, totalFields: 12 },
-      });
-      toast.success("Selesai dibaca AI multimodal");
+      setPhase((prev) =>
+        prev.kind === "ai-scanning"
+          ? {
+              kind: "parsed",
+              src: prev.src,
+              parsed: { nutrition, confidence: 90, matchedFields: 6, totalFields: 12 },
+              ocrText: prev.ocrText,
+              ocrConfidence: prev.ocrConfidence,
+            }
+          : prev,
+      );
+      toast.success("Selesai dibaca AI");
     },
     onError: (e: Error) => toast.error(e.message || "AI OCR gagal"),
   });
@@ -136,7 +151,13 @@ function Page() {
         );
       });
       const parsed = parseNutritionLabel(result.text);
-      setPhase({ kind: "parsed", src: phase.src, parsed });
+      setPhase({
+        kind: "parsed",
+        src: phase.src,
+        parsed,
+        ocrText: result.text,
+        ocrConfidence: result.confidence,
+      });
       if (parsed.confidence < CONFIDENCE_THRESHOLD) {
         toast.success(
           `Teks terbaca (confidence ${result.confidence.toFixed(0)}%). Pertimbangkan AI fallback untuk hasil lebih akurat.`,
@@ -152,9 +173,9 @@ function Page() {
 
   function startAiScan() {
     if (phase.kind !== "parsed") return;
-    const src = phase.src;
-    setPhase({ kind: "ai-scanning", src });
-    aiMut.mutate(src);
+    const { src, ocrText, ocrConfidence } = phase;
+    setPhase({ kind: "ai-scanning", src, ocrText, ocrConfidence });
+    aiMut.mutate({ ocrText, ocrConfidence });
   }
 
   function reset() {
@@ -235,13 +256,11 @@ function Page() {
                 size="lg"
                 variant="outline"
                 className="w-full"
-                onClick={() => {
-                  setPhase({ kind: "ai-scanning", src: phase.src });
-                  aiMut.mutate(phase.src);
-                }}
+                disabled
+                title="Browser tidak mendukung OCR. Update browser atau pakai device lain untuk scan."
               >
                 <Sparkles className="size-4 mr-2" />
-                Scan dengan AI (Multimodal)
+                AI perlu OCR (browser tidak support)
               </Button>
             )}
             <Button size="sm" variant="ghost" className="w-full" onClick={reset}>
@@ -278,7 +297,7 @@ function Page() {
                 disabled={aiMut.isPending}
               >
                 <Sparkles className="size-4 mr-2" />
-                Coba AI (Multimodal) untuk Akurasi
+                Coba AI (Parser Teks) untuk Akurasi
               </Button>
             )}
             <Button size="sm" variant="ghost" className="w-full" onClick={reset}>
@@ -293,10 +312,10 @@ function Page() {
           <Card className="p-4 space-y-2">
             <div className="flex items-center gap-2">
               <Sparkles className="size-4 animate-pulse text-violet-600" />
-              <p className="text-sm font-medium">AI sedang membaca label…</p>
+              <p className="text-sm font-medium">AI sedang parsing teks OCR…</p>
             </div>
             <p className="text-xs text-muted-foreground">
-              Mengirim gambar ke server (VexoAPI multimodal). Butuh ~5-10 detik.
+              Mengirim teks hasil OCR (gambar tetap di perangkat). Butuh ~3-5 detik.
             </p>
           </Card>
         )}

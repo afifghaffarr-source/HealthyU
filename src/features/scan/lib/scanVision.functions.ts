@@ -133,15 +133,42 @@ export const recipeFromFridge = createServerFn({ method: "POST" })
   });
 
 // ===== from scanBatch12b (ocrNutritionLabel) =====
+//
+// Sprint 2b fix (2026-06-19): VexoAPI has zero vision-capable models (verified
+// via /api/v1/models catalog — only text models like gpt-oss-120b, llama, etc.).
+// Image inputs to text-only models throw 400 "doesn't support images".
+//
+// Fix: client runs Tesseract OCR first (already happens for offline support),
+// then sends the OCR text + confidence to the server. Server feeds the text
+// to AI as a parsing task. AI never needs to "see" the image — it just
+// structures the already-extracted text.
+//
+// Trade-offs:
+//   - Privacy: image never leaves device (already the case; Tesseract is client-side)
+//   - Cost: ~500 tokens of text vs 1000+ for image tokens
+//   - Latency: faster (no image upload)
+//   - Reliability: works with 100% of available models
 
 const NutritionLabelSchema = z.record(z.union([z.string(), z.number()]));
 
+const OcrNutritionInput = z.object({
+  /** Raw OCR text from Tesseract.js (or any source). */
+  ocrText: z.string().min(10).max(50_000),
+  /** Tesseract confidence 0-100. Optional — affects prompt hints. */
+  ocrConfidence: z.number().min(0).max(100).optional(),
+});
+
 export const ocrNutritionLabel = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d) => z.object({ imageBase64: z.string().min(50).max(8_000_000) }).parse(d))
+  .inputValidator((d) => OcrNutritionInput.parse(d))
   .handler(async ({ data, context }) => {
     let nutrition: Record<string, string | number> = {};
     try {
+      const confidenceHint =
+        data.ocrConfidence !== undefined && data.ocrConfidence < 50
+          ? `\n\nCatatan: confidence OCR rendah (${data.ocrConfidence.toFixed(0)}%). Teks mungkin mengandung error karakter. Tolong lebih toleran terhadap kemungkinan salah baca (mis. 'O' vs '0', 'l' vs '1').`
+          : "";
+
       nutrition = await callAiJsonWithSchema({
         userId: context.userId,
         feature: "ocr.nutrition_label",
@@ -151,16 +178,12 @@ export const ocrNutritionLabel = createServerFn({ method: "POST" })
           {
             role: "system",
             content:
-              "OCR label nutrisi. Balas JSON: {servingSize, calories, protein_g, carbs_g, fat_g, sugar_g, sodium_mg}. Tanpa markdown.",
+              `Kamu adalah parser label nutrisi. Teks di bawah ini hasil OCR (bisa saja ada error karakter). Ekstrak nilai nutrisi dan balas HANYA dengan JSON valid (tanpa markdown): {"servingSize": string|null, "calories": number|null, "protein_g": number|null, "carbs_g": number|null, "fat_g": number|null, "sugar_g": number|null, "sodium_mg": number|null}. Jika field tidak terbaca, isi null.` +
+              confidenceHint,
           },
           {
             role: "user",
-            content: [
-              {
-                type: "image_url",
-                image_url: { url: `data:image/jpeg;base64,${data.imageBase64}` },
-              },
-            ],
+            content: data.ocrText,
           },
         ],
       });
