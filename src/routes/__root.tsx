@@ -14,6 +14,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
 import { ThemeProvider } from "@/components/theme-provider";
 import { InstallPrompt } from "@/components/install-prompt";
+import { SWUpdateToast } from "@/components/sw-update-toast";
 import { LiveAnnouncerProvider } from "@/components/live-announcer";
 import { I18nProvider } from "@/lib/i18n";
 import { GlobalErrorBoundary } from "@/components/healthyu/global-error-boundary";
@@ -150,6 +151,7 @@ function RootComponent() {
               <Outlet />
             </GlobalErrorBoundary>
             <InstallPrompt />
+            <SWUpdateToast />
             <ScrollToTopButton />
             <Toaster position="top-center" />
           </LiveAnnouncerProvider>
@@ -180,7 +182,8 @@ function AuthListener() {
 }
 
 function ManifestLinkManager() {
-  // Cloudflare Pages serves /manifest.json as a static asset, no token needed.
+  // PWA manifest served as static asset. vite-plugin-pwa emits
+  // /manifest.webmanifest during build; we fall back to /manifest.json.
   // (Previously we read ?__lovable_token to authenticate preview deploys on
   // Lovable's static CDN — that auth mechanism is gone with the platform.)
   useEffect(() => {
@@ -188,7 +191,7 @@ function ManifestLinkManager() {
       (document.querySelector('link[rel="manifest"]') as HTMLLinkElement | null) ??
       Object.assign(document.createElement("link"), { rel: "manifest" });
     if (!link.isConnected) document.head.appendChild(link);
-    link.href = "/manifest.json";
+    link.href = "/manifest.webmanifest";
   }, []);
 
   return null;
