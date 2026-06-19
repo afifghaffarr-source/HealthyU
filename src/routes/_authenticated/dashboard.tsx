@@ -1,5 +1,5 @@
 import { createFileRoute, redirect } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { queryOptions, useQuery, useSuspenseQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { getProfile } from "@/features/profile/lib/profile.functions";
@@ -37,6 +37,7 @@ import { WeeklyReviewCard } from "@/features/dashboard/components/WeeklyReviewCa
 import { GamificationCard } from "@/features/dashboard/components/DashboardCtas";
 import { ActionRow } from "@/features/dashboard/components/ActionRow";
 import { usePullToRefresh } from "@/hooks/use-pull-to-refresh";
+import { markFirstAction } from "@/lib/first-action";
 import { useFastClock } from "@/features/dashboard/hooks/useFastClock";
 import { useDashboardMutations } from "@/features/dashboard/hooks/useDashboardMutations";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
@@ -78,6 +79,11 @@ export const Route = createFileRoute("/_authenticated/dashboard")({
 
 function Dashboard() {
   const qc = useQueryClient();
+  // User landed on dashboard = first meaningful interaction.
+  // Signals PWA install prompt that user has seen real value.
+  useEffect(() => {
+    markFirstAction();
+  }, []);
   const { pulling, refreshing } = usePullToRefresh(async () => {
     await qc.invalidateQueries();
   });

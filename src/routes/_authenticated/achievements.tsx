@@ -25,7 +25,7 @@ function AchievementsPage() {
   const handleShare = async () => {
     if (!shareRef.current) return;
     try {
-      const { default: html2canvas } = await import("html2canvas-pro");
+      const { default: html2canvas } = await import("html2canvas");
       const canvas = await html2canvas(shareRef.current, { backgroundColor: null, scale: 2 });
       const blob: Blob | null = await new Promise((res) => canvas.toBlob(res, "image/png"));
       if (!blob) throw new Error("Gagal membuat gambar");

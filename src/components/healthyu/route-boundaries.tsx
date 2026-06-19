@@ -2,7 +2,22 @@ import { Link, useRouter } from "@tanstack/react-router";
 import { useEffect } from "react";
 import { reportLovableError as reportError } from "@/lib/errorReporting";
 
+/**
+ * 404 fallback. Inject noindex meta via DOM — TanStack Router doesn't
+ * expose head() on notFoundComponent, so we manage it manually.
+ */
 export function RouteNotFound() {
+  useEffect(() => {
+    // Mark this view as noindex for search engines + Open Graph
+    const robots = document.createElement("meta");
+    robots.name = "robots";
+    robots.content = "noindex,nofollow";
+    document.head.appendChild(robots);
+    return () => {
+      robots.remove();
+    };
+  }, []);
+
   return (
     <div className="flex min-h-dvh items-center justify-center bg-background px-4">
       <div className="max-w-md text-center">

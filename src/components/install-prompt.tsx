@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Download, X } from "lucide-react";
+import { hasCompletedFirstAction } from "@/lib/first-action";
 
 type BIPEvent = Event & {
   prompt: () => Promise<void>;
@@ -7,31 +8,79 @@ type BIPEvent = Event & {
 };
 
 const DISMISS_KEY = "healthyu-install-dismissed";
+const MIN_DELAY_MS = 30_000; // 30s — kasih user lihat dulu apa isinya
 
+/**
+ * PWA install prompt dengan smart timing:
+ *
+ *   1. Tunda minimal 30 detik setelah page load (jangan ganggu user baru)
+ *   2. Hanya muncul setelah user melakukan first meaningful action
+ *      (scan / lihat resep / lihat artikel) — user sudah lihat value
+ *   3. Tidak muncul kalau user sudah install (display-mode: standalone)
+ *   4. Tidak muncul kalau user sudah dismiss (localStorage flag)
+ *
+ * Mengapa tunda + first-action?
+ *   - New user belum paham value app-nya → install prompt premature = bounce
+ *   - User yang sudah interact = invested → install rate naik ~20-40%
+ *   - Standar PWA install prompt best practice (Chrome team recommendation)
+ */
 export function InstallPrompt() {
   const [evt, setEvt] = useState<BIPEvent | null>(null);
   const [show, setShow] = useState(false);
+  const [ready, setReady] = useState(false);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
+
+    // Skip if already installed (PWA in standalone mode)
     const isStandalone =
       window.matchMedia("(display-mode: standalone)").matches ||
       // @ts-expect-error iOS Safari
       window.navigator.standalone === true;
     if (isStandalone) return;
+
+    // Skip if user already dismissed
     if (localStorage.getItem(DISMISS_KEY)) return;
 
+    // Capture beforeinstallprompt event
     const handler = (e: Event) => {
       e.preventDefault();
       setEvt(e as BIPEvent);
-      setShow(true);
     };
     window.addEventListener("beforeinstallprompt", handler);
-    return () => window.removeEventListener("beforeinstallprompt", handler);
+
+    // Wait for 30s before allowing prompt to appear
+    const minDelayTimer = window.setTimeout(() => setReady(true), MIN_DELAY_MS);
+
+    return () => {
+      window.removeEventListener("beforeinstallprompt", handler);
+      window.clearTimeout(minDelayTimer);
+    };
   }, []);
 
+  // Show prompt when both conditions met
+  useEffect(() => {
+    if (!ready || !evt) return;
+    if (hasCompletedFirstAction()) {
+      setShow(true);
+    } else {
+      // Poll every 5s sampai user complete first action
+      const interval = window.setInterval(() => {
+        if (hasCompletedFirstAction()) {
+          setShow(true);
+          window.clearInterval(interval);
+        }
+      }, 5_000);
+      return () => window.clearInterval(interval);
+    }
+  }, [ready, evt]);
+
   const dismiss = () => {
-    localStorage.setItem(DISMISS_KEY, "1");
+    try {
+      localStorage.setItem(DISMISS_KEY, "1");
+    } catch {
+      // ignore
+    }
     setShow(false);
   };
 
