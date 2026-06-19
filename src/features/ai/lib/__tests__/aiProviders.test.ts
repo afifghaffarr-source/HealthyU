@@ -94,10 +94,8 @@ describe("aiProviders", () => {
   describe("modelSupportsVision", () => {
     it("returns true for OpenRouter free vision models", async () => {
       const { modelSupportsVision } = await import("@/features/ai/lib/aiProviders");
-      expect(modelSupportsVision("openrouter", "google/gemini-2.0-flash-exp:free")).toBe(true);
-      expect(
-        modelSupportsVision("openrouter", "meta-llama/llama-3.2-11b-vision-instruct:free"),
-      ).toBe(true);
+      expect(modelSupportsVision("openrouter", "nvidia/nemotron-nano-12b-v2-vl:free")).toBe(true);
+      expect(modelSupportsVision("openrouter", "google/gemma-4-31b-it:free")).toBe(true);
     });
 
     it("returns true for OpenRouter auto-route", async () => {
@@ -127,7 +125,9 @@ describe("aiProviders", () => {
     it("returns default free vision model when OpenRouter configured", async () => {
       setOpenRouterKey();
       const { pickVisionModel } = await import("@/features/ai/lib/aiProviders");
-      expect(pickVisionModel()).toBe("openrouter/google/gemini-2.0-flash-exp:free");
+      // Default changed 2026-06-19: gemini-2.0-flash-exp:free was deprecated;
+      // now uses nvidia/nemotron-nano-12b-v2-vl:free (verified available)
+      expect(pickVisionModel()).toBe("openrouter/nvidia/nemotron-nano-12b-v2-vl:free");
     });
 
     it("returns preferred model when explicitly provided", async () => {

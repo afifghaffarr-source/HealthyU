@@ -53,17 +53,25 @@ export type ResolvedModel = {
  * Models known to support vision (image) inputs.
  * Keep in sync with provider docs. Used to decide whether to keep an image
  * in the message or strip it to text-only.
+ *
+ * Verified 2026-06-19 against https://openrouter.ai/api/v1/models.
+ * Previous defaults (`gemini-2.0-flash-exp:free`, `llama-3.2-11b-vision-instruct:free`)
+ * were deprecated/removed from free tier; updated list below.
  */
 const VISION_CAPABLE: Record<string, boolean> = {
-  // OpenRouter free vision models (verified 2026-06-19)
-  "google/gemini-2.0-flash-exp:free": true,
-  "google/gemini-2.5-flash-exp:free": true,
-  "google/gemini-2.5-flash": true, // paid but cheap
-  "meta-llama/llama-3.2-11b-vision-instruct:free": true,
+  // OpenRouter free vision models (verified available 2026-06-19)
+  "nvidia/nemotron-nano-12b-v2-vl:free": true, // purpose-built VL
+  "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free": true, // omni (vision+audio)
+  "google/gemma-4-31b-it:free": true,
+  "google/gemma-4-26b-a4b-it:free": true,
+  "nex-agi/nex-n2-pro:free": true,
+  // Paid but cheap vision models (when free tier exhausted)
+  "google/gemini-3.1-flash-lite": true, // $0.00000025/$0.0000015 per token
+  "google/gemini-3.1-flash-image": true,
+  "google/gemini-3.5-flash": true,
   "meta-llama/llama-3.2-90b-vision-instruct": true, // paid
-  "qwen/qwen-2-vl-7b-instruct:free": true,
   "qwen/qwen-2-vl-72b-instruct": true, // paid
-  // OpenRouter auto-route: can return a vision model when image is present
+  // OpenRouter auto-route: picks best per request (may include vision)
   "openrouter/auto": true,
   // VexoAPI: NONE of the current free-tier models support vision
   // (verified 2026-06-19, catalog has 11 models all text-only)
@@ -177,8 +185,10 @@ export function hasVisionProvider(): boolean {
 export function pickVisionModel(preferred?: string): string | null {
   if (!isOpenRouterConfigured()) return null;
   if (preferred && preferred.startsWith("openrouter/")) return preferred;
-  // Default: cheapest free vision model
-  return "openrouter/google/gemini-2.0-flash-exp:free";
+  // Default: cheapest free vision model that ACTUALLY EXISTS in OpenRouter
+  // catalog as of 2026-06-19. (gemini-2.0-flash-exp:free was deprecated.)
+  // nvidia/nemotron-nano-12b-v2-vl:free is purpose-built for vision-language.
+  return "openrouter/nvidia/nemotron-nano-12b-v2-vl:free";
 }
 
 // Re-export for backward compat with code that imported from vexoProvider
@@ -250,9 +260,19 @@ export async function callAiVisionWithFallback<S extends ZodTypeAny>(
   const hasImage = Boolean(opts.imageDataUrl);
   const ocrText = opts.prompt; // when image is stripped, caller puts OCR text in prompt
 
+  // Sprint 2d diagnostic: log provider state once per call.
+  // Visible in `wrangler tail` — helps debug "vision not working" reports.
+  const orConfigured = isOpenRouterConfigured();
+  const vexoConfigured = isVexoConfigured();
+  console.log(
+    `[aiProviders.callAiVisionWithFallback] feature=${opts.feature} ` +
+      `hasImage=${hasImage} openRouterConfigured=${orConfigured} ` +
+      `vexoConfigured=${vexoConfigured}`,
+  );
+
   // ─── Branch 1: image + OpenRouter vision ──────────────────────────────
   if (hasImage && isOpenRouterConfigured()) {
-    const model = opts.preferredModel ?? "openrouter/google/gemini-2.0-flash-exp:free";
+    const model = opts.preferredModel ?? "openrouter/nvidia/nemotron-nano-12b-v2-vl:free";
     try {
       const { generateText: genText } = await import("ai");
       // We can't use generateObject directly with multimodal messages from
