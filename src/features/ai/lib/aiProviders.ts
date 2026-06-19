@@ -480,46 +480,68 @@ export async function callAiTextWithVision(opts: CallAiTextOptions): Promise<Cal
       `vexoConfigured=${vexoConfigured}`,
   );
 
-  // Branch 1: image + OpenRouter configured → use vision model
+  // ─── Branch 1: image + OpenRouter configured → use vision model ─────
+  // CRITICAL: ignore `opts.preferredModel` when an image is present, because
+  // most preferred models are VexoAPI (text-only) — calling them with image
+  // parts makes the SDK throw. Always force the OpenRouter vision default,
+  // unless the caller explicitly asked for an `openrouter/...` model.
   if (hasImage && orConfigured) {
-    const model = opts.preferredModel ?? "openrouter/nvidia/nemotron-nano-12b-v2-vl:free";
+    const visionModel =
+      pickVisionModel(opts.preferredModel) ?? "openrouter/nvidia/nemotron-nano-12b-v2-vl:free";
     try {
       const { generateText: genText } = await import("ai");
       const result = await genText({
-        model: getModelInstance(model),
+        model: getModelInstance(visionModel),
         messages: opts.messages,
         maxTokens: opts.maxTokens ?? 2048,
         abortSignal: opts.signal ?? AbortSignal.timeout(opts.timeoutMs ?? 30_000),
       });
-      return { text: result.text, mode: "openrouter-vision", model };
+      if (result.text) return { text: result.text, mode: "openrouter-vision", model: visionModel };
+      console.warn(
+        `[aiProviders] OpenRouter vision returned empty text, retrying once with auto-route`,
+      );
+      // Retry with openrouter/auto — picks best model per request, sometimes
+      // resolves rate-limit on a specific free model.
+      const retry = await genText({
+        model: getModelInstance("openrouter/auto"),
+        messages: opts.messages,
+        maxTokens: opts.maxTokens ?? 2048,
+        abortSignal: AbortSignal.timeout(opts.timeoutMs ?? 20_000),
+      });
+      if (retry.text)
+        return { text: retry.text, mode: "openrouter-vision", model: "openrouter/auto" };
+      // Both empty — fall through to OCR/text-only
+      console.warn(`[aiProviders] OpenRouter auto-route also empty`);
     } catch (err) {
       console.warn(`[aiProviders] OpenRouter vision failed, falling back:`, (err as Error).message);
       // fall through
     }
   }
 
-  // Branch 2: image but no vision → strip image, flatten to text-only
-  // (caller is expected to have pre-OCR'd via Tesseract if available;
-  //  if not, image is just dropped silently)
-  if (hasImage && !orConfigured) {
+  // ─── Branch 2: image but no vision OR vision failed → strip image ────
+  // Try OCR-strip fallback if available, otherwise just call the text model.
+  if (hasImage) {
     try {
       const flatMessages = stripImagesFromMessages(opts.messages);
-      const model = opts.preferredModel ?? "google/gemini-2.5-flash";
+      // Use VexoAPI for text-only (always configured, always text-capable)
+      const model = isVexoConfigured()
+        ? (opts.preferredModel ?? "google/gemini-2.5-flash")
+        : "openrouter/auto";
       const { generateText: genText } = await import("ai");
       const result = await genText({
         model: getModelInstance(model),
         messages: flatMessages,
         maxTokens: opts.maxTokens ?? 2048,
-        abortSignal: opts.signal ?? AbortSignal.timeout(opts.timeoutMs ?? 30_000),
+        abortSignal: AbortSignal.timeout(opts.timeoutMs ?? 30_000),
       });
       return { text: result.text, mode: "fallback-text", model };
     } catch (err) {
-      console.warn(`[aiProviders] Vexo text-only fallback failed:`, (err as Error).message);
+      console.warn(`[aiProviders] OCR-strip fallback failed:`, (err as Error).message);
       return { text: "", mode: "fallback-empty", model: "vexo" };
     }
   }
 
-  // Branch 3: text only — use preferred model or chat default
+  // ─── Branch 3: no image, text-only → use preferred or default ────────
   try {
     const model = opts.preferredModel ?? "google/gemini-2.5-flash";
     const { generateText: genText } = await import("ai");
@@ -529,7 +551,6 @@ export async function callAiTextWithVision(opts: CallAiTextOptions): Promise<Cal
       maxTokens: opts.maxTokens ?? 2048,
       abortSignal: opts.signal ?? AbortSignal.timeout(opts.timeoutMs ?? 30_000),
     });
-    // Detect provider for mode label
     const provider = detectProvider(model);
     return {
       text: result.text,
