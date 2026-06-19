@@ -5672,6 +5672,7 @@ export type Database = {
       water_logs: {
         Row: {
           amount_ml: number;
+          client_id: string | null;
           id: string;
           log_date: string | null;
           logged_at: string;
@@ -5681,6 +5682,7 @@ export type Database = {
         };
         Insert: {
           amount_ml: number;
+          client_id?: string | null;
           id?: string;
           log_date?: string | null;
           logged_at?: string;
@@ -5690,6 +5692,7 @@ export type Database = {
         };
         Update: {
           amount_ml?: number;
+          client_id?: string | null;
           id?: string;
           log_date?: string | null;
           logged_at?: string;

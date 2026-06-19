@@ -22,13 +22,32 @@ export const todaysWater = createServerFn({ method: "GET" })
 export const logWater = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) =>
-    z.object({ amount_ml: z.number().int().min(50).max(2000) }).parse(input),
+    z
+      .object({
+        amount_ml: z.number().int().min(50).max(2000),
+        // Client-generated UUID for idempotency (Dexie offline-first sync).
+        // Same client_id submitted twice = same record, no duplicate.
+        client_id: z.string().uuid().optional(),
+      })
+      .parse(input),
   )
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
-    const { error } = await supabase
-      .from("water_logs")
-      .insert({ user_id: userId, amount_ml: data.amount_ml });
+    // Idempotent insert: kalau client_id udah ada di DB, return existing row.
+    if (data.client_id) {
+      const { data: existing } = await supabase
+        .from("water_logs")
+        .select("id, client_id")
+        .eq("client_id", data.client_id)
+        .eq("user_id", userId)
+        .maybeSingle();
+      if (existing) return { ok: true, game: null, deduplicated: true };
+    }
+    const { error } = await supabase.from("water_logs").insert({
+      user_id: userId,
+      amount_ml: data.amount_ml,
+      client_id: data.client_id ?? null,
+    });
     if (error) throw new Error(error.message);
     const game = await recordActivityFor(supabase, userId, "water_logged");
     return { ok: true, game };

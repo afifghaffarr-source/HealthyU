@@ -22,6 +22,7 @@ import { RouteError, RouteNotFound } from "@/components/healthyu/route-boundarie
 import { ScrollToTopButton } from "@/components/healthyu/scroll-to-top-button";
 import { RouteProgressBar } from "@/components/healthyu/route-progress-bar";
 import { APP_CONFIG } from "@/config/app";
+import { startBackgroundSync } from "@/lib/dexie-sync";
 
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
   head: () => ({
@@ -193,6 +194,10 @@ function ManifestLinkManager() {
     if (!link.isConnected) document.head.appendChild(link);
     link.href = "/manifest.webmanifest";
   }, []);
+
+  // Start Dexie background sync (offline-first water logs → Supabase).
+  // Runs periodically + on network reconnect + on app focus.
+  useEffect(() => startBackgroundSync(), []);
 
   return null;
 }
