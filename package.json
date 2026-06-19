@@ -62,7 +62,7 @@
     "@tanstack/router-plugin": "^1.168.18",
     "@tanstack/zod-adapter": "^1.167.0",
     "@zxing/browser": "^0.2.0",
-    "@zxing/library": "^0.22.0",
+    "@zxing/library": "^0.23.0",
     "adhan": "^4.4.4",
     "ai": "4.3.0",
     "canvas-confetti": "^1.9.4",
