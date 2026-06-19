@@ -70,6 +70,15 @@ export function LandingNav({
           <a href="#faq" className="hover:text-foreground">
             FAQ
           </a>
+          <span className="inline-flex items-center gap-1 text-[10px] font-mono uppercase tracking-[0.18em] border border-white/15 rounded-full px-2 py-0.5 bg-white/5">
+            Coba desain lain
+          </span>
+          <Link to="/flow" className="text-foreground hover:text-primary transition-colors">
+            Flow
+          </Link>
+          <Link to="/prism" className="text-foreground hover:text-primary transition-colors">
+            Prism
+          </Link>
         </div>
         <Link
           to={ctaPrimary}
