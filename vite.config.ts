@@ -148,6 +148,16 @@ export default defineConfig({
         })
       : null,
   ].filter(Boolean),
+  // ────────────────────────────────────────────────────────────────────
+  // Sprint 5a: define a constant so we can invalidate old SW caches on deploy.
+  // Workbox keys caches by version — bumping this number causes the activate
+  // handler to delete all caches from the previous version (one-shot migration).
+  // Pair with sw.ts denylist of /_serverFn/* and /assets/* (see sw.ts) so the
+  // new SW never serves stale TanStack RPC endpoints or Vite chunks.
+  // ────────────────────────────────────────────────────────────────────
+  define: {
+    __SW_CACHE_VERSION__: JSON.stringify("v2-sprint5a"),
+  },
   environments: {
     // The worker entry is set via wrangler.jsonc `main: "./src/server-entry.ts"`.
     // The @cloudflare/vite-plugin bundles that file as the actual worker.
