@@ -6,6 +6,8 @@ import {
   endpointSupportsImage,
   VexoApiCallError,
 } from "./vexoAdapter.server";
+import { callAiTextWithVision, getModelInstance } from "./aiProviders";
+import type { CoreMessage } from "ai";
 import { getEnv } from "@/lib/cloudflare-env.server";
 import type { z, ZodTypeAny } from "zod";
 
@@ -151,30 +153,68 @@ export async function callAiWithGuards(opts: CallAiOptions): Promise<string> {
     text = flat.text + jsonHint;
   }
 
-  // If caller wants an image-capable model but no image, still use the
-  // text endpoint. If image attached but endpoint is text-only, fall
-  // back to gemini (the image-capable VexoAPI endpoint).
-  const targetEndpoint = endpointSupportsImage(endpoint)
-    ? endpoint
-    : flat.imageUrl
-      ? "gemini"
-      : endpoint;
-
+  // Sprint 2d follow-up: VexoAPI has zero vision-capable models (verified
+  // 2026-06-19 — all 11 models in their /models catalog are text-only).
+  // The legacy `targetEndpoint = flat.imageUrl ? "gemini" : endpoint` was
+  // mapping "gemini" → openai/gpt-oss-120b:free which then threw 400
+  // "model doesn't support images".
+  //
+  // Fix: when an image is present, route through the multi-provider registry
+  //   - OpenRouter configured → vision model (real vision)
+  //   - OpenRouter NOT configured → strip image, text-only (caller should
+  //     pre-OCR via Tesseract if needed)
+  //   - No image → legacy VexoAPI text path (unchanged)
   let data: string;
-  try {
-    const result = await callVexoApi({
-      endpoint: targetEndpoint,
-      text,
-      system: flat.system,
-      imageUrl: flat.imageUrl,
+  const hasImage = Boolean(flat.imageUrl);
+
+  if (hasImage) {
+    // Convert multimodal messages → CoreMessage with image parts.
+    const coreMessages: CoreMessage[] = opts.messages.map((m): CoreMessage => {
+      if (typeof m.content === "string") {
+        return { role: m.role, content: m.content };
+      }
+      const parts: Array<
+        { type: "text"; text: string } | { type: "image"; image: string | Uint8Array }
+      > = [];
+      for (const p of m.content) {
+        if (p.type === "text") parts.push({ type: "text", text: p.text });
+        else if (p.type === "image_url") {
+          parts.push({ type: "image", image: p.image_url.url });
+        }
+      }
+      if (parts.length === 0) return { role: m.role, content: "" };
+      return { role: m.role, content: parts } as CoreMessage;
+    });
+
+    const result = await callAiTextWithVision({
+      feature: opts.feature,
+      messages: coreMessages,
+      preferredModel: model,
+      maxTokens: opts.maxTokens,
       timeoutMs: opts.timeoutMs ?? DEFAULT_TIMEOUT_MS,
     });
-    data = result.data;
-  } catch (e) {
-    if (e instanceof VexoApiCallError) {
-      throw new AiGatewayError(e.message, e.status);
+    if (!result.text) {
+      throw new AiGatewayError("Layanan AI sedang sibuk. Coba lagi sebentar lagi.", 503);
     }
-    throw e;
+    data = result.text;
+  } else {
+    // ─── Legacy text-only path (unchanged behavior) ───────────────────
+    const targetEndpoint = endpointSupportsImage(endpoint) ? endpoint : endpoint;
+
+    try {
+      const result = await callVexoApi({
+        endpoint: targetEndpoint,
+        text,
+        system: flat.system,
+        timeoutMs: opts.timeoutMs ?? DEFAULT_TIMEOUT_MS,
+      });
+      data = result.data;
+    } catch (e) {
+      if (e instanceof VexoApiCallError) {
+        throw new AiGatewayError(e.message, e.status);
+      }
+      throw e;
+    }
   }
 
   // VexoAPI doesn't surface token counts. Estimate from input text length
