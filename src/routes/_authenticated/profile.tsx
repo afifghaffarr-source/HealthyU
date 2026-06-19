@@ -9,7 +9,7 @@ import { HealthScoreCard } from "@/components/healthyu/health-score-card";
 import { supabase } from "@/integrations/supabase/client";
 import { clearAll } from "@/lib/offline-queue";
 import { calcAge, calcBMI, bmiCategory, calcBMR, calcTDEE, type ActivityLevel } from "@/lib/health";
-import { LogOut, Settings, Trophy, Scale, HeartPulse, Activity } from "lucide-react";
+import { LogOut, Camera, Sparkles, ChefHat, ChevronRight } from "lucide-react";
 import { useTheme } from "@/components/theme-provider.hook";
 import { LocaleSwitcher } from "@/components/locale-switcher";
 import { ProfileNavGrid } from "@/features/profile/components/ProfileNavGrid";
@@ -91,9 +91,10 @@ function ProfilePage() {
 
   return (
     <main className="min-h-dvh bg-background pb-28">
-      <div className="max-w-md mx-auto px-5 pt-2 space-y-5">
+      <div className="max-w-md mx-auto px-5 pt-2 space-y-6">
         <TopAppBar title="Profil" subtitle={p?.full_name ?? "Sahabat"} showBack />
 
+        {/* ── Section A: Identitas ─────────────────────────────────────────── */}
         <section className="bg-card p-6 rounded-3xl outline-1 outline-foreground/10 text-center animate-fade-up">
           <div className="size-20 mx-auto rounded-full bg-primary text-primary-foreground grid place-items-center text-2xl font-bold mb-3">
             {(p?.full_name ?? "U").slice(0, 1).toUpperCase()}
@@ -102,134 +103,99 @@ function ProfilePage() {
           <p className="text-sm text-muted-foreground capitalize">
             {p?.dietary_preference ?? "Balanced diet"}
           </p>
+          <Link
+            to="/onboarding"
+            className="inline-flex items-center gap-1 mt-3 text-sm text-primary font-medium hover:underline"
+          >
+            Edit profil <ChevronRight className="size-3.5" />
+          </Link>
         </section>
 
+        {/* ── Section B: Kesehatan (BMI / BMR / TDEE + HealthScore) ──────── */}
         {bmi && (
-          <section className="grid grid-cols-3 gap-3 animate-fade-up">
-            <HealthCard
-              label="BMI"
-              value={bmi.toString()}
-              trend={cat?.label}
-              tone="green"
-              icon={Scale}
+          <>
+            <section className="grid grid-cols-3 gap-3 animate-fade-up">
+              <HealthCard label="BMI" value={bmi.toString()} trend={cat?.label} tone="green" />
+              <HealthCard label="BMR" value={bmr ?? "-"} unit="kcal" tone="orange" />
+              <HealthCard label="TDEE" value={tdee ?? "-"} unit="kcal" tone="blue" />
+            </section>
+
+            <HealthScoreCard
+              className="animate-fade-up"
+              factors={[
+                {
+                  label: "BMI",
+                  value:
+                    bmi >= 18.5 && bmi <= 24.9 ? 100 : Math.max(0, 100 - Math.abs(bmi - 22) * 8),
+                },
+                { label: "Aktivitas", value: activityScore(p?.activity_level) },
+                {
+                  label: "Target berat",
+                  value: weightTargetScore(Number(p?.weight_kg), Number(p?.target_weight_kg)),
+                },
+                { label: "Kalori harian", value: p?.daily_calorie_target ? 80 : 40 },
+              ]}
             />
-            <HealthCard
-              label="BMR"
-              value={bmr ?? "-"}
-              unit="kcal"
-              tone="orange"
-              icon={HeartPulse}
-            />
-            <HealthCard label="TDEE" value={tdee ?? "-"} unit="kcal" tone="blue" icon={Activity} />
-          </section>
+          </>
         )}
 
-        {bmi && (
-          <HealthScoreCard
-            className="animate-fade-up"
-            factors={[
-              {
-                label: "BMI",
-                value: bmi >= 18.5 && bmi <= 24.9 ? 100 : Math.max(0, 100 - Math.abs(bmi - 22) * 8),
-              },
-              { label: "Aktivitas", value: activityScore(p?.activity_level) },
-              {
-                label: "Target berat",
-                value: weightTargetScore(Number(p?.weight_kg), Number(p?.target_weight_kg)),
-              },
-              { label: "Kalori harian", value: p?.daily_calorie_target ? 80 : 40 },
-            ]}
-          />
-        )}
-
-        <section className="bg-card rounded-3xl outline-1 outline-foreground/10 divide-y divide-border overflow-hidden animate-fade-up">
-          <Row label="Tinggi" value={p?.height_cm ? `${p.height_cm} cm` : "-"} />
-          <Row label="Berat" value={p?.weight_kg ? `${p.weight_kg} kg` : "-"} />
-          <Row
-            label="Target berat"
-            value={p?.target_weight_kg ? `${p.target_weight_kg} kg` : "-"}
-          />
-          <Row
-            label="Target kalori"
-            value={p?.daily_calorie_target ? `${p.daily_calorie_target} kcal` : "-"}
-          />
-          <Row label="Aktivitas" value={p?.activity_level ?? "-"} />
-          <Row label="Kota" value={p?.city ?? "-"} />
-        </section>
-
-        <Link
-          to="/onboarding"
-          className="flex items-center justify-center gap-2 bg-card outline-1 outline-foreground/10 font-semibold py-4 rounded-2xl"
-        >
-          <Settings className="size-4" /> Edit profil
-        </Link>
-
-        <Link
-          to="/achievements"
-          className="flex items-center justify-center gap-2 bg-card outline-1 outline-foreground/10 font-semibold py-4 rounded-2xl"
-        >
-          <Trophy className="size-4" /> Pencapaian & badge
-        </Link>
-
-        <div className="grid grid-cols-2 gap-2">
-          <Link
-            to="/profile/scan-stats"
-            className="text-center text-xs bg-card outline-1 outline-foreground/10 py-3 rounded-2xl"
-          >
-            📊 Statistik Scan AI
-          </Link>
-          <Link
-            to="/profile/privacy"
-            className="text-center text-xs bg-card outline-1 outline-foreground/10 py-3 rounded-2xl"
-          >
-            🔒 Privasi
-          </Link>
-          <Link
-            to="/insights"
-            className="text-center text-xs bg-card outline-1 outline-foreground/10 py-3 rounded-2xl"
-          >
-            ✨ Insight AI
-          </Link>
-          <Link
-            to="/recipes/recommendations"
-            className="text-center text-xs bg-card outline-1 outline-foreground/10 py-3 rounded-2xl"
-          >
-            🍽️ Rekomendasi Resep
-          </Link>
-          <Link
-            to="/reports/nutrition"
-            className="text-center text-xs bg-card outline-1 outline-foreground/10 py-3 rounded-2xl"
-          >
-            📈 Tren Nutrisi
-          </Link>
-          <Link
-            to="/scan/barcode"
-            className="text-center text-xs bg-card outline-1 outline-foreground/10 py-3 rounded-2xl"
-          >
-            🏷️ Scan Barcode
-          </Link>
-          <Link
-            to="/scan/menu"
-            className="text-center text-xs bg-card outline-1 outline-foreground/10 py-3 rounded-2xl"
-          >
-            📋 Scan Menu
-          </Link>
-          <Link
-            to="/scan/recipe"
-            className="text-center text-xs bg-card outline-1 outline-foreground/10 py-3 rounded-2xl"
-          >
-            📖 Scan Resep
-          </Link>
-        </div>
-
-        <ProfileNavGrid theme={theme} onToggleTheme={toggle} />
-
-        <DisclaimerCard />
-
-        <section className="space-y-2 pt-2">
-          <h3 className="text-[11px] uppercase tracking-wider text-muted-foreground font-semibold px-1">
-            Zona Hati-hati
+        {/* ── Section C: Aksi Cepat (3 featured) ──────────────────────────── */}
+        <section className="animate-fade-up">
+          <h3 className="text-[12px] uppercase tracking-wider text-muted-foreground font-semibold px-1 mb-3">
+            Aksi Cepat
           </h3>
+          <div className="grid grid-cols-3 gap-3">
+            <Link
+              to="/scan"
+              className="bg-card p-4 rounded-2xl outline-1 outline-foreground/10 flex flex-col items-start gap-2 min-h-24 active:scale-[0.98] transition hover:bg-accent"
+            >
+              <Camera className="size-6 text-primary" aria-hidden />
+              <div>
+                <p className="text-sm font-semibold leading-tight">Scan</p>
+                <p className="text-[11px] text-muted-foreground leading-tight mt-0.5">
+                  Foto, barcode, menu
+                </p>
+              </div>
+            </Link>
+            <Link
+              to="/coach"
+              className="bg-card p-4 rounded-2xl outline-1 outline-foreground/10 flex flex-col items-start gap-2 min-h-24 active:scale-[0.98] transition hover:bg-accent"
+            >
+              <Sparkles className="size-6 text-coral" aria-hidden />
+              <div>
+                <p className="text-sm font-semibold leading-tight">AI Coach</p>
+                <p className="text-[11px] text-muted-foreground leading-tight mt-0.5">
+                  Tanya & insight
+                </p>
+              </div>
+            </Link>
+            <Link
+              to="/recipes/recommendations"
+              className="bg-card p-4 rounded-2xl outline-1 outline-foreground/10 flex flex-col items-start gap-2 min-h-24 active:scale-[0.98] transition hover:bg-accent"
+            >
+              <ChefHat className="size-6 text-sage-deep" aria-hidden />
+              <div>
+                <p className="text-sm font-semibold leading-tight">Resep</p>
+                <p className="text-[11px] text-muted-foreground leading-tight mt-0.5">
+                  Untukmu hari ini
+                </p>
+              </div>
+            </Link>
+          </div>
+        </section>
+
+        {/* ── Section D: Fitur Lengkap (organized nav grid) ───────────────── */}
+        <section className="animate-fade-up">
+          <h3 className="text-[12px] uppercase tracking-wider text-muted-foreground font-semibold px-1 mb-3">
+            Fitur Lainnya
+          </h3>
+          <ProfileNavGrid theme={theme} onToggleTheme={toggle} />
+        </section>
+
+        {/* ── Section E: Akun (theme, locale, logout) ─────────────────────── */}
+        <section className="space-y-2 pt-2 animate-fade-up">
+          <DisclaimerCard />
+
           <div className="rounded-2xl bg-destructive/5 dark:bg-destructive/10 outline-1 outline-destructive/25 p-2">
             <AlertDialog>
               <AlertDialogTrigger asChild>
@@ -260,21 +226,12 @@ function ProfilePage() {
               </AlertDialogContent>
             </AlertDialog>
           </div>
-        </section>
 
-        <LocaleSwitcher />
+          <LocaleSwitcher />
+        </section>
       </div>
       <BottomNav />
     </main>
-  );
-}
-
-function Row({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="flex justify-between items-center px-5 py-3.5">
-      <span className="text-sm text-muted-foreground">{label}</span>
-      <span className="text-sm font-semibold capitalize">{value}</span>
-    </div>
   );
 }
 
