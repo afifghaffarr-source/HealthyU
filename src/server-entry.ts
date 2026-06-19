@@ -25,6 +25,26 @@ export default {
     // Pass env as requestOpts.context so TanStack's requestMiddleware chain
     // (including envInjectionMiddleware in start.ts) can read it.
     // Signature: entry.fetch(request, requestOpts, ctx).
-    return inner.fetch(request, { context: env } as unknown as Request, ctx);
+    const response = await inner.fetch(request, { context: env } as unknown as Request, ctx);
+    // For HTML navigations, force CF edge to never cache the response.
+    // Without this, CF CDN caches SSR HTML by URL and keeps serving the old
+    // version after a deploy (worker code is updated but edge cache is not).
+    // Symptom: production HTML references stale `index-*.js` bundle hashes
+    // for hours after a deploy, breaking client hydration. Fix: add
+    // Cache-Control: no-store so every request re-runs the Worker.
+    // We only touch HTML responses; static assets keep their own cache
+    // headers (vite assets are content-hashed and immutable).
+    const contentType = response.headers.get("content-type") ?? "";
+    if (contentType.includes("text/html")) {
+      const headers = new Headers(response.headers);
+      headers.set("Cache-Control", "no-store, must-revalidate");
+      headers.set("Pragma", "no-cache");
+      return new Response(response.body, {
+        status: response.status,
+        statusText: response.statusText,
+        headers,
+      });
+    }
+    return response;
   },
 };
