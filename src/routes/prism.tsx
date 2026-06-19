@@ -226,10 +226,10 @@ function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
       ))}
       <div className="pt-4 mt-4 border-t border-stone-200">
         <Link
-          to="/flow"
+          to="/"
           className="block px-3 py-2 rounded-lg text-xs text-stone-500 hover:text-stone-900"
         >
-          Lihat Flow (mobile)
+          Beranda (mobile-first)
         </Link>
       </div>
     </nav>
@@ -604,9 +604,6 @@ function PrismPage() {
             <nav className="flex flex-wrap gap-x-6 gap-y-2 text-sm text-stone-500">
               <Link to="/" className="hover:text-stone-900 transition-colors">
                 Beranda
-              </Link>
-              <Link to="/flow" className="hover:text-stone-900 transition-colors">
-                Flow
               </Link>
               <Link to="/privacy" className="hover:text-stone-900 transition-colors">
                 Privasi
