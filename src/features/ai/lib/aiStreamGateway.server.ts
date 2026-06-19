@@ -1,11 +1,12 @@
 import { AiGatewayError, type AiMultimodalMessage } from "./aiGateway.server";
-import { callVexoApi, flattenMessages, resolveVexoEndpoint } from "./vexoAdapter.server";
+import type { CoreMessage } from "ai";
+import { callAiTextWithVision } from "./aiProviders";
 export { AiGatewayError };
 
 const DEFAULT_TIMEOUT_MS = 60_000;
 
 export type StreamAiOptions = {
-  model: string;
+  model?: string;
   messages: AiMultimodalMessage[];
   maxTokens?: number;
   timeoutMs?: number;
@@ -13,38 +14,55 @@ export type StreamAiOptions = {
 };
 
 /**
- * Streaming AI call — VexoAPI doesn't expose SSE, so we buffer the full
- * response and emit it as a single chunk. The chunked TextDecoder stream
- * still gives the UI something to consume chunk-by-chunk from the server
- * side, and we still expose a `body: ReadableStream<Uint8Array>` for
- * caller compatibility (the chat route just iterates deltas).
+ * Streaming AI call — buffered as a single chunk (no upstream SSE exposed
+ * by either VexoAPI or OpenRouter free tier for vision models).
  *
- * If VexoAPI ever ships SSE, replace this with a real stream forwarder.
+ * Routes through the multi-provider registry so vision works whenever
+ * OPENROUTER_API_KEY is configured. Returns SSE-shaped body that callers
+ * already parse via `parseSseChunk`.
  */
 export async function streamAiChat(opts: StreamAiOptions): Promise<{
   body: ReadableStream<Uint8Array>;
+  mode?: string;
 }> {
-  // Run the full call (uses the same auth/budget/timeout path as the
-  // non-streaming gateway via the shared adapter). Throw the same way.
-  const flat = flattenMessages(opts.messages);
+  // Convert AiMultimodalMessage → CoreMessage (Vercel AI SDK shape).
+  // Text content stays string; image parts become { type: "image", image: dataUrl }.
+  const coreMessages: CoreMessage[] = opts.messages.map((m): CoreMessage => {
+    if (typeof m.content === "string") {
+      return { role: m.role, content: m.content };
+    }
+    const parts: Array<
+      { type: "text"; text: string } | { type: "image"; image: string | Uint8Array }
+    > = [];
+    for (const p of m.content) {
+      if (p.type === "text") parts.push({ type: "text", text: p.text });
+      else if (p.type === "image_url") {
+        parts.push({ type: "image", image: p.image_url.url });
+      }
+      // input_audio and unknown parts are dropped (no provider supports)
+    }
+    if (parts.length === 0) {
+      return { role: m.role, content: "" };
+    }
+    // Cast through CoreMessage — type narrowing across union is tricky
+    // for CoreMessage's discriminated by role. The shapes we build here
+    // are valid CoreMessage instances at runtime.
+    return { role: m.role, content: parts } as CoreMessage;
+  });
 
-  // We don't have a streaming endpoint, so we resolve to one chunk.
-  // We still respect the abort signal — if the client disconnects, we
-  // abort the upstream fetch.
-  const { data } = await callVexoApi({
-    endpoint: resolveVexoEndpoint(opts.model ?? "gptoss120b"),
-    text: flat.text,
-    system: flat.system,
-    imageUrl: flat.imageUrl,
+  const result = await callAiTextWithVision({
+    feature: "chat.stream",
+    messages: coreMessages,
+    preferredModel: opts.model,
+    maxTokens: opts.maxTokens,
     timeoutMs: opts.timeoutMs ?? DEFAULT_TIMEOUT_MS,
     signal: opts.signal,
   });
 
   // Emit the full text as a single delta in a tiny SSE-shaped body.
-  // We use the same `data: {...}\n\n` shape the existing parseSseChunk
-  // already understands, so callers don't have to change.
   const ssePayload =
-    `data: ${JSON.stringify({ choices: [{ delta: { content: data } }] })}\n\n` + `data: [DONE]\n\n`;
+    `data: ${JSON.stringify({ choices: [{ delta: { content: result.text } }] })}\n\n` +
+    `data: [DONE]\n\n`;
 
   const encoder = new TextEncoder();
   const body = new ReadableStream<Uint8Array>({
@@ -54,7 +72,7 @@ export async function streamAiChat(opts: StreamAiOptions): Promise<{
     },
   });
 
-  return { body };
+  return { body, mode: result.mode };
 }
 
 /**

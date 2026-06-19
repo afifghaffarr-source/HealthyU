@@ -413,3 +413,148 @@ function safeParseJsonLike<T>(text: string, _schema: ZodTypeAny): { success: boo
     return { success: false };
   }
 }
+
+// ─────────────────────────────────────────────────────────────────────────
+// callAiTextWithVision — non-structured text call with image support.
+// Sprint 2d follow-up fix: chat route needs multimodal text (not just
+// structured output). Routes through the same provider registry so
+// vision works whenever OpenRouter is configured.
+// ─────────────────────────────────────────────────────────────────────────
+
+export type AiTextMode =
+  | "openrouter-vision" // image + OpenRouter vision model
+  | "openrouter-text" // text only via OpenRouter
+  | "vexo-text" // text via VexoAPI (always works)
+  | "fallback-text" // image present but no vision → text-only via OCR-flat prompt
+  | "fallback-empty"; // all providers failed, returned ""
+
+export interface CallAiTextOptions {
+  userId?: string | null;
+  feature: string;
+  /** OpenAI-style messages (string content or array of text/image parts). */
+  messages: CoreMessage[];
+  /** Optional model name. Defaults to chat default if omitted. */
+  preferredModel?: string;
+  timeoutMs?: number;
+  maxTokens?: number;
+  signal?: AbortSignal;
+}
+
+export interface CallAiTextResult {
+  text: string;
+  mode: AiTextMode;
+  model: string;
+}
+
+function detectImageInMessages(messages: CoreMessage[]): {
+  hasImage: boolean;
+  imageDataUrl?: string;
+} {
+  for (let i = messages.length - 1; i >= 0; i--) {
+    const m = messages[i];
+    if (m.role !== "user") continue;
+    const c = m.content;
+    if (Array.isArray(c)) {
+      const img = c.find((p) => (p as { type?: string }).type === "image");
+      if (img) {
+        return {
+          hasImage: true,
+          imageDataUrl: (img as { image?: string | Uint8Array }).image
+            ? ((img as { image: string | Uint8Array }).image as string)
+            : undefined,
+        };
+      }
+    }
+  }
+  return { hasImage: false };
+}
+
+export async function callAiTextWithVision(opts: CallAiTextOptions): Promise<CallAiTextResult> {
+  const { hasImage, imageDataUrl } = detectImageInMessages(opts.messages);
+  const orConfigured = isOpenRouterConfigured();
+  const vexoConfigured = isVexoConfigured();
+
+  console.log(
+    `[aiProviders.callAiTextWithVision] feature=${opts.feature} ` +
+      `hasImage=${hasImage} openRouterConfigured=${orConfigured} ` +
+      `vexoConfigured=${vexoConfigured}`,
+  );
+
+  // Branch 1: image + OpenRouter configured → use vision model
+  if (hasImage && orConfigured) {
+    const model = opts.preferredModel ?? "openrouter/nvidia/nemotron-nano-12b-v2-vl:free";
+    try {
+      const { generateText: genText } = await import("ai");
+      const result = await genText({
+        model: getModelInstance(model),
+        messages: opts.messages,
+        maxTokens: opts.maxTokens ?? 2048,
+        abortSignal: opts.signal ?? AbortSignal.timeout(opts.timeoutMs ?? 30_000),
+      });
+      return { text: result.text, mode: "openrouter-vision", model };
+    } catch (err) {
+      console.warn(`[aiProviders] OpenRouter vision failed, falling back:`, (err as Error).message);
+      // fall through
+    }
+  }
+
+  // Branch 2: image but no vision → strip image, flatten to text-only
+  // (caller is expected to have pre-OCR'd via Tesseract if available;
+  //  if not, image is just dropped silently)
+  if (hasImage && !orConfigured) {
+    try {
+      const flatMessages = stripImagesFromMessages(opts.messages);
+      const model = opts.preferredModel ?? "google/gemini-2.5-flash";
+      const { generateText: genText } = await import("ai");
+      const result = await genText({
+        model: getModelInstance(model),
+        messages: flatMessages,
+        maxTokens: opts.maxTokens ?? 2048,
+        abortSignal: opts.signal ?? AbortSignal.timeout(opts.timeoutMs ?? 30_000),
+      });
+      return { text: result.text, mode: "fallback-text", model };
+    } catch (err) {
+      console.warn(`[aiProviders] Vexo text-only fallback failed:`, (err as Error).message);
+      return { text: "", mode: "fallback-empty", model: "vexo" };
+    }
+  }
+
+  // Branch 3: text only — use preferred model or chat default
+  try {
+    const model = opts.preferredModel ?? "google/gemini-2.5-flash";
+    const { generateText: genText } = await import("ai");
+    const result = await genText({
+      model: getModelInstance(model),
+      messages: opts.messages,
+      maxTokens: opts.maxTokens ?? 2048,
+      abortSignal: opts.signal ?? AbortSignal.timeout(opts.timeoutMs ?? 30_000),
+    });
+    // Detect provider for mode label
+    const provider = detectProvider(model);
+    return {
+      text: result.text,
+      mode: provider === "openrouter" ? "openrouter-text" : "vexo-text",
+      model,
+    };
+  } catch (err) {
+    console.warn(`[aiProviders] text-only call failed:`, (err as Error).message);
+    return { text: "", mode: "fallback-empty", model: opts.preferredModel ?? "vexo" };
+  }
+}
+
+/**
+ * Strip image parts from messages, keeping only text content.
+ * Used when no vision provider is configured.
+ */
+function stripImagesFromMessages(messages: CoreMessage[]): CoreMessage[] {
+  return messages.map((m) => {
+    if (m.role !== "user") return m;
+    const c = m.content;
+    if (typeof c === "string") return m;
+    const textOnly = c
+      .filter((p) => (p as { type?: string }).type === "text")
+      .map((p) => (p as { type: "text"; text: string }).text)
+      .join("\n");
+    return { ...m, content: textOnly || "(gambar dihapus — tidak ada vision provider)" };
+  });
+}
