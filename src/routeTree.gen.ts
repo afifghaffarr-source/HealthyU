@@ -40,6 +40,7 @@ import { Route as DietSlugRouteImport } from './routes/diet.$slug'
 import { Route as ArtikelSlugRouteImport } from './routes/artikel.$slug'
 import { Route as ApiLogErrorRouteImport } from './routes/api/log-error'
 import { Route as ApiHealthRouteImport } from './routes/api/health'
+import { Route as ApiAiStatusRouteImport } from './routes/api/ai-status'
 import { Route as AuthenticatedWorkoutRouteImport } from './routes/_authenticated/workout'
 import { Route as AuthenticatedWeightRouteImport } from './routes/_authenticated/weight'
 import { Route as AuthenticatedWearableRouteImport } from './routes/_authenticated/wearable'
@@ -342,6 +343,11 @@ const ApiLogErrorRoute = ApiLogErrorRouteImport.update({
 const ApiHealthRoute = ApiHealthRouteImport.update({
   id: '/api/health',
   path: '/api/health',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAiStatusRoute = ApiAiStatusRouteImport.update({
+  id: '/api/ai-status',
+  path: '/api/ai-status',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedWorkoutRoute = AuthenticatedWorkoutRouteImport.update({
@@ -1240,6 +1246,7 @@ export interface FileRoutesByFullPath {
   '/wearable': typeof AuthenticatedWearableRoute
   '/weight': typeof AuthenticatedWeightRouteWithChildren
   '/workout': typeof AuthenticatedWorkoutRouteWithChildren
+  '/api/ai-status': typeof ApiAiStatusRoute
   '/api/health': typeof ApiHealthRoute
   '/api/log-error': typeof ApiLogErrorRoute
   '/artikel/$slug': typeof ArtikelSlugRoute
@@ -1413,6 +1420,7 @@ export interface FileRoutesByTo {
   '/wearable': typeof AuthenticatedWearableRoute
   '/weight': typeof AuthenticatedWeightRouteWithChildren
   '/workout': typeof AuthenticatedWorkoutRouteWithChildren
+  '/api/ai-status': typeof ApiAiStatusRoute
   '/api/health': typeof ApiHealthRoute
   '/api/log-error': typeof ApiLogErrorRoute
   '/artikel/$slug': typeof ArtikelSlugRoute
@@ -1595,6 +1603,7 @@ export interface FileRoutesById {
   '/_authenticated/wearable': typeof AuthenticatedWearableRoute
   '/_authenticated/weight': typeof AuthenticatedWeightRouteWithChildren
   '/_authenticated/workout': typeof AuthenticatedWorkoutRouteWithChildren
+  '/api/ai-status': typeof ApiAiStatusRoute
   '/api/health': typeof ApiHealthRoute
   '/api/log-error': typeof ApiLogErrorRoute
   '/artikel/$slug': typeof ArtikelSlugRoute
@@ -1778,6 +1787,7 @@ export interface FileRouteTypes {
     | '/wearable'
     | '/weight'
     | '/workout'
+    | '/api/ai-status'
     | '/api/health'
     | '/api/log-error'
     | '/artikel/$slug'
@@ -1951,6 +1961,7 @@ export interface FileRouteTypes {
     | '/wearable'
     | '/weight'
     | '/workout'
+    | '/api/ai-status'
     | '/api/health'
     | '/api/log-error'
     | '/artikel/$slug'
@@ -2132,6 +2143,7 @@ export interface FileRouteTypes {
     | '/_authenticated/wearable'
     | '/_authenticated/weight'
     | '/_authenticated/workout'
+    | '/api/ai-status'
     | '/api/health'
     | '/api/log-error'
     | '/artikel/$slug'
@@ -2260,6 +2272,7 @@ export interface RootRouteChildren {
   PrivacyRoute: typeof PrivacyRoute
   ResepRoute: typeof ResepRouteWithChildren
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
+  ApiAiStatusRoute: typeof ApiAiStatusRoute
   ApiHealthRoute: typeof ApiHealthRoute
   ApiLogErrorRoute: typeof ApiLogErrorRoute
   RecipesIndexRoute: typeof RecipesIndexRoute
@@ -2493,6 +2506,13 @@ declare module '@tanstack/react-router' {
       path: '/api/health'
       fullPath: '/api/health'
       preLoaderRoute: typeof ApiHealthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/ai-status': {
+      id: '/api/ai-status'
+      path: '/api/ai-status'
+      fullPath: '/api/ai-status'
+      preLoaderRoute: typeof ApiAiStatusRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/workout': {
@@ -4161,6 +4181,7 @@ const rootRouteChildren: RootRouteChildren = {
   PrivacyRoute: PrivacyRoute,
   ResepRoute: ResepRouteWithChildren,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
+  ApiAiStatusRoute: ApiAiStatusRoute,
   ApiHealthRoute: ApiHealthRoute,
   ApiLogErrorRoute: ApiLogErrorRoute,
   RecipesIndexRoute: RecipesIndexRoute,
