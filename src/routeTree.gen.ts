@@ -105,6 +105,7 @@ import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authentic
 import { Route as ApiImgSplatRouteImport } from './routes/api/img.$'
 import { Route as ApiDebugEnvRouteImport } from './routes/api/debug.env'
 import { Route as ApiChatStreamRouteImport } from './routes/api/chat.stream'
+import { Route as ApiAdminFillRecipeBodyRouteImport } from './routes/api/admin/fill-recipe-body'
 import { Route as AuthenticatedWorkoutTimerRouteImport } from './routes/_authenticated/workout.timer'
 import { Route as AuthenticatedWeightGoalRouteImport } from './routes/_authenticated/weight.goal'
 import { Route as AuthenticatedWeightChartRouteImport } from './routes/_authenticated/weight.chart'
@@ -675,6 +676,11 @@ const ApiDebugEnvRoute = ApiDebugEnvRouteImport.update({
 const ApiChatStreamRoute = ApiChatStreamRouteImport.update({
   id: '/api/chat/stream',
   path: '/api/chat/stream',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAdminFillRecipeBodyRoute = ApiAdminFillRecipeBodyRouteImport.update({
+  id: '/api/admin/fill-recipe-body',
+  path: '/api/admin/fill-recipe-body',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedWorkoutTimerRoute =
@@ -1321,6 +1327,7 @@ export interface FileRoutesByFullPath {
   '/weight/chart': typeof AuthenticatedWeightChartRoute
   '/weight/goal': typeof AuthenticatedWeightGoalRoute
   '/workout/timer': typeof AuthenticatedWorkoutTimerRoute
+  '/api/admin/fill-recipe-body': typeof ApiAdminFillRecipeBodyRoute
   '/api/chat/stream': typeof ApiChatStreamRoute
   '/api/debug/env': typeof ApiDebugEnvRoute
   '/api/img/$': typeof ApiImgSplatRoute
@@ -1493,6 +1500,7 @@ export interface FileRoutesByTo {
   '/weight/chart': typeof AuthenticatedWeightChartRoute
   '/weight/goal': typeof AuthenticatedWeightGoalRoute
   '/workout/timer': typeof AuthenticatedWorkoutTimerRoute
+  '/api/admin/fill-recipe-body': typeof ApiAdminFillRecipeBodyRoute
   '/api/chat/stream': typeof ApiChatStreamRoute
   '/api/debug/env': typeof ApiDebugEnvRoute
   '/api/img/$': typeof ApiImgSplatRoute
@@ -1675,6 +1683,7 @@ export interface FileRoutesById {
   '/_authenticated/weight/chart': typeof AuthenticatedWeightChartRoute
   '/_authenticated/weight/goal': typeof AuthenticatedWeightGoalRoute
   '/_authenticated/workout/timer': typeof AuthenticatedWorkoutTimerRoute
+  '/api/admin/fill-recipe-body': typeof ApiAdminFillRecipeBodyRoute
   '/api/chat/stream': typeof ApiChatStreamRoute
   '/api/debug/env': typeof ApiDebugEnvRoute
   '/api/img/$': typeof ApiImgSplatRoute
@@ -1857,6 +1866,7 @@ export interface FileRouteTypes {
     | '/weight/chart'
     | '/weight/goal'
     | '/workout/timer'
+    | '/api/admin/fill-recipe-body'
     | '/api/chat/stream'
     | '/api/debug/env'
     | '/api/img/$'
@@ -2029,6 +2039,7 @@ export interface FileRouteTypes {
     | '/weight/chart'
     | '/weight/goal'
     | '/workout/timer'
+    | '/api/admin/fill-recipe-body'
     | '/api/chat/stream'
     | '/api/debug/env'
     | '/api/img/$'
@@ -2210,6 +2221,7 @@ export interface FileRouteTypes {
     | '/_authenticated/weight/chart'
     | '/_authenticated/weight/goal'
     | '/_authenticated/workout/timer'
+    | '/api/admin/fill-recipe-body'
     | '/api/chat/stream'
     | '/api/debug/env'
     | '/api/img/$'
@@ -2253,6 +2265,7 @@ export interface RootRouteChildren {
   RecipesSavedRoute: typeof RecipesSavedRoute
   RecipesVideoRoute: typeof RecipesVideoRoute
   RecipesIndexRoute: typeof RecipesIndexRoute
+  ApiAdminFillRecipeBodyRoute: typeof ApiAdminFillRecipeBodyRoute
   ApiChatStreamRoute: typeof ApiChatStreamRoute
   ApiDebugEnvRoute: typeof ApiDebugEnvRoute
   ApiImgSplatRoute: typeof ApiImgSplatRoute
@@ -2938,6 +2951,13 @@ declare module '@tanstack/react-router' {
       path: '/api/chat/stream'
       fullPath: '/api/chat/stream'
       preLoaderRoute: typeof ApiChatStreamRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/admin/fill-recipe-body': {
+      id: '/api/admin/fill-recipe-body'
+      path: '/api/admin/fill-recipe-body'
+      fullPath: '/api/admin/fill-recipe-body'
+      preLoaderRoute: typeof ApiAdminFillRecipeBodyRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/workout/timer': {
@@ -4117,6 +4137,7 @@ const rootRouteChildren: RootRouteChildren = {
   RecipesSavedRoute: RecipesSavedRoute,
   RecipesVideoRoute: RecipesVideoRoute,
   RecipesIndexRoute: RecipesIndexRoute,
+  ApiAdminFillRecipeBodyRoute: ApiAdminFillRecipeBodyRoute,
   ApiChatStreamRoute: ApiChatStreamRoute,
   ApiDebugEnvRoute: ApiDebugEnvRoute,
   ApiImgSplatRoute: ApiImgSplatRoute,
