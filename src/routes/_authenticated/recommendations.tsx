@@ -6,7 +6,9 @@ import { useServerFn } from "@tanstack/react-start";
 import {
   generateMealPlan,
   acceptMealPlan,
+  adaptTemplateMeals,
 } from "@/features/recommendations/lib/recommendations.functions";
+import { getTemplateMealPlan } from "@/features/mealplan/lib/mealplanTemplate.functions";
 import { BottomNav } from "@/components/bottom-nav";
 import {
   Sparkles,
@@ -16,6 +18,7 @@ import {
   Moon,
   Cookie,
   Check,
+  RotateCw,
   type LucideIcon,
 } from "lucide-react";
 import { toast } from "@/lib/toast-config";
@@ -38,13 +41,73 @@ const LABELS: Record<string, string> = {
   snack: "Snack",
 };
 
+// ──────────────────────────────────────────────────────────────────────
+// Sprint 5a (re-introduced): unified plan shape that the UI consumes.
+// Server returns `mode: "ai" | "ai_empty"`. On `ai_empty`, the client fires
+// a separate `getTemplateMealPlan` call and adapts the result with
+// `adaptTemplateMeals`. The UI then renders either path identically, with
+// a small badge that tells the user which source produced the plan.
+// ──────────────────────────────────────────────────────────────────────
+type PlanMealUI = {
+  meal_type: "breakfast" | "lunch" | "dinner" | "snack";
+  name: string;
+  calories: number;
+  protein_g?: number;
+  carbs_g?: number;
+  fat_g?: number;
+  planned_qty: number;
+  reason: string;
+  food_item_id?: string | null;
+};
+type PlanUI = {
+  mode: "ai" | "template";
+  summary: string;
+  remaining_budget_kcal: number;
+  meals: PlanMealUI[];
+};
+
 function RecommendationsPage() {
   const genFn = useServerFn(generateMealPlan);
   const acceptFn = useServerFn(acceptMealPlan);
+  const tplFn = useServerFn(getTemplateMealPlan);
   const [notes, setNotes] = useState("");
 
-  const gen = useMutation({
-    mutationFn: () => genFn({ data: { notes: notes || undefined } }),
+  const gen = useMutation<PlanUI, Error, { forceAi?: boolean }>({
+    mutationFn: async ({ forceAi = false } = {}) => {
+      const result = await genFn({ data: { notes: notes || undefined } });
+
+      // AI succeeded → done.
+      if (result.mode === "ai") {
+        return {
+          mode: "ai",
+          summary: result.summary,
+          remaining_budget_kcal: result.remaining_budget_kcal,
+          meals: result.meals as PlanMealUI[],
+        };
+      }
+
+      // AI empty + user is forcing AI retry → fail fast, don't fall back.
+      if (forceAi) {
+        throw new Error("AI masih tidak tersedia. Coba lagi sebentar lagi.");
+      }
+
+      // AI empty → fetch template as fallback (separate server fn call).
+      console.info("[recommendations] AI empty, fetching template fallback");
+      const tpl = await tplFn({ data: undefined });
+      if (!tpl.template) {
+        throw new Error("Layanan AI tidak tersedia dan template kosong. Coba lagi nanti.");
+      }
+      const adapted = adaptTemplateMeals(tpl.template.meals);
+      if (adapted.length === 0) {
+        throw new Error("Template tidak punya menu yang valid. Coba lagi nanti.");
+      }
+      return {
+        mode: "template",
+        summary: `Template: ${tpl.template.name} — rekomendasi umum berdasarkan profil kalori.`,
+        remaining_budget_kcal: tpl.template.target_calories ?? 0,
+        meals: adapted as PlanMealUI[],
+      };
+    },
     onError: (e) => toastError(e, "Gagal"),
   });
 
@@ -91,7 +154,7 @@ function RecommendationsPage() {
             className="w-full bg-background rounded-2xl outline-1 outline-black/10 px-3 py-2 text-sm focus:outline-2 focus:outline-primary"
           />
           <button
-            onClick={() => gen.mutate()}
+            onClick={() => gen.mutate({})}
             disabled={gen.isPending}
             className="w-full flex items-center justify-center gap-2 bg-primary text-primary-foreground font-semibold py-3 rounded-2xl disabled:opacity-60"
           >
@@ -107,6 +170,19 @@ function RecommendationsPage() {
         {gen.data && (
           <>
             <section className="bg-card p-4 rounded-3xl outline-1 outline-black/5 animate-fade-up">
+              {/* Sprint 5a: dynamic mode badge. Tells the user which source
+                  produced the plan (AI vs template fallback). */}
+              <div className="flex items-center gap-2 mb-2">
+                {gen.data.mode === "ai" ? (
+                  <span className="inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider bg-primary/10 text-primary px-2 py-1 rounded-full">
+                    <Sparkles className="size-3" /> AI Personal
+                  </span>
+                ) : (
+                  <span className="inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider bg-muted text-muted-foreground px-2 py-1 rounded-full">
+                    📋 Template (estimasi)
+                  </span>
+                )}
+              </div>
               <p className="text-sm leading-relaxed">{gen.data.summary}</p>
               <div className="mt-3 flex items-center justify-between text-xs">
                 <span className="text-muted-foreground">
@@ -117,6 +193,18 @@ function RecommendationsPage() {
                   Total rencana: <b className="text-foreground">{Math.round(totalCal)} kcal</b>
                 </span>
               </div>
+              {gen.data.mode === "template" && (
+                <div className="mt-3 flex items-center gap-2 text-xs text-muted-foreground bg-muted/50 px-3 py-2 rounded-xl">
+                  <span>AI tidak tersedia. Coba paksa AI lagi?</span>
+                  <button
+                    onClick={() => gen.mutate({ forceAi: true })}
+                    disabled={gen.isPending}
+                    className="ml-auto inline-flex items-center gap-1 text-primary font-semibold disabled:opacity-50"
+                  >
+                    <RotateCw className="size-3" /> Coba AI lagi
+                  </button>
+                </div>
+              )}
             </section>
 
             <section className="space-y-3 animate-fade-up">

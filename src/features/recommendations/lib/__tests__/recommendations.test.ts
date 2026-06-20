@@ -1,0 +1,177 @@
+/**
+ * Unit tests for Sprint 5a (re-introduced) Meal Plan refactor:
+ * - Zod schemas (`PlanMealSchema`, `PlanResultSchema`) — exported for testability
+ * - `adaptTemplateMeals` — pure helper that normalizes `meal_plan_templates.meals`
+ *   (Json type from Supabase) into the canonical `PlanMeal[]` shape
+ * - `isUsablePlan` — gate that decides AI success vs template fallback signal
+ *
+ * The server fn (`generateMealPlan`) is wrapped in `createServerFn` which
+ * makes direct invocation awkward. The interesting branches live in pure
+ * helpers that are exported specifically for this purpose. End-to-end
+ * behavior is covered by the live /recommendations page test.
+ */
+import { describe, expect, it } from "vitest";
+import {
+  PlanMealSchema,
+  PlanResultSchema,
+  adaptTemplateMeals,
+  isUsablePlan,
+} from "@/features/recommendations/lib/recommendations.functions";
+
+// ──────────────────────────────────────────────────────────────────────────
+// PlanMealSchema — single-meal validation
+// ──────────────────────────────────────────────────────────────────────────
+describe("PlanMealSchema", () => {
+  it("accepts a valid meal with all macros", () => {
+    const parsed = PlanMealSchema.parse({
+      meal_type: "breakfast",
+      name: "Omelet putih telur",
+      calories: 320,
+      protein_g: 25,
+      carbs_g: 8,
+      fat_g: 18,
+      planned_qty: 1,
+      reason: "Tinggi protein, rendah kalori",
+    });
+    expect(parsed.meal_type).toBe("breakfast");
+    expect(parsed.calories).toBe(320);
+    expect(parsed.protein_g).toBe(25);
+  });
+
+  it("accepts a minimal meal (only required fields) and applies defaults", () => {
+    const parsed = PlanMealSchema.parse({
+      meal_type: "snack",
+      name: "Yogurt",
+      calories: 150,
+    });
+    expect(parsed.planned_qty).toBe(1);
+    expect(parsed.reason).toBe("");
+    expect(parsed.protein_g).toBeUndefined();
+  });
+
+  it("rejects unknown meal_type", () => {
+    expect(() => PlanMealSchema.parse({ meal_type: "supper", name: "x", calories: 100 })).toThrow();
+  });
+
+  it("rejects negative or absurd calories", () => {
+    expect(() => PlanMealSchema.parse({ meal_type: "lunch", name: "x", calories: -50 })).toThrow();
+    expect(() => PlanMealSchema.parse({ meal_type: "lunch", name: "x", calories: 6000 })).toThrow();
+  });
+
+  it("rejects planned_qty out of range", () => {
+    expect(() =>
+      PlanMealSchema.parse({ meal_type: "lunch", name: "x", calories: 100, planned_qty: 0 }),
+    ).toThrow();
+    expect(() =>
+      PlanMealSchema.parse({ meal_type: "lunch", name: "x", calories: 100, planned_qty: 25 }),
+    ).toThrow();
+  });
+});
+
+// ──────────────────────────────────────────────────────────────────────────
+// PlanResultSchema — AI response shape
+// ──────────────────────────────────────────────────────────────────────────
+describe("PlanResultSchema", () => {
+  it("accepts a valid result with multiple meals", () => {
+    const parsed = PlanResultSchema.parse({
+      summary: "Rekomendasi sehat untuk sisa hari ini",
+      meals: [
+        { meal_type: "breakfast", name: "Nasi goreng", calories: 400 },
+        { meal_type: "lunch", name: "Ayam bakar", calories: 500 },
+      ],
+    });
+    expect(parsed.meals).toHaveLength(2);
+    expect(parsed.summary).toContain("sehat");
+  });
+
+  it("rejects empty meals array", () => {
+    expect(() => PlanResultSchema.parse({ summary: "x", meals: [] })).toThrow();
+  });
+
+  it("rejects more than 8 meals", () => {
+    const meals = Array.from({ length: 9 }, (_, i) => ({
+      meal_type: "snack" as const,
+      name: `Snack ${i}`,
+      calories: 100,
+    }));
+    expect(() => PlanResultSchema.parse({ summary: "x", meals })).toThrow();
+  });
+
+  it("rejects missing summary", () => {
+    expect(() =>
+      PlanResultSchema.parse({ meals: [{ meal_type: "lunch", name: "x", calories: 100 }] }),
+    ).toThrow();
+  });
+});
+
+// ──────────────────────────────────────────────────────────────────────────
+// adaptTemplateMeals — Supabase Json → PlanMeal[]
+// ──────────────────────────────────────────────────────────────────────────
+describe("adaptTemplateMeals", () => {
+  it("returns empty array for non-array input", () => {
+    expect(adaptTemplateMeals(null)).toEqual([]);
+    expect(adaptTemplateMeals(undefined)).toEqual([]);
+    expect(adaptTemplateMeals({})).toEqual([]);
+    expect(adaptTemplateMeals("not an array")).toEqual([]);
+  });
+
+  it("normalizes a valid template row", () => {
+    const result = adaptTemplateMeals([
+      { meal_type: "breakfast", name: "Bubur ayam", calories: 350 },
+      { meal_type: "lunch", name: "Nasi padang", calories: 650 },
+    ]);
+    expect(result).toHaveLength(2);
+    expect(result[0]).toMatchObject({
+      meal_type: "breakfast",
+      name: "Bubur ayam",
+      calories: 350,
+      planned_qty: 1,
+      reason: "Rekomendasi template (AI tidak tersedia)",
+    });
+  });
+
+  it("filters out invalid entries silently", () => {
+    const result = adaptTemplateMeals([
+      { meal_type: "breakfast", name: "OK", calories: 100 },
+      { meal_type: "supper", name: "Invalid meal_type", calories: 100 },
+      { meal_type: "lunch", name: "", calories: 100 },
+      { meal_type: "dinner", name: "Negative cals", calories: -50 },
+      null,
+      "string",
+      { meal_type: "snack", name: "Yogurt", calories: 80 },
+    ]);
+    expect(result).toHaveLength(2);
+    expect(result[0].name).toBe("OK");
+    expect(result[1].name).toBe("Yogurt");
+  });
+
+  it("always sets planned_qty=1 and the template reason", () => {
+    const result = adaptTemplateMeals([{ meal_type: "lunch", name: "Test", calories: 200 }]);
+    expect(result[0].planned_qty).toBe(1);
+    expect(result[0].reason).toMatch(/template/);
+  });
+});
+
+// ──────────────────────────────────────────────────────────────────────────
+// isUsablePlan — gate for AI success
+// ──────────────────────────────────────────────────────────────────────────
+describe("isUsablePlan", () => {
+  it("returns true for non-empty meals array", () => {
+    expect(
+      isUsablePlan({ summary: "ok", meals: [{ meal_type: "lunch", name: "x", calories: 100 }] }),
+    ).toBe(true);
+  });
+
+  it("returns false for empty meals array", () => {
+    expect(isUsablePlan({ summary: "ok", meals: [] })).toBe(false);
+  });
+
+  it("returns false for null/undefined", () => {
+    expect(isUsablePlan(null)).toBe(false);
+    expect(isUsablePlan(undefined)).toBe(false);
+  });
+
+  it("returns false for missing meals field", () => {
+    expect(isUsablePlan({ summary: "ok" } as never)).toBe(false);
+  });
+});
