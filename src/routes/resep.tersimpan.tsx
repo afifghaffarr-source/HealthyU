@@ -1,14 +1,23 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, redirect } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { useEffect } from "react";
 import { Bookmark, Clock, Flame, Star } from "lucide-react";
 import { listRecipeBookmarks } from "@/features/recipes/lib/recipeBookmarks.functions";
-import { getOptionalUser } from "@/integrations/supabase/optional-auth";
-import { useNavigate } from "@tanstack/react-router";
 import { TopAppBar } from "@/components/healthyu/top-app-bar";
+import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/resep/tersimpan")({
+  // Server-side auth gate. Anon users go straight to /auth (no flash of
+  // empty state). `supabase.auth.getUser()` works on the server because we
+  // configured it with `persistSession` + the publishable key, and the
+  // client falls back to a fresh anonymous client when no session cookie
+  // is present.
+  beforeLoad: async () => {
+    const { data } = await supabase.auth.getUser();
+    if (!data.user?.id) {
+      throw redirect({ to: "/auth" });
+    }
+  },
   component: SavedRecipesPage,
 });
 
@@ -18,40 +27,11 @@ export const Route = createFileRoute("/resep/tersimpan")({
  * Anon users are redirected to /auth with a "please login" message.
  */
 function SavedRecipesPage() {
-  const userFn = useServerFn(getOptionalUser);
-  const { data: userData, isLoading: userLoading } = useQuery({
-    queryKey: ["optional-user"],
-    queryFn: () => userFn(),
-    staleTime: 60_000,
-  });
-  const isAuthed = !!userData?.userId;
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    if (!userLoading && !isAuthed) {
-      navigate({ to: "/auth" });
-    }
-  }, [userLoading, isAuthed, navigate]);
-
   const fetch = useServerFn(listRecipeBookmarks);
   const { data: items = [], isLoading } = useQuery({
     queryKey: ["recipe-bookmarks"],
     queryFn: () => fetch(),
-    enabled: isAuthed,
   });
-
-  if (!userLoading && !isAuthed) {
-    return (
-      <main className="min-h-dvh bg-background">
-        <div className="max-w-md mx-auto px-5 pt-2 space-y-5">
-          <TopAppBar title="Resep Tersimpan" showBack />
-          <p className="text-sm text-muted-foreground text-center py-10">
-            Mengalihkan ke halaman login...
-          </p>
-        </div>
-      </main>
-    );
-  }
 
   return (
     <main className="min-h-dvh bg-background pb-24">
