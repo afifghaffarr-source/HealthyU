@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as ResepRouteImport } from './routes/resep'
+import { Route as RecipesRouteImport } from './routes/recipes'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as PrismRouteImport } from './routes/prism'
 import { Route as OlahragaRouteImport } from './routes/olahraga'
@@ -33,6 +34,7 @@ import { Route as DietIndexRouteImport } from './routes/diet.index'
 import { Route as ArtikelIndexRouteImport } from './routes/artikel.index'
 import { Route as ResepTersimpanRouteImport } from './routes/resep.tersimpan'
 import { Route as ResepSlugRouteImport } from './routes/resep.$slug'
+import { Route as RecipesSplatRouteImport } from './routes/recipes.$'
 import { Route as OlahragaSlugRouteImport } from './routes/olahraga.$slug'
 import { Route as KaloriSlugRouteImport } from './routes/kalori.$slug'
 import { Route as KalkulatorSlugRouteImport } from './routes/kalkulator.$slug'
@@ -58,7 +60,6 @@ import { Route as AuthenticatedReportsRouteImport } from './routes/_authenticate
 import { Route as AuthenticatedRemindersRouteImport } from './routes/_authenticated/reminders'
 import { Route as AuthenticatedReferralsRouteImport } from './routes/_authenticated/referrals'
 import { Route as AuthenticatedRecommendationsRouteImport } from './routes/_authenticated/recommendations'
-import { Route as AuthenticatedRecipesRouteImport } from './routes/_authenticated/recipes'
 import { Route as AuthenticatedProgressRouteImport } from './routes/_authenticated/progress'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
 import { Route as AuthenticatedPrayerRouteImport } from './routes/_authenticated/prayer'
@@ -132,12 +133,6 @@ import { Route as AuthenticatedReportsHydrationRouteImport } from './routes/_aut
 import { Route as AuthenticatedReportsGalleryRouteImport } from './routes/_authenticated/reports.gallery'
 import { Route as AuthenticatedReportsExportRouteImport } from './routes/_authenticated/reports.export'
 import { Route as AuthenticatedReportsCompareRouteImport } from './routes/_authenticated/reports.compare'
-import { Route as AuthenticatedRecipesVideoRouteImport } from './routes/_authenticated/recipes.video'
-import { Route as AuthenticatedRecipesSavedRouteImport } from './routes/_authenticated/recipes.saved'
-import { Route as AuthenticatedRecipesRecommendationsRouteImport } from './routes/_authenticated/recipes.recommendations'
-import { Route as AuthenticatedRecipesImportRouteImport } from './routes/_authenticated/recipes.import'
-import { Route as AuthenticatedRecipesIdRouteImport } from './routes/_authenticated/recipes.$id'
-import { Route as AuthenticatedRecipesSplatRouteImport } from './routes/_authenticated/recipes.$'
 import { Route as AuthenticatedQuizDailyRouteImport } from './routes/_authenticated/quiz.daily'
 import { Route as AuthenticatedPushAlarmRouteImport } from './routes/_authenticated/push.alarm'
 import { Route as AuthenticatedProfileScanStatsRouteImport } from './routes/_authenticated/profile.scan-stats'
@@ -186,8 +181,6 @@ import { Route as ApiPublicHooksDataRetentionRouteImport } from './routes/api/pu
 import { Route as ApiPublicHooksDailyContentRouteImport } from './routes/api/public/hooks/daily-content'
 import { Route as ApiPublicHooksDailyCoachRouteImport } from './routes/api/public/hooks/daily-coach'
 import { Route as AuthenticatedWorkoutPlayerIdRouteImport } from './routes/_authenticated/workout.player.$id'
-import { Route as AuthenticatedRecipesIdReviewsRouteImport } from './routes/_authenticated/recipes.$id.reviews'
-import { Route as AuthenticatedRecipesIdRemixRouteImport } from './routes/_authenticated/recipes.$id.remix'
 import { Route as AuthenticatedProfilePublicIdRouteImport } from './routes/_authenticated/profile.public.$id'
 import { Route as AuthenticatedProfileFollowersIdRouteImport } from './routes/_authenticated/profile.followers.$id'
 import { Route as AuthenticatedGroupsIdMealsRouteImport } from './routes/_authenticated/groups.$id.meals'
@@ -201,6 +194,11 @@ const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
 const ResepRoute = ResepRouteImport.update({
   id: '/resep',
   path: '/resep',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RecipesRoute = RecipesRouteImport.update({
+  id: '/recipes',
+  path: '/recipes',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PrivacyRoute = PrivacyRouteImport.update({
@@ -268,9 +266,9 @@ const ResepIndexRoute = ResepIndexRouteImport.update({
   getParentRoute: () => ResepRoute,
 } as any)
 const RecipesIndexRoute = RecipesIndexRouteImport.update({
-  id: '/recipes/',
-  path: '/recipes/',
-  getParentRoute: () => rootRouteImport,
+  id: '/',
+  path: '/',
+  getParentRoute: () => RecipesRoute,
 } as any)
 const OlahragaIndexRoute = OlahragaIndexRouteImport.update({
   id: '/',
@@ -311,6 +309,11 @@ const ResepSlugRoute = ResepSlugRouteImport.update({
   id: '/$slug',
   path: '/$slug',
   getParentRoute: () => ResepRoute,
+} as any)
+const RecipesSplatRoute = RecipesSplatRouteImport.update({
+  id: '/$',
+  path: '/$',
+  getParentRoute: () => RecipesRoute,
 } as any)
 const OlahragaSlugRoute = OlahragaSlugRouteImport.update({
   id: '/$slug',
@@ -440,11 +443,6 @@ const AuthenticatedRecommendationsRoute =
     path: '/recommendations',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
-const AuthenticatedRecipesRoute = AuthenticatedRecipesRouteImport.update({
-  id: '/recipes',
-  path: '/recipes',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
 const AuthenticatedProgressRoute = AuthenticatedProgressRouteImport.update({
   id: '/progress',
   path: '/progress',
@@ -839,41 +837,6 @@ const AuthenticatedReportsCompareRoute =
     path: '/compare',
     getParentRoute: () => AuthenticatedReportsRoute,
   } as any)
-const AuthenticatedRecipesVideoRoute =
-  AuthenticatedRecipesVideoRouteImport.update({
-    id: '/video',
-    path: '/video',
-    getParentRoute: () => AuthenticatedRecipesRoute,
-  } as any)
-const AuthenticatedRecipesSavedRoute =
-  AuthenticatedRecipesSavedRouteImport.update({
-    id: '/saved',
-    path: '/saved',
-    getParentRoute: () => AuthenticatedRecipesRoute,
-  } as any)
-const AuthenticatedRecipesRecommendationsRoute =
-  AuthenticatedRecipesRecommendationsRouteImport.update({
-    id: '/recommendations',
-    path: '/recommendations',
-    getParentRoute: () => AuthenticatedRecipesRoute,
-  } as any)
-const AuthenticatedRecipesImportRoute =
-  AuthenticatedRecipesImportRouteImport.update({
-    id: '/import',
-    path: '/import',
-    getParentRoute: () => AuthenticatedRecipesRoute,
-  } as any)
-const AuthenticatedRecipesIdRoute = AuthenticatedRecipesIdRouteImport.update({
-  id: '/$id',
-  path: '/$id',
-  getParentRoute: () => AuthenticatedRecipesRoute,
-} as any)
-const AuthenticatedRecipesSplatRoute =
-  AuthenticatedRecipesSplatRouteImport.update({
-    id: '/$',
-    path: '/$',
-    getParentRoute: () => AuthenticatedRecipesRoute,
-  } as any)
 const AuthenticatedQuizDailyRoute = AuthenticatedQuizDailyRouteImport.update({
   id: '/quiz/daily',
   path: '/quiz/daily',
@@ -1153,18 +1116,6 @@ const AuthenticatedWorkoutPlayerIdRoute =
     path: '/player/$id',
     getParentRoute: () => AuthenticatedWorkoutRoute,
   } as any)
-const AuthenticatedRecipesIdReviewsRoute =
-  AuthenticatedRecipesIdReviewsRouteImport.update({
-    id: '/reviews',
-    path: '/reviews',
-    getParentRoute: () => AuthenticatedRecipesIdRoute,
-  } as any)
-const AuthenticatedRecipesIdRemixRoute =
-  AuthenticatedRecipesIdRemixRouteImport.update({
-    id: '/remix',
-    path: '/remix',
-    getParentRoute: () => AuthenticatedRecipesIdRoute,
-  } as any)
 const AuthenticatedProfilePublicIdRoute =
   AuthenticatedProfilePublicIdRouteImport.update({
     id: '/public/$id',
@@ -1202,6 +1153,7 @@ export interface FileRoutesByFullPath {
   '/olahraga': typeof OlahragaRouteWithChildren
   '/prism': typeof PrismRoute
   '/privacy': typeof PrivacyRoute
+  '/recipes': typeof RecipesRouteWithChildren
   '/resep': typeof ResepRouteWithChildren
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/admin': typeof AuthenticatedAdminRouteRouteWithChildren
@@ -1242,7 +1194,6 @@ export interface FileRoutesByFullPath {
   '/prayer': typeof AuthenticatedPrayerRouteWithChildren
   '/profile': typeof AuthenticatedProfileRouteWithChildren
   '/progress': typeof AuthenticatedProgressRoute
-  '/recipes': typeof AuthenticatedRecipesRouteWithChildren
   '/recommendations': typeof AuthenticatedRecommendationsRoute
   '/referrals': typeof AuthenticatedReferralsRoute
   '/reminders': typeof AuthenticatedRemindersRoute
@@ -1268,6 +1219,7 @@ export interface FileRoutesByFullPath {
   '/kalkulator/$slug': typeof KalkulatorSlugRoute
   '/kalori/$slug': typeof KaloriSlugRoute
   '/olahraga/$slug': typeof OlahragaSlugRoute
+  '/recipes/$': typeof RecipesSplatRoute
   '/resep/$slug': typeof ResepSlugRoute
   '/resep/tersimpan': typeof ResepTersimpanRoute
   '/artikel/': typeof ArtikelIndexRoute
@@ -1317,12 +1269,6 @@ export interface FileRoutesByFullPath {
   '/profile/scan-stats': typeof AuthenticatedProfileScanStatsRoute
   '/push/alarm': typeof AuthenticatedPushAlarmRoute
   '/quiz/daily': typeof AuthenticatedQuizDailyRoute
-  '/recipes/$': typeof AuthenticatedRecipesSplatRoute
-  '/recipes/$id': typeof AuthenticatedRecipesIdRouteWithChildren
-  '/recipes/import': typeof AuthenticatedRecipesImportRoute
-  '/recipes/recommendations': typeof AuthenticatedRecipesRecommendationsRoute
-  '/recipes/saved': typeof AuthenticatedRecipesSavedRoute
-  '/recipes/video': typeof AuthenticatedRecipesVideoRoute
   '/reports/compare': typeof AuthenticatedReportsCompareRoute
   '/reports/export': typeof AuthenticatedReportsExportRoute
   '/reports/gallery': typeof AuthenticatedReportsGalleryRoute
@@ -1362,8 +1308,6 @@ export interface FileRoutesByFullPath {
   '/groups/$id/meals': typeof AuthenticatedGroupsIdMealsRoute
   '/profile/followers/$id': typeof AuthenticatedProfileFollowersIdRoute
   '/profile/public/$id': typeof AuthenticatedProfilePublicIdRoute
-  '/recipes/$id/remix': typeof AuthenticatedRecipesIdRemixRoute
-  '/recipes/$id/reviews': typeof AuthenticatedRecipesIdReviewsRoute
   '/workout/player/$id': typeof AuthenticatedWorkoutPlayerIdRoute
   '/api/public/hooks/daily-coach': typeof ApiPublicHooksDailyCoachRoute
   '/api/public/hooks/daily-content': typeof ApiPublicHooksDailyContentRoute
@@ -1418,7 +1362,6 @@ export interface FileRoutesByTo {
   '/prayer': typeof AuthenticatedPrayerRouteWithChildren
   '/profile': typeof AuthenticatedProfileRouteWithChildren
   '/progress': typeof AuthenticatedProgressRoute
-  '/recipes': typeof RecipesIndexRoute
   '/recommendations': typeof AuthenticatedRecommendationsRoute
   '/referrals': typeof AuthenticatedReferralsRoute
   '/reminders': typeof AuthenticatedRemindersRoute
@@ -1444,6 +1387,7 @@ export interface FileRoutesByTo {
   '/kalkulator/$slug': typeof KalkulatorSlugRoute
   '/kalori/$slug': typeof KaloriSlugRoute
   '/olahraga/$slug': typeof OlahragaSlugRoute
+  '/recipes/$': typeof RecipesSplatRoute
   '/resep/$slug': typeof ResepSlugRoute
   '/resep/tersimpan': typeof ResepTersimpanRoute
   '/artikel': typeof ArtikelIndexRoute
@@ -1452,6 +1396,7 @@ export interface FileRoutesByTo {
   '/kalkulator': typeof KalkulatorIndexRoute
   '/kalori': typeof KaloriIndexRoute
   '/olahraga': typeof OlahragaIndexRoute
+  '/recipes': typeof RecipesIndexRoute
   '/resep': typeof ResepIndexRoute
   '/admin/articles': typeof AuthenticatedAdminArticlesRoute
   '/admin/audit': typeof AuthenticatedAdminAuditRoute
@@ -1492,12 +1437,6 @@ export interface FileRoutesByTo {
   '/profile/scan-stats': typeof AuthenticatedProfileScanStatsRoute
   '/push/alarm': typeof AuthenticatedPushAlarmRoute
   '/quiz/daily': typeof AuthenticatedQuizDailyRoute
-  '/recipes/$': typeof AuthenticatedRecipesSplatRoute
-  '/recipes/$id': typeof AuthenticatedRecipesIdRouteWithChildren
-  '/recipes/import': typeof AuthenticatedRecipesImportRoute
-  '/recipes/recommendations': typeof AuthenticatedRecipesRecommendationsRoute
-  '/recipes/saved': typeof AuthenticatedRecipesSavedRoute
-  '/recipes/video': typeof AuthenticatedRecipesVideoRoute
   '/reports/compare': typeof AuthenticatedReportsCompareRoute
   '/reports/export': typeof AuthenticatedReportsExportRoute
   '/reports/gallery': typeof AuthenticatedReportsGalleryRoute
@@ -1537,8 +1476,6 @@ export interface FileRoutesByTo {
   '/groups/$id/meals': typeof AuthenticatedGroupsIdMealsRoute
   '/profile/followers/$id': typeof AuthenticatedProfileFollowersIdRoute
   '/profile/public/$id': typeof AuthenticatedProfilePublicIdRoute
-  '/recipes/$id/remix': typeof AuthenticatedRecipesIdRemixRoute
-  '/recipes/$id/reviews': typeof AuthenticatedRecipesIdReviewsRoute
   '/workout/player/$id': typeof AuthenticatedWorkoutPlayerIdRoute
   '/api/public/hooks/daily-coach': typeof ApiPublicHooksDailyCoachRoute
   '/api/public/hooks/daily-content': typeof ApiPublicHooksDailyContentRoute
@@ -1563,6 +1500,7 @@ export interface FileRoutesById {
   '/olahraga': typeof OlahragaRouteWithChildren
   '/prism': typeof PrismRoute
   '/privacy': typeof PrivacyRoute
+  '/recipes': typeof RecipesRouteWithChildren
   '/resep': typeof ResepRouteWithChildren
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRouteRouteWithChildren
@@ -1603,7 +1541,6 @@ export interface FileRoutesById {
   '/_authenticated/prayer': typeof AuthenticatedPrayerRouteWithChildren
   '/_authenticated/profile': typeof AuthenticatedProfileRouteWithChildren
   '/_authenticated/progress': typeof AuthenticatedProgressRoute
-  '/_authenticated/recipes': typeof AuthenticatedRecipesRouteWithChildren
   '/_authenticated/recommendations': typeof AuthenticatedRecommendationsRoute
   '/_authenticated/referrals': typeof AuthenticatedReferralsRoute
   '/_authenticated/reminders': typeof AuthenticatedRemindersRoute
@@ -1629,6 +1566,7 @@ export interface FileRoutesById {
   '/kalkulator/$slug': typeof KalkulatorSlugRoute
   '/kalori/$slug': typeof KaloriSlugRoute
   '/olahraga/$slug': typeof OlahragaSlugRoute
+  '/recipes/$': typeof RecipesSplatRoute
   '/resep/$slug': typeof ResepSlugRoute
   '/resep/tersimpan': typeof ResepTersimpanRoute
   '/artikel/': typeof ArtikelIndexRoute
@@ -1678,12 +1616,6 @@ export interface FileRoutesById {
   '/_authenticated/profile/scan-stats': typeof AuthenticatedProfileScanStatsRoute
   '/_authenticated/push/alarm': typeof AuthenticatedPushAlarmRoute
   '/_authenticated/quiz/daily': typeof AuthenticatedQuizDailyRoute
-  '/_authenticated/recipes/$': typeof AuthenticatedRecipesSplatRoute
-  '/_authenticated/recipes/$id': typeof AuthenticatedRecipesIdRouteWithChildren
-  '/_authenticated/recipes/import': typeof AuthenticatedRecipesImportRoute
-  '/_authenticated/recipes/recommendations': typeof AuthenticatedRecipesRecommendationsRoute
-  '/_authenticated/recipes/saved': typeof AuthenticatedRecipesSavedRoute
-  '/_authenticated/recipes/video': typeof AuthenticatedRecipesVideoRoute
   '/_authenticated/reports/compare': typeof AuthenticatedReportsCompareRoute
   '/_authenticated/reports/export': typeof AuthenticatedReportsExportRoute
   '/_authenticated/reports/gallery': typeof AuthenticatedReportsGalleryRoute
@@ -1723,8 +1655,6 @@ export interface FileRoutesById {
   '/_authenticated/groups/$id/meals': typeof AuthenticatedGroupsIdMealsRoute
   '/_authenticated/profile/followers/$id': typeof AuthenticatedProfileFollowersIdRoute
   '/_authenticated/profile/public/$id': typeof AuthenticatedProfilePublicIdRoute
-  '/_authenticated/recipes/$id/remix': typeof AuthenticatedRecipesIdRemixRoute
-  '/_authenticated/recipes/$id/reviews': typeof AuthenticatedRecipesIdReviewsRoute
   '/_authenticated/workout/player/$id': typeof AuthenticatedWorkoutPlayerIdRoute
   '/api/public/hooks/daily-coach': typeof ApiPublicHooksDailyCoachRoute
   '/api/public/hooks/daily-content': typeof ApiPublicHooksDailyContentRoute
@@ -1749,6 +1679,7 @@ export interface FileRouteTypes {
     | '/olahraga'
     | '/prism'
     | '/privacy'
+    | '/recipes'
     | '/resep'
     | '/sitemap.xml'
     | '/admin'
@@ -1789,7 +1720,6 @@ export interface FileRouteTypes {
     | '/prayer'
     | '/profile'
     | '/progress'
-    | '/recipes'
     | '/recommendations'
     | '/referrals'
     | '/reminders'
@@ -1815,6 +1745,7 @@ export interface FileRouteTypes {
     | '/kalkulator/$slug'
     | '/kalori/$slug'
     | '/olahraga/$slug'
+    | '/recipes/$'
     | '/resep/$slug'
     | '/resep/tersimpan'
     | '/artikel/'
@@ -1864,12 +1795,6 @@ export interface FileRouteTypes {
     | '/profile/scan-stats'
     | '/push/alarm'
     | '/quiz/daily'
-    | '/recipes/$'
-    | '/recipes/$id'
-    | '/recipes/import'
-    | '/recipes/recommendations'
-    | '/recipes/saved'
-    | '/recipes/video'
     | '/reports/compare'
     | '/reports/export'
     | '/reports/gallery'
@@ -1909,8 +1834,6 @@ export interface FileRouteTypes {
     | '/groups/$id/meals'
     | '/profile/followers/$id'
     | '/profile/public/$id'
-    | '/recipes/$id/remix'
-    | '/recipes/$id/reviews'
     | '/workout/player/$id'
     | '/api/public/hooks/daily-coach'
     | '/api/public/hooks/daily-content'
@@ -1965,7 +1888,6 @@ export interface FileRouteTypes {
     | '/prayer'
     | '/profile'
     | '/progress'
-    | '/recipes'
     | '/recommendations'
     | '/referrals'
     | '/reminders'
@@ -1991,6 +1913,7 @@ export interface FileRouteTypes {
     | '/kalkulator/$slug'
     | '/kalori/$slug'
     | '/olahraga/$slug'
+    | '/recipes/$'
     | '/resep/$slug'
     | '/resep/tersimpan'
     | '/artikel'
@@ -1999,6 +1922,7 @@ export interface FileRouteTypes {
     | '/kalkulator'
     | '/kalori'
     | '/olahraga'
+    | '/recipes'
     | '/resep'
     | '/admin/articles'
     | '/admin/audit'
@@ -2039,12 +1963,6 @@ export interface FileRouteTypes {
     | '/profile/scan-stats'
     | '/push/alarm'
     | '/quiz/daily'
-    | '/recipes/$'
-    | '/recipes/$id'
-    | '/recipes/import'
-    | '/recipes/recommendations'
-    | '/recipes/saved'
-    | '/recipes/video'
     | '/reports/compare'
     | '/reports/export'
     | '/reports/gallery'
@@ -2084,8 +2002,6 @@ export interface FileRouteTypes {
     | '/groups/$id/meals'
     | '/profile/followers/$id'
     | '/profile/public/$id'
-    | '/recipes/$id/remix'
-    | '/recipes/$id/reviews'
     | '/workout/player/$id'
     | '/api/public/hooks/daily-coach'
     | '/api/public/hooks/daily-content'
@@ -2109,6 +2025,7 @@ export interface FileRouteTypes {
     | '/olahraga'
     | '/prism'
     | '/privacy'
+    | '/recipes'
     | '/resep'
     | '/sitemap.xml'
     | '/_authenticated/admin'
@@ -2149,7 +2066,6 @@ export interface FileRouteTypes {
     | '/_authenticated/prayer'
     | '/_authenticated/profile'
     | '/_authenticated/progress'
-    | '/_authenticated/recipes'
     | '/_authenticated/recommendations'
     | '/_authenticated/referrals'
     | '/_authenticated/reminders'
@@ -2175,6 +2091,7 @@ export interface FileRouteTypes {
     | '/kalkulator/$slug'
     | '/kalori/$slug'
     | '/olahraga/$slug'
+    | '/recipes/$'
     | '/resep/$slug'
     | '/resep/tersimpan'
     | '/artikel/'
@@ -2224,12 +2141,6 @@ export interface FileRouteTypes {
     | '/_authenticated/profile/scan-stats'
     | '/_authenticated/push/alarm'
     | '/_authenticated/quiz/daily'
-    | '/_authenticated/recipes/$'
-    | '/_authenticated/recipes/$id'
-    | '/_authenticated/recipes/import'
-    | '/_authenticated/recipes/recommendations'
-    | '/_authenticated/recipes/saved'
-    | '/_authenticated/recipes/video'
     | '/_authenticated/reports/compare'
     | '/_authenticated/reports/export'
     | '/_authenticated/reports/gallery'
@@ -2269,8 +2180,6 @@ export interface FileRouteTypes {
     | '/_authenticated/groups/$id/meals'
     | '/_authenticated/profile/followers/$id'
     | '/_authenticated/profile/public/$id'
-    | '/_authenticated/recipes/$id/remix'
-    | '/_authenticated/recipes/$id/reviews'
     | '/_authenticated/workout/player/$id'
     | '/api/public/hooks/daily-coach'
     | '/api/public/hooks/daily-content'
@@ -2295,12 +2204,12 @@ export interface RootRouteChildren {
   OlahragaRoute: typeof OlahragaRouteWithChildren
   PrismRoute: typeof PrismRoute
   PrivacyRoute: typeof PrivacyRoute
+  RecipesRoute: typeof RecipesRouteWithChildren
   ResepRoute: typeof ResepRouteWithChildren
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   ApiAiStatusRoute: typeof ApiAiStatusRoute
   ApiHealthRoute: typeof ApiHealthRoute
   ApiLogErrorRoute: typeof ApiLogErrorRoute
-  RecipesIndexRoute: typeof RecipesIndexRoute
   ApiChatStreamRoute: typeof ApiChatStreamRoute
   ApiDebugEnvRoute: typeof ApiDebugEnvRoute
   ApiImgSplatRoute: typeof ApiImgSplatRoute
@@ -2328,6 +2237,13 @@ declare module '@tanstack/react-router' {
       path: '/resep'
       fullPath: '/resep'
       preLoaderRoute: typeof ResepRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/recipes': {
+      id: '/recipes'
+      path: '/recipes'
+      fullPath: '/recipes'
+      preLoaderRoute: typeof RecipesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/privacy': {
@@ -2423,10 +2339,10 @@ declare module '@tanstack/react-router' {
     }
     '/recipes/': {
       id: '/recipes/'
-      path: '/recipes'
+      path: '/'
       fullPath: '/recipes/'
       preLoaderRoute: typeof RecipesIndexRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof RecipesRoute
     }
     '/olahraga/': {
       id: '/olahraga/'
@@ -2483,6 +2399,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/resep/$slug'
       preLoaderRoute: typeof ResepSlugRouteImport
       parentRoute: typeof ResepRoute
+    }
+    '/recipes/$': {
+      id: '/recipes/$'
+      path: '/$'
+      fullPath: '/recipes/$'
+      preLoaderRoute: typeof RecipesSplatRouteImport
+      parentRoute: typeof RecipesRoute
     }
     '/olahraga/$slug': {
       id: '/olahraga/$slug'
@@ -2657,13 +2580,6 @@ declare module '@tanstack/react-router' {
       path: '/recommendations'
       fullPath: '/recommendations'
       preLoaderRoute: typeof AuthenticatedRecommendationsRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/recipes': {
-      id: '/_authenticated/recipes'
-      path: '/recipes'
-      fullPath: '/recipes'
-      preLoaderRoute: typeof AuthenticatedRecipesRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/progress': {
@@ -3177,48 +3093,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedReportsCompareRouteImport
       parentRoute: typeof AuthenticatedReportsRoute
     }
-    '/_authenticated/recipes/video': {
-      id: '/_authenticated/recipes/video'
-      path: '/video'
-      fullPath: '/recipes/video'
-      preLoaderRoute: typeof AuthenticatedRecipesVideoRouteImport
-      parentRoute: typeof AuthenticatedRecipesRoute
-    }
-    '/_authenticated/recipes/saved': {
-      id: '/_authenticated/recipes/saved'
-      path: '/saved'
-      fullPath: '/recipes/saved'
-      preLoaderRoute: typeof AuthenticatedRecipesSavedRouteImport
-      parentRoute: typeof AuthenticatedRecipesRoute
-    }
-    '/_authenticated/recipes/recommendations': {
-      id: '/_authenticated/recipes/recommendations'
-      path: '/recommendations'
-      fullPath: '/recipes/recommendations'
-      preLoaderRoute: typeof AuthenticatedRecipesRecommendationsRouteImport
-      parentRoute: typeof AuthenticatedRecipesRoute
-    }
-    '/_authenticated/recipes/import': {
-      id: '/_authenticated/recipes/import'
-      path: '/import'
-      fullPath: '/recipes/import'
-      preLoaderRoute: typeof AuthenticatedRecipesImportRouteImport
-      parentRoute: typeof AuthenticatedRecipesRoute
-    }
-    '/_authenticated/recipes/$id': {
-      id: '/_authenticated/recipes/$id'
-      path: '/$id'
-      fullPath: '/recipes/$id'
-      preLoaderRoute: typeof AuthenticatedRecipesIdRouteImport
-      parentRoute: typeof AuthenticatedRecipesRoute
-    }
-    '/_authenticated/recipes/$': {
-      id: '/_authenticated/recipes/$'
-      path: '/$'
-      fullPath: '/recipes/$'
-      preLoaderRoute: typeof AuthenticatedRecipesSplatRouteImport
-      parentRoute: typeof AuthenticatedRecipesRoute
-    }
     '/_authenticated/quiz/daily': {
       id: '/_authenticated/quiz/daily'
       path: '/quiz/daily'
@@ -3555,20 +3429,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedWorkoutPlayerIdRouteImport
       parentRoute: typeof AuthenticatedWorkoutRoute
     }
-    '/_authenticated/recipes/$id/reviews': {
-      id: '/_authenticated/recipes/$id/reviews'
-      path: '/reviews'
-      fullPath: '/recipes/$id/reviews'
-      preLoaderRoute: typeof AuthenticatedRecipesIdReviewsRouteImport
-      parentRoute: typeof AuthenticatedRecipesIdRoute
-    }
-    '/_authenticated/recipes/$id/remix': {
-      id: '/_authenticated/recipes/$id/remix'
-      path: '/remix'
-      fullPath: '/recipes/$id/remix'
-      preLoaderRoute: typeof AuthenticatedRecipesIdRemixRouteImport
-      parentRoute: typeof AuthenticatedRecipesIdRoute
-    }
     '/_authenticated/profile/public/$id': {
       id: '/_authenticated/profile/public/$id'
       path: '/public/$id'
@@ -3816,44 +3676,6 @@ const AuthenticatedProfileRouteChildren: AuthenticatedProfileRouteChildren = {
 const AuthenticatedProfileRouteWithChildren =
   AuthenticatedProfileRoute._addFileChildren(AuthenticatedProfileRouteChildren)
 
-interface AuthenticatedRecipesIdRouteChildren {
-  AuthenticatedRecipesIdRemixRoute: typeof AuthenticatedRecipesIdRemixRoute
-  AuthenticatedRecipesIdReviewsRoute: typeof AuthenticatedRecipesIdReviewsRoute
-}
-
-const AuthenticatedRecipesIdRouteChildren: AuthenticatedRecipesIdRouteChildren =
-  {
-    AuthenticatedRecipesIdRemixRoute: AuthenticatedRecipesIdRemixRoute,
-    AuthenticatedRecipesIdReviewsRoute: AuthenticatedRecipesIdReviewsRoute,
-  }
-
-const AuthenticatedRecipesIdRouteWithChildren =
-  AuthenticatedRecipesIdRoute._addFileChildren(
-    AuthenticatedRecipesIdRouteChildren,
-  )
-
-interface AuthenticatedRecipesRouteChildren {
-  AuthenticatedRecipesSplatRoute: typeof AuthenticatedRecipesSplatRoute
-  AuthenticatedRecipesIdRoute: typeof AuthenticatedRecipesIdRouteWithChildren
-  AuthenticatedRecipesImportRoute: typeof AuthenticatedRecipesImportRoute
-  AuthenticatedRecipesRecommendationsRoute: typeof AuthenticatedRecipesRecommendationsRoute
-  AuthenticatedRecipesSavedRoute: typeof AuthenticatedRecipesSavedRoute
-  AuthenticatedRecipesVideoRoute: typeof AuthenticatedRecipesVideoRoute
-}
-
-const AuthenticatedRecipesRouteChildren: AuthenticatedRecipesRouteChildren = {
-  AuthenticatedRecipesSplatRoute: AuthenticatedRecipesSplatRoute,
-  AuthenticatedRecipesIdRoute: AuthenticatedRecipesIdRouteWithChildren,
-  AuthenticatedRecipesImportRoute: AuthenticatedRecipesImportRoute,
-  AuthenticatedRecipesRecommendationsRoute:
-    AuthenticatedRecipesRecommendationsRoute,
-  AuthenticatedRecipesSavedRoute: AuthenticatedRecipesSavedRoute,
-  AuthenticatedRecipesVideoRoute: AuthenticatedRecipesVideoRoute,
-}
-
-const AuthenticatedRecipesRouteWithChildren =
-  AuthenticatedRecipesRoute._addFileChildren(AuthenticatedRecipesRouteChildren)
-
 interface AuthenticatedReportsRouteChildren {
   AuthenticatedReportsCompareRoute: typeof AuthenticatedReportsCompareRoute
   AuthenticatedReportsExportRoute: typeof AuthenticatedReportsExportRoute
@@ -3999,7 +3821,6 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedPrayerRoute: typeof AuthenticatedPrayerRouteWithChildren
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRouteWithChildren
   AuthenticatedProgressRoute: typeof AuthenticatedProgressRoute
-  AuthenticatedRecipesRoute: typeof AuthenticatedRecipesRouteWithChildren
   AuthenticatedRecommendationsRoute: typeof AuthenticatedRecommendationsRoute
   AuthenticatedReferralsRoute: typeof AuthenticatedReferralsRoute
   AuthenticatedRemindersRoute: typeof AuthenticatedRemindersRoute
@@ -4076,7 +3897,6 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedPrayerRoute: AuthenticatedPrayerRouteWithChildren,
   AuthenticatedProfileRoute: AuthenticatedProfileRouteWithChildren,
   AuthenticatedProgressRoute: AuthenticatedProgressRoute,
-  AuthenticatedRecipesRoute: AuthenticatedRecipesRouteWithChildren,
   AuthenticatedRecommendationsRoute: AuthenticatedRecommendationsRoute,
   AuthenticatedReferralsRoute: AuthenticatedReferralsRoute,
   AuthenticatedRemindersRoute: AuthenticatedRemindersRoute,
@@ -4195,6 +4015,19 @@ const OlahragaRouteWithChildren = OlahragaRoute._addFileChildren(
   OlahragaRouteChildren,
 )
 
+interface RecipesRouteChildren {
+  RecipesSplatRoute: typeof RecipesSplatRoute
+  RecipesIndexRoute: typeof RecipesIndexRoute
+}
+
+const RecipesRouteChildren: RecipesRouteChildren = {
+  RecipesSplatRoute: RecipesSplatRoute,
+  RecipesIndexRoute: RecipesIndexRoute,
+}
+
+const RecipesRouteWithChildren =
+  RecipesRoute._addFileChildren(RecipesRouteChildren)
+
 interface ResepRouteChildren {
   ResepSlugRoute: typeof ResepSlugRoute
   ResepTersimpanRoute: typeof ResepTersimpanRoute
@@ -4222,12 +4055,12 @@ const rootRouteChildren: RootRouteChildren = {
   OlahragaRoute: OlahragaRouteWithChildren,
   PrismRoute: PrismRoute,
   PrivacyRoute: PrivacyRoute,
+  RecipesRoute: RecipesRouteWithChildren,
   ResepRoute: ResepRouteWithChildren,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   ApiAiStatusRoute: ApiAiStatusRoute,
   ApiHealthRoute: ApiHealthRoute,
   ApiLogErrorRoute: ApiLogErrorRoute,
-  RecipesIndexRoute: RecipesIndexRoute,
   ApiChatStreamRoute: ApiChatStreamRoute,
   ApiDebugEnvRoute: ApiDebugEnvRoute,
   ApiImgSplatRoute: ApiImgSplatRoute,

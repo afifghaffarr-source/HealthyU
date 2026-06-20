@@ -16,7 +16,7 @@ import { getSlugFromRecipeId } from "@/features/recipes/lib/recipeSlugLookup.fun
  *   /recipes/video                 → /resep        (cooking player removed)
  *   anything else                  → /resep
  */
-export const Route = createFileRoute("/_authenticated/recipes/$")({
+export const Route = createFileRoute("/recipes/$")({
   beforeLoad: async ({ params }) => {
     const splat = params._splat ?? "";
     const parts = splat.split("/").filter(Boolean);
