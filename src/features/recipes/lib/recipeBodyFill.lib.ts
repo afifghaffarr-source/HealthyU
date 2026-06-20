@@ -110,8 +110,16 @@ function extractJson(raw: string): string {
   let s = raw.trim();
   // Strip control characters (except \t, \n, \r) that can break JSON.parse.
   // Same pattern used in aiGateway.server.ts:extractJsonFromResponse.
-  // eslint-disable-next-line no-control-regex
-  s = s.replace(/[\u0000-\b\u000b\f\u000e-\u001f]/g, "");
+  // eslint-disable-next-line no-control-regex, no-irregular-whitespace
+  s = s.replace(/[\u0000--]/g, "");
+  // Strip markdown code fences (```json ... ``` or ``` ... ```) — handles the
+  // case where the model wraps its JSON in a code block. We use a non-greedy
+  // match so the LAST fence pair wins (in case of multiple fences in prose).
+  const fencePattern = /```(?:json)?\s*([\s\S]*?)```/g;
+  const fences = [...s.matchAll(fencePattern)];
+  if (fences.length > 0) {
+    return fences[fences.length - 1][1].trim();
+  }
   if (s.startsWith("{") || s.startsWith("[")) return s;
   const start = s.search(/[{[]/);
   if (start === -1) return s;
