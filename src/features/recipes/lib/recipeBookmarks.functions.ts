@@ -17,7 +17,7 @@ export const listRecipeBookmarks = createServerFn({ method: "GET" })
     const { data: recipes } = await supabase
       .from("recipes")
       .select(
-        "id, title, description, category, calories, prep_min, avg_rating, rating_count, image_url",
+        "id, slug, title, description, category, calories, prep_min, avg_rating, rating_count, image_url",
       )
       .in("id", ids);
     const map = new Map((recipes ?? []).map((r) => [r.id, r]));

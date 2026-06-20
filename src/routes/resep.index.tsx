@@ -1,8 +1,11 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { Search, Clock, Flame, Sparkles, ChevronRight } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
+import { Search, Clock, Flame, Sparkles, ChevronRight, Bookmark } from "lucide-react";
 import { canonical } from "@/lib/seo";
 import { listSeoRecipes } from "@/features/content/lib/seoContent.functions";
+import { getOptionalUser } from "@/integrations/supabase/optional-auth";
 import { TopAppBar } from "@/components/healthyu/top-app-bar";
 
 export const Route = createFileRoute("/resep/")({
@@ -48,6 +51,15 @@ function ResepHub() {
   const items = Route.useLoaderData();
   const [q, setQ] = useState("");
   const [activeCategory, setActiveCategory] = useState<string>("");
+
+  // Auth state (changes the bottom CTA)
+  const userFn = useServerFn(getOptionalUser);
+  const { data: userData } = useQuery({
+    queryKey: ["optional-user"],
+    queryFn: () => userFn(),
+    staleTime: 60_000,
+  });
+  const isAuthed = !!userData?.userId;
 
   // Group items by category for the sectioned layout
   const featured = items[0];
@@ -213,21 +225,40 @@ function ResepHub() {
         </div>
       </section>
 
-      {/* ── CTA ─────────────────────────────────────────────────────────── */}
+      {/* ── CTA (varies by auth state) ────────────────────────────────────── */}
       {filtered.length > 0 && (
         <section className="px-4 pt-8 animate-fade-up">
           <div className="max-w-md mx-auto rounded-3xl bg-gradient-to-br from-primary/10 via-primary/5 to-transparent border border-primary/20 p-6 text-center">
-            <Sparkles className="size-6 text-primary mx-auto mb-2" aria-hidden />
-            <p className="font-bold">Belum nemu yang cocok?</p>
-            <p className="text-sm text-muted-foreground mt-1 max-w-xs mx-auto leading-relaxed">
-              Login dan pakai AI Coach untuk rekomendasi resep yang dipersonalisasi sesuai profilmu.
-            </p>
-            <Link
-              to="/auth"
-              className="inline-flex items-center gap-1 mt-4 text-sm font-semibold text-primary hover:underline"
-            >
-              Coba AI Coach <ChevronRight className="size-4" />
-            </Link>
+            {isAuthed ? (
+              <>
+                <Bookmark className="size-6 text-primary mx-auto mb-2" aria-hidden />
+                <p className="font-bold">Lihat resep yang udah lo simpan</p>
+                <p className="text-sm text-muted-foreground mt-1 max-w-xs mx-auto leading-relaxed">
+                  Bookmark, rating, dan review tersimpan rapi di satu tempat.
+                </p>
+                <Link
+                  to="/resep/tersimpan"
+                  className="inline-flex items-center gap-1 mt-4 text-sm font-semibold text-primary hover:underline"
+                >
+                  Resep Tersimpan <ChevronRight className="size-4" />
+                </Link>
+              </>
+            ) : (
+              <>
+                <Sparkles className="size-6 text-primary mx-auto mb-2" aria-hidden />
+                <p className="font-bold">Belum nemu yang cocok?</p>
+                <p className="text-sm text-muted-foreground mt-1 max-w-xs mx-auto leading-relaxed">
+                  Login dan pakai AI Coach untuk rekomendasi resep yang dipersonalisasi sesuai
+                  profilmu.
+                </p>
+                <Link
+                  to="/auth"
+                  className="inline-flex items-center gap-1 mt-4 text-sm font-semibold text-primary hover:underline"
+                >
+                  Coba AI Coach <ChevronRight className="size-4" />
+                </Link>
+              </>
+            )}
           </div>
         </section>
       )}

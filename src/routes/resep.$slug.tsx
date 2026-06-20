@@ -12,6 +12,7 @@ import { toast } from "@/lib/toast-config";
 import { RatingForm, type RatingState } from "@/features/recipes/components/RatingForm";
 import { ReviewsSection } from "@/features/recipes/components/ReviewsSection";
 import { RemixModal } from "@/features/recipes/components/RemixModal";
+import { RecommendationsStrip } from "@/features/recipes/components/RecommendationsStrip";
 import { useState } from "react";
 
 function minutesToISO(min?: number | null): string | undefined {
@@ -295,6 +296,13 @@ function ResepDetail() {
           recipesId={r.recipesId}
           recipeTitle={r.title}
         />
+      )}
+
+      {/* ── "Rekomendasi Untukmu" strip (auth-gated) ── */}
+      {isAuthed && (
+        <div className="mt-8">
+          <RecommendationsStrip currentSlug={r.slug} />
+        </div>
       )}
     </main>
   );
