@@ -102,7 +102,10 @@ export default defineConfig({
         description: "Diet, puasa, dan kesehatan holistik berbasis AI untuk Indonesia.",
         lang: "id-ID",
         dir: "ltr",
-        start_url: "/dashboard",
+        // start_url: where the PWA opens after install.
+        // Use /resep (the public hub) so anon users don't get bounced to /auth.
+        // Authenticated users can navigate to /dashboard from the top nav.
+        start_url: "/resep",
         scope: "/",
         display: "standalone",
         background_color: "#FBF8F1",

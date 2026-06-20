@@ -23,6 +23,7 @@ import { ScrollToTopButton } from "@/components/healthyu/scroll-to-top-button";
 import { RouteProgressBar } from "@/components/healthyu/route-progress-bar";
 import { APP_CONFIG } from "@/config/app";
 import { startBackgroundSync } from "@/lib/dexie-sync";
+import { initWebVitals } from "@/lib/webVitals";
 
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
   head: () => ({
@@ -198,6 +199,11 @@ function ManifestLinkManager() {
   // Start Dexie background sync (offline-first water logs → Supabase).
   // Runs periodically + on network reconnect + on app focus.
   useEffect(() => startBackgroundSync(), []);
+
+  // Start web-vitals reporting. Only logs "needs-improvement" and "poor"
+  // ratings (per Google thresholds) to avoid flooding error_reports.
+  // Reuses the existing /api/log-error pipeline via reportError.
+  useEffect(() => initWebVitals(), []);
 
   return null;
 }
