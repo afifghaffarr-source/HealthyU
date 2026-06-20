@@ -170,18 +170,24 @@ function ProfilePage() {
               </div>
             </Link>
             <Link
-              to="/recipes/recommendations"
+              to="/resep/tersimpan"
               className="bg-card p-4 rounded-2xl outline-1 outline-foreground/10 flex flex-col items-start gap-2 min-h-24 active:scale-[0.98] transition hover:bg-accent"
             >
               <ChefHat className="size-6 text-sage-deep" aria-hidden />
               <div>
                 <p className="text-sm font-semibold leading-tight">Resep</p>
                 <p className="text-[11px] text-muted-foreground leading-tight mt-0.5">
-                  Untukmu hari ini
+                  Yang lo simpan
                 </p>
               </div>
             </Link>
           </div>
+          <Link
+            to="/resep"
+            className="mt-3 inline-flex items-center gap-1 text-xs font-medium text-primary hover:underline px-1"
+          >
+            Jelajahi semua resep <ChevronRight className="size-3" />
+          </Link>
         </section>
 
         {/* ── Section D: Fitur Lengkap (organized nav grid) ───────────────── */}
