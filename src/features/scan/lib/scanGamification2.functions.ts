@@ -34,7 +34,7 @@ export const addRecipeReview = createServerFn({ method: "POST" })
     return { review: row };
   });
 
-export const listRecipeReviews = createServerFn({ method: "POST" })
+export const listRecipeReviews = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d) => z.object({ recipeId: z.string().uuid() }).parse(d))
   .handler(async ({ data, context }) => {

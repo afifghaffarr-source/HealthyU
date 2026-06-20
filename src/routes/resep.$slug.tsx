@@ -4,10 +4,15 @@ import { useServerFn } from "@tanstack/react-start";
 import { canonical, SITE_NAME } from "@/lib/seo";
 import { getSeoRecipe } from "@/features/content/lib/seoContent.functions";
 import { getBookmarkStateForSlug } from "@/features/recipes/lib/recipeBookmarksPublic.functions";
+import { getRatingStateForSlug } from "@/features/recipes/lib/recipeRatingsPublic.functions";
 import { getOptionalUser } from "@/integrations/supabase/optional-auth";
 import { toggleRecipeBookmark } from "@/features/recipes/lib/recipeBookmarks.functions";
-import { Bookmark, Loader2 } from "lucide-react";
+import { Bookmark, Loader2, Sparkles } from "lucide-react";
 import { toast } from "@/lib/toast-config";
+import { RatingForm, type RatingState } from "@/features/recipes/components/RatingForm";
+import { ReviewsSection } from "@/features/recipes/components/ReviewsSection";
+import { RemixModal } from "@/features/recipes/components/RemixModal";
+import { useState } from "react";
 
 function minutesToISO(min?: number | null): string | undefined {
   if (!min || min <= 0) return undefined;
@@ -115,6 +120,7 @@ export const Route = createFileRoute("/resep/$slug")({
 function ResepDetail() {
   const r = Route.useLoaderData();
   const qc = useQueryClient();
+  const [remixOpen, setRemixOpen] = useState(false);
 
   // Auth state (used to gate bookmark button + future auth features)
   const userFn = useServerFn(getOptionalUser);
@@ -147,6 +153,14 @@ function ResepDetail() {
       qc.invalidateQueries({ queryKey: ["bookmark-state", r.slug, userId] });
     },
     onError: (e: Error) => toast.error(e.message),
+  });
+
+  // Rating state (anon can see aggregate, authed sees personal)
+  const ratingFn = useServerFn(getRatingStateForSlug);
+  const { data: ratingState } = useQuery<RatingState>({
+    queryKey: ["rating-state", r.slug, userId],
+    queryFn: () => ratingFn({ data: { slug: r.slug, userId } }),
+    staleTime: 30_000,
   });
 
   return (
@@ -184,6 +198,17 @@ function ResepDetail() {
           </button>
         )}
       </header>
+
+      {/* ── "Remix dengan AI" CTA (auth-gated) ── */}
+      {isAuthed && r.recipesId && (
+        <button
+          type="button"
+          onClick={() => setRemixOpen(true)}
+          className="mb-6 w-full inline-flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-primary to-coral text-primary-foreground py-3 text-sm font-semibold shadow-sm"
+        >
+          <Sparkles className="size-4" /> Remix dengan AI
+        </button>
+      )}
 
       {r.image_url && (
         <figure className="mb-8 overflow-hidden rounded-2xl">
@@ -241,6 +266,18 @@ function ResepDetail() {
         </ol>
       </section>
 
+      {/* ── Rating (auth-optional: anon sees CTA, authed sees form) ── */}
+      {ratingState && (
+        <div className="mb-6">
+          <RatingForm slug={r.slug} state={ratingState} />
+        </div>
+      )}
+
+      {/* ── Reviews (auth-optional: anon sees read-only + CTA) ── */}
+      <div className="mb-6">
+        <ReviewsSection slug={r.slug} isAuthed={isAuthed} recipesId={r.recipesId} />
+      </div>
+
       {r.tags && r.tags.length > 0 && (
         <footer className="mt-8 flex flex-wrap gap-2">
           {r.tags.map((t: string) => (
@@ -249,6 +286,15 @@ function ResepDetail() {
             </span>
           ))}
         </footer>
+      )}
+
+      {remixOpen && r.recipesId && (
+        <RemixModal
+          open={remixOpen}
+          onClose={() => setRemixOpen(false)}
+          recipesId={r.recipesId}
+          recipeTitle={r.title}
+        />
       )}
     </main>
   );
