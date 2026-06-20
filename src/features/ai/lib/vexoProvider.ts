@@ -46,9 +46,15 @@ function getProvider(): ReturnType<typeof createOpenAICompatible> {
       "VEXO_API_KEY is not configured. Set it in your CF Worker env vars or .env.local.",
     );
   }
+  // Vercel AI SDK's OpenAI-compatible provider hardcodes path `/chat/completions`
+  // and appends it to `baseURL`. VexoAPI serves that path under `/api/v1/`, so
+  // we append the prefix here. The `vexoAdapter.server.ts` direct caller
+  // already adds `/api/v1/chat/completions` itself, so it must keep using
+  // the un-suffixed `readVexoBaseUrl()`.
+  const baseURL = readVexoBaseUrl().replace(/\/+$/, "") + "/api/v1";
   _provider = createOpenAICompatible({
     name: "vexo",
-    baseURL: readVexoBaseUrl(),
+    baseURL,
     apiKey,
     // VexoAPI uses `Authorization: Bearer <key>` by default; the SDK handles it.
     // We don't need a custom fetch wrapper — the OpenAI-compat path is sufficient.
