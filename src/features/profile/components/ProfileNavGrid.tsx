@@ -57,7 +57,7 @@ export function ProfileNavGrid({
             <Droplet className="size-5 text-sky-600" aria-hidden />
             <span className="text-sm font-semibold">Hidrasi</span>
           </Link>
-          <Link to="/recipes" className={tileCls}>
+          <Link to="/resep" className={tileCls}>
             <ChefHat className="size-5 text-sage-deep" aria-hidden />
             <span className="text-sm font-semibold">Resep Sehat</span>
           </Link>
