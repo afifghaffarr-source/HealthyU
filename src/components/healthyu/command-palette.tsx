@@ -17,7 +17,7 @@ const ROUTES: { label: string; to: string; hint?: string }[] = [
   { label: "Air minum", to: "/water" },
   { label: "Tidur", to: "/sleep" },
   { label: "Mood", to: "/mood" },
-  { label: "Resep", to: "/recipes" },
+  { label: "Resep", to: "/resep" },
   { label: "Meal plan", to: "/mealplan" },
   { label: "Shopping list", to: "/shopping/list" },
   { label: "AI Coach (chat)", to: "/chat" },

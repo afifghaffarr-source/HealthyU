@@ -137,6 +137,7 @@ import { Route as AuthenticatedRecipesSavedRouteImport } from './routes/_authent
 import { Route as AuthenticatedRecipesRecommendationsRouteImport } from './routes/_authenticated/recipes.recommendations'
 import { Route as AuthenticatedRecipesImportRouteImport } from './routes/_authenticated/recipes.import'
 import { Route as AuthenticatedRecipesIdRouteImport } from './routes/_authenticated/recipes.$id'
+import { Route as AuthenticatedRecipesSplatRouteImport } from './routes/_authenticated/recipes.$'
 import { Route as AuthenticatedQuizDailyRouteImport } from './routes/_authenticated/quiz.daily'
 import { Route as AuthenticatedPushAlarmRouteImport } from './routes/_authenticated/push.alarm'
 import { Route as AuthenticatedProfileScanStatsRouteImport } from './routes/_authenticated/profile.scan-stats'
@@ -867,6 +868,12 @@ const AuthenticatedRecipesIdRoute = AuthenticatedRecipesIdRouteImport.update({
   path: '/$id',
   getParentRoute: () => AuthenticatedRecipesRoute,
 } as any)
+const AuthenticatedRecipesSplatRoute =
+  AuthenticatedRecipesSplatRouteImport.update({
+    id: '/$',
+    path: '/$',
+    getParentRoute: () => AuthenticatedRecipesRoute,
+  } as any)
 const AuthenticatedQuizDailyRoute = AuthenticatedQuizDailyRouteImport.update({
   id: '/quiz/daily',
   path: '/quiz/daily',
@@ -1310,6 +1317,7 @@ export interface FileRoutesByFullPath {
   '/profile/scan-stats': typeof AuthenticatedProfileScanStatsRoute
   '/push/alarm': typeof AuthenticatedPushAlarmRoute
   '/quiz/daily': typeof AuthenticatedQuizDailyRoute
+  '/recipes/$': typeof AuthenticatedRecipesSplatRoute
   '/recipes/$id': typeof AuthenticatedRecipesIdRouteWithChildren
   '/recipes/import': typeof AuthenticatedRecipesImportRoute
   '/recipes/recommendations': typeof AuthenticatedRecipesRecommendationsRoute
@@ -1484,6 +1492,7 @@ export interface FileRoutesByTo {
   '/profile/scan-stats': typeof AuthenticatedProfileScanStatsRoute
   '/push/alarm': typeof AuthenticatedPushAlarmRoute
   '/quiz/daily': typeof AuthenticatedQuizDailyRoute
+  '/recipes/$': typeof AuthenticatedRecipesSplatRoute
   '/recipes/$id': typeof AuthenticatedRecipesIdRouteWithChildren
   '/recipes/import': typeof AuthenticatedRecipesImportRoute
   '/recipes/recommendations': typeof AuthenticatedRecipesRecommendationsRoute
@@ -1669,6 +1678,7 @@ export interface FileRoutesById {
   '/_authenticated/profile/scan-stats': typeof AuthenticatedProfileScanStatsRoute
   '/_authenticated/push/alarm': typeof AuthenticatedPushAlarmRoute
   '/_authenticated/quiz/daily': typeof AuthenticatedQuizDailyRoute
+  '/_authenticated/recipes/$': typeof AuthenticatedRecipesSplatRoute
   '/_authenticated/recipes/$id': typeof AuthenticatedRecipesIdRouteWithChildren
   '/_authenticated/recipes/import': typeof AuthenticatedRecipesImportRoute
   '/_authenticated/recipes/recommendations': typeof AuthenticatedRecipesRecommendationsRoute
@@ -1854,6 +1864,7 @@ export interface FileRouteTypes {
     | '/profile/scan-stats'
     | '/push/alarm'
     | '/quiz/daily'
+    | '/recipes/$'
     | '/recipes/$id'
     | '/recipes/import'
     | '/recipes/recommendations'
@@ -2028,6 +2039,7 @@ export interface FileRouteTypes {
     | '/profile/scan-stats'
     | '/push/alarm'
     | '/quiz/daily'
+    | '/recipes/$'
     | '/recipes/$id'
     | '/recipes/import'
     | '/recipes/recommendations'
@@ -2212,6 +2224,7 @@ export interface FileRouteTypes {
     | '/_authenticated/profile/scan-stats'
     | '/_authenticated/push/alarm'
     | '/_authenticated/quiz/daily'
+    | '/_authenticated/recipes/$'
     | '/_authenticated/recipes/$id'
     | '/_authenticated/recipes/import'
     | '/_authenticated/recipes/recommendations'
@@ -3199,6 +3212,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedRecipesIdRouteImport
       parentRoute: typeof AuthenticatedRecipesRoute
     }
+    '/_authenticated/recipes/$': {
+      id: '/_authenticated/recipes/$'
+      path: '/$'
+      fullPath: '/recipes/$'
+      preLoaderRoute: typeof AuthenticatedRecipesSplatRouteImport
+      parentRoute: typeof AuthenticatedRecipesRoute
+    }
     '/_authenticated/quiz/daily': {
       id: '/_authenticated/quiz/daily'
       path: '/quiz/daily'
@@ -3813,6 +3833,7 @@ const AuthenticatedRecipesIdRouteWithChildren =
   )
 
 interface AuthenticatedRecipesRouteChildren {
+  AuthenticatedRecipesSplatRoute: typeof AuthenticatedRecipesSplatRoute
   AuthenticatedRecipesIdRoute: typeof AuthenticatedRecipesIdRouteWithChildren
   AuthenticatedRecipesImportRoute: typeof AuthenticatedRecipesImportRoute
   AuthenticatedRecipesRecommendationsRoute: typeof AuthenticatedRecipesRecommendationsRoute
@@ -3821,6 +3842,7 @@ interface AuthenticatedRecipesRouteChildren {
 }
 
 const AuthenticatedRecipesRouteChildren: AuthenticatedRecipesRouteChildren = {
+  AuthenticatedRecipesSplatRoute: AuthenticatedRecipesSplatRoute,
   AuthenticatedRecipesIdRoute: AuthenticatedRecipesIdRouteWithChildren,
   AuthenticatedRecipesImportRoute: AuthenticatedRecipesImportRoute,
   AuthenticatedRecipesRecommendationsRoute:

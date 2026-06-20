@@ -190,7 +190,7 @@ export async function sendWeeklyReportPush(
     .filter(Boolean)
     .join(" — ");
   const url = trendingRecipe
-    ? "/recipes?sort=trending"
+    ? "/resep"
     : longestStreak && longestStreak > 0
       ? "/challenges?focus=streak"
       : "/reports?focus=latest";
