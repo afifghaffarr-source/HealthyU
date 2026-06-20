@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { getEnvVar } from "@/lib/cloudflare-env.server";
+import { supabaseAdmin } from "@/integrations/supabase/client.server";
 
 // LIGHTHOUSE-001 fallback: when Supabase env is not configured OR uses the
 // CI placeholder values (lhci with placeholder URLs, no real DB), return
@@ -142,7 +143,6 @@ export const listSeoRecipes = createServerFn({ method: "GET" }).handler(async ()
 export const getSeoRecipe = createServerFn({ method: "GET" })
   .inputValidator((d) => slugSchema.parse(d))
   .handler(async ({ data }) => {
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: row, error } = await supabaseAdmin
       .from("seo_recipes")
       .select("*")
@@ -150,7 +150,20 @@ export const getSeoRecipe = createServerFn({ method: "GET" })
       .eq("published", true)
       .maybeSingle();
     if (error) throw new Error(error.message);
-    return row;
+    if (!row) return null;
+
+    // Look up the corresponding recipes.id (used by recipe_bookmarks, recipe_ratings, etc.)
+    // seo_recipes and recipes share the same slug. All 25 published seo_recipes have a
+    // matching recipes row, so this is a safe join. If a future drift appears, the page
+    // degrades gracefully (bookmark disabled, no error).
+    const { data: linkRow } = await supabaseAdmin
+      .from("recipes")
+      .select("id")
+      .eq("slug", data.slug)
+      .eq("is_published", true)
+      .maybeSingle();
+
+    return { ...row, recipesId: linkRow?.id ?? null };
   });
 
 export const listSeoFaqs = createServerFn({ method: "GET" }).handler(async () => {

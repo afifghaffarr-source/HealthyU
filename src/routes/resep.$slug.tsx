@@ -1,6 +1,13 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import { canonical, SITE_NAME } from "@/lib/seo";
 import { getSeoRecipe } from "@/features/content/lib/seoContent.functions";
+import { getBookmarkStateForSlug } from "@/features/recipes/lib/recipeBookmarksPublic.functions";
+import { getOptionalUser } from "@/integrations/supabase/optional-auth";
+import { toggleRecipeBookmark } from "@/features/recipes/lib/recipeBookmarks.functions";
+import { Bookmark, Loader2 } from "lucide-react";
+import { toast } from "@/lib/toast-config";
 
 function minutesToISO(min?: number | null): string | undefined {
   if (!min || min <= 0) return undefined;
@@ -107,6 +114,41 @@ export const Route = createFileRoute("/resep/$slug")({
 
 function ResepDetail() {
   const r = Route.useLoaderData();
+  const qc = useQueryClient();
+
+  // Auth state (used to gate bookmark button + future auth features)
+  const userFn = useServerFn(getOptionalUser);
+  const { data: userData } = useQuery({
+    queryKey: ["optional-user"],
+    queryFn: () => userFn(),
+    staleTime: 60_000,
+  });
+  const userId = userData?.userId ?? null;
+  const isAuthed = !!userId;
+
+  // Bookmark state for the current recipe
+  const bookmarkFn = useServerFn(getBookmarkStateForSlug);
+  const { data: bmState } = useQuery({
+    queryKey: ["bookmark-state", r.slug, userId],
+    queryFn: () => bookmarkFn({ data: { slug: r.slug, userId } }),
+    enabled: isAuthed && !!r.recipesId,
+    staleTime: 30_000,
+  });
+
+  // Bookmark toggle (requires auth + recipesId)
+  const toggleBm = useServerFn(toggleRecipeBookmark);
+  const bmMut = useMutation({
+    mutationFn: () => {
+      if (!bmState?.recipesId) throw new Error("Resep belum siap di-save");
+      return toggleBm({ data: { recipe_id: bmState.recipesId } });
+    },
+    onSuccess: (res) => {
+      toast.success(res.bookmarked ? "Resep disimpan" : "Bookmark dihapus");
+      qc.invalidateQueries({ queryKey: ["bookmark-state", r.slug, userId] });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
   return (
     <main className="mx-auto max-w-3xl px-4 py-8">
       <nav aria-label="Breadcrumb" className="mb-4 text-sm text-muted-foreground">
@@ -116,12 +158,31 @@ function ResepDetail() {
         <span className="mx-2">/</span>
         <span className="text-foreground">{r.title}</span>
       </nav>
-      <header className="mb-6">
-        {r.category && (
-          <p className="text-xs uppercase tracking-wide text-muted-foreground">{r.category}</p>
+      <header className="mb-6 flex items-start justify-between gap-3">
+        <div className="min-w-0 flex-1">
+          {r.category && (
+            <p className="text-xs uppercase tracking-wide text-muted-foreground">{r.category}</p>
+          )}
+          <h1 className="mt-1 text-3xl font-bold">{r.title}</h1>
+          {r.description && <p className="mt-2 text-lg text-muted-foreground">{r.description}</p>}
+        </div>
+        {isAuthed && r.recipesId && (
+          <button
+            onClick={() => bmMut.mutate()}
+            disabled={bmMut.isPending}
+            className="size-11 shrink-0 grid place-items-center rounded-full bg-card border border-border hover:bg-accent disabled:opacity-50"
+            aria-label={bmState?.bookmarked ? "Hapus bookmark" : "Simpan resep"}
+            aria-pressed={bmState?.bookmarked}
+          >
+            {bmMut.isPending ? (
+              <Loader2 className="size-4 animate-spin" />
+            ) : (
+              <Bookmark
+                className={`size-5 ${bmState?.bookmarked ? "fill-primary text-primary" : "text-muted-foreground"}`}
+              />
+            )}
+          </button>
         )}
-        <h1 className="mt-1 text-3xl font-bold">{r.title}</h1>
-        {r.description && <p className="mt-2 text-lg text-muted-foreground">{r.description}</p>}
       </header>
 
       {r.image_url && (
