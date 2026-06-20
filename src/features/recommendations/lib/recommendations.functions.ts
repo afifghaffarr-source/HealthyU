@@ -142,39 +142,79 @@ type PlanResult =
       reason: string;
       remaining_budget_kcal: number;
     };
-
 // ──────────────────────────────────────────────────────────────────────────
 // Zod schemas (Sprint 5a) — exported for unit testability
 // ──────────────────────────────────────────────────────────────────────────
 //
-// SPRINT 5A FIX (2026-06-20): schemas are LENIENT — accept common AI
+// SPRINT 5A FIXES (2026-06-20): schemas are LENIENT — accept common AI
 // aliases. Different models return different field names:
 //   - meal_type ↔ type      (case-insensitive: "Breakfast" → "breakfast")
-//   - reason ↔ notes
-//   - planned_qty: defaults to 1 if missing
+//   - reason ↔ notes ↔ description
+//   - planned_qty ↔ servings (defaults to 1)
+//   - meal_type MISSING entirely → infer from position in array
 //
-// Without the preprocess, every AI response failed validation (e.g.
-// gpt-oss-120b returns `type: "Breakfast"` + `notes: "..."`), the fallback
-// was triggered, and the user always saw "AI tidak tersedia".
+// Verified against real gpt-oss-120b production response (2026-06-20 curl):
+// uses `description` + `servings`, no `meal_type` at all.
 // ──────────────────────────────────────────────────────────────────────────
 
 const MEAL_TYPE_VALUES = ["breakfast", "lunch", "dinner", "snack"] as const;
 
-function normalizeMeal(input: unknown): unknown {
+/**
+ * Normalize a meal in the context of an array (for `PlanResultSchema`).
+ * Infers `meal_type` from array position when missing entirely.
+ */
+function normalizeMealInArray(input: unknown, index: number): unknown {
   if (!input || typeof input !== "object") return input;
   const m = input as Record<string, unknown>;
-  const rawType = m.meal_type ?? m.type;
-  const meal_type = typeof rawType === "string" ? rawType.toLowerCase().trim() : rawType;
+
+  let meal_type: string | undefined;
+  if (m.meal_type !== undefined) {
+    meal_type = typeof m.meal_type === "string" ? m.meal_type.toLowerCase().trim() : undefined;
+  } else if (m.type !== undefined) {
+    meal_type = typeof m.type === "string" ? m.type.toLowerCase().trim() : undefined;
+  } else {
+    // No meal_type at all → infer from position in array.
+    // meals[0]=breakfast, [1]=lunch, [2]=dinner, [3]=snack, [4+]=lunch
+    meal_type = ["breakfast", "lunch", "dinner", "snack"][index] ?? "lunch";
+  }
+
   return {
     ...m,
     meal_type,
-    reason: m.reason ?? m.notes ?? "",
-    planned_qty: m.planned_qty ?? 1,
+    reason: m.reason ?? m.notes ?? m.description ?? "",
+    planned_qty: m.planned_qty ?? m.servings ?? 1,
+  };
+}
+
+/**
+ * Normalize a single meal (for `PlanMealSchema` direct parse).
+ * Does NOT infer meal_type from position — if the caller has a single meal
+ * without meal_type, that's a programming error and should fail validation.
+ */
+function normalizeMealSingle(input: unknown): unknown {
+  if (!input || typeof input !== "object") return input;
+  const m = input as Record<string, unknown>;
+
+  // meal_type: prefer `meal_type`, fall back to `type` (case-insensitive).
+  // Caller must provide one — schema will reject if missing or invalid.
+  let meal_type: string | undefined;
+  if (m.meal_type !== undefined) {
+    meal_type = typeof m.meal_type === "string" ? m.meal_type.toLowerCase().trim() : undefined;
+  } else if (m.type !== undefined) {
+    meal_type = typeof m.type === "string" ? m.type.toLowerCase().trim() : undefined;
+  }
+  // Note: if both undefined, meal_type stays undefined and Zod will reject.
+
+  return {
+    ...m,
+    meal_type,
+    reason: m.reason ?? m.notes ?? m.description ?? "",
+    planned_qty: m.planned_qty ?? m.servings ?? 1,
   };
 }
 
 export const PlanMealSchema = z.preprocess(
-  normalizeMeal,
+  normalizeMealSingle,
   z.object({
     meal_type: z.enum(MEAL_TYPE_VALUES),
     name: z.string().min(1).max(200),
@@ -192,7 +232,11 @@ export const PlanResultSchema = z.preprocess(
     if (!val || typeof val !== "object") return val;
     const r = val as Record<string, unknown>;
     if (!Array.isArray(r.meals)) return val;
-    return { ...r, meals: r.meals.map(normalizeMeal) };
+    const meals = r.meals as unknown[];
+    return {
+      ...r,
+      meals: meals.map((m, i) => normalizeMealInArray(m, i)),
+    };
   },
   z.object({
     summary: z.string().min(1).max(500),
@@ -271,11 +315,35 @@ export const generateMealPlan = createServerFn({ method: "POST" })
     );
     const remaining = Math.max(300, Math.round(target - consumed));
 
+    // SPRINT 5A FIX 2 (2026-06-20): explicit field names. Earlier prompt
+    // was vague ("Output HANYA JSON valid sesuai schema") and the model
+    // invented its own field names (`description`, `servings`, no
+    // `meal_type`). Specifying the exact JSON structure with example
+    // field names dramatically improves schema-first passes.
     const system =
       "Anda ahli gizi HealthyU. Susun rencana 3-4 menu Indonesia untuk sisa hari ini. " +
       "Pertimbangkan preferensi diet, kondisi kesehatan (diabetes/hipertensi/dll), dan kategori BMI. " +
-      "Total kalori semua meals harus ≤ budget. Berikan estimasi makro (protein/carbs/fat) realistis. " +
-      "Output HANYA JSON valid sesuai schema.";
+      "Total kalori semua meals harus <= budget. Berikan estimasi makro (protein/carbs/fat) realistis.\n\n" +
+      "OUTPUT WAJIB JSON valid dengan struktur PERSIS seperti ini (field names HARUS sama):\n" +
+      "{\n" +
+      '  "summary": "string 1-2 kalimat",\n' +
+      '  "meals": [\n' +
+      "    {\n" +
+      '      "meal_type": "breakfast" | "lunch" | "dinner" | "snack",\n' +
+      '      "name": "nama menu dalam bahasa Indonesia",\n' +
+      '      "calories": <integer>,\n' +
+      '      "protein_g": <number>,\n' +
+      '      "carbs_g": <number>,\n' +
+      '      "fat_g": <number>,\n' +
+      '      "reason": "alasan singkat kenapa menu ini dipilih"\n' +
+      "    }\n" +
+      "  ]\n" +
+      "}\n\n" +
+      "PENTING:\n" +
+      "- meal_type HARUS salah satu dari: breakfast, lunch, dinner, snack (lowercase, no other values)\n" +
+      "- calories HARUS integer (bukan desimal)\n" +
+      "- reason WAJIB ada, jangan kosong\n" +
+      "- Output HANYA JSON, tanpa markdown, tanpa code block, tanpa teks tambahan.";
     const user =
       `Sisa budget kalori: ${remaining} kcal\n` +
       `Preferensi diet: ${profile?.dietary_preference ?? "tidak ada"}\n` +

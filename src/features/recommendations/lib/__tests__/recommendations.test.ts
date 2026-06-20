@@ -1,8 +1,9 @@
 /**
  * Unit tests for Sprint 5a (re-introduced 2026-06-20) Meal Plan refactor:
- * - Zod schemas (`PlanMealSchema`, `PlanResultSchema`) — LENIENT: accept AI aliases
- *   (verified against real gpt-oss-120b response shape: `type` vs `meal_type`,
- *   `notes` vs `reason`, missing `planned_qty`)
+ * - Zod schemas (`PlanMealSchema`, `PlanResultSchema`) — LENIENT
+ *   (verified against real gpt-oss-120b production response shape:
+ *   `description` vs `reason`, `servings` vs `planned_qty`, missing
+ *   `meal_type` → inferred from array position)
  * - `adaptTemplateMeals` — pure helper that normalizes `meal_plan_templates.meals`
  * - `isUsablePlan` — gate that decides AI success vs template fallback signal
  */
@@ -102,12 +103,6 @@ describe("PlanResultSchema", () => {
 
 // ──────────────────────────────────────────────────────────────────────────
 // Sprint 5a (2026-06-20): LENIENT schema — accept AI aliases.
-// Real gpt-oss-120b response shape (verified 2026-06-20):
-//   - `type: "Breakfast"` instead of `meal_type: "breakfast"`
-//   - `notes: "..."` instead of `reason: "..."`
-//   - missing `planned_qty` (default to 1)
-// Without the preprocess, every AI response failed validation, the fallback
-// was triggered, and the user always saw "AI tidak tersedia".
 // ──────────────────────────────────────────────────────────────────────────
 describe("PlanMealSchema — AI alias tolerance", () => {
   it("accepts `type` as alias for `meal_type` (case-insensitive)", () => {
@@ -200,6 +195,108 @@ describe("PlanResultSchema — AI alias tolerance", () => {
     expect(parsed.meals[0].reason).toBe("High protein");
     expect(parsed.meals[1].meal_type).toBe("lunch");
     expect(parsed.summary).toContain("diabetes-friendly");
+  });
+});
+
+// ──────────────────────────────────────────────────────────────────────────
+// Sprint 5a hotfix 2 (2026-06-20): even MORE lenient — accept the actual
+// gpt-oss-120b production response shape captured via curl:
+//   - `description` (not `reason`/`notes`)
+//   - `servings` (not `planned_qty`)
+//   - NO `meal_type` at all → infer from position
+// ──────────────────────────────────────────────────────────────────────────
+describe("PlanMealSchema — production shape (no meal_type, uses description/servings)", () => {
+  it("infers meal_type from array position when missing (only in array context)", () => {
+    // Direct PlanMealSchema.parse without array context: meal_type is REQUIRED.
+    // Position-based inference happens via PlanResultSchema.parse, NOT single-parse.
+    // This is by design — single meals without meal_type are a programming error.
+    expect(() =>
+      PlanMealSchema.parse({
+        name: "Nasi Merah dengan Ayam Bakar",
+        servings: 1,
+        calories: 420,
+        protein_g: 28,
+        carbs_g: 55,
+        fat_g: 12,
+        description: "Nasi merah (150g), ayam bakar tanpa kulit (100g)",
+      }),
+    ).toThrow(/meal_type/);
+  });
+
+  it("accepts `description` as alias for `reason`", () => {
+    const parsed = PlanMealSchema.parse({
+      meal_type: "dinner",
+      name: "Test",
+      calories: 100,
+      description: "Tasty",
+    });
+    expect(parsed.reason).toBe("Tasty");
+  });
+
+  it("accepts `servings` as alias for `planned_qty`", () => {
+    const parsed = PlanMealSchema.parse({
+      meal_type: "lunch",
+      name: "Test",
+      calories: 100,
+      servings: 2,
+    });
+    expect(parsed.planned_qty).toBe(2);
+  });
+});
+
+describe("PlanResultSchema — production gpt-oss-120b shape (real curl 2026-06-20)", () => {
+  it("accepts full production response with no meal_type, uses description + servings", () => {
+    const raw = {
+      summary: "Rencana menu Indonesia seimbang dengan total kalori sesuai budget.",
+      meals: [
+        {
+          name: "Nasi Merah dengan Ayam Bakar",
+          servings: 1,
+          calories: 420,
+          protein_g: 28,
+          carbs_g: 55,
+          fat_g: 12,
+          description: "Nasi merah (150g), ayam bakar tanpa kulit (100g)",
+        },
+        {
+          name: "Gado-Gado dengan Lontong Kecil",
+          servings: 1,
+          calories: 350,
+          protein_g: 14,
+          carbs_g: 45,
+          fat_g: 14,
+          description: "Lontong (50g), sayuran rebus 120g",
+        },
+        {
+          name: "Sup Ikan Kakap dengan Jagung",
+          servings: 1,
+          calories: 260,
+          protein_g: 22,
+          carbs_g: 20,
+          fat_g: 8,
+          description: "Ikan kakap 100g, jagung manis 80g",
+        },
+        {
+          name: "Pisang Rebus dengan Kacang",
+          servings: 1,
+          calories: 210,
+          protein_g: 5,
+          carbs_g: 35,
+          fat_g: 8,
+          description: "Pisang rebus 2 buah",
+        },
+      ],
+    };
+    const parsed = PlanResultSchema.parse(raw);
+    expect(parsed.meals).toHaveLength(4);
+    expect(parsed.meals[0].meal_type).toBe("breakfast");
+    expect(parsed.meals[1].meal_type).toBe("lunch");
+    expect(parsed.meals[2].meal_type).toBe("dinner");
+    expect(parsed.meals[3].meal_type).toBe("snack");
+    expect(parsed.meals[0].reason).toContain("Nasi merah");
+    expect(parsed.meals[3].reason).toContain("Pisang rebus");
+    expect(parsed.meals[0].planned_qty).toBe(1);
+    expect(parsed.meals[0].calories).toBe(420);
   });
 });
 
