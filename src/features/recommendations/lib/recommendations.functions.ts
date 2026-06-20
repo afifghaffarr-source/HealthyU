@@ -146,22 +146,59 @@ type PlanResult =
 // ──────────────────────────────────────────────────────────────────────────
 // Zod schemas (Sprint 5a) — exported for unit testability
 // ──────────────────────────────────────────────────────────────────────────
+//
+// SPRINT 5A FIX (2026-06-20): schemas are LENIENT — accept common AI
+// aliases. Different models return different field names:
+//   - meal_type ↔ type      (case-insensitive: "Breakfast" → "breakfast")
+//   - reason ↔ notes
+//   - planned_qty: defaults to 1 if missing
+//
+// Without the preprocess, every AI response failed validation (e.g.
+// gpt-oss-120b returns `type: "Breakfast"` + `notes: "..."`), the fallback
+// was triggered, and the user always saw "AI tidak tersedia".
+// ──────────────────────────────────────────────────────────────────────────
 
-export const PlanMealSchema = z.object({
-  meal_type: z.enum(["breakfast", "lunch", "dinner", "snack"]),
-  name: z.string().min(1).max(200),
-  calories: z.number().int().nonnegative().max(5000),
-  protein_g: z.number().nonnegative().optional(),
-  carbs_g: z.number().nonnegative().optional(),
-  fat_g: z.number().nonnegative().optional(),
-  planned_qty: z.number().min(0.1).max(20).default(1),
-  reason: z.string().max(200).default(""),
-});
+const MEAL_TYPE_VALUES = ["breakfast", "lunch", "dinner", "snack"] as const;
 
-export const PlanResultSchema = z.object({
-  summary: z.string().min(1).max(500),
-  meals: z.array(PlanMealSchema).min(1).max(8),
-});
+function normalizeMeal(input: unknown): unknown {
+  if (!input || typeof input !== "object") return input;
+  const m = input as Record<string, unknown>;
+  const rawType = m.meal_type ?? m.type;
+  const meal_type = typeof rawType === "string" ? rawType.toLowerCase().trim() : rawType;
+  return {
+    ...m,
+    meal_type,
+    reason: m.reason ?? m.notes ?? "",
+    planned_qty: m.planned_qty ?? 1,
+  };
+}
+
+export const PlanMealSchema = z.preprocess(
+  normalizeMeal,
+  z.object({
+    meal_type: z.enum(MEAL_TYPE_VALUES),
+    name: z.string().min(1).max(200),
+    calories: z.number().int().nonnegative().max(5000),
+    protein_g: z.number().nonnegative().optional(),
+    carbs_g: z.number().nonnegative().optional(),
+    fat_g: z.number().nonnegative().optional(),
+    planned_qty: z.number().min(0.1).max(20).default(1),
+    reason: z.string().max(200).default(""),
+  }),
+);
+
+export const PlanResultSchema = z.preprocess(
+  (val) => {
+    if (!val || typeof val !== "object") return val;
+    const r = val as Record<string, unknown>;
+    if (!Array.isArray(r.meals)) return val;
+    return { ...r, meals: r.meals.map(normalizeMeal) };
+  },
+  z.object({
+    summary: z.string().min(1).max(500),
+    meals: z.array(PlanMealSchema).min(1).max(8),
+  }),
+);
 
 const GenInput = z.object({ notes: z.string().max(500).optional() });
 

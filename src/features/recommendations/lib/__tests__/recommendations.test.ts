@@ -1,14 +1,10 @@
 /**
- * Unit tests for Sprint 5a (re-introduced) Meal Plan refactor:
- * - Zod schemas (`PlanMealSchema`, `PlanResultSchema`) — exported for testability
+ * Unit tests for Sprint 5a (re-introduced 2026-06-20) Meal Plan refactor:
+ * - Zod schemas (`PlanMealSchema`, `PlanResultSchema`) — LENIENT: accept AI aliases
+ *   (verified against real gpt-oss-120b response shape: `type` vs `meal_type`,
+ *   `notes` vs `reason`, missing `planned_qty`)
  * - `adaptTemplateMeals` — pure helper that normalizes `meal_plan_templates.meals`
- *   (Json type from Supabase) into the canonical `PlanMeal[]` shape
  * - `isUsablePlan` — gate that decides AI success vs template fallback signal
- *
- * The server fn (`generateMealPlan`) is wrapped in `createServerFn` which
- * makes direct invocation awkward. The interesting branches live in pure
- * helpers that are exported specifically for this purpose. End-to-end
- * behavior is covered by the live /recommendations page test.
  */
 import { describe, expect, it } from "vitest";
 import {
@@ -19,7 +15,7 @@ import {
 } from "@/features/recommendations/lib/recommendations.functions";
 
 // ──────────────────────────────────────────────────────────────────────────
-// PlanMealSchema — single-meal validation
+// PlanMealSchema — single-meal validation (strict mode)
 // ──────────────────────────────────────────────────────────────────────────
 describe("PlanMealSchema", () => {
   it("accepts a valid meal with all macros", () => {
@@ -69,7 +65,7 @@ describe("PlanMealSchema", () => {
 });
 
 // ──────────────────────────────────────────────────────────────────────────
-// PlanResultSchema — AI response shape
+// PlanResultSchema — AI response shape (strict mode)
 // ──────────────────────────────────────────────────────────────────────────
 describe("PlanResultSchema", () => {
   it("accepts a valid result with multiple meals", () => {
@@ -101,6 +97,109 @@ describe("PlanResultSchema", () => {
     expect(() =>
       PlanResultSchema.parse({ meals: [{ meal_type: "lunch", name: "x", calories: 100 }] }),
     ).toThrow();
+  });
+});
+
+// ──────────────────────────────────────────────────────────────────────────
+// Sprint 5a (2026-06-20): LENIENT schema — accept AI aliases.
+// Real gpt-oss-120b response shape (verified 2026-06-20):
+//   - `type: "Breakfast"` instead of `meal_type: "breakfast"`
+//   - `notes: "..."` instead of `reason: "..."`
+//   - missing `planned_qty` (default to 1)
+// Without the preprocess, every AI response failed validation, the fallback
+// was triggered, and the user always saw "AI tidak tersedia".
+// ──────────────────────────────────────────────────────────────────────────
+describe("PlanMealSchema — AI alias tolerance", () => {
+  it("accepts `type` as alias for `meal_type` (case-insensitive)", () => {
+    const parsed = PlanMealSchema.parse({
+      type: "Breakfast",
+      name: "Oatmeal",
+      calories: 300,
+    });
+    expect(parsed.meal_type).toBe("breakfast");
+    expect(parsed.name).toBe("Oatmeal");
+  });
+
+  it("accepts `notes` as alias for `reason`", () => {
+    const parsed = PlanMealSchema.parse({
+      meal_type: "lunch",
+      name: "Salad",
+      calories: 250,
+      notes: "Low carb, high fiber",
+    });
+    expect(parsed.reason).toBe("Low carb, high fiber");
+  });
+
+  it("defaults planned_qty to 1 when missing", () => {
+    const parsed = PlanMealSchema.parse({
+      meal_type: "snack",
+      name: "Yogurt",
+      calories: 150,
+    });
+    expect(parsed.planned_qty).toBe(1);
+  });
+
+  it("normalizes a real AI response shape (full integration)", () => {
+    const parsed = PlanMealSchema.parse({
+      type: "Dinner",
+      name: "Tofu Scramble",
+      calories: 320,
+      protein_g: 28,
+      carbs_g: 12,
+      fat_g: 16,
+      notes: "High protein, low glycemic",
+    });
+    expect(parsed.meal_type).toBe("dinner");
+    expect(parsed.reason).toBe("High protein, low glycemic");
+    expect(parsed.planned_qty).toBe(1);
+    expect(parsed.protein_g).toBe(28);
+  });
+
+  it("rejects unknown meal_type even after lowercasing", () => {
+    expect(() => PlanMealSchema.parse({ type: "supper", name: "x", calories: 100 })).toThrow();
+  });
+});
+
+describe("PlanResultSchema — AI alias tolerance", () => {
+  it("accepts a real gpt-oss-120b response (full integration)", () => {
+    const raw = {
+      meals: [
+        {
+          type: "Breakfast",
+          name: "Tofu Scramble",
+          calories: 320,
+          protein_g: 28,
+          carbs_g: 12,
+          fat_g: 16,
+          notes: "High protein",
+        },
+        {
+          type: "Lunch",
+          name: "Kacang Salad",
+          calories: 420,
+          protein_g: 30,
+          carbs_g: 30,
+          fat_g: 18,
+          notes: "Steamed mung beans",
+        },
+        {
+          type: "Dinner",
+          name: "Gado-Gado",
+          calories: 460,
+          protein_g: 32,
+          carbs_g: 38,
+          fat_g: 18,
+          notes: "Mixed blanched veggies",
+        },
+      ],
+      summary: "Menu vegetarian, high-protein, diabetes-friendly. Total 1200 kcal.",
+    };
+    const parsed = PlanResultSchema.parse(raw);
+    expect(parsed.meals).toHaveLength(3);
+    expect(parsed.meals[0].meal_type).toBe("breakfast");
+    expect(parsed.meals[0].reason).toBe("High protein");
+    expect(parsed.meals[1].meal_type).toBe("lunch");
+    expect(parsed.summary).toContain("diabetes-friendly");
   });
 });
 
