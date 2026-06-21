@@ -6,21 +6,37 @@ import {
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
-import { useEffect, type ReactNode } from "react";
+import { useEffect, lazy, type ReactNode, Suspense } from "react";
 
 import appCss from "../styles.css?url";
-import { Toaster } from "@/components/ui/toaster";
+// Sprint 8 perf: lazy-load non-critical root-level UI to shrink the main
+// 540 KB bundle. These components render AFTER first paint, so a brief
+// Suspense fallback (null) is acceptable. Each is ~2-5 KB raw compiled;
+// together ~15-25 KB raw saved from main bundle.
+const Toaster = lazy(() => import("@/components/ui/toaster").then((m) => ({ default: m.Toaster })));
+const InstallPrompt = lazy(() =>
+  import("@/components/install-prompt").then((m) => ({ default: m.InstallPrompt })),
+);
+const SWUpdateToast = lazy(() =>
+  import("@/components/sw-update-toast").then((m) => ({ default: m.SWUpdateToast })),
+);
+const ScrollToTopButton = lazy(() =>
+  import("@/components/healthyu/scroll-to-top-button").then((m) => ({
+    default: m.ScrollToTopButton,
+  })),
+);
+const RouteProgressBar = lazy(() =>
+  import("@/components/healthyu/route-progress-bar").then((m) => ({
+    default: m.RouteProgressBar,
+  })),
+);
 import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
 import { ThemeProvider } from "@/components/theme-provider";
-import { InstallPrompt } from "@/components/install-prompt";
-import { SWUpdateToast } from "@/components/sw-update-toast";
 import { LiveAnnouncerProvider } from "@/components/live-announcer";
 import { I18nProvider } from "@/lib/i18n";
 import { GlobalErrorBoundary } from "@/components/healthyu/global-error-boundary";
 import { RouteError, RouteNotFound } from "@/components/healthyu/route-boundaries";
-import { ScrollToTopButton } from "@/components/healthyu/scroll-to-top-button";
-import { RouteProgressBar } from "@/components/healthyu/route-progress-bar";
 import { APP_CONFIG } from "@/config/app";
 import { startBackgroundSync } from "@/lib/dexie-sync";
 import { initWebVitals } from "@/lib/webVitals";
@@ -148,14 +164,21 @@ function RootComponent() {
           <LiveAnnouncerProvider>
             <ManifestLinkManager />
             <AuthListener />
-            <RouteProgressBar />
+            {/* Sprint 8 perf: non-critical root-level UI wrapped in Suspense
+                with null fallback. They render after first paint so the brief
+                gap is invisible to users. */}
+            <Suspense fallback={null}>
+              <RouteProgressBar />
+            </Suspense>
             <GlobalErrorBoundary>
               <Outlet />
             </GlobalErrorBoundary>
-            <InstallPrompt />
-            <SWUpdateToast />
-            <ScrollToTopButton />
-            <Toaster position="top-center" />
+            <Suspense fallback={null}>
+              <InstallPrompt />
+              <SWUpdateToast />
+              <ScrollToTopButton />
+              <Toaster position="top-center" />
+            </Suspense>
           </LiveAnnouncerProvider>
         </I18nProvider>
       </ThemeProvider>

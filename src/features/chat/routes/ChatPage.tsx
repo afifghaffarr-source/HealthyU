@@ -22,6 +22,7 @@ import { CoachPromptChips } from "@/features/chat/components/CoachPromptChips";
 import { ConfirmDialog } from "@/components/healthyu/confirm-dialog";
 import { piiKinds, formatPiiKindsForDialog, type PiiKind } from "@/lib/pii";
 import { auditPiiOnClient } from "@/features/chat/lib/piiAudit";
+import { reportError } from "@/lib/errorReporting";
 
 export function ChatPage() {
   const qc = useQueryClient();
@@ -69,26 +70,77 @@ export function ChatPage() {
       const decoder = new TextDecoder();
       let buf = "";
       let acc = "";
+      // Sprint 5a polish: track upstream error event so empty replies don't
+      // silently succeed. See docs/postmortems/2026-06-19-chat-empty-reply.md.
+      let upstreamError: string | null = null;
       setStreaming("");
+      const handleEvent = (evt: string) => {
+        const eventLine = evt.split("\n").find((l) => l.startsWith("event:"));
+        const dataLine = evt.split("\n").find((l) => l.startsWith("data:"));
+        if (eventLine && dataLine) {
+          const evtName = eventLine.slice(6).trim();
+          if (evtName === "error") {
+            try {
+              const json = JSON.parse(dataLine.slice(5).trim());
+              upstreamError = typeof json.message === "string" ? json.message : "AI stream error";
+            } catch {
+              /* ignore */
+            }
+            return;
+          }
+          // Non-data named events (e.g. "meta", "done") are ignored here.
+          if (evtName !== "data") return;
+        }
+        if (!dataLine) return;
+        try {
+          const json = JSON.parse(dataLine.slice(5).trim());
+          if (typeof json.delta === "string") {
+            acc += json.delta;
+            setStreaming(acc);
+          }
+        } catch {
+          /* ignore */
+        }
+      };
       while (true) {
         const { done, value } = await reader.read();
         if (done) break;
         buf += decoder.decode(value, { stream: true });
         const events = buf.split("\n\n");
         buf = events.pop() ?? "";
-        for (const evt of events) {
-          const dataLine = evt.split("\n").find((l) => l.startsWith("data:"));
-          if (!dataLine) continue;
-          try {
-            const json = JSON.parse(dataLine.slice(5).trim());
-            if (typeof json.delta === "string") {
-              acc += json.delta;
-              setStreaming(acc);
-            }
-          } catch {
-            /* ignore */
-          }
-        }
+        for (const evt of events) handleEvent(evt);
+      }
+      // Flush trailing partial event (rare but possible on EOF without blank line).
+      if (buf.trim()) handleEvent(buf);
+      // Sprint 5a polish: if AI produced no text AND no explicit error, surface
+      // a friendly fallback instead of letting onSuccess fire silently.
+      // Previous behavior: empty SSE → onSuccess() → no message → user confusion.
+      if (!acc && upstreamError) {
+        // Telemetry: empty stream + explicit upstream error (e.g. 5xx, model refusal)
+        reportError(
+          new Error(`AI stream error: ${upstreamError}`),
+          {
+            source: "chat.ai.stream_error_empty",
+            chat_path: "stream",
+            upstream_error: upstreamError,
+            // message_length intentionally omitted to avoid logging user text
+          },
+          { mechanism: "manual", severity: "warning", handled: true },
+        );
+        throw new Error(`AI sedang bermasalah. Coba lagi sebentar ya. (${upstreamError})`);
+      }
+      if (!acc) {
+        // Telemetry: empty stream with no explicit error (e.g. provider swallowed a 404)
+        reportError(
+          new Error("AI stream returned no text"),
+          {
+            source: "chat.ai.empty_response",
+            chat_path: "stream",
+            // message_length intentionally omitted to avoid logging user text
+          },
+          { mechanism: "manual", severity: "warning", handled: true },
+        );
+        throw new Error("AI tidak menghasilkan balasan. Coba lagi ya.");
       }
       return acc;
     },
