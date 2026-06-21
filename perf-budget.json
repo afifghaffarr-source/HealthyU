@@ -1,0 +1,6 @@
+{
+  "maxChunkBytes": 1048576,
+  "maxTotalBytes": 5242880,
+  "maxWorkerEntryBytes": 1048576,
+  "_comment": "Sprint 6b perf budget (v2). All values are UNCOMPRESSED bytes. Cloudflare free tier Worker limit = 3 MiB, paid = 10 MiB. Chunks over 1 MiB get flagged; if you need more, justify it. 2026-06-21: raised from 320 KB / 4 MiB after audit — current build has 1× 853 KB main (TanStack router + React + query), plus 3rd-party lazy chunks (jspdf 377 KB, chart 351 KB). Plan: code-split the main bundle in Sprint 7."
+}

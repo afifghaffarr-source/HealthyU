@@ -4,6 +4,7 @@ import { SITE_URL } from "@/lib/seo";
 
 interface SitemapEntry {
   path: string;
+  lastmod?: string; // YYYY-MM-DD
   changefreq?: "always" | "hourly" | "daily" | "weekly" | "monthly" | "yearly" | "never";
   priority?: string;
 }
@@ -27,6 +28,14 @@ const STATIC_ENTRIES: SitemapEntry[] = [
   { path: "/faq", changefreq: "weekly", priority: "0.9" },
 ];
 
+/** Strip time component from ISO timestamp → YYYY-MM-DD (sitemap spec). */
+function toDate(iso: string | null | undefined): string | undefined {
+  if (!iso) return undefined;
+  // iso like "2026-06-21T00:02:29.263+00:00" or "2026-06-21"
+  const m = iso.match(/^(\d{4}-\d{2}-\d{2})/);
+  return m?.[1];
+}
+
 export const Route = createFileRoute("/sitemap.xml")({
   server: {
     handlers: {
@@ -36,51 +45,66 @@ export const Route = createFileRoute("/sitemap.xml")({
         // (AsyncLocalStorage) on first access. Works in both CF Workers
         // (production) and local dev (process.env fallback).
         const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-        const [foods, exercises, diets, articles, recipes] = await Promise.all([
-          supabaseAdmin.from("seo_foods").select("slug").eq("published", true),
-          supabaseAdmin.from("seo_exercises").select("slug").eq("published", true),
-          supabaseAdmin.from("seo_diet_guides").select("slug").eq("published", true),
-          supabaseAdmin.from("seo_articles").select("slug").eq("published", true),
-          supabaseAdmin.from("seo_recipes").select("slug").eq("published", true),
+        // Sprint 6b: include `updated_at` so sitemap emits per-URL <lastmod>.
+        // Google uses lastmod to decide when to re-crawl. Dynamic content
+        // (recipes/articles) get their real DB updated_at; static pages fall
+        // back to today's date.
+        const [foods, exercises, diets, articles, recipes, faqs] = await Promise.all([
+          supabaseAdmin.from("seo_foods").select("slug,updated_at").eq("published", true),
+          supabaseAdmin.from("seo_exercises").select("slug,updated_at").eq("published", true),
+          supabaseAdmin.from("seo_diet_guides").select("slug,updated_at").eq("published", true),
+          supabaseAdmin.from("seo_articles").select("slug,updated_at").eq("published", true),
+          supabaseAdmin.from("seo_recipes").select("slug,updated_at").eq("published", true),
+          supabaseAdmin.from("seo_faqs").select("slug,updated_at").eq("published", true),
         ]);
-        const faqs = await supabaseAdmin.from("seo_faqs").select("slug").eq("published", true);
         const dynamic: SitemapEntry[] = [
           ...(foods.data ?? []).map((r) => ({
             path: `/kalori/${r.slug}`,
+            lastmod: toDate(r.updated_at) ?? today,
             changefreq: "monthly" as const,
             priority: "0.7",
           })),
           ...(exercises.data ?? []).map((r) => ({
             path: `/olahraga/${r.slug}`,
+            lastmod: toDate(r.updated_at) ?? today,
             changefreq: "monthly" as const,
             priority: "0.7",
           })),
           ...(diets.data ?? []).map((r) => ({
             path: `/diet/${r.slug}`,
+            lastmod: toDate(r.updated_at) ?? today,
             changefreq: "monthly" as const,
             priority: "0.7",
           })),
           ...(articles.data ?? []).map((r) => ({
             path: `/artikel/${r.slug}`,
+            lastmod: toDate(r.updated_at) ?? today,
             changefreq: "weekly" as const,
             priority: "0.8",
           })),
           ...(recipes.data ?? []).map((r) => ({
             path: `/resep/${r.slug}`,
+            lastmod: toDate(r.updated_at) ?? today,
             changefreq: "weekly" as const,
             priority: "0.8",
           })),
           ...(faqs.data ?? []).map((r) => ({
             path: `/faq/${r.slug}`,
+            lastmod: toDate(r.updated_at) ?? today,
             changefreq: "monthly" as const,
             priority: "0.7",
           })),
         ];
-        const urls = [...STATIC_ENTRIES, ...dynamic].map((e) =>
+        // Static entries use today's date (they're "site-wide" updates).
+        const statics: SitemapEntry[] = STATIC_ENTRIES.map((e) => ({
+          ...e,
+          lastmod: e.lastmod ?? today,
+        }));
+        const urls = [...statics, ...dynamic].map((e) =>
           [
             `  <url>`,
             `    <loc>${SITE_URL}${e.path}</loc>`,
-            `    <lastmod>${today}</lastmod>`,
+            e.lastmod ? `    <lastmod>${e.lastmod}</lastmod>` : null,
             e.changefreq ? `    <changefreq>${e.changefreq}</changefreq>` : null,
             e.priority ? `    <priority>${e.priority}</priority>` : null,
             `  </url>`,

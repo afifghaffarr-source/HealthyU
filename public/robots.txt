@@ -4,4 +4,4 @@ Disallow: /api/
 Disallow: /_authenticated/
 Disallow: /auth
 
-Sitemap: https://healthyu.id/sitemap.xml
+Sitemap: https://healthyu.web.id/sitemap.xml
