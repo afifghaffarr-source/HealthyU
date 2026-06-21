@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { canonical } from "@/lib/seo";
+import { canonical, hreflangAlternates } from "@/lib/seo";
 import { listExercises } from "@/features/content/lib/seoContent.functions";
 
 export const Route = createFileRoute("/olahraga/")({
@@ -16,7 +16,7 @@ export const Route = createFileRoute("/olahraga/")({
       { property: "og:description", content: "Hitung kalori terbakar berdasarkan nilai MET." },
       { property: "og:url", content: canonical("/olahraga") },
     ],
-    links: [{ rel: "canonical", href: canonical("/olahraga") }],
+    links: [{ rel: "canonical", href: canonical("/olahraga") }, ...hreflangAlternates("/olahraga")],
   }),
   errorComponent: ({ error }) => (
     <main className="mx-auto max-w-3xl px-4 py-8">

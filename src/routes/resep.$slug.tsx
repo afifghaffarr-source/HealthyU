@@ -1,7 +1,7 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { canonical, SITE_NAME } from "@/lib/seo";
+import { canonical, hreflangAlternates, SITE_NAME } from "@/lib/seo";
 import { getSeoRecipe } from "@/features/content/lib/seoContent.functions";
 import { getBookmarkStateForSlug } from "@/features/recipes/lib/recipeBookmarksPublic.functions";
 import { getRatingStateForSlug } from "@/features/recipes/lib/recipeRatingsPublic.functions";
@@ -44,7 +44,7 @@ export const Route = createFileRoute("/resep/$slug")({
         { property: "og:type", content: "article" },
         ...(r?.image_url ? [{ property: "og:image", content: r.image_url }] : []),
       ],
-      links: [{ rel: "canonical", href: url }],
+      links: [{ rel: "canonical", href: url }, ...hreflangAlternates(`/resep/${params.slug}`)],
       scripts: r
         ? [
             {

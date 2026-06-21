@@ -3,6 +3,7 @@ import { lazy, Suspense, useEffect, useState } from "react";
 import { APP_CONFIG } from "@/config/app";
 import { supabase } from "@/integrations/supabase/client";
 import { BmrQuiz } from "@/features/landing/components/BmrQuiz";
+import { canonical, hreflangAlternates } from "@/lib/seo";
 import {
   TrustMarquee,
   StatsStrip,
@@ -119,7 +120,7 @@ export const Route = createFileRoute("/")({
         content: "Diet personal, puasa, jadwal sholat, dan AI coach.",
       },
     ],
-    links: [{ rel: "canonical", href: `${APP_CONFIG.siteUrl}/` }],
+    links: [{ rel: "canonical", href: `${APP_CONFIG.siteUrl}/` }, ...hreflangAlternates("/")],
     scripts: [
       {
         type: "application/ld+json",

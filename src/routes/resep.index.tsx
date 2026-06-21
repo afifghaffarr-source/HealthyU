@@ -3,7 +3,7 @@ import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { Search, Clock, Flame, Sparkles, ChevronRight, Bookmark } from "lucide-react";
-import { canonical } from "@/lib/seo";
+import { canonical, hreflangAlternates } from "@/lib/seo";
 import { listSeoRecipes } from "@/features/content/lib/seoContent.functions";
 import { getOptionalUser } from "@/integrations/supabase/optional-auth";
 import { TopAppBar } from "@/components/healthyu/top-app-bar";
@@ -22,7 +22,7 @@ export const Route = createFileRoute("/resep/")({
       { property: "og:description", content: "Resep diet Indonesia dengan info nutrisi lengkap." },
       { property: "og:url", content: canonical("/resep") },
     ],
-    links: [{ rel: "canonical", href: canonical("/resep") }],
+    links: [{ rel: "canonical", href: canonical("/resep") }, ...hreflangAlternates("/resep")],
   }),
   errorComponent: ({ error }) => (
     <main className="mx-auto max-w-3xl px-4 py-8">

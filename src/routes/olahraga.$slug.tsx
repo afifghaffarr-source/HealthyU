@@ -1,6 +1,6 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useState } from "react";
-import { canonical } from "@/lib/seo";
+import { canonical, hreflangAlternates } from "@/lib/seo";
 import { getExercise } from "@/features/content/lib/seoContent.functions";
 
 export const Route = createFileRoute("/olahraga/$slug")({
@@ -27,7 +27,7 @@ export const Route = createFileRoute("/olahraga/$slug")({
         { property: "og:url", content: url },
         { property: "og:type", content: "article" },
       ],
-      links: [{ rel: "canonical", href: url }],
+      links: [{ rel: "canonical", href: url }, ...hreflangAlternates(`/olahraga/${params.slug}`)],
       scripts: e
         ? [
             {

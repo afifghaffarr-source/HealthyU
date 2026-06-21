@@ -1,5 +1,5 @@
 import { createFileRoute, notFound } from "@tanstack/react-router";
-import { canonical } from "@/lib/seo";
+import { canonical, hreflangAlternates } from "@/lib/seo";
 import { CalculatorShell } from "@/components/healthyu/calculator-shell";
 import { breadcrumbSchema } from "@/components/healthyu/calculator-shell.utils";
 import {
@@ -97,7 +97,7 @@ export const Route = createFileRoute("/kalkulator/$slug")({
         { property: "og:url", content: url },
         { property: "og:type", content: "website" },
       ],
-      links: [{ rel: "canonical", href: url }],
+      links: [{ rel: "canonical", href: url }, ...hreflangAlternates(`/kalkulator/${slug}`)],
       scripts: [
         {
           type: "application/ld+json",

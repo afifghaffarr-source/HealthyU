@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { canonical } from "@/lib/seo";
+import { canonical, hreflangAlternates } from "@/lib/seo";
 import { CALCS } from "./kalkulator";
 
 export const Route = createFileRoute("/kalkulator/")({
@@ -18,7 +18,10 @@ export const Route = createFileRoute("/kalkulator/")({
       },
       { property: "og:url", content: canonical("/kalkulator") },
     ],
-    links: [{ rel: "canonical", href: canonical("/kalkulator") }],
+    links: [
+      { rel: "canonical", href: canonical("/kalkulator") },
+      ...hreflangAlternates("/kalkulator"),
+    ],
     scripts: [
       {
         type: "application/ld+json",

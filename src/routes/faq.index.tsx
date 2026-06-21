@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { canonical } from "@/lib/seo";
+import { canonical, hreflangAlternates } from "@/lib/seo";
 import { listSeoFaqs } from "@/features/content/lib/seoContent.functions";
 
 export const Route = createFileRoute("/faq/")({
@@ -16,7 +16,7 @@ export const Route = createFileRoute("/faq/")({
       { property: "og:description", content: "Tanya jawab seputar diet, olahraga, dan kesehatan." },
       { property: "og:url", content: canonical("/faq") },
     ],
-    links: [{ rel: "canonical", href: canonical("/faq") }],
+    links: [{ rel: "canonical", href: canonical("/faq") }, ...hreflangAlternates("/faq")],
   }),
   errorComponent: ({ error }) => (
     <main className="mx-auto max-w-3xl px-4 py-8">

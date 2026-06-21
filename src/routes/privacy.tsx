@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { APP_CONFIG } from "@/config/app";
-import { canonical } from "@/lib/seo";
+import { canonical, hreflangAlternates } from "@/lib/seo";
 import { ShieldCheck, Download, Trash2, Eye, Edit3, Mail } from "lucide-react";
 
 export const Route = createFileRoute("/privacy")({
@@ -19,7 +19,7 @@ export const Route = createFileRoute("/privacy")({
       },
       { property: "og:url", content: canonical("/privacy") },
     ],
-    links: [{ rel: "canonical", href: canonical("/privacy") }],
+    links: [{ rel: "canonical", href: canonical("/privacy") }, ...hreflangAlternates("/privacy")],
   }),
   component: PrivacyPage,
 });

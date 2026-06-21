@@ -1,5 +1,5 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { canonical, SITE_NAME } from "@/lib/seo";
+import { canonical, hreflangAlternates, SITE_NAME } from "@/lib/seo";
 import { getSeoFaq } from "@/features/content/lib/seoContent.functions";
 
 interface QA {
@@ -31,7 +31,7 @@ export const Route = createFileRoute("/faq/$slug")({
         { property: "og:url", content: url },
         { property: "og:type", content: "article" },
       ],
-      links: [{ rel: "canonical", href: url }],
+      links: [{ rel: "canonical", href: url }, ...hreflangAlternates(`/faq/${params.slug}`)],
       scripts: f
         ? [
             {

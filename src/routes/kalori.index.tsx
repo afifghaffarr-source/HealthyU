@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { canonical } from "@/lib/seo";
+import { canonical, hreflangAlternates } from "@/lib/seo";
 import { listFoods } from "@/features/content/lib/seoContent.functions";
 
 export const Route = createFileRoute("/kalori/")({
@@ -19,7 +19,7 @@ export const Route = createFileRoute("/kalori/")({
       },
       { property: "og:url", content: canonical("/kalori") },
     ],
-    links: [{ rel: "canonical", href: canonical("/kalori") }],
+    links: [{ rel: "canonical", href: canonical("/kalori") }, ...hreflangAlternates("/kalori")],
   }),
   errorComponent: ({ error }) => (
     <main className="mx-auto max-w-3xl px-4 py-8">

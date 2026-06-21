@@ -1,5 +1,5 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { canonical } from "@/lib/seo";
+import { canonical, hreflangAlternates } from "@/lib/seo";
 import { getFood } from "@/features/content/lib/seoContent.functions";
 
 export const Route = createFileRoute("/kalori/$slug")({
@@ -26,7 +26,7 @@ export const Route = createFileRoute("/kalori/$slug")({
         { property: "og:url", content: url },
         { property: "og:type", content: "article" },
       ],
-      links: [{ rel: "canonical", href: url }],
+      links: [{ rel: "canonical", href: url }, ...hreflangAlternates(`/kalori/${params.slug}`)],
       scripts: f
         ? [
             {

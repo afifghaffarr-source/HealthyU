@@ -1,6 +1,6 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { SafeMarkdown } from "@/components/SafeMarkdown";
-import { canonical, SITE_NAME } from "@/lib/seo";
+import { canonical, hreflangAlternates, SITE_NAME } from "@/lib/seo";
 import { getSeoArticle } from "@/features/content/lib/seoContent.functions";
 
 export const Route = createFileRoute("/artikel/$slug")({
@@ -27,7 +27,7 @@ export const Route = createFileRoute("/artikel/$slug")({
         { property: "og:type", content: "article" },
         ...(a?.image_url ? [{ property: "og:image", content: a.image_url }] : []),
       ],
-      links: [{ rel: "canonical", href: url }],
+      links: [{ rel: "canonical", href: url }, ...hreflangAlternates(`/artikel/${params.slug}`)],
       scripts: a
         ? [
             {

@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
-import { canonical } from "@/lib/seo";
+import { canonical, hreflangAlternates } from "@/lib/seo";
 import { TopAppBar } from "@/components/healthyu/top-app-bar";
 
 const searchSchema = z.object({
@@ -59,7 +59,7 @@ export const Route = createFileRoute("/cari")({
       { property: "og:title", content: "Cari — HealthyU" },
       { property: "og:url", content: canonical("/cari") },
     ],
-    links: [{ rel: "canonical", href: canonical("/cari") }],
+    links: [{ rel: "canonical", href: canonical("/cari") }, ...hreflangAlternates("/cari")],
   }),
   loaderDeps: ({ search }) => ({ q: search.q }),
   loader: ({ deps }) => searchCariFn({ data: { q: deps.q ?? "" } }),
