@@ -42,6 +42,17 @@ export default defineConfig({
       server: {
         entry: "start",
       },
+      // Sprint 7: Manual vendor chunking (see `build.rollupOptions.manualChunks`
+      // below) — splits heavy deps (recharts, jspdf, supabase, dexie, markdown,
+      // dompurify) out of the main bundle. Drops main chunk from 853 KB → 541 KB
+      // raw (164 KB gzipped).
+      //
+      // Note: TanStack Router's `autoCodeSplitting` is set via tsr.config.json
+      // (read by `@tanstack/router-cli` at generate time, not by the Vite
+      // plugin chain). It currently does NOT emit `lazyRouteComponent` in the
+      // generated routeTree.gen.ts in our setup — root cause is the v1.167
+      // router-cli behavior. Route-level code splitting is tracked separately;
+      // vendor chunking alone is the bulk of the win here.
     }),
     react(),
     // vite-plugin-pwa — PWA shell + Workbox offline cache for user 3G/Ramadhan.
@@ -165,6 +176,51 @@ export default defineConfig({
     // audit fails. Trade-off: +30-40% dist size (CF can serve .map files
     // separately or strip via transform rules).
     sourcemap: true,
+    // Sprint 7: Manual chunking for heavy vendor deps that were previously
+    // bundled into the main 853 KB chunk. Putting them in their own chunks
+    // means:
+    //   * The main bundle drops to a much smaller size for first paint.
+    //   * Vendor chunks are cached independently (longer cache TTL OK).
+    //   * Parallel downloads on HTTP/2 / HTTP/3.
+    rollupOptions: {
+      output: {
+        manualChunks: (id) => {
+          if (!id.includes("node_modules")) return undefined;
+          // Charts (recharts + d3 deps) — heavy, lazy-loaded on dashboard/reports.
+          if (id.includes("recharts") || id.includes("d3-") || id.includes("victory-vendor")) {
+            return "vendor-charts";
+          }
+          // PDF + screenshot (only used by reports export flow).
+          if (id.includes("jspdf") || id.includes("html2canvas")) {
+            return "vendor-pdf";
+          }
+          // Markdown rendering (used by articles).
+          if (
+            id.includes("marked") ||
+            id.includes("markdown-it") ||
+            id.includes("remark") ||
+            id.includes("micromark") ||
+            id.includes("mdast-util")
+          ) {
+            return "vendor-markdown";
+          }
+          // DOMPurify (sanitize HTML — paired with markdown).
+          if (id.includes("dompurify") || id.includes("purify")) {
+            return "vendor-purify";
+          }
+          // IndexedDB wrapper (Dexie — used for offline cache).
+          if (id.includes("dexie")) {
+            return "vendor-dexie";
+          }
+          // Supabase client + postgrest deps.
+          if (id.includes("@supabase") || id.includes("postgrest")) {
+            return "vendor-supabase";
+          }
+          // React + react-dom stay in main (used everywhere, splitting hurts).
+          return undefined;
+        },
+      },
+    },
   },
   server: {
     // Defaults that work well locally without the Lovable sandbox.
