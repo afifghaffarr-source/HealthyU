@@ -63,7 +63,7 @@ export const Route = createFileRoute("/prism")({
         content: "AI nutrition coach Bahasa Indonesia, tampilan optimal di desktop.",
       },
       { property: "og:url", content: `${APP_CONFIG.siteUrl}/prism` },
-      { property: "og:image", content: `${APP_CONFIG.siteUrl}/icon-512.svg` },
+      { property: "og:image", content: `${APP_CONFIG.siteUrl}/og/site.png` },
       { name: "twitter:card", content: "summary_large_image" },
     ],
     links: [{ rel: "canonical", href: `${APP_CONFIG.siteUrl}/prism` }],

@@ -2,6 +2,7 @@ import { describe, it, expect } from "vitest";
 import {
   canonical,
   ogImage,
+  ogImageFor,
   hreflangAlternates,
   HREFLANG_VARIANTS,
   SITE_LOCALE,
@@ -26,6 +27,24 @@ describe("ogImage", () => {
   });
   it("uses custom path", () => {
     expect(ogImage("/og.png")).toBe(`${SITE_URL}/og.png`);
+  });
+});
+
+describe("ogImageFor", () => {
+  it("builds recipe og path from slug", () => {
+    expect(ogImageFor("recipes", "smoothie-bayam-pisang")).toBe(
+      `${SITE_URL}/og/recipes/smoothie-bayam-pisang.png`,
+    );
+  });
+  it("builds article og path from slug", () => {
+    expect(ogImageFor("articles", "tips-diet-sehat")).toBe(
+      `${SITE_URL}/og/articles/tips-diet-sehat.png`,
+    );
+  });
+  it("falls back to /og/site.png when slug is missing", () => {
+    expect(ogImageFor("recipes")).toBe(`${SITE_URL}/og/site.png`);
+    expect(ogImageFor("articles", null)).toBe(`${SITE_URL}/og/site.png`);
+    expect(ogImageFor("articles", "")).toBe(`${SITE_URL}/og/site.png`);
   });
 });
 

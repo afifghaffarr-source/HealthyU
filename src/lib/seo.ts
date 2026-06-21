@@ -32,6 +32,18 @@ export function ogImage(path = "/icon-512.svg"): string {
 }
 
 /**
+ * Build the og:image URL for a given content type + slug.
+ * Used by detail routes (recipe / article) to point at the pre-generated
+ * 1200x630 PNG card (see scripts/generate-og-images.mjs).
+ *
+ * Falls back to /og/site.png if the slug is missing.
+ */
+export function ogImageFor(kind: "recipes" | "articles", slug?: string | null): string {
+  const path = slug ? `/og/${kind}/${slug}.png` : "/og/site.png";
+  return ogImage(path);
+}
+
+/**
  * Generate hreflang alternate links for a given path.
  *
  * Returns the `id-ID` variant + an `x-default` fallback. Even though
