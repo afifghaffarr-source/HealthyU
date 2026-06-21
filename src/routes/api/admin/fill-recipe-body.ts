@@ -29,12 +29,12 @@ import {
  *
  * Response shape:
  *   { ok, processed, errors, durationMs, timestamp }
- *   processed: [{ slug, body_source: "ai-generated" }]
+ *   processed: [{ slug, body_source: "ai_generated" }]
  *   errors:    [{ slug, message }]
  *
  * Side effects:
  *   - Updates `recipes.ingredients`, `recipes.instructions`,
- *     `recipes.body_source = "ai-generated"`, `recipes.body_generated_at = now()`
+ *     `recipes.body_source = "ai_generated"`, `recipes.body_generated_at = now()`
  *   - Upserts into `seo_recipes` (insert if missing, update if exists) so the
  *     public /resep/$slug page (which reads from seo_recipes) shows the body.
  *
@@ -181,7 +181,7 @@ export const Route = createFileRoute("/api/admin/fill-recipe-body")({
               .update({
                 ingredients: body.ingredients,
                 instructions: body.instructions,
-                body_source: "ai-generated",
+                body_source: "ai_generated",
                 body_generated_at: now,
                 updated_at: now,
               })
