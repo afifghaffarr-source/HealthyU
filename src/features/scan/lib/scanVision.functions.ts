@@ -77,6 +77,24 @@ const MenuImageSchema = z.object({
         price: z.number().optional(),
         description: z.string().optional(),
         est_calories: z.number().optional(),
+        // Sprint W2: AI Warung Mode extensions (nutrition + portion + category)
+        est_protein_g: z.number().optional(),
+        est_carbs_g: z.number().optional(),
+        est_fat_g: z.number().optional(),
+        est_portion_g: z.number().optional(), // suggested portion in grams
+        category: z
+          .enum([
+            "nasi",
+            "lauk",
+            "sayur",
+            "minuman",
+            "pelengkap",
+            "dessert",
+            "soup",
+            "salad",
+            "main",
+          ])
+          .optional(),
       }),
     )
     .default([]),
@@ -105,8 +123,20 @@ export const parseMenuImage = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) => ImgIn.parse(input))
   .handler(async ({ data, context }) => {
+    // Sprint W2: AI Warung Mode — Indonesian-context-aware prompt
+    const prompt = `Kamu sedang scan menu warteg/warung/restoran Indonesia. 
+Ekstrak semua makanan/minuman yang terlihat. Untuk setiap item:
+- Identifikasi nama (gunakan nama Indonesia yang umum, misalnya "Nasi Goreng" bukan "Fried Rice")
+- Estimasi kalori, protein (g), karbohidrat (g), lemak (g)
+- Estimasi porsi dalam gram (misal: nasi 150g, ayam 80g, sayur 100g)
+- Kategori: nasi, lauk (protein), sayur, minuman, pelengkap, dessert, soup, salad, main
+
+Balas JSON: {"items":[{"name":"...","price":12345,"description":"...","est_calories":420,"est_protein_g":20,"est_carbs_g":50,"est_fat_g":12,"est_portion_g":150,"category":"lauk"}]}
+
+Jika ada combo (nasi+lauk+sayur), list sebagai item terpisah.`;
+
     const parsed = await callGeminiJson(
-      'OCR menu restoran. Balas JSON {"items":[{"name":"...","price":12345,"description":"...","est_calories":420}]}',
+      prompt,
       data.image_data_url,
       "scan.menu.image",
       context.userId,
