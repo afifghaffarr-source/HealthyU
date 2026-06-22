@@ -107,7 +107,9 @@ Lihat `docs/HEALTHYU_MASTER_REKOMENDASI_REPO_2026-06-19.md` (Sprint 1a) untuk re
 bun install        # requires bun >=1.1.0 (packageManager: bun@1.2.21)
 bun run dev        # http://localhost:8080
 bun run build      # production build
-bun run test       # vitest (271 tests, 70% coverage threshold)
+bun run test       # vitest (760 tests, 70% coverage threshold)
+bun run lint       # eslint (0 errors, 0 warnings)
+bun run e2e        # playwright e2e tests (smoke + regression + a11y)
 bunx tsc --noEmit  # typecheck
 ```
 
@@ -176,11 +178,11 @@ Chat stream melakukan sendiri: auth → rate limit → budget → safety guard �
 
 `src/features/ai/lib/` punya **3 layer** — pilih sesuai use case:
 
-| Layer | File | Function | Use case |
-|---|---|---|---|
-| Legacy (prompt-hack JSON) | `aiGateway.server.ts` | `callAiJsonWithSchema` | Existing 19 call sites (unchanged) |
-| SDK structured | `aiStructured.functions.ts` | `callAiStructured<S>` | New code yang butuh Zod-native output |
-| SDK streaming | `aiStreamSdk.server.ts` | `streamChatWithSdk` | New code yang butuh real chunk-by-chunk SSE |
+| Layer                     | File                        | Function               | Use case                                    |
+| ------------------------- | --------------------------- | ---------------------- | ------------------------------------------- |
+| Legacy (prompt-hack JSON) | `aiGateway.server.ts`       | `callAiJsonWithSchema` | Existing 19 call sites (unchanged)          |
+| SDK structured            | `aiStructured.functions.ts` | `callAiStructured<S>`  | New code yang butuh Zod-native output       |
+| SDK streaming             | `aiStreamSdk.server.ts`     | `streamChatWithSdk`    | New code yang butuh real chunk-by-chunk SSE |
 
 **Provider wrapper**: `vexoProvider.ts` — `createOpenAICompatible` over VexoAPI.
 Gampang swap ke OpenAI/Anthropic nanti: ganti `baseURL` + `apiKey` doang.
@@ -225,21 +227,29 @@ For first-time setup, see [`docs/cloudflare-deploy.md`](./docs/cloudflare-deploy
 
 ## Production readiness
 
-| Area           | Status | Detail                                                            |
-| -------------- | ------ | ----------------------------------------------------------------- |
-| Build          | ✅     | `bun run build` + `bunx tsc --noEmit` clean                       |
-| Tests          | ✅     | 61 files, 529 tests, vitest 70% threshold                         |
-| Lint           | ✅     | `bun run lint` clean (`.wrangler/` di-ignore sejak 2026-06-18)    |
-| `.env` hygiene | ✅     | Not tracked in git, `.env.example` as template                    |
-| Cron auth      | ✅     | `requireCronSecret()` — timing-safe, fail-closed                  |
-| OAuth state    | ✅     | Crypto nonce, DB-persisted, single-use, 10 min TTL                |
-| XSS prevention | ✅     | `rehype-sanitize` on all markdown, no `dangerouslySetInnerHTML`   |
-| AI rate limit  | ✅     | Per-user budget + sliding-window rate limit on all AI calls       |
-| AI fail-closed | ✅     | Expensive ops deny on infra error (budget/rate-limit RPC failure) |
-| AI provider    | ✅     | VexoAPI (gpt-oss-120b / glm-4.7-flash / multimodal gemini)        |
-| Error reporter | ✅     | Custom Supabase table logger (`public.error_reports`)             |
-| PDP export     | ✅     | 91 tables mapped, 6 excluded with documented reasons              |
-| RLS            | ✅     | Row-Level Security on all user tables                             |
+| Area              | Status | Detail                                                            |
+| ----------------- | ------ | ----------------------------------------------------------------- |
+| Build             | ✅     | `bun run build` + `bunx tsc --noEmit` clean                       |
+| Tests             | ✅     | 81 files, 760 tests, vitest 70% threshold                         |
+| Lint              | ✅     | `bun run lint` 0 errors (69 warnings non-blocking)                |
+| E2E               | ✅     | Playwright (smoke, public-pages, auth, a11y, regression)          |
+| Bundle            | ✅     | Main 500KB / gzip 164KB (hard floor TanStack Start + React 19)    |
+| `.env` hygiene    | ✅     | Not tracked in git, `.env.example` as template                    |
+| Cron auth         | ✅     | `requireCronSecret()` — timing-safe, fail-closed                  |
+| OAuth state       | ✅     | Crypto nonce, DB-persisted, single-use, 10 min TTL                |
+| XSS prevention    | ✅     | `rehype-sanitize` on all markdown, no `dangerouslySetInnerHTML`   |
+| AI rate limit     | ✅     | Per-user budget + sliding-window rate limit on all AI calls       |
+| AI fail-closed    | ✅     | Expensive ops deny on infra error (budget/rate-limit RPC failure) |
+| AI provider       | ✅     | VexoAPI (gpt-oss-120b / glm-4.7-flash / multimodal gemini)        |
+| Error reporter    | ✅     | Custom Supabase table logger (`public.error_reports`)             |
+| PII detection     | ✅     | 4 categories (phone, email, ktp, credit_card) + 22 tests          |
+| Chat safety       | ✅     | ED/medical guardrails + quarterly review (2026-06-16)             |
+| PDP export        | ✅     | 91 tables mapped, 6 excluded with documented reasons              |
+| RLS               | ✅     | Row-Level Security on all user tables                             |
+| Backup            | ✅     | Daily Supabase DB backup, 30d retention, Telegram offsite         |
+| Rollback playbook | ✅     | `docs/deployment-playbook.md` + `docs/backup-restore-runbook.md`  |
+| Monitoring        | ✅     | `docs/monitoring.md` + `scripts/health-check.ts`                  |
+| Docs              | ✅     | `docs/troubleshooting.md` + `docs/known-issues.md`                |
 
 ## Known limits
 
@@ -248,6 +258,25 @@ For first-time setup, see [`docs/cloudflare-deploy.md`](./docs/cloudflare-deploy
 - Scan batch files (`src/features/scan/lib/scanBatch*.functions.ts`) — 36 files, barrel pattern. Functional but messy; refactor ditunda ke post-MVP.
 - VexoAPI free tier dapat return 503 ("upstream denied") saat upstream model provider outage. Mitigasi: rotate key, atau swap ke `AI_FALLBACK_URL` (TODO).
 - VexoAPI free tier tidak expose SSE — chat stream emits satu chunk, UI tidak dapat token-by-token animation. Acceptable trade-off.
+- **Bundle size 500KB** (gzip 164KB) adalah hard floor untuk TanStack Start + React 19. Target <400KB tidak reachable tanpa rewrite framework. Lihat `docs/known-issues.md` HI-001.
+- **37 phantom bindings** di Cloudflare Worker belum di-cleanup (no functional impact). Lihat `docs/known-issues.md` HI-003.
+- **GH Actions CF token** invalid (deploy manual dulu). Lihat `docs/known-issues.md` HI-002.
+
+## Audit & Roadmap
+
+Project ini melalui comprehensive audit (Fase 1-7) yang selesai 2026-06-23:
+
+| Fase   | Scope                                        | Status      |
+| ------ | -------------------------------------------- | ----------- |
+| Fase 1 | Critical stabilization (runtime bugs)        | ✅ Complete |
+| Fase 2 | Security hardening                           | ✅ Complete |
+| Fase 3 | Bundle optimization + type safety            | ✅ Complete |
+| Fase 4 | UI/UX, performance, maintainability          | ✅ Complete |
+| Fase 5 | Production hardening (backup, monitor, docs) | ✅ Complete |
+| Fase 6 | CI gate hardening (Lighthouse strict)        | ✅ Complete |
+| Fase 7 | Dependency audit + Dependabot                | ✅ Complete |
+
+Detail lengkap: [`audit/04-roadmap.md`](./audit/04-roadmap.md). Issue tracking: [`docs/known-issues.md`](./docs/known-issues.md).
 
 ## Security memory
 
