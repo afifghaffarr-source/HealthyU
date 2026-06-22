@@ -1,9 +1,18 @@
 # Spec — AI Warung Mode 🇮🇩
 
-> **Status:** Draft, awaiting approval before implementation
-> **Author:** Sprint planning, 2026-06-22
+> **Status:** Draft v2 (post-review corrections), awaiting approval before implementation
+> **Author:** Sprint planning, 2026-06-22 (rev. 2026-06-22 per `docs/features/ai-warung-mode-review.md`)
 > **Source PRD:** `docs/HEALTHYU_MASTER_REKOMENDASI_REPO_2026-06-19.md` (Tier 1 #1)
 > **Related:** Sprint 4a (Indonesian food database)
+
+---
+
+## Revision History
+
+| Version | Date       | Changes                                                                                                                                                                                                                                                                                                                  |
+| ------- | ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| v1      | 2026-06-22 | Initial draft                                                                                                                                                                                                                                                                                                            |
+| v2      | 2026-06-22 | Review fixes (per `ai-warung-mode-review.md`): C1 extend `food_items` (not new table), C2 add feature flag option (Option A chosen), C3 upgrade `MenuImageSchema` with protein/carbs/fat/category/portion_g fields, M1 mention `food_serving_sizes` integration, M3 add `meal_logs` migration columns. Effort 2.5w → 2w. |
 
 ---
 
@@ -57,37 +66,88 @@ feature — we're upgrading the existing one with Indonesian-specific context.
 
 ## 3. What to Build (the delta)
 
-### 3.1 Indonesian Dish Reference Table
+### 3.1 Extend Existing `food_items` Table
 
-New Supabase table: `id_dish_reference`
+**Background:** `public.food_items` already exists (`supabase/migrations/20260603045312`)
+with 20 Indonesian foods seeded (Nasi Putih, Ayam Goreng, Rendang Sapi, Soto
+Ayam, Gado-Gado, Tempe Goreng, Tahu Goreng, Bakso, Mie Ayam, Sate Ayam, etc.).
+
+Current schema:
 
 ```sql
-create table public.id_dish_reference (
-  id serial primary key,
-  canonical_name text not null,           -- "Nasi goreng"
-  aliases text[] not null default '{}',   -- ["Nasi Goreng Spesial", "Nasi Goreng Seafood"]
-  category text not null,                 -- 'nasi' | 'lauk' | 'sayur' | 'sambal' | 'minuman' | 'pelengkap'
-  default_portion_g numeric,              -- 200 (nasi), 50 (lauk), 30 (sambal)
-  default_portion_label text,             -- "1 piring", "1 potong", "1 centong"
-  calories_per_portion numeric not null,
-  protein_g_per_portion numeric,
-  carbs_g_per_portion numeric,
-  fat_g_per_portion numeric,
-  source text,                            -- 'TKPI Kemenkes' | 'OFF' | 'USDA' | 'manual'
-  source_url text,
-  created_at timestamptz default now(),
-  updated_at timestamptz default now()
+CREATE TABLE public.food_items (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  name TEXT NOT NULL,
+  name_en TEXT,
+  category TEXT,
+  calories NUMERIC NOT NULL,
+  protein_g NUMERIC DEFAULT 0,
+  carbs_g NUMERIC DEFAULT 0,
+  fat_g NUMERIC DEFAULT 0,
+  fiber_g NUMERIC DEFAULT 0,
+  serving_size NUMERIC DEFAULT 100,
+  serving_unit TEXT DEFAULT 'g',
+  is_indonesian BOOLEAN DEFAULT true,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
-
-create index on public.id_dish_reference using gin (aliases);
-create index on public.id_dish_reference (category);
 ```
 
-**Seed data:** ~200 most common items across categories, sourced from:
+**Migration:** Extend with alias support + portion labels + source attribution:
 
-- TKPI (Tabel Komposisi Pangan Indonesia) Kemenkes — public domain
-- Indonesian Food Dataset (Kaggle, CC0, 1,346 items) — cherry-pick top 200
-- Manual curation for top 20 warteg items per Sprint 4a
+```sql
+-- Sprint W1 migration: extend food_items for warung mode
+ALTER TABLE public.food_items
+  ADD COLUMN aliases TEXT[] NOT NULL DEFAULT '{}',
+  ADD COLUMN portion_label TEXT,                    -- '1 piring', '1 centong', '1 potong', etc.
+  ADD COLUMN source TEXT DEFAULT 'manual',          -- 'TKPI' | 'OFF' | 'USDA' | 'manual' | 'kaggle'
+  ADD COLUMN source_url TEXT,
+  ADD COLUMN confidence_score NUMERIC DEFAULT 0.5,  -- 0-1, used by fuzzy match
+  ADD COLUMN updated_at TIMESTAMPTZ DEFAULT now();
+
+-- GIN index for alias lookup (fast fuzzy match)
+CREATE INDEX food_items_aliases_idx ON public.food_items USING gin (aliases);
+
+-- Trigger to auto-update updated_at
+CREATE TRIGGER food_items_updated_at
+  BEFORE UPDATE ON public.food_items
+  FOR EACH ROW
+  EXECUTE FUNCTION update_updated_at_column();
+
+-- Update existing 20 seeds with aliases + portion_label
+UPDATE public.food_items SET
+  aliases = ARRAY['nasi putih', 'nasi'],
+  portion_label = '1 piring',
+  source = 'TKPI'
+WHERE name = 'Nasi Putih';
+
+UPDATE public.food_items SET
+  aliases = ARRAY['nasi goreng', 'nasgor', 'nasi goreng spesial'],
+  portion_label = '1 piring',
+  source = 'TKPI'
+WHERE name = 'Nasi Goreng';
+
+UPDATE public.food_items SET
+  aliases = ARRAY['ayam goreng', 'ayam', 'ayam goreng crispy'],
+  portion_label = '1 potong',
+  source = 'TKPI'
+WHERE name = 'Ayam Goreng';
+
+-- ... (17 more UPDATEs for remaining seeds)
+```
+
+**Seed expansion:** Add 180 more common Indonesian dishes from TKPI + Kaggle
+Indonesian Food Dataset (CC0, 1,346 items). Manual curation prioritizes:
+
+1. **Top 50 warteg items** (nasi, ayam, ikan, tempe, tahu, sayur asem, sayur
+   lodeh, soto, gado-gado, dll) — Sprint W1
+2. **Top 50 resto Padang** (rendang variants, gulai, ayam pop, ikan bakar,
+   sambal variants) — Sprint W1
+3. **Top 50 drinks + condiments** (es teh, es jeruk, sambal terasi, sambal
+   matah, kerupuk, dll) — Sprint W1
+4. **Remaining 30** (Chinese takeout, bakery, snacks) — Sprint W2 if time
+
+**Result:** `food_items` table grows from 20 → ~200 items with full alias
+coverage + portion labels.
 
 ### 3.2 Portion Template System
 
@@ -119,27 +179,123 @@ export const WARTEG_TEMPLATE: PortionTemplate = {
 };
 ```
 
-### 3.3 AI Prompt Upgrade
+**Integration with `food_serving_sizes`:** The existing `public.food_serving_sizes`
+table (migration `20260603084749`) should be verified during Sprint W1. If
+populated, portion templates should reference it as a secondary lookup
+(primary = `food_items.portion_label`, fallback = `food_serving_sizes`). If
+empty, populate it alongside `food_items` seed expansion.
 
-`scanVision.functions.ts::parseMenuImage` — change the prompt from generic
-"OCR menu restoran" to Indonesian-context-aware:
+### 3.3 AI Prompt Upgrade + Schema Extension
+
+**Current state:** `src/features/scan/lib/scanVision.functions.ts:72-115`
+
+```ts
+const MenuImageSchema = z.object({
+  items: z
+    .array(
+      z.object({
+        name: z.string().default(""),
+        price: z.number().optional(),
+        description: z.string().optional(),
+        est_calories: z.number().optional(),
+      }),
+    )
+    .default([]),
+});
+
+export const parseMenuImage = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => ImgIn.parse(input))
+  .handler(async ({ data, context }) => {
+    const parsed = await callGeminiJson(
+      'OCR menu restoran. Balas JSON {"items":[{"name":"...","price":12345,"description":"...","est_calories":420}]}',
+      data.image_data_url,
+      "scan.menu.image",
+      context.userId,
+      MenuImageSchema,
+      { items: [] },
+    );
+    return { items: parsed.items };
+  });
+```
+
+**Schema upgrade:** Add macros + portion + category fields:
+
+```ts
+const MenuImageSchema = z.object({
+  items: z
+    .array(
+      z.object({
+        name: z.string().default(""),
+        price: z.number().optional(),
+        description: z.string().optional(),
+        est_calories: z.number().optional(),
+        est_protein_g: z.number().optional(), // NEW
+        est_carbs_g: z.number().optional(), // NEW
+        est_fat_g: z.number().optional(), // NEW
+        est_portion_g: z.number().optional(), // NEW (e.g. 150 for nasi)
+        category: z
+          .enum([
+            // NEW
+            "nasi",
+            "lauk",
+            "sayur",
+            "sambal",
+            "minuman",
+            "pelengkap",
+            "other",
+          ])
+          .optional(),
+      }),
+    )
+    .default([]),
+});
+```
+
+**Prompt upgrade:** Replace generic "OCR menu restoran" with Indonesian-context-aware:
 
 ```ts
 const prompt = `
 Kamu sedang scan menu warteg/warung/resto Indonesia. Untuk SETIAP item:
-1. Identifikasi nama Indonesia (normalize: "Nasi Goreng Spesial" → "Nasi goreng")
-2. Cocokkan dengan kategori: nasi/lauk/sayur/sambal/minuman/pelengkap
-3. Estimasi PORSI STANDAR Indonesia:
+
+1. **Identifikasi nama Indonesia** (normalize: "Nasi Goreng Spesial" → "Nasi goreng")
+2. **Cocokkan dengan kategori**: nasi / lauk / sayur / sambal / minuman / pelengkap / other
+3. **Estimasi PORSI STANDAR Indonesia**:
    - Nasi: 100-150g per piring/centong (1 centong ≈ 100g)
    - Lauk (ayam/ikan/tempe): 40-60g per potong
    - Sayur: 60-100g per mangkok kecil
    - Sambal: 15-25g per sendok makan
-4. Output kalori + makro per porsi standar (gunakan rujukan TKPI jika ragu)
-5. Jika user scan KOMBO (nasi + lauk + sayur + minum), tandai sebagai combo
+   - Minuman: 200-300ml per gelas
+4. **Output kalori + makro per porsi standar** (gunakan rujukan TKPI jika ragu)
+5. **Semua field opsional** — jika tidak yakin, skip field tersebut (jangan hallucinate)
+6. **Jika user scan KOMBO** (nasi + lauk + sayur + minum), tetap pisah per item
 
-Balas JSON schema MenuImageSchema.
+Balas JSON sesuai schema MenuImageSchema.
 `.trim();
+
+export const parseMenuImage = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => ImgIn.parse(input))
+  .handler(async ({ data, context }) => {
+    const parsed = await callGeminiJson(
+      prompt,
+      data.image_data_url,
+      "scan.menu.image",
+      context.userId,
+      MenuImageSchema,
+      { items: [] },
+    );
+    return { items: parsed.items };
+  });
 ```
+
+**Post-parse fuzzy match:** After Gemini returns items, run fuzzy match against
+`food_items.aliases` to normalize names + fill missing macros from DB. This
+happens server-side before returning to client.
+
+**Note:** Gemini structured output quality degrades with 7+ fields per item.
+Prompt explicitly says "skip field jika tidak yakin" to reduce hallucination.
+Fuzzy match fills gaps from DB.
 
 ### 3.4 Post-Scan Adjuster UI
 
@@ -177,12 +333,51 @@ Balas JSON schema MenuImageSchema.
 User adjusts sliders OR picks from dropdown ("1 centong", "1 piring", etc.).
 On "Simpan ke log", creates individual food_log entries + a "combo" tag.
 
-### 3.5 Combo Detection
+### 3.5 Combo Detection + `meal_logs` Schema Extension
 
 When AI detects ≥3 items in a single scan with `nasi + lauk` both present,
 tag the scan as `combo_type: 'warteg-standard'` and link the items via
 `combo_id` UUID. Food log view shows "Paket Warteg — 545 kkal" instead of
 3 separate items.
+
+**Schema migration (Sprint W1):** Extend `meal_logs` to support combos + tracking:
+
+```sql
+-- Sprint W1: extend meal_logs for combo tracking + warung mode metadata
+ALTER TABLE public.meal_logs
+  ADD COLUMN combo_id UUID,
+  ADD COLUMN combo_name TEXT,                       -- 'Paket Warteg', 'Paket Padang', etc.
+  ADD COLUMN portion_adjusted BOOLEAN DEFAULT FALSE, -- user changed slider post-scan
+  ADD COLUMN portion_g NUMERIC,                      -- actual portion in grams
+  ADD COLUMN source TEXT DEFAULT 'manual';           -- 'manual' | 'warung_mode' | 'barcode' | 'ocr' | 'voice'
+
+CREATE INDEX meal_logs_combo_idx ON public.meal_logs(combo_id) WHERE combo_id IS NOT NULL;
+CREATE INDEX meal_logs_source_idx ON public.meal_logs(source);
+```
+
+**Combo detection logic:** Server-side in `parseMenuImage` handler after fuzzy match:
+
+```ts
+// After fuzzy match fills macros from food_items...
+const hasNasi = parsed.items.some((i) => i.category === "nasi");
+const hasLauk = parsed.items.some((i) => i.category === "lauk");
+const isCombo = parsed.items.length >= 3 && hasNasi && hasLauk;
+
+if (isCombo) {
+  const comboId = crypto.randomUUID();
+  return {
+    items: parsed.items,
+    combo: {
+      id: comboId,
+      name: "Paket Warteg",
+      totalCalories: parsed.items.reduce((sum, i) => sum + (i.est_calories || 0), 0),
+    },
+  };
+}
+return { items: parsed.items };
+```
+
+UI then shows combo chip + option to "Simpan sebagai paket" vs "Simpan terpisah".
 
 ---
 
@@ -201,16 +396,22 @@ tag the scan as `combo_type: 'warteg-standard'` and link the items via
 
 ## 5. Effort Estimate
 
-| Sprint        | Scope                                                           | Effort                  | Risk               |
-| ------------- | --------------------------------------------------------------- | ----------------------- | ------------------ |
-| **Sprint W1** | Schema migration + seed 200 dishes (manual curation top 50)     | 3 hari                  | Low                |
-| **Sprint W2** | Portion templates + AI prompt upgrade + scanVision update       | 3 hari                  | Low                |
-| **Sprint W3** | Post-scan adjuster UI (sliders + dropdowns + total live calc)   | 3 hari                  | Medium (UX detail) |
-| **Sprint W4** | Combo detection + food_log schema update + QA with 5 beta users | 4 hari                  | Medium             |
-| **Total**     |                                                                 | **~2.5 minggu** (1 dev) |                    |
+| Sprint        | Scope                                                                                                               | Effort                | Risk               |
+| ------------- | ------------------------------------------------------------------------------------------------------------------- | --------------------- | ------------------ |
+| **Sprint W1** | Migration (extend `food_items` + `meal_logs`) + seed 150 dishes (manual top 50 + Kaggle 100) + alias UPDATEs        | 2 hari                | Low                |
+| **Sprint W2** | Portion templates + AI prompt upgrade + `MenuImageSchema` extension + fuzzy match logic + scanVision handler update | 3 hari                | Low                |
+| **Sprint W3** | Post-scan adjuster UI (sliders + dropdowns + total live calc) + combo chip                                          | 3 hari                | Medium (UX detail) |
+| **Sprint W4** | Combo save logic + per-user toggle (`profiles.warung_mode_enabled`) + QA with 5 beta users                          | 3 hari                | Medium             |
+| **Total**     |                                                                                                                     | **~2 minggu** (1 dev) |                    |
 
-After Sprint W4: feature ships behind flag `feature.warung_mode` (existing
-feature flag system), 5% rollout → 25% → 100% over 2 weeks.
+**Effort reduction from v1 spec:** Original estimate was 2.5w based on creating new
+`id_dish_reference` table (3 days Sprint W1). Actual work extends existing
+`food_items` (~1 day migration + seeds) + combo schema folded into W1, saving
+~3-4 days total.
+
+After Sprint W4: feature ships with per-user opt-in toggle `profiles.warung_mode_enabled`
+(default OFF). Rollout: internal testing (5 users, 1 week) → 5% beta opt-in →
+25% → 100% over 2 weeks.
 
 ---
 
@@ -240,14 +441,42 @@ feature flag system), 5% rollout → 25% → 100% over 2 weeks.
 
 ## 8. Dependencies & Prerequisites
 
-| Dep                                           | Status                                    | Owner |
-| --------------------------------------------- | ----------------------------------------- | ----- |
-| Sprint 5d article body fill (done)            | ✅ shipped                                | —     |
-| `scanVision.functions.ts` exists              | ✅ shipped                                | —     |
-| Indonesian food recipes in DB                 | ✅ shipped                                | —     |
-| Feature flag system                           | ✅ shipped (AUDIT-019 PII toggle uses it) | —     |
-| VexoAPI + Gemini multimodal working           | ✅ shipped (Sprint 2d)                    | —     |
-| Open Food Facts API key (jika perlu fallback) | ❌ tidak dipakai                          | —     |
+| Dep                                           | Status                                                               | Owner |
+| --------------------------------------------- | -------------------------------------------------------------------- | ----- |
+| Sprint 5d article body fill (done)            | ✅ shipped                                                           | —     |
+| `scanVision.functions.ts` exists              | ✅ shipped                                                           | —     |
+| Indonesian food recipes in DB                 | ✅ shipped                                                           | —     |
+| `food_items` table with 20 ID foods seeded    | ✅ shipped (migration `20260603045312`)                              | —     |
+| `meal_logs` table                             | ✅ shipped (migration `20260603045312`)                              | —     |
+| `food_serving_sizes` table                    | ✅ shipped (migration `20260603084749`, verify population Sprint W1) | —     |
+| VexoAPI + Gemini multimodal working           | ✅ shipped (Sprint 2d)                                               | —     |
+| Open Food Facts API key (jika perlu fallback) | ❌ tidak dipakai                                                     | —     |
+
+**Feature rollout mechanism (NEW — Sprint W4):**
+
+Per-user opt-in toggle via `profiles` table (matches AUDIT-019 pattern):
+
+```sql
+-- Sprint W4 migration: add per-user warung mode toggle
+ALTER TABLE public.profiles
+  ADD COLUMN warung_mode_enabled BOOLEAN DEFAULT FALSE;
+
+CREATE INDEX profiles_warung_mode_idx ON public.profiles(warung_mode_enabled) WHERE warung_mode_enabled = TRUE;
+```
+
+Rollout strategy:
+
+1. **Internal testing** (5 users, 1 week) — manually flip `warung_mode_enabled = TRUE` for test accounts
+2. **5% beta opt-in** — add in-app CTA "Coba AI Warung Mode (beta)" in `/scan/menu` route header, flips user's column to TRUE on click
+3. **25% expansion** — promote CTA to banner on `/` landing for users with ≥3 warteg scans in history
+4. **100% rollout** — flip default to TRUE for all new users, keep existing users opt-in
+
+**Why per-user column instead of percentage-based feature flag:**
+
+- HealthyU does not have generic feature flag infrastructure (no `feature_flags` table, no rollout % system)
+- Existing `useOnboardingFlag` hook is localStorage-based "show once" UX helper, not a server-side gate
+- AUDIT-019 (`profiles.chat_redact_pii`) established the per-user boolean pattern
+- Option A (per-user column) = S effort, Option B (build generic infra) = M effort + reusable but out of scope for this spec
 
 **No new external services needed.** All dependencies are internal Supabase
 tables + existing AI infrastructure.
