@@ -483,30 +483,39 @@ tables + existing AI infrastructure.
 
 ---
 
-## 9. Open Questions (need user input)
+## 9. Design Decisions (RESOLVED 2026-06-22)
 
-1. **Seed data sourcing**: Manual curation top 50 warteg items dulu, atau langsung import 200 dari Kaggle dataset? (Manual = more accurate, slower; Kaggle = fast, may have Western bias)
-2. **Combo UX**: Pakai "Save as combo" modal konfirmasi, atau auto-detect dengan chip "Paket warteg? ✓" di atas hasil scan?
-3. **Bundle feature atau standalone**: AI Warung Mode sebagai mode di `/scan/menu` (bundle), atau jadi route baru `/scan/warung` (separate, easier A/B test)?
-4. **Monetization signal**: Free for all, atau gate behind HealthyU+ subscription? (Pivots positioning)
+| ID     | Question             | Decision                                                                                                                         | Rationale                                                                                                                                                                                                                                                         |
+| ------ | -------------------- | -------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Q1** | Seed data strategy   | **Hybrid (Option C)**: Manual curate top 50 warteg essentials + Kaggle 100 filtered by `is_indonesian=true` + category relevance | Balance speed (1 day vs 2-3 days pure manual) with quality. Manual ensures top 50 are 100% accurate for most common use cases, Kaggle expands coverage for edge cases. Confidence audit pass required before merge.                                               |
+| **Q2** | Combo UX pattern     | **Auto-detect chip (Option B)**: Chip appears above scan results "Paket Warteg detected 🍛" with dismiss (X) button              | Lowest friction — 0 extra taps if user agrees with combo, 1 tap to dismiss if not. Higher adoption than modal confirmation. Matches mobile-first UX preference.                                                                                                   |
+| **Q3** | Implementation scope | **Bundle upgrade (Option A)**: Extend existing `/scan/menu` route, gated by `profiles.warung_mode_enabled` toggle                | Smaller diff (~300 LOC vs ~400 new), reuses UI components, users already familiar with route. Per-user toggle enables A/B without route split. Rollback = revert commit.                                                                                          |
+| **Q4** | Monetization gate    | **Free for all (Option A)**: No paywall, prioritize adoption over revenue                                                        | Indonesia market price-sensitive. Differentiation via adoption first. Monetize later via: (1) Offline Diary Mode subscription, (2) AI Ramadhan Coach premium, (3) Sponsored food items (brand-verified nutrition data). Premium value stacks on top of free base. |
+
+**Approved by:** User (2026-06-22 03:11 UTC)  
+**Status:** Spec finalized, ready for Sprint W1 implementation
 
 ---
 
 ## 10. Definition of Done
 
-- [ ] `id_dish_reference` table created + migration applied to production
-- [ ] ≥150 dishes seeded with verified nutrition (TKPI or manual)
-- [ ] ≥5 portion templates defined (warteg, resto Padang, Chinese takeout, etc.)
-- [ ] `parseMenuImage` uses new Indonesian prompt + post-parse fuzzy match
-- [ ] `scan.menu.tsx` has post-scan adjuster UI (sliders + dropdowns)
-- [ ] Combo detection saves with `combo_id` + combo UI in food log
-- [ ] Tests: ≥85% accuracy on 20-scan sample, ≥70% unit coverage on portion-templates
+- [ ] `food_items` table extended with `aliases[]`, `portion_label`, `source`, `source_url`, `confidence_score`, `updated_at` columns (migration applied to production)
+- [ ] ≥150 dishes seeded with verified nutrition: top 50 manual warteg essentials + 100 Kaggle filtered (TKPI/manual source attribution)
+- [ ] ≥5 portion templates defined (warteg, resto Padang, Chinese takeout, etc.) in `src/features/scan/lib/portion-templates.ts`
+- [ ] `MenuImageSchema` extended with `est_protein_g`, `est_carbs_g`, `est_fat_g`, `est_portion_g`, `category` fields
+- [ ] `parseMenuImage` uses new Indonesian-context prompt + post-parse fuzzy match against `food_items.aliases`
+- [ ] `scan.menu.tsx` has post-scan adjuster UI (sliders + dropdowns + live total calories)
+- [ ] Auto-detect combo chip UI ("Paket Warteg detected 🍛" with dismiss X button)
+- [ ] `meal_logs` extended with `combo_id`, `combo_name`, `portion_adjusted`, `portion_g`, `source` columns
+- [ ] Combo detection logic saves linked items with shared `combo_id` UUID
+- [ ] `profiles.warung_mode_enabled` column added (default FALSE, per-user opt-in toggle)
+- [ ] Tests: ≥85% accuracy on 20-scan sample, ≥70% unit coverage on portion-templates + fuzzy match
 - [ ] `bunx tsc --noEmit` 0 errors
 - [ ] `bun run lint` 0 errors
-- [ ] `bun run test` ≥90% passing (new tests for portion-templates + parseMenuImage)
+- [ ] `bun run test` ≥90% passing (new tests for portion-templates + parseMenuImage + fuzzy match)
 - [ ] `bun run build` <550KB main bundle
-- [ ] Feature flag `feature.warung_mode` default OFF, manual rollout
-- [ ] Docs: `docs/features/ai-warung-mode.md` (user-facing) + this spec kept updated
+- [ ] Per-user toggle rollout: internal (5 users, 1w) → 5% beta opt-in CTA → 25% → 100%
+- [ ] Docs: `docs/features/ai-warung-mode.md` (user-facing how-to) + this spec kept updated
 
 ---
 
@@ -520,5 +529,13 @@ tables + existing AI infrastructure.
 
 ## Next Step
 
-Awaiting approval on Open Questions (section 9). Once decided, kick off
-**Sprint W1** with schema migration + manual seed curation.
+**Spec finalized 2026-06-22 03:11 UTC.** All design decisions resolved (section 9).
+
+Ready to kick off **Sprint W1** with:
+
+1. Migration SQL (extend `food_items` + `meal_logs`)
+2. Manual seed curation (top 50 warteg essentials)
+3. Kaggle import + filtering (100 items, `is_indonesian=true`)
+4. Alias UPDATEs for existing 20 seeds
+
+Estimated Sprint W1 completion: 2 hari (1 dev).
