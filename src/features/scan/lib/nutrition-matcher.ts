@@ -265,7 +265,7 @@ export async function matchFoodItemsBatch(
       else if (
         itemNameLower.includes(normalized) ||
         normalized.includes(itemNameLower) ||
-        aliases.some((a) => a.includes(normalized) || normalized.includes(a))
+        aliases.some((a: string) => a.includes(normalized) || normalized.includes(a))
       ) {
         matchScore = 0.8;
       }
@@ -275,7 +275,7 @@ export async function matchFoodItemsBatch(
         if (queryWords.length > 0) {
           const itemWords = [
             ...itemNameLower.split(/\s+/),
-            ...aliases.flatMap((a) => a.split(/\s+/)),
+            ...aliases.flatMap((a: string) => a.split(/\s+/)),
           ];
           const overlapCount = queryWords.filter((qw) =>
             itemWords.some((iw) => iw.includes(qw) || qw.includes(iw)),
