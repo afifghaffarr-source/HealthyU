@@ -56,7 +56,6 @@ function Page() {
           ref={ref}
           type="file"
           accept="image/*"
-          capture="environment"
           hidden
           onChange={async (e) => {
             const f = e.target.files?.[0];
