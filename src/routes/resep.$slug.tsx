@@ -217,6 +217,14 @@ function ResepDetail() {
             src={r.image_url}
             alt={r.title}
             loading="eager"
+            onError={(e) => {
+              const fallback =
+                "data:image/svg+xml," +
+                encodeURIComponent(
+                  '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#e0f2fe"/><stop offset="100%" stop-color="#bae6fd"/></linearGradient></defs><rect width="400" height="300" fill="url(#g)"/><g transform="translate(200,150)" fill="none" stroke="#0284c7" stroke-width="3" stroke-linecap="round"><path d="M-18,-30 v20 a8,8 0 0,0 16,0 v-20"/><line x1="-10" y1="-10" x2="-10" y2="30"/><path d="M10,-30 v25 c0,6 6,6 6,0 v-25"/><line x1="16" y1="-5" x2="16" y2="30"/></g></svg>',
+                );
+              if (e.currentTarget.src !== fallback) e.currentTarget.src = fallback;
+            }}
             className="aspect-[16/10] w-full object-cover"
           />
         </figure>

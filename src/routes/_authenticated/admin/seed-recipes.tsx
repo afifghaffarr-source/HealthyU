@@ -43,7 +43,7 @@ function SeedRecipesPage() {
           category: category.trim() || undefined,
           focus: focus.trim() || undefined,
           dryRun,
-          imageTemplate: "/images/recipes/{slug}.jpg",
+          imageTemplate: "/images/recipes/{slug}.png",
         },
       }),
     onSuccess: (r) => {

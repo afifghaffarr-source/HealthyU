@@ -19,7 +19,7 @@ const SeedInputSchema = z.object({
   category: z.string().max(50).optional(),
   focus: z.string().max(200).optional(),
   dryRun: z.boolean().default(false),
-  imageTemplate: z.string().default("/images/recipes/{slug}.jpg"),
+  imageTemplate: z.string().default("/images/recipes/{slug}.png"),
 });
 
 const RecipeSchema = z.object({
