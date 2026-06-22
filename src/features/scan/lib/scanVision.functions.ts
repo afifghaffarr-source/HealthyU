@@ -151,32 +151,40 @@ Jika ada combo (nasi+lauk+sayur), list sebagai item terpisah.`;
       throw new Error("Context not available");
     }
 
-    const matchResults = await matchFoodItemsBatch(
-      context.supabase,
-      parsed.items.map((item) => ({
-        name: item.name,
-        ai_estimate: {
-          calories: item.est_calories,
-          protein_g: item.est_protein_g,
-          carbs_g: item.est_carbs_g,
-          fat_g: item.est_fat_g,
-          portion_g: item.est_portion_g,
-        },
-      })),
-    );
+    let enrichedItems = parsed.items;
 
-    // Merge matched nutrition with AI results
-    const enrichedItems = parsed.items.map((item, idx) => {
-      const match = matchResults[idx];
-      return {
-        ...item,
-        food_item_id: match.food_item_id,
-        canonical_name: match.canonical_name,
-        source: match.source,
-        confidence_score: match.confidence_score,
-        verified_nutrition: match.matched ? match.verified_nutrition : undefined,
-      };
-    });
+    try {
+      const matchResults = await matchFoodItemsBatch(
+        context.supabase,
+        parsed.items.map((item) => ({
+          name: item.name,
+          ai_estimate: {
+            calories: item.est_calories,
+            protein_g: item.est_protein_g,
+            carbs_g: item.est_carbs_g,
+            fat_g: item.est_fat_g,
+            portion_g: item.est_portion_g,
+          },
+        })),
+      );
+
+      // Merge matched nutrition with AI results
+      enrichedItems = parsed.items.map((item, idx) => {
+        const match = matchResults[idx];
+        return {
+          ...item,
+          food_item_id: match.food_item_id,
+          canonical_name: match.canonical_name,
+          source: match.source,
+          confidence_score: match.confidence_score,
+          verified_nutrition: match.matched ? match.verified_nutrition : undefined,
+        };
+      });
+    } catch (error) {
+      // Log fuzzy match error but don't fail the entire scan
+      console.error("[parseMenuImage] Fuzzy match failed, using AI estimates only:", error);
+      // enrichedItems already set to parsed.items above
+    }
 
     // Sprint W3: Combo detection (nasi + lauk + ≥3 items)
     const hasNasi = enrichedItems.some((i) => i.category === "nasi");
@@ -192,11 +200,22 @@ Jika ada combo (nasi+lauk+sayur), list sebagai item terpisah.`;
         return sum + (i.est_calories || 0);
       }, 0);
 
+      // Detect combo type from dish patterns
+      const hasPadangDish = enrichedItems.some(
+        (i) =>
+          i.canonical_name?.toLowerCase().includes("rendang") ||
+          i.canonical_name?.toLowerCase().includes("gulai") ||
+          i.name.toLowerCase().includes("rendang") ||
+          i.name.toLowerCase().includes("gulai"),
+      );
+
+      const comboName = hasPadangDish ? "Paket Padang" : "Paket Warteg";
+
       return {
         items: enrichedItems,
         combo: {
           id: comboId,
-          name: "Paket Warteg",
+          name: comboName,
           totalCalories,
         },
       };

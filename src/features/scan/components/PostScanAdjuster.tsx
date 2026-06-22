@@ -58,10 +58,10 @@ export function PostScanAdjuster({
   // Initialize with AI estimates or verified portions
   const [adjustedItems, setAdjustedItems] = useState<AdjustedItem[]>(
     items.map((item) => {
-      const initialPortion = item.est_portion_g || item.verified_nutrition?.serving_size || 100;
+      const initialPortion = item.est_portion_g ?? item.verified_nutrition?.serving_size ?? 100;
       const initialCalories = item.verified_nutrition
         ? item.verified_nutrition.calories
-        : item.est_calories || 0;
+        : (item.est_calories ?? 0);
 
       return {
         ...item,
@@ -79,10 +79,15 @@ export function PostScanAdjuster({
         // Recalculate calories based on new portion
         const baseCalories = item.verified_nutrition
           ? item.verified_nutrition.calories
-          : item.est_calories || 0;
+          : (item.est_calories ?? 0);
         const basePortion = item.verified_nutrition
           ? item.verified_nutrition.serving_size
-          : item.est_portion_g || 100;
+          : (item.est_portion_g ?? 100);
+
+        // Guard against division by zero
+        if (basePortion === 0 || !Number.isFinite(basePortion)) {
+          return item; // Keep current values if base portion invalid
+        }
 
         const newCalories = Math.round((baseCalories / basePortion) * newPortionG);
 
