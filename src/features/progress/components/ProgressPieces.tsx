@@ -81,7 +81,6 @@ export function UploadProgressCard({
         ref={fileRef}
         type="file"
         accept="image/*"
-        capture="environment"
         onChange={(e) => {
           const f = e.target.files?.[0];
           if (f) onPickFile(f);

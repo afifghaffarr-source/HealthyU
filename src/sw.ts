@@ -48,6 +48,13 @@ declare const self: ServiceWorkerGlobalScope & {
 // Claim clients immediately on activate (paired with skipWaiting from registerSW).
 clientsClaim();
 
+// v2: Force skipWaiting on install to bust stale JS bundles cached by previous SW.
+// Without this, users on installed PWA see old code until they manually clear cache
+// or close all tabs. Hotfix for the gallery upload bug fix (capture=environment).
+self.addEventListener("install", () => {
+  self.skipWaiting();
+});
+
 // Precache the app shell — when injectionPoint=true, Vite plugin inlines the
 // build-time manifest. With injectionPoint=false (workbox-build ESM bug), this
 // is an empty array. Runtime caches (fonts, supabase images) still work fine.

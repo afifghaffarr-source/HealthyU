@@ -40,7 +40,6 @@ function Page() {
         <input
           type="file"
           accept="image/*"
-          capture="environment"
           onChange={(e) => onPick(e.target.files?.[0] ?? null)}
           className="w-full text-sm"
         />

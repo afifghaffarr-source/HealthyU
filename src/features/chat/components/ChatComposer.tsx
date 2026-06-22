@@ -62,12 +62,10 @@ export function ChatComposer({
           ref={fileRef}
           type="file"
           accept="image/*"
-          capture="environment"
           hidden
           onChange={(e) => {
             const f = e.target.files?.[0];
             if (f) handleFile(f);
-            e.target.value = "";
           }}
         />
         <button

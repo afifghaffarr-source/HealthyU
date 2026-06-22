@@ -237,7 +237,6 @@ function Page() {
               ref={fileInputRef}
               type="file"
               accept="image/*"
-              capture="environment"
               onChange={(e) => onFile(e.target.files?.[0])}
               className="hidden"
             />
