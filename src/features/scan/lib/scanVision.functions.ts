@@ -146,11 +146,13 @@ Jika ada combo (nasi+lauk+sayur), list sebagai item terpisah.`;
 
     // Sprint W3: Fuzzy match AI results against food_items database
     const { matchFoodItemsBatch } = await import("./nutrition-matcher");
-    const { createSupabaseServerClient } = await import("@/integrations/supabase/client");
-    const supabase = createSupabaseServerClient();
+
+    if (!context) {
+      throw new Error("Context not available");
+    }
 
     const matchResults = await matchFoodItemsBatch(
-      supabase,
+      context.supabase,
       parsed.items.map((item) => ({
         name: item.name,
         ai_estimate: {
