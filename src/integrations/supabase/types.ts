@@ -6,6 +6,31 @@ export type Database = {
   __InternalSupabase: {
     PostgrestVersion: "14.5";
   };
+  graphql_public: {
+    Tables: {
+      [_ in never]: never;
+    };
+    Views: {
+      [_ in never]: never;
+    };
+    Functions: {
+      graphql: {
+        Args: {
+          extensions?: Json;
+          operationName?: string;
+          query?: string;
+          variables?: Json;
+        };
+        Returns: Json;
+      };
+    };
+    Enums: {
+      [_ in never]: never;
+    };
+    CompositeTypes: {
+      [_ in never]: never;
+    };
+  };
   public: {
     Tables: {
       account_deletion_requests: {
@@ -1664,6 +1689,48 @@ export type Database = {
         };
         Relationships: [];
       };
+      error_reports: {
+        Row: {
+          boundary: string;
+          context: Json;
+          created_at: string;
+          handled: boolean;
+          id: string;
+          message: string;
+          route: string | null;
+          severity: string;
+          source: string;
+          stack: string | null;
+          user_id: string | null;
+        };
+        Insert: {
+          boundary: string;
+          context?: Json;
+          created_at?: string;
+          handled?: boolean;
+          id?: string;
+          message: string;
+          route?: string | null;
+          severity?: string;
+          source: string;
+          stack?: string | null;
+          user_id?: string | null;
+        };
+        Update: {
+          boundary?: string;
+          context?: Json;
+          created_at?: string;
+          handled?: boolean;
+          id?: string;
+          message?: string;
+          route?: string | null;
+          severity?: string;
+          source?: string;
+          stack?: string | null;
+          user_id?: string | null;
+        };
+        Relationships: [];
+      };
       exercise_library: {
         Row: {
           category: string | null;
@@ -1894,53 +1961,6 @@ export type Database = {
           },
         ];
       };
-      // error_reports: locally-maintained table (replaces Lovable's
-      // __lovableEvents.captureException). Added in migration
-      // 20260613000000_error_reports.sql. When the project's Supabase DB
-      // is regenerated via `supabase gen types typescript`, this manual
-      // block will be replaced with the auto-generated shape (same fields).
-      error_reports: {
-        Row: {
-          boundary: string;
-          context: Json;
-          created_at: string;
-          handled: boolean;
-          id: string;
-          message: string;
-          route: string | null;
-          severity: string;
-          source: string;
-          stack: string | null;
-          user_id: string | null;
-        };
-        Insert: {
-          boundary: string;
-          context?: Json;
-          created_at?: string;
-          handled?: boolean;
-          id?: string;
-          message: string;
-          route?: string | null;
-          severity?: string;
-          source: string;
-          stack?: string | null;
-          user_id?: string | null;
-        };
-        Update: {
-          boundary?: string;
-          context?: Json;
-          created_at?: string;
-          handled?: boolean;
-          id?: string;
-          message?: string;
-          route?: string | null;
-          severity?: string;
-          source?: string;
-          stack?: string | null;
-          user_id?: string | null;
-        };
-        Relationships: [];
-      };
       family_plans: {
         Row: {
           created_at: string;
@@ -2117,6 +2137,7 @@ export type Database = {
       };
       food_items: {
         Row: {
+          aliases: string[];
           allergens: string[] | null;
           barcode: string | null;
           bpom_number: string | null;
@@ -2127,6 +2148,7 @@ export type Database = {
           category: string | null;
           cholesterol_mg: number | null;
           common_portions: Json | null;
+          confidence_score: number | null;
           created_at: string;
           cuisine: string | null;
           data_confidence: number | null;
@@ -2155,6 +2177,7 @@ export type Database = {
           name: string;
           name_en: string | null;
           popularity_score: number | null;
+          portion_label: string | null;
           potassium_mg: number | null;
           protein_g: number | null;
           region: string | null;
@@ -2163,6 +2186,8 @@ export type Database = {
           serving_unit: string | null;
           slug: string | null;
           sodium_mg: number | null;
+          source: string | null;
+          source_url: string | null;
           subcategory: string | null;
           sugar_g: number | null;
           tags: string[] | null;
@@ -2174,6 +2199,7 @@ export type Database = {
           vitamin_d_mcg: number | null;
         };
         Insert: {
+          aliases?: string[];
           allergens?: string[] | null;
           barcode?: string | null;
           bpom_number?: string | null;
@@ -2184,6 +2210,7 @@ export type Database = {
           category?: string | null;
           cholesterol_mg?: number | null;
           common_portions?: Json | null;
+          confidence_score?: number | null;
           created_at?: string;
           cuisine?: string | null;
           data_confidence?: number | null;
@@ -2212,6 +2239,7 @@ export type Database = {
           name: string;
           name_en?: string | null;
           popularity_score?: number | null;
+          portion_label?: string | null;
           potassium_mg?: number | null;
           protein_g?: number | null;
           region?: string | null;
@@ -2220,6 +2248,8 @@ export type Database = {
           serving_unit?: string | null;
           slug?: string | null;
           sodium_mg?: number | null;
+          source?: string | null;
+          source_url?: string | null;
           subcategory?: string | null;
           sugar_g?: number | null;
           tags?: string[] | null;
@@ -2231,6 +2261,7 @@ export type Database = {
           vitamin_d_mcg?: number | null;
         };
         Update: {
+          aliases?: string[];
           allergens?: string[] | null;
           barcode?: string | null;
           bpom_number?: string | null;
@@ -2241,6 +2272,7 @@ export type Database = {
           category?: string | null;
           cholesterol_mg?: number | null;
           common_portions?: Json | null;
+          confidence_score?: number | null;
           created_at?: string;
           cuisine?: string | null;
           data_confidence?: number | null;
@@ -2269,6 +2301,7 @@ export type Database = {
           name?: string;
           name_en?: string | null;
           popularity_score?: number | null;
+          portion_label?: string | null;
           potassium_mg?: number | null;
           protein_g?: number | null;
           region?: string | null;
@@ -2277,6 +2310,8 @@ export type Database = {
           serving_unit?: string | null;
           slug?: string | null;
           sodium_mg?: number | null;
+          source?: string | null;
+          source_url?: string | null;
           subcategory?: string | null;
           sugar_g?: number | null;
           tags?: string[] | null;
@@ -2863,6 +2898,8 @@ export type Database = {
         Row: {
           calories: number;
           carbs_g: number | null;
+          combo_id: string | null;
+          combo_name: string | null;
           created_at: string;
           custom_name: string | null;
           deleted_at: string | null;
@@ -2880,6 +2917,8 @@ export type Database = {
           mood_before: number | null;
           notes: string | null;
           photo_url: string | null;
+          portion_adjusted: boolean | null;
+          portion_g: number | null;
           protein_g: number | null;
           serving_qty: number;
           sodium_mg: number | null;
@@ -2891,6 +2930,8 @@ export type Database = {
         Insert: {
           calories: number;
           carbs_g?: number | null;
+          combo_id?: string | null;
+          combo_name?: string | null;
           created_at?: string;
           custom_name?: string | null;
           deleted_at?: string | null;
@@ -2908,6 +2949,8 @@ export type Database = {
           mood_before?: number | null;
           notes?: string | null;
           photo_url?: string | null;
+          portion_adjusted?: boolean | null;
+          portion_g?: number | null;
           protein_g?: number | null;
           serving_qty?: number;
           sodium_mg?: number | null;
@@ -2919,6 +2962,8 @@ export type Database = {
         Update: {
           calories?: number;
           carbs_g?: number | null;
+          combo_id?: string | null;
+          combo_name?: string | null;
           created_at?: string;
           custom_name?: string | null;
           deleted_at?: string | null;
@@ -2936,6 +2981,8 @@ export type Database = {
           mood_before?: number | null;
           notes?: string | null;
           photo_url?: string | null;
+          portion_adjusted?: boolean | null;
+          portion_g?: number | null;
           protein_g?: number | null;
           serving_qty?: number;
           sodium_mg?: number | null;
@@ -3804,6 +3851,7 @@ export type Database = {
           bmi: number | null;
           bmi_category: string | null;
           bmr: number | null;
+          chat_retention_days: number | null;
           city: string | null;
           created_at: string;
           daily_calorie_target: number | null;
@@ -3836,6 +3884,7 @@ export type Database = {
           location_province: string | null;
           onboarded: boolean;
           phone: string | null;
+          pii_redact_enabled: boolean;
           platform: string | null;
           premium_expires_at: string | null;
           premium_status: string;
@@ -3843,11 +3892,6 @@ export type Database = {
           referral_code: string | null;
           referred_by: string | null;
           scan_audit_opt_in: boolean;
-          // AUDIT-019: pii_redact_enabled added by migration 20260618012154.
-          // Mirrored here so the Database type stays in sync with the
-          // schema. Regenerate via `supabase gen types` after applying
-          // the migration to a real Supabase project.
-          pii_redact_enabled: boolean;
           scan_streak_current: number;
           scan_streak_longest: number;
           show_meals: boolean;
@@ -3874,6 +3918,7 @@ export type Database = {
           bmi?: number | null;
           bmi_category?: string | null;
           bmr?: number | null;
+          chat_retention_days?: number | null;
           city?: string | null;
           created_at?: string;
           daily_calorie_target?: number | null;
@@ -3906,6 +3951,7 @@ export type Database = {
           location_province?: string | null;
           onboarded?: boolean;
           phone?: string | null;
+          pii_redact_enabled?: boolean;
           platform?: string | null;
           premium_expires_at?: string | null;
           premium_status?: string;
@@ -3913,7 +3959,6 @@ export type Database = {
           referral_code?: string | null;
           referred_by?: string | null;
           scan_audit_opt_in?: boolean;
-          pii_redact_enabled?: boolean;
           scan_streak_current?: number;
           scan_streak_longest?: number;
           show_meals?: boolean;
@@ -3940,6 +3985,7 @@ export type Database = {
           bmi?: number | null;
           bmi_category?: string | null;
           bmr?: number | null;
+          chat_retention_days?: number | null;
           city?: string | null;
           created_at?: string;
           daily_calorie_target?: number | null;
@@ -3972,6 +4018,7 @@ export type Database = {
           location_province?: string | null;
           onboarded?: boolean;
           phone?: string | null;
+          pii_redact_enabled?: boolean;
           platform?: string | null;
           premium_expires_at?: string | null;
           premium_status?: string;
@@ -3979,7 +4026,6 @@ export type Database = {
           referral_code?: string | null;
           referred_by?: string | null;
           scan_audit_opt_in?: boolean;
-          pii_redact_enabled?: boolean;
           scan_streak_current?: number;
           scan_streak_longest?: number;
           show_meals?: boolean;
@@ -6330,11 +6376,13 @@ export type Database = {
         };
         Returns: undefined;
       };
-      // AUDIT-020: hard-delete user data + auth.users. service_role only.
-      // Regenerate via `supabase gen types` after re-deploying the migration.
       process_account_deletion: {
-        Args: { p_user_id: string; p_tables?: string[] };
+        Args: { p_tables?: string[]; p_user_id: string };
         Returns: Json;
+      };
+      purge_user_chats: {
+        Args: { p_retention_days: number; p_user_id: string };
+        Returns: number;
       };
       redeem_friend_invite: { Args: { _token: string }; Returns: string };
       report_content: {
@@ -6482,6 +6530,9 @@ export type CompositeTypes<
     : never;
 
 export const Constants = {
+  graphql_public: {
+    Enums: {},
+  },
   public: {
     Enums: {
       app_role: ["admin", "moderator", "user"],
