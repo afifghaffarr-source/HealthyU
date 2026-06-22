@@ -57,6 +57,22 @@ export default tseslint.config(
     },
   },
   {
+    // AUDIT-006: TanStack Router route files export both Route component + server functions (loader, head, etc.)
+    // This is by design — disable react-refresh warning for route files.
+    // Also: feature "pieces" / "shared" barrel files intentionally mix components + constants.
+    files: [
+      "src/routes/**/*.tsx",
+      "src/features/**/components/*Pieces.tsx",
+      "src/features/**/components/*Shared.tsx",
+      "src/features/**/components/*Composer.tsx",
+      "src/features/onboarding/components/onboardingShared.tsx",
+      "src/features/reminders/components/ReminderPieces.tsx",
+    ],
+    rules: {
+      "react-refresh/only-export-components": "off",
+    },
+  },
+  {
     // AUDIT-008 defensive rule: ban `as any` casts in source code.
     //
     // History: the original audit measured 168 `as any` occurrences but
