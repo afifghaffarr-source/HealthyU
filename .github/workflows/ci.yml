@@ -77,6 +77,12 @@ jobs:
           bun-version: 1.2.21
       - run: bun install --frozen-lockfile
       - name: Build and check size
+        # Same Sprint 6b `og:build` env requirement as the `check` job —
+        # scripts/generate-og-images.mjs reads SUPABASE_URL + SUPABASE_SERVICE_ROLE_KEY
+        # directly from process.env.
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
         run: |
           bun run build
           # PERF (Fase 5 sub-PR 3 + 4): bundle budget reverted to 1 MB.
