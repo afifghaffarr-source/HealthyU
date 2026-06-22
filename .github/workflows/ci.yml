@@ -42,6 +42,17 @@ jobs:
         run: bun run test
 
       - name: Build (Cloudflare Pages target)
+        # Sprint 6b's `bun run og:build` step (prepended to `bun run build`
+        # via package.json scripts) invokes scripts/generate-og-images.mjs,
+        # which reads SUPABASE_URL + SUPABASE_SERVICE_ROLE_KEY directly from
+        # process.env (not the VITE_* prefix used by Vite-inlined client vars).
+        # Without these env vars the script exits with
+        # "❌ Missing SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY".
+        # Source from GH repo secrets (set 2026-06-22; values mirror VPS
+        # ~/.config/healthyu/production.env).
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
         run: bun run build
 
       - name: Upload build artifacts
@@ -66,6 +77,12 @@ jobs:
           bun-version: 1.2.21
       - run: bun install --frozen-lockfile
       - name: Build and check size
+        # Same Sprint 6b `og:build` env requirement as the `check` job —
+        # scripts/generate-og-images.mjs reads SUPABASE_URL + SUPABASE_SERVICE_ROLE_KEY
+        # directly from process.env.
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
         run: |
           bun run build
           # PERF (Fase 5 sub-PR 3 + 4): bundle budget reverted to 1 MB.

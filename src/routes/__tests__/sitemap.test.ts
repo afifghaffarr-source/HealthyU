@@ -35,7 +35,7 @@ describe("sitemap lastmod (Sprint 6b)", () => {
 
   it("ISO date → YYYY-MM-DD conversion strips time correctly", () => {
     // Replicate toDate() inline so the test doesn't import from the route.
-    const cases: Array<[string, string | undefined]> = [
+    const cases: Array<[string | null | undefined, string | undefined]> = [
       ["2026-06-21T00:02:29.263+00:00", "2026-06-21"],
       ["2026-06-21T23:59:59.999Z", "2026-06-21"],
       ["2026-06-21", "2026-06-21"],

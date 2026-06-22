@@ -42,6 +42,24 @@ export default defineConfig({
       server: {
         entry: "start",
       },
+      // Sprint 7: Manual vendor chunking (see `build.rollupOptions.manualChunks`
+      // below) — splits heavy deps (recharts, jspdf, supabase, dexie, markdown,
+      // dompurify) out of the main bundle. Drops main chunk from 853 KB → 541 KB
+      // raw (164 KB gzipped).
+      //
+      // Sprint 8 finding: route-level splitting already happens automatically
+      // via TanStack Start's built-in code splitter (it always adds it,
+      // regardless of `autoCodeSplitting` in tsr.config.json or vite options).
+      // Each route's component is already lazy-loaded on navigation — main
+      // bundle 541 KB contains React + TanStack Router/Start/Query + root
+      // routeTree metadata, not all 156 route code. Verified by:
+      // 1. main bundle has 194 dynamic imports to other chunks
+      // 2. source map shows 80% framework, 20% app code
+      // 3. `routeTree.gen.ts` (168 KB src) emits per-route lazy chunks
+      //    (visible as ?tsr-split=component markers in server bundle)
+      // `autoCodeSplitting` flag was tested (via tsr.config.json + vite
+      // router option) — produced IDENTICAL bundle hash zqhslL9F.js (553647
+      // bytes). Confirms flag is a no-op for TanStack Start.
     }),
     react(),
     // vite-plugin-pwa — PWA shell + Workbox offline cache for user 3G/Ramadhan.
@@ -141,9 +159,12 @@ export default defineConfig({
       },
     }),
     // Bundle analyzer (optional; enable with `ANALYZE=1 bun run build`)
+    // Sprint 8: emit per-environment stats (client + ssr) so we can see what
+    // actually ships to the browser. Default visualizer filename overwrites
+    // itself on each vite environment build, hiding the client tree.
     process.env.ANALYZE
       ? visualizer({
-          filename: "dist/bundle-stats.html",
+          filename: process.env.ANALYZE_FILENAME ?? "dist/bundle-stats.html",
           template: "treemap",
           gzipSize: true,
           brotliSize: true,
@@ -165,6 +186,51 @@ export default defineConfig({
     // audit fails. Trade-off: +30-40% dist size (CF can serve .map files
     // separately or strip via transform rules).
     sourcemap: true,
+    // Sprint 7: Manual chunking for heavy vendor deps that were previously
+    // bundled into the main 853 KB chunk. Putting them in their own chunks
+    // means:
+    //   * The main bundle drops to a much smaller size for first paint.
+    //   * Vendor chunks are cached independently (longer cache TTL OK).
+    //   * Parallel downloads on HTTP/2 / HTTP/3.
+    rollupOptions: {
+      output: {
+        manualChunks: (id) => {
+          if (!id.includes("node_modules")) return undefined;
+          // Charts (recharts + d3 deps) — heavy, lazy-loaded on dashboard/reports.
+          if (id.includes("recharts") || id.includes("d3-") || id.includes("victory-vendor")) {
+            return "vendor-charts";
+          }
+          // PDF + screenshot (only used by reports export flow).
+          if (id.includes("jspdf") || id.includes("html2canvas")) {
+            return "vendor-pdf";
+          }
+          // Markdown rendering (used by articles).
+          if (
+            id.includes("marked") ||
+            id.includes("markdown-it") ||
+            id.includes("remark") ||
+            id.includes("micromark") ||
+            id.includes("mdast-util")
+          ) {
+            return "vendor-markdown";
+          }
+          // DOMPurify (sanitize HTML — paired with markdown).
+          if (id.includes("dompurify") || id.includes("purify")) {
+            return "vendor-purify";
+          }
+          // IndexedDB wrapper (Dexie — used for offline cache).
+          if (id.includes("dexie")) {
+            return "vendor-dexie";
+          }
+          // Supabase client + postgrest deps.
+          if (id.includes("@supabase") || id.includes("postgrest")) {
+            return "vendor-supabase";
+          }
+          // React + react-dom stay in main (used everywhere, splitting hurts).
+          return undefined;
+        },
+      },
+    },
   },
   server: {
     // Defaults that work well locally without the Lovable sandbox.
