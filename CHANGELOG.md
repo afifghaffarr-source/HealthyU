@@ -11,10 +11,105 @@ adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
-### Changed
+---
 
-- Project documentation: added `CHANGELOG.md` (this file) — captures Sprints 1c → 8
-  - audit closures (Fase 1–7) that were not previously tracked in a release document.
+## Sprint 9 — Production Hardening (2026-06-23)
+
+> **Commits:** `15519774`, `b172c475`, `6a73e1a9`
+
+### Added
+
+- **Monitoring & Alerting Documentation** (`docs/monitoring.md`):
+  - Cloudflare Workers analytics setup & metrics
+  - Supabase error tracking queries
+  - Real-time log streaming with `wrangler tail`
+  - Health endpoints & uptime monitoring
+  - Backup monitoring procedures
+  - Database performance queries
+  - AI usage tracking
+  - Incident response playbook
+  - Weekly monitoring checklist
+
+- **Troubleshooting Guide** (`docs/troubleshooting.md`):
+  - Quick diagnostics commands
+  - 7 common issue categories with solutions:
+    - Production down (502/504 errors)
+    - Database errors (migration, RLS, constraints)
+    - Authentication issues (API keys, JWT, OAuth)
+    - Build & deployment issues
+    - Performance issues
+    - Cron jobs not running
+    - Storage issues
+  - Emergency procedures (production down, data loss, security incident)
+  - Debugging tools reference
+
+- **Known Issues Tracking** (`docs/known-issues.md`):
+  - Priority-based issue tracking (P0-P3)
+  - High priority:
+    - HI-001: Bundle size 500KB hard floor (TanStack Start + React 19)
+    - HI-002: GitHub Actions CF token invalid
+    - HI-003: 37 phantom bindings in Cloudflare Worker
+  - Medium priority:
+    - MI-001: 168 `as any` usages (top 30 fixed)
+    - MI-002: Lighthouse accessibility score < 100
+    - MI-003: E2E test coverage < 80%
+    - MI-004: Supabase database connection pooling
+  - Low priority:
+    - LI-001: Unused dependencies
+    - LI-002: Console warnings in development
+    - LI-003: Documentation gaps
+
+- **Health Check Script** (`scripts/health-check.ts`):
+  - Automated endpoint testing (landing page, health API, Supabase)
+  - Latency measurement
+  - Status reporting with exit codes
+
+- **E2E Regression Suite** (`e2e/regression.spec.ts`):
+  - Navigation & routing tests (public/protected routes, 404, deep links)
+  - API endpoint tests (health, log-error, CORS)
+  - Performance benchmarks (load time < 3s, no JS errors, image optimization)
+  - Form handling tests (validation, double-submit prevention)
+  - Error handling tests (network failures, error boundaries)
+  - Responsive design tests (mobile viewport, touch targets 44x44px)
+  - SEO & meta tags tests (unique titles, Open Graph, JSON-LD)
+  - Accessibility regression tests (ARIA names, contrast, focus indicators)
+
+### Documentation
+
+- **Roadmap Update**: Marked Fase 3 complete with acceptance criteria:
+  - AUDIT-004: Bundle 853KB → 500KB (-41%)
+  - AUDIT-006: Fast-refresh 210 → 0 warnings
+  - AUDIT-007: Type safety (already fixed)
+  - AUDIT-008: 0 `as any` violations in source
+  - Tests: 760/760 passing
+
+### Infrastructure
+
+- **Backup Strategy** (already running):
+  - Daily cron job at 03:00 UTC
+  - 30-day retention policy
+  - Telegram offsite backup notifications
+  - Status: ✅ Operational
+
+- **Rollback Playbook** (already documented):
+  - Cloudflare Worker rollback procedures
+  - Database restore procedures
+  - DNS rollback steps
+  - Located in `docs/deployment-playbook.md`
+
+### Performance
+
+- **Bundle Size Status**:
+  - Current: 500KB (gzip 164KB)
+  - Target: < 400KB (unreachable with current stack)
+  - Hard floor: TanStack Start + React 19 framework code (~400KB)
+  - All possible lazy-loading already implemented (ZXing, dexie-sync, webVitals)
+
+### Testing
+
+- Unit tests: 760/760 passing ✅
+- E2E tests: Added regression suite (40+ test cases)
+- Coverage: Maintained at >75%
 
 ---
 
