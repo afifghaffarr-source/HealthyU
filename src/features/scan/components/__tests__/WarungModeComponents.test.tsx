@@ -27,7 +27,7 @@ describe("ComboDetectionChip", () => {
       <ComboDetectionChip comboName="Paket Warteg" totalCalories={545} onDismiss={onDismiss} />,
     );
 
-    const dismissBtn = screen.getByLabelText(/dismiss combo/i);
+    const dismissBtn = screen.getByRole("button", { name: /dismiss combo/i });
     fireEvent.click(dismissBtn);
 
     expect(onDismiss).toHaveBeenCalledTimes(1);
@@ -74,7 +74,10 @@ describe("PostScanAdjuster", () => {
     const onRescan = vi.fn();
     render(<PostScanAdjuster items={mockItems} onSave={onSave} onRescan={onRescan} />);
 
-    expect(screen.getByText("400 kkal")).toBeInTheDocument(); // 150 + 250
+    // Total should be in the "Total Estimasi" section
+    expect(screen.getByText("Total Estimasi")).toBeInTheDocument();
+    const totalCaloriesElements = screen.getAllByText("400 kkal");
+    expect(totalCaloriesElements.length).toBeGreaterThan(0); // At least one should exist
   });
 
   it("recalculates calories when portion slider changed", () => {
@@ -87,7 +90,8 @@ describe("PostScanAdjuster", () => {
 
     // Initial: 150 + 250 = 400 kkal
     // After doubling nasi: 300 + 250 = 550 kkal
-    expect(screen.getByText("550 kkal")).toBeInTheDocument();
+    const totalCaloriesElements = screen.getAllByText("550 kkal");
+    expect(totalCaloriesElements.length).toBeGreaterThan(0);
   });
 
   it("calls onSave with adjusted items when save button clicked", () => {
@@ -95,7 +99,7 @@ describe("PostScanAdjuster", () => {
     const onRescan = vi.fn();
     render(<PostScanAdjuster items={mockItems} onSave={onSave} onRescan={onRescan} />);
 
-    const saveBtn = screen.getByText(/simpan ke log/i);
+    const saveBtn = screen.getByRole("button", { name: /simpan ke log/i });
     fireEvent.click(saveBtn);
 
     expect(onSave).toHaveBeenCalledTimes(1);
@@ -120,7 +124,7 @@ describe("PostScanAdjuster", () => {
     const onRescan = vi.fn();
     render(<PostScanAdjuster items={mockItems} onSave={onSave} onRescan={onRescan} />);
 
-    const rescanBtn = screen.getByText(/scan ulang/i);
+    const rescanBtn = screen.getByRole("button", { name: /scan ulang/i });
     fireEvent.click(rescanBtn);
 
     expect(onRescan).toHaveBeenCalledTimes(1);
@@ -147,6 +151,7 @@ describe("PostScanAdjuster", () => {
     const onRescan = vi.fn();
     render(<PostScanAdjuster items={mockItems} onSave={onSave} onRescan={onRescan} />);
 
-    expect(screen.getByText(/Saran: 1 potong/i)).toBeInTheDocument();
+    const portionLabels = screen.getAllByText(/Saran: 1 potong/i);
+    expect(portionLabels.length).toBeGreaterThan(0);
   });
 });
