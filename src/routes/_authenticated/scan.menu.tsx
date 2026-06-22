@@ -96,7 +96,7 @@ function Page() {
         )}
 
         {/* Sprint W3: Combo detection chip */}
-        {hasCombo && (
+        {hasCombo && m.data?.combo && (
           <ComboDetectionChip
             comboName={m.data.combo.name}
             totalCalories={m.data.combo.totalCalories}
@@ -105,7 +105,7 @@ function Page() {
         )}
 
         {/* Sprint W3: Post-scan adjuster with sliders */}
-        {hasItems && (
+        {hasItems && m.data?.items && (
           <PostScanAdjuster items={m.data.items} onSave={handleSave} onRescan={handleRescan} />
         )}
       </div>
