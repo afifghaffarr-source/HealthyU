@@ -64,6 +64,14 @@ jobs:
           VITE_SUPABASE_PUBLISHABLE_KEY: "sb_publishable_HVxped5shOOdF80dWbdQTQ_rwt3jTq8"
           VITE_SUPABASE_PROJECT_ID: "ohkfcldkuzfcxnpqvdvc"
           VITE_SITE_URL: "https://healthyu.web.id"
+          # Sprint 6b `og:build` (scripts/generate-og-images.mjs) reads
+          # SUPABASE_URL + SUPABASE_SERVICE_ROLE_KEY directly (not VITE_*
+          # prefixed). Source from GH secrets for parity with VPS
+          # ~/.config/healthyu/production.env which the script originally
+          # read locally. Without these, build fails with
+          # "❌ Missing SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY".
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
         run: bun run build
 
       - name: Verify build output exists

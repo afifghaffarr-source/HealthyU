@@ -44,6 +44,15 @@ jobs:
           VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL || 'https://placeholder.supabase.co' }}
           VITE_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.VITE_SUPABASE_PUBLISHABLE_KEY || 'placeholder' }}
           VITE_SUPABASE_PROJECT_ID: ${{ secrets.VITE_SUPABASE_PROJECT_ID || 'placeholder' }}
+          # Sprint 6b `og:build` script (scripts/generate-og-images.mjs) reads
+          # SUPABASE_URL + SUPABASE_SERVICE_ROLE_KEY directly from process.env
+          # (not VITE_* prefixed). Without these, build exits with
+          # "❌ Missing SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY".
+          # Real values needed so the script can fetch recipes/articles for
+          # OG image generation. .dev.vars placeholder values are only safe
+          # for SSR at preview time, not for build-time data fetches.
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
       - name: Run Lighthouse CI
         # Belt-and-suspenders: also source .dev.vars at preview time in case
         # any SSR code reads process.env at module-load (not embedded fallback).
