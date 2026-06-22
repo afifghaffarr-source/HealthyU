@@ -5,6 +5,8 @@ import { useServerFn } from "@tanstack/react-start";
 import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { BottomNav } from "@/components/bottom-nav";
 import { parseMenuImage } from "@/features/scan/lib/scanExtras.functions";
+import { ComboDetectionChip } from "@/features/scan/components/ComboDetectionChip";
+import { PostScanAdjuster } from "@/features/scan/components/PostScanAdjuster";
 import { Camera, Loader2 } from "lucide-react";
 import { toast } from "@/lib/toast-config";
 import { validateImageFile, fileToDataUrl } from "@/lib/image-utils";
@@ -14,11 +16,38 @@ export const Route = createFileRoute("/_authenticated/scan/menu")({ component: P
 function Page() {
   const ref = useRef<HTMLInputElement>(null);
   const [img, setImg] = useState<string | null>(null);
+  const [showCombo, setShowCombo] = useState(true);
   const parse = useServerFn(parseMenuImage);
   const m = useMutation({
     mutationFn: (url: string) => parse({ data: { image_data_url: url } }),
     onError: (e: Error) => toast.error(e.message),
   });
+
+  const handleRescan = () => {
+    setImg(null);
+    setShowCombo(true);
+    m.reset();
+    ref.current?.click();
+  };
+
+  const handleSave = async (adjustedItems: Array<{ adjusted_calories: number }>) => {
+    // TODO Sprint W4: Save to meal_logs with combo support
+    // For now, just show success toast
+    toast.success(
+      `${adjustedItems.length} item disimpan (${adjustedItems.reduce((sum, i) => sum + i.adjusted_calories, 0)} kkal)`,
+    );
+
+    // Reset for next scan
+    setTimeout(() => {
+      setImg(null);
+      setShowCombo(true);
+      m.reset();
+    }, 1500);
+  };
+
+  const hasCombo = m.data?.combo && showCombo;
+  const hasItems = m.data?.items && m.data.items.length > 0;
+
   return (
     <div className="min-h-dvh pb-24 bg-background">
       <TopAppBar title="Scan Menu Restoran" showBack />
@@ -40,6 +69,7 @@ function Page() {
             }
             const url = await fileToDataUrl(f);
             setImg(url);
+            setShowCombo(true);
             m.mutate(url);
           }}
         />
@@ -64,31 +94,19 @@ function Page() {
             <Loader2 className="inline size-4 animate-spin" /> Membaca menu…
           </div>
         )}
-        {m.data?.items && m.data.items.length > 0 && (
-          <div className="space-y-2">
-            {m.data.items.map((it, i) => (
-              <div key={i} className="rounded-2xl bg-card border p-3">
-                <div className="flex justify-between gap-2">
-                  <div className="min-w-0">
-                    <div className="font-medium truncate">{it.name}</div>
-                    {it.description && (
-                      <div className="text-xs text-muted-foreground line-clamp-2">
-                        {it.description}
-                      </div>
-                    )}
-                  </div>
-                  <div className="text-right text-xs">
-                    {it.price ? (
-                      <div className="font-semibold">Rp{it.price.toLocaleString("id-ID")}</div>
-                    ) : null}
-                    {it.est_calories ? (
-                      <div className="text-primary">{it.est_calories} kkal</div>
-                    ) : null}
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
+
+        {/* Sprint W3: Combo detection chip */}
+        {hasCombo && (
+          <ComboDetectionChip
+            comboName={m.data.combo.name}
+            totalCalories={m.data.combo.totalCalories}
+            onDismiss={() => setShowCombo(false)}
+          />
+        )}
+
+        {/* Sprint W3: Post-scan adjuster with sliders */}
+        {hasItems && (
+          <PostScanAdjuster items={m.data.items} onSave={handleSave} onRescan={handleRescan} />
         )}
       </div>
       <BottomNav />
