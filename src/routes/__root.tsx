@@ -38,8 +38,18 @@ import { I18nProvider } from "@/lib/i18n";
 import { GlobalErrorBoundary } from "@/components/healthyu/global-error-boundary";
 import { RouteError, RouteNotFound } from "@/components/healthyu/route-boundaries";
 import { APP_CONFIG } from "@/config/app";
-import { startBackgroundSync } from "@/lib/dexie-sync";
-import { initWebVitals } from "@/lib/webVitals";
+
+// Sprint 8 perf: lazy-load background sync + web-vitals init code.
+// These run AFTER first paint (in useEffect), so dynamic import is safe.
+// Saves ~15 KB from main bundle (dexie-sync + web-vitals + errorReporting).
+const startBackgroundSync = async () => {
+  const { startBackgroundSync } = await import("@/lib/dexie-sync");
+  return startBackgroundSync();
+};
+const initWebVitals = async () => {
+  const { initWebVitals } = await import("@/lib/webVitals");
+  return initWebVitals();
+};
 
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
   head: () => ({

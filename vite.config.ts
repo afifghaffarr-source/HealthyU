@@ -226,7 +226,8 @@ export default defineConfig({
           if (id.includes("@supabase") || id.includes("postgrest")) {
             return "vendor-supabase";
           }
-          // React + react-dom stay in main (used everywhere, splitting hurts).
+          // React + react-dom stay in main (required at first paint, splitting
+          // only adds HTTP requests without reducing initial load — verified).
           return undefined;
         },
       },
