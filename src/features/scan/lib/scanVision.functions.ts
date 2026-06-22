@@ -151,11 +151,28 @@ Jika ada combo (nasi+lauk+sayur), list sebagai item terpisah.`;
       throw new Error("Context not available");
     }
 
-    let enrichedItems = parsed.items;
+    let enrichedItems = parsed.items as Array<
+      z.infer<typeof MenuImageSchema>["items"][number] & {
+        food_item_id?: number;
+        canonical_name?: string;
+        source?: string;
+        confidence_score?: number;
+        verified_nutrition?: {
+          calories: number;
+          protein_g: number;
+          carbs_g: number;
+          fat_g: number;
+          fiber_g: number;
+          serving_size: number;
+          serving_unit: string;
+          portion_label?: string | null;
+        };
+      }
+    >;
 
     try {
       const matchResults = await matchFoodItemsBatch(
-        context.supabase,
+        context!.supabase,
         parsed.items.map((item) => ({
           name: item.name,
           ai_estimate: {
