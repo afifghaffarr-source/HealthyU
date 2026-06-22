@@ -4,11 +4,16 @@
  * Tests for ComboDetectionChip and PostScanAdjuster components.
  */
 
-import { describe, it, expect, vi } from "vitest";
-import { render, screen, fireEvent } from "@testing-library/react";
+import { describe, it, expect, vi, afterEach } from "vitest";
+import { render, screen, fireEvent, cleanup } from "@testing-library/react";
 import "@testing-library/jest-dom/vitest";
 import { ComboDetectionChip } from "../ComboDetectionChip";
 import { PostScanAdjuster } from "../PostScanAdjuster";
+
+// Ensure cleanup after each test to prevent DOM pollution
+afterEach(() => {
+  cleanup();
+});
 
 describe("ComboDetectionChip", () => {
   it("renders combo name and calories", () => {
@@ -23,12 +28,14 @@ describe("ComboDetectionChip", () => {
 
   it("calls onDismiss when dismiss button clicked", () => {
     const onDismiss = vi.fn();
-    render(
+    const { container } = render(
       <ComboDetectionChip comboName="Paket Warteg" totalCalories={545} onDismiss={onDismiss} />,
     );
 
-    const dismissBtn = screen.getByRole("button", { name: /dismiss combo/i });
-    fireEvent.click(dismissBtn);
+    // Use container.querySelector to scope to this specific render
+    const dismissBtn = container.querySelector('button[aria-label="Dismiss combo"]');
+    expect(dismissBtn).toBeTruthy();
+    fireEvent.click(dismissBtn!);
 
     expect(onDismiss).toHaveBeenCalledTimes(1);
   });
@@ -97,10 +104,15 @@ describe("PostScanAdjuster", () => {
   it("calls onSave with adjusted items when save button clicked", () => {
     const onSave = vi.fn();
     const onRescan = vi.fn();
-    render(<PostScanAdjuster items={mockItems} onSave={onSave} onRescan={onRescan} />);
+    const { container } = render(
+      <PostScanAdjuster items={mockItems} onSave={onSave} onRescan={onRescan} />,
+    );
 
-    const saveBtn = screen.getByRole("button", { name: /simpan ke log/i });
-    fireEvent.click(saveBtn);
+    // Use container.querySelector with button text to avoid multiple elements
+    const buttons = container.querySelectorAll("button");
+    const saveBtn = Array.from(buttons).find((btn) => btn.textContent?.includes("Simpan ke Log"));
+    expect(saveBtn).toBeTruthy();
+    fireEvent.click(saveBtn!);
 
     expect(onSave).toHaveBeenCalledTimes(1);
     expect(onSave).toHaveBeenCalledWith(
@@ -122,10 +134,15 @@ describe("PostScanAdjuster", () => {
   it("calls onRescan when rescan button clicked", () => {
     const onSave = vi.fn();
     const onRescan = vi.fn();
-    render(<PostScanAdjuster items={mockItems} onSave={onSave} onRescan={onRescan} />);
+    const { container } = render(
+      <PostScanAdjuster items={mockItems} onSave={onSave} onRescan={onRescan} />,
+    );
 
-    const rescanBtn = screen.getByRole("button", { name: /scan ulang/i });
-    fireEvent.click(rescanBtn);
+    // Use container.querySelector with button text to avoid multiple elements
+    const buttons = container.querySelectorAll("button");
+    const rescanBtn = Array.from(buttons).find((btn) => btn.textContent?.includes("Scan Ulang"));
+    expect(rescanBtn).toBeTruthy();
+    fireEvent.click(rescanBtn!);
 
     expect(onRescan).toHaveBeenCalledTimes(1);
   });
