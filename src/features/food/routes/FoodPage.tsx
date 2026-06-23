@@ -8,9 +8,12 @@ import {
   deleteMeal,
 } from "@/features/meals/lib/meals.functions";
 import { parseMealFromVoice } from "@/features/ai/lib/ai-extras.functions";
+import { parseNaturalLanguageFood } from "@/features/food/lib/aiFoodParser";
+import { FoodConfirmation } from "@/features/food/components/FoodConfirmation";
+import type { NlParsedFoodItem } from "@/features/food/lib/aiFoodParser";
 import { getAchievementToastPrefix } from "@/lib/achievement-icons";
 import { BottomNav } from "@/components/bottom-nav";
-import { WifiOff, RefreshCw, Camera, PenLine, Utensils } from "lucide-react";
+import { WifiOff, RefreshCw, Camera, PenLine, Utensils, Send, Loader2 } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { toast } from "@/lib/toast-config";
@@ -35,10 +38,17 @@ export function FoodPage() {
   const fetchMeals = useServerFn(todaysMeals);
   const del = useServerFn(deleteMeal);
   const parseVoice = useServerFn(parseMealFromVoice);
+  const nlParse = useServerFn(parseNaturalLanguageFood);
   const { online, pending, sync } = useOfflineQueue();
 
   const [q, setQ] = useState("");
   const [mealType, setMealType] = useState<MealType>(currentMealType());
+
+  // NL food parsing state
+  const [nlText, setNlText] = useState("");
+  const [nlParsing, setNlParsing] = useState(false);
+  const [nlResults, setNlResults] = useState<NlParsedFoodItem[] | null>(null);
+  const [nlRawInput, setNlRawInput] = useState("");
 
   const { basket, addToBasket, updateQty, removeFromBasket, basketTotals, logBasketM } =
     useFoodBasket(mealType);
@@ -92,6 +102,39 @@ export function FoodPage() {
     onSuccess: () => qc.invalidateQueries({ queryKey: ["meals"] }),
   });
 
+  // NL food parsing handler
+  const handleNlParse = async () => {
+    const trimmed = nlText.trim();
+    if (!trimmed || trimmed.length < 2) return;
+    setNlParsing(true);
+    try {
+      const result = await nlParse({ data: { text: trimmed } });
+      setNlRawInput(trimmed);
+      setNlResults(result.items);
+    } catch (err) {
+      toastError(err, "Gagal parse makanan");
+    } finally {
+      setNlParsing(false);
+    }
+  };
+
+  const handleNlConfirm = async (items: NlParsedFoodItem[]) => {
+    for (const item of items) {
+      logMutation.mutate({
+        food_item_id: item.matched_food_id ?? null,
+        custom_name: item.matched_food_name ?? item.name,
+        meal_type: mealType,
+        serving_qty: item.portion_qty,
+        calories: item.calories,
+        protein_g: item.protein_g,
+        carbs_g: item.carbs_g,
+        fat_g: item.fat_g,
+      });
+    }
+    setNlResults(null);
+    setNlText("");
+  };
+
   const {
     listening,
     parsing,
@@ -143,6 +186,30 @@ export function FoodPage() {
           parsing={parsing}
           onVoice={handleVoice}
         />
+
+        {/* NL Food Input — type what you ate */}
+        <div className="flex gap-2">
+          <input
+            type="text"
+            value={nlText}
+            onChange={(e) => setNlText(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") handleNlParse();
+            }}
+            placeholder='Contoh: "nasi padang ayam bakar setengah porsi"'
+            className="flex-1 bg-card border border-border/50 rounded-xl px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-primary/30 placeholder:text-muted-foreground"
+            disabled={nlParsing}
+          />
+          <button
+            type="button"
+            onClick={handleNlParse}
+            disabled={nlParsing || nlText.trim().length < 2}
+            className="bg-primary text-primary-foreground rounded-xl px-4 min-w-11 h-11 grid place-items-center disabled:opacity-50"
+            aria-label="Parse makanan"
+          >
+            {nlParsing ? <Loader2 className="size-4 animate-spin" /> : <Send className="size-4" />}
+          </button>
+        </div>
 
         {q.trim() === "" && (
           <QuickRepeatRow
@@ -236,6 +303,18 @@ export function FoodPage() {
           onAdd={(item) => addToBasket(item)}
         />
       )}
+
+      {/* NL Food Confirmation Modal */}
+      {nlResults !== null && (
+        <FoodConfirmation
+          items={nlResults}
+          rawInput={nlRawInput}
+          onConfirm={(items) => void handleNlConfirm(items)}
+          onCancel={() => setNlResults(null)}
+          isPending={logMutation.isPending}
+        />
+      )}
+
       <BottomNav />
     </main>
   );
