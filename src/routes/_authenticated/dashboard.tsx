@@ -41,6 +41,7 @@ import { ActionRow } from "@/features/dashboard/components/ActionRow";
 import { QuickStatsGrid } from "@/features/dashboard/components/QuickStatsGrid";
 import { TodayInsight } from "@/features/dashboard/components/TodayInsight";
 import { SectionGroup } from "@/features/dashboard/components/SectionGroup";
+import { AdherenceCard } from "@/features/mealplan/components/AdherenceCard";
 import { usePullToRefresh } from "@/hooks/use-pull-to-refresh";
 import { markFirstAction } from "@/lib/first-action";
 import { useFastClock } from "@/features/dashboard/hooks/useFastClock";
@@ -244,6 +245,9 @@ function Dashboard() {
 
         {/* MAKANAN HARI INI */}
         <TodaysMeals meals={meals} />
+
+        {/* MEAL PLAN ADHERENCE */}
+        <AdherenceCard />
 
         {/* Collapsible extras — keep first paint lean */}
         <Collapsible open={showMore} onOpenChange={setShowMore}>

@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -7,6 +7,7 @@ import { searchFoods } from "@/features/meals/lib/meals.functions";
 import { BottomNav } from "@/components/bottom-nav";
 import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { toast } from "@/lib/toast-config";
+import { CalendarDays } from "lucide-react";
 import {
   MEAL_TYPES,
   type MealTypeId,
@@ -93,6 +94,19 @@ function MealPlanPage() {
     <main className="min-h-dvh bg-background pb-28">
       <div className="max-w-md mx-auto px-5 pt-2 space-y-5">
         <TopAppBar title="Meal Plan" showBack />
+
+        <Link
+          to="/mealplan/week"
+          className="flex items-center gap-3 bg-gradient-to-r from-primary/10 to-primary/5 border border-primary/20 p-3 rounded-2xl"
+        >
+          <CalendarDays className="size-5 text-primary" />
+          <div className="flex-1">
+            <p className="text-sm font-semibold">Tampilan Mingguan</p>
+            <p className="text-[11px] text-muted-foreground">
+              Lihat 7 hari + adherence + swap meal
+            </p>
+          </div>
+        </Link>
 
         <WeekNav
           onPrev={() => {

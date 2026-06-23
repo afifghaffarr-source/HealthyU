@@ -122,6 +122,8 @@ type PlanMeal = {
   reason: string;
 };
 
+export type { PlanMeal };
+
 /**
  * Sprint 5a (re-introduced): discriminated union for `generateMealPlan`.
  * The AI path lives entirely in the server fn. If AI returns empty/invalid,
