@@ -10,6 +10,8 @@ import { todaysWater } from "@/features/water/lib/water.functions";
 import { getGameSummary } from "@/features/gamification/lib/gamification.functions";
 import { myGroupChallengeSummary } from "@/features/challenges/lib/groupChallengeSummary.functions";
 import { myUnlinkedJoinedChallenges } from "@/features/challenges/lib/myUnlinkedChallenges.functions";
+import { dailyCoach } from "@/features/coach/lib/coach.functions";
+import { CoachCard } from "@/features/coach/components/CoachCard";
 import { BottomNav } from "@/components/bottom-nav";
 import { Coachmark } from "@/components/healthyu/coachmark";
 import { PullIndicator } from "@/components/healthyu/pull-indicator";
@@ -99,6 +101,7 @@ function Dashboard() {
   const fetchGame = useServerFn(getGameSummary);
   const fetchGroupChallenges = useServerFn(myGroupChallengeSummary);
   const fetchUnlinked = useServerFn(myUnlinkedJoinedChallenges);
+  const fetchDailyCoach = useServerFn(dailyCoach);
   const [freezeOpen, setFreezeOpen] = useState(false);
   const [showMore, setShowMore] = useState(false);
   const { bonusClaimed, claimBonusMut, waterMutation, moodMutation } = useDashboardMutations();
@@ -130,6 +133,14 @@ function Dashboard() {
   const { data: unlinkedChallenges = [] } = useQuery({
     queryKey: ["unlinked-joined-challenges"],
     queryFn: () => fetchUnlinked(),
+  });
+
+  // AI Coach — get today's session (cached, doesn't trigger AI if exists)
+  const { data: coachData } = useQuery({
+    queryKey: ["coach", "today"],
+    queryFn: () => fetchDailyCoach(),
+    staleTime: 1000 * 60 * 30, // 30 min — server returns cached if exists
+    retry: false, // silent fail if not generated yet
   });
 
   const totals = meals.reduce(
@@ -193,6 +204,17 @@ function Dashboard() {
             calTarget={calTarget}
             waterMl={waterMl}
             waterTarget={waterTarget}
+          />
+        </SectionGroup>
+
+        {/* AI COACH — daily personalized guidance */}
+        <SectionGroup label="AI Coach" actionLabel="Buka" actionHref="/coach">
+          <CoachCard
+            kind="morning"
+            greeting={coachData?.greeting}
+            focus={coachData?.focus}
+            oneTip={coachData?.tips?.[0]}
+            hasRead={Boolean(coachData?.id && (coachData as { read_at?: string }).read_at)}
           />
         </SectionGroup>
 
