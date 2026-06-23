@@ -2,6 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { callAiJsonWithSchema } from "@/features/ai/lib/aiGateway.server";
+import { wrapAiSystemPrompt } from "@/features/safety/lib/medicalSafety";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type AnyClient = any; // table not yet in generated Supabase types until migration applied
@@ -102,7 +103,7 @@ export const scanNutritionLabel = createServerFn({ method: "POST" })
         warnings: [],
       },
       messages: [
-        { role: "system", content: OCR_SYSTEM },
+        { role: "system", content: wrapAiSystemPrompt(OCR_SYSTEM) },
         {
           role: "user",
           content: [

@@ -2,6 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { z } from "zod";
 import { callAiJsonWithSchema } from "@/features/ai/lib/aiGateway.server";
+import { wrapAiSystemPrompt } from "@/features/safety/lib/medicalSafety";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type AnyClient = any; // new tables not yet in generated types
@@ -273,7 +274,7 @@ Buat coaching pagi dengan JSON:
         mood: "neutral" as const,
       },
       messages: [
-        { role: "system", content: MORNING_SYS },
+        { role: "system", content: wrapAiSystemPrompt(MORNING_SYS) },
         { role: "user", content: userPrompt },
       ],
     });
@@ -397,7 +398,7 @@ Buat refleksi malam dengan JSON:
         action_plan: [],
       },
       messages: [
-        { role: "system", content: EVENING_SYS },
+        { role: "system", content: wrapAiSystemPrompt(EVENING_SYS) },
         { role: "user", content: userPrompt },
       ],
     });

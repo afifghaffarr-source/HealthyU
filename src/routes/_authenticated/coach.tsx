@@ -3,6 +3,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useState } from "react";
 import { dailyCoach, eveningCoach, getCoachHistory } from "@/features/coach/lib/coach.functions";
+import { MedicalDisclaimer } from "@/components/healthyu/MedicalDisclaimer";
 import { BottomNav } from "@/components/bottom-nav";
 import {
   Sparkles,
@@ -117,6 +118,9 @@ function CoachPage() {
             </button>
           ))}
         </div>
+
+        {/* Medical safety disclaimer — AI Coach provides general guidance, not medical advice. */}
+        <MedicalDisclaimer variant="disclaimer" className="w-full" />
 
         {/* Loading state */}
         {currentIsPending && !currentData && (

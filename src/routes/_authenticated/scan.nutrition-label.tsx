@@ -33,6 +33,7 @@ import {
   Loader2,
 } from "lucide-react";
 import { TopAppBar } from "@/components/healthyu/top-app-bar";
+import { MedicalDisclaimer } from "@/components/healthyu/MedicalDisclaimer";
 import { BottomNav } from "@/components/bottom-nav";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -279,6 +280,9 @@ function Page() {
     <div className="min-h-dvh pb-24 bg-background">
       <TopAppBar title="Scan Label Nutrisi" subtitle="Client-side OCR · tanpa upload" showBack />
       <main className="max-w-md mx-auto px-4 pt-4 space-y-4">
+        {/* Medical safety disclaimer — AI parses label text, not medical advice. */}
+        <MedicalDisclaimer variant="disclaimer" compact className="w-full justify-center" />
+
         {/* Offline-capable banner */}
         <Card className="p-3 bg-emerald-50 border-emerald-200 dark:bg-emerald-950/30 dark:border-emerald-900">
           <div className="flex items-start gap-2.5">

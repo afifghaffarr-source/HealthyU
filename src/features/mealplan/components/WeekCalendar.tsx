@@ -27,6 +27,9 @@ import {
 import { weekPlan } from "@/features/mealplan/lib/mealplan.functions";
 import { DayPlanCard } from "./DayPlanCard";
 import { AdherenceRing } from "./AdherenceRing";
+import { MedicalDisclaimer } from "../../../components/healthyu/MedicalDisclaimer";
+import { reportSafetyEvent } from "../../safety/lib/safetyTelemetry";
+import { detectMedicalContext } from "../../safety/lib/medicalSafety";
 import { toast } from "@/lib/toast-config";
 import { toastError } from "@/lib/toast-config";
 import { cn } from "@/lib/utils";
@@ -106,7 +109,29 @@ export function WeekCalendar() {
     mutationFn: (planId: string) => swapFn({ data: { plan_id: planId } }),
     onMutate: (planId) => setSwappingId(planId),
     onSettled: () => setSwappingId(null),
-    onSuccess: () => {
+    onSuccess: (data) => {
+      // Medical safety telemetry: the swap response contains the new meal
+      // (user-facing text). Run detector on the meal name ONLY — never log
+      // full prompt. The detector is PII-safe by construction.
+      try {
+        const newMeal = (data as { meal?: { custom_name?: string; meal_type?: string } } | null)
+          ?.meal;
+        const textToScan = newMeal?.custom_name ?? newMeal?.meal_type ?? "";
+        const result = detectMedicalContext(textToScan, {
+          triggeredByUserInput: false,
+        });
+        if (result.level !== "safe") {
+          reportSafetyEvent({
+            surface: "meal_plan_swap",
+            level: result.level,
+            category: result.category,
+            triggeredByUserInput: false,
+            meta: { meal_type: newMeal?.meal_type ?? null },
+          });
+        }
+      } catch {
+        /* swallow — telemetry must not break the swap */
+      }
       toast.success("Meal di-swap");
       qc.invalidateQueries({ queryKey: ["mealplan", "week", weekStartStr] });
     },
@@ -151,6 +176,9 @@ export function WeekCalendar() {
 
   return (
     <div className="space-y-4">
+      {/* Medical safety disclaimer — AI swaps are general suggestions, not medical advice. */}
+      <MedicalDisclaimer variant="disclaimer" compact className="w-full justify-center" />
+
       {/* Header / week controls */}
       <div className="flex items-center justify-between gap-2">
         <button
