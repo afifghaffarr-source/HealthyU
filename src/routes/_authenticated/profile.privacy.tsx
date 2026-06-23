@@ -11,7 +11,7 @@ import {
 import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { BottomNav } from "@/components/bottom-nav";
 import { toast } from "@/lib/toast-config";
-import { Download, ExternalLink } from "lucide-react";
+import { Download, ExternalLink, Settings } from "lucide-react";
 import { DeleteAccountSection } from "@/features/privacy/components/delete-account-section";
 
 const getPrivacy = createServerFn({ method: "GET" })
@@ -61,7 +61,19 @@ function Page() {
   });
   return (
     <div className="min-h-dvh pb-24 bg-background">
-      <TopAppBar title="Privasi" showBack />
+      <TopAppBar
+        title="Privasi"
+        showBack
+        action={
+          <Link
+            to="/pengaturan"
+            aria-label="Buka pengaturan"
+            className="size-9 rounded-full bg-muted grid place-items-center"
+          >
+            <Settings className="size-4" />
+          </Link>
+        }
+      />
       <div className="p-4 space-y-3">
         <div className="rounded-2xl bg-card border p-4 flex items-start justify-between gap-3">
           <div className="min-w-0">

@@ -9,7 +9,7 @@ import { HealthScoreCard } from "@/components/healthyu/health-score-card";
 import { supabase } from "@/integrations/supabase/client";
 import { clearAll } from "@/lib/offline-queue";
 import { calcAge, calcBMI, bmiCategory, calcBMR, calcTDEE, type ActivityLevel } from "@/lib/health";
-import { LogOut, Camera, Sparkles, ChefHat, ChevronRight } from "lucide-react";
+import { LogOut, Camera, Sparkles, ChefHat, ChevronRight, Settings } from "lucide-react";
 import { useTheme } from "@/components/theme-provider.hook";
 import { LocaleSwitcher } from "@/components/locale-switcher";
 import { ProfileNavGrid } from "@/features/profile/components/ProfileNavGrid";
@@ -201,6 +201,23 @@ function ProfilePage() {
         {/* ── Section E: Akun (theme, locale, logout) ─────────────────────── */}
         <section className="space-y-2 pt-2 animate-fade-up">
           <DisclaimerCard />
+
+          {/* Settings hub shortcut */}
+          <Link
+            to="/pengaturan"
+            className="w-full flex items-center gap-3 p-3 rounded-2xl bg-card outline-1 outline-black/5 hover:bg-secondary/30 active:scale-[0.99] transition"
+          >
+            <div className="size-9 rounded-xl bg-primary/10 grid place-items-center text-primary">
+              <Settings className="size-4" />
+            </div>
+            <div className="flex-1 text-left min-w-0">
+              <p className="font-semibold text-sm">Pengaturan</p>
+              <p className="text-[11px] text-muted-foreground">
+                Akun, privasi, preferensi, notifikasi
+              </p>
+            </div>
+            <ChevronRight className="size-4 text-muted-foreground shrink-0" />
+          </Link>
 
           <div className="rounded-2xl bg-destructive/5 dark:bg-destructive/10 outline-1 outline-destructive/25 p-2">
             <AlertDialog>
