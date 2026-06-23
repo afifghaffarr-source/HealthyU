@@ -7,6 +7,7 @@ import {
   startFast,
   stopFast,
   fastHistory,
+  getFastingStats,
 } from "@/features/fasting/lib/fasting.functions";
 import { getFastingSchedule, saveFastingSchedule } from "@/features/fasting/lib/fasting.functions";
 import { getAchievementToastPrefix } from "@/lib/achievement-icons";
@@ -20,6 +21,7 @@ import {
   RamadhanScheduleCard,
   FastHistoryList,
   BreakFastTipsCard,
+  StreakDisplay,
 } from "@/features/fasting/components/FastingPieces";
 
 export const Route = createFileRoute("/_authenticated/fasting")({
@@ -80,7 +82,8 @@ function FastingPage() {
   }, [fast]);
 
   const startMut = useMutation({
-    mutationFn: (p: { protocol: string; target_hours: number }) => startFn({ data: p }),
+    mutationFn: (p: { protocol: string; target_hours: number; is_custom?: boolean }) =>
+      startFn({ data: { ...p, is_custom: p.is_custom ?? false } }),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["fast"] });
       toast.success("Puasa dimulai. Semangat!");
@@ -90,6 +93,7 @@ function FastingPage() {
     mutationFn: (id: string) => stopFn({ data: { id } }),
     onSuccess: (r) => {
       qc.invalidateQueries({ queryKey: ["fast"] });
+      qc.invalidateQueries({ queryKey: ["fast", "stats"] });
       qc.invalidateQueries({ queryKey: ["game", "summary"] });
       toast.success(r.completed ? "Selamat! Puasa tercapai 🎉" : "Puasa dihentikan");
       (r?.game?.newlyUnlocked ?? []).forEach((a) =>
@@ -101,6 +105,13 @@ function FastingPage() {
   });
   const [justStopped, setJustStopped] = useState(false);
 
+  // Fasting stats (streak, total, longest, etc.)
+  const fetchStats = useServerFn(getFastingStats);
+  const { data: stats } = useQuery({
+    queryKey: ["fast", "stats"],
+    queryFn: () => fetchStats(),
+  });
+
   const elapsedMs = fast ? now - new Date(fast.start_time).getTime() : 0;
   const elapsedHrs = elapsedMs / 3600000;
   const pct = fast ? Math.min(100, (elapsedHrs / Number(fast.target_hours)) * 100) : 0;
@@ -109,6 +120,16 @@ function FastingPage() {
     <main className="min-h-dvh bg-background pb-28">
       <div className="max-w-md mx-auto px-5 pt-2 space-y-5">
         <TopAppBar title="Puasa" subtitle="Atur protokol & jadwal" showBack />
+
+        {/* Streak & Stats */}
+        {stats && (
+          <StreakDisplay
+            streak={stats.current_streak ?? 0}
+            totalFasts={stats.total_fasts ?? 0}
+            longestFast={Math.round((stats.longest_fast ?? 0) * 10) / 10}
+            thisWeekCount={stats.this_week_count ?? 0}
+          />
+        )}
 
         {fast ? (
           <ActiveFastCard

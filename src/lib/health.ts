@@ -45,11 +45,54 @@ export function calcTDEE(bmr: number, activity: ActivityLevel): number {
 }
 
 export const FASTING_PROTOCOLS = [
-  { id: "16:8", label: "16:8 Leangains", fast: 16, eat: 8 },
-  { id: "18:6", label: "18:6", fast: 18, eat: 6 },
-  { id: "20:4", label: "20:4 Warrior", fast: 20, eat: 4 },
-  { id: "OMAD", label: "OMAD", fast: 23, eat: 1 },
-  { id: "ramadhan", label: "Puasa Ramadhan (Subuh–Maghrib)", fast: 14, eat: 10 },
+  {
+    id: "16:8",
+    label: "16:8 Leangains",
+    fast: 16,
+    eat: 8,
+    difficulty: "Pemula",
+    desc: "Paling populer, mudah diikuti",
+  },
+  {
+    id: "18:6",
+    label: "18:6",
+    fast: 18,
+    eat: 6,
+    difficulty: "Menengah",
+    desc: "Lebih intens, hasil lebih cepat",
+  },
+  {
+    id: "20:4",
+    label: "20:4 Warrior",
+    fast: 20,
+    eat: 4,
+    difficulty: "Lanjutan",
+    desc: "Untuk yang sudah berpengalaman",
+  },
+  {
+    id: "OMAD",
+    label: "OMAD",
+    fast: 23,
+    eat: 1,
+    difficulty: "Ekstrem",
+    desc: "Satu kali makan per hari",
+  },
+  {
+    id: "custom",
+    label: "Kustom",
+    fast: 12,
+    eat: 12,
+    difficulty: "Fleksibel",
+    desc: "Atur durasi sendiri",
+  },
+  {
+    id: "ramadhan",
+    label: "Puasa Ramadhan",
+    fast: 14,
+    eat: 10,
+    difficulty: "Spiritual",
+    desc: "Subuh–Maghrib, jadwal otomatis",
+  },
 ] as const;
 
 export function fastingStage(hoursElapsed: number): string {
