@@ -5,7 +5,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { getProfile } from "@/features/profile/lib/profile.functions";
 import { getDailyTip } from "@/features/daily-tips/lib/dailyTips.functions";
 import { todaysMeals } from "@/features/meals/lib/meals.functions";
-import { currentFast } from "@/features/fasting/lib/fasting.functions";
+import { currentFast, getFastingStats } from "@/features/fasting/lib/fasting.functions";
 import { todaysWater } from "@/features/water/lib/water.functions";
 import { getGameSummary } from "@/features/gamification/lib/gamification.functions";
 import { myGroupChallengeSummary } from "@/features/challenges/lib/groupChallengeSummary.functions";
@@ -21,7 +21,7 @@ import { TodaysMeals } from "@/features/dashboard/components/TodaysMeals";
 import { GroupChallengeSummaryCard } from "@/features/dashboard/components/GroupChallengeSummaryCard";
 import { UnlinkedChallengesCard } from "@/features/dashboard/components/UnlinkedChallengesCard";
 import { DashboardHeader } from "@/features/dashboard/components/DashboardHeader";
-import { dashboardGreeting } from "@/features/dashboard/lib/dashboardGreeting";
+import { adaptiveGreeting } from "@/features/dashboard/lib/adaptiveGreeting";
 import { HeroStatsRow, MacroBreakdown } from "@/features/dashboard/components/HeroStatsRow";
 import { TodaysBalanceCard } from "@/features/dashboard/components/TodaysBalanceCard";
 import { SmartNextStepCard } from "@/features/dashboard/components/SmartNextStepCard";
@@ -36,6 +36,9 @@ import { StreakFreezeBadge } from "@/features/dashboard/components/StreakFreezeB
 import { WeeklyReviewCard } from "@/features/dashboard/components/WeeklyReviewCard";
 import { GamificationCard } from "@/features/dashboard/components/DashboardCtas";
 import { ActionRow } from "@/features/dashboard/components/ActionRow";
+import { QuickStatsGrid } from "@/features/dashboard/components/QuickStatsGrid";
+import { TodayInsight } from "@/features/dashboard/components/TodayInsight";
+import { SectionGroup } from "@/features/dashboard/components/SectionGroup";
 import { usePullToRefresh } from "@/hooks/use-pull-to-refresh";
 import { markFirstAction } from "@/lib/first-action";
 import { useFastClock } from "@/features/dashboard/hooks/useFastClock";
@@ -64,6 +67,7 @@ export const Route = createFileRoute("/_authenticated/dashboard")({
     queryClient.prefetchQuery(dailyTipQueryOptions);
     queryClient.prefetchQuery({ queryKey: ["meals", "today"], queryFn: () => todaysMeals() });
     queryClient.prefetchQuery({ queryKey: ["fast", "current"], queryFn: () => currentFast() });
+    queryClient.prefetchQuery({ queryKey: ["fast", "stats"], queryFn: () => getFastingStats() });
     queryClient.prefetchQuery({ queryKey: ["water", "today"], queryFn: () => todaysWater() });
     queryClient.prefetchQuery({ queryKey: ["game", "summary"], queryFn: () => getGameSummary() });
     queryClient.prefetchQuery({
@@ -90,6 +94,7 @@ function Dashboard() {
   });
   const fetchMeals = useServerFn(todaysMeals);
   const fetchFast = useServerFn(currentFast);
+  const fetchFastStats = useServerFn(getFastingStats);
   const fetchWater = useServerFn(todaysWater);
   const fetchGame = useServerFn(getGameSummary);
   const fetchGroupChallenges = useServerFn(myGroupChallengeSummary);
@@ -108,6 +113,10 @@ function Dashboard() {
     queryKey: ["fast", "current"],
     queryFn: () => fetchFast(),
     refetchInterval: 30000,
+  });
+  const { data: fastStats } = useQuery({
+    queryKey: ["fast", "stats"],
+    queryFn: () => fetchFastStats(),
   });
   const { data: waterMl = 0 } = useQuery({
     queryKey: ["water", "today"],
@@ -135,32 +144,24 @@ function Dashboard() {
 
   const calTarget = profile?.daily_calorie_target ?? 2000;
   const waterTarget = 2500;
+  const streak = game?.stats?.current_streak ?? 0;
+
+  // Adaptive greeting — considers time, streak, fast state, meals logged
+  const greeting = adaptiveGreeting({
+    streak,
+    hasActiveFast: !!fast,
+    mealsToday: meals.length,
+  });
 
   const { fastMs, fastHrs, fastPct } = useFastClock(fast);
-
-  const remainingKcal = Math.max(0, calTarget - totals.cal);
-  const overKcal = Math.max(0, totals.cal - calTarget);
-  const hour = new Date().getHours();
-  const heroSubtitle = (() => {
-    if (meals.length === 0) {
-      return hour < 11
-        ? "Mulai dengan sarapan ringan ya. Catat satu menu dulu."
-        : "Belum ada catatan hari ini. Yuk catat satu makanan dulu.";
-    }
-    if (overKcal > 0) {
-      return `Hari ini sedikit lewat target (~${overKcal} kkal). Tidak apa-apa, kita seimbangkan besok.`;
-    }
-    return `Sisa kalori hari ini ~${remainingKcal} kkal. Progress kecil tetap progress.`;
-  })();
 
   return (
     <main className="min-h-dvh bg-background pb-28">
       <PullIndicator pulling={pulling} refreshing={refreshing} />
-      <div className="max-w-md mx-auto px-5 pt-8 space-y-5">
+      <div className="max-w-md mx-auto px-5 pt-6 space-y-5">
         <DashboardHeader
-          greeting={dashboardGreeting()}
+          greeting={greeting}
           fullName={profile?.full_name}
-          subtitle={heroSubtitle}
           bonusAvailable={!bonusClaimed}
           onClaimBonus={() => claimBonusMut.mutate()}
           claiming={claimBonusMut.isPending}
@@ -174,30 +175,55 @@ function Dashboard() {
           description="Geser ke bawah untuk refresh, ketuk kartu untuk catat aktivitas, dan kunjungi Profil untuk personalisasi."
         />
 
-        <TodaysBalanceCard totals={totals} calTarget={calTarget} />
+        {/* STATISTIK HARI INI — primary glance */}
+        <SectionGroup label="Hari Ini" actionLabel="Detail" actionHref="/reports">
+          <TodayInsight
+            ctx={{
+              totals,
+              calTarget,
+              waterMl,
+              waterTarget,
+              streak,
+              mealsCount: meals.length,
+            }}
+          />
+          <TodaysBalanceCard totals={totals} calTarget={calTarget} />
+          <QuickStatsGrid
+            totals={totals}
+            calTarget={calTarget}
+            waterMl={waterMl}
+            waterTarget={waterTarget}
+          />
+        </SectionGroup>
 
-        <ActionRow />
+        {/* AKSI CEPAT */}
+        <SectionGroup label="Aksi Cepat">
+          <ActionRow />
+        </SectionGroup>
 
-        <HeroStatsRow
-          totals={totals}
-          calTarget={calTarget}
-          fast={fast}
-          fastMs={fastMs}
-          fastHrs={fastHrs}
-          fastPct={fastPct}
-        />
+        {/* TRACKING — fasting + water */}
+        <SectionGroup label="Tracking" actionLabel="Semua" actionHref="/fasting">
+          <HeroStatsRow
+            totals={totals}
+            calTarget={calTarget}
+            fast={fast}
+            fastMs={fastMs}
+            fastHrs={fastHrs}
+            fastPct={fastPct}
+          />
+          <MacroBreakdown totals={totals} />
+          <WaterCard
+            waterMl={waterMl}
+            targetMl={waterTarget}
+            onLog={(ml) => waterMutation.mutate(ml)}
+            disabled={waterMutation.isPending}
+          />
+        </SectionGroup>
 
-        <MacroBreakdown totals={totals} />
-
-        <WaterCard
-          waterMl={waterMl}
-          targetMl={waterTarget}
-          onLog={(ml) => waterMutation.mutate(ml)}
-          disabled={waterMutation.isPending}
-        />
-
+        {/* MAKANAN HARI INI */}
         <TodaysMeals meals={meals} />
 
+        {/* Collapsible extras — keep first paint lean */}
         <Collapsible open={showMore} onOpenChange={setShowMore}>
           <CollapsibleTrigger className="flex items-center justify-center gap-1.5 w-full py-3 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
             {showMore ? "Sembunyikan" : "Lihat Semua"}
@@ -206,54 +232,58 @@ function Dashboard() {
             />
           </CollapsibleTrigger>
           <CollapsibleContent className="space-y-5">
-            <SmartNextStepCard
-              hour={new Date().getHours()}
-              timezone={profile?.timezone ?? undefined}
-              mealCount={meals.length}
-              waterMl={waterMl}
-              waterTarget={waterTarget}
-              fastActive={!!fast}
-              remainingKcal={Math.max(0, calTarget - totals.cal)}
-            />
+            {/* INSIGHT TAMBAHAN */}
+            <SectionGroup label="Insight">
+              <SmartNextStepCard
+                hour={new Date().getHours()}
+                timezone={profile?.timezone ?? undefined}
+                mealCount={meals.length}
+                waterMl={waterMl}
+                waterTarget={waterTarget}
+                fastActive={!!fast}
+                remainingKcal={Math.max(0, calTarget - totals.cal)}
+              />
+              <MacroGapInsightCard totals={totals} calTarget={calTarget} />
+              <LocalFoodHintCard hour={new Date().getHours()} />
+              <HydrationSuggestCard
+                waterMl={waterMl}
+                targetMl={waterTarget}
+                hour={new Date().getHours()}
+                onLog={(ml) => waterMutation.mutate(ml)}
+                disabled={waterMutation.isPending}
+              />
+            </SectionGroup>
 
-            <MacroGapInsightCard totals={totals} calTarget={calTarget} />
+            {/* CHECK-IN & REFLEKSI */}
+            <SectionGroup label="Check-In">
+              <MoodQuickLog
+                onPick={(m) => moodMutation.mutate(m)}
+                disabled={moodMutation.isPending}
+              />
+              <MorningCheckInCard />
+              <EveningReflectionCard />
+            </SectionGroup>
 
-            <LocalFoodHintCard hour={new Date().getHours()} />
+            {/* MOTIVASI — streak, gamification, tips */}
+            <SectionGroup label="Motivasi">
+              <WeeklyReviewCard />
+              <WeeklyGoalCard />
+              <StreakFreezeBadge />
+              {dailyTip && <DailyTipCard category={dailyTip.category} tip={dailyTip.tip} />}
+              <GamificationCard
+                streak={streak}
+                level={game?.stats?.level ?? 1}
+                xp={game?.stats?.xp ?? 0}
+                onFreeze={() => setFreezeOpen(true)}
+              />
+            </SectionGroup>
 
-            <HijriWidget variant="compact" />
-
-            <HydrationSuggestCard
-              waterMl={waterMl}
-              targetMl={waterTarget}
-              hour={new Date().getHours()}
-              onLog={(ml) => waterMutation.mutate(ml)}
-              disabled={waterMutation.isPending}
-            />
-
-            <MoodQuickLog
-              onPick={(m) => moodMutation.mutate(m)}
-              disabled={moodMutation.isPending}
-            />
-
-            <MorningCheckInCard />
-            <EveningReflectionCard />
-            <WeeklyReviewCard />
-
-            <WeeklyGoalCard />
-            <StreakFreezeBadge />
-
-            {dailyTip && <DailyTipCard category={dailyTip.category} tip={dailyTip.tip} />}
-
-            <GamificationCard
-              streak={game?.stats?.current_streak ?? 0}
-              level={game?.stats?.level ?? 1}
-              xp={game?.stats?.xp ?? 0}
-              onFreeze={() => setFreezeOpen(true)}
-            />
-
-            <GroupChallengeSummaryCard groupSummary={groupSummary} />
-
-            <UnlinkedChallengesCard challenges={unlinkedChallenges} />
+            {/* LAINNYA */}
+            <SectionGroup label="Lainnya">
+              <HijriWidget variant="compact" />
+              <GroupChallengeSummaryCard groupSummary={groupSummary} />
+              <UnlinkedChallengesCard challenges={unlinkedChallenges} />
+            </SectionGroup>
           </CollapsibleContent>
         </Collapsible>
 
