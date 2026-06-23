@@ -301,7 +301,7 @@ export function ActiveWorkoutSession() {
               }
               onLogSet={(set) => logSetMut.mutate(set)}
               onSubstitute={() => substituteMut.mutate(ex.exercise_id)}
-              logging={logMut.isPending || logSetMut.isPending}
+              logging={logSetMut.isPending}
               onRestStart={(sec) => setExpandedRest(sec)}
               restCountdown={expandedRest}
             />

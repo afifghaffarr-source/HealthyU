@@ -6,33 +6,41 @@ export type Database = {
   __InternalSupabase: {
     PostgrestVersion: "14.5";
   };
-  graphql_public: {
-    Tables: {
-      [_ in never]: never;
-    };
-    Views: {
-      [_ in never]: never;
-    };
-    Functions: {
-      graphql: {
-        Args: {
-          extensions?: Json;
-          operationName?: string;
-          query?: string;
-          variables?: Json;
-        };
-        Returns: Json;
-      };
-    };
-    Enums: {
-      [_ in never]: never;
-    };
-    CompositeTypes: {
-      [_ in never]: never;
-    };
-  };
   public: {
     Tables: {
+      account_deletion_log: {
+        Row: {
+          error_message: string | null;
+          id: string;
+          ip_hash: string | null;
+          processed_at: string | null;
+          requested_at: string;
+          status: string;
+          tables_purged: Json | null;
+          user_id: string;
+        };
+        Insert: {
+          error_message?: string | null;
+          id?: string;
+          ip_hash?: string | null;
+          processed_at?: string | null;
+          requested_at?: string;
+          status?: string;
+          tables_purged?: Json | null;
+          user_id: string;
+        };
+        Update: {
+          error_message?: string | null;
+          id?: string;
+          ip_hash?: string | null;
+          processed_at?: string | null;
+          requested_at?: string;
+          status?: string;
+          tables_purged?: Json | null;
+          user_id?: string;
+        };
+        Relationships: [];
+      };
       account_deletion_requests: {
         Row: {
           id: string;
@@ -1083,6 +1091,66 @@ export type Database = {
         };
         Relationships: [];
       };
+      coach_sessions: {
+        Row: {
+          action_plan: Json | null;
+          created_at: string;
+          focus: string | null;
+          greeting: string;
+          id: string;
+          improvements: string[] | null;
+          kind: string;
+          mood: string | null;
+          mood_prediction: string | null;
+          reflection: string | null;
+          session_date: string;
+          summary: string | null;
+          tips: string[] | null;
+          tomorrow_focus: string | null;
+          user_id: string;
+          warnings: Json | null;
+          wins: string[] | null;
+        };
+        Insert: {
+          action_plan?: Json | null;
+          created_at?: string;
+          focus?: string | null;
+          greeting?: string;
+          id?: string;
+          improvements?: string[] | null;
+          kind: string;
+          mood?: string | null;
+          mood_prediction?: string | null;
+          reflection?: string | null;
+          session_date: string;
+          summary?: string | null;
+          tips?: string[] | null;
+          tomorrow_focus?: string | null;
+          user_id: string;
+          warnings?: Json | null;
+          wins?: string[] | null;
+        };
+        Update: {
+          action_plan?: Json | null;
+          created_at?: string;
+          focus?: string | null;
+          greeting?: string;
+          id?: string;
+          improvements?: string[] | null;
+          kind?: string;
+          mood?: string | null;
+          mood_prediction?: string | null;
+          reflection?: string | null;
+          session_date?: string;
+          summary?: string | null;
+          tips?: string[] | null;
+          tomorrow_focus?: string | null;
+          user_id?: string;
+          warnings?: Json | null;
+          wins?: string[] | null;
+        };
+        Relationships: [];
+      };
       coin_redemptions: {
         Row: {
           coins_spent: number;
@@ -1264,18 +1332,21 @@ export type Database = {
           created_at: string;
           id: string;
           post_id: string;
+          reaction_type: string | null;
           user_id: string;
         };
         Insert: {
           created_at?: string;
           id?: string;
           post_id: string;
+          reaction_type?: string | null;
           user_id: string;
         };
         Update: {
           created_at?: string;
           id?: string;
           post_id?: string;
+          reaction_type?: string | null;
           user_id?: string;
         };
         Relationships: [
@@ -1303,6 +1374,10 @@ export type Database = {
           is_pinned: boolean;
           likes_count: number;
           post_type: string | null;
+          reaction_count: number | null;
+          reference_id: string | null;
+          share_kind: string | null;
+          share_metadata: Json | null;
           shares_count: number;
           tags: Json | null;
           updated_at: string;
@@ -1324,6 +1399,10 @@ export type Database = {
           is_pinned?: boolean;
           likes_count?: number;
           post_type?: string | null;
+          reaction_count?: number | null;
+          reference_id?: string | null;
+          share_kind?: string | null;
+          share_metadata?: Json | null;
           shares_count?: number;
           tags?: Json | null;
           updated_at?: string;
@@ -1345,6 +1424,10 @@ export type Database = {
           is_pinned?: boolean;
           likes_count?: number;
           post_type?: string | null;
+          reaction_count?: number | null;
+          reference_id?: string | null;
+          share_kind?: string | null;
+          share_metadata?: Json | null;
           shares_count?: number;
           tags?: Json | null;
           updated_at?: string;
@@ -1656,6 +1739,51 @@ export type Database = {
           target_tags?: string[];
           tip?: string;
           weight?: number;
+        };
+        Relationships: [];
+      };
+      data_export_history: {
+        Row: {
+          completed_at: string | null;
+          error_message: string | null;
+          expires_at: string | null;
+          format: string;
+          id: string;
+          ip_hash: string | null;
+          requested_at: string;
+          row_count: number | null;
+          size_bytes: number | null;
+          status: string;
+          table_count: number | null;
+          user_id: string;
+        };
+        Insert: {
+          completed_at?: string | null;
+          error_message?: string | null;
+          expires_at?: string | null;
+          format: string;
+          id?: string;
+          ip_hash?: string | null;
+          requested_at?: string;
+          row_count?: number | null;
+          size_bytes?: number | null;
+          status?: string;
+          table_count?: number | null;
+          user_id: string;
+        };
+        Update: {
+          completed_at?: string | null;
+          error_message?: string | null;
+          expires_at?: string | null;
+          format?: string;
+          id?: string;
+          ip_hash?: string | null;
+          requested_at?: string;
+          row_count?: number | null;
+          size_bytes?: number | null;
+          status?: string;
+          table_count?: number | null;
+          user_id?: string;
         };
         Relationships: [];
       };
@@ -2033,14 +2161,21 @@ export type Database = {
           break_reason: string | null;
           completed: boolean | null;
           created_at: string;
+          eating_window_end: string | null;
+          eating_window_start: string | null;
           end_time: string | null;
           energy_level_end: number | null;
           energy_level_start: number | null;
           hunger_level_avg: number | null;
+          hydration_count: number | null;
           id: string;
           iftar_logged: boolean | null;
           iftar_time: string | null;
           imsak_time: string | null;
+          is_custom: boolean | null;
+          is_ramadhan: boolean | null;
+          mood_after: number | null;
+          mood_before: number | null;
           mood_during: number | null;
           notes: string | null;
           planned_duration_hours: number | null;
@@ -2059,14 +2194,21 @@ export type Database = {
           break_reason?: string | null;
           completed?: boolean | null;
           created_at?: string;
+          eating_window_end?: string | null;
+          eating_window_start?: string | null;
           end_time?: string | null;
           energy_level_end?: number | null;
           energy_level_start?: number | null;
           hunger_level_avg?: number | null;
+          hydration_count?: number | null;
           id?: string;
           iftar_logged?: boolean | null;
           iftar_time?: string | null;
           imsak_time?: string | null;
+          is_custom?: boolean | null;
+          is_ramadhan?: boolean | null;
+          mood_after?: number | null;
+          mood_before?: number | null;
           mood_during?: number | null;
           notes?: string | null;
           planned_duration_hours?: number | null;
@@ -2085,14 +2227,21 @@ export type Database = {
           break_reason?: string | null;
           completed?: boolean | null;
           created_at?: string;
+          eating_window_end?: string | null;
+          eating_window_start?: string | null;
           end_time?: string | null;
           energy_level_end?: number | null;
           energy_level_start?: number | null;
           hunger_level_avg?: number | null;
+          hydration_count?: number | null;
           id?: string;
           iftar_logged?: boolean | null;
           iftar_time?: string | null;
           imsak_time?: string | null;
+          is_custom?: boolean | null;
+          is_ramadhan?: boolean | null;
+          mood_after?: number | null;
+          mood_before?: number | null;
           mood_during?: number | null;
           notes?: string | null;
           planned_duration_hours?: number | null;
@@ -3111,6 +3260,7 @@ export type Database = {
       meal_plans: {
         Row: {
           calories: number;
+          confidence: string | null;
           created_at: string;
           custom_name: string | null;
           daily_budget_idr: number | null;
@@ -3128,11 +3278,14 @@ export type Database = {
           is_active: boolean;
           meal_count_per_day: number | null;
           meal_type: string;
+          note: string | null;
           plan_date: string;
           plan_name: string | null;
           plan_type: string | null;
           planned_qty: number;
           start_date: string | null;
+          swapped_from_id: string | null;
+          tags: string[] | null;
           target_calories: number | null;
           target_carbs: number | null;
           target_fat: number | null;
@@ -3142,6 +3295,7 @@ export type Database = {
         };
         Insert: {
           calories?: number;
+          confidence?: string | null;
           created_at?: string;
           custom_name?: string | null;
           daily_budget_idr?: number | null;
@@ -3159,11 +3313,14 @@ export type Database = {
           is_active?: boolean;
           meal_count_per_day?: number | null;
           meal_type: string;
+          note?: string | null;
           plan_date: string;
           plan_name?: string | null;
           plan_type?: string | null;
           planned_qty?: number;
           start_date?: string | null;
+          swapped_from_id?: string | null;
+          tags?: string[] | null;
           target_calories?: number | null;
           target_carbs?: number | null;
           target_fat?: number | null;
@@ -3173,6 +3330,7 @@ export type Database = {
         };
         Update: {
           calories?: number;
+          confidence?: string | null;
           created_at?: string;
           custom_name?: string | null;
           daily_budget_idr?: number | null;
@@ -3190,11 +3348,14 @@ export type Database = {
           is_active?: boolean;
           meal_count_per_day?: number | null;
           meal_type?: string;
+          note?: string | null;
           plan_date?: string;
           plan_name?: string | null;
           plan_type?: string | null;
           planned_qty?: number;
           start_date?: string | null;
+          swapped_from_id?: string | null;
+          tags?: string[] | null;
           target_calories?: number | null;
           target_carbs?: number | null;
           target_fat?: number | null;
@@ -3845,6 +4006,7 @@ export type Database = {
           activity_level: string | null;
           allergies: string[] | null;
           allow_dm: boolean;
+          available_equipment: string[] | null;
           avatar_url: string | null;
           birth_date: string | null;
           blood_type: string | null;
@@ -3886,6 +4048,9 @@ export type Database = {
           phone: string | null;
           pii_redact_enabled: boolean;
           platform: string | null;
+          preferred_language: string | null;
+          preferred_theme: string | null;
+          preferred_unit: string | null;
           premium_expires_at: string | null;
           premium_status: string;
           public_profile: boolean;
@@ -3912,6 +4077,7 @@ export type Database = {
           activity_level?: string | null;
           allergies?: string[] | null;
           allow_dm?: boolean;
+          available_equipment?: string[] | null;
           avatar_url?: string | null;
           birth_date?: string | null;
           blood_type?: string | null;
@@ -3953,6 +4119,9 @@ export type Database = {
           phone?: string | null;
           pii_redact_enabled?: boolean;
           platform?: string | null;
+          preferred_language?: string | null;
+          preferred_theme?: string | null;
+          preferred_unit?: string | null;
           premium_expires_at?: string | null;
           premium_status?: string;
           public_profile?: boolean;
@@ -3979,6 +4148,7 @@ export type Database = {
           activity_level?: string | null;
           allergies?: string[] | null;
           allow_dm?: boolean;
+          available_equipment?: string[] | null;
           avatar_url?: string | null;
           birth_date?: string | null;
           blood_type?: string | null;
@@ -4020,6 +4190,9 @@ export type Database = {
           phone?: string | null;
           pii_redact_enabled?: boolean;
           platform?: string | null;
+          preferred_language?: string | null;
+          preferred_theme?: string | null;
+          preferred_unit?: string | null;
           premium_expires_at?: string | null;
           premium_status?: string;
           public_profile?: boolean;
@@ -5952,6 +6125,51 @@ export type Database = {
         };
         Relationships: [];
       };
+      workout_exercises: {
+        Row: {
+          avoid_for_conditions: string[] | null;
+          category: string;
+          created_at: string;
+          description: string | null;
+          difficulty: string;
+          equipment: string;
+          id: string;
+          is_active: boolean;
+          muscle_group: string;
+          name: string;
+          name_en: string | null;
+          video_url: string | null;
+        };
+        Insert: {
+          avoid_for_conditions?: string[] | null;
+          category: string;
+          created_at?: string;
+          description?: string | null;
+          difficulty?: string;
+          equipment: string;
+          id?: string;
+          is_active?: boolean;
+          muscle_group: string;
+          name: string;
+          name_en?: string | null;
+          video_url?: string | null;
+        };
+        Update: {
+          avoid_for_conditions?: string[] | null;
+          category?: string;
+          created_at?: string;
+          description?: string | null;
+          difficulty?: string;
+          equipment?: string;
+          id?: string;
+          is_active?: boolean;
+          muscle_group?: string;
+          name?: string;
+          name_en?: string | null;
+          video_url?: string | null;
+        };
+        Relationships: [];
+      };
       workout_log_items: {
         Row: {
           calories_burned: number | null;
@@ -6154,8 +6372,165 @@ export type Database = {
         };
         Relationships: [];
       };
+      workout_program_exercises: {
+        Row: {
+          day_number: number;
+          exercise_id: string;
+          id: string;
+          notes: string | null;
+          order_index: number;
+          program_id: string;
+          rest_seconds: number;
+          target_reps_max: number;
+          target_reps_min: number;
+          target_sets: number;
+        };
+        Insert: {
+          day_number: number;
+          exercise_id: string;
+          id?: string;
+          notes?: string | null;
+          order_index?: number;
+          program_id: string;
+          rest_seconds?: number;
+          target_reps_max: number;
+          target_reps_min: number;
+          target_sets: number;
+        };
+        Update: {
+          day_number?: number;
+          exercise_id?: string;
+          id?: string;
+          notes?: string | null;
+          order_index?: number;
+          program_id?: string;
+          rest_seconds?: number;
+          target_reps_max?: number;
+          target_reps_min?: number;
+          target_sets?: number;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "workout_program_exercises_exercise_id_fkey";
+            columns: ["exercise_id"];
+            isOneToOne: false;
+            referencedRelation: "workout_exercises";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "workout_program_exercises_program_id_fkey";
+            columns: ["program_id"];
+            isOneToOne: false;
+            referencedRelation: "workout_programs";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      workout_programs: {
+        Row: {
+          created_at: string;
+          days_per_week: number;
+          description: string;
+          duration_weeks: number;
+          goal: string;
+          id: string;
+          is_active: boolean;
+          is_premium: boolean;
+          level: string;
+          name: string;
+          requires_equipment: string[] | null;
+          slug: string;
+        };
+        Insert: {
+          created_at?: string;
+          days_per_week: number;
+          description: string;
+          duration_weeks: number;
+          goal: string;
+          id?: string;
+          is_active?: boolean;
+          is_premium?: boolean;
+          level: string;
+          name: string;
+          requires_equipment?: string[] | null;
+          slug: string;
+        };
+        Update: {
+          created_at?: string;
+          days_per_week?: number;
+          description?: string;
+          duration_weeks?: number;
+          goal?: string;
+          id?: string;
+          is_active?: boolean;
+          is_premium?: boolean;
+          level?: string;
+          name?: string;
+          requires_equipment?: string[] | null;
+          slug?: string;
+        };
+        Relationships: [];
+      };
+      workout_session_sets: {
+        Row: {
+          completed_at: string;
+          exercise_id: string;
+          id: string;
+          is_pr: boolean;
+          is_warmup: boolean;
+          notes: string | null;
+          reps: number;
+          rpe: number | null;
+          session_id: string;
+          set_number: number;
+          weight_kg: number;
+        };
+        Insert: {
+          completed_at?: string;
+          exercise_id: string;
+          id?: string;
+          is_pr?: boolean;
+          is_warmup?: boolean;
+          notes?: string | null;
+          reps: number;
+          rpe?: number | null;
+          session_id: string;
+          set_number: number;
+          weight_kg?: number;
+        };
+        Update: {
+          completed_at?: string;
+          exercise_id?: string;
+          id?: string;
+          is_pr?: boolean;
+          is_warmup?: boolean;
+          notes?: string | null;
+          reps?: number;
+          rpe?: number | null;
+          session_id?: string;
+          set_number?: number;
+          weight_kg?: number;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "workout_session_sets_exercise_id_fkey";
+            columns: ["exercise_id"];
+            isOneToOne: false;
+            referencedRelation: "workout_exercises";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "workout_session_sets_session_id_fkey";
+            columns: ["session_id"];
+            isOneToOne: false;
+            referencedRelation: "workout_sessions";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       workout_sessions: {
         Row: {
+          avg_rpe: number | null;
           calories_burned: number;
           completed_at: string | null;
           created_at: string;
@@ -6163,6 +6538,7 @@ export type Database = {
           difficulty_rating: number | null;
           duration_min: number;
           exercises_completed: number | null;
+          finished_at: string | null;
           heart_rate_avg: number | null;
           heart_rate_max: number | null;
           heart_rate_min: number | null;
@@ -6175,16 +6551,19 @@ export type Database = {
           notes: string | null;
           perceived_exertion: number | null;
           performed_at: string;
+          program_id: string | null;
           source: string | null;
           started_at: string | null;
           total_reps: number | null;
           total_sets: number | null;
+          total_volume_kg: number | null;
           type: string;
           updated_at: string;
           user_id: string;
           workout_plan_id: string | null;
         };
         Insert: {
+          avg_rpe?: number | null;
           calories_burned?: number;
           completed_at?: string | null;
           created_at?: string;
@@ -6192,6 +6571,7 @@ export type Database = {
           difficulty_rating?: number | null;
           duration_min: number;
           exercises_completed?: number | null;
+          finished_at?: string | null;
           heart_rate_avg?: number | null;
           heart_rate_max?: number | null;
           heart_rate_min?: number | null;
@@ -6204,16 +6584,19 @@ export type Database = {
           notes?: string | null;
           perceived_exertion?: number | null;
           performed_at?: string;
+          program_id?: string | null;
           source?: string | null;
           started_at?: string | null;
           total_reps?: number | null;
           total_sets?: number | null;
+          total_volume_kg?: number | null;
           type: string;
           updated_at?: string;
           user_id: string;
           workout_plan_id?: string | null;
         };
         Update: {
+          avg_rpe?: number | null;
           calories_burned?: number;
           completed_at?: string | null;
           created_at?: string;
@@ -6221,6 +6604,7 @@ export type Database = {
           difficulty_rating?: number | null;
           duration_min?: number;
           exercises_completed?: number | null;
+          finished_at?: string | null;
           heart_rate_avg?: number | null;
           heart_rate_max?: number | null;
           heart_rate_min?: number | null;
@@ -6233,16 +6617,26 @@ export type Database = {
           notes?: string | null;
           perceived_exertion?: number | null;
           performed_at?: string;
+          program_id?: string | null;
           source?: string | null;
           started_at?: string | null;
           total_reps?: number | null;
           total_sets?: number | null;
+          total_volume_kg?: number | null;
           type?: string;
           updated_at?: string;
           user_id?: string;
           workout_plan_id?: string | null;
         };
-        Relationships: [];
+        Relationships: [
+          {
+            foreignKeyName: "workout_sessions_program_id_fkey";
+            columns: ["program_id"];
+            isOneToOne: false;
+            referencedRelation: "workout_programs";
+            referencedColumns: ["id"];
+          },
+        ];
       };
       workout_timer_sessions: {
         Row: {
@@ -6314,10 +6708,44 @@ export type Database = {
         };
         Relationships: [];
       };
+      fasting_streaks: {
+        Row: {
+          grp: string | null;
+          streak_days: number | null;
+          streak_end: string | null;
+          streak_start: string | null;
+          user_id: string | null;
+        };
+        Relationships: [];
+      };
+      user_exercise_prs: {
+        Row: {
+          achieved_at: string | null;
+          exercise_id: string | null;
+          exercise_name: string | null;
+          max_weight_kg: number | null;
+          muscle_group: string | null;
+          reps_at_max: number | null;
+          user_id: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "workout_session_sets_exercise_id_fkey";
+            columns: ["exercise_id"];
+            isOneToOne: false;
+            referencedRelation: "workout_exercises";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
     };
     Functions: {
       _get_field_key: { Args: never; Returns: string };
       block_user: { Args: { _target: string }; Returns: string };
+      bump_reaction_count: {
+        Args: { p_delta: number; p_post_id: string };
+        Returns: undefined;
+      };
       check_rate_limit: {
         Args: {
           _bucket: string;
@@ -6331,6 +6759,11 @@ export type Database = {
         Returns: Json;
       };
       cleanup_rate_limit_log: { Args: never; Returns: undefined };
+      get_current_fasting_streak: {
+        Args: { p_user_id: string };
+        Returns: number;
+      };
+      get_fasting_stats: { Args: { p_user_id: string }; Returns: Json };
       get_sensitive_note: {
         Args: { _id: string };
         Returns: {
@@ -6530,9 +6963,6 @@ export type CompositeTypes<
     : never;
 
 export const Constants = {
-  graphql_public: {
-    Enums: {},
-  },
   public: {
     Enums: {
       app_role: ["admin", "moderator", "user"],

@@ -231,12 +231,16 @@ function ManifestLinkManager() {
 
   // Start Dexie background sync (offline-first water logs → Supabase).
   // Runs periodically + on network reconnect + on app focus.
-  useEffect(() => startBackgroundSync(), []);
+  useEffect(() => {
+    void startBackgroundSync();
+  }, []);
 
   // Start web-vitals reporting. Only logs "needs-improvement" and "poor"
   // ratings (per Google thresholds) to avoid flooding error_reports.
   // Reuses the existing /api/log-error pipeline via reportError.
-  useEffect(() => initWebVitals(), []);
+  useEffect(() => {
+    void initWebVitals();
+  }, []);
 
   return null;
 }

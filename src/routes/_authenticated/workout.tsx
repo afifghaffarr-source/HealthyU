@@ -125,10 +125,12 @@ function WorkoutPage() {
               <p className="font-semibold truncate">{activeSession.name}</p>
               <p className="text-xs opacity-80">
                 Dimulai{" "}
-                {new Date(activeSession.started_at).toLocaleTimeString("id-ID", {
-                  hour: "2-digit",
-                  minute: "2-digit",
-                })}
+                {activeSession.started_at
+                  ? new Date(activeSession.started_at).toLocaleTimeString("id-ID", {
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })
+                  : "—"}
               </p>
             </div>
           </Link>

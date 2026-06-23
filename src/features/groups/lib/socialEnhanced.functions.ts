@@ -150,13 +150,13 @@ export const getUserCommunityStats = createServerFn({ method: "GET" })
       0,
     );
 
-    // Followers / following
+    // Followers / following (table renamed from `follows` to `user_follows` in 2026-06-03 migration)
     const { count: followers } = await supabase
-      .from("follows")
+      .from("user_follows")
       .select("follower_id", { count: "exact", head: true })
       .eq("following_id", data.user_id);
     const { count: following } = await supabase
-      .from("follows")
+      .from("user_follows")
       .select("following_id", { count: "exact", head: true })
       .eq("follower_id", data.user_id);
 
@@ -190,11 +190,11 @@ export const searchUsers = createServerFn({ method: "GET" })
       .limit(data.limit);
     if (error) throw new Error(error.message);
 
-    // Annotate with is_following
+    // Annotate with is_following (table renamed from `follows` to `user_follows` in 2026-06-03 migration)
     const ids = (profiles ?? []).map((p) => p.id);
     const { data: myFollows } = ids.length
       ? await supabase
-          .from("follows")
+          .from("user_follows")
           .select("following_id")
           .eq("follower_id", userId)
           .in("following_id", ids)

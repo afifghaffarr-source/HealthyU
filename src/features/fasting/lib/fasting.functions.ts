@@ -2,6 +2,8 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { recordActivityFor } from "@/features/gamification/lib/gamification.functions";
+import type { SupabaseClient } from "@supabase/supabase-js";
+import type { Database } from "@/integrations/supabase/types";
 
 // ─── Existing functions (unchanged, re-exported for convenience) ─────────────
 
@@ -123,10 +125,9 @@ export const getFastingStats = createServerFn({ method: "GET" })
     const { supabase, userId } = context;
 
     // Get current streak via the SQL function (may not exist until migration applied)
-    const { data: streakResult, error: rpcError } = await (supabase as never).rpc(
-      "get_fasting_stats",
-      { p_user_id: userId },
-    );
+    const { data: streakResult, error: rpcError } = await supabase.rpc("get_fasting_stats", {
+      p_user_id: userId,
+    });
 
     // If RPC fails or doesn't exist yet (migration not applied), compute manually
     if (!streakResult || rpcError) {
@@ -145,14 +146,7 @@ export const getFastingStats = createServerFn({ method: "GET" })
 /**
  * Fallback stats computation when get_fasting_stats RPC is not yet available.
  */
-async function computeFallbackStats(
-  userId: string,
-  supabase: ReturnType<typeof requireSupabaseAuth> extends Promise<infer T>
-    ? T extends { supabase: infer S }
-      ? S
-      : never
-    : never,
-) {
+async function computeFallbackStats(userId: string, supabase: SupabaseClient<Database>) {
   // Get completed fasts
   const { data: fasts } = await supabase
     .from("fasting_sessions")

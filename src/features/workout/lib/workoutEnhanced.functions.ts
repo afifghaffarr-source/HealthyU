@@ -291,7 +291,7 @@ export const finishWorkoutSession = createServerFn({ method: "POST" })
         : null;
 
     // 3. Duration
-    const startMs = new Date(session.started_at).getTime();
+    const startMs = session.started_at ? new Date(session.started_at).getTime() : Date.now();
     const durationMin = Math.max(1, Math.round((Date.now() - startMs) / 60000));
 
     // 4. Calorie estimate (very rough): METs * weight_kg * hours

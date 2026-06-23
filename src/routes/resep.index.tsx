@@ -77,7 +77,20 @@ const CATEGORY_LABELS: Record<string, string> = {
 const CATEGORY_ORDER = ["sarapan", "utama", "snack", "dessert", "minuman", "sup", "salad", "side"];
 
 function ResepHub() {
-  const items = Route.useLoaderData();
+  // seo_recipes Row type — typed to make filter callbacks infer properly
+  type Resep = {
+    slug: string;
+    title: string;
+    description: string | null;
+    category: string | null;
+    image_url: string | null;
+    calories: number | null;
+    protein_g: number | null;
+    total_min: number | null;
+    servings: number | null;
+    tags: string[] | null;
+  };
+  const items = Route.useLoaderData() as Resep[];
   const [q, setQ] = useState("");
   const [activeCategory, setActiveCategory] = useState<string>("");
 
