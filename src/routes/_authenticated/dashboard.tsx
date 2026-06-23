@@ -42,6 +42,7 @@ import { QuickStatsGrid } from "@/features/dashboard/components/QuickStatsGrid";
 import { TodayInsight } from "@/features/dashboard/components/TodayInsight";
 import { SectionGroup } from "@/features/dashboard/components/SectionGroup";
 import { AdherenceCard } from "@/features/mealplan/components/AdherenceCard";
+import { PersonalRecordsCard } from "@/features/workout/components/PersonalRecordsCard";
 import { usePullToRefresh } from "@/hooks/use-pull-to-refresh";
 import { markFirstAction } from "@/lib/first-action";
 import { useFastClock } from "@/features/dashboard/hooks/useFastClock";
@@ -248,6 +249,9 @@ function Dashboard() {
 
         {/* MEAL PLAN ADHERENCE */}
         <AdherenceCard />
+
+        {/* WORKOUT PRs */}
+        <PersonalRecordsCard />
 
         {/* Collapsible extras — keep first paint lean */}
         <Collapsible open={showMore} onOpenChange={setShowMore}>

@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -7,9 +7,10 @@ import {
   recentWorkouts,
   deleteWorkout,
 } from "@/features/workout/lib/workouts.functions";
+import { getActiveSession } from "@/features/workout/lib/workoutEnhanced.functions";
 import { BottomNav } from "@/components/bottom-nav";
 import { TopAppBar } from "@/components/healthyu/top-app-bar";
-import { Activity, Trash2, WifiOff, RefreshCw } from "lucide-react";
+import { Activity, Trash2, WifiOff, RefreshCw, Play, Trophy, BarChart3 } from "lucide-react";
 import { toast } from "@/lib/toast-config";
 import { toastError } from "@/lib/toast-config";
 import { enqueue } from "@/lib/offline-queue";
@@ -33,11 +34,17 @@ function WorkoutPage() {
   const list = useServerFn(recentWorkouts);
   const log = useServerFn(logWorkout);
   const del = useServerFn(deleteWorkout);
+  const activeFn = useServerFn(getActiveSession);
   const { online, pending, sync } = useOfflineQueue();
 
   const { data: sessions = [] } = useQuery({
     queryKey: ["workouts"],
     queryFn: () => list(),
+  });
+
+  const { data: activeSession } = useQuery({
+    queryKey: ["workout", "active"],
+    queryFn: () => activeFn({ data: undefined }),
   });
 
   const [type, setType] = useState<(typeof TYPES)[number]["id"]>("cardio");
@@ -100,6 +107,50 @@ function WorkoutPage() {
             ) : undefined
           }
         />
+
+        {/* Active session banner */}
+        {activeSession && (
+          <Link
+            to="/workout/active"
+            search={{ session: activeSession.id }}
+            className="flex items-center gap-3 bg-gradient-to-r from-primary to-primary/80 text-primary-foreground p-4 rounded-3xl animate-fade-up"
+          >
+            <div className="size-11 rounded-full bg-white/20 grid place-items-center shrink-0">
+              <Play className="size-5 fill-current" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-[10px] font-bold uppercase tracking-wider opacity-80">
+                Sesi Aktif
+              </p>
+              <p className="font-semibold truncate">{activeSession.name}</p>
+              <p className="text-xs opacity-80">
+                Dimulai{" "}
+                {new Date(activeSession.started_at).toLocaleTimeString("id-ID", {
+                  hour: "2-digit",
+                  minute: "2-digit",
+                })}
+              </p>
+            </div>
+          </Link>
+        )}
+
+        {/* Quick actions */}
+        <div className="grid grid-cols-2 gap-2 animate-fade-up">
+          <Link
+            to="/workout/programs"
+            className="flex items-center gap-2 bg-card p-3 rounded-2xl outline-1 outline-black/5 active:scale-[0.98] transition"
+          >
+            <Activity className="size-4 text-primary" />
+            <span className="text-xs font-semibold">Program</span>
+          </Link>
+          <Link
+            to="/workout/progress"
+            className="flex items-center gap-2 bg-card p-3 rounded-2xl outline-1 outline-black/5 active:scale-[0.98] transition"
+          >
+            <Trophy className="size-4 text-amber-500" />
+            <span className="text-xs font-semibold">Progress</span>
+          </Link>
+        </div>
 
         <section className="bg-card p-4 rounded-3xl outline-1 outline-black/5 space-y-3 animate-fade-up">
           <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">

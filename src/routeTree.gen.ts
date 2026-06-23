@@ -109,6 +109,9 @@ import { Route as ApiChatStreamRouteImport } from './routes/api/chat.stream'
 import { Route as ApiAdminFillRecipeBodyRouteImport } from './routes/api/admin/fill-recipe-body'
 import { Route as ApiAdminFillArticleBodyRouteImport } from './routes/api/admin/fill-article-body'
 import { Route as AuthenticatedWorkoutTimerRouteImport } from './routes/_authenticated/workout.timer'
+import { Route as AuthenticatedWorkoutProgressRouteImport } from './routes/_authenticated/workout.progress'
+import { Route as AuthenticatedWorkoutProgramsRouteImport } from './routes/_authenticated/workout.programs'
+import { Route as AuthenticatedWorkoutActiveRouteImport } from './routes/_authenticated/workout.active'
 import { Route as AuthenticatedWeightGoalRouteImport } from './routes/_authenticated/weight.goal'
 import { Route as AuthenticatedWeightChartRouteImport } from './routes/_authenticated/weight.chart'
 import { Route as AuthenticatedVoiceRoomsRouteImport } from './routes/_authenticated/voice.rooms'
@@ -701,6 +704,24 @@ const AuthenticatedWorkoutTimerRoute =
   AuthenticatedWorkoutTimerRouteImport.update({
     id: '/timer',
     path: '/timer',
+    getParentRoute: () => AuthenticatedWorkoutRoute,
+  } as any)
+const AuthenticatedWorkoutProgressRoute =
+  AuthenticatedWorkoutProgressRouteImport.update({
+    id: '/progress',
+    path: '/progress',
+    getParentRoute: () => AuthenticatedWorkoutRoute,
+  } as any)
+const AuthenticatedWorkoutProgramsRoute =
+  AuthenticatedWorkoutProgramsRouteImport.update({
+    id: '/programs',
+    path: '/programs',
+    getParentRoute: () => AuthenticatedWorkoutRoute,
+  } as any)
+const AuthenticatedWorkoutActiveRoute =
+  AuthenticatedWorkoutActiveRouteImport.update({
+    id: '/active',
+    path: '/active',
     getParentRoute: () => AuthenticatedWorkoutRoute,
   } as any)
 const AuthenticatedWeightGoalRoute = AuthenticatedWeightGoalRouteImport.update({
@@ -1355,6 +1376,9 @@ export interface FileRoutesByFullPath {
   '/voice/rooms': typeof AuthenticatedVoiceRoomsRoute
   '/weight/chart': typeof AuthenticatedWeightChartRoute
   '/weight/goal': typeof AuthenticatedWeightGoalRoute
+  '/workout/active': typeof AuthenticatedWorkoutActiveRoute
+  '/workout/programs': typeof AuthenticatedWorkoutProgramsRoute
+  '/workout/progress': typeof AuthenticatedWorkoutProgressRoute
   '/workout/timer': typeof AuthenticatedWorkoutTimerRoute
   '/api/admin/fill-article-body': typeof ApiAdminFillArticleBodyRoute
   '/api/admin/fill-recipe-body': typeof ApiAdminFillRecipeBodyRoute
@@ -1532,6 +1556,9 @@ export interface FileRoutesByTo {
   '/voice/rooms': typeof AuthenticatedVoiceRoomsRoute
   '/weight/chart': typeof AuthenticatedWeightChartRoute
   '/weight/goal': typeof AuthenticatedWeightGoalRoute
+  '/workout/active': typeof AuthenticatedWorkoutActiveRoute
+  '/workout/programs': typeof AuthenticatedWorkoutProgramsRoute
+  '/workout/progress': typeof AuthenticatedWorkoutProgressRoute
   '/workout/timer': typeof AuthenticatedWorkoutTimerRoute
   '/api/admin/fill-article-body': typeof ApiAdminFillArticleBodyRoute
   '/api/admin/fill-recipe-body': typeof ApiAdminFillRecipeBodyRoute
@@ -1719,6 +1746,9 @@ export interface FileRoutesById {
   '/_authenticated/voice/rooms': typeof AuthenticatedVoiceRoomsRoute
   '/_authenticated/weight/chart': typeof AuthenticatedWeightChartRoute
   '/_authenticated/weight/goal': typeof AuthenticatedWeightGoalRoute
+  '/_authenticated/workout/active': typeof AuthenticatedWorkoutActiveRoute
+  '/_authenticated/workout/programs': typeof AuthenticatedWorkoutProgramsRoute
+  '/_authenticated/workout/progress': typeof AuthenticatedWorkoutProgressRoute
   '/_authenticated/workout/timer': typeof AuthenticatedWorkoutTimerRoute
   '/api/admin/fill-article-body': typeof ApiAdminFillArticleBodyRoute
   '/api/admin/fill-recipe-body': typeof ApiAdminFillRecipeBodyRoute
@@ -1906,6 +1936,9 @@ export interface FileRouteTypes {
     | '/voice/rooms'
     | '/weight/chart'
     | '/weight/goal'
+    | '/workout/active'
+    | '/workout/programs'
+    | '/workout/progress'
     | '/workout/timer'
     | '/api/admin/fill-article-body'
     | '/api/admin/fill-recipe-body'
@@ -2083,6 +2116,9 @@ export interface FileRouteTypes {
     | '/voice/rooms'
     | '/weight/chart'
     | '/weight/goal'
+    | '/workout/active'
+    | '/workout/programs'
+    | '/workout/progress'
     | '/workout/timer'
     | '/api/admin/fill-article-body'
     | '/api/admin/fill-recipe-body'
@@ -2269,6 +2305,9 @@ export interface FileRouteTypes {
     | '/_authenticated/voice/rooms'
     | '/_authenticated/weight/chart'
     | '/_authenticated/weight/goal'
+    | '/_authenticated/workout/active'
+    | '/_authenticated/workout/programs'
+    | '/_authenticated/workout/progress'
     | '/_authenticated/workout/timer'
     | '/api/admin/fill-article-body'
     | '/api/admin/fill-recipe-body'
@@ -3030,6 +3069,27 @@ declare module '@tanstack/react-router' {
       path: '/timer'
       fullPath: '/workout/timer'
       preLoaderRoute: typeof AuthenticatedWorkoutTimerRouteImport
+      parentRoute: typeof AuthenticatedWorkoutRoute
+    }
+    '/_authenticated/workout/progress': {
+      id: '/_authenticated/workout/progress'
+      path: '/progress'
+      fullPath: '/workout/progress'
+      preLoaderRoute: typeof AuthenticatedWorkoutProgressRouteImport
+      parentRoute: typeof AuthenticatedWorkoutRoute
+    }
+    '/_authenticated/workout/programs': {
+      id: '/_authenticated/workout/programs'
+      path: '/programs'
+      fullPath: '/workout/programs'
+      preLoaderRoute: typeof AuthenticatedWorkoutProgramsRouteImport
+      parentRoute: typeof AuthenticatedWorkoutRoute
+    }
+    '/_authenticated/workout/active': {
+      id: '/_authenticated/workout/active'
+      path: '/active'
+      fullPath: '/workout/active'
+      preLoaderRoute: typeof AuthenticatedWorkoutActiveRouteImport
       parentRoute: typeof AuthenticatedWorkoutRoute
     }
     '/_authenticated/weight/goal': {
@@ -3952,11 +4012,17 @@ const AuthenticatedWeightRouteWithChildren =
   AuthenticatedWeightRoute._addFileChildren(AuthenticatedWeightRouteChildren)
 
 interface AuthenticatedWorkoutRouteChildren {
+  AuthenticatedWorkoutActiveRoute: typeof AuthenticatedWorkoutActiveRoute
+  AuthenticatedWorkoutProgramsRoute: typeof AuthenticatedWorkoutProgramsRoute
+  AuthenticatedWorkoutProgressRoute: typeof AuthenticatedWorkoutProgressRoute
   AuthenticatedWorkoutTimerRoute: typeof AuthenticatedWorkoutTimerRoute
   AuthenticatedWorkoutPlayerIdRoute: typeof AuthenticatedWorkoutPlayerIdRoute
 }
 
 const AuthenticatedWorkoutRouteChildren: AuthenticatedWorkoutRouteChildren = {
+  AuthenticatedWorkoutActiveRoute: AuthenticatedWorkoutActiveRoute,
+  AuthenticatedWorkoutProgramsRoute: AuthenticatedWorkoutProgramsRoute,
+  AuthenticatedWorkoutProgressRoute: AuthenticatedWorkoutProgressRoute,
   AuthenticatedWorkoutTimerRoute: AuthenticatedWorkoutTimerRoute,
   AuthenticatedWorkoutPlayerIdRoute: AuthenticatedWorkoutPlayerIdRoute,
 }
