@@ -10,6 +10,10 @@ import {
   getPersonalRecords,
   getWorkoutStreak,
 } from "@/features/workout/lib/workoutEnhanced.functions";
+import {
+  ShareAchievementButton,
+  achievementPayload,
+} from "@/features/groups/components/ShareAchievement";
 import { cn } from "@/lib/utils";
 
 type PR = {
@@ -86,6 +90,16 @@ export function PersonalRecordsCard() {
                 })}
                 kg
               </span>
+              {i === 0 && (
+                <ShareAchievementButton
+                  payload={achievementPayload.pr({
+                    exercise_name: pr.exercise_name,
+                    weight_kg: Number(pr.max_weight_kg),
+                    reps: pr.reps_at_max ?? 0,
+                  })}
+                  label="Share"
+                />
+              )}
             </div>
           ))}
           {prs.length > 4 && (

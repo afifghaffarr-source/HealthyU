@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { Gift, Flame, Sparkles, Moon, Sun, Cloud } from "lucide-react";
 import { CoinPill } from "@/components/healthyu/coin-pill";
+import { NotificationBell } from "@/features/groups/components/NotificationCenter";
 import type { Greeting } from "@/features/dashboard/lib/adaptiveGreeting";
 
 const MOOD_ICONS = {
@@ -58,6 +59,7 @@ export function DashboardHeader({
               Bonus
             </button>
           )}
+          <NotificationBell />
           <CoinPill />
           <Link
             to="/profile"

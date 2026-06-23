@@ -5,8 +5,13 @@ import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { BottomNav } from "@/components/bottom-nav";
 import { getPublicProfile } from "@/features/scan/lib/scanFinal.functions";
 import { followUser, unfollowUser } from "@/features/scan/lib/scanSocial.functions";
-import { Flame, Trophy, UserPlus, UserMinus } from "lucide-react";
+import {
+  getUserPosts,
+  getUserCommunityStats,
+} from "@/features/groups/lib/socialEnhanced.functions";
+import { Flame, Trophy, UserPlus, UserMinus, MessageCircle } from "lucide-react";
 import { toast } from "@/lib/toast-config";
+import { UserPostsList } from "@/features/groups/components/UserPostsList";
 
 export const Route = createFileRoute("/_authenticated/profile/public/$id")({
   component: Page,
@@ -16,18 +21,33 @@ function Page() {
   const { id } = useParams({ from: "/_authenticated/profile/public/$id" });
   const qc = useQueryClient();
   const fn = useServerFn(getPublicProfile);
+  const postsFn = useServerFn(getUserPosts);
+  const statsFn = useServerFn(getUserCommunityStats);
   const followFn = useServerFn(followUser);
   const unfollowFn = useServerFn(unfollowUser);
   const { data } = useQuery({
     queryKey: ["public-profile", id],
     queryFn: () => fn({ data: { userId: id } }),
   });
+  const { data: postsData } = useQuery({
+    queryKey: ["user-posts", id],
+    queryFn: () => postsFn({ data: { user_id: id, limit: 20 } }),
+    enabled: !!id,
+  });
+  const { data: stats } = useQuery({
+    queryKey: ["user-stats", id],
+    queryFn: () => statsFn({ data: { user_id: id } }),
+    enabled: !!id,
+  });
   const followMut = useMutation({
     mutationFn: () =>
       data?.isFollowing
         ? unfollowFn({ data: { targetId: id } })
         : followFn({ data: { targetId: id } }),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["public-profile", id] }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["public-profile", id] });
+      qc.invalidateQueries({ queryKey: ["user-stats", id] });
+    },
     onError: (e: Error) => toast.error(e.message),
   });
   if (!data) return <div className="p-8 text-center text-sm text-muted-foreground">Memuat…</div>;
@@ -66,16 +86,15 @@ function Page() {
             {data.isFollowing ? "Unfollow" : "Follow"}
           </button>
         </div>
-        <div className="grid grid-cols-2 gap-3">
-          <div className="rounded-2xl bg-card border p-3 text-center">
-            <div className="text-2xl font-bold">{data.followers}</div>
-            <div className="text-xs text-muted-foreground">Followers</div>
-          </div>
-          <div className="rounded-2xl bg-card border p-3 text-center">
-            <div className="text-2xl font-bold">{data.following}</div>
-            <div className="text-xs text-muted-foreground">Following</div>
-          </div>
+
+        {/* Community stats grid */}
+        <div className="grid grid-cols-4 gap-2">
+          <StatBox label="Posts" value={stats?.posts ?? 0} />
+          <StatBox label="Reaksi" value={stats?.reactions_received ?? 0} />
+          <StatBox label="Followers" value={stats?.followers ?? 0} />
+          <StatBox label="Following" value={stats?.following ?? 0} />
         </div>
+
         <div>
           <h3 className="text-sm font-semibold mb-2 inline-flex items-center gap-1">
             <Trophy className="size-4 text-yellow-500" /> Achievements
@@ -92,8 +111,38 @@ function Page() {
             )}
           </div>
         </div>
+
+        <div>
+          <h3 className="text-sm font-semibold mb-2 inline-flex items-center gap-1">
+            <MessageCircle className="size-4 text-primary" /> Posts
+          </h3>
+          <UserPostsList
+            posts={
+              (postsData as Array<{
+                id: string;
+                user_id: string;
+                content: string;
+                category: string;
+                share_kind: string;
+                share_metadata: Record<string, unknown>;
+                created_at: string;
+                reaction_count: number;
+                my_reaction: string | null;
+              }>) ?? []
+            }
+          />
+        </div>
       </main>
       <BottomNav />
+    </div>
+  );
+}
+
+function StatBox({ label, value }: { label: string; value: number }) {
+  return (
+    <div className="rounded-2xl bg-card border p-3 text-center">
+      <div className="text-lg font-bold tabular-nums">{value}</div>
+      <div className="text-[10px] text-muted-foreground uppercase tracking-wider">{label}</div>
     </div>
   );
 }
