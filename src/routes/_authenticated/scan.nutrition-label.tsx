@@ -18,16 +18,27 @@
  */
 
 import { createFileRoute } from "@tanstack/react-router";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useRef, useState } from "react";
-import { Camera, ScanLine, Sparkles, RotateCcw, Check, Wifi, WifiOff } from "lucide-react";
+import {
+  Camera,
+  ScanLine,
+  Sparkles,
+  RotateCcw,
+  Check,
+  Wifi,
+  WifiOff,
+  Plus,
+  Loader2,
+} from "lucide-react";
 import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { BottomNav } from "@/components/bottom-nav";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { ocrNutritionLabel } from "@/features/scan/lib/scanBatch12.functions";
+import { scanNutritionLabel, addOcrAsMealLog } from "@/features/food/lib/ocrNutrition.functions";
 import {
   recognizeImage,
   terminateOcr,
@@ -40,7 +51,8 @@ import {
   type NutritionLabelData,
 } from "@/features/scan/lib/nutrition-parser";
 import { validateImageFile, fileToDataUrl, dataUrlToBlob } from "@/lib/image-utils";
-import { toast } from "@/lib/toast-config";
+import { toast, toastError } from "@/lib/toast-config";
+import type { MealType } from "@/features/food/lib/foodHelpers";
 
 export const Route = createFileRoute("/_authenticated/scan/nutrition-label")({
   component: Page,
@@ -64,10 +76,14 @@ type Phase =
   | { kind: "ai-scanning"; src: string; ocrText: string; ocrConfidence: number };
 
 function Page() {
+  const qc = useQueryClient();
   const aiFn = useServerFn(ocrNutritionLabel);
+  const visionFn = useServerFn(scanNutritionLabel);
+  const addMealFn = useServerFn(addOcrAsMealLog);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [phase, setPhase] = useState<Phase>({ kind: "idle" });
   const [ocrSupported] = useState(isClientOcrSupported);
+  const [mealType, setMealType] = useState<MealType>("snack");
 
   const aiMut = useMutation({
     // Sprint 2b fix: send OCR text (not image) — VexoAPI has no vision models.
@@ -103,6 +119,67 @@ function Page() {
       toast.success("Selesai dibaca AI");
     },
     onError: (e: Error) => toast.error(e.message || "AI OCR gagal"),
+  });
+
+  // AI Vision OCR — direct image → Gemini (bypasses client Tesseract)
+  const visionMut = useMutation({
+    mutationFn: (p: { image_data_url: string }) => visionFn({ data: p }),
+    onSuccess: (data) => {
+      if (!data.ok) {
+        toast.error(data.message ?? "Gagal membaca label nutrisi");
+        return;
+      }
+      const label = data.label;
+      const nutrition: NutritionLabelData = {
+        servingSize: label.serving_size || null,
+        calories: label.calories || null,
+        protein_g: label.protein_g || null,
+        carbs_g: label.total_carbs_g || null,
+        sugar_g: label.total_sugars_g || null,
+        fat_g: label.total_fat_g || null,
+        sat_fat_g: label.saturated_fat_g || null,
+        trans_fat_g: label.trans_fat_g || null,
+        fiber_g: label.dietary_fiber_g || null,
+        sodium_mg: label.sodium_mg || null,
+        salt_g: null,
+        cholesterol_mg: label.cholesterol_mg || null,
+      };
+      setPhase({
+        kind: "parsed",
+        src: phase.kind === "preview" || phase.kind === "scanning" ? phase.src : "",
+        parsed: {
+          nutrition,
+          confidence: Math.round((label.confidence ?? 0) * 100),
+          matchedFields: Object.values(nutrition).filter((v) => v !== null).length,
+          totalFields: 10,
+          brand: label.brand || undefined,
+          productName: label.product_name || undefined,
+        } as never,
+        ocrText: label.raw_text_summary,
+        ocrConfidence: label.confidence ?? 0,
+      });
+      toast.success(
+        `AI Vision: ${label.brand ? label.brand + " " : ""}${label.product_name ?? "Label terdeteksi"}`,
+      );
+    },
+    onError: (e: Error) => toast.error(e.message || "AI Vision gagal"),
+  });
+
+  // Add OCR result as meal log
+  const addMealMut = useMutation({
+    mutationFn: (p: { label_id: string; meal_type: MealType; multiplier?: number }) =>
+      addMealFn({
+        data: {
+          label_id: p.label_id,
+          meal_type: p.meal_type as "breakfast" | "lunch" | "dinner" | "snack",
+          multiplier: p.multiplier ?? 1,
+        },
+      }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["meals", "today"] });
+      toast.success("Tersimpan ke meal log!");
+    },
+    onError: (e: Error) => toastError(e, "Gagal simpan"),
   });
 
   // Cleanup OCR worker on unmount
@@ -178,6 +255,21 @@ function Page() {
     aiMut.mutate({ ocrText, ocrConfidence });
   }
 
+  function startVisionScan() {
+    if (phase.kind !== "preview") return;
+    setPhase({
+      kind: "scanning",
+      src: phase.src,
+      progress: 0,
+      status: "Mengirim gambar ke AI Vision…",
+    });
+    visionMut.mutate({ image_data_url: phase.src });
+  }
+
+  function handleAddToMeal(labelId: string) {
+    addMealMut.mutate({ label_id: labelId, meal_type: mealType });
+  }
+
   function reset() {
     setPhase({ kind: "idle" });
     if (fileInputRef.current) fileInputRef.current.value = "";
@@ -237,30 +329,34 @@ function Page() {
               ref={fileInputRef}
               type="file"
               accept="image/*"
+              capture="environment"
               onChange={(e) => onFile(e.target.files?.[0])}
               className="hidden"
             />
           </div>
         )}
 
-        {/* Preview state: confirm or retake */}
+        {/* Preview state: choose OCR mode */}
         {phase.kind === "preview" && (
           <div className="space-y-3">
             <Button size="lg" className="w-full" onClick={startClientScan} disabled={!ocrSupported}>
               <ScanLine className="size-4 mr-2" />
-              Scan Sekarang (Client OCR)
+              Scan Client OCR (Offline)
+            </Button>
+            <Button
+              size="lg"
+              variant="outline"
+              className="w-full border-violet-300 text-violet-700 dark:border-violet-700 dark:text-violet-300"
+              onClick={startVisionScan}
+              disabled={visionMut.isPending}
+            >
+              <Sparkles className="size-4 mr-2" />
+              AI Vision (Lebih Akurat)
             </Button>
             {!ocrSupported && (
-              <Button
-                size="lg"
-                variant="outline"
-                className="w-full"
-                disabled
-                title="Browser tidak mendukung OCR. Update browser atau pakai device lain untuk scan."
-              >
-                <Sparkles className="size-4 mr-2" />
-                AI perlu OCR (browser tidak support)
-              </Button>
+              <p className="text-xs text-amber-600 dark:text-amber-400 text-center px-2">
+                Browser tidak support client OCR. Pakai AI Vision untuk hasil lebih akurat.
+              </p>
             )}
             <Button size="sm" variant="ghost" className="w-full" onClick={reset}>
               <RotateCcw className="size-3.5 mr-1.5" />
@@ -299,6 +395,62 @@ function Page() {
                 Coba AI (Parser Teks) untuk Akurasi
               </Button>
             )}
+
+            {/* Save to meal log */}
+            {visionMut.data?.ok && visionMut.data.label_id && (
+              <Card className="p-4 space-y-3 bg-emerald-50/50 dark:bg-emerald-950/20 border-emerald-200 dark:border-emerald-900">
+                <div className="flex items-center gap-2">
+                  <Plus className="size-4 text-emerald-600 dark:text-emerald-400" />
+                  <p className="text-sm font-semibold">Simpan ke meal log</p>
+                </div>
+                <div className="grid grid-cols-4 gap-2">
+                  {(["breakfast", "lunch", "dinner", "snack"] as const).map((mt) => (
+                    <button
+                      key={mt}
+                      type="button"
+                      onClick={() => setMealType(mt)}
+                      className={`text-xs font-semibold py-2 rounded-lg border transition ${
+                        mealType === mt
+                          ? "bg-primary text-primary-foreground border-primary"
+                          : "bg-card text-foreground border-border/50 hover:bg-secondary/30"
+                      }`}
+                    >
+                      {mt === "breakfast"
+                        ? "Sarapan"
+                        : mt === "lunch"
+                          ? "Siang"
+                          : mt === "dinner"
+                            ? "Malam"
+                            : "Snack"}
+                    </button>
+                  ))}
+                </div>
+                <Button
+                  size="lg"
+                  className="w-full bg-emerald-600 hover:bg-emerald-700"
+                  onClick={() => handleAddToMeal(visionMut.data!.label_id!)}
+                  disabled={addMealMut.isPending}
+                >
+                  {addMealMut.isPending ? (
+                    <Loader2 className="size-4 mr-2 animate-spin" />
+                  ) : (
+                    <Check className="size-4 mr-2" />
+                  )}
+                  Simpan sebagai{" "}
+                  {mealType === "breakfast"
+                    ? "sarapan"
+                    : mealType === "lunch"
+                      ? "makan siang"
+                      : mealType === "dinner"
+                        ? "makan malam"
+                        : "snack"}
+                </Button>
+                <p className="text-[10px] text-muted-foreground text-center">
+                  Nilai gizi dihitung per {phase.parsed.nutrition.servingSize ?? "1 takaran saji"}
+                </p>
+              </Card>
+            )}
+
             <Button size="sm" variant="ghost" className="w-full" onClick={reset}>
               <RotateCcw className="size-3.5 mr-1.5" />
               Scan Label Lain
@@ -315,6 +467,19 @@ function Page() {
             </div>
             <p className="text-xs text-muted-foreground">
               Mengirim teks hasil OCR (gambar tetap di perangkat). Butuh ~3-5 detik.
+            </p>
+          </Card>
+        )}
+
+        {/* AI Vision scanning state */}
+        {visionMut.isPending && (
+          <Card className="p-4 space-y-2 border-violet-200 dark:border-violet-800">
+            <div className="flex items-center gap-2">
+              <Sparkles className="size-4 animate-pulse text-violet-600" />
+              <p className="text-sm font-medium">AI Vision sedang membaca label…</p>
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Mengirim gambar ke Gemini. Butuh ~5-10 detik.
             </p>
           </Card>
         )}
