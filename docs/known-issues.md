@@ -106,12 +106,13 @@ wrangler pages deploy dist
 
 ---
 
-### HI-003: 37 Phantom Bindings di Cloudflare Worker
+### HI-003: 37 Phantom Bindings di Cloudflare Worker ✅
 
-**Status:** Open  
+**Status:** Resolved  
 **Priority:** High  
 **Component:** Infrastructure  
 **Created:** 2026-06-15  
+**Resolved:** 2026-06-24  
 **Related:** Fase 5 Production Hardening
 
 **Description:**
@@ -136,26 +137,32 @@ wrangler secret list
 - Multiple deployments dengan different env vars
 - No automated cleanup process
 
-**Workaround:**
-Ignore the phantom bindings (tidak影响 functionality)
+**Resolution:**
 
-**Proposed Solutions:**
+37 phantom bindings reduced to 14 total bindings (8 vars + 6 secrets), all actively used:
 
-1. **Audit all bindings**:
-   ```bash
-   wrangler secret list > current-secrets.txt
-   cat wrangler.jsonc | jq '.vars' > expected-vars.txt
-   diff current-secrets.txt expected-vars.txt
-   ```
-2. **Delete unused secrets**:
-   ```bash
-   wrangler secret delete UNUSED_VAR
-   ```
-3. **Add cleanup script** to prevent future accumulation
+**Vars (wrangler.jsonc):**
 
-**ETA:** 30 minutes
+- NODE_ENV, SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY
+- VITE_SUPABASE_URL, VITE_SUPABASE_PUBLISHABLE_KEY, VITE_SUPABASE_PROJECT_ID
+- VITE_SITE_URL, VAPID_SUBJECT
 
-**Related Commits:** None yet
+**Secrets (wrangler secret list):**
+
+- CRON_SECRET, OPENROUTER_API_KEY, SUPABASE_SERVICE_ROLE_KEY
+- VAPID_PRIVATE_KEY, VEXO_API_KEY, VEXO_BASE_URL
+
+**Cleaned:**
+
+- Multiple --var accumulation fixed (`4b9eb912`)
+- VAPID_PUBLIC_KEY removed (`814046d0`)
+- SUPABASE_ACCESS_TOKEN removed (`4186cdf3`) — only used in CLI, not runtime
+
+**Related Commits:**
+
+- `4b9eb912` fix(env): normalize wrangler --var KEY=VALUE weirdness
+- `814046d0` chore(cleanup): remove dead VAPID_PUBLIC_KEY config
+- `4186cdf3` feat(scripts): add check-errors script (removed SUPABASE_ACCESS_TOKEN)
 
 ---
 
