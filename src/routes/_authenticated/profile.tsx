@@ -1,4 +1,4 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate, Outlet, useLocation } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { getProfile } from "@/features/profile/lib/profile.functions";
@@ -31,6 +31,7 @@ export const Route = createFileRoute("/_authenticated/profile")({
 });
 
 function ProfilePage() {
+  const location = useLocation();
   const navigate = useNavigate();
   const { theme, toggle } = useTheme();
   const fetchProfile = useServerFn(getProfile);
@@ -38,6 +39,11 @@ function ProfilePage() {
     queryKey: ["profile"],
     queryFn: () => fetchProfile(),
   });
+
+  // If we're on a child route (e.g., /profile/insights), render the child instead
+  if (location.pathname !== "/profile" && location.pathname !== "/profile/") {
+    return <Outlet />;
+  }
 
   const handleLogout = async () => {
     try {
