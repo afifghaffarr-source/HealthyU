@@ -72,6 +72,7 @@ export interface PatternInsight {
   analysis_metadata: Record<string, unknown>;
   created_at: string;
   updated_at: string;
+  user_feedback?: { helpful: boolean; submitted_at: string } | null; // Pending migration
 }
 
 // Detected pattern candidate (before AI scoring)

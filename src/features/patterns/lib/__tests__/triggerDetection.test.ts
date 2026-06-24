@@ -7,8 +7,12 @@ import { describe, expect, it, beforeEach, vi } from "vitest";
 import { shouldRunDetection, markDetectionRun, triggerIfNeeded } from "../triggerDetection";
 
 interface MockKV {
-  get: ReturnType<typeof vi.fn>;
-  put: ReturnType<typeof vi.fn>;
+  get: ReturnType<typeof vi.fn<(key: string) => Promise<string | null>>>;
+  put: ReturnType<
+    typeof vi.fn<
+      (key: string, value: string, options?: { expirationTtl?: number }) => Promise<void>
+    >
+  >;
 }
 
 interface MockSupabase {
