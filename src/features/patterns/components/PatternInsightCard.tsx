@@ -8,11 +8,24 @@
  * - Dismiss option
  */
 
-import { AlertCircle, Coffee, Moon, Heart, Users, Calendar, MapPin, Apple } from "lucide-react";
+import {
+  AlertCircle,
+  Coffee,
+  Moon,
+  Heart,
+  Users,
+  Calendar,
+  MapPin,
+  Apple,
+  ThumbsUp,
+  ThumbsDown,
+} from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import type { PatternInsight } from "../types/pattern";
 import { calculateTrend, getTrendEmoji, getTrendColor } from "../lib/patternTrends";
+import { usePatternFeedback } from "../hooks/usePatternFeedback";
+import { useState } from "react";
 
 interface PatternInsightCardProps {
   pattern: PatternInsight;
@@ -59,6 +72,17 @@ export function PatternInsightCard({ pattern, onDismiss, onQuickAction }: Patter
   const Icon = PATTERN_ICONS[pattern.pattern_type] || AlertCircle;
   const title = PATTERN_TITLES[pattern.pattern_type] || pattern.pattern_type;
   const trend = calculateTrend(pattern);
+  const feedbackMutation = usePatternFeedback();
+  const [feedbackGiven, setFeedbackGiven] = useState(!!pattern.user_feedback);
+
+  const handleFeedback = async (helpful: boolean) => {
+    try {
+      await feedbackMutation.mutateAsync({ patternId: pattern.id, helpful });
+      setFeedbackGiven(true);
+    } catch (err) {
+      console.error("Feedback submit failed:", err);
+    }
+  };
 
   const urgencyColor =
     pattern.urgency_score >= 85
@@ -131,8 +155,38 @@ export function PatternInsightCard({ pattern, onDismiss, onQuickAction }: Patter
         </div>
       )}
 
+      {/* Feedback */}
+      {!feedbackGiven && (
+        <div className="flex items-center gap-2 mb-3 pb-3 border-b">
+          <span className="text-xs text-gray-600">Apakah ini membantu?</span>
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-7 px-2"
+            onClick={() => handleFeedback(true)}
+            disabled={feedbackMutation.isPending}
+          >
+            <ThumbsUp className="h-3 w-3" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-7 px-2"
+            onClick={() => handleFeedback(false)}
+            disabled={feedbackMutation.isPending}
+          >
+            <ThumbsDown className="h-3 w-3" />
+          </Button>
+        </div>
+      )}
+      {feedbackGiven && (
+        <div className="mb-3 pb-3 border-b text-xs text-green-600">
+          ✓ Terima kasih atas feedbacknya!
+        </div>
+      )}
+
       {/* Dismiss */}
-      <div className="flex items-center justify-between pt-2 border-t">
+      <div className="flex items-center justify-between pt-2">
         <button
           className="text-xs text-gray-500 hover:text-gray-700"
           onClick={() => onDismiss?.(pattern.id)}
