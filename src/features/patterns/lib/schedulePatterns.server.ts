@@ -17,9 +17,12 @@ export interface MealLogSchedule {
 
 /**
  * Detect busy day skip pattern
- * Threshold: 3+ days with <2 meals logged in 14 days
+ * Threshold: 3+ days with <2 meals logged in 14 days (adjusted by sensitivity)
  */
-export function detectBusyDaySkips(meals: MealLogSchedule[]): DetectedPattern {
+export function detectBusyDaySkips(
+  meals: MealLogSchedule[],
+  sensitivity: number = 1.0,
+): DetectedPattern {
   // Group by date
   const mealsByDate: Record<string, number> = {};
   meals.forEach((m) => {
@@ -31,23 +34,29 @@ export function detectBusyDaySkips(meals: MealLogSchedule[]): DetectedPattern {
     .filter(([_, count]) => count < 2)
     .map(([date, _]) => date);
 
+  const threshold = Math.max(2, Math.ceil(3 / sensitivity));
+
   return {
     type: "busy_day_skips",
     count: skipDays.length,
-    detected: skipDays.length >= 3,
+    detected: skipDays.length >= threshold,
     matched_dates: skipDays,
     metadata: {
       meals_by_date: mealsByDate,
       threshold_meals_per_day: 2,
+      threshold_applied: threshold,
     },
   };
 }
 
 /**
  * Detect rush meals pattern
- * Threshold: 3+ instances of meals <10 min apart
+ * Threshold: 3+ instances of meals <10 min apart (adjusted by sensitivity)
  */
-export function detectRushMeals(meals: MealLogSchedule[]): DetectedPattern {
+export function detectRushMeals(
+  meals: MealLogSchedule[],
+  sensitivity: number = 1.0,
+): DetectedPattern {
   const sorted = [...meals].sort(
     (a, b) => new Date(a.logged_at).getTime() - new Date(b.logged_at).getTime(),
   );
@@ -55,8 +64,10 @@ export function detectRushMeals(meals: MealLogSchedule[]): DetectedPattern {
   const rushDates: string[] = [];
 
   for (let i = 0; i < sorted.length - 1; i++) {
-    const timeDiff =
-      new Date(sorted[i + 1].logged_at).getTime() - new Date(sorted[i].logged_at).getTime();
+    const current = sorted[i];
+    const next = sorted[i + 1];
+
+    const timeDiff = new Date(next.logged_at).getTime() - new Date(current.logged_at).getTime();
     const minutesDiff = timeDiff / (1000 * 60);
 
     if (minutesDiff < 10) {
@@ -64,13 +75,16 @@ export function detectRushMeals(meals: MealLogSchedule[]): DetectedPattern {
     }
   }
 
+  const threshold = Math.max(2, Math.ceil(3 / sensitivity));
+
   return {
     type: "rush_meals",
     count: rushDates.length,
-    detected: rushDates.length >= 3,
+    detected: rushDates.length >= threshold,
     matched_dates: Array.from(new Set(rushDates)),
     metadata: {
       threshold_minutes: 10,
+      threshold_applied: threshold,
       pattern: "meals_logged_too_close_together",
     },
   };
@@ -78,9 +92,12 @@ export function detectRushMeals(meals: MealLogSchedule[]): DetectedPattern {
 
 /**
  * Detect workday vs weekend gap pattern
- * Threshold: Meal count or timing drastically different (>40% variance)
+ * Threshold: Meal count or timing drastically different (>40% variance) (adjusted by sensitivity)
  */
-export function detectWorkdayWeekendGap(meals: MealLogSchedule[]): DetectedPattern {
+export function detectWorkdayWeekendGap(
+  meals: MealLogSchedule[],
+  sensitivity: number = 1.0,
+): DetectedPattern {
   const weekdayMeals: MealLogSchedule[] = [];
   const weekendMeals: MealLogSchedule[] = [];
 
@@ -114,15 +131,19 @@ export function detectWorkdayWeekendGap(meals: MealLogSchedule[]): DetectedPatte
   const diff = Math.abs(weekdayMealsPerDay - weekendMealsPerDay);
   const diffPercent = (diff / Math.max(weekdayMealsPerDay, weekendMealsPerDay)) * 100;
 
+  // Adjust threshold by sensitivity (lower sensitivity = need bigger gap to detect)
+  const thresholdPercent = 40 / sensitivity;
+
   return {
     type: "workday_weekend_gap",
-    count: weekdayDates.length + weekendDates.length,
-    detected: diffPercent >= 40,
+    count: diffPercent >= thresholdPercent ? 1 : 0,
+    detected: diffPercent >= thresholdPercent,
     matched_dates: [...weekdayDates, ...weekendDates],
     metadata: {
       weekday_meals_per_day: Math.round(weekdayMealsPerDay * 10) / 10,
       weekend_meals_per_day: Math.round(weekendMealsPerDay * 10) / 10,
       diff_percent: Math.round(diffPercent),
+      threshold_applied: Math.round(thresholdPercent),
     },
   };
 }
@@ -134,7 +155,9 @@ export function detectSchedulePatterns(
   meals: MealLogSchedule[],
   sensitivity: number = 1.0,
 ): DetectedPattern[] {
-  return [detectBusyDaySkips(meals), detectRushMeals(meals), detectWorkdayWeekendGap(meals)].filter(
-    (p) => p.detected,
-  );
+  return [
+    detectBusyDaySkips(meals, sensitivity),
+    detectRushMeals(meals, sensitivity),
+    detectWorkdayWeekendGap(meals, sensitivity),
+  ].filter((p) => p.detected);
 }

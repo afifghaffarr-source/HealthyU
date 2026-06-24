@@ -1,17 +1,16 @@
 /**
  * Emotional Pattern Detection Rules
  *
- * Detects patterns related to mood and emotions:
- * - stress_eating: mood_before ≤2 + high calories (>600), 3+x
- * - mood_binges: Low mood → high calories → mood stays low
- * - celebration_overeat: mood_before ≥4 + >800 kcal, 2+x/week
+ * Detects patterns tied to emotional eating:
+ * - stress_eating: Low mood before meal + high cal intake
+ * - mood_binges: Low mood before → high cal → mood stays low after
+ * - celebration_overeat: High mood + large meals
  */
 
 import type { DetectedPattern } from "../types/pattern";
 
 export interface MealLogWithMood {
   log_date: string;
-  logged_at: string;
   calories: number;
   mood_before: number | null;
   mood_after: number | null;
@@ -19,9 +18,12 @@ export interface MealLogWithMood {
 
 /**
  * Detect stress eating pattern
- * Threshold: 3+ meals with mood_before ≤2 and calories >600
+ * Threshold: 3+ meals with mood_before ≤2 and calories >600 (adjusted by sensitivity)
  */
-export function detectStressEating(meals: MealLogWithMood[]): DetectedPattern {
+export function detectStressEating(
+  meals: MealLogWithMood[],
+  sensitivity: number = 1.0,
+): DetectedPattern {
   const stressMeals = meals.filter(
     (m) => m.mood_before !== null && m.mood_before <= 2 && m.calories > 600,
   );
@@ -38,15 +40,18 @@ export function detectStressEating(meals: MealLogWithMood[]): DetectedPattern {
         ) / 10
       : 0;
 
+  const threshold = Math.max(2, Math.ceil(3 / sensitivity));
+
   return {
     type: "stress_eating",
     count: stressMeals.length,
-    detected: stressMeals.length >= 3,
+    detected: stressMeals.length >= threshold,
     avg_calories: avgCalories,
     matched_dates: stressMeals.map((m) => m.log_date),
     metadata: {
       avg_mood_before: avgMoodBefore,
       high_cal_threshold: 600,
+      threshold_applied: threshold,
       stress_meals: stressMeals.map((m) => ({
         date: m.log_date,
         mood_before: m.mood_before,
@@ -58,9 +63,12 @@ export function detectStressEating(meals: MealLogWithMood[]): DetectedPattern {
 
 /**
  * Detect mood binge pattern
- * Threshold: 3+ meals where low mood → high cal → mood doesn't improve
+ * Threshold: 3+ meals where low mood → high cal → mood doesn't improve (adjusted by sensitivity)
  */
-export function detectMoodBinges(meals: MealLogWithMood[]): DetectedPattern {
+export function detectMoodBinges(
+  meals: MealLogWithMood[],
+  sensitivity: number = 1.0,
+): DetectedPattern {
   const bingeMeals = meals.filter(
     (m) =>
       m.mood_before !== null &&
@@ -75,14 +83,17 @@ export function detectMoodBinges(meals: MealLogWithMood[]): DetectedPattern {
       ? Math.round(bingeMeals.reduce((sum, m) => sum + m.calories, 0) / bingeMeals.length)
       : 0;
 
+  const threshold = Math.max(2, Math.ceil(3 / sensitivity));
+
   return {
     type: "mood_binges",
     count: bingeMeals.length,
-    detected: bingeMeals.length >= 3,
+    detected: bingeMeals.length >= threshold,
     avg_calories: avgCalories,
     matched_dates: bingeMeals.map((m) => m.log_date),
     metadata: {
       pattern: "low_mood_before + high_cal + mood_stays_low",
+      threshold_applied: threshold,
       binge_meals: bingeMeals.map((m) => ({
         date: m.log_date,
         mood_before: m.mood_before,
@@ -95,9 +106,12 @@ export function detectMoodBinges(meals: MealLogWithMood[]): DetectedPattern {
 
 /**
  * Detect celebration overeat pattern
- * Threshold: 2+ meals with mood_before ≥4 (happy) and calories >800
+ * Threshold: 2+ meals with mood_before ≥4 (happy) and calories >800 (adjusted by sensitivity)
  */
-export function detectCelebrationOvereat(meals: MealLogWithMood[]): DetectedPattern {
+export function detectCelebrationOvereat(
+  meals: MealLogWithMood[],
+  sensitivity: number = 1.0,
+): DetectedPattern {
   const celebrationMeals = meals.filter(
     (m) => m.mood_before !== null && m.mood_before >= 4 && m.calories > 800,
   );
@@ -109,14 +123,26 @@ export function detectCelebrationOvereat(meals: MealLogWithMood[]): DetectedPatt
         )
       : 0;
 
+  const avgMoodBefore =
+    celebrationMeals.length > 0
+      ? Math.round(
+          (celebrationMeals.reduce((sum, m) => sum + (m.mood_before || 0), 0) /
+            celebrationMeals.length) *
+            10,
+        ) / 10
+      : 0;
+
+  const threshold = Math.max(2, Math.ceil(2 / sensitivity));
+
   return {
     type: "celebration_overeat",
     count: celebrationMeals.length,
-    detected: celebrationMeals.length >= 2,
+    detected: celebrationMeals.length >= threshold,
     avg_calories: avgCalories,
     matched_dates: celebrationMeals.map((m) => m.log_date),
     metadata: {
-      pattern: "happy_mood + high_calories",
+      avg_mood_before: avgMoodBefore,
+      threshold_applied: threshold,
       celebration_meals: celebrationMeals.map((m) => ({
         date: m.log_date,
         mood_before: m.mood_before,
@@ -134,8 +160,8 @@ export function detectEmotionalPatterns(
   sensitivity: number = 1.0,
 ): DetectedPattern[] {
   return [
-    detectStressEating(meals),
-    detectMoodBinges(meals),
-    detectCelebrationOvereat(meals),
+    detectStressEating(meals, sensitivity),
+    detectMoodBinges(meals, sensitivity),
+    detectCelebrationOvereat(meals, sensitivity),
   ].filter((p) => p.detected);
 }

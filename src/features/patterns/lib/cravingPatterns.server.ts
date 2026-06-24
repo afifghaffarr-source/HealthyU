@@ -21,9 +21,12 @@ export interface MealLogWithMacros {
 
 /**
  * Detect sugar crash pattern
- * Threshold: 3+ instances of high-carb meal followed by another meal <2h later
+ * Threshold: 3+ instances of high-carb meal followed by another meal <2h later (adjusted by sensitivity)
  */
-export function detectSugarCrashes(meals: MealLogWithMacros[]): DetectedPattern {
+export function detectSugarCrashes(
+  meals: MealLogWithMacros[],
+  sensitivity: number = 1.0,
+): DetectedPattern {
   // Sort by time
   const sorted = [...meals].sort(
     (a, b) => new Date(a.logged_at).getTime() - new Date(b.logged_at).getTime(),
@@ -51,10 +54,12 @@ export function detectSugarCrashes(meals: MealLogWithMacros[]): DetectedPattern 
     }
   }
 
+  const threshold = Math.max(2, Math.ceil(3 / sensitivity));
+
   return {
     type: "sugar_crashes",
     count: crashes.length,
-    detected: crashes.length >= 3,
+    detected: crashes.length >= threshold,
     avg_carbs:
       meals.length > 0
         ? Math.round(meals.reduce((sum, m) => sum + m.carbs_g, 0) / meals.length)
@@ -64,15 +69,19 @@ export function detectSugarCrashes(meals: MealLogWithMacros[]): DetectedPattern 
       pattern: "high_carb_then_eat_again_soon",
       threshold_carb_percent: 60,
       threshold_hours: 2,
+      threshold_applied: threshold,
     },
   };
 }
 
 /**
  * Detect specific food trigger pattern
- * Threshold: Same high-cal food (>500 kcal) appears >5x in 14 days
+ * Threshold: Same high-cal food (>500 kcal) appears >5x in 14 days (adjusted by sensitivity)
  */
-export function detectSpecificFoodTriggers(meals: MealLogWithMacros[]): DetectedPattern {
+export function detectSpecificFoodTriggers(
+  meals: MealLogWithMacros[],
+  sensitivity: number = 1.0,
+): DetectedPattern {
   // Count food occurrences (high cal only)
   const foodCounts: Record<string, { count: number; dates: string[]; avgCal: number }> = {};
 
@@ -93,8 +102,9 @@ export function detectSpecificFoodTriggers(meals: MealLogWithMacros[]): Detected
     foodCounts[key].avgCal = Math.round(foodCounts[key].avgCal / foodCounts[key].count);
   });
 
-  // Find triggers (>5 occurrences)
-  const triggers = Object.entries(foodCounts).filter(([_, data]) => data.count > 5);
+  // Find triggers (>threshold occurrences)
+  const threshold = Math.max(3, Math.ceil(5 / sensitivity));
+  const triggers = Object.entries(foodCounts).filter(([_, data]) => data.count > threshold);
 
   if (triggers.length === 0) {
     return {
@@ -128,9 +138,12 @@ export function detectSpecificFoodTriggers(meals: MealLogWithMacros[]): Detected
 
 /**
  * Detect night craving pattern
- * Threshold: 3+ snacks/meals after 9pm
+ * Threshold: Sweet/savory foods after 9pm, 3+x/week (adjusted by sensitivity)
  */
-export function detectNightCravings(meals: MealLogWithMacros[]): DetectedPattern {
+export function detectNightCravings(
+  meals: MealLogWithMacros[],
+  sensitivity: number = 1.0,
+): DetectedPattern {
   const nightMeals = meals.filter((m) => {
     const hour = new Date(m.logged_at).getHours();
     return hour >= 21 || hour < 4; // 9pm-4am
@@ -141,14 +154,17 @@ export function detectNightCravings(meals: MealLogWithMacros[]): DetectedPattern
       ? Math.round(nightMeals.reduce((sum, m) => sum + m.calories, 0) / nightMeals.length)
       : 0;
 
+  const threshold = Math.max(2, Math.ceil(3 / sensitivity));
+
   return {
     type: "night_cravings",
     count: nightMeals.length,
-    detected: nightMeals.length >= 3,
+    detected: nightMeals.length >= threshold,
     avg_calories: avgCalories,
     matched_dates: nightMeals.map((m) => m.log_date),
     metadata: {
       time_window: "9pm-4am",
+      threshold_applied: threshold,
       night_meals: nightMeals.map((m) => ({
         date: m.log_date,
         time: m.logged_at,
@@ -166,8 +182,8 @@ export function detectCravingPatterns(
   sensitivity: number = 1.0,
 ): DetectedPattern[] {
   return [
-    detectSugarCrashes(meals),
-    detectSpecificFoodTriggers(meals),
-    detectNightCravings(meals),
+    detectSugarCrashes(meals, sensitivity),
+    detectSpecificFoodTriggers(meals, sensitivity),
+    detectNightCravings(meals, sensitivity),
   ].filter((p) => p.detected);
 }
