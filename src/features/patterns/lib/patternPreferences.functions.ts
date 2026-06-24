@@ -71,7 +71,12 @@ export const updateUserPreferences = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
 
-    const updateData: Record<string, unknown> = {
+    const updateData: {
+      user_id: string;
+      sensitivity?: string;
+      enabled_categories?: string[];
+      updated_at: string;
+    } = {
       user_id: userId,
       updated_at: new Date().toISOString(),
     };
