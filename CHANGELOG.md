@@ -11,7 +11,23 @@ adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
----
+### Added (Sprint 10a - 2026-06-24)
+
+- **Indonesia food context for AI coach**: Added comprehensive local food knowledge to SYSTEM_PROMPT
+  - Nasi variants (putih, merah, uduk, goreng) with GI info and swap tips
+  - Gorengan (pisang, tahu, tempe, bakwan) with healthier alternatives
+  - Santan (kental vs encer) for rendang/gulai/opor + swaps
+  - Tempe/tahu protein guidance with cooking methods
+  - Sambal, mie instan, kopi susu, warung meals context
+  - Ramadan sahur & buka recommendations
+- **Updated prompt chips** with Indonesia-specific questions:
+  - "Nasi putih diganti apa biar GI rendah?"
+  - "Gorengan 2x sehari, bahaya nggak?"
+  - "Santan rendang oke nggak untuk diet?"
+  - Time-based: "Sarapan nasi uduk boleh nggak?", "Menu warung siang yang paling aman?"
+- Non-judgmental approach: realistic swaps, acknowledges warung/budget constraints
+
+## [1.0.0] - 2026-06-19
 
 ## Sprint 9 — Production Hardening (2026-06-23)
 
