@@ -6,7 +6,8 @@
  */
 
 import { createFileRoute } from "@tanstack/react-router";
-import { useAuth } from "@/hooks/useAuth";
+import { queryOptions, useQuery } from "@tanstack/react-query";
+import { getProfile } from "@/features/profile/lib/profile.functions";
 import { useAllPatterns, useDismissPattern } from "@/features/patterns/hooks/usePatternInsights";
 import {
   PatternInsightCard,
@@ -17,14 +18,21 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, RefreshCw } from "lucide-react";
 import { useState } from "react";
+import { handleQuickAction } from "@/features/patterns/lib/quickActions";
+
+const profileQueryOptions = queryOptions({
+  queryKey: ["profile"],
+  queryFn: () => getProfile(),
+});
 
 export const Route = createFileRoute("/_authenticated/profile/insights")({
+  loader: ({ context }) => context.queryClient.ensureQueryData(profileQueryOptions),
   component: ProfileInsightsPage,
 });
 
 function ProfileInsightsPage() {
-  const { user } = useAuth();
-  const { data, isLoading, refetch, isRefetching } = useAllPatterns(user?.id);
+  const { data: profile } = useQuery(profileQueryOptions);
+  const { data, isLoading, refetch, isRefetching } = useAllPatterns(profile?.id);
   const dismissMutation = useDismissPattern();
   const [activeTab, setActiveTab] = useState<"active" | "resolved">("active");
 
@@ -100,7 +108,12 @@ function ProfileInsightsPage() {
             <PatternInsightEmpty />
           ) : (
             activePatterns.map((pattern) => (
-              <PatternInsightCard key={pattern.id} pattern={pattern} onDismiss={handleDismiss} />
+              <PatternInsightCard
+                key={pattern.id}
+                pattern={pattern}
+                onDismiss={handleDismiss}
+                onQuickAction={handleQuickAction}
+              />
             ))
           )}
         </TabsContent>
