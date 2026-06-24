@@ -47,9 +47,9 @@ export const logMeal = createServerFn({ method: "POST" })
       .gte("created_at", `${today}T00:00:00Z`)
       .lt("created_at", `${today}T23:59:59Z`);
 
-    if (count && count >= 3) {
+    if (count && count >= 3 && context.cloudflare?.env?.HEALTHYU_KV) {
       const { triggerIfNeeded } = await import("@/features/patterns/lib/triggerDetection");
-      triggerIfNeeded(userId, supabase).catch((err) =>
+      triggerIfNeeded(userId, supabase, context.cloudflare.env.HEALTHYU_KV).catch((err) =>
         console.error("[Meal Log] Pattern trigger failed:", err),
       );
     }

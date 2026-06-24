@@ -2,48 +2,36 @@
  * Pattern Detection Trigger (On-Demand)
  *
  * ponytail: simplest solution that works
- * - Cooldown in Supabase (KV at 100% quota)
+ * - Check KV cache (24h TTL)
  * - Run detection if expired
  * - No cron needed
  */
 
 import type { SupabaseClient } from "@supabase/supabase-js";
-import type { Database } from "@/integrations/supabase/types";
+
+interface KVStore {
+  get(key: string): Promise<string | null>;
+  put(key: string, value: string, options?: { expirationTtl?: number }): Promise<void>;
+}
 
 /**
  * Check if we should run detection for this user
- * Uses Supabase instead of KV (free tier KV quota at 100%)
  */
-export async function shouldRunDetection(
-  userId: string,
-  supabase: SupabaseClient<Database>,
-): Promise<boolean> {
-  const { data } = await supabase
-    .from("pattern_detection_cooldown")
-    .select("last_detection_at")
-    .eq("user_id", userId)
-    .single();
+export async function shouldRunDetection(userId: string, kv: KVStore): Promise<boolean> {
+  const lastRun = await kv.get(`pattern_last_run:${userId}`);
+  if (!lastRun) return true;
 
-  if (!data) return true; // Never run before
-
-  const hoursSince = (Date.now() - new Date(data.last_detection_at).getTime()) / (1000 * 60 * 60);
+  const hoursSince = (Date.now() - parseInt(lastRun, 10)) / (1000 * 60 * 60);
   return hoursSince >= 24;
 }
 
 /**
- * Mark detection as run (upsert into Supabase)
+ * Mark detection as run (cache for 24h)
  */
-export async function markDetectionRun(
-  userId: string,
-  supabase: SupabaseClient<Database>,
-): Promise<void> {
-  await supabase.from("pattern_detection_cooldown").upsert(
-    {
-      user_id: userId,
-      last_detection_at: new Date().toISOString(),
-    },
-    { onConflict: "user_id" },
-  );
+export async function markDetectionRun(userId: string, kv: KVStore): Promise<void> {
+  await kv.put(`pattern_last_run:${userId}`, Date.now().toString(), {
+    expirationTtl: 86400, // 24h
+  });
 }
 
 /**
@@ -52,10 +40,11 @@ export async function markDetectionRun(
  */
 export async function triggerIfNeeded(
   userId: string,
-  supabase: SupabaseClient<Database>,
+  supabase: SupabaseClient,
+  kv: KVStore,
   geminiKey?: string,
 ): Promise<{ ran: boolean; patternsFound: number }> {
-  const should = await shouldRunDetection(userId, supabase);
+  const should = await shouldRunDetection(userId, kv);
   if (!should) {
     return { ran: false, patternsFound: 0 };
   }
@@ -65,10 +54,10 @@ export async function triggerIfNeeded(
     const { detectPatternsForUser } = await import("../services/patternDetection.server");
     const result = await detectPatternsForUser(supabase, userId);
 
-    await markDetectionRun(userId, supabase);
+    await markDetectionRun(userId, kv);
     return { ran: true, patternsFound: result.detected_count };
-  } catch (error) {
-    console.error("[triggerDetection] Failed:", error);
+  } catch (err) {
+    console.error("[Pattern Trigger] Failed:", err);
     return { ran: false, patternsFound: 0 };
   }
 }
