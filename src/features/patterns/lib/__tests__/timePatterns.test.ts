@@ -75,7 +75,16 @@ describe("Time Pattern Detection", () => {
     it("does NOT detect if only 2 skips", () => {
       const meals: MealLog[] = [
         {
-          log_date: "2026-06-23", // Mon skip (recent)
+          log_date: "2026-06-24", // Tue breakfast (recent)
+          logged_at: "2026-06-24T08:00:00Z",
+          meal_type: "breakfast",
+          calories: 300,
+          carbs_g: 40,
+          protein_g: 15,
+          fat_g: 10,
+        },
+        {
+          log_date: "2026-06-23", // Mon skip
           logged_at: "2026-06-23T12:00:00Z",
           meal_type: "lunch",
           calories: 500,
@@ -84,8 +93,8 @@ describe("Time Pattern Detection", () => {
           fat_g: 15,
         },
         {
-          log_date: "2026-06-20", // Fri ok
-          logged_at: "2026-06-20T08:00:00Z",
+          log_date: "2026-06-22", // Sun breakfast
+          logged_at: "2026-06-22T08:00:00Z",
           meal_type: "breakfast",
           calories: 300,
           carbs_g: 40,
@@ -93,7 +102,7 @@ describe("Time Pattern Detection", () => {
           fat_g: 10,
         },
         {
-          log_date: "2026-06-19", // Thu ok
+          log_date: "2026-06-19", // Thu breakfast
           logged_at: "2026-06-19T08:00:00Z",
           meal_type: "breakfast",
           calories: 300,
@@ -109,15 +118,6 @@ describe("Time Pattern Detection", () => {
           carbs_g: 60,
           protein_g: 25,
           fat_g: 15,
-        },
-        {
-          log_date: "2026-06-17", // Tue ok
-          logged_at: "2026-06-17T08:00:00Z",
-          meal_type: "breakfast",
-          calories: 300,
-          carbs_g: 40,
-          protein_g: 15,
-          fat_g: 10,
         },
       ];
 
