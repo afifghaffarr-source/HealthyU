@@ -44,7 +44,13 @@ function Page() {
           className="w-full text-sm"
         />
         {preview && (
-          <img loading="lazy" decoding="async" src={preview} alt="" className="w-full rounded-xl" />
+          <img
+            loading="lazy"
+            decoding="async"
+            src={preview}
+            alt="Fridge contents preview"
+            className="w-full rounded-xl"
+          />
         )}
         <button
           onClick={() => mut.mutate()}

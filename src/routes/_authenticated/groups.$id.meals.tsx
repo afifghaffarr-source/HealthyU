@@ -44,7 +44,7 @@ function Page() {
                 decoding="async"
                 src={m.user_avatar}
                 className="size-10 rounded-full"
-                alt=""
+                alt={`${m.user_name}'s avatar`}
               />
             ) : (
               <div className="size-10 rounded-full bg-primary/10 text-primary grid place-items-center text-sm font-semibold">

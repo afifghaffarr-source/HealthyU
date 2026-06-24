@@ -49,7 +49,7 @@ export function RecommendationsStrip({ currentSlug }: Props) {
                 <div className="aspect-[4/3] overflow-hidden">
                   <img
                     src={r.image_url}
-                    alt=""
+                    alt={r.title}
                     loading="lazy"
                     className="w-full h-full object-cover"
                   />

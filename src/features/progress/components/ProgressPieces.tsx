@@ -128,7 +128,7 @@ export function ProgressPhotoGrid({
               loading="lazy"
               decoding="async"
               src={p.signed_url}
-              alt=""
+              alt={`Progress photo from ${new Date(p.taken_at).toLocaleDateString("id-ID")}`}
               className="w-full aspect-square object-cover"
             />
           ) : (

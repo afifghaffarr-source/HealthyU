@@ -106,7 +106,7 @@ function Page() {
                   loading="lazy"
                   decoding="async"
                   src={product.image}
-                  alt=""
+                  alt={product.name}
                   className="size-16 rounded-xl object-cover"
                 />
               )}

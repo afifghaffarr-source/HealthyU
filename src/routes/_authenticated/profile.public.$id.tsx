@@ -62,7 +62,7 @@ function Page() {
               loading="lazy"
               decoding="async"
               src={p.avatar_url}
-              alt=""
+              alt={`${p.full_name}'s avatar`}
               className="size-16 rounded-full"
             />
           ) : (

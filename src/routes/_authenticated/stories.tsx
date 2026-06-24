@@ -79,7 +79,7 @@ function Page() {
                 loading="lazy"
                 decoding="async"
                 src={s.image_url}
-                alt=""
+                alt={s.caption || "Story image"}
                 className="rounded-xl w-full"
               />
             )}

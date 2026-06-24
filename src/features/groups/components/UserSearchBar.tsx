@@ -90,7 +90,7 @@ function UserCard({ user }: { user: SearchResult }) {
             loading="lazy"
             decoding="async"
             src={user.avatar_url}
-            alt=""
+            alt={`${user.full_name ?? "User"}'s avatar`}
             className="size-10 rounded-full"
           />
         ) : (
