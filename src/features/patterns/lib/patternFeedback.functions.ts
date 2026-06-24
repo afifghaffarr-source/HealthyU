@@ -23,14 +23,14 @@ export const submitPatternFeedback = createServerFn({ method: "POST" })
     const { supabase, userId } = context;
     const { patternId, helpful } = data;
 
-    // Update feedback column
+    // Update feedback column (JSONB type in Supabase = string in REST API)
     const { error } = await supabase
       .from("pattern_insights")
       .update({
-        user_feedback: {
+        user_feedback: JSON.stringify({
           helpful,
           submitted_at: new Date().toISOString(),
-        },
+        }),
       })
       .eq("id", patternId)
       .eq("user_id", userId); // Security: only update own patterns

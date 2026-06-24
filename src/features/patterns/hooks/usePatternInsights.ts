@@ -74,10 +74,10 @@ export function useDismissPattern() {
         .from("pattern_insights")
         .update({
           resolved_at: new Date().toISOString(),
-          analysis_metadata: {
+          analysis_metadata: JSON.stringify({
             resolution_type: "user_dismissed",
             dismissed_at: new Date().toISOString(),
-          } as Record<string, unknown>,
+          }),
         })
         .eq("id", patternId);
 
@@ -104,9 +104,10 @@ export function useSnoozePattern() {
       const { error } = await supabase
         .from("pattern_insights")
         .update({
-          analysis_metadata: {
+          analysis_metadata: JSON.stringify({
             snoozed_until: snoozeUntil.toISOString(),
-          } as Record<string, unknown>,
+            snoozed_at: new Date().toISOString(),
+          }),
         })
         .eq("id", patternId);
 
