@@ -69,6 +69,7 @@ describe("Time Pattern Detection", () => {
       expect(result.detected).toBe(true);
       expect(result.type).toBe("skip_breakfast");
       expect(result.count).toBeGreaterThanOrEqual(3);
+      expect(result.metadata.threshold_applied).toBe(3);
     });
 
     it("does NOT detect if only 2 skips", () => {
@@ -124,6 +125,7 @@ describe("Time Pattern Detection", () => {
 
       expect(result.detected).toBe(false);
       expect(result.count).toBeLessThan(3);
+      expect(result.metadata.threshold_applied).toBe(3);
     });
   });
 
@@ -165,6 +167,7 @@ describe("Time Pattern Detection", () => {
       expect(result.type).toBe("late_night_eating");
       expect(result.count).toBe(3);
       expect(result.avg_calories).toBeGreaterThan(0);
+      expect(result.metadata.threshold_applied).toBe(3);
     });
 
     it("does NOT detect if only 2 late meals", () => {
