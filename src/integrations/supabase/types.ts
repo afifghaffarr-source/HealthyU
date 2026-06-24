@@ -5698,6 +5698,30 @@ export type Database = {
         };
         Relationships: [];
       };
+      user_pattern_preferences: {
+        Row: {
+          created_at: string;
+          enabled_categories: Json | null;
+          sensitivity: string;
+          updated_at: string;
+          user_id: string;
+        };
+        Insert: {
+          created_at?: string;
+          enabled_categories?: Json | null;
+          sensitivity?: string;
+          updated_at?: string;
+          user_id: string;
+        };
+        Update: {
+          created_at?: string;
+          enabled_categories?: Json | null;
+          sensitivity?: string;
+          updated_at?: string;
+          user_id?: string;
+        };
+        Relationships: [];
+      };
       user_pet_accessories: {
         Row: {
           accessory_id: string;
