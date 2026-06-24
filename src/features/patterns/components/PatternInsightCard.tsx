@@ -12,6 +12,7 @@ import { AlertCircle, Coffee, Moon, Heart, Users, Calendar, MapPin, Apple } from
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import type { PatternInsight } from "../types/pattern";
+import { calculateTrend, getTrendEmoji, getTrendColor } from "../lib/patternTrends";
 
 interface PatternInsightCardProps {
   pattern: PatternInsight;
@@ -57,6 +58,7 @@ const PATTERN_TITLES: Record<string, string> = {
 export function PatternInsightCard({ pattern, onDismiss, onQuickAction }: PatternInsightCardProps) {
   const Icon = PATTERN_ICONS[pattern.pattern_type] || AlertCircle;
   const title = PATTERN_TITLES[pattern.pattern_type] || pattern.pattern_type;
+  const trend = calculateTrend(pattern);
 
   const urgencyColor =
     pattern.urgency_score >= 85
@@ -87,9 +89,21 @@ export function PatternInsightCard({ pattern, onDismiss, onQuickAction }: Patter
             </span>
           </div>
           <p className="text-sm text-gray-600 mb-1">{pattern.ai_explanation}</p>
-          <p className="text-xs text-gray-500">
-            {pattern.occurrence_count}x dalam 14 hari terakhir
-          </p>
+          <div className="flex items-center gap-3 text-xs">
+            <span className="text-gray-500">
+              {pattern.occurrence_count}x dalam 14 hari terakhir
+            </span>
+            {trend.daysTracked >= 7 && (
+              <span className={`font-medium ${getTrendColor(trend.status)}`}>
+                {getTrendEmoji(trend.status)} {Math.abs(trend.improvementPercent)}%{" "}
+                {trend.status === "improving"
+                  ? "membaik"
+                  : trend.status === "worsening"
+                    ? "memburuk"
+                    : "stabil"}
+              </span>
+            )}
+          </div>
         </div>
       </div>
 
