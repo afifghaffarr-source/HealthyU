@@ -9,29 +9,28 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 
 describe("Pattern Detection Triggers", () => {
   let mockSupabase: SupabaseClient;
+  let mockSelect: ReturnType<typeof vi.fn>;
+  let mockEq: ReturnType<typeof vi.fn>;
+  let mockSingle: ReturnType<typeof vi.fn>;
+  let mockUpsert: ReturnType<typeof vi.fn>;
 
   beforeEach(() => {
-    const mockFrom = vi.fn();
-    const mockSelect = vi.fn();
-    const mockEq = vi.fn();
-    const mockSingle = vi.fn();
-    const mockUpsert = vi.fn();
+    mockSingle = vi.fn();
+    mockEq = vi.fn(() => ({ single: mockSingle }));
+    mockSelect = vi.fn(() => ({ eq: mockEq }));
+    mockUpsert = vi.fn();
 
-    // Chain: from().select().eq().single()
-    mockEq.mockReturnValue({ single: mockSingle });
-    mockSelect.mockReturnValue({ eq: mockEq });
-    mockFrom.mockReturnValue({
+    const mockFrom = vi.fn((table: string) => ({
       select: mockSelect,
       upsert: mockUpsert,
-    });
+    }));
 
     mockSupabase = { from: mockFrom } as unknown as SupabaseClient;
   });
 
   describe("shouldRunDetection", () => {
     it("returns true when no record exists (first run)", async () => {
-      const mockFrom = mockSupabase.from as unknown as ReturnType<typeof vi.fn>;
-      mockFrom().select().eq().single.mockResolvedValue({ data: null, error: null });
+      mockSingle.mockResolvedValue({ data: null, error: null });
 
       const result = await shouldRunDetection("user-123", mockSupabase);
 
@@ -40,14 +39,10 @@ describe("Pattern Detection Triggers", () => {
 
     it("returns false when last detection < 24h ago", async () => {
       const twoHoursAgo = new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString();
-      const mockFrom = mockSupabase.from as unknown as ReturnType<typeof vi.fn>;
-      mockFrom()
-        .select()
-        .eq()
-        .single.mockResolvedValue({
-          data: { last_detection_at: twoHoursAgo },
-          error: null,
-        });
+      mockSingle.mockResolvedValue({
+        data: { last_detection_at: twoHoursAgo },
+        error: null,
+      });
 
       const result = await shouldRunDetection("user-123", mockSupabase);
 
@@ -56,14 +51,10 @@ describe("Pattern Detection Triggers", () => {
 
     it("returns true when last detection >= 24h ago", async () => {
       const twentyFiveHoursAgo = new Date(Date.now() - 25 * 60 * 60 * 1000).toISOString();
-      const mockFrom = mockSupabase.from as unknown as ReturnType<typeof vi.fn>;
-      mockFrom()
-        .select()
-        .eq()
-        .single.mockResolvedValue({
-          data: { last_detection_at: twentyFiveHoursAgo },
-          error: null,
-        });
+      mockSingle.mockResolvedValue({
+        data: { last_detection_at: twentyFiveHoursAgo },
+        error: null,
+      });
 
       const result = await shouldRunDetection("user-123", mockSupabase);
 
@@ -73,9 +64,7 @@ describe("Pattern Detection Triggers", () => {
 
   describe("markDetectionRun", () => {
     it("upserts current timestamp for user", async () => {
-      const mockFrom = mockSupabase.from as unknown as ReturnType<typeof vi.fn>;
-      const mockUpsert = vi.fn().mockResolvedValue({ data: null, error: null });
-      mockFrom.mockReturnValue({ upsert: mockUpsert });
+      mockUpsert.mockResolvedValue({ data: null, error: null });
 
       await markDetectionRun("user-123", mockSupabase);
 
@@ -91,14 +80,10 @@ describe("Pattern Detection Triggers", () => {
   describe("triggerIfNeeded", () => {
     it("skips detection when last run < 24h", async () => {
       const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString();
-      const mockFrom = mockSupabase.from as unknown as ReturnType<typeof vi.fn>;
-      mockFrom()
-        .select()
-        .eq()
-        .single.mockResolvedValue({
-          data: { last_detection_at: oneHourAgo },
-          error: null,
-        });
+      mockSingle.mockResolvedValue({
+        data: { last_detection_at: oneHourAgo },
+        error: null,
+      });
 
       const result = await triggerIfNeeded("user-123", mockSupabase);
 
@@ -109,13 +94,8 @@ describe("Pattern Detection Triggers", () => {
     });
 
     it("marks as run even if detection fails", async () => {
-      const mockFrom = mockSupabase.from as unknown as ReturnType<typeof vi.fn>;
-      const mockUpsert = vi.fn().mockResolvedValue({ data: null, error: null });
-
-      // First call: shouldRunDetection (select chain)
-      mockFrom().select().eq().single.mockResolvedValue({ data: null, error: null });
-      // Second call: markDetectionRun (upsert)
-      mockFrom.mockReturnValue({ upsert: mockUpsert });
+      mockSingle.mockResolvedValue({ data: null, error: null });
+      mockUpsert.mockResolvedValue({ data: null, error: null });
 
       await triggerIfNeeded("user-123", mockSupabase);
 
