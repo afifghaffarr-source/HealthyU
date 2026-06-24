@@ -20,6 +20,9 @@ import {
   UsersRound,
   Sparkles,
   AlertTriangle,
+  Settings,
+  Lightbulb,
+  ShieldAlert,
 } from "lucide-react";
 
 const tileCls =
@@ -91,6 +94,10 @@ export function ProfileNavGrid({
             <BarChart3 className="size-5 text-sage-deep" aria-hidden />
             <span className="text-sm font-semibold">Laporan</span>
           </Link>
+          <Link to="/profile/insights" className={tileCls}>
+            <Lightbulb className="size-5 text-amber-500" aria-hidden />
+            <span className="text-sm font-semibold">Pattern Insights</span>
+          </Link>
         </div>
       </section>
 
@@ -119,6 +126,14 @@ export function ProfileNavGrid({
       <section className="space-y-3">
         <SectionHeader>Data & privasi</SectionHeader>
         <div className="grid grid-cols-2 gap-3">
+          <Link to="/profile/patterns" className={tileCls}>
+            <Settings className="size-5 text-primary" aria-hidden />
+            <span className="text-sm font-semibold">Pattern Settings</span>
+          </Link>
+          <Link to="/profile/privacy" className={tileCls}>
+            <ShieldAlert className="size-5 text-red-600" aria-hidden />
+            <span className="text-sm font-semibold">Privacy</span>
+          </Link>
           <Link to="/backup" className={tileCls}>
             <Download className="size-5 text-primary" aria-hidden />
             <span className="text-sm font-semibold">Backup Data</span>
