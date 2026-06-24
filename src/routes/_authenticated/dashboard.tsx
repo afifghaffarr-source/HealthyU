@@ -56,6 +56,7 @@ import {
   PatternInsightCardSkeleton,
 } from "@/features/patterns/components/PatternInsightCard";
 import { handleQuickAction } from "@/features/patterns/lib/quickActions";
+import { checkPatternTrigger } from "@/features/patterns/lib/triggerPattern.functions";
 
 const profileQueryOptions = queryOptions({
   queryKey: ["profile"],
@@ -88,6 +89,8 @@ export const Route = createFileRoute("/_authenticated/dashboard")({
       queryKey: ["unlinked-joined-challenges"],
       queryFn: () => myUnlinkedJoinedChallenges(),
     });
+    // Lazy pattern detection trigger (24h check)
+    checkPatternTrigger().catch((err) => console.error("[Dashboard] Pattern check failed:", err));
   },
   component: Dashboard,
 });

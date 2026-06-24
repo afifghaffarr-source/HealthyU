@@ -37,6 +37,23 @@ export const logMeal = createServerFn({ method: "POST" })
     const { error } = await supabase.from("meal_logs").insert({ ...data, user_id: userId });
     if (error) throw new Error(error.message);
     const game = await recordActivityFor(supabase, userId, "meal_logged");
+
+    // Trigger pattern detection after 3rd meal
+    const today = new Date().toISOString().split("T")[0];
+    const { count } = await supabase
+      .from("meal_logs")
+      .select("*", { count: "exact", head: true })
+      .eq("user_id", userId)
+      .gte("created_at", `${today}T00:00:00Z`)
+      .lt("created_at", `${today}T23:59:59Z`);
+
+    if (count && count >= 3 && context.cloudflare?.env?.HEALTHYU_KV) {
+      const { triggerIfNeeded } = await import("@/features/patterns/lib/triggerDetection");
+      triggerIfNeeded(userId, supabase, context.cloudflare.env.HEALTHYU_KV).catch((err) =>
+        console.error("[Meal Log] Pattern trigger failed:", err),
+      );
+    }
+
     return { ok: true, game };
   });
 
