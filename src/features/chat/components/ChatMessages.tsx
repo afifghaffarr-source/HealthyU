@@ -7,9 +7,11 @@ export type ChatMessage = { id: string; role: string; content: string };
 const SUGGESTIONS = [
   "Protein saya kurang, makan apa?",
   "Ide menu warung yang lebih sehat",
+  "Nasi putih diganti apa biar GI rendah?",
+  "Gorengan 2x sehari, bahaya nggak?",
   "Bantu evaluasi hari ini",
   "Makan malam ringan apa?",
-  "Saya lewat target, harus bagaimana?",
+  "Santan rendang oke nggak untuk diet?",
 ];
 
 export function ChatEmptyState({ onPick }: { onPick: (text: string) => void }) {

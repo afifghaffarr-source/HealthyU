@@ -4,9 +4,11 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 const DEFAULT_PROMPTS = [
   "Protein saya kurang, makan apa?",
   "Ide menu warung yang lebih sehat",
+  "Nasi putih diganti apa biar GI rendah?",
+  "Gorengan 2x sehari, bahaya nggak?",
   "Bantu evaluasi hari ini",
   "Makan malam ringan apa?",
-  "Saya lewat target, harus bagaimana?",
+  "Santan rendang oke nggak untuk diet?",
 ];
 
 function buildPersonalizedPrompts({
@@ -20,10 +22,10 @@ function buildPersonalizedPrompts({
 }): string[] {
   const out: string[] = [];
   if (typeof hour === "number") {
-    if (hour >= 6 && hour < 10) out.push("Ide sarapan praktis < 400 kkal?");
-    else if (hour >= 11 && hour < 14) out.push("Menu makan siang seimbang warung apa?");
-    else if (hour >= 17 && hour < 21) out.push("Makan malam ringan tinggi protein?");
-    else if (hour >= 21) out.push("Camilan malam yang tidak ganggu tidur?");
+    if (hour >= 6 && hour < 10) out.push("Sarapan nasi uduk boleh nggak?");
+    else if (hour >= 11 && hour < 14) out.push("Menu warung siang yang paling aman?");
+    else if (hour >= 17 && hour < 21) out.push("Makan malam: ayam bakar atau tempe?");
+    else if (hour >= 21) out.push("Ngemil gorengan malam gimana?");
   }
   if (typeof proteinGap === "number" && proteinGap > 15) {
     out.push(`Protein kurang ~${Math.round(proteinGap)}g, makan apa?`);
