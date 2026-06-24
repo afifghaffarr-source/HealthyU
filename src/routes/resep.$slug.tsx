@@ -13,6 +13,8 @@ import { RatingForm, type RatingState } from "@/features/recipes/components/Rati
 import { ReviewsSection } from "@/features/recipes/components/ReviewsSection";
 import { RemixModal } from "@/features/recipes/components/RemixModal";
 import { RecommendationsStrip } from "@/features/recipes/components/RecommendationsStrip";
+import { TopAppBar } from "@/components/healthyu/top-app-bar";
+import { BottomNav } from "@/components/bottom-nav";
 import { useState } from "react";
 
 function minutesToISO(min?: number | null): string | undefined {
@@ -165,153 +167,152 @@ function ResepDetail() {
   });
 
   return (
-    <main className="mx-auto max-w-3xl px-4 py-8">
-      <nav aria-label="Breadcrumb" className="mb-4 text-sm text-muted-foreground">
-        <Link to="/resep" className="hover:text-foreground">
-          Resep
-        </Link>
-        <span className="mx-2">/</span>
-        <span className="text-foreground">{r.title}</span>
-      </nav>
-      <header className="mb-6 flex items-start justify-between gap-3">
-        <div className="min-w-0 flex-1">
-          {r.category && (
-            <p className="text-xs uppercase tracking-wide text-muted-foreground">{r.category}</p>
+    <div className="min-h-dvh bg-background pb-24">
+      <TopAppBar title={r.title} showBack />
+
+      <main className="mx-auto max-w-3xl px-4 py-6">
+        <header className="mb-6 flex items-start justify-between gap-3">
+          <div className="min-w-0 flex-1">
+            {r.category && (
+              <p className="text-xs uppercase tracking-wide text-muted-foreground">{r.category}</p>
+            )}
+            <h1 className="mt-1 text-3xl font-bold">{r.title}</h1>
+            {r.description && <p className="mt-2 text-lg text-muted-foreground">{r.description}</p>}
+          </div>
+          {isAuthed && r.recipesId && (
+            <button
+              onClick={() => bmMut.mutate()}
+              disabled={bmMut.isPending}
+              className="size-11 shrink-0 grid place-items-center rounded-full bg-card border border-border hover:bg-accent disabled:opacity-50"
+              aria-label={bmState?.bookmarked ? "Hapus bookmark" : "Simpan resep"}
+              aria-pressed={bmState?.bookmarked}
+            >
+              {bmMut.isPending ? (
+                <Loader2 className="size-4 animate-spin" />
+              ) : (
+                <Bookmark
+                  className={`size-5 ${bmState?.bookmarked ? "fill-primary text-primary" : "text-muted-foreground"}`}
+                />
+              )}
+            </button>
           )}
-          <h1 className="mt-1 text-3xl font-bold">{r.title}</h1>
-          {r.description && <p className="mt-2 text-lg text-muted-foreground">{r.description}</p>}
-        </div>
+        </header>
+
+        {/* ── "Remix dengan AI" CTA (auth-gated) ── */}
         {isAuthed && r.recipesId && (
           <button
-            onClick={() => bmMut.mutate()}
-            disabled={bmMut.isPending}
-            className="size-11 shrink-0 grid place-items-center rounded-full bg-card border border-border hover:bg-accent disabled:opacity-50"
-            aria-label={bmState?.bookmarked ? "Hapus bookmark" : "Simpan resep"}
-            aria-pressed={bmState?.bookmarked}
+            type="button"
+            onClick={() => setRemixOpen(true)}
+            className="mb-6 w-full inline-flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-primary to-coral text-primary-foreground py-3 text-sm font-semibold shadow-sm"
           >
-            {bmMut.isPending ? (
-              <Loader2 className="size-4 animate-spin" />
-            ) : (
-              <Bookmark
-                className={`size-5 ${bmState?.bookmarked ? "fill-primary text-primary" : "text-muted-foreground"}`}
-              />
-            )}
+            <Sparkles className="size-4" /> Remix dengan AI
           </button>
         )}
-      </header>
 
-      {/* ── "Remix dengan AI" CTA (auth-gated) ── */}
-      {isAuthed && r.recipesId && (
-        <button
-          type="button"
-          onClick={() => setRemixOpen(true)}
-          className="mb-6 w-full inline-flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-primary to-coral text-primary-foreground py-3 text-sm font-semibold shadow-sm"
-        >
-          <Sparkles className="size-4" /> Remix dengan AI
-        </button>
-      )}
+        {r.image_url && (
+          <figure className="mb-8 overflow-hidden rounded-2xl">
+            <img
+              src={r.image_url}
+              alt={r.title}
+              loading="eager"
+              onError={(e) => {
+                const fallback =
+                  "data:image/svg+xml," +
+                  encodeURIComponent(
+                    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#e0f2fe"/><stop offset="100%" stop-color="#bae6fd"/></linearGradient></defs><rect width="400" height="300" fill="url(#g)"/><g transform="translate(200,150)" fill="none" stroke="#0284c7" stroke-width="3" stroke-linecap="round"><path d="M-18,-30 v20 a8,8 0 0,0 16,0 v-20"/><line x1="-10" y1="-10" x2="-10" y2="30"/><path d="M10,-30 v25 c0,6 6,6 6,0 v-25"/><line x1="16" y1="-5" x2="16" y2="30"/></g></svg>',
+                  );
+                if (e.currentTarget.src !== fallback) e.currentTarget.src = fallback;
+              }}
+              className="aspect-[16/10] w-full object-cover"
+            />
+          </figure>
+        )}
 
-      {r.image_url && (
-        <figure className="mb-8 overflow-hidden rounded-2xl">
-          <img
-            src={r.image_url}
-            alt={r.title}
-            loading="eager"
-            onError={(e) => {
-              const fallback =
-                "data:image/svg+xml," +
-                encodeURIComponent(
-                  '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#e0f2fe"/><stop offset="100%" stop-color="#bae6fd"/></linearGradient></defs><rect width="400" height="300" fill="url(#g)"/><g transform="translate(200,150)" fill="none" stroke="#0284c7" stroke-width="3" stroke-linecap="round"><path d="M-18,-30 v20 a8,8 0 0,0 16,0 v-20"/><line x1="-10" y1="-10" x2="-10" y2="30"/><path d="M10,-30 v25 c0,6 6,6 6,0 v-25"/><line x1="16" y1="-5" x2="16" y2="30"/></g></svg>',
-                );
-              if (e.currentTarget.src !== fallback) e.currentTarget.src = fallback;
-            }}
-            className="aspect-[16/10] w-full object-cover"
-          />
-        </figure>
-      )}
+        <section className="mb-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
+          {r.calories != null && (
+            <div className="rounded-lg border bg-card p-3 text-center">
+              <p className="text-xs text-muted-foreground">Kalori</p>
+              <p className="font-semibold">{r.calories} kcal</p>
+            </div>
+          )}
+          {r.protein_g != null && (
+            <div className="rounded-lg border bg-card p-3 text-center">
+              <p className="text-xs text-muted-foreground">Protein</p>
+              <p className="font-semibold">{r.protein_g} g</p>
+            </div>
+          )}
+          {r.total_min != null && (
+            <div className="rounded-lg border bg-card p-3 text-center">
+              <p className="text-xs text-muted-foreground">Waktu</p>
+              <p className="font-semibold">{r.total_min} mnt</p>
+            </div>
+          )}
+          {r.servings != null && (
+            <div className="rounded-lg border bg-card p-3 text-center">
+              <p className="text-xs text-muted-foreground">Porsi</p>
+              <p className="font-semibold">{r.servings}</p>
+            </div>
+          )}
+        </section>
 
-      <section className="mb-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
-        {r.calories != null && (
-          <div className="rounded-lg border bg-card p-3 text-center">
-            <p className="text-xs text-muted-foreground">Kalori</p>
-            <p className="font-semibold">{r.calories} kcal</p>
+        <section className="mb-6">
+          <h2 className="mb-3 text-xl font-semibold">Bahan-bahan</h2>
+          <ul className="list-disc space-y-1 pl-5 text-sm">
+            {(r.ingredients ?? []).map((ing: string, i: number) => (
+              <li key={i}>{ing}</li>
+            ))}
+          </ul>
+        </section>
+
+        <section className="mb-6">
+          <h2 className="mb-3 text-xl font-semibold">Cara Membuat</h2>
+          <ol className="list-decimal space-y-2 pl-5 text-sm">
+            {(r.instructions ?? []).map((step: string, i: number) => (
+              <li key={i}>{step}</li>
+            ))}
+          </ol>
+        </section>
+
+        {/* ── Rating (auth-optional: anon sees CTA, authed sees form) ── */}
+        {ratingState && (
+          <div className="mb-6">
+            <RatingForm slug={r.slug} state={ratingState} />
           </div>
         )}
-        {r.protein_g != null && (
-          <div className="rounded-lg border bg-card p-3 text-center">
-            <p className="text-xs text-muted-foreground">Protein</p>
-            <p className="font-semibold">{r.protein_g} g</p>
-          </div>
-        )}
-        {r.total_min != null && (
-          <div className="rounded-lg border bg-card p-3 text-center">
-            <p className="text-xs text-muted-foreground">Waktu</p>
-            <p className="font-semibold">{r.total_min} mnt</p>
-          </div>
-        )}
-        {r.servings != null && (
-          <div className="rounded-lg border bg-card p-3 text-center">
-            <p className="text-xs text-muted-foreground">Porsi</p>
-            <p className="font-semibold">{r.servings}</p>
-          </div>
-        )}
-      </section>
 
-      <section className="mb-6">
-        <h2 className="mb-3 text-xl font-semibold">Bahan-bahan</h2>
-        <ul className="list-disc space-y-1 pl-5 text-sm">
-          {(r.ingredients ?? []).map((ing: string, i: number) => (
-            <li key={i}>{ing}</li>
-          ))}
-        </ul>
-      </section>
-
-      <section className="mb-6">
-        <h2 className="mb-3 text-xl font-semibold">Cara Membuat</h2>
-        <ol className="list-decimal space-y-2 pl-5 text-sm">
-          {(r.instructions ?? []).map((step: string, i: number) => (
-            <li key={i}>{step}</li>
-          ))}
-        </ol>
-      </section>
-
-      {/* ── Rating (auth-optional: anon sees CTA, authed sees form) ── */}
-      {ratingState && (
+        {/* ── Reviews (auth-optional: anon sees read-only + CTA) ── */}
         <div className="mb-6">
-          <RatingForm slug={r.slug} state={ratingState} />
+          <ReviewsSection slug={r.slug} isAuthed={isAuthed} recipesId={r.recipesId} />
         </div>
-      )}
 
-      {/* ── Reviews (auth-optional: anon sees read-only + CTA) ── */}
-      <div className="mb-6">
-        <ReviewsSection slug={r.slug} isAuthed={isAuthed} recipesId={r.recipesId} />
-      </div>
+        {r.tags && r.tags.length > 0 && (
+          <footer className="mt-8 flex flex-wrap gap-2">
+            {r.tags.map((t: string) => (
+              <span key={t} className="rounded-full bg-muted px-3 py-1 text-xs">
+                #{t}
+              </span>
+            ))}
+          </footer>
+        )}
 
-      {r.tags && r.tags.length > 0 && (
-        <footer className="mt-8 flex flex-wrap gap-2">
-          {r.tags.map((t: string) => (
-            <span key={t} className="rounded-full bg-muted px-3 py-1 text-xs">
-              #{t}
-            </span>
-          ))}
-        </footer>
-      )}
+        {remixOpen && r.recipesId && (
+          <RemixModal
+            open={remixOpen}
+            onClose={() => setRemixOpen(false)}
+            recipesId={r.recipesId}
+            recipeTitle={r.title}
+          />
+        )}
 
-      {remixOpen && r.recipesId && (
-        <RemixModal
-          open={remixOpen}
-          onClose={() => setRemixOpen(false)}
-          recipesId={r.recipesId}
-          recipeTitle={r.title}
-        />
-      )}
+        {/* ── "Rekomendasi Untukmu" strip (auth-gated) ── */}
+        {isAuthed && (
+          <div className="mt-8">
+            <RecommendationsStrip currentSlug={r.slug} />
+          </div>
+        )}
+      </main>
 
-      {/* ── "Rekomendasi Untukmu" strip (auth-gated) ── */}
-      {isAuthed && (
-        <div className="mt-8">
-          <RecommendationsStrip currentSlug={r.slug} />
-        </div>
-      )}
-    </main>
+      <BottomNav />
+    </div>
   );
 }
