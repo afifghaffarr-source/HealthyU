@@ -142,7 +142,7 @@ export function detectIrregularMeals(meals: MealLog[]): DetectedPattern {
   return {
     type: "irregular_meals",
     count: irregularDates.length,
-    detected: irregularDates.length >= 3,
+    detected: irregularDates.length >= 2, // Changed from 3 to 2 (more realistic threshold)
     matched_dates: Array.from(new Set(irregularDates)),
     metadata: {
       max_variance_hours: Math.round(maxVariance * 10) / 10,
