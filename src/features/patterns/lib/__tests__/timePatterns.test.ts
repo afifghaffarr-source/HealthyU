@@ -75,50 +75,50 @@ describe("Time Pattern Detection", () => {
     it("does NOT detect if only 2 skips", () => {
       const meals: MealLog[] = [
         {
-          log_date: "2026-06-16",
-          logged_at: "2026-06-16T12:00:00Z",
+          log_date: "2026-06-23", // Mon skip (recent)
+          logged_at: "2026-06-23T12:00:00Z",
           meal_type: "lunch",
           calories: 500,
           carbs_g: 60,
           protein_g: 25,
           fat_g: 15,
-        }, // Mon skip
+        },
         {
-          log_date: "2026-06-17",
-          logged_at: "2026-06-17T08:00:00Z",
-          meal_type: "breakfast",
-          calories: 300,
-          carbs_g: 40,
-          protein_g: 15,
-          fat_g: 10,
-        }, // Tue ok
-        {
-          log_date: "2026-06-18",
-          logged_at: "2026-06-18T08:00:00Z",
-          meal_type: "breakfast",
-          calories: 300,
-          carbs_g: 40,
-          protein_g: 15,
-          fat_g: 10,
-        }, // Wed ok
-        {
-          log_date: "2026-06-19",
-          logged_at: "2026-06-19T12:00:00Z",
-          meal_type: "lunch",
-          calories: 500,
-          carbs_g: 60,
-          protein_g: 25,
-          fat_g: 15,
-        }, // Thu skip
-        {
-          log_date: "2026-06-20",
+          log_date: "2026-06-20", // Fri ok
           logged_at: "2026-06-20T08:00:00Z",
           meal_type: "breakfast",
           calories: 300,
           carbs_g: 40,
           protein_g: 15,
           fat_g: 10,
-        }, // Fri ok
+        },
+        {
+          log_date: "2026-06-19", // Thu ok
+          logged_at: "2026-06-19T08:00:00Z",
+          meal_type: "breakfast",
+          calories: 300,
+          carbs_g: 40,
+          protein_g: 15,
+          fat_g: 10,
+        },
+        {
+          log_date: "2026-06-18", // Wed skip
+          logged_at: "2026-06-18T12:00:00Z",
+          meal_type: "lunch",
+          calories: 500,
+          carbs_g: 60,
+          protein_g: 25,
+          fat_g: 15,
+        },
+        {
+          log_date: "2026-06-17", // Tue ok
+          logged_at: "2026-06-17T08:00:00Z",
+          meal_type: "breakfast",
+          calories: 300,
+          carbs_g: 40,
+          protein_g: 15,
+          fat_g: 10,
+        },
       ];
 
       const result = detectSkipBreakfast(meals);
@@ -203,8 +203,8 @@ describe("Time Pattern Detection", () => {
     it("detects irregular meal timing (>3h variance)", () => {
       const meals: MealLog[] = [
         {
-          log_date: "2026-06-10",
-          logged_at: "2026-06-10T08:00:00Z",
+          log_date: "2026-06-23", // Recent Mon
+          logged_at: "2026-06-23T08:00:00Z",
           meal_type: "breakfast",
           calories: 300,
           carbs_g: 40,
@@ -212,8 +212,8 @@ describe("Time Pattern Detection", () => {
           fat_g: 10,
         }, // 8am
         {
-          log_date: "2026-06-11",
-          logged_at: "2026-06-11T11:30:00Z",
+          log_date: "2026-06-22", // Recent Sun
+          logged_at: "2026-06-22T11:30:00Z",
           meal_type: "breakfast",
           calories: 300,
           carbs_g: 40,
@@ -221,8 +221,8 @@ describe("Time Pattern Detection", () => {
           fat_g: 10,
         }, // 11:30am (3.5h diff)
         {
-          log_date: "2026-06-12",
-          logged_at: "2026-06-12T07:30:00Z",
+          log_date: "2026-06-21", // Recent Sat
+          logged_at: "2026-06-21T07:30:00Z",
           meal_type: "breakfast",
           calories: 300,
           carbs_g: 40,
@@ -230,8 +230,8 @@ describe("Time Pattern Detection", () => {
           fat_g: 10,
         }, // 7:30am (4h diff from prev)
         {
-          log_date: "2026-06-13",
-          logged_at: "2026-06-13T10:00:00Z",
+          log_date: "2026-06-20", // Recent Fri
+          logged_at: "2026-06-20T10:00:00Z",
           meal_type: "breakfast",
           calories: 300,
           carbs_g: 40,
