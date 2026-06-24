@@ -1,0 +1,30 @@
+name: Weekly Pattern Digest
+
+on:
+  schedule:
+    - cron: "0 2 * * 1" # Monday 2am UTC (9am WIB)
+  workflow_dispatch: # Manual trigger for testing
+
+jobs:
+  send-digest:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send Weekly Pattern Digests
+        run: |
+          response=$(curl -X POST "https://healthyu.web.id/api/sendWeeklyDigests" \
+            -H "Content-Type: application/json" \
+            -w "\n%{http_code}" \
+            -s)
+
+          status=$(echo "$response" | tail -n1)
+          body=$(echo "$response" | head -n-1)
+
+          echo "Response: $body"
+          echo "Status: $status"
+
+          if [ "$status" != "200" ]; then
+            echo "❌ Digest send failed with status $status"
+            exit 1
+          fi
+
+          echo "✅ Weekly digests sent successfully"
