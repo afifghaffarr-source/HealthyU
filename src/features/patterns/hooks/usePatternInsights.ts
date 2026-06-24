@@ -6,7 +6,7 @@
 
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import type { PatternInsight } from "../types/pattern";
+import type { PatternInsight, QuickAction } from "../types/pattern";
 
 /**
  * Fetch top pattern for dashboard
@@ -51,7 +51,10 @@ export function useAllPatterns(userId: string | undefined) {
 
       if (error) throw error;
 
-      const patterns = data as PatternInsight[];
+      const patterns = (data || []).map((p) => ({
+        ...p,
+        quick_actions: (p.quick_actions || []) as unknown as QuickAction[],
+      })) as PatternInsight[];
       return {
         active: patterns.filter((p) => !p.resolved_at),
         resolved: patterns.filter((p) => p.resolved_at),

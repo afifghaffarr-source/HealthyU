@@ -22,15 +22,15 @@ import {
 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import type { PatternInsight } from "../types/pattern";
+import type { PatternInsight, QuickAction } from "../types/pattern";
 import { calculateTrend, getTrendEmoji, getTrendColor } from "../lib/patternTrends";
 import { usePatternFeedback } from "../hooks/usePatternFeedback";
 import { useState } from "react";
 
 interface PatternInsightCardProps {
   pattern: PatternInsight;
-  onDismiss?: (id: string) => void;
-  onQuickAction?: (action: { type: string; label: string; action_data?: unknown }) => void;
+  onDismiss?: (patternId: string) => void;
+  onQuickAction?: (action: QuickAction) => void;
 }
 
 const PATTERN_ICONS: Record<string, typeof AlertCircle> = {

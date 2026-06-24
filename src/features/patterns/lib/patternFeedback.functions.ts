@@ -30,7 +30,7 @@ export const submitPatternFeedback = createServerFn({ method: "POST" })
         user_feedback: JSON.stringify({
           helpful,
           submitted_at: new Date().toISOString(),
-        }),
+        }) as never, // Cast: user_feedback not in generated types yet
       })
       .eq("id", patternId)
       .eq("user_id", userId); // Security: only update own patterns

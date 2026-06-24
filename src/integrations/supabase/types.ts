@@ -3861,6 +3861,7 @@ export type Database = {
           resolved_at: string | null;
           updated_at: string;
           urgency_score: number;
+          user_feedback: Json | null;
           user_id: string;
         };
         Insert: {
@@ -3880,6 +3881,7 @@ export type Database = {
           resolved_at?: string | null;
           updated_at?: string;
           urgency_score: number;
+          user_feedback?: Json | null;
           user_id: string;
         };
         Update: {
@@ -3899,6 +3901,7 @@ export type Database = {
           resolved_at?: string | null;
           updated_at?: string;
           urgency_score?: number;
+          user_feedback?: Json | null;
           user_id?: string;
         };
         Relationships: [];
