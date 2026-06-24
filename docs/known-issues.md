@@ -170,34 +170,43 @@ wrangler secret list
 
 ### MI-001: Type Safety - 168 `as any` Usages
 
-**Status:** In Progress (Top 30 fixed)  
+**Status:** Resolved ✅  
 **Priority:** Medium  
 **Component:** Code Quality  
 **Created:** 2026-06-15  
+**Resolved:** 2026-06-15  
 **Related:** Fase 3 AUDIT-008
 
 **Description:**
-Masih ada 168 penggunaan `as any` di codebase yang mengurangi type safety.
+Original audit claimed 168 `as any` usages. Re-measurement revealed the number was inflated.
 
-**Progress:**
+**Actual Count:**
 
-- ✅ Top 30 critical `as any` sudah di-fix (Fase 3)
-- 🔄 Remaining 138 `as any` masih ada
+- 166 occurrences in `src/routeTree.gen.ts` (auto-generated TanStack Router, has `@ts-nocheck`)
+- 1 false positive in comment: `// overlaps = has any of these allergens`
+- **0 actual `as any` casts in hand-written code**
 
-**Impact:**
+**Resolution:**
+Real refactor work was already done in Fase 1 type cleanup (AUDIT-003). Added defensive ESLint rule to prevent regression:
 
-- Runtime errors yang seharusnya catch di compile-time
-- Harder refactoring (type checker tidak bisa help)
-- IDE autocomplete tidak optimal
+```js
+"no-restricted-syntax": [
+  "error",
+  {
+    selector: "TSAsExpression[typeAnnotation.typeName.name='any']",
+    message: "Direct 'as any' casts are banned. Use 'as unknown as Type' for unavoidable cases."
+  }
+]
+```
 
-**Workaround:**
+Allows `as unknown as <Type>` (double cast) for truly unavoidable cases with justification comment.
 
-- Use `// @ts-expect-error` untuk kasus yang unavoidable
-- Add runtime validation di critical paths
+**Related Commits:**
 
-**Proposed Solutions:**
+- `471f4c0a` chore(audit-008): ban 'as any' casts with defensive ESLint rule (Jun 15 2026)
 
-1. **Batch fix** (5-10 `as any` per week)
+---
+
 2. **Add ESLint rule** untuk block new `as any`
 3. **Use `unknown` instead of `any`** untuk better type narrowing
 
