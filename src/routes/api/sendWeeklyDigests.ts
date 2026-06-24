@@ -1,106 +1,104 @@
 /**
- * Weekly Pattern Digest Email
- * Sprint 10b+ enhancement
- *
- * Ponytail: API endpoint (no cron slot needed)
- * Trigger: Manual or external scheduler (GitHub Actions, cron-job.org)
- * Cloudflare Email Workers: 100 emails/day free
+ * Weekly Pattern Digest API Endpoint
+ * Called by GitHub Actions cron (Monday 2am UTC)
  */
 
-import { createServerFn } from "@tanstack/react-start";
+import { createFileRoute } from "@tanstack/react-router";
 import { createClient } from "@supabase/supabase-js";
+import { getEnv } from "@/lib/cloudflare-env.server";
 
-interface DigestResult {
-  sent: number;
-  skipped: number;
-  errors: string[];
-}
+export const Route = createFileRoute("/api/sendWeeklyDigests")({
+  server: {
+    handlers: {
+      POST: async () => {
+        const env = getEnv();
 
-export const sendWeeklyDigests = createServerFn({ method: "POST" }).handler(
-  async ({ context }): Promise<DigestResult> => {
-    // Note: Auth should be handled at network level (Cloudflare Access)
-    // This endpoint is designed to be called by GitHub Actions cron
+        if (!env.SUPABASE_URL || !env.SUPABASE_SERVICE_ROLE_KEY) {
+          return new Response(
+            JSON.stringify({ sent: 0, skipped: 0, errors: ["Missing credentials"] }),
+            { status: 500, headers: { "Content-Type": "application/json" } },
+          );
+        }
 
-    // @ts-expect-error - cloudflare env typing
-    const env = context.cloudflare?.env;
-    if (!env?.SUPABASE_URL || !env?.SUPABASE_SERVICE_ROLE_KEY) {
-      throw new Error("Missing Supabase credentials");
-    }
+        const supabase = createClient(env.SUPABASE_URL, env.SUPABASE_SERVICE_ROLE_KEY);
 
-    const supabase = createClient(env.SUPABASE_URL, env.SUPABASE_SERVICE_ROLE_KEY);
+        // Get patterns from last 7 days, grouped by user
+        const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
 
-    // Get patterns from last 7 days, group by user
-    const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
+        const { data: patterns, error } = await supabase
+          .from("pattern_insights")
+          .select("user_id, pattern_type, ai_explanation, urgency_score, users!inner(email)")
+          .gte("detected_at", sevenDaysAgo)
+          .is("resolved_at", null)
+          .order("urgency_score", { ascending: false });
 
-    const { data: patterns, error } = await supabase
-      .from("pattern_insights")
-      .select("user_id, pattern_type, ai_explanation, urgency_score, users!inner(email)")
-      .gte("detected_at", sevenDaysAgo)
-      .is("resolved_at", null)
-      .order("urgency_score", { ascending: false });
+        if (error || !patterns) {
+          return new Response(
+            JSON.stringify({ sent: 0, skipped: 0, errors: [error?.message || "Query failed"] }),
+            { status: 500, headers: { "Content-Type": "application/json" } },
+          );
+        }
 
-    if (error || !patterns) {
-      return { sent: 0, skipped: 0, errors: [error?.message || "Query failed"] };
-    }
+        // Group by user (top 3 patterns per user)
+        const digestMap = new Map<
+          string,
+          { email: string; patterns: Array<{ type: string; explanation: string }> }
+        >();
 
-    // Group by user, top 3 per user
-    const digestMap = new Map<
-      string,
-      { email: string; patterns: Array<{ type: string; explanation: string; urgency: number }> }
-    >();
+        for (const p of patterns) {
+          const userId = p.user_id;
+          if (!digestMap.has(userId)) {
+            const userEmail = (p.users as unknown as { email: string }).email;
+            digestMap.set(userId, { email: userEmail, patterns: [] });
+          }
+          const digest = digestMap.get(userId)!;
+          if (digest.patterns.length < 3) {
+            digest.patterns.push({
+              type: p.pattern_type,
+              explanation: p.ai_explanation,
+            });
+          }
+        }
 
-    for (const p of patterns) {
-      const userId = p.user_id;
-      if (!digestMap.has(userId)) {
-        // Supabase join returns users object
-        const userEmail = (p.users as unknown as { email: string }).email;
-        digestMap.set(userId, { email: userEmail, patterns: [] });
-      }
-      const digest = digestMap.get(userId)!;
-      if (digest.patterns.length < 3) {
-        digest.patterns.push({
-          type: p.pattern_type,
-          explanation: p.ai_explanation,
-          urgency: p.urgency_score,
+        let sent = 0;
+        let skipped = 0;
+        const errors: string[] = [];
+
+        // Send emails (max 100/day free tier)
+        const digests = Array.from(digestMap.entries());
+        for (const [userId, digest] of digests) {
+          if (sent >= 100) {
+            console.warn("[Digest] Hit daily limit (100)");
+            skipped += digestMap.size - sent;
+            break;
+          }
+
+          try {
+            await sendEmail(digest.email, digest.patterns);
+            sent++;
+          } catch (err) {
+            console.error(`[Digest] Failed for ${digest.email}:`, err);
+            errors.push(`${digest.email}: ${(err as Error).message}`);
+            skipped++;
+          }
+        }
+
+        return new Response(JSON.stringify({ sent, skipped, errors }), {
+          status: 200,
+          headers: { "Content-Type": "application/json" },
         });
-      }
-    }
-
-    let sent = 0;
-    let skipped = 0;
-    const errors: string[] = [];
-
-    // Send emails (max 100/day free tier)
-    const digests = Array.from(digestMap.entries());
-    for (const [userId, digest] of digests) {
-      if (sent >= 100) {
-        console.warn("[Digest] Hit daily limit (100)");
-        skipped += digestMap.size - sent;
-        break;
-      }
-
-      try {
-        await sendEmail(digest.email, digest.patterns);
-        sent++;
-      } catch (err) {
-        console.error(`[Digest] Failed for ${digest.email}:`, err);
-        errors.push(`${digest.email}: ${(err as Error).message}`);
-        skipped++;
-      }
-    }
-
-    return { sent, skipped, errors };
+      },
+    },
   },
-);
+});
 
 async function sendEmail(
   email: string,
-  patterns: Array<{ type: string; explanation: string; urgency: number }>,
+  patterns: Array<{ type: string; explanation: string }>,
 ): Promise<void> {
   const html = renderHTML(patterns);
   const text = renderText(patterns);
 
-  // MailChannels (free via Cloudflare Email Workers)
   const response = await fetch("https://api.mailchannels.net/tx/v1/send", {
     method: "POST",
     headers: { "Content-Type": "application/json" },

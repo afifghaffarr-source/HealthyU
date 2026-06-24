@@ -44,6 +44,7 @@ import { Route as KalkulatorSlugRouteImport } from './routes/kalkulator.$slug'
 import { Route as FaqSlugRouteImport } from './routes/faq.$slug'
 import { Route as DietSlugRouteImport } from './routes/diet.$slug'
 import { Route as ArtikelSlugRouteImport } from './routes/artikel.$slug'
+import { Route as ApiSendWeeklyDigestsRouteImport } from './routes/api/sendWeeklyDigests'
 import { Route as ApiLogErrorRouteImport } from './routes/api/log-error'
 import { Route as ApiHealthRouteImport } from './routes/api/health'
 import { Route as ApiAiStatusRouteImport } from './routes/api/ai-status'
@@ -371,6 +372,11 @@ const ArtikelSlugRoute = ArtikelSlugRouteImport.update({
   id: '/$slug',
   path: '/$slug',
   getParentRoute: () => ArtikelRoute,
+} as any)
+const ApiSendWeeklyDigestsRoute = ApiSendWeeklyDigestsRouteImport.update({
+  id: '/api/sendWeeklyDigests',
+  path: '/api/sendWeeklyDigests',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const ApiLogErrorRoute = ApiLogErrorRouteImport.update({
   id: '/api/log-error',
@@ -1291,6 +1297,7 @@ export interface FileRoutesByFullPath {
   '/api/ai-status': typeof ApiAiStatusRoute
   '/api/health': typeof ApiHealthRoute
   '/api/log-error': typeof ApiLogErrorRoute
+  '/api/sendWeeklyDigests': typeof ApiSendWeeklyDigestsRoute
   '/artikel/$slug': typeof ArtikelSlugRoute
   '/diet/$slug': typeof DietSlugRoute
   '/faq/$slug': typeof FaqSlugRoute
@@ -1472,6 +1479,7 @@ export interface FileRoutesByTo {
   '/api/ai-status': typeof ApiAiStatusRoute
   '/api/health': typeof ApiHealthRoute
   '/api/log-error': typeof ApiLogErrorRoute
+  '/api/sendWeeklyDigests': typeof ApiSendWeeklyDigestsRoute
   '/artikel/$slug': typeof ArtikelSlugRoute
   '/diet/$slug': typeof DietSlugRoute
   '/faq/$slug': typeof FaqSlugRoute
@@ -1663,6 +1671,7 @@ export interface FileRoutesById {
   '/api/ai-status': typeof ApiAiStatusRoute
   '/api/health': typeof ApiHealthRoute
   '/api/log-error': typeof ApiLogErrorRoute
+  '/api/sendWeeklyDigests': typeof ApiSendWeeklyDigestsRoute
   '/artikel/$slug': typeof ArtikelSlugRoute
   '/diet/$slug': typeof DietSlugRoute
   '/faq/$slug': typeof FaqSlugRoute
@@ -1854,6 +1863,7 @@ export interface FileRouteTypes {
     | '/api/ai-status'
     | '/api/health'
     | '/api/log-error'
+    | '/api/sendWeeklyDigests'
     | '/artikel/$slug'
     | '/diet/$slug'
     | '/faq/$slug'
@@ -2035,6 +2045,7 @@ export interface FileRouteTypes {
     | '/api/ai-status'
     | '/api/health'
     | '/api/log-error'
+    | '/api/sendWeeklyDigests'
     | '/artikel/$slug'
     | '/diet/$slug'
     | '/faq/$slug'
@@ -2225,6 +2236,7 @@ export interface FileRouteTypes {
     | '/api/ai-status'
     | '/api/health'
     | '/api/log-error'
+    | '/api/sendWeeklyDigests'
     | '/artikel/$slug'
     | '/diet/$slug'
     | '/faq/$slug'
@@ -2361,6 +2373,7 @@ export interface RootRouteChildren {
   ApiAiStatusRoute: typeof ApiAiStatusRoute
   ApiHealthRoute: typeof ApiHealthRoute
   ApiLogErrorRoute: typeof ApiLogErrorRoute
+  ApiSendWeeklyDigestsRoute: typeof ApiSendWeeklyDigestsRoute
   RecipesIdRoute: typeof RecipesIdRoute
   RecipesImportRoute: typeof RecipesImportRoute
   RecipesRecommendationsRoute: typeof RecipesRecommendationsRoute
@@ -2628,6 +2641,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/artikel/$slug'
       preLoaderRoute: typeof ArtikelSlugRouteImport
       parentRoute: typeof ArtikelRoute
+    }
+    '/api/sendWeeklyDigests': {
+      id: '/api/sendWeeklyDigests'
+      path: '/api/sendWeeklyDigests'
+      fullPath: '/api/sendWeeklyDigests'
+      preLoaderRoute: typeof ApiSendWeeklyDigestsRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/api/log-error': {
       id: '/api/log-error'
@@ -4317,6 +4337,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiAiStatusRoute: ApiAiStatusRoute,
   ApiHealthRoute: ApiHealthRoute,
   ApiLogErrorRoute: ApiLogErrorRoute,
+  ApiSendWeeklyDigestsRoute: ApiSendWeeklyDigestsRoute,
   RecipesIdRoute: RecipesIdRoute,
   RecipesImportRoute: RecipesImportRoute,
   RecipesRecommendationsRoute: RecipesRecommendationsRoute,
