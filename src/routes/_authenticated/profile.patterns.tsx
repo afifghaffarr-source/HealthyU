@@ -7,21 +7,37 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { useAuth } from "@/lib/auth";
 import { usePatternPreferences } from "@/features/patterns/hooks/usePatternPreferences";
 import type { PatternSensitivity } from "@/features/patterns/types/preferences";
+import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
+import { getProfile } from "@/features/profile/lib/profile.functions";
 
 export const Route = createFileRoute("/_authenticated/profile/patterns")({
   component: PatternSettingsPage,
 });
 
 function PatternSettingsPage() {
-  const { user } = useAuth();
-  const { preferences, updateSensitivity, isLoading, isUpdating } = usePatternPreferences(user?.id);
+  const getProfileFn = useServerFn(getProfile);
+  const { data: profile } = useQuery({
+    queryKey: ["profile"],
+    queryFn: () => getProfileFn(),
+  });
+
+  const userId = profile?.id;
+  const { preferences, updateSensitivity, isLoading, isUpdating } = usePatternPreferences(userId);
 
   const handleSensitivityChange = (value: string) => {
     updateSensitivity(value as PatternSensitivity);
   };
+
+  if (!userId) {
+    return (
+      <div className="container max-w-2xl py-6">
+        <p className="text-muted-foreground">Loading...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="container max-w-2xl py-6">
