@@ -375,10 +375,11 @@ describe("Time Pattern Detection", () => {
     });
 
     it("returns empty array if no patterns detected", () => {
+      // Use recent dates with consistent breakfast logging
       const meals: MealLog[] = [
         {
-          log_date: "2026-06-10",
-          logged_at: "2026-06-10T08:00:00Z",
+          log_date: "2026-06-23",
+          logged_at: "2026-06-23T08:00:00Z",
           meal_type: "breakfast",
           calories: 300,
           carbs_g: 40,
@@ -386,8 +387,8 @@ describe("Time Pattern Detection", () => {
           fat_g: 10,
         },
         {
-          log_date: "2026-06-10",
-          logged_at: "2026-06-10T12:00:00Z",
+          log_date: "2026-06-23",
+          logged_at: "2026-06-23T12:00:00Z",
           meal_type: "lunch",
           calories: 500,
           carbs_g: 60,
@@ -395,8 +396,35 @@ describe("Time Pattern Detection", () => {
           fat_g: 15,
         },
         {
-          log_date: "2026-06-11",
-          logged_at: "2026-06-11T08:00:00Z",
+          log_date: "2026-06-22",
+          logged_at: "2026-06-22T08:00:00Z",
+          meal_type: "breakfast",
+          calories: 300,
+          carbs_g: 40,
+          protein_g: 15,
+          fat_g: 10,
+        },
+        {
+          log_date: "2026-06-20",
+          logged_at: "2026-06-20T08:00:00Z",
+          meal_type: "breakfast",
+          calories: 300,
+          carbs_g: 40,
+          protein_g: 15,
+          fat_g: 10,
+        },
+        {
+          log_date: "2026-06-19",
+          logged_at: "2026-06-19T08:00:00Z",
+          meal_type: "breakfast",
+          calories: 300,
+          carbs_g: 40,
+          protein_g: 15,
+          fat_g: 10,
+        },
+        {
+          log_date: "2026-06-18",
+          logged_at: "2026-06-18T08:00:00Z",
           meal_type: "breakfast",
           calories: 300,
           carbs_g: 40,
