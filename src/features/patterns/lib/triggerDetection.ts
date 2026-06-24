@@ -54,8 +54,9 @@ export async function triggerIfNeeded(
   userId: string,
   supabase: SupabaseClient<Database>,
   geminiKey?: string,
+  forceRun = false,
 ): Promise<{ ran: boolean; patternsFound: number }> {
-  const should = await shouldRunDetection(userId, supabase);
+  const should = forceRun || (await shouldRunDetection(userId, supabase));
   if (!should) {
     return { ran: false, patternsFound: 0 };
   }

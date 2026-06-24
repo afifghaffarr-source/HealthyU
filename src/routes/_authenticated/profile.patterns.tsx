@@ -3,22 +3,29 @@
  * Sprint 10c Phase 1 - Custom Thresholds UI
  */
 
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useRouter } from "@tanstack/react-router";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Button } from "@/components/ui/button";
 import { usePatternPreferences } from "@/features/patterns/hooks/usePatternPreferences";
 import type { PatternSensitivity } from "@/features/patterns/types/preferences";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { getProfile } from "@/features/profile/lib/profile.functions";
+import { runPatternDetectionNow } from "@/features/patterns/lib/manualTrigger.functions";
+import { Sparkles, Loader2 } from "lucide-react";
+import { toast } from "@/lib/toast-config";
 
 export const Route = createFileRoute("/_authenticated/profile/patterns")({
   component: PatternSettingsPage,
 });
 
 function PatternSettingsPage() {
+  const router = useRouter();
   const getProfileFn = useServerFn(getProfile);
+  const runDetectionFn = useServerFn(runPatternDetectionNow);
+
   const { data: profile } = useQuery({
     queryKey: ["profile"],
     queryFn: () => getProfileFn(),
@@ -26,6 +33,25 @@ function PatternSettingsPage() {
 
   const userId = profile?.id;
   const { preferences, updateSensitivity, isLoading, isUpdating } = usePatternPreferences(userId);
+
+  const runDetectionMutation = useMutation({
+    mutationFn: () => runDetectionFn(),
+    onSuccess: (result) => {
+      if (result.patternsFound > 0) {
+        toast.success(
+          `Found ${result.patternsFound} pattern${result.patternsFound > 1 ? "s" : ""}!`,
+        );
+        setTimeout(() => {
+          router.navigate({ to: "/profile/insights" });
+        }, 1000);
+      } else {
+        toast("No patterns detected. Keep logging meals to build pattern data.");
+      }
+    },
+    onError: () => {
+      toast.error("Failed to run detection. Please try again.");
+    },
+  });
 
   const handleSensitivityChange = (value: string) => {
     updateSensitivity(value as PatternSensitivity);
@@ -105,6 +131,30 @@ function PatternSettingsPage() {
           )}
 
           {isUpdating && <p className="text-sm text-muted-foreground animate-pulse">Saving...</p>}
+
+          <div className="pt-4 border-t">
+            <Button
+              onClick={() => runDetectionMutation.mutate()}
+              disabled={runDetectionMutation.isPending}
+              className="w-full"
+              size="lg"
+            >
+              {runDetectionMutation.isPending ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Analyzing...
+                </>
+              ) : (
+                <>
+                  <Sparkles className="mr-2 h-4 w-4" />
+                  Analyze Patterns Now
+                </>
+              )}
+            </Button>
+            <p className="text-xs text-muted-foreground text-center mt-2">
+              Run pattern detection with your current sensitivity setting
+            </p>
+          </div>
         </CardContent>
       </Card>
 
