@@ -50,6 +50,12 @@ import { useDashboardMutations } from "@/features/dashboard/hooks/useDashboardMu
 import { HijriWidget } from "@/features/hijri/components/HijriWidget";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { ChevronDown } from "lucide-react";
+import { useTopPattern, useDismissPattern } from "@/features/patterns/hooks/usePatternInsights";
+import {
+  PatternInsightCard,
+  PatternInsightCardSkeleton,
+} from "@/features/patterns/components/PatternInsightCard";
+import { handleQuickAction } from "@/features/patterns/lib/quickActions";
 
 const profileQueryOptions = queryOptions({
   queryKey: ["profile"],
@@ -107,6 +113,10 @@ function Dashboard() {
   const [freezeOpen, setFreezeOpen] = useState(false);
   const [showMore, setShowMore] = useState(false);
   const { bonusClaimed, claimBonusMut, waterMutation, moodMutation } = useDashboardMutations();
+
+  // Pattern insights (Sprint 10b)
+  const { data: topPattern, isLoading: patternLoading } = useTopPattern(profile?.id);
+  const dismissPatternMut = useDismissPattern();
 
   const { data: profile } = useSuspenseQuery(profileQueryOptions);
   const { data: dailyTip } = useQuery(dailyTipQueryOptions);
@@ -219,6 +229,21 @@ function Dashboard() {
             hasRead={Boolean(coachData?.id && (coachData as { read_at?: string }).read_at)}
           />
         </SectionGroup>
+
+        {/* PATTERN INSIGHTS — eating pattern detection (Sprint 10b) */}
+        {patternLoading ? (
+          <SectionGroup label="Pattern Insights" actionLabel="Semua" actionHref="/profile/insights">
+            <PatternInsightCardSkeleton />
+          </SectionGroup>
+        ) : topPattern ? (
+          <SectionGroup label="Pattern Insights" actionLabel="Semua" actionHref="/profile/insights">
+            <PatternInsightCard
+              pattern={topPattern}
+              onDismiss={(id) => dismissPatternMut.mutate(id)}
+              onQuickAction={handleQuickAction}
+            />
+          </SectionGroup>
+        ) : null}
 
         {/* AKSI CEPAT */}
         <SectionGroup label="Aksi Cepat">
