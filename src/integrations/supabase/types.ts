@@ -6,31 +6,6 @@ export type Database = {
   __InternalSupabase: {
     PostgrestVersion: "14.5";
   };
-  graphql_public: {
-    Tables: {
-      [_ in never]: never;
-    };
-    Views: {
-      [_ in never]: never;
-    };
-    Functions: {
-      graphql: {
-        Args: {
-          extensions?: Json;
-          operationName?: string;
-          query?: string;
-          variables?: Json;
-        };
-        Returns: Json;
-      };
-    };
-    Enums: {
-      [_ in never]: never;
-    };
-    CompositeTypes: {
-      [_ in never]: never;
-    };
-  };
   public: {
     Tables: {
       account_deletion_log: {
@@ -3853,6 +3828,21 @@ export type Database = {
         };
         Relationships: [];
       };
+      pattern_detection_cooldown: {
+        Row: {
+          last_detection_at: string;
+          user_id: string;
+        };
+        Insert: {
+          last_detection_at?: string;
+          user_id: string;
+        };
+        Update: {
+          last_detection_at?: string;
+          user_id?: string;
+        };
+        Relationships: [];
+      };
       pattern_insights: {
         Row: {
           ai_explanation: string;
@@ -7048,9 +7038,6 @@ export type CompositeTypes<
     : never;
 
 export const Constants = {
-  graphql_public: {
-    Enums: {},
-  },
   public: {
     Enums: {
       app_role: ["admin", "moderator", "user"],

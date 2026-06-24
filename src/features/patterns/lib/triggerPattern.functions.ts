@@ -5,18 +5,16 @@ import { triggerIfNeeded } from "./triggerDetection";
 /**
  * Check and trigger pattern detection if 24h passed
  * Called from dashboard loader (lazy trigger)
+ *
+ * KV removed — cooldown now in Supabase (free tier KV at 100%)
  */
 export const checkPatternTrigger = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     const { supabase, userId } = context;
 
-    if (!context.cloudflare?.env?.HEALTHYU_KV) {
-      return { checked: false, reason: "no_kv" };
-    }
-
     try {
-      const result = await triggerIfNeeded(userId, supabase, context.cloudflare.env.HEALTHYU_KV);
+      const result = await triggerIfNeeded(userId, supabase);
       return { checked: true, ...result };
     } catch (err) {
       console.error("[Dashboard] Pattern trigger check failed:", err);
