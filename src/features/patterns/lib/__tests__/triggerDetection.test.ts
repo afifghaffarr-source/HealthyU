@@ -7,6 +7,11 @@ import { describe, expect, it, beforeEach, vi } from "vitest";
 import { shouldRunDetection, markDetectionRun, triggerIfNeeded } from "../triggerDetection";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
+// Mock the detection function to avoid aiGateway dependency
+vi.mock("../patternDetection.functions", () => ({
+  detectPatterns: vi.fn().mockResolvedValue([]),
+}));
+
 describe("Pattern Detection Triggers", () => {
   let mockSupabase: SupabaseClient;
   let mockSelect: ReturnType<typeof vi.fn>;
