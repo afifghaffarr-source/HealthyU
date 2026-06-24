@@ -156,25 +156,74 @@ function compressContext(
 }
 
 /**
- * Call AI for refinement (mock for now, will integrate Gemini Flash)
- */
+ /**
+  * Call AI for refinement (Gemini Flash via VexoAPI)
+  * Cost: ~$0.0006 per call (250 input tokens + 300 output tokens)
+  */
 async function callAIForScoring(compressed: {
   user: string;
   patterns: string;
 }): Promise<Array<{ type: string; score: number; reason: string; recommendation: string }>> {
-  // TODO: Integrate with Gemini Flash API
-  // For now, return mock refined scores
+  // Import AI gateway
+  const { callAiJsonWithGuards } = await import("@/features/ai/lib/aiGateway.server");
 
-  const prompt = `Score these patterns (0-100). Return JSON only.
-User: ${compressed.user}
-Patterns: ${compressed.patterns}
-Format: [{"type":"skip_breakfast","score":75,"reason":"...","recommendation":"..."}]`;
+  const prompt = `You are a diet pattern analyzer. Score these eating patterns (0-100) based on health impact, goal alignment, and ease of fix.
 
-  // Mock response (will be replaced with actual API call)
-  console.log("[Pattern AI] Would call Gemini Flash with prompt:", prompt);
+ User context: ${compressed.user}
+ Patterns detected: ${compressed.patterns}
 
-  // Return empty for now (hardcoded scores will be used)
-  return [];
+ Return ONLY a JSON array with this exact structure:
+ [
+   {
+     "type": "pattern_type",
+     "score": 75,
+     "reason": "Short explanation in Indonesian (max 100 chars)",
+     "recommendation": "Actionable tip in Indonesian (max 150 chars)"
+   }
+ ]
+
+ Rules:
+ - Higher score = more urgent to address
+ - Health risks (diabetes + sugar) = 85-95
+ - Goal misalignment (weight loss + overeating) = 70-85
+ - Minor issues = 50-65
+ - Keep Indonesian casual & friendly ("kamu", not formal)`;
+
+  try {
+    const result = await callAiJsonWithGuards({
+      userId: null, // System job (cron)
+      feature: "patterns.scoring",
+      messages: [
+        {
+          role: "system",
+          content: "You are a helpful diet pattern analyzer. Always respond with valid JSON.",
+        },
+        { role: "user", content: prompt },
+      ],
+      model: "google/gemini-2.5-flash-lite", // Cheapest model (glm47flash)
+      skipBudget: true, // Cron job, no user rate limit
+      responseFormat: "json_object",
+      timeoutMs: 15000, // 15s timeout
+    });
+
+    // Parse response
+    if (Array.isArray(result)) {
+      return result.map((item) => ({
+        type: item.type || "",
+        score: typeof item.score === "number" ? item.score : 50,
+        reason: item.reason || "",
+        recommendation: item.recommendation || "",
+      }));
+    }
+
+    // Fallback: empty array if parsing fails
+    console.warn("[Pattern AI] Invalid response format:", result);
+    return [];
+  } catch (error) {
+    console.error("[Pattern AI] API call failed:", error);
+    // Fail gracefully: return empty array, hardcoded scores will be used
+    return [];
+  }
 }
 
 /**
