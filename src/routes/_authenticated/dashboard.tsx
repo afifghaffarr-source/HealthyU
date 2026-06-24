@@ -117,12 +117,12 @@ function Dashboard() {
   const [showMore, setShowMore] = useState(false);
   const { bonusClaimed, claimBonusMut, waterMutation, moodMutation } = useDashboardMutations();
 
+  const { data: profile } = useSuspenseQuery(profileQueryOptions);
+  const { data: dailyTip } = useQuery(dailyTipQueryOptions);
+
   // Pattern insights (Sprint 10b)
   const { data: topPattern, isLoading: patternLoading } = useTopPattern(profile?.id);
   const dismissPatternMut = useDismissPattern();
-
-  const { data: profile } = useSuspenseQuery(profileQueryOptions);
-  const { data: dailyTip } = useQuery(dailyTipQueryOptions);
   const { data: meals = [] } = useQuery({
     queryKey: ["meals", "today"],
     queryFn: () => fetchMeals(),

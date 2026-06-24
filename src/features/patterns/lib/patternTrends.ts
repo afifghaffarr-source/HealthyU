@@ -21,8 +21,9 @@ export function calculateTrend(pattern: PatternInsight): PatternTrend {
 
   // Improvement = (baseline - current) / baseline * 100
   // Example: baseline=10, current=3 → (10-3)/10*100 = 70% improvement
+  const safeBaseline = baseline_count ?? 0;
   const improvementPercent =
-    baseline_count > 0 ? ((baseline_count - occurrence_count) / baseline_count) * 100 : 0;
+    safeBaseline > 0 ? ((safeBaseline - occurrence_count) / safeBaseline) * 100 : 0;
 
   // Status thresholds
   let status: PatternTrend["status"];

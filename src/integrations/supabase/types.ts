@@ -6,6 +6,31 @@ export type Database = {
   __InternalSupabase: {
     PostgrestVersion: "14.5";
   };
+  graphql_public: {
+    Tables: {
+      [_ in never]: never;
+    };
+    Views: {
+      [_ in never]: never;
+    };
+    Functions: {
+      graphql: {
+        Args: {
+          extensions?: Json;
+          operationName?: string;
+          query?: string;
+          variables?: Json;
+        };
+        Returns: Json;
+      };
+    };
+    Enums: {
+      [_ in never]: never;
+    };
+    CompositeTypes: {
+      [_ in never]: never;
+    };
+  };
   public: {
     Tables: {
       account_deletion_log: {
@@ -3828,6 +3853,66 @@ export type Database = {
         };
         Relationships: [];
       };
+      pattern_insights: {
+        Row: {
+          ai_explanation: string;
+          ai_recommendation: string;
+          analysis_metadata: Json | null;
+          baseline_count: number | null;
+          created_at: string;
+          detected_at: string;
+          detection_window_end: string;
+          detection_window_start: string;
+          id: string;
+          last_occurrence: string;
+          occurrence_count: number;
+          pattern_type: string;
+          quick_actions: Json;
+          resolved_at: string | null;
+          updated_at: string;
+          urgency_score: number;
+          user_id: string;
+        };
+        Insert: {
+          ai_explanation: string;
+          ai_recommendation: string;
+          analysis_metadata?: Json | null;
+          baseline_count?: number | null;
+          created_at?: string;
+          detected_at?: string;
+          detection_window_end: string;
+          detection_window_start: string;
+          id?: string;
+          last_occurrence: string;
+          occurrence_count: number;
+          pattern_type: string;
+          quick_actions?: Json;
+          resolved_at?: string | null;
+          updated_at?: string;
+          urgency_score: number;
+          user_id: string;
+        };
+        Update: {
+          ai_explanation?: string;
+          ai_recommendation?: string;
+          analysis_metadata?: Json | null;
+          baseline_count?: number | null;
+          created_at?: string;
+          detected_at?: string;
+          detection_window_end?: string;
+          detection_window_start?: string;
+          id?: string;
+          last_occurrence?: string;
+          occurrence_count?: number;
+          pattern_type?: string;
+          quick_actions?: Json;
+          resolved_at?: string | null;
+          updated_at?: string;
+          urgency_score?: number;
+          user_id?: string;
+        };
+        Relationships: [];
+      };
       payment_history: {
         Row: {
           amount_idr: number;
@@ -6963,6 +7048,9 @@ export type CompositeTypes<
     : never;
 
 export const Constants = {
+  graphql_public: {
+    Enums: {},
+  },
   public: {
     Enums: {
       app_role: ["admin", "moderator", "user"],

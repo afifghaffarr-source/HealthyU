@@ -9,6 +9,8 @@
 
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { DetectedPattern, ScoredPattern, QuickAction } from "../types/pattern";
+import { callAiJsonWithSchema } from "@/features/ai/lib/aiGateway.server";
+import { z } from "zod";
 
 interface UserProfile {
   user_id: string;
@@ -190,8 +192,17 @@ async function callAIForScoring(compressed: {
  - Keep Indonesian casual & friendly ("kamu", not formal)`;
 
   try {
-    const result = await callAiJsonWithGuards({
-      userId: null, // System job (cron)
+    const PatternScoreSchema = z.array(
+      z.object({
+        type: z.string(),
+        score: z.number(),
+        reason: z.string(),
+        recommendation: z.string(),
+      }),
+    );
+
+    const result = await callAiJsonWithSchema({
+      userId: null,
       feature: "patterns.scoring",
       messages: [
         {
@@ -200,10 +211,10 @@ async function callAIForScoring(compressed: {
         },
         { role: "user", content: prompt },
       ],
-      model: "google/gemini-2.5-flash-lite", // Cheapest model (glm47flash)
-      skipBudget: true, // Cron job, no user rate limit
-      responseFormat: "json_object",
-      timeoutMs: 15000, // 15s timeout
+      model: "google/gemini-2.5-flash-lite",
+      skipBudget: true,
+      timeoutMs: 15000,
+      schema: PatternScoreSchema,
     });
 
     // Parse response
