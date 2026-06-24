@@ -5,124 +5,115 @@
 
 import { describe, expect, it, beforeEach, vi } from "vitest";
 import { shouldRunDetection, markDetectionRun, triggerIfNeeded } from "../triggerDetection";
-
-interface MockKV {
-  get: ReturnType<typeof vi.fn<(key: string) => Promise<string | null>>>;
-  put: ReturnType<
-    typeof vi.fn<
-      (key: string, value: string, options?: { expirationTtl?: number }) => Promise<void>
-    >
-  >;
-}
-
-interface MockSupabase {
-  from: ReturnType<typeof vi.fn>;
-  select: ReturnType<typeof vi.fn>;
-  eq: ReturnType<typeof vi.fn>;
-  gte: ReturnType<typeof vi.fn>;
-  lt: ReturnType<typeof vi.fn>;
-  is: ReturnType<typeof vi.fn>;
-  order: ReturnType<typeof vi.fn>;
-  limit: ReturnType<typeof vi.fn>;
-  single: ReturnType<typeof vi.fn>;
-}
+import type { SupabaseClient } from "@supabase/supabase-js";
 
 describe("Pattern Detection Triggers", () => {
-  let mockKV: MockKV;
-  let mockSupabase: MockSupabase;
+  let mockSupabase: Partial<SupabaseClient>;
 
   beforeEach(() => {
-    mockKV = {
-      get: vi.fn(),
-      put: vi.fn(),
+    const chainable = {
+      from: vi.fn(),
+      select: vi.fn(),
+      eq: vi.fn(),
+      gte: vi.fn(),
+      lt: vi.fn(),
+      is: vi.fn(),
+      order: vi.fn(),
+      limit: vi.fn(),
+      single: vi.fn(),
+      upsert: vi.fn(),
     };
 
-    mockSupabase = {
-      from: vi.fn(() => mockSupabase),
-      select: vi.fn(() => mockSupabase),
-      eq: vi.fn(() => mockSupabase),
-      gte: vi.fn(() => mockSupabase),
-      lt: vi.fn(() => mockSupabase),
-      is: vi.fn(() => mockSupabase),
-      order: vi.fn(() => mockSupabase),
-      limit: vi.fn(() => mockSupabase),
-      single: vi.fn(),
-    };
+    // Chain all methods back to chainable
+    Object.keys(chainable).forEach((key) => {
+      if (key !== "single" && key !== "upsert") {
+        (chainable as Record<string, unknown>)[key] = vi.fn(() => chainable);
+      }
+    });
+
+    mockSupabase = chainable as unknown as Partial<SupabaseClient>;
   });
 
   describe("shouldRunDetection", () => {
-    it("returns true when no cache exists (first run)", async () => {
-      mockKV.get.mockResolvedValue(null);
+    it("returns true when no record exists (first run)", async () => {
+      (mockSupabase.from as ReturnType<typeof vi.fn>)().single.mockResolvedValue({
+        data: null,
+        error: null,
+      });
 
-      const result = await shouldRunDetection("user-123", mockKV);
+      const result = await shouldRunDetection("user-123", mockSupabase as SupabaseClient);
 
       expect(result).toBe(true);
-      expect(mockKV.get).toHaveBeenCalledWith("pattern_last_run:user-123");
     });
 
-    it("returns false when cached < 24h ago", async () => {
-      const twoHoursAgo = Date.now() - 2 * 60 * 60 * 1000;
-      mockKV.get.mockResolvedValue(twoHoursAgo.toString());
+    it("returns false when last detection < 24h ago", async () => {
+      const twoHoursAgo = new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString();
+      (mockSupabase.from as ReturnType<typeof vi.fn>)().single.mockResolvedValue({
+        data: { last_detection_at: twoHoursAgo },
+        error: null,
+      });
 
-      const result = await shouldRunDetection("user-123", mockKV);
+      const result = await shouldRunDetection("user-123", mockSupabase as SupabaseClient);
 
       expect(result).toBe(false);
     });
 
-    it("returns true when cached >= 24h ago", async () => {
-      const twentyFiveHoursAgo = Date.now() - 25 * 60 * 60 * 1000;
-      mockKV.get.mockResolvedValue(twentyFiveHoursAgo.toString());
+    it("returns true when last detection >= 24h ago", async () => {
+      const twentyFiveHoursAgo = new Date(Date.now() - 25 * 60 * 60 * 1000).toISOString();
+      (mockSupabase.from as ReturnType<typeof vi.fn>)().single.mockResolvedValue({
+        data: { last_detection_at: twentyFiveHoursAgo },
+        error: null,
+      });
 
-      const result = await shouldRunDetection("user-123", mockKV);
+      const result = await shouldRunDetection("user-123", mockSupabase as SupabaseClient);
 
       expect(result).toBe(true);
     });
   });
 
   describe("markDetectionRun", () => {
-    it("caches current timestamp with 24h TTL", async () => {
-      const beforeTime = Date.now();
+    it("upserts current timestamp for user", async () => {
+      const mockChain = mockSupabase.from as ReturnType<typeof vi.fn>;
+      const chain = mockChain();
+      chain.upsert.mockResolvedValue({ data: null, error: null });
 
-      await markDetectionRun("user-123", mockKV);
+      await markDetectionRun("user-123", mockSupabase as SupabaseClient);
 
-      const afterTime = Date.now();
+      expect(chain.upsert).toHaveBeenCalledTimes(1);
+      const [insertData, options] = chain.upsert.mock.calls[0];
 
-      expect(mockKV.put).toHaveBeenCalledTimes(1);
-      const [key, value, options] = mockKV.put.mock.calls[0];
-
-      expect(key).toBe("pattern_last_run:user-123");
-      const cachedTime = parseInt(value, 10);
-      expect(cachedTime).toBeGreaterThanOrEqual(beforeTime);
-      expect(cachedTime).toBeLessThanOrEqual(afterTime);
-      expect(options).toEqual({ expirationTtl: 86400 });
+      expect(insertData.user_id).toBe("user-123");
+      expect(insertData.last_detection_at).toBeDefined();
+      expect(options).toEqual({ onConflict: "user_id" });
     });
   });
 
   describe("triggerIfNeeded", () => {
-    it("skips detection when cache is fresh (<24h)", async () => {
-      const oneHourAgo = Date.now() - 60 * 60 * 1000;
-      mockKV.get.mockResolvedValue(oneHourAgo.toString());
+    it("skips detection when last run < 24h", async () => {
+      const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString();
+      (mockSupabase.from as ReturnType<typeof vi.fn>)().single.mockResolvedValue({
+        data: { last_detection_at: oneHourAgo },
+        error: null,
+      });
 
-      const result = await triggerIfNeeded("user-123", mockSupabase, mockKV);
+      const result = await triggerIfNeeded("user-123", mockSupabase as SupabaseClient);
 
       expect(result).toEqual({
         ran: false,
         patternsFound: 0,
       });
-      expect(mockKV.put).not.toHaveBeenCalled();
     });
 
-    it("marks as run even if detection fails (cache updated)", async () => {
-      mockKV.get.mockResolvedValue(null); // No cache = should run
+    it("marks as run even if detection fails", async () => {
+      const mockChain = mockSupabase.from as ReturnType<typeof vi.fn>;
+      const chain = mockChain();
+      chain.single.mockResolvedValue({ data: null, error: null });
+      chain.upsert.mockResolvedValue({ data: null, error: null });
 
-      // Trigger will attempt detection, we just verify cache is set
-      const result = await triggerIfNeeded("user-123", mockSupabase, mockKV);
+      await triggerIfNeeded("user-123", mockSupabase as SupabaseClient);
 
-      // May succeed or fail depending on real detectPatternsForUser,
-      // but cache should be marked regardless
-      expect(mockKV.put).toHaveBeenCalledWith("pattern_last_run:user-123", expect.any(String), {
-        expirationTtl: 86400,
-      });
+      // Cooldown should be marked regardless of detection outcome
+      expect(chain.upsert).toHaveBeenCalled();
     });
   });
 });
