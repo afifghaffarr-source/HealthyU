@@ -133,7 +133,10 @@ export function detectWeekendSplurge(meals: MealLogWithLocation[]): DetectedPatt
 /**
  * Run all social pattern detections
  */
-export function detectSocialPatterns(meals: MealLogWithLocation[]): DetectedPattern[] {
+export function detectSocialPatterns(
+  meals: MealLogWithLocation[],
+  sensitivity: number = 1.0,
+): DetectedPattern[] {
   return [
     detectGatheringOvereat(meals),
     detectPeerPressure(meals),

@@ -129,7 +129,10 @@ export function detectCelebrationOvereat(meals: MealLogWithMood[]): DetectedPatt
 /**
  * Run all emotional pattern detections
  */
-export function detectEmotionalPatterns(meals: MealLogWithMood[]): DetectedPattern[] {
+export function detectEmotionalPatterns(
+  meals: MealLogWithMood[],
+  sensitivity: number = 1.0,
+): DetectedPattern[] {
   return [
     detectStressEating(meals),
     detectMoodBinges(meals),

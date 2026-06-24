@@ -21,9 +21,9 @@ export interface MealLog {
 
 /**
  * Detect skip breakfast pattern
- * Threshold: <3 breakfasts in last 5 weekdays
+ * Threshold: <3 breakfasts in last 5 weekdays (adjusted by sensitivity)
  */
-export function detectSkipBreakfast(meals: MealLog[]): DetectedPattern {
+export function detectSkipBreakfast(meals: MealLog[], sensitivity: number = 1.0): DetectedPattern {
   const now = new Date();
   const fiveDaysAgo = new Date(now.getTime() - 5 * 86400000);
 
@@ -44,23 +44,30 @@ export function detectSkipBreakfast(meals: MealLog[]): DetectedPattern {
   const breakfastCount = weekdays.filter((d) => breakfastDays.has(d)).length;
   const skippedDays = weekdays.filter((d) => !breakfastDays.has(d));
 
+  // Apply sensitivity: low=4+, medium=3+, high=2+
+  const threshold = Math.max(2, Math.ceil(3 / sensitivity));
+
   return {
     type: "skip_breakfast",
     count: skippedDays.length,
-    detected: skippedDays.length >= 3,
+    detected: skippedDays.length >= threshold,
     matched_dates: skippedDays,
     metadata: {
       weekdays_checked: weekdays,
       breakfast_count: breakfastCount,
+      threshold_applied: threshold,
     },
   };
 }
 
 /**
  * Detect late-night eating pattern
- * Threshold: 3+ meals after 10pm in 14 days
+ * Threshold: 3+ meals after 10pm in 14 days (adjusted by sensitivity)
  */
-export function detectLateNightEating(meals: MealLog[]): DetectedPattern {
+export function detectLateNightEating(
+  meals: MealLog[],
+  sensitivity: number = 1.0,
+): DetectedPattern {
   const lateNightMeals = meals.filter((m) => {
     const hour = new Date(m.logged_at).getHours();
     return hour >= 22 || hour < 4; // 10pm-4am
@@ -76,14 +83,18 @@ export function detectLateNightEating(meals: MealLog[]): DetectedPattern {
       ? Math.round(lateNightMeals.reduce((sum, m) => sum + m.carbs_g, 0) / lateNightMeals.length)
       : 0;
 
+  // Apply sensitivity: low=4+, medium=3+, high=2+
+  const threshold = Math.max(2, Math.ceil(3 / sensitivity));
+
   return {
     type: "late_night_eating",
     count: lateNightMeals.length,
-    detected: lateNightMeals.length >= 3,
+    detected: lateNightMeals.length >= threshold,
     avg_calories: avgCalories,
     avg_carbs: avgCarbs,
     matched_dates: lateNightMeals.map((m) => m.log_date),
     metadata: {
+      threshold_applied: threshold,
       late_night_meals: lateNightMeals.map((m) => ({
         date: m.log_date,
         time: m.logged_at,
@@ -143,10 +154,10 @@ export function detectIrregularMeals(meals: MealLog[]): DetectedPattern {
 /**
  * Run all time-based pattern detections
  */
-export function detectTimePatterns(meals: MealLog[]): DetectedPattern[] {
+export function detectTimePatterns(meals: MealLog[], sensitivity: number = 1.0): DetectedPattern[] {
   return [
-    detectSkipBreakfast(meals),
-    detectLateNightEating(meals),
+    detectSkipBreakfast(meals, sensitivity),
+    detectLateNightEating(meals, sensitivity),
     detectIrregularMeals(meals),
   ].filter((p) => p.detected);
 }

@@ -139,7 +139,10 @@ export function detectWorkplaceCafeteria(meals: MealLogLocation[]): DetectedPatt
 /**
  * Run all location pattern detections
  */
-export function detectLocationPatterns(meals: MealLogLocation[]): DetectedPattern[] {
+export function detectLocationPatterns(
+  meals: MealLogLocation[],
+  sensitivity: number = 1.0,
+): DetectedPattern[] {
   return [
     detectWarungOvereat(meals),
     detectHomeVsOutside(meals),

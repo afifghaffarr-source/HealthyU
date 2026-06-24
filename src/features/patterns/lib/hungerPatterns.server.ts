@@ -138,7 +138,10 @@ export function detectHungerDisconnect(meals: MealLogHunger[]): DetectedPattern 
 /**
  * Run all hunger/satiety pattern detections
  */
-export function detectHungerPatterns(meals: MealLogHunger[]): DetectedPattern[] {
+export function detectHungerPatterns(
+  meals: MealLogHunger[],
+  sensitivity: number = 1.0,
+): DetectedPattern[] {
   return [
     detectEatingNotHungry(meals),
     detectIgnoringFullness(meals),

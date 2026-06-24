@@ -56,18 +56,21 @@ async function fetch14DayMeals(supabase: SupabaseClient, userId: string): Promis
 }
 
 /**
- * Run all 7 rule engines in parallel
+ * Run all 7 rule engines in parallel with sensitivity multiplier
  */
-async function runAllRuleEngines(meals: MealLogFull[]): Promise<DetectedPattern[]> {
+async function runAllRuleEngines(
+  meals: MealLogFull[],
+  sensitivityMultiplier: number = 1.0,
+): Promise<DetectedPattern[]> {
   // Run all detections in parallel
   const results = await Promise.all([
-    Promise.resolve(detectTimePatterns(meals)),
-    Promise.resolve(detectEmotionalPatterns(meals)),
-    Promise.resolve(detectSocialPatterns(meals)),
-    Promise.resolve(detectCravingPatterns(meals)),
-    Promise.resolve(detectSchedulePatterns(meals)),
-    Promise.resolve(detectLocationPatterns(meals)),
-    Promise.resolve(detectHungerPatterns(meals)),
+    Promise.resolve(detectTimePatterns(meals, sensitivityMultiplier)),
+    Promise.resolve(detectEmotionalPatterns(meals, sensitivityMultiplier)),
+    Promise.resolve(detectSocialPatterns(meals, sensitivityMultiplier)),
+    Promise.resolve(detectCravingPatterns(meals, sensitivityMultiplier)),
+    Promise.resolve(detectSchedulePatterns(meals, sensitivityMultiplier)),
+    Promise.resolve(detectLocationPatterns(meals, sensitivityMultiplier)),
+    Promise.resolve(detectHungerPatterns(meals, sensitivityMultiplier)),
   ]);
 
   // Flatten results
@@ -193,7 +196,17 @@ export async function detectPatternsForUser(
   top_pattern: ScoredPattern | null;
   analyzed_at: string;
 }> {
-  // 1. Fetch 14-day meal logs
+  // 1. Fetch user preferences (sensitivity)
+  const { data: prefs } = await supabase
+    .from("user_pattern_preferences")
+    .select("sensitivity")
+    .eq("user_id", userId)
+    .single();
+
+  const sensitivity = prefs?.sensitivity || "medium";
+  const sensitivityMultiplier = sensitivity === "low" ? 0.7 : sensitivity === "high" ? 1.3 : 1.0;
+
+  // 2. Fetch 14-day meal logs
   const meals = await fetch14DayMeals(supabase, userId);
 
   if (meals.length < 7) {
@@ -205,8 +218,8 @@ export async function detectPatternsForUser(
     };
   }
 
-  // 2. Run all rule engines
-  const candidates = await runAllRuleEngines(meals);
+  // 3. Run all rule engines with sensitivity
+  const candidates = await runAllRuleEngines(meals, sensitivityMultiplier);
 
   if (candidates.length === 0) {
     // No patterns detected
@@ -217,10 +230,10 @@ export async function detectPatternsForUser(
     };
   }
 
-  // 3. Score patterns (hybrid: hardcoded + AI)
+  // 4. Score patterns (hybrid: hardcoded + AI)
   const scored = await scorePatterns(supabase, userId, candidates);
 
-  // 4. Save to database
+  // 5. Save to database
   const windowStart = new Date();
   windowStart.setDate(windowStart.getDate() - 14);
   const windowEnd = new Date();

@@ -161,7 +161,10 @@ export function detectNightCravings(meals: MealLogWithMacros[]): DetectedPattern
 /**
  * Run all craving pattern detections
  */
-export function detectCravingPatterns(meals: MealLogWithMacros[]): DetectedPattern[] {
+export function detectCravingPatterns(
+  meals: MealLogWithMacros[],
+  sensitivity: number = 1.0,
+): DetectedPattern[] {
   return [
     detectSugarCrashes(meals),
     detectSpecificFoodTriggers(meals),

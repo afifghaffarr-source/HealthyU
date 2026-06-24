@@ -130,7 +130,10 @@ export function detectWorkdayWeekendGap(meals: MealLogSchedule[]): DetectedPatte
 /**
  * Run all schedule pattern detections
  */
-export function detectSchedulePatterns(meals: MealLogSchedule[]): DetectedPattern[] {
+export function detectSchedulePatterns(
+  meals: MealLogSchedule[],
+  sensitivity: number = 1.0,
+): DetectedPattern[] {
   return [detectBusyDaySkips(meals), detectRushMeals(meals), detectWorkdayWeekendGap(meals)].filter(
     (p) => p.detected,
   );
