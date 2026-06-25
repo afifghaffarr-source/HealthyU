@@ -9,7 +9,6 @@ import { getOptionalUser } from "@/integrations/supabase/optional-auth";
 import { toggleRecipeBookmark } from "@/features/recipes/lib/recipeBookmarks.functions";
 import { Bookmark, Loader2, Sparkles } from "lucide-react";
 import { toast } from "@/lib/toast-config";
-import { RatingForm, type RatingState } from "@/features/recipes/components/RatingForm";
 import { ReviewsSection } from "@/features/recipes/components/ReviewsSection";
 import { RemixModal } from "@/features/recipes/components/RemixModal";
 import { RecommendationsStrip } from "@/features/recipes/components/RecommendationsStrip";
@@ -158,13 +157,7 @@ function ResepDetail() {
     onError: (e: Error) => toast.error(e.message),
   });
 
-  // Rating state (anon can see aggregate, authed sees personal)
-  const ratingFn = useServerFn(getRatingStateForSlug);
-  const { data: ratingState } = useQuery<RatingState>({
-    queryKey: ["rating-state", r.slug, userId],
-    queryFn: () => ratingFn({ data: { slug: r.slug, userId } }),
-    staleTime: 30_000,
-  });
+  // Rating state removed - now handled by ReviewsSection
 
   return (
     <div className="min-h-dvh bg-background pb-24">
@@ -273,14 +266,7 @@ function ResepDetail() {
           </ol>
         </section>
 
-        {/* ── Rating (auth-optional: anon sees CTA, authed sees form) ── */}
-        {ratingState && (
-          <div className="mb-6">
-            <RatingForm slug={r.slug} state={ratingState} />
-          </div>
-        )}
-
-        {/* ── Reviews (auth-optional: anon sees read-only + CTA) ── */}
+        {/* ── Reviews & Rating (unified component) ── */}
         <div className="mb-6">
           <ReviewsSection slug={r.slug} isAuthed={isAuthed} recipesId={r.recipesId} />
         </div>
