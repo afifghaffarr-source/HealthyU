@@ -39,6 +39,38 @@ Component mobile-specific di `src/features/landing/components/MobileNav.tsx`:
 
 Lihat design rationale di header comment `MobileNav.tsx`.
 
+## Artikel
+
+HealthyU punya 20 artikel kesehatan dan nutrisi yang ditulis evidence-based dengan sumber terpercaya (WHO, Harvard, Kemenkes RI, Johns Hopkins, dll).
+
+| Aspek      | Detail                                                                                                       |
+| ---------- | ------------------------------------------------------------------------------------------------------------ |
+| Route      | `/articles` (list), `/articles/:slug` (detail)                                                               |
+| Content    | Curated Indonesian health/nutrition articles                                                                 |
+| Sources    | WHO, Harvard T.H. Chan, Kemenkes RI, Johns Hopkins Medicine, American Diabetes Association, Mayo Clinic, dll |
+| Images     | Colorful placeholders via picsum.photos                                                                      |
+| Navigation | Profile page → "Estimasi AI & laporan" section → Artikel tile                                                |
+| Features   | Reading time badge, bookmark, share, progress indicator, related articles                                    |
+| Categories | Nutrisi, Praktis, Mitos, Diet, Wellness, Fitness                                                             |
+
+**Content quality:**
+
+- Evidence-based from trusted medical/nutrition sources
+- Informal Indonesian (kamu/aku), accessible language
+- Practical examples with Indonesian food context (tempe, nasi, soto, etc.)
+- 2-3 minute reads with clear structure (subheadings, bullet points)
+- Source citations at bottom of each article
+
+**Seeding:**
+
+```bash
+# Seed curated articles
+bun scripts/seed-articles-curated.ts
+
+# Update images for articles without them
+bun scripts/update-article-images.ts
+```
+
 ## PWA (Progressive Web App)
 
 HealthyU installable sebagai aplikasi native di Android/iOS lewat home screen.
