@@ -20,7 +20,7 @@ export const Route = createFileRoute("/artikel/$slug")({
     return { article, related };
   },
   head: ({ loaderData, params }) => {
-    const a = loaderData.article;
+    const a = loaderData?.article;
     const title = a ? `${a.title} | ${SITE_NAME}` : `Artikel | ${SITE_NAME}`;
     const desc = a?.excerpt ?? "Artikel kesehatan HealthyU.";
     const url = canonical(`/artikel/${params.slug}`);
