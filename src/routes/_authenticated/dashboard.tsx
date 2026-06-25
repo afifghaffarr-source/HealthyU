@@ -222,6 +222,24 @@ function Dashboard() {
           />
         </SectionGroup>
 
+        {/* AKSI CEPAT — Phase 2: moved above fold */}
+        <SectionGroup label="Aksi Cepat">
+          <ActionRow />
+        </SectionGroup>
+
+        {/* LANGKAH BERIKUTNYA — Phase 2: contextual guidance above fold */}
+        <SectionGroup label="Langkah Berikutnya">
+          <SmartNextStepCard
+            hour={new Date().getHours()}
+            timezone={profile?.timezone ?? undefined}
+            mealCount={meals.length}
+            waterMl={waterMl}
+            waterTarget={waterTarget}
+            fastActive={!!fast}
+            remainingKcal={Math.max(0, calTarget - totals.cal)}
+          />
+        </SectionGroup>
+
         {/* AI COACH — daily personalized guidance */}
         <SectionGroup label="AI Coach" actionLabel="Buka" actionHref="/coach">
           <CoachCard
@@ -247,11 +265,6 @@ function Dashboard() {
             />
           </SectionGroup>
         ) : null}
-
-        {/* AKSI CEPAT */}
-        <SectionGroup label="Aksi Cepat">
-          <ActionRow />
-        </SectionGroup>
 
         {/* TRACKING — fasting + water */}
         <SectionGroup label="Tracking" actionLabel="Semua" actionHref="/fasting">
@@ -292,15 +305,6 @@ function Dashboard() {
           <CollapsibleContent className="space-y-5">
             {/* INSIGHT TAMBAHAN */}
             <SectionGroup label="Insight">
-              <SmartNextStepCard
-                hour={new Date().getHours()}
-                timezone={profile?.timezone ?? undefined}
-                mealCount={meals.length}
-                waterMl={waterMl}
-                waterTarget={waterTarget}
-                fastActive={!!fast}
-                remainingKcal={Math.max(0, calTarget - totals.cal)}
-              />
               <MacroGapInsightCard totals={totals} calTarget={calTarget} />
               <LocalFoodHintCard hour={new Date().getHours()} />
               <HydrationSuggestCard
