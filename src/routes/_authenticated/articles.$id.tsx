@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { Bookmark, BookmarkCheck, Clock, Share2 } from "lucide-react";
+import { Bookmark, BookmarkCheck, Share2 } from "lucide-react";
 import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { BottomNav } from "@/components/bottom-nav";
 import { TakeawayBox } from "@/components/healthyu/takeaway-box";
@@ -10,6 +10,7 @@ import { DisclaimerCard } from "@/components/healthyu/disclaimer-card";
 import { CardSkeleton, ListSkeleton } from "@/components/healthyu/skeletons";
 import { LazyImage } from "@/components/healthyu/lazy-image";
 import { EmptyState } from "@/components/healthyu/empty-state";
+import { ReadingTimeBadge } from "@/components/healthyu/reading-time-badge";
 import { BookOpen } from "lucide-react";
 import { toast } from "@/lib/toast-config";
 import { getArticle, toggleBookmark } from "@/features/articles/lib/articles.functions";
@@ -166,13 +167,9 @@ function ArticleReader() {
               </p>
             )}
             <h1 className="text-2xl font-bold leading-tight">{article.title}</h1>
-            <div className="flex flex-wrap gap-3 text-xs text-muted-foreground">
+            <div className="flex flex-wrap gap-2 items-center text-xs text-muted-foreground">
+              {minutes && <ReadingTimeBadge minutes={minutes} />}
               {article.author_name && <span>oleh {article.author_name}</span>}
-              {minutes && (
-                <span className="inline-flex items-center gap-1">
-                  <Clock className="size-3" aria-hidden /> {minutes} menit baca
-                </span>
-              )}
             </div>
             {article.excerpt && (
               <p className="text-sm text-muted-foreground leading-relaxed pt-1">
@@ -219,9 +216,7 @@ function ArticleReader() {
                     <div className="p-3 space-y-1">
                       <p className="text-xs font-semibold leading-snug line-clamp-2">{r.title}</p>
                       {r.reading_time_minutes && (
-                        <p className="text-[12px] text-muted-foreground inline-flex items-center gap-1">
-                          <Clock className="size-3" aria-hidden /> {r.reading_time_minutes} mnt
-                        </p>
+                        <ReadingTimeBadge minutes={r.reading_time_minutes} />
                       )}
                     </div>
                   </Link>

@@ -1,12 +1,13 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { BookOpen, Bookmark, BookmarkCheck, Clock } from "lucide-react";
+import { BookOpen, Bookmark, BookmarkCheck } from "lucide-react";
 import { useMemo, useState } from "react";
 import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { EmptyState } from "@/components/healthyu/empty-state";
 import { ListSkeleton } from "@/components/healthyu/skeletons";
 import { LazyImage } from "@/components/healthyu/lazy-image";
+import { ReadingTimeBadge } from "@/components/healthyu/reading-time-badge";
 import { toast } from "@/lib/toast-config";
 import { BottomNav } from "@/components/bottom-nav";
 import { listArticles, toggleBookmark } from "@/features/articles/lib/articles.functions";
@@ -142,14 +143,11 @@ function ArticlesPage() {
                 {a.excerpt && (
                   <p className="text-sm text-muted-foreground mt-2 line-clamp-3">{a.excerpt}</p>
                 )}
-                <div className="flex gap-3 text-xs text-muted-foreground mt-3">
-                  {a.reading_time_minutes && (
-                    <span className="inline-flex items-center gap-1">
-                      <Clock className="size-3" />
-                      {a.reading_time_minutes} menit baca
-                    </span>
+                <div className="flex gap-2 items-center mt-3">
+                  {a.reading_time_minutes && <ReadingTimeBadge minutes={a.reading_time_minutes} />}
+                  {a.author_name && (
+                    <span className="text-xs text-muted-foreground">oleh {a.author_name}</span>
                   )}
-                  {a.author_name && <span>oleh {a.author_name}</span>}
                 </div>
               </div>
             </article>
