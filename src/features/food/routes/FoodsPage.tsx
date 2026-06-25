@@ -45,14 +45,19 @@ export function FoodsPage() {
     Array<{
       id: string;
       name: string;
-      name_en?: string;
-      category?: string;
-      region?: string;
+      name_en: string | null;
+      category: string | null;
+      subcategory: string | null;
+      region: string | null;
       calories: number;
-      protein_g?: number;
-      carbs_g?: number;
-      fat_g?: number;
-      tags?: string[];
+      protein_g: number | null;
+      carbs_g: number | null;
+      fat_g: number | null;
+      fiber_g: number | null;
+      sodium_mg: number | null;
+      sugar_g: number | null;
+      tags: string[] | null;
+      popularity_score: number | null;
     }>
   >([]);
 

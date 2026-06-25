@@ -23,6 +23,7 @@ import { ConfirmDialog } from "@/components/healthyu/confirm-dialog";
 import { piiKinds, formatPiiKindsForDialog, type PiiKind } from "@/lib/pii";
 import { auditPiiOnClient } from "@/features/chat/lib/piiAudit";
 import { reportError } from "@/lib/errorReporting";
+import { MedicalDisclaimer } from "@/components/healthyu/MedicalDisclaimer";
 
 export function ChatPage() {
   const qc = useQueryClient();
@@ -46,8 +47,18 @@ export function ChatPage() {
     imageBase64?: string;
     imageMime?: string;
   } | null>(null);
+  const [showDisclaimer, setShowDisclaimer] = useState(false);
   const shellClassName = "mx-auto w-full max-w-md px-4 sm:px-5";
   const pageGutterClassName = "pb-6 lg:pb-8";
+
+  // Phase 1 C3: Show medical disclaimer on first visit
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const seen = localStorage.getItem("healthyu:coach:disclaimer:seen");
+    if (!seen) {
+      setShowDisclaimer(true);
+    }
+  }, []);
 
   const mutation = useMutation({
     mutationFn: async (payload: { message: string; imageBase64?: string; imageMime?: string }) => {
@@ -378,6 +389,42 @@ export function ChatPage() {
           onConfirm={confirmPiiSend}
           onCancel={cancelPiiSend}
         />
+      )}
+
+      {/* Phase 1 C3: Medical disclaimer modal on first visit */}
+      {showDisclaimer && (
+        <div
+          className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm grid place-items-center p-4"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) {
+              // Allow dismiss by clicking backdrop
+              localStorage.setItem("healthyu:coach:disclaimer:seen", "1");
+              setShowDisclaimer(false);
+            }
+          }}
+        >
+          <div
+            className="bg-background rounded-3xl p-6 max-w-md w-full space-y-4 shadow-2xl animate-fade-up"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h2 className="text-xl font-bold">Sebelum memulai</h2>
+            <MedicalDisclaimer variant="disclaimer" className="w-full" />
+            <p className="text-sm text-muted-foreground">
+              AI Coach memberikan saran umum berbasis pola makanmu. Untuk kondisi medis seperti
+              kehamilan, diabetes, gangguan makan, atau penyakit kronis, konsultasikan dengan tenaga
+              kesehatan profesional.
+            </p>
+            <button
+              onClick={() => {
+                localStorage.setItem("healthyu:coach:disclaimer:seen", "1");
+                setShowDisclaimer(false);
+              }}
+              className="w-full bg-primary text-primary-foreground font-semibold py-3 rounded-xl"
+            >
+              Saya mengerti
+            </button>
+          </div>
+        </div>
       )}
     </main>
   );

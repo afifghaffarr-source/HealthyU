@@ -253,13 +253,17 @@ export function ProtocolPicker({
           </div>
           <button
             type="button"
-            onClick={() =>
-              onStart({
-                protocol: `custom:${customHours}j`,
-                target_hours: customHours,
-                is_custom: true,
-              })
-            }
+            onClick={() => {
+              if (customHours > 16) {
+                setPending({ protocol: `custom:${customHours}j`, target_hours: customHours });
+              } else {
+                onStart({
+                  protocol: `custom:${customHours}j`,
+                  target_hours: customHours,
+                  is_custom: true,
+                });
+              }
+            }}
             disabled={starting}
             className="w-full bg-primary text-primary-foreground font-semibold py-3 rounded-xl disabled:opacity-50"
           >
@@ -275,7 +279,14 @@ export function ProtocolPicker({
         confirmLabel="Saya mengerti, mulai"
         cancelLabel="Batal"
         onConfirm={() => {
-          if (pending) onStart({ protocol: pending.protocol, target_hours: pending.target_hours });
+          if (pending) {
+            const isCustom = pending.protocol.startsWith("custom:");
+            onStart({
+              protocol: pending.protocol,
+              target_hours: pending.target_hours,
+              is_custom: isCustom,
+            });
+          }
           setPending(null);
         }}
         onCancel={() => setPending(null)}
