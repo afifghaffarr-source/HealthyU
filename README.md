@@ -278,6 +278,45 @@ Project ini melalui comprehensive audit (Fase 1-7) yang selesai 2026-06-23:
 
 Detail lengkap: [`audit/04-roadmap.md`](./audit/04-roadmap.md). Issue tracking: [`docs/known-issues.md`](./docs/known-issues.md).
 
+### TasteSkill Design Audit (2026-06-25)
+
+Post-launch design refinement untuk meningkatkan UX consistency, safety messaging, dan polish:
+
+| Phase   | Scope                                           | Status      | Commits                      |
+| ------- | ----------------------------------------------- | ----------- | ---------------------------- |
+| Phase 1 | Safety & Trust (disclaimers, guardrails)        | ✅ Complete | 0672aa0e, bd21e7a3           |
+| Phase 2 | Dashboard Redesign (hierarchy optimization)     | ✅ Complete | bd21e7a3                     |
+| Phase 3 | Page Polish (grouping, explainers, microcopy)   | ✅ Complete | 873ce778, 9f192bd8, b18f18fe |
+| Phase 4 | System Tightening (components, dark mode, a11y) | ✅ Complete | c58c508d, 6f6170e9           |
+| Phase 5 | Nice-to-haves (badges, motion, settings)        | ⏳ Pending  | —                            |
+
+**Phase 1 deliverables:**
+
+- Medical disclaimer modal on AI Coach first visit
+- Fasting safety confirmation dialog for >16h protocols
+- Scan intro microcopy improvements
+
+**Phase 2 deliverables:**
+
+- Dashboard hierarchy reordered: actions + next step moved above fold
+- Balance card → Quick actions → Next step → AI Coach pattern
+
+**Phase 3 deliverables:**
+
+- Food log meal grouping by type with subtotals
+- Fasting phase educational explainer (Fed/Glycogen/Fat burning)
+- Onboarding microcopy polish (warmer, less clinical tone)
+- Confidence badges on scan results (existing, verified)
+- Progress consistency score (existing, verified)
+
+**Phase 4 deliverables:**
+
+- PageShell component for standardized layout + loading/error/empty states
+- Dark mode contrast audit (referrals page fixed)
+- Accessibility: aria-live on fasting timer for screen readers
+
+Detail lengkap: [`.lovable/plan.md`](./.lovable/plan.md).
+
 ## Security memory
 
 Lihat `.lovable/security-memory.md` (managed by Lovable scanner).
