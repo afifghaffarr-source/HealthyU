@@ -13,7 +13,7 @@ export function StepIdentity({
     <section className="space-y-6 animate-fade-up">
       <div>
         <h1 className="text-2xl font-bold mb-1">Halo! Siapa namamu?</h1>
-        <p className="text-muted-foreground text-sm">Kami ingin mengenalmu lebih baik.</p>
+        <p className="text-muted-foreground text-sm">Biar kami bisa bantu kamu lebih personal 😊</p>
       </div>
       <input
         placeholder="Nama lengkap"

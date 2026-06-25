@@ -20,11 +20,14 @@ export function StepBody({
   return (
     <section className="space-y-5 animate-fade-up">
       <div>
-        <h1 className="text-2xl font-bold mb-1">Tubuhmu sekarang</h1>
+        <h1 className="text-2xl font-bold mb-1">Tentang tubuhmu</h1>
         <p className="text-muted-foreground text-sm">
           Kami pakai data ini untuk menghitung kebutuhan kalori harian. Bisa diubah kapan saja.
         </p>
       </div>
+      <p className="text-xs font-medium text-primary bg-primary/10 rounded-xl px-3 py-2">
+        💡 Tidak ada target "sempurna". Fokus ke konsistensi, bukan angka.
+      </p>
       <NumberField
         label="Tinggi (cm)"
         value={form.height_cm}
@@ -46,9 +49,6 @@ export function StepBody({
         min={30}
         max={200}
       />
-      <p className="text-[11px] text-muted-foreground px-1">
-        Tidak ada target “sempurna”. Fokus ke konsistensi, bukan angka.
-      </p>
       <WhyAskDisclosure>
         Tinggi & berat dipakai untuk menghitung kebutuhan kalori harianmu (BMR & TDEE). Data
         tersimpan privat di akunmu dan bisa diubah kapan saja.

@@ -15,7 +15,9 @@ export function StepLifestyle({
     <section className="space-y-5 animate-fade-up">
       <div>
         <h1 className="text-2xl font-bold mb-1">Gaya hidup</h1>
-        <p className="text-muted-foreground text-sm">Seberapa aktif kamu setiap hari?</p>
+        <p className="text-muted-foreground text-sm">
+          Seberapa aktif kamu setiap hari? Kami pakai ini untuk rekomendasi yang lebih pas.
+        </p>
       </div>
       <div className="space-y-2">
         {(
