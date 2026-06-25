@@ -67,13 +67,13 @@ function ReferralsPage() {
           <div className="grid grid-cols-2 gap-2">
             <button
               onClick={copyCode}
-              className="bg-white/15 backdrop-blur py-3 rounded-2xl font-semibold flex items-center justify-center gap-2"
+              className="bg-white/15 backdrop-blur dark:bg-white/20 py-3 rounded-2xl font-semibold flex items-center justify-center gap-2"
             >
               <Copy className="size-4" /> Salin
             </button>
             <button
               onClick={share}
-              className="bg-white text-sage-deep py-3 rounded-2xl font-semibold flex items-center justify-center gap-2"
+              className="bg-white text-sage-deep dark:bg-white dark:text-sage-deep py-3 rounded-2xl font-semibold flex items-center justify-center gap-2"
             >
               <Share2 className="size-4" /> Bagikan
             </button>
@@ -120,7 +120,7 @@ function ReferralsPage() {
             {data!.referrals.map((r) => (
               <div
                 key={r.id}
-                className="bg-card p-3 rounded-2xl outline-1 outline-black/5 flex items-center justify-between text-sm"
+                className="bg-card p-3 rounded-2xl outline-1 outline-black/5 dark:outline-white/10 flex items-center justify-between text-sm"
               >
                 <span className="text-muted-foreground">
                   {new Date(r.created_at).toLocaleDateString("id-ID")}
