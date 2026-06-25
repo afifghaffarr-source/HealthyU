@@ -41,25 +41,8 @@ export function FoodsPage() {
   const [excluded, setExcluded] = useState<string[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [offset, setOffset] = useState(0);
-  const [allFoods, setAllFoods] = useState<
-    Array<{
-      id: string;
-      name: string;
-      name_en: string | null;
-      category: string | null;
-      subcategory: string | null;
-      region: string | null;
-      calories: number;
-      protein_g: number | null;
-      carbs_g: number | null;
-      fat_g: number | null;
-      fiber_g: number | null;
-      sodium_mg: number | null;
-      sugar_g: number | null;
-      tags: string[] | null;
-      popularity_score: number | null;
-    }>
-  >([]);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [allFoods, setAllFoods] = useState<any[]>([]);
 
   const { data: facetData } = useQuery({
     queryKey: ["food-facets"],
