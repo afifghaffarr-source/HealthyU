@@ -115,7 +115,8 @@ function Dashboard() {
   const fetchDailyCoach = useServerFn(dailyCoach);
   const [freezeOpen, setFreezeOpen] = useState(false);
   const [showMore, setShowMore] = useState(false);
-  const { bonusClaimed, claimBonusMut, waterMutation, moodMutation } = useDashboardMutations();
+  const { bonusClaimed, claimBonusMut, waterMutation, moodMutation, waterJustLogged } =
+    useDashboardMutations();
 
   const { data: profile } = useSuspenseQuery(profileQueryOptions);
   const { data: dailyTip } = useQuery(dailyTipQueryOptions);
@@ -282,6 +283,7 @@ function Dashboard() {
             targetMl={waterTarget}
             onLog={(ml) => waterMutation.mutate(ml)}
             disabled={waterMutation.isPending}
+            justLogged={waterJustLogged}
           />
         </SectionGroup>
 

@@ -20,6 +20,8 @@ export function useDashboardMutations() {
     return window.localStorage.getItem("dailyBonusClaimed") === new Date().toDateString();
   });
 
+  const [waterJustLogged, setWaterJustLogged] = useState(false);
+
   const claimBonusMut = useMutation({
     mutationFn: () => claimBonusFn({ data: undefined as never }),
     onSuccess: (r) => {
@@ -47,6 +49,10 @@ export function useDashboardMutations() {
       newlyUnlocked.forEach((a) =>
         toast.success(`${getAchievementToastPrefix(a.icon)} ${a.title} terbuka!`),
       );
+
+      // Trigger success animation
+      setWaterJustLogged(true);
+      setTimeout(() => setWaterJustLogged(false), 600);
     },
   });
 
@@ -59,5 +65,5 @@ export function useDashboardMutations() {
     },
   });
 
-  return { bonusClaimed, claimBonusMut, waterMutation, moodMutation };
+  return { bonusClaimed, claimBonusMut, waterMutation, moodMutation, waterJustLogged };
 }

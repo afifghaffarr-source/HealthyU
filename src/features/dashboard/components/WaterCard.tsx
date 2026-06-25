@@ -6,16 +6,20 @@ export function WaterCard({
   targetMl,
   onLog,
   disabled,
+  justLogged = false,
 }: {
   waterMl: number;
   targetMl: number;
   onLog: (ml: number) => void;
   disabled?: boolean;
+  justLogged?: boolean;
 }) {
   return (
     <Link
       to="/water"
-      className="bg-card p-4 rounded-3xl outline-1 outline-black/5 shadow-sm flex items-center gap-4 animate-fade-up"
+      className={`bg-card p-4 rounded-3xl outline-1 outline-black/5 shadow-sm flex items-center gap-4 animate-fade-up transition-transform ${
+        justLogged ? "animate-pulse-scale" : ""
+      }`}
     >
       <div className="size-12 rounded-2xl bg-sky-100 grid place-items-center">
         <Droplet className="size-5 text-sky-600" />
