@@ -40,6 +40,21 @@ export function FoodsPage() {
   const [tag, setTag] = useState<string>("");
   const [excluded, setExcluded] = useState<string[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [offset, setOffset] = useState(0);
+  const [allFoods, setAllFoods] = useState<
+    Array<{
+      id: string;
+      name: string;
+      name_en?: string;
+      category?: string;
+      region?: string;
+      calories: number;
+      protein_g?: number;
+      carbs_g?: number;
+      fat_g?: number;
+      tags?: string[];
+    }>
+  >([]);
 
   const { data: facetData } = useQuery({
     queryKey: ["food-facets"],
@@ -48,7 +63,7 @@ export function FoodsPage() {
   });
 
   const { data: foods = [], isFetching } = useQuery({
-    queryKey: ["food-db", q, region, category, tag, excluded],
+    queryKey: ["food-db", q, region, category, tag, excluded, offset],
     queryFn: () =>
       browse({
         data: {
@@ -57,9 +72,28 @@ export function FoodsPage() {
           category: category || undefined,
           tag: tag || undefined,
           excludeAllergens: excluded,
+          limit: 30,
+          offset,
         },
       }),
   });
+
+  // Accumulate foods when loading more
+
+  useEffect(() => {
+    if (offset === 0) {
+      setAllFoods(foods);
+    } else {
+      setAllFoods((prev) => [...prev, ...foods]);
+    }
+  }, [foods, offset]);
+
+  // Reset pagination when filters change
+
+  useEffect(() => {
+    setOffset(0);
+    setAllFoods([]);
+  }, [q, region, category, tag, excluded]);
 
   const { data: selected } = useQuery({
     queryKey: ["food-detail", selectedId],
@@ -146,7 +180,7 @@ export function FoodsPage() {
 
         <div className="flex items-center justify-between text-xs text-muted-foreground">
           <span>
-            {isFetching ? "Mencari..." : `${foods.length} makanan`}
+            {isFetching && offset === 0 ? "Mencari..." : `${allFoods.length} makanan`}
             {activeFilters > 0 && ` · ${activeFilters} filter`}
           </span>
           {activeFilters > 0 && (
@@ -165,8 +199,8 @@ export function FoodsPage() {
         </div>
 
         <ul className="space-y-2">
-          {isFetching && foods.length === 0 && <ListSkeleton count={5} />}
-          {foods.map((f) => (
+          {isFetching && allFoods.length === 0 && <ListSkeleton count={5} />}
+          {allFoods.map((f) => (
             <li key={f.id}>
               <button
                 onClick={() => setSelectedId(f.id)}
@@ -199,10 +233,28 @@ export function FoodsPage() {
               </button>
             </li>
           ))}
-          {!isFetching && foods.length === 0 && (
+          {!isFetching && allFoods.length === 0 && (
             <li className="text-center text-sm text-muted-foreground py-8">Tidak ada hasil.</li>
           )}
         </ul>
+
+        {/* Load More Button */}
+        {foods.length === 30 && !isFetching && (
+          <div className="flex justify-center py-4">
+            <button
+              onClick={() => setOffset((prev) => prev + 30)}
+              className="px-6 py-3 rounded-xl bg-primary text-primary-foreground font-medium text-sm hover:bg-primary/90 transition"
+            >
+              Muat Lebih Banyak
+            </button>
+          </div>
+        )}
+
+        {isFetching && offset > 0 && (
+          <div className="flex justify-center py-4">
+            <p className="text-sm text-muted-foreground">Memuat...</p>
+          </div>
+        )}
       </main>
 
       {selectedId && (

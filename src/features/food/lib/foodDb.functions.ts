@@ -12,6 +12,8 @@ export const browseFoods = createServerFn({ method: "GET" })
         category: z.string().max(50).optional(),
         tag: z.string().max(50).optional(),
         excludeAllergens: z.array(z.string().max(50)).max(20).default([]),
+        limit: z.number().int().min(10).max(100).default(30),
+        offset: z.number().int().min(0).default(0),
       })
       .parse(input),
   )
@@ -23,7 +25,7 @@ export const browseFoods = createServerFn({ method: "GET" })
         "id,name,name_en,category,subcategory,region,calories,protein_g,carbs_g,fat_g,fiber_g,serving_size,serving_unit,allergens,tags,popularity_score",
       )
       .order("popularity_score", { ascending: false })
-      .limit(60);
+      .range(data.offset, data.offset + data.limit - 1);
 
     if (data.q.trim()) query = query.or(`name.ilike.%${data.q}%,name_en.ilike.%${data.q}%`);
     if (data.region) query = query.eq("region", data.region);
