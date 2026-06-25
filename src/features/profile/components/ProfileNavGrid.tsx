@@ -23,6 +23,7 @@ import {
   Settings,
   Lightbulb,
   ShieldAlert,
+  BookOpen,
 } from "lucide-react";
 
 const tileCls =
@@ -85,6 +86,10 @@ export function ProfileNavGrid({
           <Link to="/coach" className={tileCls}>
             <Sparkles className="size-5 text-primary" aria-hidden />
             <span className="text-sm font-semibold">AI Coach</span>
+          </Link>
+          <Link to="/articles" className={tileCls}>
+            <BookOpen className="size-5 text-primary" aria-hidden />
+            <span className="text-sm font-semibold">Artikel</span>
           </Link>
           <Link to="/progress" className={tileCls}>
             <Camera className="size-5 text-coral" aria-hidden />
