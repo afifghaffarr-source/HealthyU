@@ -93,6 +93,18 @@ function ResepHub() {
   const items = Route.useLoaderData() as Resep[];
   const [q, setQ] = useState("");
   const [activeCategory, setActiveCategory] = useState<string>("");
+  const [displayLimit, setDisplayLimit] = useState(30);
+
+  // Reset pagination when filters change
+  const resetPagination = () => setDisplayLimit(30);
+  const handleSearch = (value: string) => {
+    setQ(value);
+    resetPagination();
+  };
+  const handleCategoryChange = (cat: string) => {
+    setActiveCategory(cat);
+    resetPagination();
+  };
 
   // Auth state (changes the bottom CTA)
   const userFn = useServerFn(getOptionalUser);
@@ -126,6 +138,12 @@ function ResepHub() {
     });
   }, [items, q, activeCategory]);
 
+  const displayed = useMemo(() => {
+    return filtered.slice(0, displayLimit);
+  }, [filtered, displayLimit]);
+
+  const hasMore = filtered.length > displayLimit;
+
   return (
     <div className="min-h-dvh bg-background pb-24">
       <TopAppBar title="Resep Sehat" showBack />
@@ -156,7 +174,7 @@ function ResepHub() {
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
             <input
               value={q}
-              onChange={(e) => setQ(e.target.value)}
+              onChange={(e) => handleSearch(e.target.value)}
               placeholder="Cari nasi goreng, ayam, sup..."
               className="w-full pl-9 pr-3 py-2.5 rounded-xl bg-muted/60 border border-transparent focus:border-primary focus:bg-background outline-none text-sm"
               aria-label="Cari resep"
@@ -172,14 +190,14 @@ function ResepHub() {
             <div className="flex gap-2 overflow-x-auto -mx-4 px-4 pb-1 scrollbar-hide">
               <Pill
                 active={activeCategory === ""}
-                onClick={() => setActiveCategory("")}
+                onClick={() => handleCategoryChange("")}
                 label="Semua"
               />
               {categoriesInUse.map((c) => (
                 <Pill
                   key={c}
                   active={activeCategory === c}
-                  onClick={() => setActiveCategory(c)}
+                  onClick={() => handleCategoryChange(c)}
                   label={CATEGORY_LABELS[c] ?? c}
                 />
               ))}
@@ -254,19 +272,34 @@ function ResepHub() {
             <h2 className="text-[12px] uppercase tracking-[0.18em] text-muted-foreground font-semibold">
               {activeCategory ? (CATEGORY_LABELS[activeCategory] ?? activeCategory) : "Semua Resep"}
             </h2>
-            <span className="text-xs text-muted-foreground">{filtered.length} hasil</span>
+            <span className="text-xs text-muted-foreground">
+              {displayed.length} dari {filtered.length} resep
+            </span>
           </div>
 
           {filtered.length === 0 ? (
             <EmptyState query={q} />
           ) : (
-            <ul className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {filtered
-                .filter((r) => r.slug !== featured?.slug || activeCategory || q)
-                .map((r) => (
-                  <RecipeCard key={r.slug} recipe={r} />
-                ))}
-            </ul>
+            <>
+              <ul className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {displayed
+                  .filter((r) => r.slug !== featured?.slug || activeCategory || q)
+                  .map((r) => (
+                    <RecipeCard key={r.slug} recipe={r} />
+                  ))}
+              </ul>
+
+              {hasMore && (
+                <div className="flex justify-center pt-6">
+                  <button
+                    onClick={() => setDisplayLimit((prev) => prev + 30)}
+                    className="px-6 py-2.5 rounded-xl bg-primary text-primary-foreground font-medium text-sm hover:bg-primary/90 transition"
+                  >
+                    Muat Lebih Banyak
+                  </button>
+                </div>
+              )}
+            </>
           )}
         </div>
       </section>
