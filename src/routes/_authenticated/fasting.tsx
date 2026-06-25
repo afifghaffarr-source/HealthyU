@@ -23,6 +23,7 @@ import {
   BreakFastTipsCard,
   StreakDisplay,
 } from "@/features/fasting/components/FastingPieces";
+import { FastingPhaseExplainer } from "@/features/fasting/components/FastingPhaseExplainer";
 
 export const Route = createFileRoute("/_authenticated/fasting")({
   component: FastingPage,
@@ -146,6 +147,9 @@ function FastingPage() {
             <ProtocolPicker onStart={(p) => startMut.mutate(p)} starting={startMut.isPending} />
           </>
         )}
+
+        {/* Phase 3 (8.6): Educational fasting phases explainer */}
+        <FastingPhaseExplainer currentHours={fast ? elapsedHrs : undefined} />
 
         <RamadhanScheduleCard
           ramadhan={ramadhan}
