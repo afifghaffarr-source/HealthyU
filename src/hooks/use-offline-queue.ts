@@ -57,6 +57,8 @@ export function useOfflineQueue() {
   }, [water, weight, meal, mood, vitals, workout, qc, refresh]);
 
   useEffect(() => {
+    if (typeof window === "undefined") return;
+
     refresh();
     const on = () => {
       setOnline(true);

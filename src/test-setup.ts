@@ -14,3 +14,14 @@ for (const [k, v] of Object.entries(STUBS)) {
     (import.meta.env as Record<string, string>)[k] = v;
   }
 }
+
+// Ensure navigator.onLine is available in jsdom environment
+if (typeof window !== "undefined" && typeof navigator !== "undefined") {
+  if (!("onLine" in navigator)) {
+    Object.defineProperty(navigator, "onLine", {
+      writable: true,
+      configurable: true,
+      value: true,
+    });
+  }
+}
