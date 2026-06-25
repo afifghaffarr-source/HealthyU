@@ -87,9 +87,9 @@ export function ProfileNavGrid({
             <Sparkles className="size-5 text-primary" aria-hidden />
             <span className="text-sm font-semibold">AI Coach</span>
           </Link>
-          <Link to="/articles" className={tileCls}>
-            <BookOpen className="size-5 text-primary" aria-hidden />
-            <span className="text-sm font-semibold">Artikel</span>
+          <Link to="/artikel" className={tileCls}>
+            <BookOpen className="size-5" />
+            <span className="text-sm font-medium">Artikel</span>
           </Link>
           <Link to="/progress" className={tileCls}>
             <Camera className="size-5 text-coral" aria-hidden />
