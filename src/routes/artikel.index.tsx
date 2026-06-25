@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
-import { ChevronLeft, ChevronRight, ArrowLeft } from "@phosphor-icons/react";
+import { CaretLeft, CaretRight, ArrowLeft } from "@phosphor-icons/react";
 import { canonical, hreflangAlternates } from "@/lib/seo";
 import { listSeoArticles } from "@/features/content/lib/seoContent.functions";
 
@@ -103,7 +103,7 @@ function ArtikelHub() {
             className="inline-flex items-center gap-1 rounded-lg px-3 py-2 text-sm font-medium hover:bg-accent disabled:opacity-50 disabled:cursor-not-allowed"
             aria-label="Previous page"
           >
-            <ChevronLeft size={16} />
+            <CaretLeft size={16} weight="bold" />
             Sebelumnya
           </button>
 
@@ -130,7 +130,7 @@ function ArtikelHub() {
             aria-label="Next page"
           >
             Selanjutnya
-            <ChevronRight size={16} />
+            <CaretRight size={16} weight="bold" />
           </button>
         </nav>
       )}
