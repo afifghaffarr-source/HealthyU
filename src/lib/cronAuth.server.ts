@@ -26,8 +26,18 @@ export function requireCronSecret(request: Request): Response | null {
   }
 
   const headerSecret = request.headers.get("x-cron-secret");
-  const bearer = request.headers.get("authorization")?.replace(/^Bearer\s+/i, "");
+  const authHeader = request.headers.get("authorization");
+  const bearer = authHeader?.replace(/^Bearer\s+/i, "");
   const received = headerSecret || bearer;
+
+  // Temporary debug logging
+  console.log("[CRON_AUTH_DEBUG] Auth header raw:", authHeader?.substring(0, 20) + "...");
+  console.log("[CRON_AUTH_DEBUG] Received length:", received?.length);
+  console.log("[CRON_AUTH_DEBUG] Expected length:", expected.length);
+  console.log("[CRON_AUTH_DEBUG] Received first 8:", received?.substring(0, 8));
+  console.log("[CRON_AUTH_DEBUG] Expected first 8:", expected.substring(0, 8));
+  console.log("[CRON_AUTH_DEBUG] Received last 8:", received?.substring(received.length - 8));
+  console.log("[CRON_AUTH_DEBUG] Expected last 8:", expected.substring(expected.length - 8));
 
   if (!received || !timingSafeEqualStr(received, expected)) {
     return new Response(JSON.stringify({ error: "Unauthorized" }), {
