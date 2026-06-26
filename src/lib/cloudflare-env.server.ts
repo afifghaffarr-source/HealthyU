@@ -44,6 +44,8 @@ export interface CloudflareEnv {
   VAPID_PRIVATE_KEY?: string;
   GOOGLE_FIT_CLIENT_ID?: string;
   GOOGLE_FIT_CLIENT_SECRET?: string;
+  // Resend email API (replaced MailChannels, which is discontinued on CF Workers free tier)
+  RESEND_API_KEY?: string;
   // Client-side vars (VITE_*) — also available in browser bundle
   VITE_SUPABASE_URL?: string;
   VITE_SUPABASE_PUBLISHABLE_KEY?: string;

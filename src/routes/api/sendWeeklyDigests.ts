@@ -133,26 +133,32 @@ async function sendEmail(
   email: string,
   patterns: Array<{ type: string; explanation: string }>,
 ): Promise<void> {
+  const env = getEnv();
+  if (!env.RESEND_API_KEY) {
+    throw new Error("RESEND_API_KEY not configured");
+  }
+
   const html = renderHTML(patterns);
   const text = renderText(patterns);
 
-  const response = await fetch("https://api.mailchannels.net/tx/v1/send", {
+  const response = await fetch("https://api.resend.com/emails", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${env.RESEND_API_KEY}`,
+    },
     body: JSON.stringify({
-      personalizations: [{ to: [{ email }] }],
-      from: { email: "noreply@healthyu.web.id", name: "HealthyU" },
+      from: "HealthyU <noreply@healthyu.web.id>",
+      to: [email],
       subject: "📊 Ringkasan Pola Makan Mingguan",
-      content: [
-        { type: "text/plain", value: text },
-        { type: "text/html", value: html },
-      ],
+      text,
+      html,
     }),
   });
 
   if (!response.ok) {
     const body = await response.text();
-    throw new Error(`MailChannels error ${response.status}: ${body}`);
+    throw new Error(`Resend error ${response.status}: ${body}`);
   }
 }
 
