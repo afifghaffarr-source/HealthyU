@@ -38,6 +38,18 @@ export function requireCronSecret(request: Request): Response | null {
   console.log("[CRON_AUTH_DEBUG] Expected first 8:", expected.substring(0, 8));
   console.log("[CRON_AUTH_DEBUG] Received last 8:", received?.substring(received.length - 8));
   console.log("[CRON_AUTH_DEBUG] Expected last 8:", expected.substring(expected.length - 8));
+  console.log(
+    "[CRON_AUTH_DEBUG] Byte-by-byte first 16 received:",
+    Array.from(received?.substring(0, 16) || "")
+      .map((c) => c.charCodeAt(0))
+      .join(","),
+  );
+  console.log(
+    "[CRON_AUTH_DEBUG] Byte-by-byte first 16 expected:",
+    Array.from(expected.substring(0, 16))
+      .map((c) => c.charCodeAt(0))
+      .join(","),
+  );
 
   if (!received || !timingSafeEqualStr(received, expected)) {
     return new Response(JSON.stringify({ error: "Unauthorized" }), {
