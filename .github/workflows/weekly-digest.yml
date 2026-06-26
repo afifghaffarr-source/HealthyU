@@ -22,6 +22,8 @@ jobs:
           CLEAN_SECRET=$(echo -n "$CRON_SECRET" | tr -d '\n\r' | xargs)
 
           echo "Debug: Secret length = ${#CLEAN_SECRET}"
+          echo "Debug: First 8 chars = ${CLEAN_SECRET:0:8}"
+          echo "Debug: Last 8 chars = ${CLEAN_SECRET: -8}"
 
           response=$(curl -X POST "https://healthyu.web.id/api/sendWeeklyDigests" \
             -H "Content-Type: application/json" \
