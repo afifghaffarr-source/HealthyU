@@ -6,11 +6,20 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { createClient } from "@supabase/supabase-js";
 import { getEnv } from "@/lib/cloudflare-env.server";
+import { requireCronSecret } from "@/lib/cronAuth.server";
 
 export const Route = createFileRoute("/api/sendWeeklyDigests")({
   server: {
     handlers: {
-      POST: async () => {
+      POST: async ({ request }) => {
+        // SECURITY: this endpoint uses the service-role key (bypasses RLS) and
+        // sends email to real users. It MUST validate the shared CRON_SECRET,
+        // exactly like the other /api/public/hooks/* cron endpoints. Without
+        // this guard, anyone on the internet could POST here and trigger a
+        // mass email send (spam, cost, abuse). Fail-closed via requireCronSecret.
+        const unauthorized = requireCronSecret(request);
+        if (unauthorized) return unauthorized;
+
         const env = getEnv();
 
         if (!env.SUPABASE_URL || !env.SUPABASE_SERVICE_ROLE_KEY) {
