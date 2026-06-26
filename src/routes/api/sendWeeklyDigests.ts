@@ -31,12 +31,13 @@ export const Route = createFileRoute("/api/sendWeeklyDigests")({
 
         const supabase = createClient(env.SUPABASE_URL, env.SUPABASE_SERVICE_ROLE_KEY);
 
-        // Get patterns from last 7 days, grouped by user
+        // Get patterns from last 7 days (no join — users table is auth.users,
+        // not exposed via PostgREST; fetch emails separately via admin API)
         const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
 
         const { data: patterns, error } = await supabase
           .from("pattern_insights")
-          .select("user_id, pattern_type, ai_explanation, urgency_score, users!inner(email)")
+          .select("user_id, pattern_type, ai_explanation, urgency_score")
           .gte("detected_at", sevenDaysAgo)
           .is("resolved_at", null)
           .order("urgency_score", { ascending: false });
@@ -48,6 +49,31 @@ export const Route = createFileRoute("/api/sendWeeklyDigests")({
           );
         }
 
+        if (patterns.length === 0) {
+          return new Response(JSON.stringify({ sent: 0, skipped: 0, errors: [] }), {
+            status: 200,
+            headers: { "Content-Type": "application/json" },
+          });
+        }
+
+        // Fetch user emails via admin API (FK join impossible — no public.users table)
+        const uniqueUserIds = Array.from(new Set(patterns.map((p) => p.user_id)));
+        const { data: authData, error: authError } = await supabase.auth.admin.listUsers();
+
+        if (authError || !authData?.users) {
+          return new Response(
+            JSON.stringify({ sent: 0, skipped: 0, errors: ["Failed to fetch user emails"] }),
+            { status: 500, headers: { "Content-Type": "application/json" } },
+          );
+        }
+
+        const emailMap = new Map<string, string>();
+        for (const u of authData.users) {
+          if (uniqueUserIds.includes(u.id)) {
+            emailMap.set(u.id, u.email || "");
+          }
+        }
+
         // Group by user (top 3 patterns per user)
         const digestMap = new Map<
           string,
@@ -56,9 +82,11 @@ export const Route = createFileRoute("/api/sendWeeklyDigests")({
 
         for (const p of patterns) {
           const userId = p.user_id;
+          const email = emailMap.get(userId);
+          if (!email) continue;
+
           if (!digestMap.has(userId)) {
-            const userEmail = (p.users as unknown as { email: string }).email;
-            digestMap.set(userId, { email: userEmail, patterns: [] });
+            digestMap.set(userId, { email, patterns: [] });
           }
           const digest = digestMap.get(userId)!;
           if (digest.patterns.length < 3) {
