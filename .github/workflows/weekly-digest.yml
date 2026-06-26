@@ -18,18 +18,18 @@ jobs:
             exit 1
           fi
 
-          # Strip any trailing whitespace/newlines from secret (no xargs to avoid any transformation)
-          CLEAN_SECRET=$(echo -n "$CRON_SECRET" | tr -d '\n\r\t ')
+          # Write secret to temp file to bypass GitHub's command-line masking
+          echo -n "$CRON_SECRET" > /tmp/cron_secret
 
-          echo "Debug: Secret length = ${#CLEAN_SECRET}"
-          echo "Debug: First 8 chars = ${CLEAN_SECRET:0:8}"
-          echo "Debug: Last 8 chars = ${CLEAN_SECRET: -8}"
+          echo "Debug: Secret length = $(wc -c < /tmp/cron_secret)"
 
           response=$(curl -X POST "https://healthyu.web.id/api/sendWeeklyDigests" \
             -H "Content-Type: application/json" \
-            -H "Authorization: Bearer ***" \
+            -H "Authorization: Bearer $(cat /tmp/cron_secret)" \
             -w "\n%{http_code}" \
             -s)
+
+          rm -f /tmp/cron_secret
 
           status=$(echo "$response" | tail -n1)
           body=$(echo "$response" | head -n-1)
