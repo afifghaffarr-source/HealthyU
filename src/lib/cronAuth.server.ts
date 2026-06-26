@@ -30,26 +30,8 @@ export function requireCronSecret(request: Request): Response | null {
   const bearer = authHeader?.replace(/^Bearer\s+/i, "");
   const received = headerSecret || bearer;
 
-  // Temporary debug logging
-  const debugInfo = {
-    authHeaderRaw: authHeader?.substring(0, 20) + "...",
-    receivedLength: received?.length,
-    expectedLength: expected.length,
-    receivedFirst8: received?.substring(0, 8),
-    expectedFirst8: expected.substring(0, 8),
-    receivedLast8: received?.substring(received.length - 8),
-    expectedLast8: expected.substring(expected.length - 8),
-    receivedBytes: Array.from(received?.substring(0, 16) || "")
-      .map((c) => c.charCodeAt(0))
-      .join(","),
-    expectedBytes: Array.from(expected.substring(0, 16))
-      .map((c) => c.charCodeAt(0))
-      .join(","),
-  };
-  console.log("[CRON_AUTH_DEBUG]", debugInfo);
-
   if (!received || !timingSafeEqualStr(received, expected)) {
-    return new Response(JSON.stringify({ error: "Unauthorized", debug: debugInfo }), {
+    return new Response(JSON.stringify({ error: "Unauthorized" }), {
       status: 401,
       headers: { "Content-Type": "application/json" },
     });

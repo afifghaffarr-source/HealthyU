@@ -18,14 +18,12 @@ jobs:
             exit 1
           fi
 
-          # Write secret to temp file to bypass GitHub's command-line masking
+          # Write secret to temp file to bypass GitHub's command-line secret masking
           echo -n "$CRON_SECRET" > /tmp/cron_secret
-
-          echo "Debug: Secret length = $(wc -c < /tmp/cron_secret)"
 
           response=$(curl -X POST "https://healthyu.web.id/api/sendWeeklyDigests" \
             -H "Content-Type: application/json" \
-            -H "Authorization: Bearer $(cat /tmp/cron_secret)" \
+            -H "Authorization: Bearer *** /tmp/cron_secret)" \
             -w "\n%{http_code}" \
             -s)
 
