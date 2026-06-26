@@ -18,8 +18,8 @@ jobs:
             exit 1
           fi
 
-          # Strip any trailing whitespace/newlines from secret
-          CLEAN_SECRET=$(echo -n "$CRON_SECRET" | tr -d '\n\r' | xargs)
+          # Strip any trailing whitespace/newlines from secret (no xargs to avoid any transformation)
+          CLEAN_SECRET=$(echo -n "$CRON_SECRET" | tr -d '\n\r\t ')
 
           echo "Debug: Secret length = ${#CLEAN_SECRET}"
           echo "Debug: First 8 chars = ${CLEAN_SECRET:0:8}"
