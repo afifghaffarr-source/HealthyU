@@ -23,7 +23,7 @@ jobs:
 
           response=$(curl -X POST "https://healthyu.web.id/api/sendWeeklyDigests" \
             -H "Content-Type: application/json" \
-            -H "Authorization: Bearer *** /tmp/cron_secret)" \
+            -H "Authorization: Bearer $(cat /tmp/cron_secret)" \
             -w "\n%{http_code}" \
             -s)
 
