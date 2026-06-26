@@ -31,28 +31,25 @@ export function requireCronSecret(request: Request): Response | null {
   const received = headerSecret || bearer;
 
   // Temporary debug logging
-  console.log("[CRON_AUTH_DEBUG] Auth header raw:", authHeader?.substring(0, 20) + "...");
-  console.log("[CRON_AUTH_DEBUG] Received length:", received?.length);
-  console.log("[CRON_AUTH_DEBUG] Expected length:", expected.length);
-  console.log("[CRON_AUTH_DEBUG] Received first 8:", received?.substring(0, 8));
-  console.log("[CRON_AUTH_DEBUG] Expected first 8:", expected.substring(0, 8));
-  console.log("[CRON_AUTH_DEBUG] Received last 8:", received?.substring(received.length - 8));
-  console.log("[CRON_AUTH_DEBUG] Expected last 8:", expected.substring(expected.length - 8));
-  console.log(
-    "[CRON_AUTH_DEBUG] Byte-by-byte first 16 received:",
-    Array.from(received?.substring(0, 16) || "")
+  const debugInfo = {
+    authHeaderRaw: authHeader?.substring(0, 20) + "...",
+    receivedLength: received?.length,
+    expectedLength: expected.length,
+    receivedFirst8: received?.substring(0, 8),
+    expectedFirst8: expected.substring(0, 8),
+    receivedLast8: received?.substring(received.length - 8),
+    expectedLast8: expected.substring(expected.length - 8),
+    receivedBytes: Array.from(received?.substring(0, 16) || "")
       .map((c) => c.charCodeAt(0))
       .join(","),
-  );
-  console.log(
-    "[CRON_AUTH_DEBUG] Byte-by-byte first 16 expected:",
-    Array.from(expected.substring(0, 16))
+    expectedBytes: Array.from(expected.substring(0, 16))
       .map((c) => c.charCodeAt(0))
       .join(","),
-  );
+  };
+  console.log("[CRON_AUTH_DEBUG]", debugInfo);
 
   if (!received || !timingSafeEqualStr(received, expected)) {
-    return new Response(JSON.stringify({ error: "Unauthorized" }), {
+    return new Response(JSON.stringify({ error: "Unauthorized", debug: debugInfo }), {
       status: 401,
       headers: { "Content-Type": "application/json" },
     });
