@@ -18,6 +18,11 @@ jobs:
             exit 1
           fi
 
+          # Strip any trailing whitespace/newlines from secret
+          CLEAN_SECRET=$(echo -n "$CRON_SECRET" | tr -d '\n\r' | xargs)
+
+          echo "Debug: Secret length = ${#CLEAN_SECRET}"
+
           response=$(curl -X POST "https://healthyu.web.id/api/sendWeeklyDigests" \
             -H "Content-Type: application/json" \
             -H "Authorization: Bearer ***" \
