@@ -268,6 +268,79 @@ export function generateQuickActionsForPattern(patternType: string): QuickAction
         action_data: { question: "Gimana cara aware sama sinyal kenyang?" },
       },
     ],
+    // Meta-patterns (Sprint 14)
+    stress_late_night_combo: [
+      {
+        type: "reminder",
+        label: "Set 9 PM eating cutoff",
+        action_data: { time: "21:00", message: "Stop eating — destress instead!" },
+      },
+      {
+        type: "tips",
+        label: "Evening stress relief",
+        action_data: {
+          tips: [
+            "Jalan santai 15 menit setelah dinner",
+            "Teh herbal hangat (bukan makanan)",
+            "Journaling 5 menit sebelum tidur",
+            "Set alarm tidur konsisten",
+          ],
+        },
+      },
+      {
+        type: "chat",
+        label: "Break the cycle",
+        action_data: { question: "Gimana cara stop stress eating malam hari?" },
+      },
+    ],
+    weekend_indulgence_combo: [
+      {
+        type: "tips",
+        label: "Weekend balance tips",
+        action_data: {
+          tips: [
+            "Plan 1 indulgence meal, sisanya normal",
+            "Weekend juga track — jangan auto cheat day",
+            "Olahraga weekend buat kompensasi",
+            "Warung: porsi normal, jangan jumbo",
+          ],
+        },
+      },
+      {
+        type: "recipes",
+        label: "Healthy weekend meals",
+        action_data: { filter: "healthy,special" },
+      },
+      {
+        type: "chat",
+        label: "Ask coach",
+        action_data: { question: "Gimana enjoy weekend tanpa overeat?" },
+      },
+    ],
+    emotional_mood_cycle: [
+      {
+        type: "tracker",
+        label: "Track mood triggers",
+        action_data: { route: "/meal/log" },
+      },
+      {
+        type: "tips",
+        label: "Break emotional eating",
+        action_data: {
+          tips: [
+            "Pause 10 menit sebelum makan (cek lapar atau emosi?)",
+            "Call/chat teman saat mood drop",
+            "Aktivitas pengganti: jalan, musik, stretching",
+            "Jangan stok comfort food di rumah",
+          ],
+        },
+      },
+      {
+        type: "chat",
+        label: "Talk it out",
+        action_data: { question: "Gimana handle emotional eating pattern?" },
+      },
+    ],
   };
 
   return actionMap[patternType] || [];

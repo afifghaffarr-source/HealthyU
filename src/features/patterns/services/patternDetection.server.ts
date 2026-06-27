@@ -21,6 +21,7 @@ import { detectHungerPatterns } from "../lib/hungerPatterns.server";
 import { detectMetaPatterns, type MetaDetectedPattern } from "../lib/metaPatterns.server";
 import { scorePatterns } from "../lib/patternScoring.server";
 import { parsePatternPreferences, type PatternPreferences } from "../types/preferences";
+import { generateQuickActionsForPattern } from "../lib/quickActions";
 
 interface MealLogFull {
   id: string;
@@ -365,13 +366,7 @@ function toScoredMeta(meta: MetaDetectedPattern): ScoredPattern {
     score: Math.min(95, 70 + meta.count * 5),
     reason: meta.metadata.metapattern_description,
     recommendation: meta.metadata.metapattern_title,
-    quick_actions: [
-      {
-        type: "tips",
-        label: "Lihat strategi gabungan",
-        action_data: { metapattern_id: meta.metapattern_id, components: meta.components },
-      },
-    ],
+    quick_actions: generateQuickActionsForPattern(meta.metapattern_id),
   };
 }
 

@@ -5,8 +5,10 @@
 
 import { Link } from "@tanstack/react-router";
 import { AlertTriangle, TrendingUp } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import type { PatternInsight, PatternType } from "../types/pattern";
 import { PATTERN_METADATA } from "../types/pattern";
+import { handleQuickAction } from "../lib/quickActions";
 
 interface MetaPatternHeroCardProps {
   pattern: PatternInsight;
@@ -25,11 +27,8 @@ export function MetaPatternHeroCard({ pattern }: MetaPatternHeroCardProps) {
     .join(" + ");
 
   return (
-    <Link
-      to="/profile/insights"
-      className="block rounded-xl border-2 border-amber-500 bg-gradient-to-br from-amber-50 to-orange-50 p-4 transition-all hover:shadow-lg dark:from-amber-950/30 dark:to-orange-950/30 dark:border-amber-600"
-    >
-      <div className="flex items-start gap-3">
+    <div className="rounded-xl border-2 border-amber-500 bg-gradient-to-br from-amber-50 to-orange-50 p-4 dark:from-amber-950/30 dark:to-orange-950/30 dark:border-amber-600">
+      <div className="flex items-start gap-3 mb-3">
         <div className="rounded-lg bg-amber-500 p-2 text-white">
           <AlertTriangle size={20} />
         </div>
@@ -50,11 +49,33 @@ export function MetaPatternHeroCard({ pattern }: MetaPatternHeroCardProps) {
               <span className="truncate">{componentLabels}</span>
             </div>
           )}
-          <div className="mt-3 text-xs font-medium text-amber-600 dark:text-amber-400">
-            Ketuk untuk lihat detail & rekomendasi →
-          </div>
         </div>
       </div>
-    </Link>
+
+      {/* Quick Actions */}
+      {pattern.quick_actions && pattern.quick_actions.length > 0 && (
+        <div className="flex flex-wrap gap-2 mb-3">
+          {pattern.quick_actions.slice(0, 3).map((action, idx) => (
+            <Button
+              key={idx}
+              variant="outline"
+              size="sm"
+              className="text-xs border-amber-600 text-amber-900 hover:bg-amber-100 dark:border-amber-500 dark:text-amber-100 dark:hover:bg-amber-950/50"
+              onClick={() => handleQuickAction(action)}
+            >
+              {action.label}
+            </Button>
+          ))}
+        </div>
+      )}
+
+      {/* Link to full insights */}
+      <Link
+        to="/profile/insights"
+        className="block text-xs font-medium text-amber-600 dark:text-amber-400 hover:underline"
+      >
+        Lihat detail lengkap & rekomendasi →
+      </Link>
+    </div>
   );
 }
