@@ -3879,7 +3879,10 @@ export type Database = {
           detection_window_end: string;
           detection_window_start: string;
           id: string;
+          is_meta: boolean;
           last_occurrence: string;
+          metapattern_components: string[] | null;
+          metapattern_id: string | null;
           occurrence_count: number;
           pattern_type: string;
           quick_actions: Json;
@@ -3899,7 +3902,10 @@ export type Database = {
           detection_window_end: string;
           detection_window_start: string;
           id?: string;
+          is_meta?: boolean;
           last_occurrence: string;
+          metapattern_components?: string[] | null;
+          metapattern_id?: string | null;
           occurrence_count: number;
           pattern_type: string;
           quick_actions?: Json;
@@ -3919,7 +3925,10 @@ export type Database = {
           detection_window_end?: string;
           detection_window_start?: string;
           id?: string;
+          is_meta?: boolean;
           last_occurrence?: string;
+          metapattern_components?: string[] | null;
+          metapattern_id?: string | null;
           occurrence_count?: number;
           pattern_type?: string;
           quick_actions?: Json;
