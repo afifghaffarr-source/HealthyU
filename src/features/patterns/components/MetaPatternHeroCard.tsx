@@ -5,7 +5,8 @@
 
 import { Link } from "@tanstack/react-router";
 import { AlertTriangle, TrendingUp } from "lucide-react";
-import type { PatternInsight } from "../types/pattern";
+import type { PatternInsight, PatternType } from "../types/pattern";
+import { PATTERN_METADATA } from "../types/pattern";
 
 interface MetaPatternHeroCardProps {
   pattern: PatternInsight;
@@ -18,8 +19,10 @@ export function MetaPatternHeroCard({ pattern }: MetaPatternHeroCardProps) {
   const metaDescription = (metadata.metapattern_description as string) || pattern.ai_explanation;
   const components = pattern.metapattern_components || [];
 
-  // Simple label join
-  const componentLabels = components.join(" + ");
+  // Map pattern_type to readable titles
+  const componentLabels = components
+    .map((pt) => PATTERN_METADATA[pt as PatternType]?.title || pt)
+    .join(" + ");
 
   return (
     <Link
