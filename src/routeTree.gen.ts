@@ -149,6 +149,7 @@ import { Route as AuthenticatedPushAlarmRouteImport } from './routes/_authentica
 import { Route as AuthenticatedProfileScanStatsRouteImport } from './routes/_authenticated/profile.scan-stats'
 import { Route as AuthenticatedProfilePrivacyRouteImport } from './routes/_authenticated/profile.privacy'
 import { Route as AuthenticatedProfilePatternsRouteImport } from './routes/_authenticated/profile.patterns'
+import { Route as AuthenticatedProfilePatternSettingsRouteImport } from './routes/_authenticated/profile.pattern-settings'
 import { Route as AuthenticatedProfileInsightsRouteImport } from './routes/_authenticated/profile.insights'
 import { Route as AuthenticatedPrayerQiblaRouteImport } from './routes/_authenticated/prayer.qibla'
 import { Route as AuthenticatedPrayerAladhanRouteImport } from './routes/_authenticated/prayer.aladhan'
@@ -938,6 +939,12 @@ const AuthenticatedProfilePatternsRoute =
     path: '/patterns',
     getParentRoute: () => AuthenticatedProfileRoute,
   } as any)
+const AuthenticatedProfilePatternSettingsRoute =
+  AuthenticatedProfilePatternSettingsRouteImport.update({
+    id: '/pattern-settings',
+    path: '/pattern-settings',
+    getParentRoute: () => AuthenticatedProfileRoute,
+  } as any)
 const AuthenticatedProfileInsightsRoute =
   AuthenticatedProfileInsightsRouteImport.update({
     id: '/insights',
@@ -1371,6 +1378,7 @@ export interface FileRoutesByFullPath {
   '/prayer/aladhan': typeof AuthenticatedPrayerAladhanRoute
   '/prayer/qibla': typeof AuthenticatedPrayerQiblaRoute
   '/profile/insights': typeof AuthenticatedProfileInsightsRoute
+  '/profile/pattern-settings': typeof AuthenticatedProfilePatternSettingsRoute
   '/profile/patterns': typeof AuthenticatedProfilePatternsRoute
   '/profile/privacy': typeof AuthenticatedProfilePrivacyRoute
   '/profile/scan-stats': typeof AuthenticatedProfileScanStatsRoute
@@ -1555,6 +1563,7 @@ export interface FileRoutesByTo {
   '/prayer/aladhan': typeof AuthenticatedPrayerAladhanRoute
   '/prayer/qibla': typeof AuthenticatedPrayerQiblaRoute
   '/profile/insights': typeof AuthenticatedProfileInsightsRoute
+  '/profile/pattern-settings': typeof AuthenticatedProfilePatternSettingsRoute
   '/profile/patterns': typeof AuthenticatedProfilePatternsRoute
   '/profile/privacy': typeof AuthenticatedProfilePrivacyRoute
   '/profile/scan-stats': typeof AuthenticatedProfileScanStatsRoute
@@ -1749,6 +1758,7 @@ export interface FileRoutesById {
   '/_authenticated/prayer/aladhan': typeof AuthenticatedPrayerAladhanRoute
   '/_authenticated/prayer/qibla': typeof AuthenticatedPrayerQiblaRoute
   '/_authenticated/profile/insights': typeof AuthenticatedProfileInsightsRoute
+  '/_authenticated/profile/pattern-settings': typeof AuthenticatedProfilePatternSettingsRoute
   '/_authenticated/profile/patterns': typeof AuthenticatedProfilePatternsRoute
   '/_authenticated/profile/privacy': typeof AuthenticatedProfilePrivacyRoute
   '/_authenticated/profile/scan-stats': typeof AuthenticatedProfileScanStatsRoute
@@ -1943,6 +1953,7 @@ export interface FileRouteTypes {
     | '/prayer/aladhan'
     | '/prayer/qibla'
     | '/profile/insights'
+    | '/profile/pattern-settings'
     | '/profile/patterns'
     | '/profile/privacy'
     | '/profile/scan-stats'
@@ -2127,6 +2138,7 @@ export interface FileRouteTypes {
     | '/prayer/aladhan'
     | '/prayer/qibla'
     | '/profile/insights'
+    | '/profile/pattern-settings'
     | '/profile/patterns'
     | '/profile/privacy'
     | '/profile/scan-stats'
@@ -2320,6 +2332,7 @@ export interface FileRouteTypes {
     | '/_authenticated/prayer/aladhan'
     | '/_authenticated/prayer/qibla'
     | '/_authenticated/profile/insights'
+    | '/_authenticated/profile/pattern-settings'
     | '/_authenticated/profile/patterns'
     | '/_authenticated/profile/privacy'
     | '/_authenticated/profile/scan-stats'
@@ -3403,6 +3416,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedProfilePatternsRouteImport
       parentRoute: typeof AuthenticatedProfileRoute
     }
+    '/_authenticated/profile/pattern-settings': {
+      id: '/_authenticated/profile/pattern-settings'
+      path: '/pattern-settings'
+      fullPath: '/profile/pattern-settings'
+      preLoaderRoute: typeof AuthenticatedProfilePatternSettingsRouteImport
+      parentRoute: typeof AuthenticatedProfileRoute
+    }
     '/_authenticated/profile/insights': {
       id: '/_authenticated/profile/insights'
       path: '/insights'
@@ -3983,6 +4003,7 @@ const AuthenticatedPrayerRouteWithChildren =
 
 interface AuthenticatedProfileRouteChildren {
   AuthenticatedProfileInsightsRoute: typeof AuthenticatedProfileInsightsRoute
+  AuthenticatedProfilePatternSettingsRoute: typeof AuthenticatedProfilePatternSettingsRoute
   AuthenticatedProfilePatternsRoute: typeof AuthenticatedProfilePatternsRoute
   AuthenticatedProfilePrivacyRoute: typeof AuthenticatedProfilePrivacyRoute
   AuthenticatedProfileScanStatsRoute: typeof AuthenticatedProfileScanStatsRoute
@@ -3992,6 +4013,8 @@ interface AuthenticatedProfileRouteChildren {
 
 const AuthenticatedProfileRouteChildren: AuthenticatedProfileRouteChildren = {
   AuthenticatedProfileInsightsRoute: AuthenticatedProfileInsightsRoute,
+  AuthenticatedProfilePatternSettingsRoute:
+    AuthenticatedProfilePatternSettingsRoute,
   AuthenticatedProfilePatternsRoute: AuthenticatedProfilePatternsRoute,
   AuthenticatedProfilePrivacyRoute: AuthenticatedProfilePrivacyRoute,
   AuthenticatedProfileScanStatsRoute: AuthenticatedProfileScanStatsRoute,

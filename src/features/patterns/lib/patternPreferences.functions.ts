@@ -1,107 +1,45 @@
-/**
- * Pattern Preferences Server Functions
- * Sprint 10c Phase 1 - Custom Thresholds
- */
-
 import { createServerFn } from "@tanstack/react-start";
-import type { PatternSensitivity } from "../types/preferences";
-import type { PatternCategory } from "../types/pattern";
-import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { createSupabaseServerClient } from "~/lib/supabase.server";
+import type { PatternPreferences } from "../types/preferences";
+import { parsePatternPreferences } from "../types/preferences";
 
-/**
- * Get user's pattern preferences (with defaults)
- */
-export const getUserPreferences = createServerFn({ method: "GET" })
-  .middleware([requireSupabaseAuth])
-  .validator((data: { userId: string }) => data)
-  .handler(async ({ data, context }) => {
-    const { supabase, userId } = context;
+export const getPatternPreferences = createServerFn({ method: "GET" }).handler(async (ctx) => {
+  const supabase = createSupabaseServerClient(ctx);
 
-    const { data: prefs, error } = await supabase
-      .from("user_pattern_preferences")
-      .select("*")
-      .eq("user_id", data.userId)
-      .single();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
-    if (error && error.code !== "PGRST116") {
-      // PGRST116 = not found (expected for first-time users)
-      throw error;
-    }
+  if (!user) throw new Error("Unauthorized");
 
-    // Return defaults if no preferences exist
-    if (!prefs) {
-      return {
-        user_id: data.userId,
-        sensitivity: "medium" as PatternSensitivity,
-        enabled_categories: [
-          "time",
-          "emotional",
-          "social",
-          "cravings",
-          "schedule",
-          "location",
-          "hunger",
-        ] as PatternCategory[],
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-      };
-    }
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("pattern_preferences")
+    .eq("id", user.id)
+    .single();
 
-    return {
-      user_id: prefs.user_id,
-      sensitivity: prefs.sensitivity as PatternSensitivity,
-      enabled_categories: (prefs.enabled_categories || []) as PatternCategory[],
-      created_at: prefs.created_at,
-      updated_at: prefs.updated_at,
-    };
-  });
+  return parsePatternPreferences(profile?.pattern_preferences);
+});
 
-/**
- * Update user's pattern preferences
- */
-export const updateUserPreferences = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
-  .validator(
-    (data: {
-      userId: string;
-      sensitivity?: PatternSensitivity;
-      enabled_categories?: PatternCategory[];
-    }) => data,
-  )
-  .handler(async ({ data, context }) => {
-    const { supabase, userId } = context;
+export const updatePatternPreferences = createServerFn({ method: "POST" })
+  .validator((data: PatternPreferences) => data)
+  .handler(async (ctx) => {
+    const supabase = createSupabaseServerClient(ctx.context);
 
-    const updateData: {
-      user_id: string;
-      sensitivity?: string;
-      enabled_categories?: string[];
-      updated_at: string;
-    } = {
-      user_id: userId,
-      updated_at: new Date().toISOString(),
-    };
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
 
-    if (data.sensitivity) {
-      updateData.sensitivity = data.sensitivity;
-    }
+    if (!user) throw new Error("Unauthorized");
 
-    if (data.enabled_categories) {
-      updateData.enabled_categories = data.enabled_categories;
-    }
-
-    const { data: updated, error } = await supabase
-      .from("user_pattern_preferences")
-      .upsert(updateData, { onConflict: "user_id" })
-      .select()
-      .single();
+    const { error } = await supabase
+      .from("profiles")
+      .update({
+        pattern_preferences: ctx.data,
+      })
+      .eq("id", user.id);
 
     if (error) throw error;
 
-    return {
-      user_id: updated.user_id,
-      sensitivity: updated.sensitivity as PatternSensitivity,
-      enabled_categories: (updated.enabled_categories || []) as PatternCategory[],
-      created_at: updated.created_at,
-      updated_at: updated.updated_at,
-    };
+    return { success: true };
   });

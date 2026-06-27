@@ -19,6 +19,7 @@ import { detectSchedulePatterns } from "../lib/schedulePatterns.server";
 import { detectLocationPatterns } from "../lib/locationPatterns.server";
 import { detectHungerPatterns } from "../lib/hungerPatterns.server";
 import { scorePatterns } from "../lib/patternScoring.server";
+import { parsePatternPreferences, type PatternPreferences } from "../types/preferences";
 
 interface MealLogFull {
   id: string;
@@ -56,15 +57,26 @@ async function fetch14DayMeals(supabase: SupabaseClient, userId: string): Promis
 }
 
 /**
- * Run all 7 rule engines in parallel with sensitivity multiplier
+ * Run all 7 rule engines in parallel with user preferences
  */
 async function runAllRuleEngines(
   meals: MealLogFull[],
-  sensitivityMultiplier: number = 1.0,
+  preferences: PatternPreferences,
 ): Promise<DetectedPattern[]> {
+  // Map sensitivity to multiplier: low=0.7, medium=1.0, high=1.3
+  const sensitivityMultiplier =
+    preferences.sensitivity === "low" ? 0.7 : preferences.sensitivity === "high" ? 1.3 : 1.0;
+
   // Run all detections in parallel
   const results = await Promise.all([
-    Promise.resolve(detectTimePatterns(meals, sensitivityMultiplier)),
+    Promise.resolve(
+      detectTimePatterns(meals, {
+        skipBreakfastThreshold: preferences.skip_breakfast_threshold,
+        lateNightHour: preferences.late_night_hour,
+        irregularVariance: preferences.irregular_meals_variance,
+        sensitivity: sensitivityMultiplier,
+      }),
+    ),
     Promise.resolve(detectEmotionalPatterns(meals, sensitivityMultiplier)),
     Promise.resolve(detectSocialPatterns(meals, sensitivityMultiplier)),
     Promise.resolve(detectCravingPatterns(meals, sensitivityMultiplier)),
@@ -196,21 +208,19 @@ export async function detectPatternsForUser(
   top_pattern: ScoredPattern | null;
   analyzed_at: string;
 }> {
-  // 1. Fetch user preferences (sensitivity)
-  const { data: prefs } = await supabase
-    .from("user_pattern_preferences")
-    .select("sensitivity")
-    .eq("user_id", userId)
+  // 1. Fetch user pattern preferences
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("pattern_preferences")
+    .eq("id", userId)
     .single();
 
-  const sensitivity = prefs?.sensitivity || "medium";
-  const sensitivityMultiplier = sensitivity === "low" ? 0.7 : sensitivity === "high" ? 1.3 : 1.0;
+  const preferences = parsePatternPreferences(profile?.pattern_preferences);
 
   // 2. Fetch 14-day meal logs
   const meals = await fetch14DayMeals(supabase, userId);
 
-  if (meals.length < 7) {
-    // Not enough data (less than 7 meals in 14 days)
+  if (meals.length === 0) {
     return {
       detected_count: 0,
       top_pattern: null,
@@ -218,11 +228,10 @@ export async function detectPatternsForUser(
     };
   }
 
-  // 3. Run all rule engines with sensitivity
-  const candidates = await runAllRuleEngines(meals, sensitivityMultiplier);
+  // 3. Run all rule engines with user preferences
+  const detectedPatterns = await runAllRuleEngines(meals, preferences);
 
-  if (candidates.length === 0) {
-    // No patterns detected
+  if (detectedPatterns.length === 0) {
     return {
       detected_count: 0,
       top_pattern: null,
@@ -231,7 +240,7 @@ export async function detectPatternsForUser(
   }
 
   // 4. Score patterns (hybrid: hardcoded + AI)
-  const scored = await scorePatterns(supabase, userId, candidates);
+  const scored = await scorePatterns(supabase, userId, detectedPatterns);
 
   // 5. Save to database
   const windowStart = new Date();
@@ -246,8 +255,8 @@ export async function detectPatternsForUser(
     windowEnd.toISOString().split("T")[0],
   );
 
-  // 5. Check auto-resolution
-  await checkAutoResolution(supabase, userId, candidates);
+  // 6. Check auto-resolution
+  await checkAutoResolution(supabase, userId, detectedPatterns);
 
   // Return summary
   return {

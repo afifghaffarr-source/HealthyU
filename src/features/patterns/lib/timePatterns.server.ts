@@ -21,9 +21,13 @@ export interface MealLog {
 
 /**
  * Detect skip breakfast pattern
- * Threshold: <3 breakfasts in last 5 weekdays (adjusted by sensitivity)
+ * Threshold: <N breakfasts in last 5 weekdays (adjusted by sensitivity)
  */
-export function detectSkipBreakfast(meals: MealLog[], sensitivity: number = 1.0): DetectedPattern {
+export function detectSkipBreakfast(
+  meals: MealLog[],
+  threshold: number = 3,
+  sensitivity: number = 1.0,
+): DetectedPattern {
   const now = new Date();
   const fiveDaysAgo = new Date(now.getTime() - 5 * 86400000);
 
@@ -44,9 +48,6 @@ export function detectSkipBreakfast(meals: MealLog[], sensitivity: number = 1.0)
   const breakfastCount = weekdays.filter((d) => breakfastDays.has(d)).length;
   const skippedDays = weekdays.filter((d) => !breakfastDays.has(d));
 
-  // Apply sensitivity: low=4+, medium=3+, high=2+
-  const threshold = Math.max(2, Math.ceil(3 / sensitivity));
-
   return {
     type: "skip_breakfast",
     count: skippedDays.length,
@@ -62,15 +63,16 @@ export function detectSkipBreakfast(meals: MealLog[], sensitivity: number = 1.0)
 
 /**
  * Detect late-night eating pattern
- * Threshold: 3+ meals after 10pm in 14 days (adjusted by sensitivity)
+ * Threshold: 3+ meals after configured hour in 14 days (adjusted by sensitivity)
  */
 export function detectLateNightEating(
   meals: MealLog[],
+  lateNightHour: number = 22,
   sensitivity: number = 1.0,
 ): DetectedPattern {
   const lateNightMeals = meals.filter((m) => {
     const hour = new Date(m.logged_at).getUTCHours();
-    return hour >= 22 || hour < 4; // 10pm-4am
+    return hour >= lateNightHour || hour < 4; // configured hour-4am
   });
 
   const avgCalories =
@@ -106,9 +108,12 @@ export function detectLateNightEating(
 
 /**
  * Detect irregular meal timing pattern
- * Threshold: meal times vary >3h from day to day for same meal type
+ * Threshold: meal times vary >N hours from day to day for same meal type
  */
-export function detectIrregularMeals(meals: MealLog[]): DetectedPattern {
+export function detectIrregularMeals(
+  meals: MealLog[],
+  varianceThreshold: number = 2,
+): DetectedPattern {
   // Group by meal_type
   const byType: Record<string, { date: string; hour: number }[]> = {};
 
@@ -133,7 +138,7 @@ export function detectIrregularMeals(meals: MealLog[]): DetectedPattern {
     // Check consecutive day differences
     for (let i = 1; i < entries.length; i++) {
       const diff = Math.abs(entries[i].hour - entries[i - 1].hour);
-      if (diff > 3) {
+      if (diff > varianceThreshold) {
         irregularDates.push(entries[i].date);
         maxVariance = Math.max(maxVariance, diff);
       }
@@ -143,11 +148,12 @@ export function detectIrregularMeals(meals: MealLog[]): DetectedPattern {
   return {
     type: "irregular_meals",
     count: irregularDates.length,
-    detected: irregularDates.length >= 2, // Changed from 3 to 2 (more realistic threshold)
+    detected: irregularDates.length >= 2,
     matched_dates: Array.from(new Set(irregularDates)),
     metadata: {
       max_variance_hours: Math.round(maxVariance * 10) / 10,
       meal_types_checked: Object.keys(byType),
+      variance_threshold_applied: varianceThreshold,
     },
   };
 }
@@ -155,10 +161,25 @@ export function detectIrregularMeals(meals: MealLog[]): DetectedPattern {
 /**
  * Run all time-based pattern detections
  */
-export function detectTimePatterns(meals: MealLog[], sensitivity: number = 1.0): DetectedPattern[] {
+export function detectTimePatterns(
+  meals: MealLog[],
+  options: {
+    skipBreakfastThreshold?: number;
+    lateNightHour?: number;
+    irregularVariance?: number;
+    sensitivity?: number;
+  } = {},
+): DetectedPattern[] {
+  const {
+    skipBreakfastThreshold = 3,
+    lateNightHour = 22,
+    irregularVariance = 2,
+    sensitivity = 1.0,
+  } = options;
+
   return [
-    detectSkipBreakfast(meals, sensitivity),
-    detectLateNightEating(meals, sensitivity),
-    detectIrregularMeals(meals),
+    detectSkipBreakfast(meals, skipBreakfastThreshold, sensitivity),
+    detectLateNightEating(meals, lateNightHour, sensitivity),
+    detectIrregularMeals(meals, irregularVariance),
   ].filter((p) => p.detected);
 }
