@@ -63,10 +63,34 @@ const errorMiddleware = createMiddleware().server(async ({ next }) => {
 });
 
 /**
- * Security headers — diaplikasikan ke semua response HTML/JSON.
- * Catatan: CSP sengaja TIDAK ditambahkan dulu agar tidak memblok
- * Supabase Realtime (wss), Lovable AI, Google Fonts inline style,
- * dan service worker. Tambahkan CSP terpisah setelah audit upstream.
+ * CSP directives — allowlist berdasarkan origin yang benar-benar dipakai:
+ * - self: semua asset lokal
+ * - *.supabase.co: REST, auth, storage images, Realtime websocket
+ * - cdn.jsdelivr.net + tessdata.projectnaptha.com: Tesseract.js OCR (worker/WASM/data)
+ * - 'unsafe-inline' style: Tailwind/Radix/vaul/recharts inline styles
+ * - 'unsafe-inline' script: TanStack Start hydration script
+ * - 'wasm-unsafe-eval' + blob:: Tesseract.js WASM
+ * Font tidak masuk allowlist karena sudah self-hosted (/fonts/*.woff2).
+ */
+const CSP_DIRECTIVES = [
+  "default-src 'self'",
+  "script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net blob:",
+  "style-src 'self' 'unsafe-inline'",
+  "img-src 'self' data: blob: https://*.supabase.co",
+  "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://cdn.jsdelivr.net https://tessdata.projectnaptha.com",
+  "font-src 'self'",
+  "object-src 'none'",
+  "base-uri 'self'",
+  "form-action 'self'",
+  "frame-ancestors 'none'",
+  "worker-src 'self' blob:",
+  "script-src-elem 'self' 'unsafe-inline' https://cdn.jsdelivr.net blob:",
+  "wasm-unsafe-eval",
+].join("; ");
+
+/**
+ * Security headers — diaplikasikan ke semua response HTML.
+ * CSP default report-only, bisa di-enforce via CSP_ENFORCE=1 env.
  */
 const securityHeadersMiddleware = createMiddleware().server(async ({ next }) => {
   const result = await next();
@@ -99,6 +123,16 @@ const securityHeadersMiddleware = createMiddleware().server(async ({ next }) => 
   // Isolasi cross-origin (aman untuk app yang tidak embed third-party widget)
   if (!headers.has("cross-origin-opener-policy")) {
     headers.set("cross-origin-opener-policy", "same-origin");
+  }
+
+  // CSP hanya untuk HTML responses (bukan API/static assets)
+  const contentType = headers.get("content-type") || "";
+  if (contentType.includes("text/html")) {
+    const cspEnforce = (globalThis as { CSP_ENFORCE?: unknown }).CSP_ENFORCE === "1";
+    const cspHeaderName = cspEnforce
+      ? "Content-Security-Policy"
+      : "Content-Security-Policy-Report-Only";
+    headers.set(cspHeaderName, CSP_DIRECTIVES + "; report-uri /api/csp-report");
   }
 
   return {

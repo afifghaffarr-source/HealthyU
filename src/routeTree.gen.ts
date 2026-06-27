@@ -47,6 +47,7 @@ import { Route as ArtikelSlugRouteImport } from './routes/artikel.$slug'
 import { Route as ApiSendWeeklyDigestsRouteImport } from './routes/api/sendWeeklyDigests'
 import { Route as ApiLogErrorRouteImport } from './routes/api/log-error'
 import { Route as ApiHealthRouteImport } from './routes/api/health'
+import { Route as ApiCspReportRouteImport } from './routes/api/csp-report'
 import { Route as ApiAiStatusRouteImport } from './routes/api/ai-status'
 import { Route as AuthenticatedWorkoutRouteImport } from './routes/_authenticated/workout'
 import { Route as AuthenticatedWeightRouteImport } from './routes/_authenticated/weight'
@@ -387,6 +388,11 @@ const ApiLogErrorRoute = ApiLogErrorRouteImport.update({
 const ApiHealthRoute = ApiHealthRouteImport.update({
   id: '/api/health',
   path: '/api/health',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiCspReportRoute = ApiCspReportRouteImport.update({
+  id: '/api/csp-report',
+  path: '/api/csp-report',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiAiStatusRoute = ApiAiStatusRouteImport.update({
@@ -1302,6 +1308,7 @@ export interface FileRoutesByFullPath {
   '/weight': typeof AuthenticatedWeightRouteWithChildren
   '/workout': typeof AuthenticatedWorkoutRouteWithChildren
   '/api/ai-status': typeof ApiAiStatusRoute
+  '/api/csp-report': typeof ApiCspReportRoute
   '/api/health': typeof ApiHealthRoute
   '/api/log-error': typeof ApiLogErrorRoute
   '/api/sendWeeklyDigests': typeof ApiSendWeeklyDigestsRoute
@@ -1485,6 +1492,7 @@ export interface FileRoutesByTo {
   '/weight': typeof AuthenticatedWeightRouteWithChildren
   '/workout': typeof AuthenticatedWorkoutRouteWithChildren
   '/api/ai-status': typeof ApiAiStatusRoute
+  '/api/csp-report': typeof ApiCspReportRoute
   '/api/health': typeof ApiHealthRoute
   '/api/log-error': typeof ApiLogErrorRoute
   '/api/sendWeeklyDigests': typeof ApiSendWeeklyDigestsRoute
@@ -1678,6 +1686,7 @@ export interface FileRoutesById {
   '/_authenticated/weight': typeof AuthenticatedWeightRouteWithChildren
   '/_authenticated/workout': typeof AuthenticatedWorkoutRouteWithChildren
   '/api/ai-status': typeof ApiAiStatusRoute
+  '/api/csp-report': typeof ApiCspReportRoute
   '/api/health': typeof ApiHealthRoute
   '/api/log-error': typeof ApiLogErrorRoute
   '/api/sendWeeklyDigests': typeof ApiSendWeeklyDigestsRoute
@@ -1871,6 +1880,7 @@ export interface FileRouteTypes {
     | '/weight'
     | '/workout'
     | '/api/ai-status'
+    | '/api/csp-report'
     | '/api/health'
     | '/api/log-error'
     | '/api/sendWeeklyDigests'
@@ -2054,6 +2064,7 @@ export interface FileRouteTypes {
     | '/weight'
     | '/workout'
     | '/api/ai-status'
+    | '/api/csp-report'
     | '/api/health'
     | '/api/log-error'
     | '/api/sendWeeklyDigests'
@@ -2246,6 +2257,7 @@ export interface FileRouteTypes {
     | '/_authenticated/weight'
     | '/_authenticated/workout'
     | '/api/ai-status'
+    | '/api/csp-report'
     | '/api/health'
     | '/api/log-error'
     | '/api/sendWeeklyDigests'
@@ -2384,6 +2396,7 @@ export interface RootRouteChildren {
   ResepRoute: typeof ResepRouteWithChildren
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   ApiAiStatusRoute: typeof ApiAiStatusRoute
+  ApiCspReportRoute: typeof ApiCspReportRoute
   ApiHealthRoute: typeof ApiHealthRoute
   ApiLogErrorRoute: typeof ApiLogErrorRoute
   ApiSendWeeklyDigestsRoute: typeof ApiSendWeeklyDigestsRoute
@@ -2674,6 +2687,13 @@ declare module '@tanstack/react-router' {
       path: '/api/health'
       fullPath: '/api/health'
       preLoaderRoute: typeof ApiHealthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/csp-report': {
+      id: '/api/csp-report'
+      path: '/api/csp-report'
+      fullPath: '/api/csp-report'
+      preLoaderRoute: typeof ApiCspReportRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/ai-status': {
@@ -4357,6 +4377,7 @@ const rootRouteChildren: RootRouteChildren = {
   ResepRoute: ResepRouteWithChildren,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   ApiAiStatusRoute: ApiAiStatusRoute,
+  ApiCspReportRoute: ApiCspReportRoute,
   ApiHealthRoute: ApiHealthRoute,
   ApiLogErrorRoute: ApiLogErrorRoute,
   ApiSendWeeklyDigestsRoute: ApiSendWeeklyDigestsRoute,
