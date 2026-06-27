@@ -77,7 +77,7 @@ export const Route = createFileRoute("/api/sendWeeklyDigests")({
         // Group by user (top 3 patterns per user)
         const digestMap = new Map<
           string,
-          { email: string; patterns: Array<{ type: string; explanation: string }> }
+          { user_id: string; email: string; patterns: Array<{ type: string; explanation: string }> }
         >();
 
         for (const p of patterns) {
@@ -86,7 +86,7 @@ export const Route = createFileRoute("/api/sendWeeklyDigests")({
           if (!email) continue;
 
           if (!digestMap.has(userId)) {
-            digestMap.set(userId, { email, patterns: [] });
+            digestMap.set(userId, { user_id: userId, email, patterns: [] });
           }
           const digest = digestMap.get(userId)!;
           if (digest.patterns.length < 3) {
@@ -114,8 +114,10 @@ export const Route = createFileRoute("/api/sendWeeklyDigests")({
             await sendEmail(digest.email, digest.patterns);
             sent++;
           } catch (err) {
-            console.error(`[Digest] Failed for ${digest.email}:`, err);
-            errors.push(`${digest.email}: ${(err as Error).message}`);
+            // Mask email for PII compliance - log only domain
+            const emailDomain = digest.email.split("@")[1] || "unknown";
+            console.error(`[Digest] Failed for ***@${emailDomain}:`, err);
+            errors.push(`user_id=${digest.user_id}: ${(err as Error).message}`);
             skipped++;
           }
         }

@@ -73,9 +73,29 @@ describe("Time Pattern Detection", () => {
     });
 
     it("does NOT detect if only 2 skips", () => {
+      // 5 weekdays terakhir: Jun 27(Fri), 26(Thu), 25(Wed), 24(Tue), 23(Mon)
+      // 3 breakfast, 2 skip → count=2 < threshold=3 → detected=false
       const meals: MealLog[] = [
         {
-          log_date: "2026-06-24", // Tue breakfast (recent)
+          log_date: "2026-06-26", // Thu breakfast ✓
+          logged_at: "2026-06-26T08:00:00Z",
+          meal_type: "breakfast",
+          calories: 300,
+          carbs_g: 40,
+          protein_g: 15,
+          fat_g: 10,
+        },
+        {
+          log_date: "2026-06-25", // Wed skip
+          logged_at: "2026-06-25T12:00:00Z",
+          meal_type: "lunch",
+          calories: 500,
+          carbs_g: 60,
+          protein_g: 25,
+          fat_g: 15,
+        },
+        {
+          log_date: "2026-06-24", // Tue breakfast ✓
           logged_at: "2026-06-24T08:00:00Z",
           meal_type: "breakfast",
           calories: 300,
@@ -84,17 +104,8 @@ describe("Time Pattern Detection", () => {
           fat_g: 10,
         },
         {
-          log_date: "2026-06-23", // Mon skip
-          logged_at: "2026-06-23T12:00:00Z",
-          meal_type: "lunch",
-          calories: 500,
-          carbs_g: 60,
-          protein_g: 25,
-          fat_g: 15,
-        },
-        {
-          log_date: "2026-06-22", // Sun breakfast
-          logged_at: "2026-06-22T08:00:00Z",
+          log_date: "2026-06-23", // Mon breakfast ✓
+          logged_at: "2026-06-23T08:00:00Z",
           meal_type: "breakfast",
           calories: 300,
           carbs_g: 40,
@@ -102,17 +113,8 @@ describe("Time Pattern Detection", () => {
           fat_g: 10,
         },
         {
-          log_date: "2026-06-19", // Thu breakfast
-          logged_at: "2026-06-19T08:00:00Z",
-          meal_type: "breakfast",
-          calories: 300,
-          carbs_g: 40,
-          protein_g: 15,
-          fat_g: 10,
-        },
-        {
-          log_date: "2026-06-18", // Wed skip
-          logged_at: "2026-06-18T12:00:00Z",
+          log_date: "2026-06-20", // Fri skip
+          logged_at: "2026-06-20T12:00:00Z",
           meal_type: "lunch",
           calories: 500,
           carbs_g: 60,
@@ -375,10 +377,47 @@ describe("Time Pattern Detection", () => {
     });
 
     it("returns empty array if no patterns detected", () => {
-      // Use recent dates with consistent breakfast logging
+      // Last 5 weekdays: Jun 27(Fri), 26(Thu), 25(Wed), 24(Tue), 23(Mon)
+      // All have breakfast, no late-night, consistent timing → no patterns
       const meals: MealLog[] = [
         {
-          log_date: "2026-06-23",
+          log_date: "2026-06-26", // Thu breakfast
+          logged_at: "2026-06-26T08:00:00Z",
+          meal_type: "breakfast",
+          calories: 300,
+          carbs_g: 40,
+          protein_g: 15,
+          fat_g: 10,
+        },
+        {
+          log_date: "2026-06-26",
+          logged_at: "2026-06-26T12:00:00Z",
+          meal_type: "lunch",
+          calories: 500,
+          carbs_g: 60,
+          protein_g: 25,
+          fat_g: 15,
+        },
+        {
+          log_date: "2026-06-25", // Wed breakfast
+          logged_at: "2026-06-25T08:00:00Z",
+          meal_type: "breakfast",
+          calories: 300,
+          carbs_g: 40,
+          protein_g: 15,
+          fat_g: 10,
+        },
+        {
+          log_date: "2026-06-24", // Tue breakfast
+          logged_at: "2026-06-24T08:00:00Z",
+          meal_type: "breakfast",
+          calories: 300,
+          carbs_g: 40,
+          protein_g: 15,
+          fat_g: 10,
+        },
+        {
+          log_date: "2026-06-23", // Mon breakfast
           logged_at: "2026-06-23T08:00:00Z",
           meal_type: "breakfast",
           calories: 300,
@@ -387,44 +426,8 @@ describe("Time Pattern Detection", () => {
           fat_g: 10,
         },
         {
-          log_date: "2026-06-23",
-          logged_at: "2026-06-23T12:00:00Z",
-          meal_type: "lunch",
-          calories: 500,
-          carbs_g: 60,
-          protein_g: 25,
-          fat_g: 15,
-        },
-        {
-          log_date: "2026-06-22",
-          logged_at: "2026-06-22T08:00:00Z",
-          meal_type: "breakfast",
-          calories: 300,
-          carbs_g: 40,
-          protein_g: 15,
-          fat_g: 10,
-        },
-        {
-          log_date: "2026-06-20",
+          log_date: "2026-06-20", // Fri (last week) breakfast
           logged_at: "2026-06-20T08:00:00Z",
-          meal_type: "breakfast",
-          calories: 300,
-          carbs_g: 40,
-          protein_g: 15,
-          fat_g: 10,
-        },
-        {
-          log_date: "2026-06-19",
-          logged_at: "2026-06-19T08:00:00Z",
-          meal_type: "breakfast",
-          calories: 300,
-          carbs_g: 40,
-          protein_g: 15,
-          fat_g: 10,
-        },
-        {
-          log_date: "2026-06-18",
-          logged_at: "2026-06-18T08:00:00Z",
           meal_type: "breakfast",
           calories: 300,
           carbs_g: 40,

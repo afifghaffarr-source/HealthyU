@@ -69,7 +69,7 @@ export function detectLateNightEating(
   sensitivity: number = 1.0,
 ): DetectedPattern {
   const lateNightMeals = meals.filter((m) => {
-    const hour = new Date(m.logged_at).getHours();
+    const hour = new Date(m.logged_at).getUTCHours();
     return hour >= 22 || hour < 4; // 10pm-4am
   });
 
@@ -114,7 +114,8 @@ export function detectIrregularMeals(meals: MealLog[]): DetectedPattern {
 
   meals.forEach((m) => {
     if (!m.meal_type) return;
-    const hour = new Date(m.logged_at).getHours() + new Date(m.logged_at).getMinutes() / 60;
+    const d = new Date(m.logged_at);
+    const hour = d.getUTCHours() + d.getUTCMinutes() / 60;
     if (!byType[m.meal_type]) byType[m.meal_type] = [];
     byType[m.meal_type].push({ date: m.log_date, hour });
   });
