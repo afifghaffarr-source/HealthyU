@@ -86,6 +86,21 @@ export interface DetectedPattern {
   metadata: Record<string, unknown>;
 }
 
+// Meta-pattern types (combinations of single patterns)
+// ponytail: reuses PatternType strings via metapattern_components — no new enum.
+export type MetaPatternType =
+  | "stress_late_night_combo" // stress_eating + late_night_eating on same days
+  | "weekend_indulgence_combo" // weekend_splurge + warung_overeat
+  | "emotional_mood_cycle"; // stress_eating + mood_binges
+
+export interface MetaPatternDefinition {
+  id: MetaPatternType;
+  title: string;
+  description: string;
+  components: PatternType[]; // required single patterns
+  minOverlapDays?: number; // default 2
+}
+
 // Scored pattern (after AI or hardcoded scoring)
 export interface ScoredPattern extends DetectedPattern {
   score: number;

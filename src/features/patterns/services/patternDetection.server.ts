@@ -18,6 +18,7 @@ import { detectCravingPatterns } from "../lib/cravingPatterns.server";
 import { detectSchedulePatterns } from "../lib/schedulePatterns.server";
 import { detectLocationPatterns } from "../lib/locationPatterns.server";
 import { detectHungerPatterns } from "../lib/hungerPatterns.server";
+import { detectMetaPatterns, type MetaDetectedPattern } from "../lib/metaPatterns.server";
 import { scorePatterns } from "../lib/patternScoring.server";
 import { parsePatternPreferences, type PatternPreferences } from "../types/preferences";
 
@@ -242,6 +243,11 @@ export async function detectPatternsForUser(
   // 4. Score patterns (hybrid: hardcoded + AI)
   const scored = await scorePatterns(supabase, userId, detectedPatterns);
 
+  // 4a. Meta-pattern detection: combinations of single patterns
+  // ponytail: reuses same scoring surface (ScoredPattern) — no separate meta scoring.
+  const metas = detectMetaPatterns(detectedPatterns);
+  const scoredMetas = metas.map((m) => toScoredMeta(m));
+
   // 5. Save to database
   const windowStart = new Date();
   windowStart.setDate(windowStart.getDate() - 14);
@@ -251,6 +257,14 @@ export async function detectPatternsForUser(
     supabase,
     userId,
     scored,
+    windowStart.toISOString().split("T")[0],
+    windowEnd.toISOString().split("T")[0],
+  );
+
+  await upsertMetaPatternInsights(
+    supabase,
+    userId,
+    scoredMetas,
     windowStart.toISOString().split("T")[0],
     windowEnd.toISOString().split("T")[0],
   );
@@ -304,4 +318,105 @@ export async function getAllPatterns(
     active: all.filter((p) => !p.resolved_at),
     resolved: all.filter((p) => p.resolved_at),
   };
+}
+
+/**
+ * Convert a meta-pattern detection to the shared ScoredPattern shape so it can
+ * flow through the same orchestrator pipeline (DB upsert, UI card).
+ *
+ * ponytail: meta-patterns sit on top of same single ScoredPattern surface,
+ * keeping orchestrator diff minimal.
+ */
+function toScoredMeta(meta: MetaDetectedPattern): ScoredPattern {
+  return {
+    type: meta.components[0] as ScoredPattern["type"], // first component, satisfies CHECK constraint
+    count: meta.count,
+    detected: true,
+    matched_dates: meta.matched_dates,
+    metadata: {
+      ...meta.metadata,
+      is_meta: true,
+      metapattern_id: meta.metapattern_id,
+      metapattern_components: meta.components,
+      total_component_occurrences: meta.total_component_occurrences,
+    },
+    // Meta-pattern scores higher (combo is more actionable than single)
+    score: Math.min(95, 70 + meta.count * 5),
+    reason: meta.metadata.metapattern_description,
+    recommendation: meta.metadata.metapattern_title,
+    quick_actions: [
+      {
+        type: "tips",
+        label: "Lihat strategi gabungan",
+        action_data: { metapattern_id: meta.metapattern_id, components: meta.components },
+      },
+    ],
+  };
+}
+
+/**
+ * Upsert meta-pattern rows in pattern_insights.
+ *
+ * Dedup key: (user_id, metapattern_id) on rows where is_meta=true AND resolved_at IS NULL.
+ * ponytail: reuses single pattern_insights table — no separate meta table.
+ */
+async function upsertMetaPatternInsights(
+  supabase: SupabaseClient,
+  userId: string,
+  metas: ScoredPattern[],
+  windowStart: string,
+  windowEnd: string,
+): Promise<void> {
+  for (const meta of metas) {
+    const metapatternId = meta.metadata.metapattern_id as string | undefined;
+    if (!metapatternId) continue;
+
+    // Lookup existing active meta-row by composite key
+    const { data: existing } = await supabase
+      .from("pattern_insights")
+      .select("id, baseline_count")
+      .eq("user_id", userId)
+      .eq("is_meta", true)
+      .eq("metapattern_id", metapatternId)
+      .is("resolved_at", null)
+      .maybeSingle();
+
+    const metapatternComponents = (meta.metadata.metapattern_components ?? []) as string[];
+
+    if (existing) {
+      await supabase
+        .from("pattern_insights")
+        .update({
+          last_occurrence: new Date().toISOString(),
+          occurrence_count: meta.count,
+          urgency_score: meta.score,
+          ai_explanation: meta.reason || "",
+          ai_recommendation: meta.recommendation || "",
+          quick_actions: meta.quick_actions || [],
+          detection_window_end: windowEnd,
+          metapattern_components: metapatternComponents,
+          analysis_metadata: meta.metadata,
+        })
+        .eq("id", existing.id);
+    } else {
+      await supabase.from("pattern_insights").insert({
+        user_id: userId,
+        pattern_type: meta.type, // first component — satisfies CHECK
+        is_meta: true,
+        metapattern_id: metapatternId,
+        metapattern_components: metapatternComponents,
+        detected_at: new Date().toISOString(),
+        last_occurrence: new Date().toISOString(),
+        occurrence_count: meta.count,
+        baseline_count: meta.count,
+        urgency_score: meta.score,
+        ai_explanation: meta.reason || "",
+        ai_recommendation: meta.recommendation || "",
+        quick_actions: meta.quick_actions || [],
+        detection_window_start: windowStart,
+        detection_window_end: windowEnd,
+        analysis_metadata: meta.metadata,
+      });
+    }
+  }
 }
