@@ -131,7 +131,7 @@ export function ProfileNavGrid({
       <section className="space-y-3">
         <SectionHeader>Data & privasi</SectionHeader>
         <div className="grid grid-cols-2 gap-3">
-          <Link to="/profile/patterns" className={tileCls}>
+          <Link to="/profile/pattern-settings" className={tileCls}>
             <Settings className="size-5 text-primary" aria-hidden />
             <span className="text-sm font-semibold">Pattern Settings</span>
           </Link>

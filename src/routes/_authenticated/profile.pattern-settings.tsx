@@ -1,25 +1,23 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
-import {
-  getPatternPreferences,
-  updatePatternPreferences,
-} from "~/features/patterns/lib/patternPreferences.functions";
-import {
-  DEFAULT_PATTERN_PREFERENCES,
-  type PatternPreferences,
-} from "~/features/patterns/types/preferences";
-import { Button } from "~/components/ui/button";
-import { Label } from "~/components/ui/label";
-import { Slider } from "~/components/ui/slider";
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import { Slider } from "@/components/ui/slider";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "~/components/ui/select";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card";
+} from "@/components/ui/select";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  DEFAULT_PREFERENCES,
+  type PatternPreferences,
+  getPatternPreferences,
+  updatePatternPreferences,
+} from "@/features/patterns/lib/patternPreferences.functions";
 
 export const Route = createFileRoute("/_authenticated/profile/pattern-settings")({
   component: PatternSettings,
@@ -59,10 +57,10 @@ function PatternSettings() {
   };
 
   const handleReset = () => {
-    setSkipBreakfast(DEFAULT_PATTERN_PREFERENCES.skip_breakfast_threshold);
-    setLateNightHour(DEFAULT_PATTERN_PREFERENCES.late_night_hour);
-    setIrregularVariance(DEFAULT_PATTERN_PREFERENCES.irregular_meals_variance);
-    setSensitivity(DEFAULT_PATTERN_PREFERENCES.sensitivity);
+    setSkipBreakfast(DEFAULT_PREFERENCES.skip_breakfast_threshold);
+    setLateNightHour(DEFAULT_PREFERENCES.late_night_hour);
+    setIrregularVariance(DEFAULT_PREFERENCES.irregular_meals_variance);
+    setSensitivity(DEFAULT_PREFERENCES.sensitivity);
   };
 
   return (
@@ -81,122 +79,98 @@ function PatternSettings() {
             <CardDescription>Atur batas minimal untuk mendeteksi pola tertentu</CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
-            {/* Skip Breakfast Threshold */}
             <div className="space-y-3">
               <div className="flex items-center justify-between">
-                <Label htmlFor="skip-breakfast" className="text-base font-medium">
-                  Skip Sarapan
-                </Label>
-                <span className="text-sm text-muted-foreground">{skipBreakfast} dari 5 hari</span>
+                <Label htmlFor="skip-breakfast">Lewati Sarapan</Label>
+                <span className="text-sm font-medium">{skipBreakfast} hari/minggu</span>
               </div>
-              <p className="text-sm text-muted-foreground">
-                Deteksi pola skip sarapan jika melewatkan N hari dalam 5 hari kerja terakhir
+              <Slider
+                id="skip-breakfast"
+                min={2}
+                max={5}
+                step={1}
+                value={[skipBreakfast]}
+                onValueChange={(v) => setSkipBreakfast(v[0])}
+              />
+              <p className="text-xs text-muted-foreground">
+                Minimal hari per minggu untuk dianggap melewatkan sarapan
               </p>
-              <div className="flex items-center gap-4">
-                <span className="text-sm text-muted-foreground">2</span>
-                <Slider
-                  id="skip-breakfast"
-                  value={[skipBreakfast]}
-                  onValueChange={(val: number[]) => setSkipBreakfast(val[0])}
-                  min={2}
-                  max={5}
-                  step={1}
-                  className="flex-1"
-                />
-                <span className="text-sm text-muted-foreground">5</span>
-              </div>
             </div>
 
-            {/* Late Night Hour */}
             <div className="space-y-3">
               <div className="flex items-center justify-between">
-                <Label htmlFor="late-night" className="text-base font-medium">
-                  Jam Makan Malam
-                </Label>
-                <span className="text-sm text-muted-foreground">{lateNightHour}:00</span>
+                <Label htmlFor="late-night">Jam Makan Malam Terlambat</Label>
+                <span className="text-sm font-medium">
+                  {lateNightHour.toString().padStart(2, "0")}:00
+                </span>
               </div>
-              <p className="text-sm text-muted-foreground">
-                Deteksi makan larut malam jika makan setelah jam ini
+              <Slider
+                id="late-night"
+                min={20}
+                max={24}
+                step={1}
+                value={[lateNightHour]}
+                onValueChange={(v) => setLateNightHour(v[0])}
+              />
+              <p className="text-xs text-muted-foreground">
+                Jam mulai &ldquo;makan malam terlambat&rdquo;
               </p>
-              <div className="flex items-center gap-4">
-                <span className="text-sm text-muted-foreground">20:00</span>
-                <Slider
-                  id="late-night"
-                  value={[lateNightHour]}
-                  onValueChange={(val: number[]) => setLateNightHour(val[0])}
-                  min={20}
-                  max={24}
-                  step={1}
-                  className="flex-1"
-                />
-                <span className="text-sm text-muted-foreground">24:00</span>
-              </div>
             </div>
 
-            {/* Irregular Meals Variance */}
             <div className="space-y-3">
               <div className="flex items-center justify-between">
-                <Label htmlFor="irregular" className="text-base font-medium">
-                  Variasi Jam Makan
-                </Label>
-                <span className="text-sm text-muted-foreground">{irregularVariance} jam</span>
+                <Label htmlFor="irregular">Variasi Jam Makan Tidak Teratur</Label>
+                <span className="text-sm font-medium">±{irregularVariance} jam</span>
               </div>
-              <p className="text-sm text-muted-foreground">
-                Deteksi pola tidak teratur jika jam makan bervariasi lebih dari N jam
+              <Slider
+                id="irregular"
+                min={1}
+                max={4}
+                step={1}
+                value={[irregularVariance]}
+                onValueChange={(v) => setIrregularVariance(v[0])}
+              />
+              <p className="text-xs text-muted-foreground">
+                Toleransi deviasi standar dari pola makan normal
               </p>
-              <div className="flex items-center gap-4">
-                <span className="text-sm text-muted-foreground">1</span>
-                <Slider
-                  id="irregular"
-                  value={[irregularVariance]}
-                  onValueChange={(val: number[]) => setIrregularVariance(val[0])}
-                  min={1}
-                  max={4}
-                  step={1}
-                  className="flex-1"
-                />
-                <span className="text-sm text-muted-foreground">4</span>
-              </div>
             </div>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader>
-            <CardTitle>Sensitivitas Global</CardTitle>
-            <CardDescription>Seberapa ketat sistem mendeteksi pola</CardDescription>
+            <CardTitle>Sensitivitas Deteksi</CardTitle>
+            <CardDescription>Seberapa sering pola dilaporkan</CardDescription>
           </CardHeader>
           <CardContent>
-            <Label htmlFor="sensitivity" className="text-base font-medium">
-              Tingkat Sensitivitas
-            </Label>
-            <p className="text-sm text-muted-foreground">
-              Tingkat sensitivitas keseluruhan deteksi pola
-            </p>
-            <Select
-              value={sensitivity}
-              onValueChange={(val: string) =>
-                setSensitivity(val as PatternPreferences["sensitivity"])
-              }
-            >
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="low">Rendah (lebih toleran)</SelectItem>
-                <SelectItem value="medium">Sedang (default)</SelectItem>
-                <SelectItem value="high">Tinggi (lebih ketat)</SelectItem>
-              </SelectContent>
-            </Select>
+            <div className="space-y-3">
+              <Label htmlFor="sensitivity">Tingkat Sensitivitas</Label>
+              <Select
+                value={sensitivity}
+                onValueChange={(v) => setSensitivity(v as PatternPreferences["sensitivity"])}
+              >
+                <SelectTrigger id="sensitivity">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="low">Rendah (hanya pola kuat)</SelectItem>
+                  <SelectItem value="medium">Sedang (default)</SelectItem>
+                  <SelectItem value="high">Tinggi (semua pola terdeteksi)</SelectItem>
+                </SelectContent>
+              </Select>
+              <p className="text-xs text-muted-foreground">
+                Sensitivitas rendah = lebih sedikit notifikasi, hanya pola yang sangat jelas
+              </p>
+            </div>
           </CardContent>
         </Card>
 
         <div className="flex gap-3">
-          <Button onClick={handleSave} disabled={mutation.isPending} className="flex-1">
+          <Button onClick={handleSave} disabled={mutation.isPending}>
             {mutation.isPending ? "Menyimpan..." : "Simpan Pengaturan"}
           </Button>
-          <Button onClick={handleReset} variant="outline">
-            Reset Default
+          <Button variant="outline" onClick={handleReset}>
+            Reset ke Default
           </Button>
         </div>
       </div>
