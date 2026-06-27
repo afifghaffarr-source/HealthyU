@@ -26,6 +26,9 @@ describe("Pattern Trends", () => {
     analysis_metadata: {},
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
+    is_meta: false,
+    metapattern_id: null,
+    metapattern_components: null,
   };
 
   describe("calculateTrend", () => {

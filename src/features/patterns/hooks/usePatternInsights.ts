@@ -35,6 +35,34 @@ export function useTopPattern(userId: string | undefined) {
 }
 
 /**
+ * Fetch top meta-pattern for dashboard hero (Sprint 13)
+ * Meta-patterns have higher urgency (70-95) and represent combo patterns
+ */
+export function useTopMetaPattern(userId: string | undefined) {
+  return useQuery({
+    queryKey: ["pattern-insights", "meta-top", userId],
+    queryFn: async () => {
+      if (!userId) return null;
+
+      const { data, error } = await supabase
+        .from("pattern_insights")
+        .select("*")
+        .eq("user_id", userId)
+        .eq("is_meta", true)
+        .is("resolved_at", null)
+        .order("urgency_score", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      if (error) throw error;
+      return data as PatternInsight | null;
+    },
+    enabled: !!userId,
+    staleTime: 12 * 60 * 60 * 1000, // 12h
+  });
+}
+
+/**
  * Fetch all patterns for profile insights page
  */
 export function useAllPatterns(userId: string | undefined) {

@@ -43,6 +43,7 @@ import { TodayInsight } from "@/features/dashboard/components/TodayInsight";
 import { SectionGroup } from "@/features/dashboard/components/SectionGroup";
 import { AdherenceCard } from "@/features/mealplan/components/AdherenceCard";
 import { PersonalRecordsCard } from "@/features/workout/components/PersonalRecordsCard";
+import { MetaPatternHeroCard } from "@/features/patterns/components/MetaPatternHeroCard";
 import { usePullToRefresh } from "@/hooks/use-pull-to-refresh";
 import { markFirstAction } from "@/lib/first-action";
 import { useFastClock } from "@/features/dashboard/hooks/useFastClock";
@@ -50,7 +51,11 @@ import { useDashboardMutations } from "@/features/dashboard/hooks/useDashboardMu
 import { HijriWidget } from "@/features/hijri/components/HijriWidget";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { ChevronDown } from "lucide-react";
-import { useTopPattern, useDismissPattern } from "@/features/patterns/hooks/usePatternInsights";
+import {
+  useTopPattern,
+  useDismissPattern,
+  useTopMetaPattern,
+} from "@/features/patterns/hooks/usePatternInsights";
 import {
   PatternInsightCard,
   PatternInsightCardSkeleton,
@@ -124,6 +129,9 @@ function Dashboard() {
   // Pattern insights (Sprint 10b)
   const { data: topPattern, isLoading: patternLoading } = useTopPattern(profile?.id);
   const dismissPatternMut = useDismissPattern();
+
+  // Meta-pattern hero (Sprint 13)
+  const { data: metaPattern } = useTopMetaPattern(profile?.id);
   const { data: meals = [] } = useQuery({
     queryKey: ["meals", "today"],
     queryFn: () => fetchMeals(),
@@ -240,6 +248,17 @@ function Dashboard() {
             remainingKcal={Math.max(0, calTarget - totals.cal)}
           />
         </SectionGroup>
+
+        {/* META-PATTERN HERO — Sprint 13: high-priority combo alerts */}
+        {metaPattern && (
+          <SectionGroup
+            label="⚠️ Pola Penting Terdeteksi"
+            actionLabel="Semua"
+            actionHref="/profile/insights"
+          >
+            <MetaPatternHeroCard pattern={metaPattern} />
+          </SectionGroup>
+        )}
 
         {/* AI COACH — daily personalized guidance */}
         <SectionGroup label="AI Coach" actionLabel="Buka" actionHref="/coach">

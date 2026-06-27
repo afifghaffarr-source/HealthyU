@@ -300,6 +300,27 @@ export async function getTopPattern(
 }
 
 /**
+ * Fetch top meta-pattern for dashboard hero (Sprint 13)
+ * Meta-patterns score higher (70-95) → prioritized over single patterns
+ */
+export async function getTopMetaPattern(
+  supabase: SupabaseClient,
+  userId: string,
+): Promise<PatternInsight | null> {
+  const { data } = await supabase
+    .from("pattern_insights")
+    .select("*")
+    .eq("user_id", userId)
+    .eq("is_meta", true)
+    .is("resolved_at", null)
+    .order("urgency_score", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  return data || null;
+}
+
+/**
  * Fetch all patterns for user (for profile insights page)
  */
 export async function getAllPatterns(

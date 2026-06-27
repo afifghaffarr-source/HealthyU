@@ -73,6 +73,10 @@ export interface PatternInsight {
   created_at: string;
   updated_at: string;
   user_feedback?: { helpful: boolean; submitted_at: string } | null; // Pending migration
+  // Sprint 12 meta-pattern fields
+  is_meta: boolean;
+  metapattern_id: string | null;
+  metapattern_components: string[] | null;
 }
 
 // Detected pattern candidate (before AI scoring)
