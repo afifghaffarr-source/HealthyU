@@ -6,6 +6,7 @@ import {
   getTopTrendingRecipe,
 } from "@/features/reports/lib/weeklyReportRunner.server";
 import { requireCronSecret } from "@/lib/cronAuth.server";
+import { logServerError } from "@/lib/logger.server";
 
 /**
  * Weekly AI report scheduler. Runs every Sunday morning via pg_cron.
@@ -55,7 +56,8 @@ export const Route = createFileRoute("/api/public/hooks/weekly-ai-report")({
             processed++;
           } catch (e) {
             failed++;
-            console.error("weekly report fail", uid, (e as Error).message);
+            // Sprint 38 — uid goes through sanitizeLogMeta (matches "id" fragment).
+            logServerError("weekly-report.fail", e as Error, { user_id: uid });
           }
         }
 

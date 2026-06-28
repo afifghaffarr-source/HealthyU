@@ -9,6 +9,7 @@
 
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@/integrations/supabase/types";
+import { logServerError } from "@/lib/logger.server";
 
 /**
  * Check if we should run detection for this user
@@ -69,7 +70,7 @@ export async function triggerIfNeeded(
     await markDetectionRun(userId, supabase);
     return { ran: true, patternsFound: result.detected_count };
   } catch (error) {
-    console.error("[triggerDetection] Failed:", error);
+    logServerError("trigger-detection", error);
     return { ran: false, patternsFound: 0 };
   }
 }

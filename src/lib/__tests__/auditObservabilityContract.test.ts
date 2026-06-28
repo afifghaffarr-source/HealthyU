@@ -126,22 +126,80 @@ describe("Sprint 37 — audit-observability contract", () => {
     //   blocks static `*.server.*` from client bundles. The "import"
     //   regex below matches both `from "@/lib/logger.server"` AND
     //   dynamic `import("@/lib/logger.server")`.
+    //
+    // Sprint 38 — expanded from 4 → 9 high-risk files. Each new file is
+    // a server-only hook (static `*.server.ts` import of logger.server
+    // permitted) OR a `.functions.ts` that must go through `@/lib/logSafe`
+    // for the same dynamic-import safety reason.
     const HIGH_RISK_FILES = [
+      // Sprint 37 (privacy/PII flow — dynamic import + static import mix)
       "routes/api/public/hooks/process-account-deletions.ts",
       "routes/api/public/hooks/daily-content.ts",
       "features/privacy/lib/pdpRights.functions.ts",
       "features/recommendations/lib/recommendations.functions.ts",
+      // Sprint 38 — server-only static imports (no client co-import)
+      "routes/api/chat.stream.ts",
+      "routes/api/csp-report.ts",
+      "routes/api/sendWeeklyDigests.ts",
+      "routes/api/public/hooks/weekly-ai-report.ts",
+      "features/ai/lib/aiStreamSdk.server.ts",
+      "features/chat/lib/chatRetention.server.ts",
+      "features/patterns/lib/patternScoring.server.ts",
+      "features/patterns/lib/triggerDetection.ts",
+      // Sprint 38 — .functions.ts files co-imported by client routes;
+      // MUST use logSafe helpers (which wrap dynamic logger.server import)
+      "features/ai/lib/aiStructured.functions.ts",
+      "features/meals/lib/meals.functions.ts",
+      "features/patterns/lib/triggerPattern.functions.ts",
+      "features/patterns/lib/patternFeedback.functions.ts",
+      "features/challenges/lib/challenges.functions.ts",
+      "features/challenges/lib/groupChallengeBonus.functions.ts",
+      "features/scan/lib/scanVision.functions.ts",
+      "features/patterns/lib/requestDigest.functions.ts",
+      "features/roles/lib/roles.functions.ts",
+      // start.ts + log-error.ts are deliberately excluded: both are
+      // LAST-RESORT global error layers and intentionally keep bare
+      // console.error so they never depend on the logger pipeline.
     ];
 
-    it("logger.server.ts is referenced (static or dynamic import) in every high-risk server hook", () => {
+    /** Files co-imported by client routes → MUST go through @/lib/logSafe.
+     *  `pdpRights.functions.ts` is the SPRINT 37 grandfather — it uses
+     *  raw dynamic `await import("@/lib/logger.server")` directly, so
+     *  the contract test for it sits in the "uses anything" test above. */
+    const LOGSAFE_FILES = new Set([
+      "features/ai/lib/aiStructured.functions.ts",
+      "features/meals/lib/meals.functions.ts",
+      "features/patterns/lib/triggerPattern.functions.ts",
+      "features/patterns/lib/patternFeedback.functions.ts",
+      "features/challenges/lib/challenges.functions.ts",
+      "features/challenges/lib/groupChallengeBonus.functions.ts",
+      "features/scan/lib/scanVision.functions.ts",
+      "features/patterns/lib/requestDigest.functions.ts",
+      "features/roles/lib/roles.functions.ts",
+    ]);
+
+    it("every high-risk server hook references @/lib/logger.server (static or dynamic) or @/lib/logSafe", () => {
       for (const rel of HIGH_RISK_FILES) {
         const src = readProject(rel);
-        const staticOR = /from\s+["']@\/lib\/logger\.server["']/;
-        const dynamicOR = /import\s*\(\s*["']@\/lib\/logger\.server["']\s*\)/;
-        const matched = staticOR.test(src) || dynamicOR.test(src);
+        const refLoggerStatic = /from\s+["']@\/lib\/logger\.server["']/.test(src);
+        const refLoggerDynamic = /import\s*\(\s*["']@\/lib\/logger\.server["']\s*\)/.test(src);
+        const refLogSafe = /from\s+["']@\/lib\/logSafe["']/.test(src);
+        const matched = refLoggerStatic || refLoggerDynamic || refLogSafe;
+        // Optional: if .functions.ts is in LOGSAFE_FILES, it MAY use either
+        // dynamic import OR the logSafe helper — both are valid.
         expect(
           matched,
-          `${rel} must import logger.server.ts (static OR dynamic) so server.log is PII-redacted`,
+          `${rel} must reference @/lib/logger.server (static/dynamic) or @/lib/logSafe`,
+        ).toBe(true);
+      }
+    });
+
+    it(".functions.ts files that are logSafe-targeted actually use safeLogServerError / safeLogServerWarn", () => {
+      for (const rel of LOGSAFE_FILES) {
+        const src = readProject(rel);
+        expect(
+          /safeLogServerError|safeLogServerWarn/.test(src),
+          `${rel} is co-imported by client routes; must use safeLog* helpers (NOT raw dynamic import OR direct logger.server)`,
         ).toBe(true);
       }
     });

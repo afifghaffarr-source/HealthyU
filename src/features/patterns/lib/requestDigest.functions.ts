@@ -15,6 +15,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { getEnv } from "@/lib/cloudflare-env.server";
 import { renderDigestHTML, renderDigestText } from "./digestEmail";
+import { safeLogServerError } from "@/lib/logSafe";
 
 interface DigestPattern {
   type: string;
@@ -52,7 +53,7 @@ export const requestWeeklyDigest = createServerFn({ method: "POST" })
       .limit(3);
 
     if (error) {
-      console.error("[Digest] Query failed:", error);
+      safeLogServerError("digest.query", error).catch(() => {});
       return { sent: false, reason: "Query failed" };
     }
 
@@ -79,7 +80,10 @@ export const requestWeeklyDigest = createServerFn({ method: "POST" })
     } catch (err) {
       // PII masking in error logs — never log full email
       const emailDomain = user.email.split("@")[1] ?? "unknown";
-      console.error(`[Digest] Send failed for ***@${emailDomain}:`, err);
+      // Sprint 38 — domain goes through sanitize meta, never raw email.
+      safeLogServerError("digest.send", err as Error, { email_domain: emailDomain }).catch(
+        () => {},
+      );
       return { sent: false, reason: "Send failed", emailDomain };
     }
   });

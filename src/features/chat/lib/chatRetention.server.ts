@@ -9,6 +9,7 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@/integrations/supabase/types";
 import { type ChatRetentionDays, validateChatRetentionDays } from "./chatRetention";
+import { logServerError } from "@/lib/logger.server";
 
 type SB = SupabaseClient<Database>;
 // Local-cast alias: the Supabase `Database` type is auto-generated
@@ -60,8 +61,9 @@ export async function setChatRetention(
  * the new message is inserted. If the user has a retention period
  * set, this purges their old messages in the same transaction.
  *
- * Errors are swallowed (logged via console.error) so a purge
- * failure can never break the user's chat send. The next message
+ * Errors are swallowed (logged via logServerError so the underlying
+ * Supabase row-identifier leak risk is mitigated) so a purge
+ * failure never blocks a chat send.
  * send will retry.
  */
 export async function enforceRetentionAfterWrite(
@@ -85,7 +87,7 @@ export async function enforceRetentionAfterWrite(
     return { deleted: Number(data ?? 0) };
   } catch (e) {
     // Best-effort — log but don't fail the chat send.
-    console.error("[chatRetention] enforce failed:", e);
+    logServerError("chat-retention.enforce", e);
     return null;
   }
 }

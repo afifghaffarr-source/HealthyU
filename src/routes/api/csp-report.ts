@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { logServerWarn } from "@/lib/logger.server";
 
 /**
  * POST /api/csp-report
@@ -16,7 +17,9 @@ export const Route = createFileRoute("/api/csp-report")({
         try {
           const raw = (await request.text()).slice(0, 8_000);
           if (raw) {
-            console.warn("[csp-report]", raw);
+            // Sprint 38 — payload goes through sanitizeLogMeta (>200 char
+            // strings are truncated by the logger).
+            logServerWarn("csp-report", "received", { payload: raw });
           }
         } catch {
           // sink laporan tidak boleh pernah throw

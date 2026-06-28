@@ -1,5 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { safeLogServerError } from "@/lib/logSafe";
 
 export type AppRole = "admin" | "moderator" | "user";
 
@@ -10,7 +11,7 @@ export const getMyRoles = createServerFn({ method: "GET" })
     const { supabase, userId } = context;
     const { data, error } = await supabase.from("user_roles").select("role").eq("user_id", userId);
     if (error) {
-      console.error("[roles] fetch error:", error.message);
+      safeLogServerError("roles.fetch", error).catch(() => {});
       return { roles: [] as AppRole[] };
     }
     return { roles: (data ?? []).map((r) => r.role as AppRole) };
@@ -27,7 +28,7 @@ export const checkMyRole = createServerFn({ method: "POST" })
       _role: data.role,
     });
     if (error) {
-      console.error("[roles] has_role error:", error.message);
+      safeLogServerError("roles.has-role", error).catch(() => {});
       return { hasRole: false };
     }
     return { hasRole: ok === true };

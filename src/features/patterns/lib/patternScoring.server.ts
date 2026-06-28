@@ -11,6 +11,7 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import type { DetectedPattern, ScoredPattern, QuickAction } from "../types/pattern";
 import { callAiJsonWithSchema } from "@/features/ai/lib/aiGateway.server";
 import { z } from "zod";
+import { logServerError, logServerWarn } from "@/lib/logger.server";
 
 interface UserProfile {
   user_id: string;
@@ -228,10 +229,12 @@ async function callAIForScoring(compressed: {
     }
 
     // Fallback: empty array if parsing fails
-    console.warn("[Pattern AI] Invalid response format:", result);
+    logServerWarn("pattern-ai.invalid-response", "Invalid AI response format", {
+      result_kind: typeof result,
+    });
     return [];
   } catch (error) {
-    console.error("[Pattern AI] API call failed:", error);
+    logServerError("pattern-ai.api-call", error);
     // Fail gracefully: return empty array, hardcoded scores will be used
     return [];
   }

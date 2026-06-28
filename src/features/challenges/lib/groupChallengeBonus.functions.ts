@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { safeLogServerError } from "@/lib/logSafe";
 
 export const claimGroupChallengeBonus = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
@@ -31,7 +32,7 @@ export const claimGroupChallengeBonus = createServerFn({ method: "POST" })
           coins: result.coins_awarded,
         });
       } catch (e) {
-        console.error("broadcastGroupBonusClaim failed", (e as Error).message);
+        safeLogServerError("broadcast-group-bonus-claim", e as Error).catch(() => {});
       }
     }
     return result;

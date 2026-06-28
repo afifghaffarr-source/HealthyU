@@ -5,6 +5,7 @@ import { callAiJsonWithSchema } from "@/features/ai/lib/aiGateway.server";
 import { callAiVisionWithFallback } from "@/features/ai/lib/aiProviders";
 import { getCachedImageResult, setCachedImageResult } from "@/features/ai/lib/aiCache.server";
 import type { ZodTypeAny } from "zod";
+import { safeLogServerError } from "@/lib/logSafe";
 
 // ===== from scanExtras1 (ALL) =====
 
@@ -199,7 +200,7 @@ Jika ada combo (nasi+lauk+sayur), list sebagai item terpisah.`;
       });
     } catch (error) {
       // Log fuzzy match error but don't fail the entire scan
-      console.error("[parseMenuImage] Fuzzy match failed, using AI estimates only:", error);
+      safeLogServerError("scan-menu.fuzzy-match", error).catch(() => {});
       // enrichedItems already set to parsed.items above
     }
 

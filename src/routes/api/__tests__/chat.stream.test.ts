@@ -513,11 +513,14 @@ describe("POST /api/chat/stream", () => {
         request: makeRequest({ message: "halo" }, "Bearer valid-token"),
       });
       expect(res.status).toBe(200);
-      // The error should be logged for ops visibility.
-      expect(consoleErrorSpy).toHaveBeenCalledWith(
-        "chat.stream auditPiiOnServer threw — continuing",
-        "audit backend exploded",
-      );
+      // Sprint 38 — log goes through logger.server instead of bare console.
+      // The test only needs to verify SOME error was emitted; logServerError
+      // calls console.error internally with `[scope]` + structured payload.
+      expect(consoleErrorSpy).toHaveBeenCalled();
+      const lastCall = consoleErrorSpy.mock.calls[consoleErrorSpy.mock.calls.length - 1];
+      // First arg is the scope tag, second is the structured error object.
+      expect(lastCall?.[0]).toBe("[chat.stream.audit-pii-on-server]");
+      expect(lastCall?.[1]).toEqual(expect.objectContaining({ message: "audit backend exploded" }));
       consoleErrorSpy.mockRestore();
     });
   });

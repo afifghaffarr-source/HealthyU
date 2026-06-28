@@ -3,6 +3,7 @@ import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { todayRange } from "@/lib/health";
 import { recordActivityFor } from "@/features/gamification/lib/gamification.functions";
+import { safeLogServerError } from "@/lib/logSafe";
 
 export const searchFoods = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
@@ -50,7 +51,7 @@ export const logMeal = createServerFn({ method: "POST" })
     if (count && count >= 3) {
       const { triggerIfNeeded } = await import("@/features/patterns/lib/triggerDetection");
       triggerIfNeeded(userId, supabase).catch((err) =>
-        console.error("[Meal Log] Pattern trigger failed:", err),
+        safeLogServerError("meal-log.pattern-trigger", err).catch(() => {}),
       );
     }
 

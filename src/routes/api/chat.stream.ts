@@ -15,6 +15,7 @@ import { getEnv } from "@/lib/cloudflare-env.server";
 import { auditPiiOnServer } from "@/features/chat/lib/piiAudit";
 import { redactPII, containsPII } from "@/lib/pii";
 import { getPiiRedactEnabled } from "@/features/privacy/lib/piiRedactToggle.functions";
+import { logServerError } from "@/lib/logger.server";
 
 export const Route = createFileRoute("/api/chat/stream")({
   server: {
@@ -71,7 +72,7 @@ export const Route = createFileRoute("/api/chat/stream")({
         try {
           await auditPiiOnServer(supabase, userId, body.message);
         } catch (e) {
-          console.error("chat.stream auditPiiOnServer threw — continuing", (e as Error).message);
+          logServerError("chat.stream.audit-pii-on-server", e);
         }
 
         // AUDIT-019: PII redaction toggle. If the user has opted in, run
@@ -92,10 +93,7 @@ export const Route = createFileRoute("/api/chat/stream")({
             });
           }
         } catch (e) {
-          console.error(
-            "chat.stream pii redact check failed — continuing with original",
-            (e as Error).message,
-          );
+          logServerError("chat.stream.pii-redact-check", e);
         }
 
         // Image moderation: block unsafe uploads before persisting/sending to AI.
@@ -220,8 +218,10 @@ export const Route = createFileRoute("/api/chat/stream")({
         try {
           budget = await enforceAiBudget(userId, isPremium);
         } catch (e) {
-          console.error("chat.stream enforceAiBudget failed", (e as Error).message);
           // Fail-open: allow the request with downgrade flag when budget service unavailable.
+          // Sprint 38 — passes via the structured logger; user_id goes through
+          // sanitizeLogMeta blocklist (the key fragment matches "id"/"session").
+          logServerError("chat.stream.enforce-ai-budget", e, { user_id: userId });
           budget = { allowed: true, shouldDowngrade: true };
         }
         if (!budget.allowed) {
@@ -286,7 +286,7 @@ export const Route = createFileRoute("/api/chat/stream")({
                     isPersonal: decision.tier === 3,
                   });
                 } catch (e) {
-                  console.error("ai cache write fail", (e as Error).message);
+                  logServerError("chat.stream.ai-cache-write", e);
                 }
               }
               const promptTokens = Math.ceil(JSON.stringify(messages).length / 4);

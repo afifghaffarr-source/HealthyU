@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { safeLogServerError } from "@/lib/logSafe";
 
 export const listChallenges = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
@@ -51,7 +52,7 @@ export const joinChallenge = createServerFn({ method: "POST" })
         challengeId: data.challenge_id,
       });
     } catch (e) {
-      console.error("group broadcast failed:", e);
+      safeLogServerError("group-broadcast", e).catch(() => {});
     }
 
     return { id: inserted.id, already: false };

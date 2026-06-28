@@ -6,6 +6,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { z } from "zod";
+import { safeLogServerError } from "@/lib/logSafe";
 
 const FeedbackSchema = z.object({
   patternId: z.string().uuid(),
@@ -36,7 +37,7 @@ export const submitPatternFeedback = createServerFn({ method: "POST" })
       .eq("user_id", userId); // Security: only update own patterns
 
     if (error) {
-      console.error("Failed to submit feedback:", error);
+      safeLogServerError("pattern-feedback.submit", error).catch(() => {});
       throw new Error("Failed to submit feedback");
     }
 

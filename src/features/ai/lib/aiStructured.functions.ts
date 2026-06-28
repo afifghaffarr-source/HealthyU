@@ -29,6 +29,7 @@ import type { z, ZodTypeAny } from "zod";
 import { getModelInstance } from "./aiProviders";
 import { AiGatewayError } from "./aiGateway.server";
 import { enforceAiBudget, logAiUsage } from "./aiBudget.server";
+import { safeLogServerError } from "@/lib/logSafe";
 
 export { AiGatewayError };
 
@@ -109,7 +110,11 @@ export async function callAiStructured<S extends ZodTypeAny>(
       }
     } catch (e) {
       if (e instanceof AiGatewayError) throw e;
-      console.error("enforceAiBudget failed", (e as Error).message);
+      // Sprint 38 — safe dynamic-import shim keeps logger.server out of
+      // the client bundle (this file is co-imported via useServerFn).
+      safeLogServerError("ai-structured.enforce-budget", e as Error)
+        // Log helper itself can't return; absent await so we don't block.
+        .catch(() => {});
       // Fail-open for non-fail-closed features, matching existing
       // aiGateway.server.ts behavior for best-effort UX.
     }

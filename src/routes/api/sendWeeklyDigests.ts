@@ -11,6 +11,7 @@ import { createClient } from "@supabase/supabase-js";
 import { getEnv } from "@/lib/cloudflare-env.server";
 import { requireCronSecret } from "@/lib/cronAuth.server";
 import { renderDigestHTML, renderDigestText } from "@/features/patterns/lib/digestEmail";
+import { logServerError, logServerWarn } from "@/lib/logger.server";
 
 export const Route = createFileRoute("/api/sendWeeklyDigests")({
   server: {
@@ -109,7 +110,7 @@ export const Route = createFileRoute("/api/sendWeeklyDigests")({
         const digests = Array.from(digestMap.entries());
         for (const [userId, digest] of digests) {
           if (sent >= 100) {
-            console.warn("[Digest] Hit daily limit (100)");
+            logServerWarn("digest.daily-limit", "Hit daily limit (100)");
             skipped += digestMap.size - sent;
             break;
           }
@@ -120,7 +121,12 @@ export const Route = createFileRoute("/api/sendWeeklyDigests")({
           } catch (err) {
             // Mask email for PII compliance - log only domain
             const emailDomain = digest.email.split("@")[1] || "unknown";
-            console.error(`[Digest] Failed for ***@${emailDomain}:`, err);
+            // Sprint 38 — pass domain through meta so sanitizeLogMeta can
+            // trim long strings; the comment above says "log only domain"
+            // but the previous code still emitted the full error object.
+            logServerError("digest.send-failed", err as Error, {
+              email_domain: emailDomain,
+            });
             errors.push(`user_id=${digest.user_id}: ${(err as Error).message}`);
             skipped++;
           }

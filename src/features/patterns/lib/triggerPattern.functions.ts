@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { triggerIfNeeded } from "./triggerDetection";
+import { safeLogServerError } from "@/lib/logSafe";
 
 /**
  * Check and trigger pattern detection if 24h passed
@@ -17,7 +18,7 @@ export const checkPatternTrigger = createServerFn({ method: "GET" })
       const result = await triggerIfNeeded(userId, supabase);
       return { checked: true, ...result };
     } catch (err) {
-      console.error("[Dashboard] Pattern trigger check failed:", err);
+      safeLogServerError("dashboard.pattern-trigger", err).catch(() => {});
       return { checked: false, reason: "error" };
     }
   });

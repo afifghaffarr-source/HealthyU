@@ -22,6 +22,7 @@ import { vexoModel } from "./vexoProvider";
 import type { AiMultimodalMessage } from "./aiGateway.server";
 import { AiGatewayError } from "./aiGateway.server";
 import { enforceAiBudget } from "./aiBudget.server";
+import { logServerError } from "@/lib/logger.server";
 
 export { AiGatewayError };
 
@@ -107,7 +108,9 @@ export async function streamChatWithSdk(opts: StreamChatSdkOptions): Promise<{
       }
     } catch (e) {
       if (e instanceof AiGatewayError) throw e;
-      console.error("enforceAiBudget failed", (e as Error).message);
+      // Sprint 38 — fail-open log goes through the structured logger so
+      // envelope JSON gets sanitised if any PII creeps into the error.
+      logServerError("ai.enforce-budget", e as Error);
       // Fail-open for chat (best-effort UX)
     }
   }
