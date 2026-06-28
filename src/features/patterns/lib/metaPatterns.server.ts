@@ -64,6 +64,20 @@ export const META_PATTERN_REGISTRY: MetaPatternDefinition[] = [
     components: ["stress_eating", "mood_binges"],
     minOverlapDays: 2,
   },
+  // Sprint 26 — Smart Cheat Day Guard. Detects the restrictive-then-binge
+  // cycle: 2+ days where user both skipped meals AND over-ate on the same
+  // dates. The intervention is SCHEDULED cheat days, not more restriction.
+  // Clinical response copy DEFERRED to psychologist sign-off.
+  {
+    id: "restrictive_cheat_cycle",
+    title: "Siklus Restrict–Cheat",
+    description:
+      "Hari-hari sibuk-skip makan diikuti overeat di hari yang sama. " +
+      "Siklus ini menumpuk defisit dan rebound. Solusi: jadwalkan 'cheat " +
+      "day' yang direncanakan, bukan ledakan tiba-tiba.",
+    components: ["busy_day_skips", "celebration_overeat"],
+    minOverlapDays: 2,
+  },
 ];
 
 /**

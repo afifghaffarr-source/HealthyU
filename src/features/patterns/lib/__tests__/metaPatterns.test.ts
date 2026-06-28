@@ -117,7 +117,8 @@ describe("detectMetaPatterns", () => {
     expect(meta!.matched_dates.sort()).toEqual(["2026-06-04", "2026-06-07"]);
   });
 
-  it("registry size matches design (3 metapatterns initially)", () => {
-    expect(META_PATTERN_REGISTRY.length).toBe(3);
+  it("registry size matches design (3 metapatterns Sprint 12 + 1 Sprint 26)", () => {
+    // Sprint 26 added restrictive_cheat_cycle.
+    expect(META_PATTERN_REGISTRY.length).toBe(4);
   });
 });

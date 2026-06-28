@@ -91,11 +91,15 @@ export interface DetectedPattern {
 }
 
 // Meta-pattern types (combinations of single patterns)
-// ponytail: reuses PatternType strings via metapattern_components — no new enum.
+// Sprint 12: original 3. Sprint 26 adds anti-restrictive cycle detector.
 export type MetaPatternType =
   | "stress_late_night_combo" // stress_eating + late_night_eating on same days
   | "weekend_indulgence_combo" // weekend_splurge + warung_overeat
-  | "emotional_mood_cycle"; // stress_eating + mood_binges
+  | "emotional_mood_cycle" // stress_eating + mood_binges
+  // Sprint 26: Smart Cheat Day Guard — restrictive deficit co-occurring
+  // with celebration overeats. Anti-restrictive cycle detector. Clinical
+  // response copy DEFERRED to psychologist sign-off (same pattern as ED).
+  | "restrictive_cheat_cycle"; // busy_day_skips + celebration_overeat
 
 export interface MetaPatternDefinition {
   id: MetaPatternType;
