@@ -17,8 +17,15 @@ import { logMealWithItems } from "@/features/meals/lib/meals.functions";
 const SYNC_BATCH_SIZE = 50;
 const SYNC_INTERVAL_MS = 30_000;
 const MAX_RETRY_DELAY_MS = 30_000;
+const ERROR_DAYS_THRESHOLD = 7;
 
-let syncInProgress = false;
+// Sprint 35 fix — Bug A: split the single global mutex into per-table
+// flags so concurrent calls to syncWaterLogs + syncMealLogs no longer
+// starve each other. Each table gets its own in-progress flag.
+// (Previously a single `syncInProgress` made meal sync silently bail
+//  whenever water sync was running — see sprint-arc 2026-06-28.)
+let waterSyncInProgress = false;
+let mealSyncInProgress = false;
 let syncInterval: number | null = null;
 const retryTimeouts = new Map<string, number>();
 
@@ -33,14 +40,15 @@ export async function syncWaterLogs(): Promise<{
   synced: number;
   failed: number;
 }> {
-  if (syncInProgress) return { synced: 0, failed: 0 };
+  // Sprint 35 — per-table mutex. Water + meal no longer starve each other.
+  if (waterSyncInProgress) return { synced: 0, failed: 0 };
   if (typeof navigator !== "undefined" && !navigator.onLine) {
     return { synced: 0, failed: 0 }; // offline, skip silently
   }
   const db = getDb();
   if (!db) return { synced: 0, failed: 0 };
 
-  syncInProgress = true;
+  waterSyncInProgress = true;
   let synced = 0;
   let failed = 0;
 
@@ -89,7 +97,7 @@ export async function syncWaterLogs(): Promise<{
       }
     }
   } finally {
-    syncInProgress = false;
+    waterSyncInProgress = false;
   }
 
   return { synced, failed };
@@ -113,14 +121,16 @@ export async function syncMealLogs(): Promise<{
   synced: number;
   failed: number;
 }> {
-  if (syncInProgress) return { synced: 0, failed: 0 };
+  // Sprint 35 — per-table mutex (Bug A fix). mealInProgress is independent
+  // of waterInProgress now, so the two fns never starve each other.
+  if (mealSyncInProgress) return { synced: 0, failed: 0 };
   if (typeof navigator !== "undefined" && !navigator.onLine) {
     return { synced: 0, failed: 0 };
   }
   const db = getDb();
   if (!db) return { synced: 0, failed: 0 };
 
-  syncInProgress = true;
+  mealSyncInProgress = true;
   let synced = 0;
   let failed = 0;
 
@@ -164,7 +174,7 @@ export async function syncMealLogs(): Promise<{
       }
     }
   } finally {
-    syncInProgress = false;
+    mealSyncInProgress = false;
   }
 
   return { synced, failed };
@@ -189,27 +199,47 @@ function scheduleRetry(recordId: string, delayMs: number) {
  * Runs syncWaterLogs() AND syncMealLogs() periodically + on network
  * reconnect + on app focus.
  *
- * Ponytail: one shared interval instead of two — both water + meals
- * share SYNC_INTERVAL_MS window. The serial syncInProgress mutex in each
- * sync fn prevents concurrent batches from double-processing the same row.
+/**
+ * Sprint 35 — chain runOnce SERIAL (await both) instead of fire-and-forget
+ * both. With splice mutex (Bug A) this is now safe + actually correct: the
+ * orchestrator drives them in order rather than letting them race.
  */
 export function startBackgroundSync(): () => void {
   if (typeof window === "undefined") return () => {};
 
-  const runOnce = () => {
-    void syncWaterLogs();
-    void syncMealLogs();
+  /**
+   * Serial: water first (lighter batch, fewer retries), then meal.
+   * Each fn's per-table mutex (Sprint 35 Bug A) keeps independent
+   * concurrent callers from double-processing.
+   */
+  const runOnce = async () => {
+    try {
+      await syncWaterLogs();
+    } catch {
+      /* swallow — per-record retry handled inside syncWaterLogs */
+    }
+    try {
+      await syncMealLogs();
+    } catch {
+      /* swallow — per-record retry handled inside syncMealLogs */
+    }
   };
 
   // Periodic sync
-  syncInterval = window.setInterval(runOnce, SYNC_INTERVAL_MS);
+  syncInterval = window.setInterval(() => {
+    void runOnce();
+  }, SYNC_INTERVAL_MS);
 
   // Sync on network reconnect
-  const onOnline = runOnce;
+  const onOnline = () => {
+    void runOnce();
+  };
   window.addEventListener("online", onOnline);
 
   // Sync on app focus
-  const onFocus = runOnce;
+  const onFocus = () => {
+    void runOnce();
+  };
   window.addEventListener("focus", onFocus);
 
   // Initial sync after 5s (let app render first)
@@ -248,4 +278,68 @@ export async function purgeWaterLog(id: string): Promise<void> {
   const db = getDb();
   if (!db) return;
   await db.waterLogs.delete(id);
+}
+
+/**
+ * Sprint 35 — Bug C fix: purge permanently-stuck error rows.
+ *
+ * Rows that have `sync_status = "error"` for too long are unrecoverable
+ * (e.g. schema mismatch, server rejected payload, deleted elsewhere).
+ * They permanently inflate `pendingMealSyncCount` and therefore keep
+ * the OfflineStatusBand pill visible even when online +
+ * `syncWaterLogs/syncMealLogs` are both happy.
+ *
+ * Behaviour:
+ *   - ONLY deletes rows with sync_status="error"
+ *   - ONLY deletes rows older than `daysThreshold` (default 7)
+ *   - Never touches "pending" rows (those will eventually sync)
+ *   - Never touches "synced" rows
+ *
+ * The OfflineStatusBand calls this on its "Hapus yang gagal" button.
+ * User can self-clean without going through Privacy Vault.
+ */
+export interface PurgeStuckErrorsResult {
+  waterDeleted: number;
+  mealDeleted: number;
+  thrashedRejected: number; // rows that were <= threshold days old (kept + reported)
+}
+
+export async function purgeStuckSyncErrors(
+  daysThreshold = ERROR_DAYS_THRESHOLD,
+  now = Date.now(),
+): Promise<PurgeStuckErrorsResult> {
+  const db = getDb();
+  if (!db) return { waterDeleted: 0, mealDeleted: 0, thrashedRejected: 0 };
+
+  const threshold = daysThreshold * 24 * 60 * 60 * 1000;
+  const cutoff = now - threshold;
+
+  let waterDeleted = 0;
+  let mealDeleted = 0;
+  let thrashedRejected = 0;
+
+  // Iterate all error rows + filter by age. Dexie lacks a combined
+  // (sync_status, updated_at) compound index; we keep that simple
+  // here because "error" rows are rare (only after genuine rejections).
+  const errorWaters = await db.waterLogs.where("sync_status").equals("error").toArray();
+  for (const r of errorWaters) {
+    if (r.updated_at < cutoff) {
+      await db.waterLogs.delete(r.id);
+      waterDeleted += 1;
+    } else {
+      thrashedRejected += 1;
+    }
+  }
+
+  const errorMeals = await db.mealLogs.where("sync_status").equals("error").toArray();
+  for (const r of errorMeals) {
+    if (r.updated_at < cutoff) {
+      await db.mealLogs.delete(r.id);
+      mealDeleted += 1;
+    } else {
+      thrashedRejected += 1;
+    }
+  }
+
+  return { waterDeleted, mealDeleted, thrashedRejected };
 }

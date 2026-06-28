@@ -24,7 +24,7 @@
  */
 
 import { useEffect, useState } from "react";
-import { CloudOff, Loader2, RefreshCw, Wifi } from "lucide-react";
+import { CloudOff, Loader2, RefreshCw, Trash2, Wifi } from "lucide-react";
 import { pendingMealSyncCount } from "@/features/meals/lib/mealDexie";
 
 const REFRESH_INTERVAL_MS = 30_000;
@@ -36,6 +36,10 @@ export function OfflineStatusBand() {
   const [pendingMeals, setPendingMeals] = useState<number>(0);
   const [pendingWaters, setPendingWaters] = useState<number>(0);
   const [syncing, setSyncing] = useState<boolean>(false);
+  // Sprint 35 — Bug C: dismiss button state for purging stuck error rows.
+  // Separated from `syncing` so the spinner flows don't conflict.
+  const [purging, setPurging] = useState<boolean>(false);
+  const [purgeMessage, setPurgeMessage] = useState<string | null>(null);
 
   // Listen for browser online/offline events.
   useEffect(() => {
@@ -89,14 +93,62 @@ export function OfflineStatusBand() {
     setSyncing(true);
     try {
       const { syncMealLogs, syncWaterLogs } = await import("@/lib/dexie-sync");
-      void syncMealLogs();
       void syncWaterLogs();
+      void syncMealLogs();
       // Brief optimistic delay so the spinner is visible
       await new Promise((r) => setTimeout(r, 1_500));
     } finally {
       setSyncing(false);
     }
   };
+
+  // Sprint 35 — Bug C: purges rows that are in `sync_status = "error"`
+  // AND older than 7 days. These are unrecoverable server-side rejections
+  // and would otherwise keep the band visible forever.
+
+  const handlePurgeStuck = async () => {
+    if (typeof window === "undefined") return;
+    if (
+      !window.confirm(
+        "Hapus semua catatan yang gagal sync > 7 hari? Tindakan ini tidak bisa dibatalkan.",
+      )
+    ) {
+      return;
+    }
+    setPurging(true);
+    setPurgeMessage(null);
+    try {
+      const { purgeStuckSyncErrors } = await import("@/lib/dexie-sync");
+      const result = await purgeStuckSyncErrors();
+      const total = result.waterDeleted + result.mealDeleted;
+      if (total === 0 && result.thrashedRejected === 0) {
+        setPurgeMessage("Tidak ada catatan yang gagal.");
+      } else if (total === 0) {
+        setPurgeMessage("Tidak ada yang gagal sync > 7 hari.");
+      } else {
+        setPurgeMessage(
+          `${total} catatan yang gagal dihapus${
+            result.thrashedRejected > 0
+              ? `. ${result.thrashedRejected} lagi masih recent — coba lagi besok.`
+              : "."
+          }`,
+        );
+      }
+      // Optimistic re-fetch of pending counts so the band disappears
+      // when totalPending drops to 0.
+      const { pendingMealSyncCount: refreshMeals } = await import("@/features/meals/lib/mealDexie");
+      const mealsNow = await refreshMeals().catch(() => 0);
+      setPendingMeals(mealsNow);
+    } finally {
+      setPurging(false);
+    }
+  };
+
+  // Only offer the dismiss button when the user is online AND there are
+  // pending entries. If they're truly offline, the manual sync stays off
+  // (it would no-op) but the dismiss-purge still helps if the count is
+  // dominated by stale "error" rows.
+  const offerPurge = online && totalPending > 0;
 
   return (
     <div
@@ -143,6 +195,28 @@ export function OfflineStatusBand() {
         {syncing ? <Loader2 className="size-3 animate-spin" /> : <RefreshCw className="size-3" />}
         Sync
       </button>
+      {offerPurge && (
+        <button
+          type="button"
+          onClick={handlePurgeStuck}
+          disabled={purging}
+          aria-label="Hapus catatan yang gagal sync lebih dari 7 hari"
+          title="Hapus catatan yang gagal sync > 7 hari"
+          className="shrink-0 inline-flex items-center gap-1 text-xs font-medium hover:underline disabled:no-underline disabled:opacity-60"
+        >
+          {purging ? <Loader2 className="size-3 animate-spin" /> : <Trash2 className="size-3" />}
+          Hapus yang gagal
+        </button>
+      )}
+      {purgeMessage && (
+        <span
+          role="status"
+          aria-live="polite"
+          className="basis-full text-[11px] text-muted-foreground mt-1"
+        >
+          {purgeMessage}
+        </span>
+      )}
     </div>
   );
 }
