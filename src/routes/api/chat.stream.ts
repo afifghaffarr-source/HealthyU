@@ -7,7 +7,7 @@ import { cacheKey, getCached, setCached } from "@/features/ai/lib/aiCache.server
 import { enforceAiBudget, logAiUsage } from "@/features/ai/lib/aiBudget.server";
 import { checkRateLimit, RATE_LIMITS } from "@/lib/rateLimit.server";
 import { chatMessageSchema } from "@/lib/validation";
-import { checkChatSafety } from "@/features/chat/lib/chatSafety";
+import { checkChatSafety, buildEdMeta } from "@/features/chat/lib/chatSafety";
 import { moderateImage } from "@/features/moderation/lib/imageModeration.server";
 import { streamAiChat, AiGatewayError } from "@/features/ai/lib/aiStreamGateway.server";
 import { staticReplyStream, proxyUpstreamStream } from "@/features/chat/lib/chatStream.server";
@@ -142,12 +142,18 @@ export const Route = createFileRoute("/api/chat/stream")({
         // ED-disclosure analytics (AUDIT-012 Finding 4 follow-up 2026-06-17):
         // log de-identified event so clinical team has data for next quarterly
         // review. NOT PII (no message text), only message length + category.
+        // Sprint 25: enrich the meta with keyword_count, length_bucket, and
+        // has_purge_language so the clinical team can prioritize outreach.
         // Auto-escalation to crisis is a clinical decision — deferred.
         if (safety.kind === "disclaimer-ed") {
           await supabase.rpc("log_audit_event", {
             _action: "chat.safety.ed_disclosure",
             _entity: "chat",
-            _meta: { message_length: body.message.length, category: safety.category },
+            _meta: {
+              message_length: body.message.length,
+              category: safety.category,
+              ...(buildEdMeta(body.message) ?? {}),
+            } as never,
           });
         }
 

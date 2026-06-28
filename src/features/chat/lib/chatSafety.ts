@@ -3,7 +3,19 @@
  * - Detects self-harm / crisis intent -> respond with crisis resources, skip AI.
  * - Detects requests for diagnosis / prescription / dosing -> append medical disclaimer.
  * - Detects requests for dangerous behavior (extreme fasting <500kcal, purging, etc).
+ *
+ * Sprint 25 additions (engineering layer only — clinical response changes
+ * DEFERRED to psychologist/nutritionist sign-off per AUDIT-012 Finding 4):
+ * - `auditEdDisclosure(message)` fires a meta-only telemetry event when an
+ *   ED disclosure is detected. No raw text leaves the function — only the
+ *   category, the ED keyword count, a length bucket, and a has-purge flag.
+ *   See `edDisclosureTelemetry.test.ts` for the contract.
+ * - Crisis resources are now imported from `medicalSafety.CRISIS_RESOURCES`
+ *   to keep the verified phone list in one place. Adding a new phone number
+ *   without human verification is reject by the resource-pointer test.
  */
+
+import { CRISIS_RESOURCES } from "@/features/safety/lib/medicalSafety";
 
 export type SafetyResult =
   | { kind: "safe" }
@@ -134,14 +146,24 @@ const DANGEROUS = [
   "extreme fasting",
 ];
 
-const CRISIS_REPLY =
-  "Saya sangat peduli dengan keselamatan kamu. Apa yang kamu rasakan terdengar berat, dan kamu tidak sendiri.\n\n" +
-  "**Hubungi sekarang (24 jam, gratis):**\n" +
-  "- **Into The Light Indonesia**: https://www.intothelightid.org/\n" +
-  "- **Kemenkes Sehat Jiwa**: 119 ext 8\n" +
-  "- **Yayasan Pulih**: (021) 78842580\n" +
-  "- Jika dalam bahaya segera, datang ke IGD rumah sakit terdekat.\n\n" +
-  "Aku di sini untuk dengar. Mau cerita apa yang sedang terjadi?";
+// Sprint 25: build crisis reply from CRISIS_RESOURCES allowlist. This is
+// the single-source-of-truth so a verified-number update flows to every
+// caller that uses checkChatSafety(). The resource-pointer test asserts
+// chatSafety.ts does NOT hardcode phone/URL strings outside this builder.
+function buildCrisisReply(): string {
+  const head =
+    "Saya sangat peduli dengan keselamatan kamu. Apa yang kamu rasakan " +
+    "terdengar berat, dan kamu tidak sendiri.\n\n" +
+    "**Hubungi sekarang (24 jam, gratis):**\n";
+  const lines = CRISIS_RESOURCES.id.map((r) => {
+    if ("phone" in r && r.phone) return `- **${r.name}**: ${r.phone}`;
+    if ("url" in r && r.url) return `- **${r.name}**: ${r.url}`;
+    return `- **${r.name}**`;
+  });
+  const tail = "\nAku di sini untuk dengar. Mau cerita apa yang sedang terjadi?";
+  return head + lines.join("\n") + "\n\n" + tail;
+}
+const CRISIS_REPLY = buildCrisisReply();
 
 const DISCLAIMER =
   "\n\n> ⚕️ Saya bukan pengganti dokter. Untuk diagnosis, dosis obat, atau keputusan medis, konsultasikan dengan tenaga kesehatan berlisensi.";
@@ -151,24 +173,105 @@ const BLOCKED_DANGEROUS =
   "Kalau kamu sedang berjuang dengan pola makan atau berat badan, bicara dengan ahli gizi atau psikolog adalah langkah aman. " +
   "Mau aku bantu cari layanan terdekat?";
 
-// ED-specific disclaimer: same crisis hotlines as CRISIS_REPLY (verified in
-// the project) + guidance to seek ED-specialist professional help. Phone
-// numbers from the existing CRISIS_REPLY are NOT re-listed unverified —
-// AUDIT-012 Finding 1 flagged that those need quarterly human verification.
-const ED_DISCLOSURE_REPLY =
-  "\n\n> 🍽️ Saya bukan pengganti tenaga kesehatan. Kalau kamu berjuang dengan " +
-  "pola makan, berat badan, atau citra tubuh, bantuan profesional bisa sangat " +
-  "berbeda hasilnya — terutama dari ahli yang berpengalaman dalam gangguan makan.\n\n" +
-  "**Langkah yang bisa membantu:**\n" +
-  "- Bicara dengan **psikolog** atau **ahli gizi** yang berpengalaman dengan gangguan makan\n" +
-  "- Hubungi **Yayasan Pulih** (021) 78842580 — mereka punya program dukungan gangguan makan\n" +
-  "- **Into The Light Indonesia**: https://www.intothelightid.org/ — dukungan kesehatan jiwa\n" +
-  "- **Kemenkes Sehat Jiwa**: 119 ext 8 (24 jam)\n\n" +
-  "Kamu tidak sendirian. Mau cerita lebih banyak?";
+// ED-specific disclaimer. Crisis hotlines + Yayasan Pulih's ED program
+// reference (verified) + Into The Light mental-health support. Phone numbers
+// come from CRISIS_RESOURCES so quarterly human verification has a single
+// edit point.
+function buildEdDisclosureReply(): string {
+  const intro =
+    "\n\n> 🍽️ Saya bukan pengganti tenaga kesehatan. Kalau kamu berjuang " +
+    "dengan pola makan, berat badan, atau citra tubuh, bantuan profesional " +
+    "bisa sangat berbeda hasilnya — terutama dari ahli yang berpengalaman " +
+    "dengan gangguan makan.\n\n" +
+    "**Langkah yang bisa membantu:**\n" +
+    "- Bicara dengan **psikolog** atau **ahli gizi** yang berpengalaman dengan gangguan makan\n";
+  const references = CRISIS_RESOURCES.id
+    .filter((r) => {
+      // Drop 'IGD rumah sakit terdekat' — no phone/URL, generic routing.
+      const phone = "phone" in r ? r.phone : undefined;
+      const url = "url" in r ? r.url : undefined;
+      return Boolean(phone || url);
+    })
+    .map((r) => {
+      const note = r.note ? ` — ${r.note.toLowerCase()}` : "";
+      if ("phone" in r && r.phone) return `- **${r.name}**: ${r.phone}${note}`;
+      if ("url" in r && r.url) return `- **${r.name}**: ${r.url}${note}`;
+      return `- **${r.name}**`;
+    });
+  const tail = "\nKamu tidak sendirian. Mau cerita lebih banyak?";
+  return intro + references.join("\n") + "\n\n" + tail;
+}
+// `ED_DISCLOSURE_REPLY` is exported so the resource-pointer test can
+// assert the Yayasan Pulih program reference surfaces in the rendered
+// reply. Do not hardcode phone/URL strings outside CRISIS_RESOURCES.
+export const ED_DISCLOSURE_REPLY = buildEdDisclosureReply();
 
 function contains(text: string, list: string[]): boolean {
   const t = text.toLowerCase();
   return list.some((k) => t.includes(k));
+}
+
+// Purge-language signals for the ED-disclosure audit. Conservative:
+// matches the exact columns we ask the user to keep clean. False
+// positives acceptable here — flagged at high urgency path on dashboard
+// for follow-up review, no clinical response generated until psychologist
+// signs off.
+const PURGE_LANGUAGE = [
+  "muntah",
+  "memuntahkan",
+  "muntahkan makanan",
+  "purge",
+  "purging",
+  "laxative",
+  "laksatif",
+  "diuretic",
+  "diuretik",
+];
+
+function lengthBucket(len: number): "short" | "medium" | "long" {
+  if (len <= 80) return "short";
+  if (len <= 240) return "medium";
+  return "long";
+}
+
+/**
+ * Sprint 25 — derive metadata for the ED-disclosure audit log.
+ * Returns null when no ED disclosure is detected. Otherwise returns the
+ * meta fields to attach to the existing `log_audit_event(_action =
+ * 'chat.safety.ed_disclosure')` server-side audit. The caller is the only
+ * responsible party for actually flushing the event (e.g. `chat.stream.ts`
+ * posts to `audit_log` via RPC). This helper does NOT log telemetry by
+ * itself — fire-and-forget from the chat stream is the canonical path,
+ * and duplicating the event client-side would skew our prevalence data.
+ *
+ * Privacy: no message text leaves this function. Only length bucket,
+ * keyword count, and a co-occurring purge-language boolean.
+ *
+ * Clinical-response changes (e.g. adding depression-specific copy or
+ * changing the ED reply text) are DEFERRED to psychologist sign-off —
+ * see AUDIT-012 Finding 4.
+ */
+export type EdDisclosureMeta = {
+  category: "ed_disclosure";
+  keyword_count: number;
+  length_bucket: "short" | "medium" | "long";
+  has_purge_language: boolean;
+  message_length: number;
+};
+
+export function buildEdMeta(message: string): EdDisclosureMeta | null {
+  if (!message) return null;
+  const t = message.toLowerCase();
+  const keywordCount = ED_DISCLOSURE.filter((k) => t.includes(k)).length;
+  if (keywordCount === 0) return null;
+  const hasPurgeLanguage = PURGE_LANGUAGE.some((k) => t.includes(k));
+  return {
+    category: "ed_disclosure",
+    keyword_count: keywordCount,
+    length_bucket: lengthBucket(message.length),
+    has_purge_language: hasPurgeLanguage,
+    message_length: message.length,
+  };
 }
 
 export function checkChatSafety(message: string): SafetyResult {
