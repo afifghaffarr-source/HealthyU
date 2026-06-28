@@ -18,6 +18,7 @@ import { DeleteAccountSection } from "@/features/privacy/components/delete-accou
 import { PrivacyVaultHero } from "@/features/privacy/components/privacy-vault-hero";
 import { DataInventorySection } from "@/features/privacy/components/data-inventory-section";
 import { AuditLogSection } from "@/features/privacy/components/audit-log-section";
+import { TelemetryEventsSection } from "@/features/privacy/components/telemetry-events-section";
 
 const getPrivacy = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
@@ -98,6 +99,9 @@ function Page() {
 
         {/* Audit log viewer — "siapa akses apa, kapan" */}
         <AuditLogSection limit={10} />
+
+        {/* Sprint 33: Telemetry events viewer — what `track()` writes */}
+        <TelemetryEventsSection limit={10} />
 
         {/* Privacy toggles — the existing switches */}
         <div className="rounded-2xl bg-card border p-4 flex items-start justify-between gap-3">
