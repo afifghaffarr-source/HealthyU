@@ -16,6 +16,7 @@ import {
 describe("Time Pattern Detection", () => {
   describe("detectSkipBreakfast", () => {
     it("detects 5 skipped breakfasts in weekdays", () => {
+      const now = new Date("2026-06-21T12:00:00Z"); // Minggu → last 5 weekdays = Jun 16-20
       const meals: MealLog[] = [
         {
           log_date: "2026-06-16",
@@ -64,7 +65,8 @@ describe("Time Pattern Detection", () => {
         }, // Fri skip
       ];
 
-      const result = detectSkipBreakfast(meals);
+      // All skip (no breakfast) → 5 skipped → detected
+      const result = detectSkipBreakfast(meals, 3, 1.0, now);
 
       expect(result.detected).toBe(true);
       expect(result.type).toBe("skip_breakfast");
@@ -72,9 +74,62 @@ describe("Time Pattern Detection", () => {
       expect(result.metadata.threshold_applied).toBe(3);
     });
 
+    it("does NOT over-count when 2 breakfasts + 2 lunches in same day window", () => {
+      // Semua meal di 1 hari (Mon, Jun 15) — 2 breakfast + 2 lunch
+      // Hari ini ada breakfast → matched_dates TIDAK boleh contain "2026-06-15"
+      const now = new Date("2026-06-19T12:00:00Z"); // Jumat → last 5 weekdays = Jun 15-19
+      const meals: MealLog[] = [
+        {
+          log_date: "2026-06-15",
+          logged_at: "2026-06-15T07:00:00Z",
+          meal_type: "breakfast",
+          calories: 300,
+          carbs_g: 40,
+          protein_g: 15,
+          fat_g: 10,
+        },
+        {
+          log_date: "2026-06-15",
+          logged_at: "2026-06-15T07:30:00Z",
+          meal_type: "breakfast",
+          calories: 250,
+          carbs_g: 35,
+          protein_g: 12,
+          fat_g: 8,
+        },
+        {
+          log_date: "2026-06-15",
+          logged_at: "2026-06-15T12:00:00Z",
+          meal_type: "lunch",
+          calories: 500,
+          carbs_g: 60,
+          protein_g: 25,
+          fat_g: 15,
+        },
+        {
+          log_date: "2026-06-15",
+          logged_at: "2026-06-15T12:30:00Z",
+          meal_type: "lunch",
+          calories: 400,
+          carbs_g: 50,
+          protein_g: 20,
+          fat_g: 12,
+        },
+      ];
+
+      const result = detectSkipBreakfast(meals, 3, 1.0, now);
+
+      // 5 weekdays (Mon-Fri), 1 has breakfast → 4 skip → detected
+      expect(result.count).toBe(4);
+      expect(result.detected).toBe(true);
+      // Hari dengan breakfast TIDAK boleh di matched_dates
+      expect(result.matched_dates).not.toContain("2026-06-15");
+    });
+
     it("does NOT detect if only 2 skips", () => {
-      // 5 weekdays terakhir: Jun 27(Fri), 26(Thu), 25(Wed), 24(Tue), 23(Mon)
+      // 5 weekdays terakhir: Jun 22(Mon), 23(Tue), 24(Wed), 25(Thu), 26(Fri)
       // 3 breakfast, 2 skip → count=2 < threshold=3 → detected=false
+      const now = new Date("2026-06-28T12:00:00Z"); // Minggu → last 5 weekdays = Jun 22-26
       const meals: MealLog[] = [
         {
           log_date: "2026-06-26", // Thu breakfast ✓
@@ -123,7 +178,7 @@ describe("Time Pattern Detection", () => {
         },
       ];
 
-      const result = detectSkipBreakfast(meals);
+      const result = detectSkipBreakfast(meals, 3, 1.0, now);
 
       expect(result.detected).toBe(false);
       expect(result.count).toBeLessThan(3);

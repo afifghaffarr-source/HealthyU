@@ -27,14 +27,15 @@ export function detectSkipBreakfast(
   meals: MealLog[],
   threshold: number = 3,
   sensitivity: number = 1.0,
+  now?: Date,
 ): DetectedPattern {
-  const now = new Date();
-  const fiveDaysAgo = new Date(now.getTime() - 5 * 86400000);
+  const currentDate = now ?? new Date();
+  const fiveDaysAgo = new Date(currentDate.getTime() - 5 * 86400000);
 
   // Get last 5 weekdays
   const weekdays = [];
   for (let i = 0; i < 14; i++) {
-    const d = new Date(now.getTime() - i * 86400000);
+    const d = new Date(currentDate.getTime() - i * 86400000);
     const day = d.getDay();
     if (day !== 0 && day !== 6) weekdays.push(d.toISOString().split("T")[0]);
     if (weekdays.length >= 5) break;
