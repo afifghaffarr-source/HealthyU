@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { extractNutriments, scoreBarcodeProduct } from "./barcodeHealthScore";
 
 // ===== from scanBatch9b (scanBarcode) =====
 
@@ -14,7 +15,21 @@ export const scanBarcode = createServerFn({ method: "POST" })
       .select("*")
       .eq("barcode", data.barcode)
       .maybeSingle();
-    if (cached) return { product: cached, cached: true };
+    if (cached) {
+      // Sprint 27: pull grade from cached `raw` jsonb (already stored at
+      // insert time). Avoids re-fetching from OFF on every cache hit
+      // (~100ms saved per scan, especially valuable under poor network).
+      const raw = (cached as { raw?: Record<string, unknown> | null }).raw ?? null;
+      const grade = raw
+        ? scoreBarcodeProduct(extractNutriments((raw.nutriments as Record<string, unknown>) ?? raw))
+        : null;
+      const { raw: _omit, ...safe } = cached as Record<string, unknown> & { raw?: unknown };
+      void _omit;
+      return {
+        product: { ...safe, raw: null as never, health_grade: grade },
+        cached: true,
+      };
+    }
     const res = await fetch(`https://world.openfoodfacts.org/api/v2/product/${data.barcode}.json`);
     if (!res.ok) throw new Error("Barcode tidak ditemukan");
     const json = (await res.json()) as { product?: Record<string, unknown>; status?: number };
@@ -37,8 +52,16 @@ export const scanBarcode = createServerFn({ method: "POST" })
     await supabase.from("barcode_cache").insert(product as never);
     const { raw: _omit, ...safe } = product;
     void _omit;
+    // Sprint 27: compute Nutritrack-style grade server-side so raw payload
+    // never leaves the server. Both cached and fresh paths include it.
+    const grade = scoreBarcodeProduct(extractNutriments(n));
     return {
-      product: { ...safe, created_at: new Date().toISOString(), raw: null as never },
+      product: {
+        ...safe,
+        created_at: new Date().toISOString(),
+        raw: null as never,
+        health_grade: grade,
+      },
       cached: false,
     };
   });
@@ -77,6 +100,9 @@ export const lookupBarcode = createServerFn({ method: "POST" })
     };
     if (j.status !== 1 || !j.product) return { found: false };
     const p = j.product;
+    const grade = scoreBarcodeProduct(
+      extractNutriments((p as { nutriments?: Record<string, unknown> }).nutriments ?? {}),
+    );
     return {
       found: true,
       name: p.product_name ?? "Produk",
@@ -88,6 +114,7 @@ export const lookupBarcode = createServerFn({ method: "POST" })
         carbs: Number(p.nutriments?.carbohydrates_100g ?? 0),
         fat: Number(p.nutriments?.fat_100g ?? 0),
       },
+      health_grade: grade,
     };
   });
 

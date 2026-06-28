@@ -7,6 +7,8 @@ import { BottomNav } from "@/components/bottom-nav";
 import { scanBarcode } from "@/features/scan/lib/scanBatch9.functions";
 import { toast } from "@/lib/toast-config";
 import { Camera, CameraOff } from "lucide-react";
+import { BarcodeHealthGradeBadge } from "@/features/scan/components/BarcodeHealthGradeBadge";
+import type { BarcodeHealthGrade } from "@/features/scan/lib/barcodeHealthScore";
 
 export const Route = createFileRoute("/_authenticated/scan/barcode-live")({ component: Page });
 
@@ -97,6 +99,7 @@ function Page() {
         fat_g?: number;
         image?: string;
         allergens?: string[];
+        health_grade?: BarcodeHealthGrade | null;
       }
     | undefined;
   return (
@@ -150,7 +153,7 @@ function Page() {
           {mut.isPending ? "Mencari…" : "Cari Produk"}
         </button>
         {p && (
-          <div className="rounded-2xl bg-card border p-4 space-y-2 text-sm">
+          <div className="rounded-2xl bg-card border p-4 space-y-3 text-sm">
             <div className="font-semibold text-base">{p.product_name ?? "Tanpa nama"}</div>
             {p.brand && <div className="text-muted-foreground">{p.brand}</div>}
             <div className="grid grid-cols-2 gap-2 pt-2">
@@ -161,6 +164,13 @@ function Page() {
             </div>
             {(p.allergens?.length ?? 0) > 0 && (
               <div className="pt-2 text-red-500 text-xs">⚠️ Alergen: {p.allergens!.join(", ")}</div>
+            )}
+            {p.health_grade && (
+              <BarcodeHealthGradeBadge
+                grade={p.health_grade}
+                reliable={p.health_grade.reliable}
+                reasons={p.health_grade.reasons}
+              />
             )}
           </div>
         )}

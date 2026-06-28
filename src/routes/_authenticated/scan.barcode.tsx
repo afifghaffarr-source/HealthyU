@@ -7,6 +7,8 @@ import { BottomNav } from "@/components/bottom-nav";
 import { lookupBarcode, relogMeal } from "@/features/scan/lib/scanExtras.functions";
 import { toast } from "@/lib/toast-config";
 import { Loader2 } from "lucide-react";
+import { BarcodeHealthGradeBadge } from "@/features/scan/components/BarcodeHealthGradeBadge";
+import type { BarcodeHealthGrade } from "@/features/scan/lib/barcodeHealthScore";
 
 export const Route = createFileRoute("/_authenticated/scan/barcode")({
   component: Page,
@@ -127,6 +129,13 @@ function Page() {
                 className="w-full mt-1 px-3 py-2 rounded-xl bg-muted/60 outline-none"
               />
             </div>
+            {product.health_grade && (
+              <BarcodeHealthGradeBadge
+                grade={product.health_grade as BarcodeHealthGrade}
+                reliable={(product.health_grade as BarcodeHealthGrade).reliable}
+                reasons={(product.health_grade as BarcodeHealthGrade).reasons}
+              />
+            )}
             <button
               onClick={() => logMut.mutate()}
               disabled={logMut.isPending}
