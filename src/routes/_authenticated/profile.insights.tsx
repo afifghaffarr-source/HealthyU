@@ -1,8 +1,8 @@
 /**
  * Profile Insights Page
  *
- * Shows all active and resolved eating patterns for the user
- * Sprint 10b - Pattern Detection AI
+ * Shows all active and resolved eating patterns for the user.
+ * Sprint 15-16: Timeline view + category filter (Option B features).
  */
 
 import { createFileRoute } from "@tanstack/react-router";
@@ -14,11 +14,39 @@ import {
   PatternInsightCardSkeleton,
   PatternInsightEmpty,
 } from "@/features/patterns/components/PatternInsightCard";
+import { PatternTimeline } from "@/features/patterns/components/PatternTimeline";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, RefreshCw } from "lucide-react";
-import { useState } from "react";
+import { ArrowLeft, RefreshCw, LayoutGrid, GitBranch, Filter } from "lucide-react";
+import { useState, useMemo } from "react";
+import type { PatternCategory, PatternInsight } from "@/features/patterns/types/pattern";
+import { PATTERN_METADATA } from "@/features/patterns/types/pattern";
 import { handleQuickAction } from "@/features/patterns/lib/quickActions";
+
+// Indonesian labels for pattern categories — kept here (not in PATTERN_METADATA)
+// since labels change per-locale and metadata is UI-agnostic.
+const CATEGORY_LABELS: Record<PatternCategory, string> = {
+  time: "Waktu Makan",
+  emotional: "Emosi",
+  social: "Sosial",
+  cravings: "Ngidam",
+  schedule: "Jadwal",
+  location: "Lokasi",
+  hunger: "Lapar",
+};
 
 const profileQueryOptions = queryOptions({
   queryKey: ["profile"],
@@ -35,6 +63,25 @@ function ProfileInsightsPage() {
   const { data, isLoading, refetch, isRefetching } = useAllPatterns(profile?.id);
   const dismissMutation = useDismissPattern();
   const [activeTab, setActiveTab] = useState<"active" | "resolved">("active");
+  const [viewMode, setViewMode] = useState<"cards" | "timeline">("cards");
+  const [categoryFilter, setCategoryFilter] = useState<PatternCategory | "all">("all");
+
+  // Build category list once from PATTERN_METADATA (only categories present
+  // in the user's actual data — no need to render 7 empty options).
+  const availableCategories = useMemo<PatternCategory[]>(() => {
+    const seen = new Set<PatternCategory>();
+    for (const p of [...(data?.active ?? []), ...(data?.resolved ?? [])]) {
+      const meta = PATTERN_METADATA[p.pattern_type as keyof typeof PATTERN_METADATA];
+      if (meta) seen.add(meta.category);
+    }
+    return Array.from(seen);
+  }, [data]);
+
+  function matchesCategory(p: PatternInsight): boolean {
+    if (categoryFilter === "all") return true;
+    const meta = PATTERN_METADATA[p.pattern_type as keyof typeof PATTERN_METADATA];
+    return meta?.category === categoryFilter;
+  }
 
   const handleDismiss = async (patternId: string) => {
     if (!confirm("Yakin sudah handle pattern ini?")) return;
@@ -67,8 +114,8 @@ function ProfileInsightsPage() {
     );
   }
 
-  const activePatterns = data?.active || [];
-  const resolvedPatterns = data?.resolved || [];
+  const activePatterns = (data?.active ?? []).filter(matchesCategory);
+  const resolvedPatterns = (data?.resolved ?? []).filter(matchesCategory);
 
   return (
     <div className="container max-w-4xl mx-auto px-4 py-6">
@@ -81,17 +128,65 @@ function ProfileInsightsPage() {
           <ArrowLeft className="h-4 w-4 mr-1" />
           Kembali ke Profile
         </a>
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between gap-2 flex-wrap">
           <div>
             <h1 className="text-2xl font-bold">Pattern Insights</h1>
             <p className="text-sm text-gray-600 mt-1">
               Pola makan yang terdeteksi dari aktivitasmu
             </p>
           </div>
-          <Button variant="outline" size="sm" onClick={handleRefresh} disabled={isRefetching}>
-            <RefreshCw className={`h-4 w-4 mr-2 ${isRefetching ? "animate-spin" : ""}`} />
-            Refresh
-          </Button>
+          <div className="flex items-center gap-2 flex-wrap">
+            {availableCategories.length > 0 && (
+              <Select
+                value={categoryFilter}
+                onValueChange={(v: string) => setCategoryFilter(v as PatternCategory | "all")}
+              >
+                <SelectTrigger className="h-9 w-[160px] text-xs">
+                  <Filter className="h-3 w-3 mr-1" />
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Semua kategori</SelectItem>
+                  {availableCategories.map((cat) => (
+                    <SelectItem key={cat} value={cat}>
+                      {CATEGORY_LABELS[cat]}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" size="sm">
+                  {viewMode === "cards" ? (
+                    <>
+                      <LayoutGrid className="h-4 w-4 mr-2" />
+                      Cards
+                    </>
+                  ) : (
+                    <>
+                      <GitBranch className="h-4 w-4 mr-2" />
+                      Timeline
+                    </>
+                  )}
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent>
+                <DropdownMenuItem onSelect={() => setViewMode("cards")}>
+                  <LayoutGrid className="h-4 w-4 mr-2" />
+                  Cards
+                </DropdownMenuItem>
+                <DropdownMenuItem onSelect={() => setViewMode("timeline")}>
+                  <GitBranch className="h-4 w-4 mr-2" />
+                  Timeline
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+            <Button variant="outline" size="sm" onClick={handleRefresh} disabled={isRefetching}>
+              <RefreshCw className={`h-4 w-4 mr-2 ${isRefetching ? "animate-spin" : ""}`} />
+              Refresh
+            </Button>
+          </div>
         </div>
       </div>
 
@@ -105,8 +200,15 @@ function ProfileInsightsPage() {
         {/* Active Patterns */}
         <TabsContent value="active" className="space-y-4">
           {activePatterns.length === 0 ? (
-            <PatternInsightEmpty />
-          ) : (
+            categoryFilter !== "all" ? (
+              <div className="text-center py-12 text-gray-500 text-sm">
+                Tidak ada pattern aktif di kategori "
+                {CATEGORY_LABELS[categoryFilter as PatternCategory]}"
+              </div>
+            ) : (
+              <PatternInsightEmpty />
+            )
+          ) : viewMode === "cards" ? (
             activePatterns.map((pattern) => (
               <PatternInsightCard
                 key={pattern.id}
@@ -115,16 +217,25 @@ function ProfileInsightsPage() {
                 onQuickAction={handleQuickAction}
               />
             ))
+          ) : (
+            <PatternTimeline patterns={activePatterns} onQuickAction={handleQuickAction} />
           )}
         </TabsContent>
 
         {/* Resolved Patterns */}
         <TabsContent value="resolved" className="space-y-4">
           {resolvedPatterns.length === 0 ? (
-            <div className="text-center py-12 text-gray-500">
-              <p>Belum ada pattern yang resolved</p>
-            </div>
-          ) : (
+            categoryFilter !== "all" ? (
+              <div className="text-center py-12 text-gray-500 text-sm">
+                Tidak ada pattern resolved di kategori "
+                {CATEGORY_LABELS[categoryFilter as PatternCategory]}"
+              </div>
+            ) : (
+              <div className="text-center py-12 text-gray-500">
+                <p>Belum ada pattern yang resolved</p>
+              </div>
+            )
+          ) : viewMode === "cards" ? (
             <div className="space-y-4">
               {resolvedPatterns.map((pattern) => (
                 <div key={pattern.id} className="relative">
@@ -141,6 +252,8 @@ function ProfileInsightsPage() {
                 </div>
               ))}
             </div>
+          ) : (
+            <PatternTimeline patterns={resolvedPatterns} onQuickAction={handleQuickAction} />
           )}
         </TabsContent>
       </Tabs>
