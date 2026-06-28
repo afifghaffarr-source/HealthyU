@@ -83,6 +83,41 @@ jobs:
           ls -la dist/ | head -10
           echo "✅ Build output present"
 
+      - name: Verify VITE_* values baked into client bundle
+        # Defense against incident 2026-06-16: vite silently inlines `undefined`
+        # for missing VITE_* values without warning or build failure. The bundle
+        # builds "successfully" but runtime breaks (auth fails, routes 500).
+        # This step GREPs the built client bundle for the expected non-empty
+        # fragment of each required env var and fails loudly if missing.
+        # Source of truth: the `env:` block in the previous build step (these
+        # vars are public by design — already in wrangler.jsonc vars block).
+        # If you add a new VITE_* env var to the repo, add it to the checks
+        # below too, or this guard will silently pass on a broken build.
+        run: |
+          failures=0
+          # Pair format: "<var name>|<required non-empty fragment in client bundle>"
+          declare -a checks=(
+            "VITE_SUPABASE_URL|ohkfcldkuzfcxnpqvdvc.supabase.co"
+            "VITE_SUPABASE_PROJECT_ID|ohkfcldkuzfcxnpqvdvc"
+            "VITE_SUPABASE_PUBLISHABLE_KEY|sb_publishable_"
+            "VITE_SITE_URL|healthyu.web.id"
+          )
+          for pair in "${checks[@]}"; do
+            key="${pair%%|*}"
+            fragment="${pair#*|}"
+            if ! grep -qr -- "$fragment" dist/client/assets/ 2>/dev/null; then
+              echo "::error::$key fragment '$fragment' NOT FOUND in dist/client/assets/ — env var probably missing from build step env: block"
+              failures=$((failures + 1))
+            else
+              echo "✅ $key present in client bundle"
+            fi
+          done
+          if [ $failures -gt 0 ]; then
+            echo "::error::$failures required VITE_* value(s) missing from client bundle. Aborting deploy."
+            exit 1
+          fi
+          echo "✅ All required VITE_* values verified in client bundle"
+
       - name: Install wrangler (pinned to match VPS verified-working version)
         # Pin to 4.100.0 — same as the global install on our deploy VPS.
         # Reason: `bunx wrangler` (resolves @latest) sometimes gets a newer

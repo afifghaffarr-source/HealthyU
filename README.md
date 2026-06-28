@@ -287,8 +287,8 @@ For first-time setup, see [`docs/cloudflare-deploy.md`](./docs/cloudflare-deploy
 
 - Cron job otentikasi via `CRON_SECRET` di Cloudflare Pages env — bukan publishable key (lihat `docs/cron.md`).
 - Image processing pakai canvas API browser; tidak ada `sharp`/`canvas` di server (Worker constraint).
-- Scan batch files (`src/features/scan/lib/scanBatch*.functions.ts`) — 36 files, barrel pattern. Functional but messy; refactor ditunda ke post-MVP.
-- VexoAPI free tier dapat return 503 ("upstream denied") saat upstream model provider outage. Mitigasi: rotate key, atau swap ke `AI_FALLBACK_URL` (TODO).
+- Scan batch files (`src/features/scan/lib/scanBatch*.functions.ts`) — barrel pattern, 36 files. Functional; consolidation deferred (low risk, no runtime impact).
+- VexoAPI free tier dapat return 503 ("upstream denied") saat upstream model outage. Mitigasi tersedia: rotate API key di CF secret. Single-provider saat ini (no fallback URL wired).
 - VexoAPI free tier tidak expose SSE — chat stream emits satu chunk, UI tidak dapat token-by-token animation. Acceptable trade-off.
 - **Bundle size 500KB** (gzip 164KB) adalah hard floor untuk TanStack Start + React 19. Target <400KB tidak reachable tanpa rewrite framework. Lihat `docs/known-issues.md` HI-001.
 - **37 phantom bindings** di Cloudflare Worker belum di-cleanup (no functional impact). Lihat `docs/known-issues.md` HI-003.
