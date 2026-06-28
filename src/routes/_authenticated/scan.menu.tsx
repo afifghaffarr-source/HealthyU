@@ -31,8 +31,10 @@ function Page() {
   };
 
   const handleSave = async (adjustedItems: Array<{ adjusted_calories: number }>) => {
-    // TODO Sprint W4: Save to meal_logs with combo support
-    // For now, just show success toast
+    // Note: meal_logs persistence is deferred — see sprint board.
+    // AI Warung Mode currently shows a calorie-adjusted success toast only
+    // (no DB write) so the UX flow is still visible to users while the
+    // persistence path is gated behind the pattern_insights schema work.
     toast.success(
       `${adjustedItems.length} item disimpan (${adjustedItems.reduce((sum, i) => sum + i.adjusted_calories, 0)} kkal)`,
     );

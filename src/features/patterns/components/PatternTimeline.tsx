@@ -13,7 +13,7 @@
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { AlertCircle, Coffee, Moon, Heart, Users, Calendar, MapPin, Apple } from "lucide-react";
-import type { PatternInsight, QuickAction } from "../types/pattern.js";
+import type { PatternInsight, QuickAction } from "../types/pattern";
 
 interface PatternTimelineProps {
   patterns: PatternInsight[];
@@ -95,7 +95,7 @@ export function PatternTimeline({ patterns, onQuickAction }: PatternTimelineProp
               {dayPatterns.map((pattern) => {
                 const Icon = ICONS[pattern.pattern_type] ?? AlertCircle;
                 const isResolved = pattern.resolved_at !== null;
-                const isMeta = (pattern as PatternInsight & { is_meta?: boolean }).is_meta === true;
+                const isMeta = pattern.is_meta === true;
 
                 return (
                   <Card
