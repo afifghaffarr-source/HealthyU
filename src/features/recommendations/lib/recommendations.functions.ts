@@ -2,6 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { callAiJsonWithSchema } from "@/features/ai/lib/aiGateway.server";
+import { logServerWarn } from "@/lib/logger.server";
 
 /**
  * Lightweight content personalization: score published articles & recipes
@@ -382,8 +383,12 @@ export const generateMealPlan = createServerFn({ method: "POST" })
     // AI returned empty/invalid → tell the client to fetch template.
     // The client (`recommendations.tsx`) will fire `getTemplateMealPlan`
     // as a separate request and adapt the template via `adaptTemplateMeals`.
-    console.warn(
-      `[recommendations.generateMealPlan] AI returned empty/invalid, signaling client fallback for userId=${userId}`,
+    // Sprint 37 — userId goes through sanitizeLogMeta (which redacts
+    // "id" / "session" fragments) so the UUID never lands in CF logs raw.
+    logServerWarn(
+      "recommendations.generateMealPlan",
+      "AI returned empty/invalid, signaling client fallback",
+      { user_id: userId },
     );
     return {
       mode: "ai_empty",

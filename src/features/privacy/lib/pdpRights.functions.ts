@@ -25,8 +25,12 @@ type JsonValue = string | number | boolean | null | JsonValue[] | { [key: string
  * - required + error  → table value is `{ error: "unavailable" }` (NEVER throw —
  *                        one broken table must not block the whole export)
  *
- * Raw error details are logged server-side via `console.error` and never leak
- * to the user.
+ * Raw error details are logged server-side via a guarded dynamic
+ * import of `@/lib/logger.server` (Sprint 37). The dynamic import
+ * keeps `pdpRights.functions.ts` off the client bundle — this file is
+ * co-imported by client routes (backup.tsx, audit-log-section.tsx,
+ * use-delete-account.ts) and the TanStack import-protection plugin
+ * blocks static `*.server.*` imports for transitive client chunks.
  */
 export async function buildExportDump(
   supabase: AppSupabase,
@@ -48,7 +52,15 @@ export async function buildExportDump(
     } else if (optional) {
       dump[table] = [];
     } else {
-      console.error(`[pdp.export] ${table}:`, error);
+      // Sprint 37 — dynamic import keeps logger.server out of the
+      // client bundle. sanitizeLogMeta redacts row hints / RLS meta.
+      import("@/lib/logger.server")
+        .then(({ logServerError }) => logServerError("pdp.export", error, { table }))
+        .catch((loggerErr) => {
+          // Last-resort: strip per-message redundantly if the dynamic
+          // import fails (should never happen in production).
+          console.error(`[pdp.export] ${table}`, error?.message ?? error, loggerErr);
+        });
       dump[table] = { error: "unavailable" };
     }
   }

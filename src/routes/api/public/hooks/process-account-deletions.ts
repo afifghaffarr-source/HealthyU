@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { requireCronSecret } from "@/lib/cronAuth.server";
+import { logServerError, logServerWarn } from "@/lib/logger.server";
 
 /**
  * AUDIT-020 — Account deletion cron worker (right-to-erasure completion).
@@ -80,15 +81,13 @@ export const Route = createFileRoute("/api/public/hooks/process-account-deletion
           // stuck requests will get another chance in the next cron
           // run. We'd rather process new pending requests than fail
           // the whole cron over a recovery step.
-          console.error(
-            "process-account-deletions: stuck-processing reset failed:",
-            resetError.message,
-          );
+          logServerError("account-deletions.stuck-reset", resetError);
         } else if (resetRows) {
           reset = resetRows.length;
           if (reset > 0) {
-            console.log(
-              `process-account-deletions: auto-recovered ${reset} stuck 'processing' request(s) older than ${STUCK_PROCESSING_MINUTES}min`,
+            logServerWarn(
+              "account-deletions.stuck-reset",
+              `auto-recovered ${reset} stuck 'processing' request(s) older than ${STUCK_PROCESSING_MINUTES}min`,
             );
           }
         }
@@ -123,7 +122,11 @@ export const Route = createFileRoute("/api/public/hooks/process-account-deletion
             // ponytail: the function already rolls back on error, so
             // the request row stays 'pending' for the next run. We
             // log here so ops can see WHICH user failed and why.
-            console.error("process-account-deletions: failed for user", req.user_id, error.message);
+            // (Sprint 37 — user_id goes through sanitizeLogMeta blocklist
+            //  via the meta-object channel so it does NOT leak to logs.)
+            logServerError("account-deletions.per-user", error, {
+              user_id: req.user_id,
+            });
           } else {
             processed.push({ user_id: req.user_id, result: data });
           }

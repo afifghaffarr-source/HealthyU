@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { requireCronSecret } from "@/lib/cronAuth.server";
+import { logServerError } from "@/lib/logger.server";
 
 /**
  * Cron: daily-content
@@ -88,7 +89,10 @@ export const Route = createFileRoute("/api/public/hooks/daily-content")({
         }
         const { error } = await supabaseAdmin.from("daily_content_schedule").insert(rows);
         if (error) {
-          console.error("[daily-content] insert", error);
+          // Sprint 37 — pass through sanitizeLogMeta so any Supabase
+          // error metadata (hints, RLS context) gets redacted before
+          // hitting CF Workers logs.
+          logServerError("daily-content.insert", error);
           return new Response(error.message, { status: 500 });
         }
         return Response.json({ ok: true, scheduled: rows.length, theme, date });

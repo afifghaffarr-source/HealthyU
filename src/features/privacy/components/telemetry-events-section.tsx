@@ -21,6 +21,7 @@ const LABEL_MAP: Record<string, string> = {
   "dashboard.badge_celebrated.seen": "Selamat badge baru",
   "privacy.vault.viewed": "Buka brankas privasi",
   "scan.warung.saved": "Catat menu warung",
+  "scan.warung.dexie_local_save_failed": "Gagal simpan lokal menu warung (offline retry)",
   "barcode_grade.viewed": "Lihat grade barcode",
   "weekly_card.shared": "Bagikan kartu mingguan",
   "puasa_aman_widget.viewed": "Buka widget puasa aman",
