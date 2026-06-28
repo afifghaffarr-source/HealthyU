@@ -167,5 +167,19 @@ export function subscribeToWaterToday(
   };
 }
 
+/**
+ * Sprint 23 — count pending (unsynced) water records across all days.
+ * Used by OfflineStatusBand to surface "3 entry menunggu sinkronisasi".
+ * Mirrors pendingMealSyncCount in mealDexie.ts.
+ */
+export async function pendingWaterSyncCount(): Promise<number> {
+  const db = getDb();
+  if (!db) return 0;
+  return db.waterLogs
+    .where("sync_status")
+    .anyOf(["pending", "error"] as OfflineWaterLog["sync_status"][])
+    .count();
+}
+
 // Module-level cleanup registry (avoid memory leaks from orphaned subscriptions)
 const cleanupRegistry = new Map<string, { unsubscribe: () => void }>();

@@ -30,6 +30,11 @@ const RouteProgressBar = lazy(() =>
     default: m.RouteProgressBar,
   })),
 );
+const OfflineStatusBand = lazy(() =>
+  import("@/components/offline-status-band").then((m) => ({
+    default: m.OfflineStatusBand,
+  })),
+);
 import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
 import { ThemeProvider } from "@/components/theme-provider";
@@ -181,6 +186,10 @@ function RootComponent() {
               <RouteProgressBar />
             </Suspense>
             <GlobalErrorBoundary>
+              {/* Sprint 23 — Offline Diary Mode: status band renders sticky-top
+                  so it's visible across every route. Lazy + null fallback
+                  keeps it out of the main bundle. */}
+              <OfflineStatusBand />
               <Outlet />
             </GlobalErrorBoundary>
             <Suspense fallback={null}>

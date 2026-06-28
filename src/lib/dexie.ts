@@ -54,16 +54,64 @@ export interface OfflineWaterLog extends BaseOfflineRecord {
   logged_at: number;
 }
 
+// ===== Meal Logs =====
+// Sprint 23 — Offline Diary Mode. Mirror of OfflineWaterLog but with the
+// full logMealWithItems payload inlined so we can replay writes verbatim
+// when the network comes back. Why an offline-first layer?
+//   - User scan piring di warteg / Ramadhan iftar → save → offline? Without
+//     this layer, scan.menu.tsx throws and food log silently lost.
+//   - Pola Gagal Diet warns based on meal frequency (meta-pattern detection).
+//     Missing entries in airplane mode = false late-night-eating pattern.
+//   - Diary contract: "tetap bisa log makanan tanpa internet" is the
+//     explicit feature #8 in research/07_ide_fitur_unik.md.
+export interface OfflineMealLog extends BaseOfflineRecord {
+  meal_type: "breakfast" | "lunch" | "dinner" | "snack";
+  /** Free-text notes from user (e.g. "Scan Warung: 3 item (650 kkal)"). */
+  notes: string | null;
+  /** Sum of all items' (calories * serving_qty). Rounded integer. */
+  total_calories: number;
+  /** Sum of all items' macros. Decimals (1dp). */
+  total_protein_g: number;
+  total_carbs_g: number;
+  total_fat_g: number;
+  /** Items normalized to the server's logMealWithItems child payload. */
+  items: SerializedMealLogItem[];
+  /** Time the user actually ate. May differ from created_at when backdated. */
+  logged_at: number;
+  /** Optional combo_id (e.g. warteg-standard) if scan matched a portion template. */
+  combo_id: string | null;
+  combo_name: string | null;
+}
+
+export interface SerializedMealLogItem {
+  food_item_id: string | null;
+  food_name: string;
+  serving_qty: number;
+  serving_unit: string | null;
+  calories: number;
+  protein_g: number;
+  carbs_g: number;
+  fat_g: number;
+}
+
 class HealthyUDatabase extends Dexie {
   waterLogs!: Table<OfflineWaterLog, string>;
+  mealLogs!: Table<OfflineMealLog, string>;
 
   constructor() {
     super("HealthyUDB");
-    // v1: initial schema. Tambah version baru kalau ada perubahan schema.
+    // v1 (kept for migration safety): initial water logs schema only.
     this.version(1).stores({
-      // Compound index [user_id+logged_at] untuk query harian yang cepet
-      // sync_status index untuk sync queue processing
       waterLogs: "id, user_id, [user_id+logged_at], sync_status, created_at, logged_at",
+    });
+    // Sprint 23 v2: add mealLogs table for offline diary mode.
+    // Compound index [user_id+logged_at] for fast per-day queries.
+    // sync_status index for the orchestrator queue.
+    // created_at index for retention sweeps (future).
+    this.version(2).stores({
+      waterLogs: "id, user_id, [user_id+logged_at], sync_status, created_at, logged_at",
+      mealLogs:
+        "id, user_id, [user_id+logged_at], [user_id+meal_type], sync_status, meal_type, created_at, logged_at",
     });
   }
 }

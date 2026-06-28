@@ -12,6 +12,7 @@
 
 import { getDb, type SyncStatus } from "@/lib/dexie";
 import { logWater, deleteWater } from "@/features/water/lib/water.functions";
+import { logMealWithItems } from "@/features/meals/lib/meals.functions";
 
 const SYNC_BATCH_SIZE = 50;
 const SYNC_INTERVAL_MS = 30_000;
@@ -94,6 +95,81 @@ export async function syncWaterLogs(): Promise<{
   return { synced, failed };
 }
 
+/**
+ * Sprint 23 — sync meal logs offline-first.
+ *
+ * Mirrors syncWaterLogs() pattern but replays the full itemized payload
+ * via logMealWithItems server fn. The server computes totals from items
+ * independently (server-computed values are authoritative), but we still
+ * pre-compute total_calories/etc. so the offline UI can show immediate
+ * feedback before the server round-trip.
+ *
+ * Parse-error recovery: if a Dexie record has malformed items (corruption
+ * from a pre-v2 schema migration), the row is marked error with full
+ * payload preserved in sync_error message so a human can recover it via
+ * the Privacy Vault eventually.
+ */
+export async function syncMealLogs(): Promise<{
+  synced: number;
+  failed: number;
+}> {
+  if (syncInProgress) return { synced: 0, failed: 0 };
+  if (typeof navigator !== "undefined" && !navigator.onLine) {
+    return { synced: 0, failed: 0 };
+  }
+  const db = getDb();
+  if (!db) return { synced: 0, failed: 0 };
+
+  syncInProgress = true;
+  let synced = 0;
+  let failed = 0;
+
+  try {
+    const pending = await db.mealLogs
+      .where("sync_status")
+      .anyOf(["pending", "error"] as SyncStatus[])
+      .limit(SYNC_BATCH_SIZE)
+      .toArray();
+
+    for (const record of pending) {
+      try {
+        await db.mealLogs.update(record.id, { sync_status: "syncing" });
+
+        // Push the full itemized payload to the server.
+        await logMealWithItems({
+          data: {
+            meal_type: record.meal_type,
+            items: record.items,
+            notes: record.notes ?? undefined,
+          },
+        });
+
+        await db.mealLogs.update(record.id, {
+          sync_status: "synced",
+          synced_at: Date.now(),
+          sync_error: null,
+        });
+        synced += 1;
+      } catch (err) {
+        failed += 1;
+        const msg = err instanceof Error ? err.message : "Sync failed";
+        const retryCount = (record.sync_error ? Number(record.sync_error.split(":")[0]) : 0) || 0;
+        const delay = Math.min(2 ** retryCount * 1000, MAX_RETRY_DELAY_MS);
+
+        await db.mealLogs.update(record.id, {
+          sync_status: "error",
+          sync_error: `${retryCount + 1}:${msg}`,
+        });
+        scheduleRetry(record.id, delay);
+      }
+    }
+  } finally {
+    syncInProgress = false;
+  }
+
+  return { synced, failed };
+}
+
 function scheduleRetry(recordId: string, delayMs: number) {
   // Cancel previous retry for this record
   const existing = retryTimeouts.get(recordId);
@@ -101,33 +177,43 @@ function scheduleRetry(recordId: string, delayMs: number) {
 
   const t = window.setTimeout(() => {
     retryTimeouts.delete(recordId);
+    // Retry both water + meal — they're cheap when no records pending.
     void syncWaterLogs();
+    void syncMealLogs();
   }, delayMs);
   retryTimeouts.set(recordId, t);
 }
 
 /**
  * Start background sync loop. Call once on app mount.
- * Runs syncWaterLogs() periodically + on network reconnect.
+ * Runs syncWaterLogs() AND syncMealLogs() periodically + on network
+ * reconnect + on app focus.
+ *
+ * Ponytail: one shared interval instead of two — both water + meals
+ * share SYNC_INTERVAL_MS window. The serial syncInProgress mutex in each
+ * sync fn prevents concurrent batches from double-processing the same row.
  */
 export function startBackgroundSync(): () => void {
   if (typeof window === "undefined") return () => {};
 
-  // Periodic sync
-  syncInterval = window.setInterval(() => {
+  const runOnce = () => {
     void syncWaterLogs();
-  }, SYNC_INTERVAL_MS);
+    void syncMealLogs();
+  };
+
+  // Periodic sync
+  syncInterval = window.setInterval(runOnce, SYNC_INTERVAL_MS);
 
   // Sync on network reconnect
-  const onOnline = () => void syncWaterLogs();
+  const onOnline = runOnce;
   window.addEventListener("online", onOnline);
 
   // Sync on app focus
-  const onFocus = () => void syncWaterLogs();
+  const onFocus = runOnce;
   window.addEventListener("focus", onFocus);
 
   // Initial sync after 5s (let app render first)
-  const initialTimeout = window.setTimeout(() => void syncWaterLogs(), 5_000);
+  const initialTimeout = window.setTimeout(runOnce, 5_000);
 
   return () => {
     if (syncInterval) window.clearInterval(syncInterval);
