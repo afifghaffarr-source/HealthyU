@@ -55,11 +55,13 @@ import {
   useTopPattern,
   useDismissPattern,
   useTopMetaPattern,
+  useAllMetaPatterns,
 } from "@/features/patterns/hooks/usePatternInsights";
 import {
   PatternInsightCard,
   PatternInsightCardSkeleton,
 } from "@/features/patterns/components/PatternInsightCard";
+import { MilestoneBadges } from "@/features/patterns/components/MilestoneBadges";
 import { handleQuickAction } from "@/features/patterns/lib/quickActions";
 import { checkPatternTrigger } from "@/features/patterns/lib/triggerPattern.functions";
 
@@ -132,6 +134,8 @@ function Dashboard() {
 
   // Meta-pattern hero (Sprint 13)
   const { data: metaPattern } = useTopMetaPattern(profile?.id);
+  // Meta-pattern badges (Sprint 17)
+  const { data: allMetaPatterns = [] } = useAllMetaPatterns(profile?.id);
   const { data: meals = [] } = useQuery({
     queryKey: ["meals", "today"],
     queryFn: () => fetchMeals(),
@@ -257,6 +261,17 @@ function Dashboard() {
             actionHref="/profile/insights"
           >
             <MetaPatternHeroCard pattern={metaPattern} />
+          </SectionGroup>
+        )}
+
+        {/* META-PATTERN BADGES — Sprint 17: first-time celebration banner */}
+        {allMetaPatterns.length > 0 && (
+          <SectionGroup
+            label="🎖 Achievement"
+            actionLabel="Lihat semua"
+            actionHref="/profile/insights"
+          >
+            <MilestoneBadges patterns={allMetaPatterns} showBanner={true} />
           </SectionGroup>
         )}
 

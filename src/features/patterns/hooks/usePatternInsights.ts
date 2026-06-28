@@ -63,6 +63,31 @@ export function useTopMetaPattern(userId: string | undefined) {
 }
 
 /**
+ * Fetch ALL meta-patterns for badge derivation (Sprint 17).
+ * Mirrors useTopMetaPattern's query except drops .limit(1) so callers can
+ * derive which combos the user has earned.
+ */
+export function useAllMetaPatterns(userId: string | undefined) {
+  return useQuery({
+    queryKey: ["pattern-insights", "meta-all", userId],
+    queryFn: async () => {
+      if (!userId) return [] as PatternInsight[];
+
+      const { data, error } = await supabase
+        .from("pattern_insights")
+        .select("*")
+        .eq("user_id", userId)
+        .eq("is_meta", true);
+
+      if (error) throw error;
+      return (data ?? []) as unknown as PatternInsight[];
+    },
+    enabled: !!userId,
+    staleTime: 12 * 60 * 60 * 1000,
+  });
+}
+
+/**
  * Fetch all patterns for profile insights page
  */
 export function useAllPatterns(userId: string | undefined) {

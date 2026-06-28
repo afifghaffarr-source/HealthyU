@@ -34,6 +34,7 @@ import { ArrowLeft, RefreshCw, LayoutGrid, GitBranch, Filter } from "lucide-reac
 import { useState, useMemo } from "react";
 import type { PatternCategory, PatternInsight } from "@/features/patterns/types/pattern";
 import { PATTERN_METADATA } from "@/features/patterns/types/pattern";
+import { MilestoneBadges } from "@/features/patterns/components/MilestoneBadges";
 import { handleQuickAction } from "@/features/patterns/lib/quickActions";
 
 // Indonesian labels for pattern categories — kept here (not in PATTERN_METADATA)
@@ -92,6 +93,18 @@ function ProfileInsightsPage() {
     refetch();
   };
 
+  const activePatterns = (data?.active ?? []).filter(matchesCategory);
+  const resolvedPatterns = (data?.resolved ?? []).filter(matchesCategory);
+
+  // All meta patterns → badge derivation. Filter independent of category
+  // filter so badges stay visible regardless of what's filtered above.
+  // Must run BEFORE any early returns — React hooks must always be called
+  // in the same order.
+  const allMetaPatterns = useMemo(
+    () => [...(data?.active ?? []), ...(data?.resolved ?? [])].filter((p) => p.is_meta),
+    [data],
+  );
+
   if (isLoading) {
     return (
       <div className="container max-w-4xl mx-auto px-4 py-6">
@@ -113,9 +126,6 @@ function ProfileInsightsPage() {
       </div>
     );
   }
-
-  const activePatterns = (data?.active ?? []).filter(matchesCategory);
-  const resolvedPatterns = (data?.resolved ?? []).filter(matchesCategory);
 
   return (
     <div className="container max-w-4xl mx-auto px-4 py-6">
@@ -257,6 +267,14 @@ function ProfileInsightsPage() {
           )}
         </TabsContent>
       </Tabs>
+
+      {/* Meta-Pattern Badges — Sprint 17 persistent grid. Banner is suppressed
+          here so we don't double-fire with the dashboard celebration. */}
+      {allMetaPatterns.length > 0 && (
+        <div className="mt-8">
+          <MilestoneBadges patterns={allMetaPatterns} showBanner={false} />
+        </div>
+      )}
 
       {/* Info footer */}
       <div className="mt-8 p-4 bg-blue-50 rounded-lg text-sm text-gray-700">
