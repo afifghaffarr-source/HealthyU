@@ -1,7 +1,15 @@
 import { createFileRoute, redirect } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { queryOptions, useQuery, useSuspenseQuery, useQueryClient } from "@tanstack/react-query";
+import {
+  queryOptions,
+  useMutation,
+  useQuery,
+  useSuspenseQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { getProfile } from "@/features/profile/lib/profile.functions";
 import { getDailyTip } from "@/features/daily-tips/lib/dailyTips.functions";
 import { todaysMeals } from "@/features/meals/lib/meals.functions";
@@ -50,13 +58,14 @@ import { useFastClock } from "@/features/dashboard/hooks/useFastClock";
 import { useDashboardMutations } from "@/features/dashboard/hooks/useDashboardMutations";
 import { HijriWidget } from "@/features/hijri/components/HijriWidget";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, Mail } from "lucide-react";
 import {
   useTopPattern,
   useDismissPattern,
   useTopMetaPattern,
   useAllMetaPatterns,
 } from "@/features/patterns/hooks/usePatternInsights";
+import { requestWeeklyDigest } from "@/features/patterns/lib/requestDigest.functions";
 import {
   PatternInsightCard,
   PatternInsightCardSkeleton,
@@ -122,6 +131,17 @@ function Dashboard() {
   const fetchDailyCoach = useServerFn(dailyCoach);
   const [freezeOpen, setFreezeOpen] = useState(false);
   const [showMore, setShowMore] = useState(false);
+  const [digestResult, setDigestResult] = useState<{
+    sent: boolean;
+    reason?: string;
+    patternCount?: number;
+  } | null>(null);
+  const digestMutation = useMutation({
+    mutationFn: async () => {
+      return await requestWeeklyDigest();
+    },
+    onSuccess: (result) => setDigestResult(result),
+  });
   const { bonusClaimed, claimBonusMut, waterMutation, moodMutation, waterJustLogged } =
     useDashboardMutations();
 
@@ -274,6 +294,42 @@ function Dashboard() {
             <MilestoneBadges patterns={allMetaPatterns} showBanner={true} />
           </SectionGroup>
         )}
+
+        {/* WEEKLY DIGEST — Sprint 18: on-demand email summary (no cron) */}
+        <SectionGroup label="📊 Ringkasan Mingguan">
+          <Card className="p-4 border-l-4 border-blue-500">
+            <div className="flex items-start gap-3">
+              <div className="rounded-lg bg-blue-500 p-2 text-white">
+                <Mail className="h-5 w-5" />
+              </div>
+              <div className="flex-1">
+                <h3 className="font-semibold text-gray-900 mb-1">Kirim Ringkasan Minggu Ini</h3>
+                <p className="text-sm text-gray-600 mb-3">
+                  Dapatkan top 3 pola makan 7 hari terakhir langsung ke email kamu.
+                </p>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => digestMutation.mutate()}
+                  disabled={digestMutation.isPending}
+                >
+                  {digestMutation.isPending
+                    ? "Mengirim..."
+                    : digestResult?.sent
+                      ? "✓ Kirim ulang"
+                      : "📧 Kirim ke Email"}
+                </Button>
+                {digestResult && (
+                  <p className="text-xs text-gray-500 mt-2">
+                    {digestResult.sent
+                      ? `✓ Terkirim (${digestResult.patternCount} pola)`
+                      : `Info: ${digestResult.reason ?? "belum diproses"}`}
+                  </p>
+                )}
+              </div>
+            </div>
+          </Card>
+        </SectionGroup>
 
         {/* AI COACH — daily personalized guidance */}
         <SectionGroup label="AI Coach" actionLabel="Buka" actionHref="/coach">
