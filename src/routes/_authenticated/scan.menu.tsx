@@ -1,14 +1,18 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useRef, useState } from "react";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { BottomNav } from "@/components/bottom-nav";
 import { parseMenuImage } from "@/features/scan/lib/scanExtras.functions";
 import { ComboDetectionChip } from "@/features/scan/components/ComboDetectionChip";
 import { PostScanAdjuster } from "@/features/scan/components/PostScanAdjuster";
+import { logMealWithItems } from "@/features/meals/lib/meals.functions";
+import { mapAdjustedToLogItems, detectWarungMealType } from "@/features/scan/lib/warungSave";
+import { track } from "@/lib/errorReporting";
 import { Camera, Loader2 } from "lucide-react";
 import { toast } from "@/lib/toast-config";
+import { toastError } from "@/lib/toast-config";
 import { validateImageFile, fileToDataUrl } from "@/lib/image-utils";
 
 export const Route = createFileRoute("/_authenticated/scan/menu")({ component: Page });
@@ -18,9 +22,29 @@ function Page() {
   const [img, setImg] = useState<string | null>(null);
   const [showCombo, setShowCombo] = useState(true);
   const parse = useServerFn(parseMenuImage);
+  const saveFn = useServerFn(logMealWithItems);
+  const qc = useQueryClient();
   const m = useMutation({
     mutationFn: (url: string) => parse({ data: { image_data_url: url } }),
     onError: (e: Error) => toast.error(e.message),
+  });
+  const saveMut = useMutation({
+    // Use ReturnType to dodge TanStack Start's complex inferred type for
+    // server-fn factories — we only need the input shape here.
+    mutationFn: (input: {
+      meal_type: "breakfast" | "lunch" | "dinner" | "snack";
+      items: Array<{
+        food_item_id: string | null;
+        food_name: string;
+        serving_qty: number;
+        serving_unit: string | null;
+        calories: number;
+        protein_g: number;
+        carbs_g: number;
+        fat_g: number;
+      }>;
+      notes?: string;
+    }) => saveFn({ data: input }),
   });
 
   const handleRescan = () => {
@@ -30,21 +54,66 @@ function Page() {
     ref.current?.click();
   };
 
-  const handleSave = async (adjustedItems: Array<{ adjusted_calories: number }>) => {
-    // Note: meal_logs persistence is deferred — see sprint board.
-    // AI Warung Mode currently shows a calorie-adjusted success toast only
-    // (no DB write) so the UX flow is still visible to users while the
-    // persistence path is gated behind the pattern_insights schema work.
-    toast.success(
-      `${adjustedItems.length} item disimpan (${adjustedItems.reduce((sum, i) => sum + i.adjusted_calories, 0)} kkal)`,
-    );
+  // Sprint 22 — Nasi Intelligence: now persists the AI Warung scan to
+  // meal_logs so Pola Gagal Diet detection has fresh input. Was deferred
+  // (see previous comment at this position). Mapping is a pure helper in
+  // warungSave.ts; we also fire-and-forget a telemetry event + invalidate
+  // the meta-pattern cache so the dashboard hero updates immediately.
+  const handleSave = async (
+    adjustedItems: Array<{
+      name: string;
+      canonical_name?: string | null;
+      food_item_id?: number | string | null;
+      adjusted_portion_g: number;
+      adjusted_calories: number;
+      est_protein_g?: number;
+      est_carbs_g?: number;
+      est_fat_g?: number;
+      est_portion_g?: number;
+      // verified_nutrition is the full TKPI block when the AI matched an
+      // existing food_items row. We only need serving_unit at the route
+      // level — the mapper reads the rest from the same object.
+      verified_nutrition?: {
+        calories: number;
+        protein_g: number;
+        carbs_g: number;
+        fat_g: number;
+        fiber_g?: number;
+        serving_size: number;
+        serving_unit: string;
+        portion_label?: string | null;
+      } | null;
+    }>,
+  ) => {
+    const items = mapAdjustedToLogItems(adjustedItems);
+    const totalCal = items.reduce((s, i) => s + i.calories * i.serving_qty, 0);
+    const mealType = detectWarungMealType(adjustedItems);
+    const notes = `Scan Warung: ${adjustedItems.length} item (${totalCal} kkal)`;
 
-    // Reset for next scan
-    setTimeout(() => {
-      setImg(null);
-      setShowCombo(true);
-      m.reset();
-    }, 1500);
+    try {
+      await saveMut.mutateAsync({ meal_type: mealType, items, notes });
+      toast.success(
+        `${adjustedItems.length} item disimpan (${totalCal} kkal) · lihat /profile/insights untuk pola kamu`,
+      );
+      void track("scan.warung.saved", {
+        items_count: adjustedItems.length,
+        total_calories: totalCal,
+        meal_type: mealType,
+      });
+      // Refresh pattern insights cache so the dashboard hero reflects the
+      // new meal data on the next render.
+      qc.invalidateQueries({ queryKey: ["pattern-insights"] });
+    } catch (e) {
+      toastError(e as Error, "Gagal menyimpan hasil scan");
+    } finally {
+      // Reset for next scan regardless of outcome
+      setTimeout(() => {
+        setImg(null);
+        setShowCombo(true);
+        m.reset();
+        saveMut.reset();
+      }, 1500);
+    }
   };
 
   const hasCombo = m.data?.combo && showCombo;
@@ -105,6 +174,7 @@ function Page() {
               Coba foto yang lebih jelas atau pastikan ada makanan di frame
             </div>
             <button
+              type="button"
               onClick={handleRescan}
               className="mt-3 px-4 py-2 rounded-xl border font-medium hover:bg-accent transition-colors"
             >
