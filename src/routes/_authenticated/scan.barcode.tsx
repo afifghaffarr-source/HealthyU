@@ -9,6 +9,7 @@ import { toast } from "@/lib/toast-config";
 import { Loader2 } from "lucide-react";
 import { BarcodeHealthGradeBadge } from "@/features/scan/components/BarcodeHealthGradeBadge";
 import type { BarcodeHealthGrade } from "@/features/scan/lib/barcodeHealthScore";
+import { track } from "@/lib/errorReporting";
 
 export const Route = createFileRoute("/_authenticated/scan/barcode")({
   component: Page,
@@ -32,6 +33,19 @@ function Page() {
     },
     onError: (e: Error) => toast.error(e.message),
   });
+
+  // Sprint 34 — telemetry: track when a manually-looked-up product
+  // surfaces a grade. Same intent as scan.barcode-live.tsx but for the
+  // non-camera flow. Fires once per (name, grade) pair.
+
+  useEffect(() => {
+    const grade = product?.health_grade;
+    if (!grade) return;
+    void track("barcode_grade.viewed", {
+      grade: grade.grade,
+      reliable: grade.reliable,
+    });
+  }, [product?.name, product?.health_grade?.grade]);
 
   const logMut = useMutation({
     mutationFn: () => {

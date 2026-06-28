@@ -11,6 +11,8 @@ import { getSustainabilitySummary } from "@/features/food/lib/sustainability.fun
 import { SustainabilityCard } from "@/features/food/components/SustainabilityCard";
 import { Loader2, Download, FileText, Share2, Sparkles } from "lucide-react";
 import { toast } from "@/lib/toast-config";
+import { useEffect } from "react";
+import { track } from "@/lib/errorReporting";
 
 export const Route = createFileRoute("/_authenticated/reports/weekly")({ component: Page });
 
@@ -34,6 +36,20 @@ function Page() {
     queryFn: () => susFn(),
     staleTime: 5 * 60_000,
   });
+
+  // Sprint 34 — telemetry: track when SustainabilityCard actually mounts
+  // with real data. The card self-suppresses while loading so we only fire
+  // once user has seen it.
+
+  useEffect(() => {
+    const cls = sustainability.data?.classification;
+    if (!cls) return;
+    void track("sustainability.card.viewed", {
+      classification: cls,
+      week_total_co2e: Number(sustainability.data?.totalKgCo2e ?? 0),
+    });
+  }, [sustainability.data?.classification, sustainability.data?.totalKgCo2e]);
+
   const [sharing, setSharing] = useState(false);
 
   const shareCard = share.data;
@@ -66,8 +82,21 @@ function Page() {
       if (r.ok) toast.success(`Berhasil dibagikan (${r.via})`);
       else if (r.reason === "cancelled") toast.success("Dibatalkan");
       else toast.error("Gagal membagikan");
+      // Sprint 34 — telemetry: every share attempt (success OR cancel OR error)
+      // counts in the privacy vault timeline. The user can see how often
+      // they ACTUALLY press the share button, not just successful ones.
+      track("weekly_card.shared", {
+        ok: r.ok,
+        via: r.ok ? r.via : null,
+        reason: r.ok ? null : (r.reason ?? "error"),
+      });
     },
-    onError: (e: Error) => toast.error(e.message),
+    onError: (e: Error) => {
+      toast.error(e.message);
+      // Sprint 34 — telemetry: even throw-path is reported so the vault
+      // shows the attempt happened (error didn't break the metadata contract).
+      track("weekly_card.shared", { ok: false, via: null, reason: "throw" });
+    },
     onSettled: () => setSharing(false),
   });
 

@@ -9,6 +9,7 @@ import { toast } from "@/lib/toast-config";
 import { Camera, CameraOff } from "lucide-react";
 import { BarcodeHealthGradeBadge } from "@/features/scan/components/BarcodeHealthGradeBadge";
 import type { BarcodeHealthGrade } from "@/features/scan/lib/barcodeHealthScore";
+import { track } from "@/lib/errorReporting";
 
 export const Route = createFileRoute("/_authenticated/scan/barcode-live")({ component: Page });
 
@@ -102,6 +103,20 @@ function Page() {
         health_grade?: BarcodeHealthGrade | null;
       }
     | undefined;
+
+  // Sprint 34 — telemetry: track when a scanned product surfaces a grade.
+  // Fires once per unique scanned barcode (key on product_name + grade).
+  // Reuses Sprint 19 `track()` which is DEV-mode no-op and piggy-backs on
+  // error_reports. The privacy vault reads it via Sprint 33.
+
+  useEffect(() => {
+    const grade = p?.health_grade;
+    if (!grade) return;
+    void track("barcode_grade.viewed", {
+      grade: grade.grade,
+      reliable: grade.reliable,
+    });
+  }, [p?.product_name, p?.health_grade?.grade]);
   return (
     <div className="min-h-dvh pb-24 bg-background">
       <TopAppBar title="Barcode Scanner" showBack />

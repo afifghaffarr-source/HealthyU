@@ -26,6 +26,7 @@ import {
   StreakDisplay,
 } from "@/features/fasting/components/FastingPieces";
 import { FastingPhaseExplainer } from "@/features/fasting/components/FastingPhaseExplainer";
+import { track } from "@/lib/errorReporting";
 
 export const Route = createFileRoute("/_authenticated/fasting")({
   component: FastingPage,
@@ -124,6 +125,18 @@ function FastingPage() {
     queryFn: () => fetchPuasaAman(),
     refetchInterval: 60_000, // 1 minute — countdowns need refresh
   });
+
+  // Sprint 34 — telemetry: track when Puasa Aman widget actually mounts.
+  // The widget self-hides when there's no active fast AND not in Ramadhan
+  // mode, so we only fire when data is non-null (i.e. user saw it).
+
+  useEffect(() => {
+    if (!puasaAman) return;
+    void track("puasa_aman_widget.viewed", {
+      active_fast: Boolean(puasaAman.activeFast),
+      in_ramadhan: Boolean(puasaAman.inRamadhanMode),
+    });
+  }, [puasaAman?.activeFast, puasaAman?.inRamadhanMode]);
 
   const elapsedMs = fast ? now - new Date(fast.start_time).getTime() : 0;
   const elapsedHrs = elapsedMs / 3600000;
