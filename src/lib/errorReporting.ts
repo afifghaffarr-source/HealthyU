@@ -10,7 +10,7 @@
  */
 
 export type ReportErrorOptions = {
-  mechanism?: "manual" | "onerror" | "unhandledrejection" | "react_error_boundary";
+  mechanism?: "manual" | "onerror" | "unhandledrejection" | "react_error_boundary" | "telemetry";
   handled?: boolean;
   severity?: "error" | "warning" | "info";
 };
@@ -95,3 +95,24 @@ export function reportError(
  * Same signature, same behavior, new name internally.
  */
 export const reportLovableError = reportError;
+
+/**
+ * Client-side telemetry — fires a fire-and-forget POST to /api/log-error
+ * with severity='info' and mechanism='telemetry'. Reuses the existing
+ * error_reports table (which is general-purpose: error | warning | info
+ * severity levels, source = free text).
+ *
+ * ponytail: zero new tables, zero new endpoints, zero new deps.
+ * piggy-backs on existing /api/log-error infrastructure. Add a dedicated
+ * telemetry_events table if/when volume justifies (currently expected
+ * <100 events/day/user → fits in error_reports capacity).
+ *
+ * Never throws — telemetry must not crash the app.
+ */
+export function track(event: string, props: Record<string, unknown> = {}): void {
+  return reportError(
+    `event:${event}`,
+    { source: `telemetry:${event}`, ...props, is_telemetry: true },
+    { severity: "info", handled: true, mechanism: "telemetry" },
+  );
+}

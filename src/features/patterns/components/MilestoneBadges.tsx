@@ -14,6 +14,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Award, Trophy, Sparkles } from "lucide-react";
+import { track } from "@/lib/errorReporting";
 import type { PatternInsight } from "../types/pattern";
 
 interface MetaBadge {
@@ -107,6 +108,15 @@ export function MilestoneBadges({ patterns, showBanner = true }: MilestoneBadges
     const next = Array.from(new Set([...celebrated, ...newCelebrations.map((b) => b.id)]));
     saveCelebrated(next);
     setCelebrated(next);
+    // Telemetry (Sprint 19): one event per newly-observed badge in this
+    // session. Server-side we can then derive "first-time combos achieved
+    // per user" funnel.
+    for (const b of newCelebrations) {
+      track("dashboard.badge_celebrated.seen", {
+        badge_id: b.id,
+        badge_title: b.title,
+      });
+    }
   }, [newCelebrations, hydrated, celebrated]);
 
   const earnedCount = badges.filter((b) => b.earnedAt).length;

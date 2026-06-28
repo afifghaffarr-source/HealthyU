@@ -54,6 +54,7 @@ import { PersonalRecordsCard } from "@/features/workout/components/PersonalRecor
 import { MetaPatternHeroCard } from "@/features/patterns/components/MetaPatternHeroCard";
 import { usePullToRefresh } from "@/hooks/use-pull-to-refresh";
 import { markFirstAction } from "@/lib/first-action";
+import { track } from "@/lib/errorReporting";
 import { useFastClock } from "@/features/dashboard/hooks/useFastClock";
 import { useDashboardMutations } from "@/features/dashboard/hooks/useDashboardMutations";
 import { HijriWidget } from "@/features/hijri/components/HijriWidget";
@@ -140,7 +141,16 @@ function Dashboard() {
     mutationFn: async () => {
       return await requestWeeklyDigest();
     },
-    onSuccess: (result) => setDigestResult(result),
+    onSuccess: (result) => {
+      setDigestResult(result);
+      // Telemetry (Sprint 19): emitted regardless of sent/fail so we can
+      // see both engagement and `no patterns` empty-state occurrence.
+      track("dashboard.digest.requested", {
+        sent: result.sent,
+        pattern_count: result.patternCount ?? 0,
+        reason: result.reason,
+      });
+    },
   });
   const { bonusClaimed, claimBonusMut, waterMutation, moodMutation, waterJustLogged } =
     useDashboardMutations();
@@ -154,6 +164,17 @@ function Dashboard() {
 
   // Meta-pattern hero (Sprint 13)
   const { data: metaPattern } = useTopMetaPattern(profile?.id);
+
+  // Telemetry: meta hero viewed (Sprint 19). Fires once when a new meta
+  // session arrives (pattern id gates useEffect).
+  useEffect(() => {
+    if (metaPattern) {
+      track("dashboard.meta_hero.viewed", {
+        pattern_id: metaPattern.id,
+        urgency: metaPattern.urgency_score,
+      });
+    }
+  }, [metaPattern?.id]); // eslint-disable-line react-hooks/exhaustive-deps
   // Meta-pattern badges (Sprint 17)
   const { data: allMetaPatterns = [] } = useAllMetaPatterns(profile?.id);
   const { data: meals = [] } = useQuery({
