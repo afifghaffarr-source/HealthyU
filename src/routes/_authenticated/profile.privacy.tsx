@@ -2,17 +2,22 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { queryOptions, useSuspenseQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { createServerFn } from "@tanstack/react-start";
+import { useEffect } from "react";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { setAuditOptIn } from "@/features/scan/lib/scanExtras.functions";
 import {
   getPiiRedactEnabledFn,
   setPiiRedactEnabledFn,
 } from "@/features/privacy/lib/piiRedactToggle.functions";
+import { track } from "@/lib/errorReporting";
 import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { BottomNav } from "@/components/bottom-nav";
 import { toast } from "@/lib/toast-config";
 import { Download, ExternalLink, Settings } from "lucide-react";
 import { DeleteAccountSection } from "@/features/privacy/components/delete-account-section";
+import { PrivacyVaultHero } from "@/features/privacy/components/privacy-vault-hero";
+import { DataInventorySection } from "@/features/privacy/components/data-inventory-section";
+import { AuditLogSection } from "@/features/privacy/components/audit-log-section";
 
 const getPrivacy = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
@@ -59,6 +64,16 @@ function Page() {
     },
     onError: (e: Error) => toast.error(e.message),
   });
+
+  // Sprint 21 telemetry: track first-time Privacy Vault view (DEV-mode no-op).
+  useEffect(() => {
+    void track("privacy.vault.viewed", {
+      audit_opt_in: data.auditOptIn,
+      pii_redact_enabled: data.piiRedactEnabled,
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   return (
     <div className="min-h-dvh pb-24 bg-background">
       <TopAppBar
@@ -75,6 +90,16 @@ function Page() {
         }
       />
       <div className="p-4 space-y-3">
+        {/* Brankas Privasi — calm reassurance + UU PDP compliance */}
+        <PrivacyVaultHero />
+
+        {/* Data Inventory — "apa yang kami simpan" */}
+        <DataInventorySection />
+
+        {/* Audit log viewer — "siapa akses apa, kapan" */}
+        <AuditLogSection limit={10} />
+
+        {/* Privacy toggles — the existing switches */}
         <div className="rounded-2xl bg-card border p-4 flex items-start justify-between gap-3">
           <div className="min-w-0">
             <div className="font-medium text-sm">Bantu tingkatkan AI</div>

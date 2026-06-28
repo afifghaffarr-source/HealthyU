@@ -18,6 +18,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
  * a recurring risk).
  */
 import { buildExportDump } from "@/features/privacy/lib/pdpRights.functions";
+import { categorizeAll, INVENTORY_CATEGORIES } from "@/features/privacy/lib/inventoryCategories";
 import { USER_DATA_TABLES } from "@/lib/userDataTables";
 
 // Per-table programmable result so each test can choose which tables error.
@@ -130,6 +131,44 @@ describe("buildExportDump", () => {
       // Optional → [] ; required → { error: "unavailable" }
       const expected = t.optional ? [] : { error: "unavailable" };
       expect(dump[t.table]).toEqual(expected);
+    }
+  });
+});
+
+/**
+ * Inventory categorization test — guarantees every entry of USER_DATA_TABLES
+ * is placed in some INVENTORY_CATEGORIES bucket. If a developer adds a new
+ * user-data table and forgets to add it to a bucket, this test fails.
+ *
+ * We DO NOT want orphan tables displayed in the Privacy Vault "Apa yang kami
+ * simpan" UI — that's both a UX hole and a PDP compliance miss.
+ */
+describe("INVENTORY_CATEGORIES coverage", () => {
+  it("covers every table in USER_DATA_TABLES exactly once", () => {
+    const { covered, missing } = categorizeAll(USER_DATA_TABLES);
+
+    // Sanity: we cover at least the canonical core tables
+    expect(covered).toContain("profiles");
+    expect(covered).toContain("meal_logs");
+    expect(covered).toContain("audit_log");
+
+    // Hard invariant: zero tables unaccounted for
+    if (missing.length > 0) {
+      throw new Error(
+        `INVENTORY_CATEGORIES missing coverage for ${missing.length} table(s):\n` +
+          missing.map((t) => `  - ${t}`).join("\n") +
+          `\n\nAdd these to inventoryCategories.ts or document an exclusion in EXCLUDED_USER_DATA_TABLES.`,
+      );
+    }
+    expect(missing).toEqual([]);
+  });
+
+  it("every table in a bucket exists in USER_DATA_TABLES (no typos)", () => {
+    const validTables = new Set(USER_DATA_TABLES.map((t) => t.table));
+    for (const cat of INVENTORY_CATEGORIES) {
+      for (const t of cat.tables) {
+        expect(validTables.has(t)).toBe(true);
+      }
     }
   });
 });

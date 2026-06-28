@@ -111,3 +111,28 @@ export const getDeletionRequest = createServerFn({ method: "GET" })
     if (error) throw new Error(error.message);
     return { request: data };
   });
+
+/**
+ * Return the most-recent N entries from audit_log for the current user.
+ * RLS on audit_log is row-scoped to auth.uid(), so this only ever returns
+ * rows owned by the caller. Pure read — never throws on empty result.
+ *
+ * Used by /profile/privacy → AuditLogSection so the user can see what
+ * the platform has recorded about them (UU PDP transparency).
+ */
+export const getMyRecentAuditLog = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((i: unknown) =>
+    parseInput(z.object({ limit: z.number().int().min(1).max(50).default(10) }), i),
+  )
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    const { data: rows, error } = await supabase
+      .from("audit_log")
+      .select("id, action, entity, entity_id, meta, ip_address, created_at")
+      .eq("user_id", userId)
+      .order("created_at", { ascending: false })
+      .limit(data.limit);
+    if (error) throw new Error(error.message);
+    return { events: rows ?? [] };
+  });
