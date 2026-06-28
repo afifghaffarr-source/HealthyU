@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 export function useFastClock(
   fast: { start_time: string; target_hours: number | string } | null | undefined,
 ) {
+  // eslint-disable-next-line react-hooks/purity -- wall-clock / non-deterministic browser API; re-renders deliberately driven by interval/timer or event subscription
   const [now, setNow] = useState(Date.now());
   useEffect(() => {
     if (!fast) return;

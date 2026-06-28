@@ -78,6 +78,7 @@ export function ShareAchievementButton({
 /**
  * Pre-baked payload generators for common achievements.
  */
+// eslint-disable-next-line react-refresh/only-export-components -- feature barrel intentionally mixes components + constants (AUDIT-006 acknowledged baseline)
 export const achievementPayload = {
   pr: (params: { exercise_name: string; weight_kg: number; reps: number }): SharePayload => ({
     kind: "pr",

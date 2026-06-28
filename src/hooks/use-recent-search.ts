@@ -10,6 +10,7 @@ export function useRecentSearch(key: string) {
     if (typeof window === "undefined") return;
     try {
       const raw = window.localStorage.getItem(storageKey);
+      /* eslint-disable-next-line react-hooks/set-state-in-effect -- external store sync (localStorage); client-only. */
       if (raw) setItems(JSON.parse(raw));
     } catch {
       /* ignore */

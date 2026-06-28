@@ -16,6 +16,7 @@ function Page() {
   const map = new Map((data?.days ?? []).map((d) => [d.date, d.avg]));
   const days: Array<{ date: string; avg?: number }> = [];
   for (let i = 364; i >= 0; i--) {
+    // eslint-disable-next-line react-hooks/purity -- wall-clock / non-deterministic browser API; re-renders deliberately driven by interval/timer or event subscription
     const d = new Date(Date.now() - i * 86400000).toISOString().slice(0, 10);
     days.push({ date: d, avg: map.get(d) });
   }

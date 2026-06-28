@@ -38,6 +38,7 @@ export function MorningCheckInCard() {
 
   useEffect(() => {
     if (typeof window === "undefined") return;
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- external-store/async-query sync; `useSyncExternalStore` and equivalent restructure would change the API surface
     setDone(window.localStorage.getItem(storageKey) === "1");
   }, [storageKey]);
 

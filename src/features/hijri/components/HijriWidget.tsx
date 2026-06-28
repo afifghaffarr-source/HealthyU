@@ -24,6 +24,7 @@ export function HijriWidget({ variant = "compact", className }: HijriWidgetProps
   // Avoid SSR/CSR mismatch — moment-hijri reads `new Date()` and the server
   // and client clocks can disagree across day boundaries.
   const [mounted, setMounted] = useState(false);
+  // eslint-disable-next-line react-hooks/set-state-in-effect -- external-store/async-query sync; `useSyncExternalStore` and equivalent restructure would change the API surface
   useEffect(() => setMounted(true), []);
 
   if (!mounted) {

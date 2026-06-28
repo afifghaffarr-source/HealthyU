@@ -70,6 +70,7 @@ export function FoodsPage() {
 
   useEffect(() => {
     if (offset === 0) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- external-store/async-query sync; `useSyncExternalStore` and equivalent restructure would change the API surface
       setAllFoods(foods);
     } else {
       setAllFoods((prev) => [...prev, ...foods]);
@@ -79,6 +80,7 @@ export function FoodsPage() {
   // Reset pagination when filters change
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- external-store/async-query sync; `useSyncExternalStore` and equivalent restructure would change the API surface
     setOffset(0);
     setAllFoods([]);
   }, [q, region, category, tag, excluded]);

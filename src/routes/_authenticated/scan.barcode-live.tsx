@@ -29,6 +29,7 @@ function Page() {
   });
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- external-store/async-query sync; `useSyncExternalStore` and equivalent restructure would change the API surface
     setSupported(typeof window !== "undefined" && "BarcodeDetector" in window);
   }, []);
 

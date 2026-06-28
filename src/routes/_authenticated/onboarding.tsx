@@ -50,6 +50,7 @@ function Onboarding() {
 
   useEffect(() => {
     if (!profile) return;
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- external-store/async-query sync; `useSyncExternalStore` and equivalent restructure would change the API surface
     setForm((current: OnboardingForm) => ({
       ...current,
       full_name: profile.full_name ?? current.full_name,

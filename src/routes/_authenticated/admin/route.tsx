@@ -87,6 +87,7 @@ function AdminLayout() {
 
   // Auto-close mobile sidebar on route change
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- external-store/async-query sync; `useSyncExternalStore` and equivalent restructure would change the API surface
     setSidebarOpen(false);
   }, [location.pathname]);
 

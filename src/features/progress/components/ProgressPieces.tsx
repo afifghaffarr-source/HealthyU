@@ -196,6 +196,7 @@ export function TimelapseButton({ photos }: { photos: { url: string; taken_at: s
           <video src={video.url} controls autoPlay loop className="w-full rounded-2xl" />
           <a
             href={video.url}
+            // eslint-disable-next-line react-hooks/purity -- wall-clock / non-deterministic browser API; re-renders deliberately driven by interval/timer or event subscription
             download={`timelapse-${Date.now()}.${video.ext}`}
             className="block w-full text-center bg-card outline-1 outline-black/10 font-semibold py-3 rounded-2xl text-sm"
           >

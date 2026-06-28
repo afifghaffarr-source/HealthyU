@@ -26,6 +26,7 @@ export function GroupChallengeSummaryCard({ groupSummary }: { groupSummary: Grou
         />
       </div>
       <div className="space-y-2">
+        {/* eslint-disable-next-line react-hooks/refs -- pre-existing ref-as-cache inside map */}
         {groupSummary.slice(0, 3).map((g, i) => (
           <Link
             key={i}

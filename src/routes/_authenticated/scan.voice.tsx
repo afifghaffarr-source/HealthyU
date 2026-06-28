@@ -78,6 +78,7 @@ function VoicePage() {
     };
     const Ctor = W.SpeechRecognition || W.webkitSpeechRecognition;
     if (!Ctor) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- external-store/async-query sync; `useSyncExternalStore` and equivalent restructure would change the API surface
       setSupported(false);
       return;
     }

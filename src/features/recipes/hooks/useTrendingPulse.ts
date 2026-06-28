@@ -83,6 +83,7 @@ export function useTrendingPulse(all: RecipeLike[], sort: string) {
     }
     prevGrowth.current = next;
     if (Object.keys(bumps).length === 0) return;
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- external-store/async-query sync; `useSyncExternalStore` and equivalent restructure would change the API surface
     setFlashIds((cur) => ({ ...cur, ...bumps }));
     const ids = Object.keys(bumps);
     const t = window.setTimeout(() => {

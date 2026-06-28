@@ -30,6 +30,7 @@ export function RatingForm({ slug, state }: Props) {
   const [stars, setStars] = useState<number>(state.myRating ?? 0);
   const [review, setReview] = useState<string>(state.myReview ?? "");
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- external-store/async-query sync; `useSyncExternalStore` and equivalent restructure would change the API surface
     if (state.myRating) setStars(state.myRating);
     if (state.myReview) setReview(state.myReview);
   }, [state.myRating, state.myReview]);

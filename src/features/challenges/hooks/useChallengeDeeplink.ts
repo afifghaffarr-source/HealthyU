@@ -47,6 +47,7 @@ export function useChallengeDeeplink({
 
   useEffect(() => {
     if (!focusChallenge) return;
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- external-store/async-query sync; `useSyncExternalStore` and equivalent restructure would change the API surface
     setOpenLb(focusChallenge);
     const t = setTimeout(() => {
       const el = articleRefs.current?.[focusChallenge];
@@ -80,6 +81,7 @@ export function useChallengeDeeplink({
     }
     const top = active.slice().sort((a, b) => (b.streak ?? 0) - (a.streak ?? 0))[0];
     if (!top?.challenge_id) return;
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- external-store/async-query sync; `useSyncExternalStore` and equivalent restructure would change the API surface
     setOpenLb(top.challenge_id);
     setStreakAutoChallenge(top.challenge_id);
     const t = setTimeout(() => {

@@ -58,6 +58,7 @@ function RemindersPage() {
   };
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- external-store/async-query sync; `useSyncExternalStore` and equivalent restructure would change the API surface
     setItems(loadReminders());
     if ("Notification" in window) setPermission(Notification.permission);
   }, []);

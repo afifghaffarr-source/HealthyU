@@ -9,9 +9,12 @@ export function ConfettiBurst() {
           key={i}
           className="absolute top-0 size-2 rounded-sm animate-confetti"
           style={{
+            // eslint-disable-next-line react-hooks/purity -- wall-clock / non-deterministic browser API; re-renders deliberately driven by interval/timer or event subscription
             left: `${Math.random() * 100}%`,
             background: ["#16a34a", "#0ea5e9", "#f59e0b", "#ec4899", "#a855f7"][i % 5],
+            // eslint-disable-next-line react-hooks/purity -- wall-clock / non-deterministic browser API; re-renders deliberately driven by interval/timer or event subscription
             animationDelay: `${Math.random() * 0.4}s`,
+            // eslint-disable-next-line react-hooks/purity -- wall-clock / non-deterministic browser API; re-renders deliberately driven by interval/timer or event subscription
             transform: `rotate(${Math.random() * 360}deg)`,
           }}
         />

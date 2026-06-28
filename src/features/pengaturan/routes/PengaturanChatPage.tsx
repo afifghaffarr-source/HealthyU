@@ -49,6 +49,7 @@ export function PengaturanChatPage() {
   // selection isn't overwritten by a refetch.
   useEffect(() => {
     if (data && selectedDays === 0 && data.days !== 0) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- external-store/async-query sync; `useSyncExternalStore` and equivalent restructure would change the API surface
       setSelectedDays(data.days);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

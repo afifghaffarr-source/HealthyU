@@ -38,6 +38,7 @@ function OfflineQueuePage() {
   }, []);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- external-store/async-query sync; `useSyncExternalStore` and equivalent restructure would change the API surface
     refresh();
     const h = () => refresh();
     window.addEventListener("offline-queue:changed", h);

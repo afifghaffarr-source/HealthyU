@@ -62,6 +62,7 @@ export function GroupBonusBadge({
   const total = Object.values(newClaims).reduce((a, b) => a + b, 0);
   if (total === 0) return null;
   const tsValues = Object.keys(newClaims)
+    // eslint-disable-next-line react-hooks/refs -- pre-existing ref-as-cache pattern; refactor to useState would change public API
     .map((gid) => claimsTsRef.current[gid])
     .filter((v): v is number => typeof v === "number");
   const latestTs = tsValues.length > 0 ? Math.max(...tsValues) : nowTick;

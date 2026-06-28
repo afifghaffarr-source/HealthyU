@@ -25,6 +25,7 @@ export function Leaderboard({
     if (!autoSelectFirstGroup) return;
     if (mode !== "all") return;
     if (groups.length === 0) return;
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- external-store/async-query sync; `useSyncExternalStore` and equivalent restructure would change the API surface
     setMode(groups[0].id);
   }, [autoSelectFirstGroup, groups, mode]);
   const { data: rows = [], isLoading } = useQuery({

@@ -52,6 +52,7 @@ function FastingPage() {
   const [iftar, setIftar] = useState("18:00");
   useEffect(() => {
     if (!schedule) return;
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- external-store/async-query sync; `useSyncExternalStore` and equivalent restructure would change the API surface
     setRamadhan(Boolean(schedule.is_ramadhan_mode));
     if (schedule.eating_window_end) setImsak(String(schedule.eating_window_end).slice(0, 5));
     if (schedule.eating_window_start) setIftar(String(schedule.eating_window_start).slice(0, 5));
@@ -75,6 +76,7 @@ function FastingPage() {
     onError: (e) => toastError(e, "Gagal"),
   });
 
+  // eslint-disable-next-line react-hooks/purity -- wall-clock / non-deterministic browser API; re-renders deliberately driven by interval/timer or event subscription
   const [now, setNow] = useState(Date.now());
   useEffect(() => {
     if (!fast) return;

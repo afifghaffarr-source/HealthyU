@@ -84,6 +84,7 @@ export function MilestoneBadges({ patterns, showBanner = true }: MilestoneBadges
   const [hydrated, setHydrated] = useState(false);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- external-store/async-query sync; `useSyncExternalStore` and equivalent restructure would change the API surface
     setCelebrated(loadCelebrated());
     setHydrated(true);
   }, []);
@@ -107,6 +108,7 @@ export function MilestoneBadges({ patterns, showBanner = true }: MilestoneBadges
     if (!hydrated || newCelebrations.length === 0) return;
     const next = Array.from(new Set([...celebrated, ...newCelebrations.map((b) => b.id)]));
     saveCelebrated(next);
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- external-store/async-query sync; `useSyncExternalStore` and equivalent restructure would change the API surface
     setCelebrated(next);
     // Telemetry (Sprint 19): one event per newly-observed badge in this
     // session. Server-side we can then derive "first-time combos achieved

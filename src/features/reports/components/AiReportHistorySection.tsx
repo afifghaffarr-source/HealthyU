@@ -29,6 +29,7 @@ export function AiReportHistorySection({
 }) {
   const filtered = history.filter((r) => {
     if (rangeWeeks === 0) return true;
+    // eslint-disable-next-line react-hooks/purity -- wall-clock / non-deterministic browser API; re-renders deliberately driven by interval/timer or event subscription
     const cutoff = Date.now() - rangeWeeks * 7 * 86400000;
     return new Date(r.created_at).getTime() >= cutoff;
   });

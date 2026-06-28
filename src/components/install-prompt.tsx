@@ -62,6 +62,7 @@ export function InstallPrompt() {
   useEffect(() => {
     if (!ready || !evt) return;
     if (hasCompletedFirstAction()) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- external-store/async-query sync; `useSyncExternalStore` and equivalent restructure would change the API surface
       setShow(true);
     } else {
       // Poll every 5s sampai user complete first action

@@ -31,6 +31,7 @@ import { handleQuickAction } from "../lib/quickActions";
  */
 export const HIGH_URGENCY_THRESHOLD = 0.7;
 
+// eslint-disable-next-line react-refresh/only-export-components -- feature barrel intentionally mixes components + constants (AUDIT-006 acknowledged baseline)
 export function isHighUrgency(score: number | undefined | null): boolean {
   // Guard: `Infinity >= 0.7` is `true` in JS, which would silently escalate
   // the dashboard hero on garbage scores from broken upstream callers.

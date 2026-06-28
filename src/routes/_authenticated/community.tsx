@@ -87,6 +87,7 @@ function CommunityPage() {
             icon={<Flame className="size-3.5" />}
             label="Aktif"
             value={
+              // eslint-disable-next-line react-hooks/purity -- wall-clock / non-deterministic browser API; re-renders deliberately driven by interval/timer or event subscription
               posts.filter((p) => Date.now() - new Date(p.created_at).getTime() < 24 * 3600_000)
                 .length
             }

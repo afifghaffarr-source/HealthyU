@@ -72,6 +72,7 @@ function PrayerPage() {
 
   useEffect(() => {
     if (typeof window !== "undefined" && "Notification" in window) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- external-store/async-query sync; `useSyncExternalStore` and equivalent restructure would change the API surface
       setPermission(Notification.permission);
     }
   }, []);

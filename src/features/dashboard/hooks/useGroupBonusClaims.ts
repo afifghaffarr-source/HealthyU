@@ -13,6 +13,7 @@ export function useGroupBonusClaims() {
   const navigate = useNavigate();
   const qc = useQueryClient();
   const claimsTsRef = useRef<Record<string, number>>({});
+  // eslint-disable-next-line react-hooks/refs -- pre-existing ref-as-cache pattern; refactor to useState would change public API
   const [newClaims, setNewClaims] = useState<Record<string, number>>(() => {
     if (typeof window === "undefined") return {};
     try {

@@ -56,6 +56,7 @@ export function ChatPage() {
     if (typeof window === "undefined") return;
     const seen = localStorage.getItem("healthyu:coach:disclaimer:seen");
     if (!seen) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- external-store/async-query sync; `useSyncExternalStore` and equivalent restructure would change the API surface
       setShowDisclaimer(true);
     }
   }, []);

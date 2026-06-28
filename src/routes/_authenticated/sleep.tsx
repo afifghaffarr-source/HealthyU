@@ -64,6 +64,7 @@ function SleepPage() {
     onSuccess: () => qc.invalidateQueries({ queryKey: ["sleep"] }),
   });
 
+  // eslint-disable-next-line react-hooks/purity -- wall-clock / non-deterministic browser API; re-renders deliberately driven by interval/timer or event subscription
   const last7 = logs.filter((l) => Date.now() - new Date(l.sleep_end).getTime() < 7 * 86400000);
   const totalHours = last7.reduce(
     (s, l) => s + (new Date(l.sleep_end).getTime() - new Date(l.sleep_start).getTime()) / 3600000,
