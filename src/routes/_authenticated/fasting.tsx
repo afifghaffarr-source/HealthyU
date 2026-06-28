@@ -10,6 +10,8 @@ import {
   getFastingStats,
 } from "@/features/fasting/lib/fasting.functions";
 import { getFastingSchedule, saveFastingSchedule } from "@/features/fasting/lib/fasting.functions";
+import { getPuasaAmanWidget } from "@/features/fasting/lib/puasaAman.functions";
+import { PuasaAmanWidget } from "@/features/fasting/components/PuasaAmanWidget";
 import { getAchievementToastPrefix } from "@/lib/achievement-icons";
 import { BottomNav } from "@/components/bottom-nav";
 import { TopAppBar } from "@/components/healthyu/top-app-bar";
@@ -115,6 +117,14 @@ function FastingPage() {
     queryFn: () => fetchStats(),
   });
 
+  // Sprint 29 — Puasa Aman countdown + safe-fasting nudge widget
+  const fetchPuasaAman = useServerFn(getPuasaAmanWidget);
+  const { data: puasaAman } = useQuery({
+    queryKey: ["fast", "puasa-aman"],
+    queryFn: () => fetchPuasaAman(),
+    refetchInterval: 60_000, // 1 minute — countdowns need refresh
+  });
+
   const elapsedMs = fast ? now - new Date(fast.start_time).getTime() : 0;
   const elapsedHrs = elapsedMs / 3600000;
   const pct = fast ? Math.min(100, (elapsedHrs / Number(fast.target_hours)) * 100) : 0;
@@ -123,6 +133,9 @@ function FastingPage() {
     <main className="min-h-dvh bg-background pb-28">
       <div className="max-w-md mx-auto px-5 pt-2 space-y-5">
         <TopAppBar title="Puasa" subtitle="Atur protokol & jadwal" showBack />
+
+        {/* Sprint 29 — Puasa Aman widget sits at top so users see countdown first */}
+        {puasaAman && <PuasaAmanWidget data={puasaAman} />}
 
         {/* Streak & Stats */}
         {stats && (
