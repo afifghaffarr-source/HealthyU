@@ -7,6 +7,8 @@ import { BottomNav } from "@/components/bottom-nav";
 import { generateWeeklyReport } from "@/features/scan/lib/scanBatch8.functions";
 import { getWeeklyShareSummary } from "@/features/reports/lib/weeklyShare.functions";
 import { renderShareCardPng, shareImage } from "@/features/reports/lib/shareCard";
+import { getSustainabilitySummary } from "@/features/food/lib/sustainability.functions";
+import { SustainabilityCard } from "@/features/food/components/SustainabilityCard";
 import { Loader2, Download, FileText, Share2, Sparkles } from "lucide-react";
 import { toast } from "@/lib/toast-config";
 
@@ -23,6 +25,14 @@ function Page() {
     queryKey: ["weekly-share-summary"],
     queryFn: () => shareFn({ data: {} as never }),
     staleTime: 60_000,
+  });
+
+  // Sprint 30 — Sustainability tracker
+  const susFn = useServerFn(getSustainabilitySummary);
+  const sustainability = useQuery({
+    queryKey: ["weekly-sustainability"],
+    queryFn: () => susFn(),
+    staleTime: 5 * 60_000,
   });
   const [sharing, setSharing] = useState(false);
 
@@ -113,6 +123,14 @@ function Page() {
               </button>
             </div>
           </>
+        )}
+
+        {/* Sprint 30 — sustainability tracker */}
+        {sustainability.data && <SustainabilityCard data={sustainability.data} />}
+        {sustainability.isLoading && (
+          <div className="rounded-2xl border bg-card p-4 text-sm text-muted-foreground flex items-center gap-2">
+            <Loader2 className="size-4 animate-spin" /> Menghitung jejak karbon…
+          </div>
         )}
 
         {/* Sprint 28 — shareable weekly wrap-up card */}
