@@ -42,7 +42,11 @@ recombining what was already there.
 | 30        | Sustainability Tracker (30-food Indonesian emission dictionary)                         | `72bfe072`      | +504                   | 0         |
 | 31        | Memory refresh + 3 reusable skills saved                                                | (housekeeping)  | 0                      | 0         |
 | **32**    | **Lint Drift Guard + this doc**                                                         | (this commit)   | +30                    | 0         |
-| **TOTAL** |                                                                                         | **20 commits**  | **~5,350 LOC + 1 doc** | **0**     |
+| 33-35     | Bug patrol surface (cheap, no new infra; rolled into S36)                               | (rolled up)     | +~80                   | 0         |
+| 36        | Telemetry contract lock (`telemetryContract.test.ts` — 11 event names)                  | `467c51c2`      | +95                    | 0         |
+| 37        | Audit-observability contract (4 high-risk server hooks → `logger.server`)               | `1e7665d6`      | +180                   | 0         |
+| **38**    | **Server log PII full sweep (18 files + `logSafe` helper + 22-file contract lock)**     | `c34a8e43`      | **+214/-39**           | **0**     |
+| **TOTAL** |                                                                                         | **23 commits**  | **~5,920 LOC + 1 doc** | **0**     |
 
 ---
 
@@ -154,19 +158,94 @@ to violate on HealthyU without an explicit reason (cited in commit body).
 
 ---
 
-## After Sprint 32
+## Sprint 38 specifics
 
-The arc is **stable**. The ponytail scoreboard is **zero new infra across
-21 sprints**. The closest next action would be either:
+### What ships (c34a8e43)
 
-1. **Telemetry flip from DEV to PROD** — connect S19/S21/S22/S25/S29/S30
-   events into a CF Analytics engine. New infra: 1 worker + 1 engine; ~2
-   sprints of work.
-2. **Indonesian clinical-content partner onboarding** — psychologist /
-   nutritionist sign-off on the deferred items from AUDIT-012 Finding 4.
-3. **Skill-library spin-off project** — use the 4 reusable skills
-   (`healthyu-weekly-share-card`, `healthyu-puasa-aman-widget`,
-   `healthyu-sustainability-tracker`, `bulk-react-hooks-disable`) as the
-   starting point for a NEW app (e.g. `HabitKu.app`, `WarungFit.app`).
+| Artefact                               | Purpose                                                                                                         |
+| -------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
+| `src/lib/logSafe.ts` (NEW, 36 lines)   | Dynamic-import wrapper around `@/lib/logger.server` for `.functions.ts` co-imported by the client bundle.       |
+| 8 STATIC-tier migrations               | `*.server.ts` + `routes/api/*` → `import { logServerError } from "@/lib/logger.server"` (TanStack server-only). |
+| 9 DYNAMIC-tier migrations              | `*.functions.ts` → `safeLogServerError(scope, err, meta?)` via `logSafe` (avoids import-protection failure).    |
+| `audit-observability-contract.test.ts` | HIGH_RISK_FILES 4 → 22; new `LOGSAFE_FILES` set (9 entries) asserts logSafe usage on co-imported files.         |
+| `chat.stream.test.ts:517` patched      | Old bare-console format → new structured `[scope]` + `{message, meta}` matcher.                                 |
+| 1 grandfathered                        | `pdpRights.functions.ts` keeps S37 inline dynamic-import (NOT moved to `logSafe`).                              |
+| 4 last-resort layers exempt            | `start.ts`, `routes/api/log-error.ts`, `auth-middleware.ts:22`, `client.ts:20` keep bare `console.error`.       |
+
+### Two-tier import strategy (S37 → S38)
+
+| Tier        | File pattern                  | Import form                                            | Why                                                             |
+| ----------- | ----------------------------- | ------------------------------------------------------ | --------------------------------------------------------------- |
+| **STATIC**  | `*.server.ts`, `routes/api/*` | `import { logServerError } from "@/lib/logger.server"` | TanStack import-protection gates these server-side; safe.       |
+| **DYNAMIC** | `*.functions.ts`              | `import { safeLogServerError } from "@/lib/logSafe"`   | Co-imported by client; static `*.server.*` import aborts build. |
+
+### Free-tier envelopes (Sprint 38 state)
+
+| Resource             | At cap?                   | Sprint 38 state                                                              |
+| -------------------- | ------------------------- | ---------------------------------------------------------------------------- |
+| Cloudflare cron      | **3/3 (AT LIMIT)**        | 0 new cron. Pattern unchanged: on-demand + button-triggered.                 |
+| Cloudflare KV writes | **1K/day (AT LIMIT)**     | 0 new writes. Pure code refactor.                                            |
+| Cloudflare Workers   | **4K/day (4% used)**      | 0 new invocations.                                                           |
+| Supabase             | **33/500 MB (6.6% used)** | 0 new rows/columns.                                                          |
+| New dependencies     | **0**                     | Only existing `src/lib/logger.server.ts` + new `src/lib/logSafe.ts` (local). |
+| New AI cost          | **0**                     | No AI call paths touched.                                                    |
+
+### Verification (5 gates)
+
+| Gate                                                                  | Sprint 38 result                                                                                                                                                         |
+| --------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `bunx tsc --noEmit`                                                   | ✅ 0 errors.                                                                                                                                                             |
+| `bun run lint`                                                        | ✅ 0 errors, 5 pre-existing warnings (unchanged from S37).                                                                                                               |
+| `bun run test`                                                        | ✅ 1023/1024 — 1 pre-existing flake in `timePatterns.test.ts::detectSkipBreakfast` (verified by `git stash` against HEAD `1e7665d6` to predate S38; filed as follow-up). |
+| `bun run build`                                                       | ✅ 48.5s, sw.js 24.9kb. No bundle regression.                                                                                                                            |
+| `curl https://healthyu.web.id/{,scan,scan/menu,auth,profile/privacy}` | ✅ 5/5 HTTP 200.                                                                                                                                                         |
+| CI 3 workflows                                                        | ✅ `lint-constants` + `ci` + `deploy` all green. Lighthouse verified in `deploy` smoke step.                                                                             |
+
+---
+
+## Sprint 39 specifics
+
+### Fix applied (`507062e3`)
+
+| Change                     | Detail                                                                                                                                        |
+| -------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Root cause**             | `detectSkipBreakfast` used `new Date()` internally — non-deterministic. "Last 5 weekdays" shifted per run, causing the pre-existing flake.    |
+| **Fix**                    | Optional `now?: Date` parameter. Production omits it (backward-compatible, defaults to `new Date()`). Tests pass a fixed date.                |
+| **New test**               | "does NOT over-count when 2 breakfasts + 2 lunches in same day window" — asserts `matched_dates` doesn't contain a day that had 2 breakfasts. |
+| **Existing tests updated** | All 3 `detectSkipBreakfast` tests now pass a fixed `now` date for deterministic results.                                                      |
+
+### Verification (5 gates)
+
+| Gate                                                                  | Sprint 39 result                                                    |
+| --------------------------------------------------------------------- | ------------------------------------------------------------------- |
+| `bunx tsc --noEmit`                                                   | ✅ 0 errors.                                                        |
+| `bun run lint`                                                        | ✅ 0 errors, 3 pre-existing warnings (unchanged).                   |
+| `bun run test`                                                        | ✅ **1025/1025** (up from 1023/1024 — +1 new test, flake resolved). |
+| `bun run build`                                                       | ✅ 57.0s, sw.js 24.9kb.                                             |
+| `curl https://healthyu.web.id/{,scan,scan/menu,auth,profile/privacy}` | ✅ 5/5 HTTP 200.                                                    |
+| CI 3 workflows                                                        | ✅ `lint-constants` + `deploy` + `lighthouse` all green.            |
+
+### Ponytail scoreboard
+
+**Zero new infra across 24 shipped sprints** (15→39):
+
+- 0 new tables
+- 0 new cron jobs (CF cron still 3/3 at limit)
+- 0 new KV writers
+- 0 new dependencies
+- 0 new AI cost paths
+
+---
+
+## After Sprint 39
+
+The arc is **stable**. The ponytail scoreboard remains **zero new infra across
+24 sprints**. Closest next actions:
+
+1. **Client-side `console.*` in `.tsx` files** — e.g. `useChatError`, scan-vision error toasts. Low PII risk (browser) but consistent with the audit story. ~1 sprint, no infra.
+2. **Telemetry flip from DEV to PROD** — connect S19/S21/S22/S25/S29/S30/S32 events into a CF Analytics engine. New infra: 1 worker + 1 engine; ~2 sprints of work.
+3. **`@track()` event naming consistency** — S37 audit identified some `pattern_*` vs `meta_pattern_*` drift; lock via lint rule.
+4. **Indonesian clinical-content partner onboarding** — psychologist / nutritionist sign-off on the deferred items from AUDIT-012 Finding 4.
+5. **Skill-library spin-off project** — use the 5 reusable skills as the starting point for a NEW app (e.g. `HabitKu.app`, `WarungFit.app`).
 
 Until the user picks one of these, the arc is closed.
