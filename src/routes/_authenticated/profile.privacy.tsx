@@ -19,6 +19,7 @@ import { PrivacyVaultHero } from "@/features/privacy/components/privacy-vault-he
 import { DataInventorySection } from "@/features/privacy/components/data-inventory-section";
 import { AuditLogSection } from "@/features/privacy/components/audit-log-section";
 import { TelemetryEventsSection } from "@/features/privacy/components/telemetry-events-section";
+import { TelemetryChart } from "@/features/privacy/components/telemetry-chart";
 
 const getPrivacy = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
@@ -101,6 +102,8 @@ function Page() {
         <AuditLogSection limit={10} />
 
         {/* Sprint 33: Telemetry events viewer — what `track()` writes */}
+        {/* Sprint 42: Telemetry chart — aggregation bar chart, 0 infra */}
+        <TelemetryChart className="mb-3" />
         <TelemetryEventsSection limit={10} />
 
         {/* Privacy toggles — the existing switches */}

@@ -99,16 +99,38 @@ export const getMyRecentTelemetryEvents = createServerFn({ method: "GET" })
   .handler(async ({ data, context }) => {
     const { userId } = context;
 
-    // Telemetry rows: severity='info' AND mechanism='telemetry' AND user match.
-    // The current schema doesn't expose mechanism directly — it lives in
-    // `context` JSONB. Supabase filters on jsonb fields via `->>` and `->`.
     const sb = supabaseAdmin as unknown as LooseSB;
     const result = await sb
       .from("error_reports")
       .select("id, message, source, route, context, severity, created_at")
       .eq("user_id", userId)
       .order("created_at", { ascending: false })
-      .limit(data.limit * 2); // over-fetch, then filter client-side to telemetry rows
+      .limit(data.limit * 2);
 
     return { events: buildTelemetryEventsFromRows(result, data.limit) };
+  });
+
+/** Sprint 42: event count aggregation for telemetry chart */
+export type EventCount = { eventName: string; count: number };
+
+export const getTelemetryEventCounts = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { userId } = context;
+    const sb = supabaseAdmin as unknown as LooseSB;
+    const result = await sb.from("error_reports").select("message").eq("user_id", userId);
+
+    const counts: Record<string, number> = {};
+    const rows = (result as { data?: Array<{ message: string }> })?.data ?? [];
+    for (const row of rows) {
+      const name = parseEventName(row.message);
+      if (name === "unknown") continue;
+      counts[name] = (counts[name] ?? 0) + 1;
+    }
+
+    const events: EventCount[] = Object.entries(counts)
+      .map(([eventName, count]) => ({ eventName, count }))
+      .sort((a, b) => b.count - a.count);
+
+    return { events };
   });
