@@ -33,11 +33,18 @@ function deleteLegacyDb(): void {
 
 let legacyCleanupDone = false;
 
+const MAX_DB_RETRIES = 3;
+const DB_RETRY_BASE_MS = 100;
+
 function openDb(): Promise<IDBDatabase> {
   if (!legacyCleanupDone) {
     legacyCleanupDone = true;
     deleteLegacyDb();
   }
+  return _openDbWithRetry(MAX_DB_RETRIES);
+}
+
+function _openDbWithRetry(retries: number): Promise<IDBDatabase> {
   return new Promise((resolve, reject) => {
     const req = indexedDB.open(DB_NAME, DB_VERSION);
     req.onupgradeneeded = () => {
@@ -50,7 +57,15 @@ function openDb(): Promise<IDBDatabase> {
       }
     };
     req.onsuccess = () => resolve(req.result);
-    req.onerror = () => reject(req.error);
+    req.onerror = () => {
+      if (retries > 0) {
+        // Transient failure — retry with backoff
+        const delay = DB_RETRY_BASE_MS * 2 ** (MAX_DB_RETRIES - retries);
+        setTimeout(() => _openDbWithRetry(retries - 1).then(resolve, reject), delay);
+      } else {
+        reject(req.error);
+      }
+    };
   });
 }
 
@@ -168,35 +183,45 @@ export async function clearDead(): Promise<void> {
   window.dispatchEvent(new CustomEvent("offline-queue:changed"));
 }
 
+/** Wrap IndexedDB cursor iteration in a Promise so the caller waits for completion. */
+function cursorForEach(s: IDBObjectStore, fn: (cursor: IDBCursorWithValue) => void): Promise<void> {
+  return new Promise<void>((resolve, reject) => {
+    const req = s.openCursor();
+    req.onsuccess = () => {
+      const cursor = req.result;
+      if (!cursor) return resolve();
+      try {
+        fn(cursor);
+        cursor.continue();
+      } catch (err) {
+        reject(err);
+      }
+    };
+    req.onerror = () => reject(req.error);
+  });
+}
+
 /** Remove expired items from both queue and dead-letter stores. */
 export async function cleanupExpired(): Promise<void> {
   const now = Date.now();
   // Clean main queue
-  await tx(STORE, "readwrite", (s) => {
-    const req = s.openCursor();
-    req.onsuccess = () => {
-      const cursor = req.result;
-      if (!cursor) return;
+  await tx(STORE, "readwrite", (s) =>
+    cursorForEach(s, (cursor) => {
       const item = cursor.value as QueueItem;
       if (item.expires_at && item.expires_at < now) {
         cursor.delete();
       }
-      cursor.continue();
-    };
-  });
+    }),
+  );
   // Clean dead-letter store
-  await tx(DEAD_STORE, "readwrite", (s) => {
-    const req = s.openCursor();
-    req.onsuccess = () => {
-      const cursor = req.result;
-      if (!cursor) return;
+  await tx(DEAD_STORE, "readwrite", (s) =>
+    cursorForEach(s, (cursor) => {
       const item = cursor.value as QueueItem;
       if (item.expires_at && item.expires_at < now) {
         cursor.delete();
       }
-      cursor.continue();
-    };
-  });
+    }),
+  );
 }
 
 /** Clear all queue data — call on user logout to purge health data from IndexedDB. */
