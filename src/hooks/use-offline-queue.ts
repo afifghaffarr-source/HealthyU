@@ -62,25 +62,45 @@ export function useOfflineQueue() {
 
     // eslint-disable-next-line react-hooks/set-state-in-effect -- external-store/async-query sync; `useSyncExternalStore` and equivalent restructure would change the API surface
     refresh();
-    const on = () => {
-      setOnline(true);
-      sync();
+    const onBrowserOnline = () => setOnline(true);
+    const onBrowserOffline = () => setOnline(false);
+    const onQueueChanged = () => refresh();
+    window.addEventListener("online", onBrowserOnline);
+    window.addEventListener("offline", onBrowserOffline);
+    window.addEventListener("offline-queue:changed", onQueueChanged);
+
+    // Passive ping to verify real connectivity — navigator.onLine is unreliable
+    // in installed PWAs where SW interception can cause false negatives.
+    let cancelled = false;
+    const ping = async () => {
+      try {
+        const controller = new AbortController();
+        const t = setTimeout(() => controller.abort(), 5_000);
+        await fetch("/favicon.ico", {
+          method: "HEAD",
+          signal: controller.signal,
+          cache: "no-store",
+        });
+        clearTimeout(t);
+        if (!cancelled) setOnline(true);
+      } catch {
+        if (!cancelled) setOnline(false);
+      }
     };
-    const off = () => setOnline(false);
-    const ch = () => refresh();
-    window.addEventListener("online", on);
-    window.addEventListener("offline", off);
-    window.addEventListener("offline-queue:changed", ch);
+    void ping();
+
     if (navigator.onLine) sync();
-    // periodic retry for items with backoff
     const t = setInterval(() => {
       if (navigator.onLine) sync();
     }, 5_000);
+    const pingId = setInterval(ping, 60_000);
     return () => {
-      window.removeEventListener("online", on);
-      window.removeEventListener("offline", off);
-      window.removeEventListener("offline-queue:changed", ch);
+      cancelled = true;
+      window.removeEventListener("online", onBrowserOnline);
+      window.removeEventListener("offline", onBrowserOffline);
+      window.removeEventListener("offline-queue:changed", onQueueChanged);
       clearInterval(t);
+      clearInterval(pingId);
     };
   }, [refresh, sync]);
 

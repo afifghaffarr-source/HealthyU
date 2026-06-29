@@ -1,14 +1,19 @@
-import { CloudOff, RefreshCw } from "lucide-react";
+import { useState } from "react";
+import { CloudOff, RefreshCw, X } from "lucide-react";
 import { useOfflineQueue } from "@/hooks/use-offline-queue";
 
 /**
  * Compact, non-blocking banner that surfaces offline state and any pending
  * queued logs (water, meals, weight, mood, vitals, workouts).
- * Renders nothing when the user is online and has nothing queued.
+ * Sync button always visible. Dismissible.
  */
 export function OfflineQueueBanner() {
   const { online, pending, sync } = useOfflineQueue();
+  const [dismissed, setDismissed] = useState(false);
+
+  if (dismissed) return null;
   if (online && pending === 0) return null;
+
   return (
     <div
       role="status"
@@ -23,7 +28,7 @@ export function OfflineQueueBanner() {
           `Offline · ${pending} catatan menunggu sinkron saat koneksi kembali.`}
         {online && pending > 0 && `${pending} catatan menunggu sinkron…`}
       </span>
-      {online && pending > 0 && (
+      {pending > 0 && (
         <button
           type="button"
           onClick={() => void sync()}
@@ -33,6 +38,14 @@ export function OfflineQueueBanner() {
           <RefreshCw className="size-3" aria-hidden /> Sync
         </button>
       )}
+      <button
+        type="button"
+        onClick={() => setDismissed(true)}
+        aria-label="Tutup notifikasi"
+        className="shrink-0 inline-flex items-center text-xs text-muted-foreground/60 hover:text-muted-foreground ml-0.5"
+      >
+        <X className="size-3.5" />
+      </button>
     </div>
   );
 }
