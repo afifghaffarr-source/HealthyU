@@ -42,6 +42,8 @@ export function RouteNotFound() {
 export function RouteError({ error, reset }: { error: Error; reset: () => void }) {
   const router = useRouter();
   useEffect(() => {
+    // Sprint 40 exemption: route-level error boundary — fires before user
+    // data exists, same rationale as S38 start.ts/log-error.ts exemption.
     console.error(error);
     reportError(error, { boundary: "tanstack_default_error_component" });
   }, [error]);

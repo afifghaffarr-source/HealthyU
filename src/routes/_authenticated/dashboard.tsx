@@ -74,6 +74,7 @@ import {
 import { MilestoneBadges } from "@/features/patterns/components/MilestoneBadges";
 import { handleQuickAction } from "@/features/patterns/lib/quickActions";
 import { checkPatternTrigger } from "@/features/patterns/lib/triggerPattern.functions";
+import { clientSafeError } from "@/lib/clientLogSafe";
 
 const profileQueryOptions = queryOptions({
   queryKey: ["profile"],
@@ -107,7 +108,7 @@ export const Route = createFileRoute("/_authenticated/dashboard")({
       queryFn: () => myUnlinkedJoinedChallenges(),
     });
     // Lazy pattern detection trigger (24h check)
-    checkPatternTrigger().catch((err) => console.error("[Dashboard] Pattern check failed:", err));
+    checkPatternTrigger().catch((err) => clientSafeError("dashboard", err));
   },
   component: Dashboard,
 });

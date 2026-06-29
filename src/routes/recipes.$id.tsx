@@ -1,5 +1,6 @@
 import { createFileRoute, redirect } from "@tanstack/react-router";
 import { getSlugFromRecipeId } from "@/features/recipes/lib/recipeSlugLookup.functions";
+import { clientSafeError } from "@/lib/clientLogSafe";
 
 /**
  * /recipes/$id → /resep/$slug
@@ -41,7 +42,7 @@ export const Route = createFileRoute("/recipes/$id")({
           throw err;
         }
         // Silently fall through to /resep on query error
-        console.error(`[recipes.$id] lookup failed for ${id}:`, err);
+        clientSafeError("recipes.$id", err, { id });
       }
     }
 

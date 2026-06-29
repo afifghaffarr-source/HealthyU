@@ -9,6 +9,7 @@ import { HealthScoreCard } from "@/components/healthyu/health-score-card";
 import { supabase } from "@/integrations/supabase/client";
 import { clearAll } from "@/lib/offline-queue";
 import { calcAge, calcBMI, bmiCategory, calcBMR, calcTDEE, type ActivityLevel } from "@/lib/health";
+import { clientSafeError } from "@/lib/clientLogSafe";
 import { LogOut, Camera, Sparkles, ChefHat, ChevronRight, Settings } from "lucide-react";
 import { useTheme } from "@/components/theme-provider.hook";
 import { LocaleSwitcher } from "@/components/locale-switcher";
@@ -49,7 +50,7 @@ function ProfilePage() {
     try {
       await clearAll();
     } catch (err) {
-      console.error("[logout] Failed to clear offline queue:", err);
+      clientSafeError("logout", err);
     }
     await supabase.auth.signOut();
     navigate({ to: "/" });

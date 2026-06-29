@@ -57,7 +57,8 @@ export function SWUpdateToast() {
           },
           onRegisterError: (error) => {
             // Non-fatal — surface to errorReporting.ts in future.
-
+            // Sprint 40 exemption: service worker lifecycle — no PII surface,
+            // boot/bootstrap scenario where structured logging adds no value.
             console.warn("[SW] register error:", error);
           },
         };
@@ -66,7 +67,8 @@ export function SWUpdateToast() {
       } catch (err) {
         // Virtual module not available (e.g. SW disabled or build without PWA plugin).
         // Silent fail — InstallPrompt + offline fallback still work without it.
-
+        // Sprint 40 exemption: service worker bootstrap — no PII surface,
+        // boot scenario where structured logging adds no value.
         console.warn("[SW] useRegisterSW not available:", err);
       }
     })();

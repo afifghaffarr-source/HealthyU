@@ -26,6 +26,8 @@ export class FeatureErrorBoundary extends Component<Props, State> {
 
   componentDidCatch(error: Error) {
     reportError(error, { boundary: "feature_error_boundary", feature: this.props.feature });
+    // Sprint 40 exemption: framework error boundary — fires before user
+    // data exists, same rationale as S38 start.ts/log-error.ts exemption.
     console.error(`[feature:${this.props.feature}]`, error);
   }
 

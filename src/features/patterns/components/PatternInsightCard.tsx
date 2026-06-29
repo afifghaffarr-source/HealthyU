@@ -26,6 +26,7 @@ import type { PatternInsight, QuickAction } from "../types/pattern";
 import { calculateTrend, getTrendEmoji, getTrendColor } from "../lib/patternTrends";
 import { usePatternFeedback } from "../hooks/usePatternFeedback";
 import { useState } from "react";
+import { clientSafeError } from "@/lib/clientLogSafe";
 
 interface PatternInsightCardProps {
   pattern: PatternInsight;
@@ -80,7 +81,7 @@ export function PatternInsightCard({ pattern, onDismiss, onQuickAction }: Patter
       await feedbackMutation.mutateAsync({ patternId: pattern.id, helpful });
       setFeedbackGiven(true);
     } catch (err) {
-      console.error("Feedback submit failed:", err);
+      clientSafeError("pattern-feedback", err);
     }
   };
 
