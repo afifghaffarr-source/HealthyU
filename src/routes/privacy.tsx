@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { APP_CONFIG } from "@/config/app";
 import { canonical, hreflangAlternates } from "@/lib/seo";
+import { useTranslation } from "@/lib/i18n";
 import { ShieldCheck, Download, Trash2, Eye, Edit3, Mail } from "lucide-react";
 
 export const Route = createFileRoute("/privacy")({
@@ -40,6 +41,7 @@ export const Route = createFileRoute("/privacy")({
  */
 function PrivacyPage() {
   const lastUpdated = "2026-06-17";
+  const { t } = useTranslation();
   return (
     <main className="min-h-dvh bg-background">
       <article className="max-w-3xl mx-auto px-4 py-8 prose prose-sm prose-stone dark:prose-invert max-w-none">
@@ -50,82 +52,51 @@ function PrivacyPage() {
           >
             <ShieldCheck className="size-3" /> HealthyU
           </Link>
-          <h1 className="text-3xl font-bold tracking-tight">Kebijakan Privasi</h1>
+          <h1 className="text-3xl font-bold tracking-tight">{t("privacyPolicy.title")}</h1>
           <p className="text-sm text-muted-foreground mt-2">
-            Terakhir diperbarui: {lastUpdated} · Merujuk pada UU PDP No. 27/2022
+            {t("privacyPolicy.lastUpdated", { date: lastUpdated })}
           </p>
         </header>
 
         <section>
-          <h2>Ringkasan singkat</h2>
-          <p>
-            HealthyU adalah aplikasi catatan kesehatan pribadi. Kami hanya mengumpulkan data yang
-            Anda berikan secara sadar (profil, log makanan, olahraga, tidur, dll) untuk menampilkan
-            kembali informasi tersebut kepada Anda. Kami <strong>tidak menjual data Anda</strong> ke
-            pihak ketiga.
-          </p>
+          <h2>{t("privacyPolicy.summaryTitle")}</h2>
+          <p>{t("privacyPolicy.summaryLead")}</p>
         </section>
 
         <section>
-          <h2>1. Data yang kami kumpulkan</h2>
+          <h2>{t("privacyPolicy.section1Title")}</h2>
 
-          <h3>Data yang Anda berikan</h3>
+          <h3>{t("privacyPolicy.section1UserTitle")}</h3>
           <ul>
-            <li>
-              <strong>Akun</strong>: email, nama tampilan, foto profil (jika diunggah), preferensi
-              publik (mis. profil publik/privat).
-            </li>
-            <li>
-              <strong>Profil kesehatan</strong>: tanggal lahir, jenis kelamin, tinggi, berat,
-              alergi, kondisi kesehatan yang Anda catat sendiri.
-            </li>
-            <li>
-              <strong>Log aktivitas</strong>: makanan, minuman, olahraga, tidur, berat, mood, obat,
-              catatan, foto progres.
-            </li>
-            <li>
-              <strong>Konten komunitas</strong>: posting, komentar, dan interaksi (like, simpan)
-              yang Anda buat di fitur komunitas.
-            </li>
-            <li>
-              <strong>Percakapan AI</strong>: pesan yang Anda kirim ke AI coach.
-            </li>
+            <li>{t("privacyPolicy.section1UserItems.akun")}</li>
+            <li>{t("privacyPolicy.section1UserItems.profil")}</li>
+            <li>{t("privacyPolicy.section1UserItems.log")}</li>
+            <li>{t("privacyPolicy.section1UserItems.komunitas")}</li>
+            <li>{t("privacyPolicy.section1UserItems.ai")}</li>
           </ul>
 
-          <h3>Data yang dikumpulkan otomatis</h3>
+          <h3>{t("privacyPolicy.section1AutoTitle")}</h3>
           <ul>
-            <li>
-              <strong>Autentikasi</strong>: token sesi, refresh token (Supabase Auth).
-            </li>
-            <li>
-              <strong>Notifikasi</strong>: endpoint push subscription (VAPID) untuk kirim pengingat.
-            </li>
-            <li>
-              <strong>Wearable</strong> (opsional): token koneksi ke Google Fit, jika Anda
-              menghubungkan perangkat.
-            </li>
-            <li>
-              <strong>Log teknis</strong>: error report anonim, metrik performa (tanpa PII).
-            </li>
+            <li>{t("privacyPolicy.section1AutoItems.auth")}</li>
+            <li>{t("privacyPolicy.section1AutoItems.notif")}</li>
+            <li>{t("privacyPolicy.section1AutoItems.wearable")}</li>
+            <li>{t("privacyPolicy.section1AutoItems.logs")}</li>
           </ul>
         </section>
 
         <section>
-          <h2>2. Untuk apa data digunakan</h2>
+          <h2>{t("privacyPolicy.section2Title")}</h2>
           <ul>
-            <li>Menampilkan kembali ringkasan, grafik, dan tren kesehatan Anda.</li>
-            <li>Mengirimkan rekomendasi personal (AI coach, rekomendasi olahraga, dll).</li>
-            <li>Mengirim notifikasi yang Anda daftarkan (pengingat minum, jadwal puasa, dst).</li>
-            <li>
-              Audit kualitas model AI — <strong>hanya</strong> jika Anda mengaktifkan toggle "Bantu
-              tingkatkan AI" di halaman privasi.
-            </li>
+            <li>{t("privacyPolicy.section2Item.summary")}</li>
+            <li>{t("privacyPolicy.section2Item.recommend")}</li>
+            <li>{t("privacyPolicy.section2Item.notif")}</li>
+            <li>{t("privacyPolicy.section2Item.audit")}</li>
           </ul>
-          <p>Kami tidak menggunakan data Anda untuk iklan bertarget atau dibagikan ke pengiklan.</p>
+          <p>{t("privacyPolicy.section2NoTargeted")}</p>
         </section>
 
         <section>
-          <h2>3. Siapa yang menerima data</h2>
+          <h2>{t("privacyPolicy.section3Title")}</h2>
           <ul>
             <li>
               <strong>Penyedia infrastruktur</strong>: Supabase (penyimpanan database), Cloudflare
@@ -142,11 +113,11 @@ function PrivacyPage() {
         </section>
 
         <section>
-          <h2>4. Periode retensi</h2>
+          <h2>{t("privacyPolicy.section4Title")}</h2>
           <ul>
             <li>
-              <strong>Akun aktif</strong>: data disimpan selama akun Anda aktif + 30 hari setelah
-              proses penghapusan selesai (backup window).
+              <strong>{t("privacyPolicy.section4ActiveAccount")}</strong>: data disimpan selama akun
+              Anda aktif + 30 hari setelah proses penghapusan selesai (backup window).
             </li>
             <li>
               <strong>Percakapan AI</strong>: disimpan sampai Anda menghapusnya.
@@ -161,45 +132,41 @@ function PrivacyPage() {
         </section>
 
         <section>
-          <h2>5. Hak-hak Anda (UU PDP Pasal 5-12)</h2>
-          <p>Anda berhak untuk:</p>
+          <h2>{t("privacyPolicy.section5Title")}</h2>
+          <p>{t("privacyPolicy.section5Intro")}</p>
 
           <div className="not-prose grid gap-3 sm:grid-cols-2 my-4">
             <RightCard
               icon={<Eye className="size-4" />}
-              title="Melihat & mengakses"
-              desc="Lihat semua data pribadi Anda yang kami simpan."
-              action={{ to: "/profile/privacy", label: "Privasi saya" }}
+              title={t("privacyPolicy.rightAccessTitle")}
+              desc={t("privacyPolicy.rightAccessDesc")}
+              action={{ to: "/profile/privacy", label: t("privacyPolicy.rightAccessAction") }}
             />
             <RightCard
               icon={<Download className="size-4" />}
-              title="Mendapatkan salinan"
-              desc="Ekspor seluruh data Anda dalam format JSON atau CSV."
-              action={{ to: "/backup", label: "Unduh data" }}
+              title={t("privacyPolicy.rightCopyTitle")}
+              desc={t("privacyPolicy.rightCopyDesc")}
+              action={{ to: "/backup", label: t("privacyPolicy.rightCopyAction") }}
             />
             <RightCard
               icon={<Edit3 className="size-4" />}
-              title="Memperbaiki"
-              desc="Perbarui data yang tidak akurat di halaman profil."
-              action={{ to: "/profile", label: "Edit profil" }}
+              title={t("privacyPolicy.rightFixTitle")}
+              desc={t("privacyPolicy.rightFixDesc")}
+              action={{ to: "/profile", label: t("privacyPolicy.rightFixAction") }}
             />
             <RightCard
               icon={<Trash2 className="size-4" />}
-              title="Menghapus akun"
-              desc="Hapus permanen akun & semua data Anda."
-              action={{ to: "/profile/privacy", label: "Hapus akun" }}
+              title={t("privacyPolicy.rightDeleteTitle")}
+              desc={t("privacyPolicy.rightDeleteDesc")}
+              action={{ to: "/profile/privacy", label: t("privacyPolicy.rightDeleteAction") }}
             />
           </div>
 
-          <p>
-            Setiap permintaan dieksekusi maksimal <strong>7×24 jam</strong> setelah permintaan
-            diverifikasi. Permintaan yang terkait kewajiban hukum (mis. log audit yang sudah
-            kadaluarsa) akan dijelaskan alasannya.
-          </p>
+          <p>{t("privacyPolicy.section5After")}</p>
         </section>
 
         <section>
-          <h2>6. Keamanan</h2>
+          <h2>{t("privacyPolicy.section6Title")}</h2>
           <ul>
             <li>Enkripsi in-transit (HTTPS) & at-rest (Supabase default).</li>
             <li>
@@ -214,40 +181,31 @@ function PrivacyPage() {
         </section>
 
         <section>
-          <h2>7. Anak di bawah umur</h2>
-          <p>
-            HealthyU tidak ditujukan untuk anak di bawah 13 tahun. Kami tidak dengan sengaja
-            mengumpulkan data anak di bawah batas usia tersebut. Orang tua/wali yang khawatir dapat
-            menghubungi kami untuk meminta penghapusan data.
-          </p>
+          <h2>{t("privacyPolicy.section7Title")}</h2>
+          <p>{t("privacyPolicy.section7Body")}</p>
         </section>
 
         <section>
-          <h2>8. Kontak & pengaduan</h2>
-          <p>Untuk pertanyaan, permintaan akses data, atau pengaduan privasi:</p>
+          <h2>{t("privacyPolicy.section8Title")}</h2>
+          <p>{t("privacyPolicy.section8Intro")}</p>
           <ul>
             <li>
               <Mail className="inline size-3.5 mr-1" />
-              Email: <a href={`mailto:${APP_CONFIG.supportEmail}`}>{APP_CONFIG.supportEmail}</a>
+              {t("privacyPolicy.section8EmailLabel")}{" "}
+              <a href={`mailto:${APP_CONFIG.supportEmail}`}>{APP_CONFIG.supportEmail}</a>
             </li>
           </ul>
-          <p>
-            Jika Anda merasa keluhan tidak ditangani dengan baik, Anda berhak mengajukan pengaduan
-            ke otoritas perlindungan data pribadi Indonesia (kominfo).
-          </p>
+          <p>{t("privacyPolicy.section8After")}</p>
         </section>
 
         <section>
-          <h2>9. Perubahan kebijakan</h2>
-          <p>
-            Kami akan memberi tahu Anda melalui notifikasi aplikasi jika ada perubahan material pada
-            kebijakan ini. Versi sebelumnya akan tetap tersedia di histori publik halaman ini.
-          </p>
+          <h2>{t("privacyPolicy.section9Title")}</h2>
+          <p>{t("privacyPolicy.section9Body")}</p>
         </section>
 
         <footer className="mt-8 pt-4 border-t text-xs text-muted-foreground not-prose">
           <p>
-            Halaman ini bersifat publik. Untuk tindakan (lihat, unduh, edit, hapus data) silakan{" "}
+            {t("privacyPolicy.footer")}{" "}
             <Link to="/auth" className="underline">
               masuk ke aplikasi
             </Link>

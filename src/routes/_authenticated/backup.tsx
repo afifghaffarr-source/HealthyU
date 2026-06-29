@@ -23,7 +23,7 @@ import {
 } from "lucide-react";
 import { toast } from "@/lib/toast-config";
 import { toastError } from "@/lib/toast-config";
-
+import { useTranslation, type TranslationKey } from "@/lib/i18n";
 export const Route = createFileRoute("/_authenticated/backup")({
   component: BackupPage,
 });
@@ -63,22 +63,25 @@ function formatBytes(bytes: number | null | undefined): string {
   return `${(bytes / (1024 * 1024)).toFixed(2)} MB`;
 }
 
-function formatRelativeTime(dateStr: string | null | undefined): string {
+function formatRelativeTime(
+  dateStr: string | null | undefined,
+  t: (key: TranslationKey, vars?: Record<string, string | number>) => string,
+): string {
   if (!dateStr) return "—";
   const date = new Date(dateStr);
   const now = Date.now();
   const diffMs = now - date.getTime();
   const diffMin = Math.floor(diffMs / 60_000);
-  if (diffMin < 1) return "baru saja";
-  if (diffMin < 60) return `${diffMin} menit lalu`;
+  if (diffMin < 1) return t("backup.justNow");
+  if (diffMin < 60) return t("backup.minutesAgo", { n: diffMin });
   const diffH = Math.floor(diffMin / 60);
-  if (diffH < 24) return `${diffH} jam lalu`;
+  if (diffH < 24) return t("backup.hoursAgo", { n: diffH });
   const diffD = Math.floor(diffH / 24);
-  if (diffD < 7) return `${diffD} hari lalu`;
+  if (diffD < 7) return t("backup.daysAgo", { n: diffD });
   return date.toLocaleDateString("id-ID", { day: "2-digit", month: "short" });
 }
-
 function BackupPage() {
+  const { t } = useTranslation();
   const qc = useQueryClient();
   const exportFn = useServerFn(exportMyData);
   const startFn = useServerFn(recordExportStart);
@@ -159,7 +162,7 @@ function BackupPage() {
       }
 
       toast.success(
-        `Backup ${format.toUpperCase()} berhasil · ${tableCount} tabel, ${totalRows} baris`,
+        t("backup.success", { format: format.toUpperCase(), tables: tableCount, rows: totalRows }),
       );
     } catch (e) {
       if (exportId) {
@@ -171,7 +174,7 @@ function BackupPage() {
           },
         });
       }
-      toastError(e, "Gagal membuat backup");
+      toastError(e, t("backup.failed"));
     } finally {
       setBusy(null);
     }
@@ -180,7 +183,7 @@ function BackupPage() {
   return (
     <main className="min-h-dvh bg-background pb-28">
       <div className="max-w-md mx-auto px-5 pt-2 space-y-5">
-        <TopAppBar title="Backup & Ekspor" showBack />
+        <TopAppBar title={t("backup.title")} showBack />
 
         {/* Hero */}
         <section className="bg-gradient-to-br from-primary/10 to-primary/5 p-5 rounded-3xl outline-1 outline-primary/20 space-y-3">
@@ -188,20 +191,17 @@ function BackupPage() {
             <Download className="size-6" />
           </div>
           <div>
-            <h2 className="text-lg font-bold">Unduh semua data Anda</h2>
-            <p className="text-sm text-muted-foreground mt-1">
-              Termasuk profil, makanan, latihan, tidur, vital signs, obat, mood, komunitas, dan
-              pencapaian. Data Anda milik Anda — bawa kapan saja.
-            </p>
+            <h2 className="text-lg font-bold">{t("backup.downloadAll")}</h2>
+            <p className="text-sm text-muted-foreground mt-1">{t("backup.downloadAllDesc")}</p>
           </div>
           <div className="flex items-center gap-3 text-[11px] text-muted-foreground pt-1">
             <div className="inline-flex items-center gap-1">
               <Shield className="size-3 text-emerald-600" />
-              <span>Audit logged</span>
+              <span>{t("backup.auditLogged")}</span>
             </div>
             <div className="inline-flex items-center gap-1">
               <Database className="size-3 text-blue-600" />
-              <span>Semua tabel</span>
+              <span>{t("backup.allTables")}</span>
             </div>
           </div>
         </section>
@@ -216,12 +216,12 @@ function BackupPage() {
             {busy === "json" ? (
               <>
                 <Loader2 className="size-4 animate-spin" />
-                <span>Generating JSON...</span>
+                <span>{t("backup.generatingJson")}</span>
               </>
             ) : (
               <>
                 <FileJson className="size-4" />
-                <span>Unduh JSON (lengkap)</span>
+                <span>{t("backup.downloadJsonFull")}</span>
               </>
             )}
           </button>
@@ -234,35 +234,35 @@ function BackupPage() {
             {busy === "csv" ? (
               <>
                 <Loader2 className="size-4 animate-spin" />
-                <span>Generating CSV...</span>
+                <span>{t("backup.generatingCsv")}</span>
               </>
             ) : (
               <>
                 <FileSpreadsheet className="size-4" />
-                <span>Unduh CSV (per tabel)</span>
+                <span>{t("backup.downloadCsv")}</span>
               </>
             )}
           </button>
         </section>
 
-        <p className="text-xs text-muted-foreground text-center">
-          File berisi semua data pribadi Anda. Simpan di tempat aman.
-        </p>
+        <p className="text-xs text-muted-foreground text-center">{t("backup.fileWarning")}</p>
 
         {/* History */}
         <section className="space-y-2 pt-2">
           <div className="flex items-center justify-between px-1">
             <h3 className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
-              Riwayat Ekspor
+              {t("backup.exportHistory")}
             </h3>
             {history.length > 0 && (
-              <span className="text-[10px] text-muted-foreground">{history.length} entri</span>
+              <span className="text-[10px] text-muted-foreground">
+                {t("backup.entriesCount", { count: history.length })}
+              </span>
             )}
           </div>
 
           {history.length === 0 ? (
             <div className="bg-card p-5 rounded-2xl outline-1 outline-black/5 text-center text-xs text-muted-foreground">
-              Belum ada riwayat export.
+              {t("backup.noHistory")}
             </div>
           ) : (
             <div className="bg-card rounded-2xl outline-1 outline-black/5 overflow-hidden">
@@ -310,12 +310,15 @@ function BackupPage() {
                         <div className="flex items-center gap-2">
                           <p className="text-sm font-semibold uppercase">{h.format}</p>
                           <span className="text-[10px] text-muted-foreground">
-                            {h.table_count ?? 0} tabel · {h.row_count ?? 0} baris
+                            {t("backup.historyMeta", {
+                              tables: h.table_count ?? 0,
+                              rows: h.row_count ?? 0,
+                            })}
                           </span>
                         </div>
                         <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground mt-0.5">
                           <Clock className="size-2.5" />
-                          <span>{formatRelativeTime(h.completed_at || h.started_at)}</span>
+                          <span>{formatRelativeTime(h.completed_at || h.started_at, t)}</span>
                           {h.size_bytes && <span>· {formatBytes(h.size_bytes)}</span>}
                         </div>
                       </div>
@@ -330,9 +333,8 @@ function BackupPage() {
         {/* UU PDP disclaimer */}
         <section className="bg-secondary/30 p-3.5 rounded-2xl text-[11px] text-muted-foreground leading-relaxed">
           <p>
-            <strong className="text-foreground">Hak Anda (UU PDP No. 27/2022):</strong> Anda berhak
-            mengakses, mengoreksi, menghapus, dan membatasi pemrosesan data pribadi Anda. Semua
-            ekspor dicatat untuk transparansi dan kepatuhan.
+            <strong className="text-foreground">{t("backup.pdpDisclaimerTitle")}</strong>{" "}
+            {t("backup.pdpDisclaimerBody")}
           </p>
         </section>
       </div>

@@ -54,6 +54,7 @@ import {
 import { validateImageFile, fileToDataUrl, dataUrlToBlob } from "@/lib/image-utils";
 import { toast, toastError } from "@/lib/toast-config";
 import type { MealType } from "@/features/food/lib/foodHelpers";
+import { useTranslation } from "@/lib/i18n";
 
 export const Route = createFileRoute("/_authenticated/scan/nutrition-label")({
   component: Page,
@@ -77,6 +78,7 @@ type Phase =
   | { kind: "ai-scanning"; src: string; ocrText: string; ocrConfidence: number };
 
 function Page() {
+  const { t } = useTranslation();
   const qc = useQueryClient();
   const aiFn = useServerFn(ocrNutritionLabel);
   const visionFn = useServerFn(scanNutritionLabel);
@@ -117,9 +119,9 @@ function Page() {
             }
           : prev,
       );
-      toast.success("Selesai dibaca AI");
+      toast.success(t("scan.label.aiSuccess"));
     },
-    onError: (e: Error) => toast.error(e.message || "AI OCR gagal"),
+    onError: (e: Error) => toast.error(e.message || t("scan.label.aiFailed")),
   });
 
   // AI Vision OCR — direct image → Gemini (bypasses client Tesseract)
@@ -127,7 +129,7 @@ function Page() {
     mutationFn: (p: { image_data_url: string }) => visionFn({ data: p }),
     onSuccess: (data) => {
       if (!data.ok) {
-        toast.error(data.message ?? "Gagal membaca label nutrisi");
+        toast.error(data.message ?? t("scan.label.readFailedFallback"));
         return;
       }
       const label = data.label;
@@ -160,10 +162,10 @@ function Page() {
         ocrConfidence: label.confidence ?? 0,
       });
       toast.success(
-        `AI Vision: ${label.brand ? label.brand + " " : ""}${label.product_name ?? "Label terdeteksi"}`,
+        `AI Vision: ${label.brand ? label.brand + " " : ""}${label.product_name ?? t("scan.label.detectedFallback")}`,
       );
     },
-    onError: (e: Error) => toast.error(e.message || "AI Vision gagal"),
+    onError: (e: Error) => toast.error(e.message || t("scan.label.aiFailed")),
   });
 
   // Add OCR result as meal log
@@ -178,9 +180,9 @@ function Page() {
       }),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["meals", "today"] });
-      toast.success("Tersimpan ke meal log!");
+      toast.success(t("scan.label.saveToMealLogSuccess"));
     },
-    onError: (e: Error) => toastError(e, "Gagal simpan"),
+    onError: (e: Error) => toastError(e, t("scan.label.saveFailed")),
   });
 
   // Cleanup OCR worker on unmount
@@ -205,7 +207,7 @@ function Page() {
   async function startClientScan() {
     if (phase.kind !== "preview") return;
     if (!ocrSupported) {
-      toast.error("Browser tidak mendukung OCR. Gunakan AI fallback.");
+      toast.error(t("scan.label.ocrNotSupported"));
       return;
     }
     const blob = await dataUrlToBlob(phase.src);
@@ -213,7 +215,7 @@ function Page() {
       kind: "scanning",
       src: phase.src,
       progress: 0,
-      status: "Mempersiapkan engine OCR…",
+      status: t("scan.label.enginePreparing"),
     });
     try {
       const result = await recognizeImage(blob, (p: OcrProgress) => {
@@ -223,7 +225,14 @@ function Page() {
                 kind: "scanning",
                 src: prev.src,
                 progress: p.progress,
-                status: progressLabel(p),
+                status:
+                  p.status === "loading"
+                    ? t("scan.label.enginePreparing")
+                    : p.status === "initializing"
+                      ? t("scan.label.engineInitializing")
+                      : p.status === "recognizing"
+                        ? t("scan.label.engineReading")
+                        : t("scan.label.engineDone"),
               }
             : prev,
         );
@@ -237,14 +246,17 @@ function Page() {
         ocrConfidence: result.confidence,
       });
       if (parsed.confidence < CONFIDENCE_THRESHOLD) {
-        toast.success(
-          `Teks terbaca (confidence ${result.confidence.toFixed(0)}%). Pertimbangkan AI fallback untuk hasil lebih akurat.`,
-        );
+        toast.success(t("scan.label.lowConfidenceHint", { pct: result.confidence.toFixed(0) }));
       } else {
-        toast.success(`Berhasil! ${parsed.matchedFields}/${parsed.totalFields} field terdeteksi.`);
+        toast.success(
+          t("scan.label.matchedFields", {
+            matched: parsed.matchedFields,
+            total: parsed.totalFields,
+          }),
+        );
       }
     } catch (err) {
-      toast.error(`OCR gagal: ${(err as Error).message}. Coba AI fallback.`);
+      toast.error(t("scan.label.ocrFailed", { msg: (err as Error).message }));
       setPhase({ kind: "preview", src: phase.src, base64: phase.base64 });
     }
   }
@@ -262,7 +274,7 @@ function Page() {
       kind: "scanning",
       src: phase.src,
       progress: 0,
-      status: "Mengirim gambar ke AI Vision…",
+      status: t("scan.label.aiVisionPending"),
     });
     visionMut.mutate({ image_data_url: phase.src });
   }
@@ -278,7 +290,7 @@ function Page() {
 
   return (
     <div className="min-h-dvh pb-24 bg-background">
-      <TopAppBar title="Scan Label Nutrisi" subtitle="Client-side OCR · tanpa upload" showBack />
+      <TopAppBar title={t("scan.label.title")} subtitle={t("scan.label.subtitle")} showBack />
       <main className="max-w-md mx-auto px-4 pt-4 space-y-4">
         {/* Medical safety disclaimer — AI parses label text, not medical advice. */}
         <MedicalDisclaimer variant="disclaimer" compact className="w-full justify-center" />
@@ -292,9 +304,7 @@ function Page() {
               <WifiOff className="size-4 mt-0.5 text-amber-600 shrink-0" />
             )}
             <p className="text-xs leading-relaxed text-emerald-900 dark:text-emerald-100">
-              {ocrSupported
-                ? "Scan berjalan 100% di perangkat. Gambar label tidak di-upload kecuali Anda pilih AI fallback."
-                : "Browser tidak support client OCR. Pakai AI fallback (perlu internet)."}
+              {ocrSupported ? t("scan.label.offlineSupported") : t("scan.label.offlineNoSupport")}
             </p>
           </div>
         </Card>
@@ -307,7 +317,7 @@ function Page() {
           <div className="rounded-2xl overflow-hidden border bg-card">
             <img
               src={phase.src}
-              alt="Label nutrisi"
+              alt={t("scan.label.altText")}
               className="w-full max-h-72 object-contain bg-muted"
             />
           </div>
@@ -318,7 +328,7 @@ function Page() {
           <div className="space-y-3">
             <Button size="lg" className="w-full" onClick={() => fileInputRef.current?.click()}>
               <Camera className="size-4 mr-2" />
-              Ambil Foto Label
+              {t("scan.label.takePhoto")}
             </Button>
             <Button
               size="lg"
@@ -327,7 +337,7 @@ function Page() {
               onClick={() => fileInputRef.current?.click()}
             >
               <ScanLine className="size-4 mr-2" />
-              Pilih dari Galeri
+              {t("scan.label.gallery")}
             </Button>
             <input
               ref={fileInputRef}
@@ -345,7 +355,7 @@ function Page() {
           <div className="space-y-3">
             <Button size="lg" className="w-full" onClick={startClientScan} disabled={!ocrSupported}>
               <ScanLine className="size-4 mr-2" />
-              Scan Client OCR (Offline)
+              {t("scan.label.clientScan")}
             </Button>
             <Button
               size="lg"
@@ -355,16 +365,16 @@ function Page() {
               disabled={visionMut.isPending}
             >
               <Sparkles className="size-4 mr-2" />
-              AI Vision (Lebih Akurat)
+              {t("scan.label.aiVision")}
             </Button>
             {!ocrSupported && (
               <p className="text-xs text-amber-600 dark:text-amber-400 text-center px-2">
-                Browser tidak support client OCR. Pakai AI Vision untuk hasil lebih akurat.
+                {t("scan.label.noOcrBrowser")}
               </p>
             )}
             <Button size="sm" variant="ghost" className="w-full" onClick={reset}>
               <RotateCcw className="size-3.5 mr-1.5" />
-              Ganti Foto
+              {t("scan.label.changePhoto")}
             </Button>
           </div>
         )}
@@ -373,7 +383,7 @@ function Page() {
         {phase.kind === "scanning" && (
           <Card className="p-4 space-y-3">
             <div className="flex items-center justify-between">
-              <p className="text-sm font-medium">Memproses…</p>
+              <p className="text-sm font-medium">{t("scan.label.processing")}</p>
               <span className="text-xs text-muted-foreground tabular-nums">
                 {Math.round(phase.progress * 100)}%
               </span>
@@ -396,7 +406,7 @@ function Page() {
                 disabled={aiMut.isPending}
               >
                 <Sparkles className="size-4 mr-2" />
-                Coba AI (Parser Teks) untuk Akurasi
+                {t("scan.label.tryAi")}
               </Button>
             )}
 
@@ -405,7 +415,7 @@ function Page() {
               <Card className="p-4 space-y-3 bg-emerald-50/50 dark:bg-emerald-950/20 border-emerald-200 dark:border-emerald-900">
                 <div className="flex items-center gap-2">
                   <Plus className="size-4 text-emerald-600 dark:text-emerald-400" />
-                  <p className="text-sm font-semibold">Simpan ke meal log</p>
+                  <p className="text-sm font-semibold">{t("scan.label.mealLogTitle")}</p>
                 </div>
                 <div className="grid grid-cols-4 gap-2">
                   {(["breakfast", "lunch", "dinner", "snack"] as const).map((mt) => (
@@ -420,12 +430,12 @@ function Page() {
                       }`}
                     >
                       {mt === "breakfast"
-                        ? "Sarapan"
+                        ? t("scan.label.mealTypes.breakfast")
                         : mt === "lunch"
-                          ? "Siang"
+                          ? t("scan.label.mealTypes.lunch")
                           : mt === "dinner"
-                            ? "Malam"
-                            : "Snack"}
+                            ? t("scan.label.mealTypes.dinner")
+                            : t("scan.label.mealTypes.snack")}
                     </button>
                   ))}
                 </div>
@@ -440,24 +450,23 @@ function Page() {
                   ) : (
                     <Check className="size-4 mr-2" />
                   )}
-                  Simpan sebagai{" "}
                   {mealType === "breakfast"
-                    ? "sarapan"
+                    ? t("scan.label.savedAs.breakfast")
                     : mealType === "lunch"
-                      ? "makan siang"
+                      ? t("scan.label.savedAs.lunch")
                       : mealType === "dinner"
-                        ? "makan malam"
-                        : "snack"}
+                        ? t("scan.label.savedAs.dinner")
+                        : t("scan.label.savedAs.snack")}
                 </Button>
                 <p className="text-[10px] text-muted-foreground text-center">
-                  Nilai gizi dihitung per {phase.parsed.nutrition.servingSize ?? "1 takaran saji"}
+                  {phase.parsed.nutrition.servingSize ?? t("scan.label.servingDefault")}
                 </p>
               </Card>
             )}
 
             <Button size="sm" variant="ghost" className="w-full" onClick={reset}>
               <RotateCcw className="size-3.5 mr-1.5" />
-              Scan Label Lain
+              {t("scan.label.scanAnother")}
             </Button>
           </>
         )}
@@ -467,11 +476,9 @@ function Page() {
           <Card className="p-4 space-y-2">
             <div className="flex items-center gap-2">
               <Sparkles className="size-4 animate-pulse text-violet-600" />
-              <p className="text-sm font-medium">AI sedang parsing teks OCR…</p>
+              <p className="text-sm font-medium">{t("scan.label.aiParsing")}</p>
             </div>
-            <p className="text-xs text-muted-foreground">
-              Mengirim teks hasil OCR (gambar tetap di perangkat). Butuh ~3-5 detik.
-            </p>
+            <p className="text-xs text-muted-foreground">{t("scan.label.aiParsingHint")}</p>
           </Card>
         )}
 
@@ -480,11 +487,9 @@ function Page() {
           <Card className="p-4 space-y-2 border-violet-200 dark:border-violet-800">
             <div className="flex items-center gap-2">
               <Sparkles className="size-4 animate-pulse text-violet-600" />
-              <p className="text-sm font-medium">AI Vision sedang membaca label…</p>
+              <p className="text-sm font-medium">{t("scan.label.aiVisionReading")}</p>
             </div>
-            <p className="text-xs text-muted-foreground">
-              Mengirim gambar ke Gemini. Butuh ~5-10 detik.
-            </p>
+            <p className="text-xs text-muted-foreground">{t("scan.label.aiVisionHint")}</p>
           </Card>
         )}
       </main>
@@ -493,7 +498,8 @@ function Page() {
   );
 }
 
-function progressLabel(p: OcrProgress): string {
+function progressLabel_unused(p: OcrProgress): string {
+  // Kept for back-compat reference; actual logic now inlined inside Page.
   if (p.status === "loading") return "Memuat model OCR (~13MB)…";
   if (p.status === "initializing") return "Inisialisasi engine…";
   if (p.status === "recognizing") return "Membaca teks dari gambar…";
@@ -501,28 +507,41 @@ function progressLabel(p: OcrProgress): string {
 }
 
 function NutritionCard({ parsed }: { parsed: ParseResult }) {
+  const { t } = useTranslation();
   const { nutrition, confidence, matchedFields, totalFields } = parsed;
   const rows: { label: string; value: string | null; unit: string }[] = [
-    { label: "Energi", value: nutrition.calories?.toString() ?? null, unit: "kkal" },
-    { label: "Protein", value: nutrition.protein_g?.toFixed(1) ?? null, unit: "g" },
-    { label: "Karbohidrat", value: nutrition.carbs_g?.toFixed(1) ?? null, unit: "g" },
-    { label: "Gula", value: nutrition.sugar_g?.toFixed(1) ?? null, unit: "g" },
-    { label: "Lemak Total", value: nutrition.fat_g?.toFixed(1) ?? null, unit: "g" },
-    { label: "Lemak Jenuh", value: nutrition.sat_fat_g?.toFixed(1) ?? null, unit: "g" },
-    { label: "Lemak Trans", value: nutrition.trans_fat_g?.toFixed(1) ?? null, unit: "g" },
-    { label: "Serat", value: nutrition.fiber_g?.toFixed(1) ?? null, unit: "g" },
-    { label: "Natrium", value: nutrition.sodium_mg?.toString() ?? null, unit: "mg" },
-    { label: "Kolesterol", value: nutrition.cholesterol_mg?.toString() ?? null, unit: "mg" },
+    {
+      label: t("scan.label.energy"),
+      value: nutrition.calories?.toString() ?? null,
+      unit: t("scan.label.kcal"),
+    },
+    { label: t("scan.label.protein"), value: nutrition.protein_g?.toFixed(1) ?? null, unit: "g" },
+    { label: t("scan.label.carbs"), value: nutrition.carbs_g?.toFixed(1) ?? null, unit: "g" },
+    { label: t("scan.label.sugar"), value: nutrition.sugar_g?.toFixed(1) ?? null, unit: "g" },
+    { label: t("scan.label.fatTotal"), value: nutrition.fat_g?.toFixed(1) ?? null, unit: "g" },
+    { label: t("scan.label.fatSat"), value: nutrition.sat_fat_g?.toFixed(1) ?? null, unit: "g" },
+    {
+      label: t("scan.label.fatTrans"),
+      value: nutrition.trans_fat_g?.toFixed(1) ?? null,
+      unit: "g",
+    },
+    { label: t("scan.label.fiber"), value: nutrition.fiber_g?.toFixed(1) ?? null, unit: "g" },
+    { label: t("scan.label.sodium"), value: nutrition.sodium_mg?.toString() ?? null, unit: "mg" },
+    {
+      label: t("scan.label.cholesterol"),
+      value: nutrition.cholesterol_mg?.toString() ?? null,
+      unit: "mg",
+    },
   ];
 
   return (
     <Card className="p-4 space-y-3">
       <div className="flex items-center justify-between">
         <div>
-          <h3 className="font-bold text-base">Hasil Scan</h3>
+          <h3 className="font-bold text-base">{t("scan.label.resultsTitle")}</h3>
           <p className="text-xs text-muted-foreground">
-            {matchedFields}/{totalFields} field terdeteksi ·{" "}
-            {nutrition.servingSize ?? "Tanpa takaran saji"}
+            {t("scan.label.fieldsDetected", { matched: matchedFields, total: totalFields })} ·{" "}
+            {nutrition.servingSize ?? t("scan.label.noServingSize")}
           </p>
         </div>
         <ConfidenceBadge confidence={confidence} />
@@ -549,15 +568,16 @@ function NutritionCard({ parsed }: { parsed: ParseResult }) {
 }
 
 function ConfidenceBadge({ confidence }: { confidence: number }) {
+  const { t } = useTranslation();
   let color = "bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300";
-  let label = "Akurat";
+  let label = t("scan.label.confidenceAccurate");
   const Icon = Check;
   if (confidence < CONFIDENCE_THRESHOLD) {
     color = "bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-300";
-    label = "Kurang yakin";
+    label = t("scan.label.confidenceLow");
   } else if (confidence < 70) {
     color = "bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-300";
-    label = "Cukup";
+    label = t("scan.label.confidenceMedium");
   }
   return (
     <div className={`flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${color}`}>

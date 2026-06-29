@@ -15,12 +15,14 @@ import { BookOpen } from "lucide-react";
 import { toast } from "@/lib/toast-config";
 import { getArticle, toggleBookmark } from "@/features/articles/lib/articles.functions";
 import { SafeMarkdown } from "@/components/SafeMarkdown";
+import { useTranslation } from "@/lib/i18n";
 
 export const Route = createFileRoute("/_authenticated/articles/$id")({
   component: ArticleReader,
 });
 
 function ArticleReader() {
+  const { t } = useTranslation();
   const { id } = Route.useParams();
   const qc = useQueryClient();
   const fetchArticle = useServerFn(getArticle);
@@ -39,7 +41,7 @@ function ArticleReader() {
   const bookmarkM = useMutation({
     mutationFn: () => toggleFn({ data: { article_id: id } }),
     onSuccess: (r) => {
-      toast.success(r.bookmarked ? "Disimpan" : "Bookmark dihapus");
+      toast.success(r.bookmarked ? t("common.saved") : t("common.deleted"));
       qc.invalidateQueries({ queryKey: ["article", id] });
       qc.invalidateQueries({ queryKey: ["articles"] });
     },
@@ -59,8 +61,8 @@ function ArticleReader() {
 
   const share = async () => {
     const payload = {
-      title: article?.title ?? "Artikel HealthyU",
-      text: "Baca artikel sehat ini di HealthyU",
+      title: article?.title ?? t("articles.shareFallback"),
+      text: t("articles.share.dialogText"),
       url: window.location.href,
     };
     if (navigator.share) {
@@ -74,7 +76,7 @@ function ArticleReader() {
       }
     } else {
       await navigator.clipboard.writeText(payload.url);
-      toast.success("Link disalin");
+      toast.success(t("articles.linkCopied"));
     }
   };
 
@@ -88,14 +90,14 @@ function ArticleReader() {
         />
       </div>
       <TopAppBar
-        title="Artikel"
-        subtitle={minutes ? `${minutes} menit baca` : undefined}
+        title={t("articles.navTitle")}
+        subtitle={minutes ? t("articles.readingTime", { n: minutes }) : undefined}
         showBack
         action={
           <div className="flex items-center gap-1">
             <button
               onClick={share}
-              aria-label="Bagikan"
+              aria-label={t("articles.share.trigger")}
               className="inline-flex size-11 items-center justify-center rounded-full hover:bg-muted transition"
             >
               <Share2 className="size-5" aria-hidden />
@@ -103,7 +105,7 @@ function ArticleReader() {
             <button
               onClick={() => bookmarkM.mutate()}
               disabled={bookmarkM.isPending || isLoading}
-              aria-label={saved ? "Hapus bookmark" : "Simpan bookmark"}
+              aria-label={saved ? t("articles.unbookmark") : t("articles.bookmark")}
               aria-pressed={saved}
               className="inline-flex size-11 items-center justify-center rounded-full hover:bg-muted transition disabled:opacity-50"
             >
@@ -127,14 +129,14 @@ function ArticleReader() {
       {!isLoading && isError && (
         <EmptyState
           icon={BookOpen}
-          title="Artikel tidak bisa dimuat"
-          description="Cek koneksi lalu coba lagi."
+          title={t("articles.loadError")}
+          description={t("articles.loadErrorDesc")}
           action={
             <button
               onClick={() => refetch()}
               className="px-4 py-2 rounded-full bg-primary text-primary-foreground text-sm font-semibold"
             >
-              Coba lagi
+              {t("common.retry")}
             </button>
           }
         />
@@ -143,8 +145,8 @@ function ArticleReader() {
       {!isLoading && !isError && !article && (
         <EmptyState
           icon={BookOpen}
-          title="Artikel tidak ditemukan"
-          description="Artikel ini mungkin sudah tidak tersedia."
+          title={t("articles.notFound")}
+          description={t("articles.notFoundDesc")}
         />
       )}
 
@@ -169,7 +171,9 @@ function ArticleReader() {
             <h1 className="text-2xl font-bold leading-tight">{article.title}</h1>
             <div className="flex flex-wrap gap-2 items-center text-xs text-muted-foreground">
               {minutes && <ReadingTimeBadge minutes={minutes} />}
-              {article.author_name && <span>oleh {article.author_name}</span>}
+              {article.author_name && (
+                <span>{t("articles.byline", { name: article.author_name })}</span>
+              )}
             </div>
             {article.excerpt && (
               <p className="text-sm text-muted-foreground leading-relaxed pt-1">
@@ -182,19 +186,19 @@ function ArticleReader() {
             {article.content ? (
               <SafeMarkdown>{article.content}</SafeMarkdown>
             ) : (
-              <p className="text-muted-foreground">Konten artikel belum tersedia.</p>
+              <p className="text-muted-foreground">{t("articles.contentMissing")}</p>
             )}
           </article>
 
           <div className="mt-6 space-y-3">
-            <TakeawayBox body="Coba hari ini: pilih satu ide praktis dari artikel ini, terapkan di makan berikutnya." />
+            <TakeawayBox body={t("articles.takeaway")} />
             <DisclaimerCard />
           </div>
 
           {related.length > 0 && (
             <section className="mt-6 space-y-3">
               <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground px-1">
-                Artikel terkait
+                {t("articles.relatedTitle")}
               </h2>
               <div className="grid grid-cols-2 gap-3">
                 {related.map((r) => (

@@ -928,6 +928,201 @@ export type TranslationKey =
   | "family.namePlaceholder"
   | "family.createBtn"
   | "family.activePlan"
+  | "privacy.openSettings"
+  | "privacy.toggleAudit"
+  | "privacy.togglePiiRedact"
+  | "privacy.policyLinkTitle"
+  | "privacyPolicy.title"
+  | "privacyPolicy.lastUpdated"
+  | "privacyPolicy.summaryTitle"
+  | "privacyPolicy.summaryLead"
+  | "privacyPolicy.section1Title"
+  | "privacyPolicy.section1UserTitle"
+  | "privacyPolicy.section1AutoTitle"
+  | "privacyPolicy.section2Title"
+  | "privacyPolicy.section3Title"
+  | "privacyPolicy.section4Title"
+  | "privacyPolicy.section5Title"
+  | "privacyPolicy.section5Intro"
+  | "privacyPolicy.rightAccessTitle"
+  | "privacyPolicy.rightAccessDesc"
+  | "privacyPolicy.rightAccessAction"
+  | "privacyPolicy.rightCopyTitle"
+  | "privacyPolicy.rightCopyDesc"
+  | "privacyPolicy.rightCopyAction"
+  | "privacyPolicy.rightFixTitle"
+  | "privacyPolicy.rightFixDesc"
+  | "privacyPolicy.rightFixAction"
+  | "privacyPolicy.rightDeleteTitle"
+  | "privacyPolicy.rightDeleteDesc"
+  | "privacyPolicy.rightDeleteAction"
+  | "privacyPolicy.section5After"
+  | "privacyPolicy.section6Title"
+  | "privacyPolicy.section7Title"
+  | "privacyPolicy.section7Body"
+  | "privacyPolicy.section8Title"
+  | "privacyPolicy.section8Intro"
+  | "privacyPolicy.section8EmailLabel"
+  | "privacyPolicy.section8After"
+  | "privacyPolicy.section9Title"
+  | "privacyPolicy.section9Body"
+  | "privacyPolicy.footer"
+  | "privacyPolicy.publicNotice"
+  | "backup.historyMeta"
+  | "body.title"
+  | "body.tabs.weight"
+  | "body.tabs.measurements"
+  | "body.tabs.photo"
+  | "body.tabs.vitals"
+  | "body.weightChart"
+  | "body.weightGoal"
+  | "body.measurements.waist"
+  | "body.measurements.chest"
+  | "body.measurements.arm"
+  | "body.measurements.thigh"
+  | "body.measurementsHint"
+  | "body.photo.addProgress"
+  | "body.photo.angles"
+  | "body.photo.upload"
+  | "body.vitals.bloodPressure"
+  | "body.vitals.heartRate"
+  | "body.vitals.bodyTemp"
+  | "body.vitals.spo2"
+  | "body.vitalsLogLink"
+  | "patternSettings.title"
+  | "patternSettings.subtitle"
+  | "patternSettings.skipBreakfastLabel"
+  | "patternSettings.daysPerWeek"
+  | "patternSettings.skipBreakfastDesc"
+  | "patternSettings.lateNightDinnerLabel"
+  | "patternSettings.lateNightDesc"
+  | "patternSettings.irregularVarianceLabel"
+  | "patternSettings.hoursUnit"
+  | "patternSettings.irregularDesc"
+  | "patternSettings.thresholdTitle"
+  | "patternSettings.thresholdDesc"
+  | "patternSettings.sensitivityTitle"
+  | "patternSettings.sensitivityDesc"
+  | "patternSettings.sensitivityLabel"
+  | "patternSettings.sensitivity.low"
+  | "patternSettings.sensitivity.medium"
+  | "patternSettings.sensitivity.high"
+  | "patternSettings.sensitivityHint"
+  | "patternSettings.saveButton"
+  | "patternSettings.savingButton"
+  | "patternSettings.resetButton"
+  | "patternSettings.savedAlert"
+  | "patternSettings.errorAlert"
+  | "articles.title"
+  | "articles.navTitle"
+  | "articles.savedFilter"
+  | "articles.empty"
+  | "articles.emptyDesc"
+  | "articles.noResults"
+  | "articles.noResultsDesc"
+  | "articles.byline"
+  | "articles.unbookmark"
+  | "articles.bookmark"
+  | "articles.readingTime"
+  | "articles.share.trigger"
+  | "articles.share.dialogTitle"
+  | "articles.share.dialogText"
+  | "articles.linkCopied"
+  | "articles.loadError"
+  | "articles.loadErrorDesc"
+  | "articles.notFound"
+  | "articles.notFoundDesc"
+  | "articles.contentMissing"
+  | "articles.takeaway"
+  | "articles.relatedTitle"
+  | "articles.loadFailImage"
+  | "sleep.diaryTitle"
+  | "sleep.diaryTonight"
+  | "sleep.diaryHours"
+  | "sleep.diaryBedtimeLabel"
+  | "sleep.diaryWakeLabel"
+  | "sleep.diaryNotePlaceholder"
+  | "sleep.diaryAvgQuality"
+  | "sleep.diaryHistory"
+  | "scan.label.title"
+  | "scan.label.subtitle"
+  | "scan.label.takePhoto"
+  | "scan.label.gallery"
+  | "scan.label.clientScan"
+  | "scan.label.aiVision"
+  | "scan.label.noOcrBrowser"
+  | "scan.label.changePhoto"
+  | "scan.label.processing"
+  | "scan.label.progressStatus"
+  | "scan.label.enginePreparing"
+  | "scan.label.engineInitializing"
+  | "scan.label.engineReading"
+  | "scan.label.engineDone"
+  | "scan.label.ocrNotSupported"
+  | "scan.label.aiVisionPending"
+  | "scan.label.offlineSupported"
+  | "scan.label.offlineNoSupport"
+  | "scan.label.tryAi"
+  | "scan.label.mealLogTitle"
+  | "scan.label.mealTypes.breakfast"
+  | "scan.label.mealTypes.lunch"
+  | "scan.label.mealTypes.dinner"
+  | "scan.label.mealTypes.snack"
+  | "scan.label.savedAs.breakfast"
+  | "scan.label.savedAs.lunch"
+  | "scan.label.savedAs.dinner"
+  | "scan.label.savedAs.snack"
+  | "scan.label.servingDefault"
+  | "scan.label.scanAnother"
+  | "scan.label.aiParsing"
+  | "scan.label.aiParsingHint"
+  | "scan.label.aiVisionReading"
+  | "scan.label.aiVisionHint"
+  | "scan.label.aiSuccess"
+  | "scan.label.aiFailed"
+  | "scan.label.altText"
+  | "scan.label.lowConfidenceHint"
+  | "scan.label.matchedFields"
+  | "scan.label.ocrFailed"
+  | "scan.label.saveToMealLogSuccess"
+  | "scan.label.saveFailed"
+  | "scan.label.readFailedFallback"
+  | "scan.label.detectedFallback"
+  | "backup.pdpDisclaimerTitle"
+  | "backup.pdpDisclaimerBody"
+  | "articles.shareFallback"
+  | "scan.label.resultsTitle"
+  | "scan.label.fieldsDetected"
+  | "scan.label.noServingSize"
+  | "scan.label.energy"
+  | "scan.label.protein"
+  | "scan.label.carbs"
+  | "scan.label.sugar"
+  | "scan.label.fatTotal"
+  | "scan.label.fatSat"
+  | "scan.label.fatTrans"
+  | "scan.label.fiber"
+  | "scan.label.sodium"
+  | "scan.label.cholesterol"
+  | "scan.label.kcal"
+  | "scan.label.confidenceAccurate"
+  | "scan.label.confidenceLow"
+  | "scan.label.confidenceMedium"
+  | "privacyPolicy.section1UserItems.akun"
+  | "privacyPolicy.section1UserItems.profil"
+  | "privacyPolicy.section1UserItems.log"
+  | "privacyPolicy.section1UserItems.komunitas"
+  | "privacyPolicy.section1UserItems.ai"
+  | "privacyPolicy.section1AutoItems.auth"
+  | "privacyPolicy.section1AutoItems.notif"
+  | "privacyPolicy.section1AutoItems.wearable"
+  | "privacyPolicy.section1AutoItems.logs"
+  | "privacyPolicy.section2Item.summary"
+  | "privacyPolicy.section2Item.recommend"
+  | "privacyPolicy.section2Item.notif"
+  | "privacyPolicy.section2Item.audit"
+  | "privacyPolicy.section2NoTargeted"
+  | "privacyPolicy.section4ActiveAccount"
   | "family.createdToast";
 
 /** Template string `{page}` → page number. */
@@ -1874,6 +2069,229 @@ export const bundles = {
     "family.createBtn": "Buat",
     "family.activePlan": "Plan aktif",
     "family.createdToast": "Family plan dibuat",
+    "privacyPolicy.section1UserItems.akun":
+      "email, nama tampilan, foto profil (jika diunggah), preferensi publik.",
+    "privacyPolicy.section1UserItems.profil":
+      "tanggal lahir, jenis kelamin, tinggi, berat, alergi, kondisi kesehatan yang Anda catat sendiri.",
+    "privacyPolicy.section1UserItems.log":
+      "makanan, minuman, olahraga, tidur, berat, mood, obat, catatan, foto progres.",
+    "privacyPolicy.section1UserItems.komunitas":
+      "posting, komentar, dan interaksi (like, simpan) yang Anda buat di fitur komunitas.",
+    "privacyPolicy.section1UserItems.ai": "pesan yang Anda kirim ke AI coach.",
+    "privacyPolicy.section1AutoItems.auth": "token sesi, refresh token (Supabase Auth).",
+    "privacyPolicy.section1AutoItems.notif":
+      "endpoint push subscription (VAPID) untuk kirim pengingat.",
+    "privacyPolicy.section1AutoItems.wearable":
+      "token koneksi ke Google Fit, jika Anda menghubungkan perangkat.",
+    "privacyPolicy.section1AutoItems.logs": "error report anonim, metrik performa (tanpa PII).",
+    "privacyPolicy.section2Item.summary":
+      "Menampilkan kembali ringkasan, grafik, dan tren kesehatan Anda.",
+    "privacyPolicy.section2Item.recommend":
+      "Mengirimkan rekomendasi personal (AI coach, rekomendasi olahraga, dll).",
+    "privacyPolicy.section2Item.notif":
+      "Mengirim notifikasi yang Anda daftarkan (pengingat minum, jadwal puasa, dst).",
+    "privacyPolicy.section2Item.audit":
+      'Audit kualitas model AI — hanya jika Anda mengaktifkan toggle "Bantu tingkatkan AI" di halaman privasi.',
+    "privacyPolicy.section2NoTargeted":
+      "Kami tidak menggunakan data Anda untuk iklan bertarget atau dibagikan ke pengiklan.",
+    "privacyPolicy.section4ActiveAccount": "Akun aktif",
+    "scan.label.resultsTitle": "Hasil Scan",
+    "scan.label.fieldsDetected": "{matched}/{total} field terdeteksi",
+    "scan.label.noServingSize": "Tanpa takaran saji",
+    "scan.label.energy": "Energi",
+    "scan.label.protein": "Protein",
+    "scan.label.carbs": "Karbohidrat",
+    "scan.label.sugar": "Gula",
+    "scan.label.fatTotal": "Lemak Total",
+    "scan.label.fatSat": "Lemak Jenuh",
+    "scan.label.fatTrans": "Lemak Trans",
+    "scan.label.fiber": "Serat",
+    "scan.label.sodium": "Natrium",
+    "scan.label.cholesterol": "Kolesterol",
+    "scan.label.kcal": "kkal",
+    "scan.label.confidenceAccurate": "Akurat",
+    "scan.label.confidenceLow": "Kurang yakin",
+    "scan.label.confidenceMedium": "Cukup",
+    "articles.shareFallback": "Artikel HealthyU",
+    "backup.pdpDisclaimerTitle": "Hak Anda (UU PDP No. 27/2022):",
+    "backup.pdpDisclaimerBody":
+      "Anda berhak mengakses, mengoreksi, menghapus, dan membatasi pemrosesan data pribadi Anda. Semua ekspor dicatat untuk transparansi dan kepatuhan.",
+    "privacy.openSettings": "Buka pengaturan",
+    "privacy.toggleAudit": "Toggle audit",
+    "privacy.togglePiiRedact": "Toggle PII redaction",
+    "privacy.policyLinkTitle": "Kebijakan Privasi",
+    "privacyPolicy.title": "Kebijakan Privasi",
+    "privacyPolicy.lastUpdated": "Terakhir diperbarui: {date} · Merujuk pada UU PDP No. 27/2022",
+    "privacyPolicy.summaryTitle": "Ringkasan singkat",
+    "privacyPolicy.summaryLead":
+      "HealthyU adalah aplikasi catatan kesehatan pribadi. Kami hanya mengumpulkan data yang Anda berikan secara sadar (profil, log makanan, olahraga, tidur, dll) untuk menampilkan kembali informasi tersebut kepada Anda. Kami **tidak menjual data Anda** ke pihak ketiga.",
+    "privacyPolicy.section1Title": "1. Data yang kami kumpulkan",
+    "privacyPolicy.section1UserTitle": "Data yang Anda berikan",
+    "privacyPolicy.section1AutoTitle": "Data yang dikumpulkan otomatis",
+    "privacyPolicy.section2Title": "2. Untuk apa data digunakan",
+    "privacyPolicy.section3Title": "3. Siapa yang menerima data",
+    "privacyPolicy.section4Title": "4. Periode retensi",
+    "privacyPolicy.section5Title": "5. Hak-hak Anda (UU PDP Pasal 5–12)",
+    "privacyPolicy.section5Intro": "Anda berhak untuk:",
+    "privacyPolicy.rightAccessTitle": "Melihat & mengakses",
+    "privacyPolicy.rightAccessDesc": "Lihat semua data pribadi Anda yang kami simpan.",
+    "privacyPolicy.rightAccessAction": "Privasi saya",
+    "privacyPolicy.rightCopyTitle": "Mendapatkan salinan",
+    "privacyPolicy.rightCopyDesc": "Ekspor seluruh data Anda dalam format JSON atau CSV.",
+    "privacyPolicy.rightCopyAction": "Unduh data",
+    "privacyPolicy.rightFixTitle": "Memperbaiki",
+    "privacyPolicy.rightFixDesc": "Perbarui data yang tidak akurat di halaman profil.",
+    "privacyPolicy.rightFixAction": "Edit profil",
+    "privacyPolicy.rightDeleteTitle": "Menghapus akun",
+    "privacyPolicy.rightDeleteDesc": "Hapus permanen akun & semua data Anda.",
+    "privacyPolicy.rightDeleteAction": "Hapus akun",
+    "privacyPolicy.section5After":
+      "Setiap permintaan dieksekusi maksimal **7×24 jam** setelah permintaan diverifikasi. Permintaan yang terkait kewajiban hukum (mis. log audit yang sudah kadaluarsa) akan dijelaskan alasannya.",
+    "privacyPolicy.section6Title": "6. Keamanan",
+    "privacyPolicy.section7Title": "7. Anak di bawah umur",
+    "privacyPolicy.section7Body":
+      "HealthyU tidak ditujukan untuk anak di bawah 13 tahun. Kami tidak dengan sengaja mengumpulkan data anak di bawah batas usia tersebut. Orang tua/wali yang khawatir dapat menghubungi kami untuk meminta penghapusan data.",
+    "privacyPolicy.section8Title": "8. Kontak & pengaduan",
+    "privacyPolicy.section8Intro":
+      "Untuk pertanyaan, permintaan akses data, atau pengaduan privasi:",
+    "privacyPolicy.section8EmailLabel": "Email:",
+    "privacyPolicy.section8After":
+      "Jika Anda merasa keluhan tidak ditangani dengan baik, Anda berhak mengajukan pengaduan ke otoritas perlindungan data pribadi Indonesia (kominfo).",
+    "privacyPolicy.section9Title": "9. Perubahan kebijakan",
+    "privacyPolicy.section9Body":
+      "Kami akan memberi tahu Anda melalui notifikasi aplikasi jika ada perubahan material pada kebijakan ini. Versi sebelumnya akan tetap tersedia di histori publik halaman ini.",
+    "privacyPolicy.footer":
+      "Halaman ini bersifat publik. Untuk tindakan (lihat, unduh, edit, hapus data) silakan masuk ke aplikasi.",
+    "privacyPolicy.publicNotice":
+      "Halaman ini bersifat publik. Untuk tindakan (lihat, unduh, edit, hapus data) silakan masuk ke aplikasi.",
+    "backup.historyMeta": "{tables} tabel · {rows} baris",
+    "body.title": "Body Composition",
+    "body.tabs.weight": "Berat",
+    "body.tabs.measurements": "Ukuran",
+    "body.tabs.photo": "Foto",
+    "body.tabs.vitals": "Vitals",
+    "body.weightChart": "Grafik berat",
+    "body.weightGoal": "Atur target",
+    "body.measurements.waist": "Lingkar pinggang",
+    "body.measurements.chest": "Lingkar dada",
+    "body.measurements.arm": "Lingkar lengan",
+    "body.measurements.thigh": "Lingkar paha",
+    "body.measurementsHint": "Catat tiap minggu untuk lihat progres komposisi tubuh.",
+    "body.photo.addProgress": "Tambah foto progres",
+    "body.photo.angles": "Depan · Samping · Belakang",
+    "body.photo.upload": "Unggah foto",
+    "body.vitals.bloodPressure": "Tekanan darah",
+    "body.vitals.heartRate": "Detak jantung",
+    "body.vitals.bodyTemp": "Suhu tubuh",
+    "body.vitals.spo2": "SpO₂",
+    "body.vitalsLogLink": "Catat vitals",
+    "patternSettings.title": "Pengaturan Deteksi Pola",
+    "patternSettings.subtitle": "Sesuaikan sensitivitas deteksi pola makan sesuai preferensi Anda",
+    "patternSettings.skipBreakfastLabel": "Lewati Sarapan",
+    "patternSettings.daysPerWeek": "{n} hari/minggu",
+    "patternSettings.skipBreakfastDesc":
+      "Minimal hari per minggu untuk dianggap melewatkan sarapan",
+    "patternSettings.lateNightDinnerLabel": "Jam Makan Malam Terlambat",
+    "patternSettings.lateNightDesc": "Jam mulai “makan malam terlambat”",
+    "patternSettings.irregularVarianceLabel": "Variasi Jam Makan Tidak Teratur",
+    "patternSettings.hoursUnit": "±{n} jam",
+    "patternSettings.irregularDesc": "Toleransi deviasi standar dari pola makan normal",
+    "patternSettings.thresholdTitle": "Threshold Pola",
+    "patternSettings.thresholdDesc": "Atur batas minimal untuk mendeteksi pola tertentu",
+    "patternSettings.sensitivityTitle": "Sensitivitas Deteksi",
+    "patternSettings.sensitivityDesc": "Seberapa sering pola dilaporkan",
+    "patternSettings.sensitivityLabel": "Tingkat Sensitivitas",
+    "patternSettings.sensitivity.low": "Rendah (hanya pola kuat)",
+    "patternSettings.sensitivity.medium": "Sedang (default)",
+    "patternSettings.sensitivity.high": "Tinggi (semua pola terdeteksi)",
+    "patternSettings.sensitivityHint":
+      "Sensitivitas rendah = lebih sedikit notifikasi, hanya pola yang sangat jelas",
+    "patternSettings.saveButton": "Simpan Pengaturan",
+    "patternSettings.savingButton": "Menyimpan...",
+    "patternSettings.resetButton": "Reset ke Default",
+    "patternSettings.savedAlert": "✅ Pengaturan pola tersimpan",
+    "patternSettings.errorAlert": "❌ Error: {msg}",
+    "articles.title": "Artikel Kesehatan",
+    "articles.navTitle": "Artikel",
+    "articles.savedFilter": "★ Disimpan",
+    "articles.empty": "Belum ada artikel",
+    "articles.emptyDesc": "Artikel kesehatan baru akan muncul di sini.",
+    "articles.noResults": "Tidak ada hasil",
+    "articles.noResultsDesc": "Coba pilih kategori lain.",
+    "articles.byline": "oleh {name}",
+    "articles.unbookmark": "Hapus bookmark",
+    "articles.bookmark": "Simpan bookmark",
+    "articles.readingTime": "{n} menit baca",
+    "articles.share.trigger": "Bagikan",
+    "articles.share.dialogTitle": "Artikel HealthyU",
+    "articles.share.dialogText": "Baca artikel sehat ini di HealthyU",
+    "articles.linkCopied": "Link disalin",
+    "articles.loadError": "Artikel tidak bisa dimuat",
+    "articles.loadErrorDesc": "Cek koneksi lalu coba lagi.",
+    "articles.notFound": "Artikel tidak ditemukan",
+    "articles.notFoundDesc": "Artikel ini mungkin sudah tidak tersedia.",
+    "articles.contentMissing": "Konten artikel belum tersedia.",
+    "articles.takeaway":
+      "Coba hari ini: pilih satu ide praktis dari artikel ini, terapkan di makan berikutnya.",
+    "articles.relatedTitle": "Artikel terkait",
+    "articles.loadFailImage": "Gagal membuat gambar",
+    "sleep.diaryTitle": "Sleep Diary",
+    "sleep.diaryTonight": "Tidur malam ini",
+    "sleep.diaryHours": "jam",
+    "sleep.diaryBedtimeLabel": "Jam tidur",
+    "sleep.diaryWakeLabel": "Jam bangun",
+    "sleep.diaryNotePlaceholder": "Catatan (mimpi, gangguan, dll)…",
+    "sleep.diaryAvgQuality": "Kualitas rata-rata",
+    "sleep.diaryHistory": "Riwayat",
+    "scan.label.title": "Scan Label Nutrisi",
+    "scan.label.subtitle": "Client-side OCR · tanpa upload",
+    "scan.label.takePhoto": "Ambil Foto Label",
+    "scan.label.gallery": "Pilih dari Galeri",
+    "scan.label.clientScan": "Scan Client OCR (Offline)",
+    "scan.label.aiVision": "AI Vision (Lebih Akurat)",
+    "scan.label.noOcrBrowser":
+      "Browser tidak support client OCR. Pakai AI Vision untuk hasil lebih akurat.",
+    "scan.label.changePhoto": "Ganti Foto",
+    "scan.label.processing": "Memproses…",
+    "scan.label.progressStatus": "{pct}%",
+    "scan.label.enginePreparing": "Mempersiapkan engine OCR…",
+    "scan.label.engineInitializing": "Inisialisasi engine…",
+    "scan.label.engineReading": "Membaca teks dari gambar…",
+    "scan.label.engineDone": "Selesai",
+    "scan.label.ocrNotSupported": "Browser tidak mendukung OCR. Gunakan AI fallback.",
+    "scan.label.aiVisionPending": "Mengirim gambar ke AI Vision…",
+    "scan.label.offlineSupported":
+      "Scan berjalan 100% di perangkat. Gambar label tidak di-upload kecuali Anda pilih AI fallback.",
+    "scan.label.offlineNoSupport":
+      "Browser tidak support client OCR. Pakai AI fallback (perlu internet).",
+    "scan.label.tryAi": "Coba AI (Parser Teks) untuk Akurasi",
+    "scan.label.mealLogTitle": "Simpan ke meal log",
+    "scan.label.mealTypes.breakfast": "Sarapan",
+    "scan.label.mealTypes.lunch": "Siang",
+    "scan.label.mealTypes.dinner": "Malam",
+    "scan.label.mealTypes.snack": "Snack",
+    "scan.label.savedAs.breakfast": "Simpan sebagai sarapan",
+    "scan.label.savedAs.lunch": "Simpan sebagai makan siang",
+    "scan.label.savedAs.dinner": "Simpan sebagai makan malam",
+    "scan.label.savedAs.snack": "Simpan sebagai snack",
+    "scan.label.servingDefault": "1 takaran saji",
+    "scan.label.scanAnother": "Scan Label Lain",
+    "scan.label.aiParsing": "AI sedang parsing teks OCR…",
+    "scan.label.aiParsingHint":
+      "Mengirim teks hasil OCR (gambar tetap di perangkat). Butuh ~3-5 detik.",
+    "scan.label.aiVisionReading": "AI Vision sedang membaca label…",
+    "scan.label.aiVisionHint": "Mengirim gambar ke Gemini. Butuh ~5-10 detik.",
+    "scan.label.aiSuccess": "Selesai dibaca AI",
+    "scan.label.aiFailed": "AI OCR gagal",
+    "scan.label.altText": "Label nutrisi",
+    "scan.label.lowConfidenceHint":
+      "Teks terbaca (confidence {pct}%). Pertimbangkan AI fallback untuk hasil lebih akurat.",
+    "scan.label.matchedFields": "Berhasil! {matched}/{total} field terdeteksi.",
+    "scan.label.ocrFailed": "OCR gagal: {msg}. Coba AI fallback.",
+    "scan.label.saveToMealLogSuccess": "Tersimpan ke meal log!",
+    "scan.label.saveFailed": "Gagal simpan",
+    "scan.label.readFailedFallback": "Gagal membaca label nutrisi",
+    "scan.label.detectedFallback": "Label terdeteksi",
   },
 
   // ══════════════════════════════════════════════════════════════════
@@ -2813,6 +3231,227 @@ export const bundles = {
     "family.createBtn": "Create",
     "family.activePlan": "Active plan",
     "family.createdToast": "Family plan created",
+    "privacyPolicy.section1UserItems.akun":
+      "email, display name, profile photo (if uploaded), public preferences.",
+    "privacyPolicy.section1UserItems.profil":
+      "date of birth, gender, height, weight, allergies, health conditions you log yourself.",
+    "privacyPolicy.section1UserItems.log":
+      "meals, drinks, exercise, sleep, weight, mood, medications, notes, progress photos.",
+    "privacyPolicy.section1UserItems.komunitas":
+      "posts, comments, and interactions (likes, saves) you make in the community feature.",
+    "privacyPolicy.section1UserItems.ai": "messages you send to the AI coach.",
+    "privacyPolicy.section1AutoItems.auth": "session token, refresh token (Supabase Auth).",
+    "privacyPolicy.section1AutoItems.notif":
+      "push subscription endpoint (VAPID) for sending reminders.",
+    "privacyPolicy.section1AutoItems.wearable":
+      "Google Fit connection token, if you link a device.",
+    "privacyPolicy.section1AutoItems.logs":
+      "anonymous error reports, performance metrics (no PII).",
+    "privacyPolicy.section2Item.summary": "Display your health summary, charts, and trends.",
+    "privacyPolicy.section2Item.recommend":
+      "Send personal recommendations (AI coach, workout suggestions, etc.).",
+    "privacyPolicy.section2Item.notif":
+      "Send notifications you opted into (water reminders, fasting schedule, etc.).",
+    "privacyPolicy.section2Item.audit":
+      'Audit AI model quality — only if you enable the "Help improve AI" toggle on the privacy page.',
+    "privacyPolicy.section2NoTargeted":
+      "We do not use your data for targeted ads or share it with advertisers.",
+    "privacyPolicy.section4ActiveAccount": "Active account",
+    "scan.label.resultsTitle": "Scan results",
+    "scan.label.fieldsDetected": "{matched}/{total} fields detected",
+    "scan.label.noServingSize": "No serving size",
+    "scan.label.energy": "Energy",
+    "scan.label.protein": "Protein",
+    "scan.label.carbs": "Carbs",
+    "scan.label.sugar": "Sugar",
+    "scan.label.fatTotal": "Total Fat",
+    "scan.label.fatSat": "Saturated Fat",
+    "scan.label.fatTrans": "Trans Fat",
+    "scan.label.fiber": "Fiber",
+    "scan.label.sodium": "Sodium",
+    "scan.label.cholesterol": "Cholesterol",
+    "scan.label.kcal": "kcal",
+    "scan.label.confidenceAccurate": "Accurate",
+    "scan.label.confidenceLow": "Low confidence",
+    "scan.label.confidenceMedium": "Fair",
+    "articles.shareFallback": "HealthyU article",
+    "backup.pdpDisclaimerTitle": "Your rights (Indonesian PDP Law No. 27/2022):",
+    "backup.pdpDisclaimerBody":
+      "You have the right to access, correct, delete, and restrict processing of your personal data. Every export is logged for transparency and compliance.",
+    "privacy.openSettings": "Open settings",
+    "privacy.toggleAudit": "Toggle audit",
+    "privacy.togglePiiRedact": "Toggle PII redaction",
+    "privacy.policyLinkTitle": "Privacy Policy",
+    "privacyPolicy.title": "Privacy Policy",
+    "privacyPolicy.lastUpdated":
+      "Last updated: {date} · Compliant with Indonesian PDP Law No. 27/2022",
+    "privacyPolicy.summaryTitle": "Quick summary",
+    "privacyPolicy.summaryLead":
+      "HealthyU is a personal health journaling app. We only collect data you knowingly provide (profile, food log, exercise, sleep, etc.) in order to display it back to you. We **do not sell your data** to third parties.",
+    "privacyPolicy.section1Title": "1. Data we collect",
+    "privacyPolicy.section1UserTitle": "Data you provide",
+    "privacyPolicy.section1AutoTitle": "Data collected automatically",
+    "privacyPolicy.section2Title": "2. What data is used for",
+    "privacyPolicy.section3Title": "3. Who receives the data",
+    "privacyPolicy.section4Title": "4. Retention period",
+    "privacyPolicy.section5Title": "5. Your rights (PDP Law articles 5–12)",
+    "privacyPolicy.section5Intro": "You have the right to:",
+    "privacyPolicy.rightAccessTitle": "View & access",
+    "privacyPolicy.rightAccessDesc": "View all personal data we have stored.",
+    "privacyPolicy.rightAccessAction": "My privacy",
+    "privacyPolicy.rightCopyTitle": "Get a copy",
+    "privacyPolicy.rightCopyDesc": "Export all your data as JSON or CSV.",
+    "privacyPolicy.rightCopyAction": "Download data",
+    "privacyPolicy.rightFixTitle": "Correct",
+    "privacyPolicy.rightFixDesc": "Update inaccurate data on the profile page.",
+    "privacyPolicy.rightFixAction": "Edit profile",
+    "privacyPolicy.rightDeleteTitle": "Delete account",
+    "privacyPolicy.rightDeleteDesc": "Permanently delete your account & all data.",
+    "privacyPolicy.rightDeleteAction": "Delete account",
+    "privacyPolicy.section5After":
+      "Every request is processed within **7×24 hours** of verification. Requests affected by legal obligations (e.g. expired audit logs) will be explained.",
+    "privacyPolicy.section6Title": "6. Security",
+    "privacyPolicy.section7Title": "7. Children under 13",
+    "privacyPolicy.section7Body":
+      "HealthyU is not intended for children under 13. We do not knowingly collect data from children below that age. Parents/guardians with concerns may contact us to request deletion.",
+    "privacyPolicy.section8Title": "8. Contact & complaints",
+    "privacyPolicy.section8Intro": "For questions, data access requests, or privacy complaints:",
+    "privacyPolicy.section8EmailLabel": "Email:",
+    "privacyPolicy.section8After":
+      "If you feel a complaint was not handled well, you have the right to file a complaint with the Indonesian personal data protection authority (KOMINFO).",
+    "privacyPolicy.section9Title": "9. Changes to this policy",
+    "privacyPolicy.section9Body":
+      "We will notify you via in-app push notification if material changes are made. Previous versions remain available in the public history of this page.",
+    "privacyPolicy.footer":
+      "This page is public. For actions (view, download, edit, delete) please log in to the app.",
+    "privacyPolicy.publicNotice":
+      "This page is public. For actions (view, download, edit, delete) please log in to the app.",
+    "backup.historyMeta": "{tables} tables · {rows} rows",
+    "body.title": "Body Composition",
+    "body.tabs.weight": "Weight",
+    "body.tabs.measurements": "Measurements",
+    "body.tabs.photo": "Photo",
+    "body.tabs.vitals": "Vitals",
+    "body.weightChart": "Weight chart",
+    "body.weightGoal": "Set target",
+    "body.measurements.waist": "Waist",
+    "body.measurements.chest": "Chest",
+    "body.measurements.arm": "Arm",
+    "body.measurements.thigh": "Thigh",
+    "body.measurementsHint": "Log weekly to see body composition progress.",
+    "body.photo.addProgress": "Add progress photo",
+    "body.photo.angles": "Front · Side · Back",
+    "body.photo.upload": "Upload photo",
+    "body.vitals.bloodPressure": "Blood pressure",
+    "body.vitals.heartRate": "Heart rate",
+    "body.vitals.bodyTemp": "Body temp",
+    "body.vitals.spo2": "SpO₂",
+    "body.vitalsLogLink": "Log vitals",
+    "patternSettings.title": "Pattern Detection Settings",
+    "patternSettings.subtitle": "Tune eating-pattern detection sensitivity to your preferences",
+    "patternSettings.skipBreakfastLabel": "Skip Breakfast",
+    "patternSettings.daysPerWeek": "{n} days/week",
+    "patternSettings.skipBreakfastDesc": "Minimum days per week to count as skipping breakfast",
+    "patternSettings.lateNightDinnerLabel": "Late Dinner Hour",
+    "patternSettings.lateNightDesc": "Hour that counts as “late dinner”",
+    "patternSettings.irregularVarianceLabel": "Irregular Meal Hour Variance",
+    "patternSettings.hoursUnit": "±{n} hours",
+    "patternSettings.irregularDesc": "Standard deviation tolerance from normal eating pattern",
+    "patternSettings.thresholdTitle": "Pattern Threshold",
+    "patternSettings.thresholdDesc": "Set the minimum threshold to detect specific patterns",
+    "patternSettings.sensitivityTitle": "Detection Sensitivity",
+    "patternSettings.sensitivityDesc": "How often patterns are reported",
+    "patternSettings.sensitivityLabel": "Sensitivity Level",
+    "patternSettings.sensitivity.low": "Low (only strong patterns)",
+    "patternSettings.sensitivity.medium": "Medium (default)",
+    "patternSettings.sensitivity.high": "High (all patterns detected)",
+    "patternSettings.sensitivityHint":
+      "Low sensitivity = fewer notifications, only very clear patterns",
+    "patternSettings.saveButton": "Save Settings",
+    "patternSettings.savingButton": "Saving...",
+    "patternSettings.resetButton": "Reset to default",
+    "patternSettings.savedAlert": "✅ Pattern settings saved",
+    "patternSettings.errorAlert": "❌ Error: {msg}",
+    "articles.title": "Health Articles",
+    "articles.navTitle": "Article",
+    "articles.savedFilter": "★ Saved",
+    "articles.empty": "No articles yet",
+    "articles.emptyDesc": "New health articles will appear here.",
+    "articles.noResults": "No results",
+    "articles.noResultsDesc": "Try another category.",
+    "articles.byline": "by {name}",
+    "articles.unbookmark": "Remove bookmark",
+    "articles.bookmark": "Save bookmark",
+    "articles.readingTime": "{n} min read",
+    "articles.share.trigger": "Share",
+    "articles.share.dialogTitle": "HealthyU article",
+    "articles.share.dialogText": "Read this health article on HealthyU",
+    "articles.linkCopied": "Link copied",
+    "articles.loadError": "Article failed to load",
+    "articles.loadErrorDesc": "Check your connection and try again.",
+    "articles.notFound": "Article not found",
+    "articles.notFoundDesc": "This article is no longer available.",
+    "articles.contentMissing": "Article content not available yet.",
+    "articles.takeaway":
+      "Try today: pick one practical idea from this article, apply it at your next meal.",
+    "articles.relatedTitle": "Related articles",
+    "articles.loadFailImage": "Failed to create image",
+    "sleep.diaryTitle": "Sleep Diary",
+    "sleep.diaryTonight": "Tonight's sleep",
+    "sleep.diaryHours": "hours",
+    "sleep.diaryBedtimeLabel": "Bedtime",
+    "sleep.diaryWakeLabel": "Wake time",
+    "sleep.diaryNotePlaceholder": "Notes (dreams, disturbances, etc.)…",
+    "sleep.diaryAvgQuality": "Avg quality",
+    "sleep.diaryHistory": "History",
+    "scan.label.title": "Nutrition Label Scan",
+    "scan.label.subtitle": "Client-side OCR · no upload",
+    "scan.label.takePhoto": "Capture Label Photo",
+    "scan.label.gallery": "Choose from Gallery",
+    "scan.label.clientScan": "Scan with Client OCR (Offline)",
+    "scan.label.aiVision": "AI Vision (More accurate)",
+    "scan.label.noOcrBrowser":
+      "Browser doesn't support client OCR. Use AI Vision for better results.",
+    "scan.label.changePhoto": "Change Photo",
+    "scan.label.processing": "Processing…",
+    "scan.label.progressStatus": "{pct}%",
+    "scan.label.enginePreparing": "Preparing OCR engine…",
+    "scan.label.engineInitializing": "Initializing engine…",
+    "scan.label.engineReading": "Reading text from image…",
+    "scan.label.engineDone": "Done",
+    "scan.label.ocrNotSupported": "Browser doesn't support OCR. Use AI fallback.",
+    "scan.label.aiVisionPending": "Sending image to AI Vision…",
+    "scan.label.offlineSupported":
+      "Scan runs 100% on device. Label image is not uploaded unless you choose AI fallback.",
+    "scan.label.offlineNoSupport":
+      "Browser doesn't support client OCR. Use AI fallback (internet required).",
+    "scan.label.tryAi": "Try AI (text parser) for accuracy",
+    "scan.label.mealLogTitle": "Save to meal log",
+    "scan.label.mealTypes.breakfast": "Breakfast",
+    "scan.label.mealTypes.lunch": "Lunch",
+    "scan.label.mealTypes.dinner": "Dinner",
+    "scan.label.mealTypes.snack": "Snack",
+    "scan.label.savedAs.breakfast": "Save as breakfast",
+    "scan.label.savedAs.lunch": "Save as lunch",
+    "scan.label.savedAs.dinner": "Save as dinner",
+    "scan.label.savedAs.snack": "Save as snack",
+    "scan.label.servingDefault": "1 serving",
+    "scan.label.scanAnother": "Scan another label",
+    "scan.label.aiParsing": "AI is parsing OCR text…",
+    "scan.label.aiParsingHint": "Sending OCR text (image stays on device). Takes ~3-5 seconds.",
+    "scan.label.aiVisionReading": "AI Vision is reading the label…",
+    "scan.label.aiVisionHint": "Sending image to Gemini. Takes ~5-10 seconds.",
+    "scan.label.aiSuccess": "AI finished reading",
+    "scan.label.aiFailed": "AI OCR failed",
+    "scan.label.altText": "Nutrition label",
+    "scan.label.lowConfidenceHint":
+      "Text read (confidence {pct}%). Consider AI fallback for better accuracy.",
+    "scan.label.matchedFields": "Success! {matched}/{total} fields detected.",
+    "scan.label.ocrFailed": "OCR failed: {msg}. Try AI fallback.",
+    "scan.label.saveToMealLogSuccess": "Saved to meal log!",
+    "scan.label.saveFailed": "Save failed",
+    "scan.label.readFailedFallback": "Failed to read nutrition label",
+    "scan.label.detectedFallback": "Label detected",
   },
 } satisfies Record<string, TranslationBundle>;
 

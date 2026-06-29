@@ -7,6 +7,7 @@ import { BottomNav } from "@/components/bottom-nav";
 import { listSleepDiary, upsertSleepDiary } from "@/features/scan/lib/scanBatch11.functions";
 import { toast } from "@/lib/toast-config";
 import { Moon, Sunrise, Star } from "lucide-react";
+import { useTranslation } from "@/lib/i18n";
 
 export const Route = createFileRoute("/_authenticated/sleep/diary")({ component: Page });
 
@@ -19,6 +20,7 @@ function durationHours(bed: string, wake: string) {
 }
 
 function Page() {
+  const { t } = useTranslation();
   const qc = useQueryClient();
   const listFn = useServerFn(listSleepDiary);
   const upsertFn = useServerFn(upsertSleepDiary);
@@ -43,7 +45,7 @@ function Page() {
         },
       }),
     onSuccess: () => {
-      toast.success("Tersimpan");
+      toast.success(t("common.saved"));
       qc.invalidateQueries({ queryKey: ["sleep-diary"] });
     },
     onError: (e: Error) => toast.error(e.message),
@@ -69,15 +71,15 @@ function Page() {
 
   return (
     <div className="min-h-dvh pb-24 bg-background">
-      <TopAppBar title="Sleep Diary" showBack />
+      <TopAppBar title={t("sleep.diaryTitle")} showBack />
       <main className="max-w-md mx-auto px-4 pt-4 space-y-4 animate-fade-up">
         <section className="rounded-3xl p-5 bg-gradient-to-br from-indigo-500 via-violet-500 to-purple-600 text-white outline-1 outline-black/5">
           <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider opacity-80">
-            <Moon className="size-3.5" /> Tidur malam ini
+            <Moon className="size-3.5" /> {t("sleep.diaryTonight")}
           </div>
           <div className="mt-2 flex items-end gap-3">
             <span className="text-5xl font-black tabular-nums leading-none">{dur.toFixed(1)}</span>
-            <span className="pb-1 text-sm opacity-80">jam</span>
+            <span className="pb-1 text-sm opacity-80">{t("sleep.diaryHours")}</span>
           </div>
           <div className="mt-3 flex items-center justify-between text-xs">
             <span className="inline-flex items-center gap-1">
@@ -92,7 +94,9 @@ function Page() {
         <section className="rounded-3xl bg-card outline-1 outline-black/5 p-4 space-y-3">
           <div className="grid grid-cols-2 gap-2">
             <div>
-              <label className="text-[11px] font-semibold text-muted-foreground">Jam tidur</label>
+              <label className="text-[11px] font-semibold text-muted-foreground">
+                {t("sleep.diaryBedtimeLabel")}
+              </label>
               <input
                 type="time"
                 value={bt}
@@ -101,7 +105,9 @@ function Page() {
               />
             </div>
             <div>
-              <label className="text-[11px] font-semibold text-muted-foreground">Jam bangun</label>
+              <label className="text-[11px] font-semibold text-muted-foreground">
+                {t("sleep.diaryWakeLabel")}
+              </label>
               <input
                 type="time"
                 value={wt}
@@ -112,7 +118,7 @@ function Page() {
           </div>
           <div>
             <div className="flex items-center justify-between text-[11px] font-semibold">
-              <span className="text-muted-foreground">Kualitas</span>
+              <span className="text-muted-foreground">{t("sleep.quality")}</span>
               <span className="inline-flex items-center gap-0.5">
                 {Array.from({ length: 5 }).map((_, i) => (
                   <Star
@@ -134,7 +140,7 @@ function Page() {
           <textarea
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
-            placeholder="Catatan (mimpi, gangguan, dll)…"
+            placeholder={t("sleep.diaryNotePlaceholder")}
             rows={2}
             className="w-full px-3 py-2 rounded-xl outline-1 outline-black/10 bg-background text-sm"
           />
@@ -143,7 +149,7 @@ function Page() {
             disabled={mut.isPending}
             className="w-full rounded-xl bg-primary text-primary-foreground py-3 text-sm font-semibold disabled:opacity-50"
           >
-            Simpan
+            {t("common.save")}
           </button>
         </section>
 
@@ -151,16 +157,19 @@ function Page() {
           <section className="grid grid-cols-2 gap-2">
             <div className="rounded-2xl bg-card outline-1 outline-black/5 p-3">
               <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
-                Rata-rata 7 hari
+                {t("sleep.avg7Days")}
               </p>
               <p className="mt-1 text-xl font-black tabular-nums">
                 {avgDur.toFixed(1)}
-                <span className="text-xs font-semibold text-muted-foreground"> jam</span>
+                <span className="text-xs font-semibold text-muted-foreground">
+                  {" "}
+                  {t("sleep.diaryHours")}
+                </span>
               </p>
             </div>
             <div className="rounded-2xl bg-card outline-1 outline-black/5 p-3">
               <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
-                Kualitas rata-rata
+                {t("sleep.diaryAvgQuality")}
               </p>
               <p className="mt-1 text-xl font-black tabular-nums">
                 {avgQ.toFixed(1)}
@@ -171,7 +180,7 @@ function Page() {
         )}
 
         <section className="space-y-2">
-          <h2 className="font-bold text-sm">Riwayat</h2>
+          <h2 className="font-bold text-sm">{t("sleep.diaryHistory")}</h2>
           {entries.map((e) => {
             const d = e.bedtime && e.wake_time ? durationHours(e.bedtime, e.wake_time) : 0;
             return (

@@ -18,6 +18,7 @@ import {
   getPatternPreferences,
   updatePatternPreferences,
 } from "@/features/patterns/lib/patternPreferences.functions";
+import { useTranslation } from "@/lib/i18n";
 
 export const Route = createFileRoute("/_authenticated/profile/pattern-settings")({
   component: PatternSettings,
@@ -28,6 +29,7 @@ export const Route = createFileRoute("/_authenticated/profile/pattern-settings")
 });
 
 function PatternSettings() {
+  const { t } = useTranslation();
   const { preferences: initialPrefs } = Route.useLoaderData();
 
   const [skipBreakfast, setSkipBreakfast] = useState(initialPrefs.skip_breakfast_threshold);
@@ -40,10 +42,10 @@ function PatternSettings() {
       return await updatePatternPreferences({ data: prefs });
     },
     onSuccess: () => {
-      alert("✅ Pengaturan pola tersimpan");
+      alert(t("patternSettings.savedAlert"));
     },
     onError: (error: Error) => {
-      alert(`❌ Error: ${error.message}`);
+      alert(t("patternSettings.errorAlert", { msg: error.message }));
     },
   });
 
@@ -66,23 +68,23 @@ function PatternSettings() {
   return (
     <div className="container max-w-2xl py-8">
       <div className="mb-6">
-        <h1 className="text-2xl font-bold">Pengaturan Deteksi Pola</h1>
-        <p className="text-muted-foreground">
-          Sesuaikan sensitivitas deteksi pola makan sesuai preferensi Anda
-        </p>
+        <h1 className="text-2xl font-bold">{t("patternSettings.title")}</h1>
+        <p className="text-muted-foreground">{t("patternSettings.subtitle")}</p>
       </div>
 
       <div className="space-y-6">
         <Card>
           <CardHeader>
-            <CardTitle>Threshold Pola</CardTitle>
-            <CardDescription>Atur batas minimal untuk mendeteksi pola tertentu</CardDescription>
+            <CardTitle>{t("patternSettings.thresholdTitle")}</CardTitle>
+            <CardDescription>{t("patternSettings.thresholdDesc")}</CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
             <div className="space-y-3">
               <div className="flex items-center justify-between">
-                <Label htmlFor="skip-breakfast">Lewati Sarapan</Label>
-                <span className="text-sm font-medium">{skipBreakfast} hari/minggu</span>
+                <Label htmlFor="skip-breakfast">{t("patternSettings.skipBreakfastLabel")}</Label>
+                <span className="text-sm font-medium">
+                  {t("patternSettings.daysPerWeek", { n: skipBreakfast })}
+                </span>
               </div>
               <Slider
                 id="skip-breakfast"
@@ -93,13 +95,13 @@ function PatternSettings() {
                 onValueChange={(v) => setSkipBreakfast(v[0])}
               />
               <p className="text-xs text-muted-foreground">
-                Minimal hari per minggu untuk dianggap melewatkan sarapan
+                {t("patternSettings.skipBreakfastDesc")}
               </p>
             </div>
 
             <div className="space-y-3">
               <div className="flex items-center justify-between">
-                <Label htmlFor="late-night">Jam Makan Malam Terlambat</Label>
+                <Label htmlFor="late-night">{t("patternSettings.lateNightDinnerLabel")}</Label>
                 <span className="text-sm font-medium">
                   {lateNightHour.toString().padStart(2, "0")}:00
                 </span>
@@ -112,15 +114,15 @@ function PatternSettings() {
                 value={[lateNightHour]}
                 onValueChange={(v) => setLateNightHour(v[0])}
               />
-              <p className="text-xs text-muted-foreground">
-                Jam mulai &ldquo;makan malam terlambat&rdquo;
-              </p>
+              <p className="text-xs text-muted-foreground">{t("patternSettings.lateNightDesc")}</p>
             </div>
 
             <div className="space-y-3">
               <div className="flex items-center justify-between">
-                <Label htmlFor="irregular">Variasi Jam Makan Tidak Teratur</Label>
-                <span className="text-sm font-medium">±{irregularVariance} jam</span>
+                <Label htmlFor="irregular">{t("patternSettings.irregularVarianceLabel")}</Label>
+                <span className="text-sm font-medium">
+                  {t("patternSettings.hoursUnit", { n: irregularVariance })}
+                </span>
               </div>
               <Slider
                 id="irregular"
@@ -130,21 +132,19 @@ function PatternSettings() {
                 value={[irregularVariance]}
                 onValueChange={(v) => setIrregularVariance(v[0])}
               />
-              <p className="text-xs text-muted-foreground">
-                Toleransi deviasi standar dari pola makan normal
-              </p>
+              <p className="text-xs text-muted-foreground">{t("patternSettings.irregularDesc")}</p>
             </div>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader>
-            <CardTitle>Sensitivitas Deteksi</CardTitle>
-            <CardDescription>Seberapa sering pola dilaporkan</CardDescription>
+            <CardTitle>{t("patternSettings.sensitivityTitle")}</CardTitle>
+            <CardDescription>{t("patternSettings.sensitivityDesc")}</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
-              <Label htmlFor="sensitivity">Tingkat Sensitivitas</Label>
+              <Label htmlFor="sensitivity">{t("patternSettings.sensitivityLabel")}</Label>
               <Select
                 value={sensitivity}
                 onValueChange={(v) => setSensitivity(v as PatternPreferences["sensitivity"])}
@@ -153,13 +153,13 @@ function PatternSettings() {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="low">Rendah (hanya pola kuat)</SelectItem>
-                  <SelectItem value="medium">Sedang (default)</SelectItem>
-                  <SelectItem value="high">Tinggi (semua pola terdeteksi)</SelectItem>
+                  <SelectItem value="low">{t("patternSettings.sensitivity.low")}</SelectItem>
+                  <SelectItem value="medium">{t("patternSettings.sensitivity.medium")}</SelectItem>
+                  <SelectItem value="high">{t("patternSettings.sensitivity.high")}</SelectItem>
                 </SelectContent>
               </Select>
               <p className="text-xs text-muted-foreground">
-                Sensitivitas rendah = lebih sedikit notifikasi, hanya pola yang sangat jelas
+                {t("patternSettings.sensitivityHint")}
               </p>
             </div>
           </CardContent>
@@ -167,10 +167,12 @@ function PatternSettings() {
 
         <div className="flex gap-3">
           <Button onClick={handleSave} disabled={mutation.isPending}>
-            {mutation.isPending ? "Menyimpan..." : "Simpan Pengaturan"}
+            {mutation.isPending
+              ? t("patternSettings.savingButton")
+              : t("patternSettings.saveButton")}
           </Button>
           <Button variant="outline" onClick={handleReset}>
-            Reset ke Default
+            {t("patternSettings.resetButton")}
           </Button>
         </div>
       </div>

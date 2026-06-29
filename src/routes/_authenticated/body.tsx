@@ -10,19 +10,19 @@ export const Route = createFileRoute("/_authenticated/body")({
 });
 
 const tabs = [
-  { id: "Berat", icon: Scale },
-  { id: "Ukuran", icon: Ruler },
-  { id: "Foto", icon: Camera },
-  { id: "Vitals", icon: HeartPulse },
+  { id: "body.tabs.weight", icon: Scale },
+  { id: "body.tabs.measurements", icon: Ruler },
+  { id: "body.tabs.photo", icon: Camera },
+  { id: "body.tabs.vitals", icon: HeartPulse },
 ] as const;
 type TabId = (typeof tabs)[number]["id"];
 
 function BodyPage() {
   const { t } = useTranslation();
-  const [tab, setTab] = useState<TabId>("Berat");
+  const [tab, setTab] = useState<TabId>(tabs[0].id);
   return (
     <div className="min-h-dvh pb-28 px-4 bg-background">
-      <TopAppBar title="Body Composition" showBack />
+      <TopAppBar title={t("body.title")} showBack />
       <div className="mt-4 flex gap-2 overflow-x-auto -mx-4 px-4 pb-1">
         {tabs.map(({ id, icon: Icon }) => (
           <button
@@ -35,53 +35,51 @@ function BodyPage() {
             }`}
           >
             <Icon className="size-3.5" />
-            {id}
+            {t(id)}
           </button>
         ))}
       </div>
       <div className="mt-6">
-        {tab === "Berat" && (
+        {tab === "body.tabs.weight" && (
           <TabPanel>
             <Metric label={t("weight.current")} value="—" unit="kg" />
             <Metric label={t("weight.target")} value="—" unit="kg" />
             <Metric label={t("weight.trend", { count: 30 })} value="—" unit="kg" />
             <PageLink to="/weight" label={t("weight.logToday")} />
-            <PageLink to="/weight.chart" label="Grafik berat" />
-            <PageLink to="/weight.goal" label="Atur target" />
+            <PageLink to="/weight.chart" label={t("body.weightChart")} />
+            <PageLink to="/weight.goal" label={t("body.weightGoal")} />
           </TabPanel>
         )}
-        {tab === "Ukuran" && (
+        {tab === "body.tabs.measurements" && (
           <TabPanel>
-            <Metric label="Lingkar pinggang" value="—" unit="cm" />
-            <Metric label="Lingkar dada" value="—" unit="cm" />
-            <Metric label="Lingkar lengan" value="—" unit="cm" />
-            <Metric label="Lingkar paha" value="—" unit="cm" />
-            <p className="text-xs text-muted-foreground px-1">
-              Catat tiap minggu untuk lihat progres komposisi tubuh.
-            </p>
+            <Metric label={t("body.measurements.waist")} value="—" unit="cm" />
+            <Metric label={t("body.measurements.chest")} value="—" unit="cm" />
+            <Metric label={t("body.measurements.arm")} value="—" unit="cm" />
+            <Metric label={t("body.measurements.thigh")} value="—" unit="cm" />
+            <p className="text-xs text-muted-foreground px-1">{t("body.measurementsHint")}</p>
           </TabPanel>
         )}
-        {tab === "Foto" && (
+        {tab === "body.tabs.photo" && (
           <TabPanel>
             <div className="aspect-[3/4] rounded-2xl bg-gradient-to-br from-muted to-card border-2 border-dashed grid place-items-center text-muted-foreground">
               <div className="text-center">
                 <Camera className="size-8 mx-auto mb-2" />
-                <p className="text-sm">Tambah foto progres</p>
-                <p className="text-xs">Depan · Samping · Belakang</p>
+                <p className="text-sm">{t("body.photo.addProgress")}</p>
+                <p className="text-xs">{t("body.photo.angles")}</p>
               </div>
             </div>
             <button className="w-full rounded-2xl bg-primary text-primary-foreground py-3 font-semibold inline-flex items-center justify-center gap-2">
-              <Plus className="size-4" /> Unggah foto
+              <Plus className="size-4" /> {t("body.photo.upload")}
             </button>
           </TabPanel>
         )}
-        {tab === "Vitals" && (
+        {tab === "body.tabs.vitals" && (
           <TabPanel>
-            <Metric label="Tekanan darah" value="—" unit="mmHg" />
-            <Metric label="Detak jantung" value="—" unit="bpm" />
-            <Metric label="Suhu tubuh" value="—" unit="°C" />
-            <Metric label="SpO₂" value="—" unit="%" />
-            <PageLink to="/vitals" label="Catat vitals" />
+            <Metric label={t("body.vitals.bloodPressure")} value="—" unit="mmHg" />
+            <Metric label={t("body.vitals.heartRate")} value="—" unit="bpm" />
+            <Metric label={t("body.vitals.bodyTemp")} value="—" unit="°C" />
+            <Metric label={t("body.vitals.spo2")} value="—" unit="%" />
+            <PageLink to="/vitals" label={t("body.vitalsLogLink")} />
           </TabPanel>
         )}
       </div>

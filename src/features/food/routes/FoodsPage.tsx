@@ -12,8 +12,10 @@ import { PullIndicator } from "@/components/healthyu/pull-indicator";
 import { usePullToRefresh } from "@/hooks/use-pull-to-refresh";
 import { useQueryClient } from "@tanstack/react-query";
 import { FacetSelect, FoodDetailSheet } from "@/features/food/components/FoodsPagePieces";
+import { useTranslation } from "@/lib/i18n";
 
 export function FoodsPage() {
+  const { t } = useTranslation();
   const browse = useServerFn(browseFoods);
   const facets = useServerFn(getFoodFacets);
   const detail = useServerFn(getFoodDetail);
@@ -103,7 +105,7 @@ export function FoodsPage() {
     <div className="min-h-dvh bg-background pb-28">
       <PullIndicator pulling={pulling} refreshing={refreshing} />
       <div className="max-w-md mx-auto px-4">
-        <TopAppBar title="Database Makanan" showBack />
+        <TopAppBar title={t("foods.dbTitle")} showBack />
       </div>
       <div className="sticky top-[57px] z-20 bg-background/85 backdrop-blur-xl border-b border-border/50">
         <div className="max-w-md mx-auto px-4 py-3">
@@ -112,7 +114,7 @@ export function FoodsPage() {
             <input
               value={q}
               onChange={(e) => setQ(e.target.value)}
-              placeholder="Cari nasi, ayam, sate..."
+              placeholder={t("foods.searchPlaceholder")}
               className="w-full pl-9 pr-3 py-2.5 rounded-xl bg-muted/60 border border-transparent focus:border-primary focus:bg-background outline-none text-sm"
             />
           </div>
@@ -122,30 +124,37 @@ export function FoodsPage() {
       <main className="max-w-md mx-auto px-4 pt-4 space-y-4">
         {!q && recent.items.length > 0 && (
           <SearchChips
-            label="Pencarian terakhir"
+            label={t("foods.recentSearch")}
             items={recent.items}
-            onPick={(t) => setQ(t)}
+            onPick={(t2) => setQ(t2)}
             onRemove={recent.remove}
             onClear={recent.clear}
           />
         )}
         <section className="space-y-3">
           <FacetSelect
-            label="Daerah"
+            label={t("foods.region")}
             value={region}
             setValue={setRegion}
             options={facetData?.regions ?? []}
           />
           <FacetSelect
-            label="Kategori"
+            label={t("foods.category")}
             value={category}
             setValue={setCategory}
             options={facetData?.categories ?? []}
           />
-          <FacetSelect label="Tag" value={tag} setValue={setTag} options={facetData?.tags ?? []} />
+          <FacetSelect
+            label={t("foods.tag")}
+            value={tag}
+            setValue={setTag}
+            options={facetData?.tags ?? []}
+          />
 
           <div>
-            <p className="text-xs font-medium text-muted-foreground mb-2">Hindari alergen</p>
+            <p className="text-xs font-medium text-muted-foreground mb-2">
+              {t("foods.avoidAllergen")}
+            </p>
             <div className="flex flex-wrap gap-2">
               {(facetData?.allergens ?? []).map((a) => {
                 const on = excluded.includes(a);
@@ -170,8 +179,10 @@ export function FoodsPage() {
 
         <div className="flex items-center justify-between text-xs text-muted-foreground">
           <span>
-            {isFetching && offset === 0 ? "Mencari..." : `${allFoods.length} makanan`}
-            {activeFilters > 0 && ` · ${activeFilters} filter`}
+            {isFetching && offset === 0
+              ? t("common.searching")
+              : t("foods.resultCount", { count: allFoods.length })}
+            {activeFilters > 0 && ` · ${t("foods.filterCount", { count: activeFilters })}`}
           </span>
           {activeFilters > 0 && (
             <button
@@ -183,7 +194,7 @@ export function FoodsPage() {
               }}
               className="text-primary font-medium"
             >
-              Reset
+              {t("foods.reset")}
             </button>
           )}
         </div>
@@ -204,12 +215,12 @@ export function FoodsPage() {
                     </p>
                     {(f.tags?.length ?? 0) > 0 && (
                       <div className="flex flex-wrap gap-1 mt-1.5">
-                        {f.tags!.slice(0, 3).map((t: string) => (
+                        {f.tags!.slice(0, 3).map((t2: string) => (
                           <span
-                            key={t}
+                            key={t2}
                             className="text-[10px] px-1.5 py-0.5 rounded bg-muted text-muted-foreground"
                           >
-                            {t}
+                            {t2}
                           </span>
                         ))}
                       </div>
@@ -224,7 +235,9 @@ export function FoodsPage() {
             </li>
           ))}
           {!isFetching && allFoods.length === 0 && (
-            <li className="text-center text-sm text-muted-foreground py-8">Tidak ada hasil.</li>
+            <li className="text-center text-sm text-muted-foreground py-8">
+              {t("foods.noResults")}
+            </li>
           )}
         </ul>
 
@@ -235,14 +248,14 @@ export function FoodsPage() {
               onClick={() => setOffset((prev) => prev + 30)}
               className="px-6 py-3 rounded-xl bg-primary text-primary-foreground font-medium text-sm hover:bg-primary/90 transition"
             >
-              Muat Lebih Banyak
+              {t("foods.loadMore")}
             </button>
           </div>
         )}
 
         {isFetching && offset > 0 && (
           <div className="flex justify-center py-4">
-            <p className="text-sm text-muted-foreground">Memuat...</p>
+            <p className="text-sm text-muted-foreground">{t("common.loading")}</p>
           </div>
         )}
       </main>

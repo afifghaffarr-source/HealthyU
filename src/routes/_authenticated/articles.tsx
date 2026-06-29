@@ -11,12 +11,14 @@ import { ReadingTimeBadge } from "@/components/healthyu/reading-time-badge";
 import { toast } from "@/lib/toast-config";
 import { BottomNav } from "@/components/bottom-nav";
 import { listArticles, toggleBookmark } from "@/features/articles/lib/articles.functions";
+import { useTranslation } from "@/lib/i18n";
 
 export const Route = createFileRoute("/_authenticated/articles")({
   component: ArticlesPage,
 });
 
 function ArticlesPage() {
+  const { t } = useTranslation();
   const qc = useQueryClient();
   const fetchAll = useServerFn(listArticles);
   const toggleFn = useServerFn(toggleBookmark);
@@ -29,7 +31,7 @@ function ArticlesPage() {
   const bookmarkM = useMutation({
     mutationFn: (article_id: string) => toggleFn({ data: { article_id } }),
     onSuccess: (r) => {
-      toast.success(r.bookmarked ? "Disimpan" : "Bookmark dihapus");
+      toast.success(r.bookmarked ? t("common.saved") : t("common.deleted"));
       qc.invalidateQueries({ queryKey: ["articles"] });
     },
     onError: (e: Error) => toast.error(e.message),
@@ -62,7 +64,7 @@ function ArticlesPage() {
   return (
     <div className="min-h-dvh pb-32">
       <div className="max-w-md mx-auto px-4">
-        <TopAppBar title="Artikel Kesehatan" showBack />
+        <TopAppBar title={t("articles.title")} showBack />
       </div>
       <main className="max-w-md mx-auto px-4 pt-4 space-y-3">
         {!isLoading && articles.length > 0 && (
@@ -72,14 +74,14 @@ function ArticlesPage() {
               onClick={() => setFilter("all")}
               count={articles.length}
             >
-              Semua
+              {t("common.all")}
             </Chip>
             <Chip
               active={filter === "bookmark"}
               onClick={() => setFilter("bookmark")}
               count={bookmarks.size}
             >
-              ★ Disimpan
+              {t("articles.savedFilter")}
             </Chip>
             {categories.map(([c, n]) => (
               <Chip key={c} active={filter === c} onClick={() => setFilter(c)} count={n}>
@@ -92,15 +94,15 @@ function ArticlesPage() {
         {!isLoading && articles.length === 0 && (
           <EmptyState
             icon={BookOpen}
-            title="Belum ada artikel"
-            description="Artikel kesehatan baru akan muncul di sini."
+            title={t("articles.empty")}
+            description={t("articles.emptyDesc")}
           />
         )}
         {!isLoading && articles.length > 0 && visible.length === 0 && (
           <EmptyState
             icon={BookOpen}
-            title="Tidak ada hasil"
-            description="Coba pilih kategori lain."
+            title={t("articles.noResults")}
+            description={t("articles.noResultsDesc")}
           />
         )}
         {visible.map((a) => {
@@ -130,7 +132,7 @@ function ArticlesPage() {
                   <button
                     onClick={() => bookmarkM.mutate(a.id)}
                     className="size-11 inline-flex items-center justify-center rounded-full bg-muted shrink-0 hover:bg-muted/70 transition"
-                    aria-label={marked ? "Hapus bookmark" : "Simpan bookmark"}
+                    aria-label={marked ? t("articles.unbookmark") : t("articles.bookmark")}
                     aria-pressed={marked}
                   >
                     {marked ? (
@@ -146,7 +148,9 @@ function ArticlesPage() {
                 <div className="flex gap-2 items-center mt-3">
                   {a.reading_time_minutes && <ReadingTimeBadge minutes={a.reading_time_minutes} />}
                   {a.author_name && (
-                    <span className="text-xs text-muted-foreground">oleh {a.author_name}</span>
+                    <span className="text-xs text-muted-foreground">
+                      {t("articles.byline", { name: a.author_name })}
+                    </span>
                   )}
                 </div>
               </div>

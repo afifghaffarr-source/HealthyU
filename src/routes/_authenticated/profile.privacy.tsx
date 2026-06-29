@@ -21,6 +21,7 @@ import { AuditLogSection } from "@/features/privacy/components/audit-log-section
 import { TelemetryEventsSection } from "@/features/privacy/components/telemetry-events-section";
 import { TelemetryChart } from "@/features/privacy/components/telemetry-chart";
 import { TelemetryTimelineChart } from "@/features/privacy/components/telemetry-timeline-chart";
+import { useTranslation } from "@/lib/i18n";
 
 const getPrivacy = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
@@ -43,10 +44,16 @@ export const Route = createFileRoute("/_authenticated/profile/privacy")({
   loader: ({ context }) => context.queryClient.ensureQueryData(opts),
   component: Page,
   errorComponent: ({ error }) => <div className="p-4 text-destructive">{error.message}</div>,
-  notFoundComponent: () => <div className="p-4">Tidak ditemukan</div>,
+  notFoundComponent: NotFound,
 });
 
+function NotFound() {
+  const { t } = useTranslation();
+  return <div className="p-4">{t("privacy.notFound")}</div>;
+}
+
 function Page() {
+  const { t } = useTranslation();
   const { data } = useSuspenseQuery(opts);
   const qc = useQueryClient();
   const auditFn = useServerFn(setAuditOptIn);
@@ -54,7 +61,7 @@ function Page() {
   const auditMut = useMutation({
     mutationFn: (enabled: boolean) => auditFn({ data: { enabled } }),
     onSuccess: () => {
-      toast.success("Tersimpan");
+      toast.success(t("common.saved"));
       qc.invalidateQueries({ queryKey: ["privacy"] });
     },
     onError: (e: Error) => toast.error(e.message),
@@ -62,7 +69,7 @@ function Page() {
   const redactionMut = useMutation({
     mutationFn: (enabled: boolean) => redactionFn({ data: { enabled } }),
     onSuccess: () => {
-      toast.success("Tersimpan");
+      toast.success(t("common.saved"));
       qc.invalidateQueries({ queryKey: ["privacy"] });
     },
     onError: (e: Error) => toast.error(e.message),
@@ -80,12 +87,12 @@ function Page() {
   return (
     <div className="min-h-dvh pb-24 bg-background">
       <TopAppBar
-        title="Privasi"
+        title={t("privacy.title")}
         showBack
         action={
           <Link
             to="/pengaturan"
-            aria-label="Buka pengaturan"
+            aria-label={t("privacy.openSettings")}
             className="size-9 rounded-full bg-muted grid place-items-center"
           >
             <Settings className="size-4" />
@@ -112,16 +119,14 @@ function Page() {
         {/* Privacy toggles — the existing switches */}
         <div className="rounded-2xl bg-card border p-4 flex items-start justify-between gap-3">
           <div className="min-w-0">
-            <div className="font-medium text-sm">Bantu tingkatkan AI</div>
-            <div className="text-xs text-muted-foreground mt-1">
-              Izinkan koreksi scan makanan kamu dikirim secara anonim untuk audit kualitas AI.
-            </div>
+            <div className="font-medium text-sm">{t("privacy.improveAI")}</div>
+            <div className="text-xs text-muted-foreground mt-1">{t("privacy.improveAIDesc")}</div>
           </div>
           <button
             onClick={() => auditMut.mutate(!data.auditOptIn)}
             disabled={auditMut.isPending}
             className={`shrink-0 w-12 h-7 rounded-full relative transition ${data.auditOptIn ? "bg-primary" : "bg-muted"}`}
-            aria-label="Toggle audit"
+            aria-label={t("privacy.toggleAudit")}
           >
             <span
               className={`absolute top-0.5 size-6 rounded-full bg-white transition ${data.auditOptIn ? "left-[22px]" : "left-0.5"}`}
@@ -131,17 +136,14 @@ function Page() {
 
         <div className="rounded-2xl bg-card border p-4 flex items-start justify-between gap-3">
           <div className="min-w-0">
-            <div className="font-medium text-sm">Redaksi otomatis data sensitif</div>
-            <div className="text-xs text-muted-foreground mt-1">
-              Saat aktif, nomor telepon, email, KTP/NIK, dan nomor kartu kredit di pesan chat akan
-              otomatis disembunyikan sebelum dikirim ke AI. Pesan di riwayat chat kamu tetap utuh.
-            </div>
+            <div className="font-medium text-sm">{t("privacy.autoRedact")}</div>
+            <div className="text-xs text-muted-foreground mt-1">{t("privacy.autoRedactDesc")}</div>
           </div>
           <button
             onClick={() => redactionMut.mutate(!data.piiRedactEnabled)}
             disabled={redactionMut.isPending}
             className={`shrink-0 w-12 h-7 rounded-full relative transition ${data.piiRedactEnabled ? "bg-primary" : "bg-muted"}`}
-            aria-label="Toggle PII redaction"
+            aria-label={t("privacy.togglePiiRedact")}
           >
             <span
               className={`absolute top-0.5 size-6 rounded-full bg-white transition ${data.piiRedactEnabled ? "left-[22px]" : "left-0.5"}`}
@@ -155,9 +157,9 @@ function Page() {
         >
           <Download className="size-5 text-primary shrink-0 mt-0.5" />
           <div className="min-w-0 flex-1">
-            <div className="font-medium text-sm">Unduh data saya</div>
+            <div className="font-medium text-sm">{t("privacy.downloadData")}</div>
             <div className="text-xs text-muted-foreground mt-1">
-              Ekspor semua data pribadi Anda dalam format JSON atau CSV.
+              {t("privacy.downloadDataDesc")}
             </div>
           </div>
           <ExternalLink className="size-4 text-muted-foreground shrink-0 mt-0.5" />
@@ -169,11 +171,8 @@ function Page() {
         >
           <ExternalLink className="size-5 text-primary shrink-0 mt-0.5" />
           <div className="min-w-0 flex-1">
-            <div className="font-medium text-sm">Kebijakan Privasi</div>
-            <div className="text-xs text-muted-foreground mt-1">
-              Data apa saja yang kami kumpulkan dan hak-hak Anda sebagai pengguna (UU PDP No.
-              27/2022).
-            </div>
+            <div className="font-medium text-sm">{t("privacy.policyLinkTitle")}</div>
+            <div className="text-xs text-muted-foreground mt-1">{t("privacy.policyDesc")}</div>
           </div>
         </Link>
 

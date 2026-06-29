@@ -12,12 +12,14 @@ import { AchievementIcon } from "@/lib/achievement-icons";
 import { BottomNav } from "@/components/bottom-nav";
 import { Flame, Trophy, Star, Share2 } from "lucide-react";
 import { toast } from "@/lib/toast-config";
+import { useTranslation } from "@/lib/i18n";
 
 export const Route = createFileRoute("/_authenticated/achievements")({
   component: AchievementsPage,
 });
 
 function AchievementsPage() {
+  const { t } = useTranslation();
   const fetch = useServerFn(getGameSummary);
   const { data } = useQuery({ queryKey: ["game", "summary"], queryFn: () => fetch() });
   const shareRef = useRef<HTMLDivElement | null>(null);
@@ -28,11 +30,11 @@ function AchievementsPage() {
       const { default: html2canvas } = await import("html2canvas");
       const canvas = await html2canvas(shareRef.current, { backgroundColor: null, scale: 2 });
       const blob: Blob | null = await new Promise((res) => canvas.toBlob(res, "image/png"));
-      if (!blob) throw new Error("Gagal membuat gambar");
+      if (!blob) throw new Error(t("articles.loadFailImage"));
       const file = new File([blob], "achievement.png", { type: "image/png" });
       const nav = navigator as Navigator & { canShare?: (data: ShareData) => boolean };
       if (nav.canShare?.({ files: [file] })) {
-        await navigator.share({ files: [file], title: "Pencapaianku di Healthy U" });
+        await navigator.share({ files: [file], title: t("achievements.shareTitle") });
       } else {
         const url = URL.createObjectURL(blob);
         const a = document.createElement("a");
@@ -40,7 +42,7 @@ function AchievementsPage() {
         a.download = "achievement.png";
         a.click();
         URL.revokeObjectURL(url);
-        toast.success("Gambar diunduh");
+        toast.success(t("achievements.imageDownloaded"));
       }
     } catch (e) {
       toast.error((e as Error).message);
@@ -61,7 +63,7 @@ function AchievementsPage() {
   return (
     <main className="min-h-dvh bg-background pb-28">
       <div className="max-w-md mx-auto px-5 pt-2 space-y-5">
-        <TopAppBar title="Pencapaian" showBack />
+        <TopAppBar title={t("achievements.title")} showBack />
 
         <div ref={shareRef}>
           <section className="bg-gradient-to-br from-sage to-sage-deep p-5 rounded-3xl text-primary-foreground animate-fade-up">
@@ -71,7 +73,7 @@ function AchievementsPage() {
               </div>
               <div className="flex-1">
                 <p className="text-[10px] font-bold uppercase tracking-wider text-white/70">
-                  Level
+                  {t("achievements.level")}
                 </p>
                 <p className="text-3xl font-bold tabular-nums">{level}</p>
                 <p className="text-xs text-white/80">{xp.toLocaleString()} XP</p>
@@ -81,7 +83,7 @@ function AchievementsPage() {
               <div className="h-full bg-coral transition-all" style={{ width: `${pct}%` }} />
             </div>
             <p className="text-[10px] text-white/75 mt-1.5 text-right">
-              {Math.max(0, nextLevelXp - xp)} XP ke level {level + 1}
+              {t("achievements.xpToLevel", { xp: Math.max(0, nextLevelXp - xp), next: level + 1 })}
             </p>
           </section>
         </div>
@@ -90,7 +92,7 @@ function AchievementsPage() {
           onClick={handleShare}
           className="w-full flex items-center justify-center gap-2 bg-card outline-1 outline-black/10 font-semibold py-3 rounded-2xl text-sm"
         >
-          <Share2 className="size-4" /> Bagikan pencapaian
+          <Share2 className="size-4" /> {t("achievements.share")}
         </button>
 
         <section className="grid grid-cols-2 gap-3 animate-fade-up">
@@ -100,11 +102,14 @@ function AchievementsPage() {
             </div>
             <div>
               <p className="text-[10px] font-bold uppercase text-muted-foreground tracking-wider">
-                Streak
+                {t("achievements.streakLabel")}
               </p>
               <p className="text-xl font-bold tabular-nums">
                 {stats?.current_streak ?? 0}
-                <span className="text-xs font-medium text-muted-foreground"> hari</span>
+                <span className="text-xs font-medium text-muted-foreground">
+                  {" "}
+                  {t("achievements.daysUnit")}
+                </span>
               </p>
             </div>
           </div>
@@ -114,11 +119,14 @@ function AchievementsPage() {
             </div>
             <div>
               <p className="text-[10px] font-bold uppercase text-muted-foreground tracking-wider">
-                Terpanjang
+                {t("achievements.longestLabel")}
               </p>
               <p className="text-xl font-bold tabular-nums">
                 {stats?.longest_streak ?? 0}
-                <span className="text-xs font-medium text-muted-foreground"> hari</span>
+                <span className="text-xs font-medium text-muted-foreground">
+                  {" "}
+                  {t("achievements.daysUnit")}
+                </span>
               </p>
             </div>
           </div>
@@ -126,7 +134,10 @@ function AchievementsPage() {
 
         <section className="space-y-2 animate-fade-up">
           <h2 className="font-bold text-sm px-1">
-            Badge ({unlockedIds.size}/{data?.achievements.length ?? 0})
+            {t("achievements.badgeCount", {
+              unlocked: unlockedIds.size,
+              total: data?.achievements.length ?? 0,
+            })}
           </h2>
           {(data?.achievements ?? []).map((a) => {
             const unlocked = unlockedIds.has(a.id);

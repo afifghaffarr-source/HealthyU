@@ -30,8 +30,10 @@ import { FoodSearchBar, MealTypeTabs } from "@/features/food/components/FoodSear
 import { useFoodBasket } from "@/features/food/hooks/useFoodBasket";
 import { QuickRepeatRow } from "@/features/food/components/QuickRepeatRow";
 import { QuickPresetsRow } from "@/features/food/components/QuickPresetsRow";
+import { useTranslation } from "@/lib/i18n";
 
 export function FoodPage() {
+  const { t } = useTranslation();
   const qc = useQueryClient();
   const search = useServerFn(searchFoods);
   const log = useServerFn(logMeal);
@@ -85,16 +87,16 @@ export function FoodPage() {
       qc.invalidateQueries({ queryKey: ["meals"] });
       qc.invalidateQueries({ queryKey: ["game", "summary"] });
       if (res && "offline" in res && res.offline) {
-        toast.success("Makanan disimpan offline. Akan sync otomatis.");
+        toast.success(t("meals.offlineSaved"));
         return;
       }
-      toast.success("Makanan dicatat");
+      toast.success(t("meals.logged"));
       const game = "game" in res ? res.game : undefined;
       (game?.newlyUnlocked ?? []).forEach((a: { icon: string; title: string }) =>
-        toast.success(`${getAchievementToastPrefix(a.icon)} ${a.title} terbuka!`),
+        toast.success(`${getAchievementToastPrefix(a.icon)} ${a.title} ${t("common.open")}!`),
       );
     },
-    onError: (e) => toastError(e, "Gagal"),
+    onError: (e) => toastError(e, t("common.error")),
   });
 
   const delMutation = useMutation({
@@ -112,7 +114,7 @@ export function FoodPage() {
       setNlRawInput(trimmed);
       setNlResults(result.items);
     } catch (err) {
-      toastError(err, "Gagal parse makanan");
+      toastError(err, t("meals.parseError"));
     } finally {
       setNlParsing(false);
     }
@@ -153,7 +155,7 @@ export function FoodPage() {
         fat_g: parsed.fat_g,
       });
     } catch (err) {
-      toastError(err, "Gagal parse suara");
+      toastError(err, t("meals.voiceParseError"));
     }
   });
 
@@ -161,8 +163,8 @@ export function FoodPage() {
     <main className="min-h-dvh bg-background pb-28">
       <div className="max-w-md mx-auto px-5 pt-2 space-y-5">
         <TopAppBar
-          title="Catat makanan"
-          subtitle="Cari, scan, atau bicarakan"
+          title={t("meals.title")}
+          subtitle={t("meals.subtitle")}
           showBack
           action={
             !online || pending > 0 ? (
@@ -196,7 +198,7 @@ export function FoodPage() {
             onKeyDown={(e) => {
               if (e.key === "Enter") handleNlParse();
             }}
-            placeholder='Contoh: "nasi padang ayam bakar setengah porsi"'
+            placeholder={t("meals.nlPlaceholder")}
             className="flex-1 bg-card border border-border/50 rounded-xl px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-primary/30 placeholder:text-muted-foreground"
             disabled={nlParsing}
           />
@@ -205,7 +207,7 @@ export function FoodPage() {
             onClick={handleNlParse}
             disabled={nlParsing || nlText.trim().length < 2}
             className="bg-primary text-primary-foreground rounded-xl px-4 min-w-11 h-11 grid place-items-center disabled:opacity-50"
-            aria-label="Parse makanan"
+            aria-label={t("meals.parseLabel")}
           >
             {nlParsing ? <Loader2 className="size-4 animate-spin" /> : <Send className="size-4" />}
           </button>
@@ -268,17 +270,15 @@ export function FoodPage() {
               <Utensils className="size-5" aria-hidden />
             </div>
             <div>
-              <p className="font-semibold text-sm">Belum ada makanan hari ini.</p>
-              <p className="text-[12px] text-muted-foreground mt-0.5">
-                Mulai dengan scan makanan atau tambah manual.
-              </p>
+              <p className="font-semibold text-sm">{t("meals.empty")}</p>
+              <p className="text-[12px] text-muted-foreground mt-0.5">{t("meals.emptyHint")}</p>
             </div>
             <div className="grid grid-cols-2 gap-2 pt-1">
               <Link
                 to="/scan"
                 className="inline-flex items-center justify-center gap-1.5 bg-primary text-primary-foreground text-sm font-semibold px-3 py-2.5 rounded-xl min-h-11"
               >
-                <Camera className="size-4" aria-hidden /> Scan makanan
+                <Camera className="size-4" aria-hidden /> {t("meals.scanFood")}
               </Link>
               <button
                 type="button"
@@ -290,7 +290,7 @@ export function FoodPage() {
                 }}
                 className="inline-flex items-center justify-center gap-1.5 bg-muted text-foreground text-sm font-semibold px-3 py-2.5 rounded-xl min-h-11"
               >
-                <PenLine className="size-4" aria-hidden /> Tambah manual
+                <PenLine className="size-4" aria-hidden /> {t("meals.addManual")}
               </button>
             </div>
           </section>
