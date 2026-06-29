@@ -43,10 +43,10 @@ function ReportsPage() {
   const announce = useAnnounce();
   useEffect(() => {
     if (focus !== "latest") return;
-    const t = setTimeout(() => {
+    const timer = setTimeout(() => {
       navigate({ to: "/reports", search: {}, replace: true });
     }, 3000);
-    return () => clearTimeout(t);
+    return () => clearTimeout(timer);
   }, [focus, navigate]);
   const fetchFn = useServerFn(weeklyReport);
   const aiFn = useServerFn(weeklyAiAnalysis);
@@ -88,15 +88,15 @@ function ReportsPage() {
         const periode =
           row?.report_period_start && row?.report_period_end
             ? `${row.report_period_start} → ${row.report_period_end}`
-            : "terbaru";
-        announce(`Laporan ${periode} baru di-generate`);
+            : t("reports.latest");
+        announce(t("reports.announceGenerated", { periode }));
         window.setTimeout(() => setManualFlashId((cur) => (cur === latest ? null : cur)), 3000);
       }
     },
     onError: (e) => {
-      const msg = e instanceof Error ? e.message : "Gagal generate";
+      const msg = e instanceof Error ? e.message : t("reports.generateError");
       toast.error(msg);
-      announce(`Gagal generate laporan: ${msg}`, "assertive");
+      announce(t("reports.announceGenerateError", { msg }), "assertive");
     },
   });
 
@@ -115,31 +115,43 @@ function ReportsPage() {
     <main className="min-h-dvh bg-background pb-28">
       <div className="max-w-md mx-auto px-5 pt-2 space-y-5">
         <TopAppBar
-          title="Laporan 7 Hari"
-          subtitle="Ringkasan kesehatan mingguan"
+          title={t("reports.title")}
+          subtitle={t("reports.subtitle")}
           showBack
           className="print:hidden"
         />
 
         <section className="grid grid-cols-2 gap-3 animate-fade-up">
           <Stat
-            label="Total kalori masuk"
+            label={t("reports.stat.totalCalIn")}
             value={`${Math.round(summary?.totals.cals ?? 0)}`}
-            sub="kcal"
+            sub={t("reports.unit.kcal")}
           />
-          <Stat label="Kalori terbakar" value={`${summary?.totals.burn ?? 0}`} sub="kcal" />
           <Stat
-            label="Total air"
+            label={t("reports.stat.burn")}
+            value={`${summary?.totals.burn ?? 0}`}
+            sub={t("reports.unit.kcal")}
+          />
+          <Stat
+            label={t("reports.stat.totalWater")}
             value={`${((summary?.totals.ml ?? 0) / 1000).toFixed(1)}`}
-            sub="liter"
+            sub={t("reports.unit.liter")}
           />
           <Stat
-            label="Total tidur"
+            label={t("reports.stat.totalSleep")}
             value={`${(summary?.totals.hours ?? 0).toFixed(1)}`}
-            sub="jam"
+            sub={t("reports.unit.hours")}
           />
-          <Stat label="Latihan" value={`${summary?.workoutCount ?? 0}`} sub="sesi" />
-          <Stat label="Puasa selesai" value={`${summary?.fastingDone ?? 0}`} sub="sesi" />
+          <Stat
+            label={t("reports.stat.workout")}
+            value={`${summary?.workoutCount ?? 0}`}
+            sub={t("workout.sessionUnit")}
+          />
+          <Stat
+            label={t("reports.stat.fastingDone")}
+            value={`${summary?.fastingDone ?? 0}`}
+            sub={t("workout.sessionUnit")}
+          />
         </section>
 
         {summary && <WeeklyChart byDay={summary.byDay} maxCal={maxCal} />}
@@ -176,7 +188,7 @@ function ReportsPage() {
             ) : (
               <Sparkles className="size-4" />
             )}
-            {aiMut.isPending ? "Menganalisis..." : "Analisis AI Mingguan"}
+            {aiMut.isPending ? t("reports.generating") : t("reports.weekly.title")}
           </button>
           {aiMut.data && (
             <article className="bg-card p-5 rounded-3xl outline-1 outline-black/5 text-sm leading-relaxed whitespace-pre-wrap">

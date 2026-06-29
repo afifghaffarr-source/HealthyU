@@ -1,6 +1,7 @@
 import { ChevronLeft } from "lucide-react";
 import { useRouter } from "@tanstack/react-router";
 import { cn } from "@/lib/utils";
+import { useTranslation } from "@/lib/i18n";
 import type { ReactNode } from "react";
 
 interface Props {
@@ -12,6 +13,7 @@ interface Props {
 }
 
 export function TopAppBar({ title, subtitle, showBack, action, className }: Props) {
+  const { t } = useTranslation();
   const router = useRouter();
   return (
     <header
@@ -24,7 +26,7 @@ export function TopAppBar({ title, subtitle, showBack, action, className }: Prop
         <button
           type="button"
           onClick={() => router.history.back()}
-          aria-label="Kembali"
+          aria-label={t("common.back")}
           className="-ml-1 inline-flex size-9 items-center justify-center rounded-full hover:bg-muted transition-colors"
         >
           <ChevronLeft className="size-5" />

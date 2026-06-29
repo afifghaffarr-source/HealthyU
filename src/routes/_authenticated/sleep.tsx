@@ -9,6 +9,7 @@ import { Moon, Trash2 } from "lucide-react";
 import { toast } from "@/lib/toast-config";
 import { toastError } from "@/lib/toast-config";
 import { ClientChart } from "@/components/ClientChart";
+import { useTranslation } from "@/lib/i18n";
 
 export const Route = createFileRoute("/_authenticated/sleep")({
   component: SleepPage,
@@ -32,6 +33,7 @@ function defaultEnd() {
 }
 
 function SleepPage() {
+  const { t } = useTranslation();
   const qc = useQueryClient();
   const list = useServerFn(recentSleep);
   const log = useServerFn(logSleep);
@@ -54,9 +56,9 @@ function SleepPage() {
       }),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["sleep"] });
-      toast.success("Tidur dicatat");
+      toast.success(t("sleep.logged"));
     },
-    onError: (e) => toastError(e, "Gagal"),
+    onError: (e) => toastError(e, t("common.error")),
   });
 
   const delMut = useMutation({
@@ -88,12 +90,12 @@ function SleepPage() {
   return (
     <main className="min-h-dvh bg-background pb-28">
       <div className="max-w-md mx-auto px-5 pt-2 space-y-5">
-        <TopAppBar title="Tidur" showBack />
+        <TopAppBar title={t("sleep.title")} showBack />
 
         <section className="grid grid-cols-2 gap-3 animate-fade-up">
           <div className="bg-card p-4 rounded-3xl outline-1 outline-black/5">
             <p className="text-[10px] font-bold uppercase text-muted-foreground tracking-wider">
-              Rata-rata 7 hari
+              {t("sleep.avg7Days")}
             </p>
             <p className="text-2xl font-bold tabular-nums">
               {avgHours.toFixed(1)}
@@ -102,7 +104,7 @@ function SleepPage() {
           </div>
           <div className="bg-card p-4 rounded-3xl outline-1 outline-black/5">
             <p className="text-[10px] font-bold uppercase text-muted-foreground tracking-wider">
-              Kualitas
+              {t("sleep.quality")}
             </p>
             <p className="text-2xl font-bold tabular-nums">
               {avgQuality.toFixed(1)}
@@ -114,7 +116,7 @@ function SleepPage() {
         {chartData.length > 0 && (
           <section className="bg-card p-4 rounded-3xl outline-1 outline-black/5 animate-fade-up">
             <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-2">
-              Tren 7 hari
+              {t("sleep.trend")}
             </p>
             <div className="h-32">
               <ClientChart
@@ -132,11 +134,11 @@ function SleepPage() {
 
         <section className="bg-card p-4 rounded-3xl outline-1 outline-black/5 space-y-3 animate-fade-up">
           <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
-            Catat tidur
+            {t("sleep.log")}
           </p>
           <label className="block">
             <span className="text-[10px] font-bold uppercase text-muted-foreground">
-              Mulai tidur
+              {t("sleep.sleepStart")}
             </span>
             <input
               type="datetime-local"
@@ -146,7 +148,9 @@ function SleepPage() {
             />
           </label>
           <label className="block">
-            <span className="text-[10px] font-bold uppercase text-muted-foreground">Bangun</span>
+            <span className="text-[10px] font-bold uppercase text-muted-foreground">
+              {t("sleep.wakeUp")}
+            </span>
             <input
               type="datetime-local"
               value={end}
@@ -155,7 +159,9 @@ function SleepPage() {
             />
           </label>
           <div>
-            <p className="text-[10px] font-bold uppercase text-muted-foreground mb-1">Kualitas</p>
+            <p className="text-[10px] font-bold uppercase text-muted-foreground mb-1">
+              {t("sleep.quality")}
+            </p>
             <div className="flex gap-2">
               {[1, 2, 3, 4, 5].map((n) => (
                 <button
@@ -175,14 +181,14 @@ function SleepPage() {
             disabled={logMut.isPending}
             className="w-full bg-primary text-primary-foreground font-semibold py-3 rounded-2xl"
           >
-            Simpan
+            {t("common.save")}
           </button>
         </section>
 
         <section className="space-y-2 animate-fade-up">
-          <h2 className="text-sm font-bold px-1">Riwayat</h2>
+          <h2 className="text-sm font-bold px-1">{t("common.history")}</h2>
           {logs.length === 0 ? (
-            <p className="text-sm text-muted-foreground text-center py-6">Belum ada catatan</p>
+            <p className="text-sm text-muted-foreground text-center py-6">{t("sleep.empty")}</p>
           ) : (
             logs.map((l) => {
               const hrs =

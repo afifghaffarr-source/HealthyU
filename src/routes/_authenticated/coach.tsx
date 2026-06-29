@@ -21,17 +21,14 @@ import {
 import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { ActionPlanCard } from "@/features/coach/components/ActionPlanCard";
 import { toast } from "@/lib/toast-config";
+import { useTranslation } from "@/lib/i18n";
 
 export const Route = createFileRoute("/_authenticated/coach")({
   component: CoachPage,
 });
 
-const TABS = [
-  { id: "morning" as const, label: "Pagi", Icon: Sun },
-  { id: "evening" as const, label: "Malam", Icon: Moon },
-];
-
 function CoachPage() {
+  const { t } = useTranslation();
   const qc = useQueryClient();
   const dailyFn = useServerFn(dailyCoach);
   const eveningFn = useServerFn(eveningCoach);
@@ -39,15 +36,20 @@ function CoachPage() {
   const [tab, setTab] = useState<"morning" | "evening">("morning");
   const [showHistory, setShowHistory] = useState(false);
 
+  const TABS = [
+    { id: "morning" as const, label: t("coach.morning"), Icon: Sun },
+    { id: "evening" as const, label: t("coach.evening"), Icon: Moon },
+  ];
+
   const dailyMut = useMutation({
     mutationFn: () => dailyFn(),
     onSuccess: () => qc.invalidateQueries({ queryKey: ["coach"] }),
-    onError: (e: Error) => toast.error(e.message || "Gagal generate coach"),
+    onError: (e: Error) => toast.error(e.message || t("coach.generateError")),
   });
   const eveningMut = useMutation({
     mutationFn: () => eveningFn(),
     onSuccess: () => qc.invalidateQueries({ queryKey: ["coach"] }),
-    onError: (e: Error) => toast.error(e.message || "Gagal generate coach"),
+    onError: (e: Error) => toast.error(e.message || t("coach.generateError")),
   });
 
   // Generate on first mount (morning)
@@ -81,15 +83,15 @@ function CoachPage() {
     <main className="min-h-dvh bg-background pb-28">
       <div className="max-w-md mx-auto px-5 pt-2 space-y-5">
         <TopAppBar
-          title="AI Coach"
-          subtitle="Personalisasi dari data 7 hari kamu"
+          title={t("coach.title")}
+          subtitle={t("coach.subtitle")}
           showBack
           action={
             <button
               onClick={handleRefresh}
               disabled={currentIsPending}
               className="size-9 rounded-full bg-muted grid place-items-center disabled:opacity-50"
-              aria-label="Refresh coach"
+              aria-label={t("coach.refresh")}
             >
               {currentIsPending ? (
                 <Loader2 className="size-4 animate-spin" />
@@ -127,9 +129,7 @@ function CoachPage() {
           <div className="bg-card p-8 rounded-3xl outline-1 outline-black/5 text-center space-y-3">
             <Loader2 className="size-8 animate-spin mx-auto text-primary" />
             <p className="text-sm text-muted-foreground">
-              {tab === "morning"
-                ? "AI sedang menganalisis data Anda..."
-                : "AI sedang menyiapkan refleksi malam..."}
+              {tab === "morning" ? t("coach.analyzingMorning") : t("coach.analyzingEvening")}
             </p>
           </div>
         )}
@@ -137,7 +137,7 @@ function CoachPage() {
         {/* Error state */}
         {currentError && !currentData && (
           <div className="bg-destructive/10 p-5 rounded-3xl text-sm text-destructive">
-            {currentError instanceof Error ? currentError.message : "Gagal memuat coach"}
+            {currentError instanceof Error ? currentError.message : t("coach.loadError")}
           </div>
         )}
 
@@ -160,7 +160,7 @@ function CoachPage() {
           >
             <span className="inline-flex items-center gap-2">
               <TrendingUp className="size-4 text-muted-foreground" />
-              Riwayat Coach (7 hari)
+              {t("coach.historyLabel")}
             </span>
             <ArrowRight
               className={`size-4 transition-transform ${showHistory ? "rotate-90" : ""}`}
@@ -185,9 +185,7 @@ function CoachPage() {
             </div>
           )}
           {showHistory && history.length === 0 && (
-            <p className="text-xs text-muted-foreground text-center py-4">
-              Belum ada riwayat coach.
-            </p>
+            <p className="text-xs text-muted-foreground text-center py-4">{t("coach.noHistory")}</p>
           )}
         </section>
       </div>
@@ -234,12 +232,15 @@ type EveningCoachView = {
 };
 
 function MorningView({ data, loading }: { data: MorningCoachView; loading: boolean }) {
+  const { t } = useTranslation();
   return (
     <>
       <section className="bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-950/20 dark:to-orange-950/10 p-6 rounded-3xl outline-1 outline-amber-200/40 dark:outline-amber-900/30 space-y-2 animate-fade-up">
         <div className="flex items-center gap-2 text-amber-700 dark:text-amber-400">
           <Sun className="size-5" aria-hidden />
-          <span className="text-xs font-bold uppercase tracking-wider">Sapaan Pagi</span>
+          <span className="text-xs font-bold uppercase tracking-wider">
+            {t("coach.morningGreeting")}
+          </span>
           {data.cached && (
             <span className="text-[10px] bg-white/50 dark:bg-black/30 px-1.5 py-0.5 rounded-full">
               cached
@@ -252,7 +253,9 @@ function MorningView({ data, loading }: { data: MorningCoachView; loading: boole
       <section className="bg-card p-5 rounded-3xl outline-1 outline-black/5 space-y-2 animate-fade-up">
         <div className="flex items-center gap-2 text-coral">
           <Target className="size-4" aria-hidden />
-          <span className="text-xs font-bold uppercase tracking-wider">Fokus Hari Ini</span>
+          <span className="text-xs font-bold uppercase tracking-wider">
+            {t("coach.todayFocus")}
+          </span>
         </div>
         <p className="text-sm font-semibold leading-relaxed">{data.focus}</p>
       </section>
@@ -260,7 +263,7 @@ function MorningView({ data, loading }: { data: MorningCoachView; loading: boole
       {data.summary && (
         <section className="bg-card p-5 rounded-3xl outline-1 outline-black/5 space-y-2 animate-fade-up">
           <h2 className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
-            Ringkasan Minggu Lalu
+            {t("coach.lastWeekSummary")}
           </h2>
           <p className="text-sm leading-relaxed text-foreground/80">{data.summary}</p>
         </section>
@@ -274,13 +277,15 @@ function MorningView({ data, loading }: { data: MorningCoachView; loading: boole
         <section className="bg-card p-5 rounded-3xl outline-1 outline-black/5 space-y-3 animate-fade-up">
           <div className="flex items-center gap-2 text-sage-deep dark:text-sage">
             <Lightbulb className="size-4" aria-hidden />
-            <span className="text-xs font-bold uppercase tracking-wider">Tips Hari Ini</span>
+            <span className="text-xs font-bold uppercase tracking-wider">
+              {t("coach.todayTips")}
+            </span>
           </div>
           <ul className="space-y-2">
-            {data.tips.map((t: string, i: number) => (
+            {data.tips.map((tip: string, i: number) => (
               <li key={i} className="flex gap-2 text-sm leading-relaxed">
                 <span className="text-primary font-bold shrink-0">{i + 1}.</span>
-                <span>{t}</span>
+                <span>{tip}</span>
               </li>
             ))}
           </ul>
@@ -291,7 +296,9 @@ function MorningView({ data, loading }: { data: MorningCoachView; loading: boole
         <section className="bg-amber-500/10 p-5 rounded-3xl outline-1 outline-amber-500/20 space-y-2 animate-fade-up">
           <div className="flex items-center gap-2 text-amber-700 dark:text-amber-500">
             <AlertTriangle className="size-4" aria-hidden />
-            <span className="text-xs font-bold uppercase tracking-wider">Perhatian</span>
+            <span className="text-xs font-bold uppercase tracking-wider">
+              {t("coach.warnings")}
+            </span>
           </div>
           <ul className="space-y-1.5">
             {data.warnings.map((w: string, i: number) => (
@@ -304,7 +311,7 @@ function MorningView({ data, loading }: { data: MorningCoachView; loading: boole
       )}
 
       <p className="text-xs text-center text-muted-foreground">
-        Dibuat {new Date(data.generated_at).toLocaleString("id-ID")} • Bukan saran medis
+        {t("coach.generatedAt", { date: new Date(data.generated_at).toLocaleString("id-ID") })}
       </p>
     </>
   );
@@ -313,12 +320,15 @@ function MorningView({ data, loading }: { data: MorningCoachView; loading: boole
 // ─── Evening View ────────────────────────────────────────────────────────────
 
 function EveningView({ data, loading }: { data: EveningCoachView; loading: boolean }) {
+  const { t } = useTranslation();
   return (
     <>
       <section className="bg-gradient-to-br from-indigo-50 to-violet-50 dark:from-indigo-950/20 dark:to-violet-950/10 p-6 rounded-3xl outline-1 outline-indigo-200/40 dark:outline-indigo-900/30 space-y-2 animate-fade-up">
         <div className="flex items-center gap-2 text-indigo-700 dark:text-indigo-300">
           <Moon className="size-5" aria-hidden />
-          <span className="text-xs font-bold uppercase tracking-wider">Refleksi Malam</span>
+          <span className="text-xs font-bold uppercase tracking-wider">
+            {t("coach.eveningReflection")}
+          </span>
           {data.cached && (
             <span className="text-[10px] bg-white/50 dark:bg-black/30 px-1.5 py-0.5 rounded-full">
               cached
@@ -335,7 +345,9 @@ function EveningView({ data, loading }: { data: EveningCoachView; loading: boole
         <section className="bg-emerald-50/50 dark:bg-emerald-950/20 p-5 rounded-3xl outline-1 outline-emerald-200/40 dark:outline-emerald-900/30 space-y-3 animate-fade-up">
           <div className="flex items-center gap-2 text-emerald-700 dark:text-emerald-300">
             <Trophy className="size-4" aria-hidden />
-            <span className="text-xs font-bold uppercase tracking-wider">Pencapaian Hari Ini</span>
+            <span className="text-xs font-bold uppercase tracking-wider">
+              {t("coach.todayWins")}
+            </span>
           </div>
           <ul className="space-y-1.5">
             {data.wins.map((w: string, i: number) => (
@@ -352,7 +364,9 @@ function EveningView({ data, loading }: { data: EveningCoachView; loading: boole
         <section className="bg-amber-50/50 dark:bg-amber-950/20 p-5 rounded-3xl outline-1 outline-amber-200/40 dark:outline-amber-900/30 space-y-2 animate-fade-up">
           <div className="flex items-center gap-2 text-amber-700 dark:text-amber-300">
             <Lightbulb className="size-4" aria-hidden />
-            <span className="text-xs font-bold uppercase tracking-wider">Untuk Besok</span>
+            <span className="text-xs font-bold uppercase tracking-wider">
+              {t("coach.forTomorrow")}
+            </span>
           </div>
           <ul className="space-y-1.5">
             {data.improvements.map((w: string, i: number) => (
@@ -369,7 +383,9 @@ function EveningView({ data, loading }: { data: EveningCoachView; loading: boole
         <section className="bg-card p-5 rounded-3xl outline-1 outline-black/5 space-y-2 animate-fade-up">
           <div className="flex items-center gap-2 text-coral">
             <Target className="size-4" aria-hidden />
-            <span className="text-xs font-bold uppercase tracking-wider">Fokus Besok</span>
+            <span className="text-xs font-bold uppercase tracking-wider">
+              {t("coach.tomorrowFocus")}
+            </span>
           </div>
           <p className="text-sm font-semibold leading-relaxed">{data.tomorrow_focus}</p>
         </section>
@@ -382,13 +398,13 @@ function EveningView({ data, loading }: { data: EveningCoachView; loading: boole
       {data.tips && data.tips.length > 0 && (
         <section className="bg-card p-5 rounded-3xl outline-1 outline-black/5 space-y-2 animate-fade-up">
           <h2 className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
-            Tips Malam Ini
+            {t("coach.tonightTips")}
           </h2>
           <ul className="space-y-1.5">
-            {data.tips.map((t: string, i: number) => (
+            {data.tips.map((tip: string, i: number) => (
               <li key={i} className="flex gap-2 text-sm leading-relaxed">
                 <span className="text-primary font-bold shrink-0">•</span>
-                <span>{t}</span>
+                <span>{tip}</span>
               </li>
             ))}
           </ul>
@@ -396,7 +412,7 @@ function EveningView({ data, loading }: { data: EveningCoachView; loading: boole
       )}
 
       <p className="text-xs text-center text-muted-foreground">
-        Dibuat {new Date(data.generated_at).toLocaleString("id-ID")} • Bukan saran medis
+        {t("coach.generatedAt", { date: new Date(data.generated_at).toLocaleString("id-ID") })}
       </p>
     </>
   );
@@ -416,6 +432,7 @@ type HistoryItem = {
 };
 
 function HistoryRow({ item }: { item: HistoryItem }) {
+  const { t } = useTranslation();
   const date = new Date(item.session_date).toLocaleDateString("id-ID", {
     weekday: "short",
     day: "2-digit",
@@ -438,12 +455,12 @@ function HistoryRow({ item }: { item: HistoryItem }) {
       <div className="min-w-0 flex-1">
         <div className="flex items-center justify-between gap-2">
           <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
-            {isEvening ? "Malam" : "Pagi"} • {date}
+            {isEvening ? t("coach.evening") : t("coach.morning")} • {date}
           </p>
           {item.read_at ? (
-            <span className="text-[9px] text-muted-foreground/60">✓ dibaca</span>
+            <span className="text-[9px] text-muted-foreground/60">{t("coach.read")}</span>
           ) : (
-            <span className="text-[9px] text-coral">baru</span>
+            <span className="text-[9px] text-coral">{t("coach.new")}</span>
           )}
         </div>
         <p className="text-sm font-medium leading-snug mt-0.5 line-clamp-2">

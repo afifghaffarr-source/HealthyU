@@ -11,6 +11,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { getProfile } from "@/features/profile/lib/profile.functions";
+import { useTranslation } from "@/lib/i18n";
 import { getDailyTip } from "@/features/daily-tips/lib/dailyTips.functions";
 import { todaysMeals } from "@/features/meals/lib/meals.functions";
 import { currentFast, getFastingStats } from "@/features/fasting/lib/fasting.functions";
@@ -114,6 +115,7 @@ export const Route = createFileRoute("/_authenticated/dashboard")({
 });
 
 function Dashboard() {
+  const { t } = useTranslation();
   const qc = useQueryClient();
   // User landed on dashboard = first meaningful interaction.
   // Signals PWA install prompt that user has seen real value.
@@ -252,12 +254,16 @@ function Dashboard() {
 
         <Coachmark
           flagKey="dashboard-v1"
-          title="Selamat datang di Healthy U"
-          description="Geser ke bawah untuk refresh, ketuk kartu untuk catat aktivitas, dan kunjungi Profil untuk personalisasi."
+          title={t("dashboard.coachmark.title")}
+          description={t("dashboard.coachmark.description")}
         />
 
         {/* STATISTIK HARI INI — primary glance */}
-        <SectionGroup label="Hari Ini" actionLabel="Detail" actionHref="/reports">
+        <SectionGroup
+          label={t("dashboard.today")}
+          actionLabel={t("dashboard.detail")}
+          actionHref="/reports"
+        >
           <TodayInsight
             ctx={{
               totals,
@@ -278,12 +284,12 @@ function Dashboard() {
         </SectionGroup>
 
         {/* AKSI CEPAT — Phase 2: moved above fold */}
-        <SectionGroup label="Aksi Cepat">
+        <SectionGroup label={t("dashboard.quickActions")}>
           <ActionRow />
         </SectionGroup>
 
         {/* LANGKAH BERIKUTNYA — Phase 2: contextual guidance above fold */}
-        <SectionGroup label="Langkah Berikutnya">
+        <SectionGroup label={t("dashboard.nextStep")}>
           <SmartNextStepCard
             hour={new Date().getHours()}
             timezone={profile?.timezone ?? undefined}
@@ -298,8 +304,8 @@ function Dashboard() {
         {/* META-PATTERN HERO — Sprint 13: high-priority combo alerts */}
         {metaPattern && (
           <SectionGroup
-            label="⚠️ Pola Penting Terdeteksi"
-            actionLabel="Semua"
+            label={t("dashboard.metaPatternDetected")}
+            actionLabel={t("dashboard.viewAll")}
             actionHref="/profile/insights"
           >
             <MetaPatternHeroCard pattern={metaPattern} />
@@ -309,8 +315,8 @@ function Dashboard() {
         {/* META-PATTERN BADGES — Sprint 17: first-time celebration banner */}
         {allMetaPatterns.length > 0 && (
           <SectionGroup
-            label="🎖 Achievement"
-            actionLabel="Lihat semua"
+            label={t("dashboard.achievement")}
+            actionLabel={t("dashboard.seeAll")}
             actionHref="/profile/insights"
           >
             <MilestoneBadges patterns={allMetaPatterns} showBanner={true} />
@@ -318,16 +324,18 @@ function Dashboard() {
         )}
 
         {/* WEEKLY DIGEST — Sprint 18: on-demand email summary (no cron) */}
-        <SectionGroup label="📊 Ringkasan Mingguan">
+        <SectionGroup label={t("dashboard.weeklySummary")}>
           <Card className="p-4 border-l-4 border-blue-500">
             <div className="flex items-start gap-3">
               <div className="rounded-lg bg-blue-500 p-2 text-white">
                 <Mail className="h-5 w-5" />
               </div>
               <div className="flex-1">
-                <h3 className="font-semibold text-gray-900 mb-1">Kirim Ringkasan Minggu Ini</h3>
+                <h3 className="font-semibold text-gray-900 mb-1">
+                  {t("dashboard.weeklyDigest.title")}
+                </h3>
                 <p className="text-sm text-gray-600 mb-3">
-                  Dapatkan top 3 pola makan 7 hari terakhir langsung ke email kamu.
+                  {t("dashboard.weeklyDigest.description")}
                 </p>
                 <Button
                   variant="outline"
@@ -336,16 +344,18 @@ function Dashboard() {
                   disabled={digestMutation.isPending}
                 >
                   {digestMutation.isPending
-                    ? "Mengirim..."
+                    ? t("dashboard.weeklyDigest.sending")
                     : digestResult?.sent
-                      ? "✓ Kirim ulang"
-                      : "📧 Kirim ke Email"}
+                      ? t("dashboard.weeklyDigest.resend")
+                      : t("dashboard.weeklyDigest.send")}
                 </Button>
                 {digestResult && (
                   <p className="text-xs text-gray-500 mt-2">
                     {digestResult.sent
-                      ? `✓ Terkirim (${digestResult.patternCount} pola)`
-                      : `Info: ${digestResult.reason ?? "belum diproses"}`}
+                      ? t("dashboard.weeklyDigest.sent", { count: digestResult.patternCount ?? 0 })
+                      : t("dashboard.weeklyDigest.info", {
+                          reason: digestResult.reason ?? t("dashboard.weeklyDigest.notProcessed"),
+                        })}
                   </p>
                 )}
               </div>
@@ -354,7 +364,11 @@ function Dashboard() {
         </SectionGroup>
 
         {/* AI COACH — daily personalized guidance */}
-        <SectionGroup label="AI Coach" actionLabel="Buka" actionHref="/coach">
+        <SectionGroup
+          label={t("dashboard.aiCoach")}
+          actionLabel={t("dashboard.open")}
+          actionHref="/coach"
+        >
           <CoachCard
             kind="morning"
             greeting={coachData?.greeting}
@@ -366,11 +380,19 @@ function Dashboard() {
 
         {/* PATTERN INSIGHTS — eating pattern detection (Sprint 10b) */}
         {patternLoading ? (
-          <SectionGroup label="Pattern Insights" actionLabel="Semua" actionHref="/profile/insights">
+          <SectionGroup
+            label={t("dashboard.patternInsights")}
+            actionLabel={t("dashboard.viewAll")}
+            actionHref="/profile/insights"
+          >
             <PatternInsightCardSkeleton />
           </SectionGroup>
         ) : topPattern ? (
-          <SectionGroup label="Pattern Insights" actionLabel="Semua" actionHref="/profile/insights">
+          <SectionGroup
+            label={t("dashboard.patternInsights")}
+            actionLabel={t("dashboard.viewAll")}
+            actionHref="/profile/insights"
+          >
             <PatternInsightCard
               pattern={topPattern}
               onDismiss={(id) => dismissPatternMut.mutate(id)}
@@ -380,7 +402,11 @@ function Dashboard() {
         ) : null}
 
         {/* TRACKING — fasting + water */}
-        <SectionGroup label="Tracking" actionLabel="Semua" actionHref="/fasting">
+        <SectionGroup
+          label={t("dashboard.tracking")}
+          actionLabel={t("dashboard.viewAll")}
+          actionHref="/fasting"
+        >
           <HeroStatsRow
             totals={totals}
             calTarget={calTarget}
@@ -411,14 +437,14 @@ function Dashboard() {
         {/* Collapsible extras — keep first paint lean */}
         <Collapsible open={showMore} onOpenChange={setShowMore}>
           <CollapsibleTrigger className="flex items-center justify-center gap-1.5 w-full py-3 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
-            {showMore ? "Sembunyikan" : "Lihat Semua"}
+            {showMore ? t("dashboard.hide") : t("dashboard.seeAllSections")}
             <ChevronDown
               className={`h-4 w-4 transition-transform ${showMore ? "rotate-180" : ""}`}
             />
           </CollapsibleTrigger>
           <CollapsibleContent className="space-y-5">
             {/* INSIGHT TAMBAHAN */}
-            <SectionGroup label="Insight">
+            <SectionGroup label={t("dashboard.insight")}>
               <MacroGapInsightCard totals={totals} calTarget={calTarget} />
               <LocalFoodHintCard hour={new Date().getHours()} />
               <HydrationSuggestCard
@@ -431,7 +457,7 @@ function Dashboard() {
             </SectionGroup>
 
             {/* CHECK-IN & REFLEKSI */}
-            <SectionGroup label="Check-In">
+            <SectionGroup label={t("dashboard.checkIn")}>
               <MoodQuickLog
                 onPick={(m) => moodMutation.mutate(m)}
                 disabled={moodMutation.isPending}
@@ -441,7 +467,7 @@ function Dashboard() {
             </SectionGroup>
 
             {/* MOTIVASI — streak, gamification, tips */}
-            <SectionGroup label="Motivasi">
+            <SectionGroup label={t("dashboard.motivation")}>
               <WeeklyReviewCard />
               <WeeklyGoalCard />
               <StreakFreezeBadge />
@@ -455,7 +481,7 @@ function Dashboard() {
             </SectionGroup>
 
             {/* LAINNYA */}
-            <SectionGroup label="Lainnya">
+            <SectionGroup label={t("dashboard.others")}>
               <HijriWidget variant="compact" />
               <GroupChallengeSummaryCard groupSummary={groupSummary} />
               <UnlinkedChallengesCard challenges={unlinkedChallenges} />

@@ -3,6 +3,7 @@ import { useState } from "react";
 import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { BottomNav } from "@/components/bottom-nav";
 import { Scale, Ruler, Camera, HeartPulse, ArrowRight, Plus } from "lucide-react";
+import { useTranslation } from "@/lib/i18n";
 
 export const Route = createFileRoute("/_authenticated/body")({
   component: BodyPage,
@@ -17,6 +18,7 @@ const tabs = [
 type TabId = (typeof tabs)[number]["id"];
 
 function BodyPage() {
+  const { t } = useTranslation();
   const [tab, setTab] = useState<TabId>("Berat");
   return (
     <div className="min-h-dvh pb-28 px-4 bg-background">
@@ -40,10 +42,10 @@ function BodyPage() {
       <div className="mt-6">
         {tab === "Berat" && (
           <TabPanel>
-            <Metric label="Berat saat ini" value="—" unit="kg" />
-            <Metric label="Target" value="—" unit="kg" />
-            <Metric label="Tren 30 hari" value="—" unit="kg" />
-            <PageLink to="/weight" label="Catat berat" />
+            <Metric label={t("weight.current")} value="—" unit="kg" />
+            <Metric label={t("weight.target")} value="—" unit="kg" />
+            <Metric label={t("weight.trend", { count: 30 })} value="—" unit="kg" />
+            <PageLink to="/weight" label={t("weight.logToday")} />
             <PageLink to="/weight.chart" label="Grafik berat" />
             <PageLink to="/weight.goal" label="Atur target" />
           </TabPanel>

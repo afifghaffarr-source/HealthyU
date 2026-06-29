@@ -17,6 +17,7 @@ import { BottomNav } from "@/components/bottom-nav";
 import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { toast } from "@/lib/toast-config";
 import { toastError } from "@/lib/toast-config";
+import { useTranslation } from "@/lib/i18n";
 import {
   ActiveFastCard,
   ProtocolPicker,
@@ -34,6 +35,7 @@ export const Route = createFileRoute("/_authenticated/fasting")({
 
 function FastingPage() {
   const qc = useQueryClient();
+  const { t } = useTranslation();
   const fetchFast = useServerFn(currentFast);
   const startFn = useServerFn(startFast);
   const stopFn = useServerFn(stopFast);
@@ -74,9 +76,9 @@ function FastingPage() {
       }),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["fast", "schedule"] });
-      toast.success("Jadwal tersimpan");
+      toast.success(t("fasting.scheduleSaved"));
     },
-    onError: (e) => toastError(e, "Gagal"),
+    onError: (e) => toastError(e, t("common.error")),
   });
 
   // eslint-disable-next-line react-hooks/purity -- wall-clock / non-deterministic browser API; re-renders deliberately driven by interval/timer or event subscription
@@ -92,7 +94,7 @@ function FastingPage() {
       startFn({ data: { ...p, is_custom: p.is_custom ?? false } }),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["fast"] });
-      toast.success("Puasa dimulai. Semangat!");
+      toast.success(t("fasting.startedToast"));
     },
   });
   const stopMut = useMutation({
@@ -101,7 +103,7 @@ function FastingPage() {
       qc.invalidateQueries({ queryKey: ["fast"] });
       qc.invalidateQueries({ queryKey: ["fast", "stats"] });
       qc.invalidateQueries({ queryKey: ["game", "summary"] });
-      toast.success(r.completed ? "Selamat! Puasa tercapai 🎉" : "Puasa dihentikan");
+      toast.success(r.completed ? t("fasting.completedToast") : t("fasting.stoppedToast"));
       (r?.game?.newlyUnlocked ?? []).forEach((a) =>
         toast.success(`${getAchievementToastPrefix(a.icon)} ${a.title} terbuka!`),
       );
@@ -145,7 +147,7 @@ function FastingPage() {
   return (
     <main className="min-h-dvh bg-background pb-28">
       <div className="max-w-md mx-auto px-5 pt-2 space-y-5">
-        <TopAppBar title="Puasa" subtitle="Atur protokol & jadwal" showBack />
+        <TopAppBar title={t("fasting.title")} subtitle={t("fasting.subtitle")} showBack />
 
         {/* Sprint 29 — Puasa Aman widget sits at top so users see countdown first */}
         {puasaAman && <PuasaAmanWidget data={puasaAman} />}

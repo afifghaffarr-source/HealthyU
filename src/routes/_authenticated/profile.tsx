@@ -12,6 +12,7 @@ import { calcAge, calcBMI, bmiCategory, calcBMR, calcTDEE, type ActivityLevel } 
 import { clientSafeError } from "@/lib/clientLogSafe";
 import { LogOut, Camera, Sparkles, ChefHat, ChevronRight, Settings } from "lucide-react";
 import { useTheme } from "@/components/theme-provider.hook";
+import { useTranslation } from "@/lib/i18n";
 import { LocaleSwitcher } from "@/components/locale-switcher";
 import { ProfileNavGrid } from "@/features/profile/components/ProfileNavGrid";
 import { DisclaimerCard } from "@/components/healthyu/disclaimer-card";
@@ -34,6 +35,7 @@ export const Route = createFileRoute("/_authenticated/profile")({
 function ProfilePage() {
   const location = useLocation();
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const { theme, toggle } = useTheme();
   const fetchProfile = useServerFn(getProfile);
   const { data: p, isLoading } = useQuery({
@@ -74,7 +76,7 @@ function ProfilePage() {
     return (
       <main className="min-h-dvh bg-background pb-28">
         <div className="max-w-md mx-auto px-5 pt-2 space-y-5">
-          <TopAppBar title="Profil" subtitle="Memuat…" showBack />
+          <TopAppBar title={t("profile.title")} subtitle={t("profile.loading")} showBack />
           <div className="bg-card p-6 rounded-3xl outline-1 outline-foreground/10 text-center animate-pulse">
             <div className="size-20 mx-auto rounded-full bg-muted mb-3" />
             <div className="h-5 w-32 mx-auto bg-muted rounded mb-2" />
@@ -99,14 +101,18 @@ function ProfilePage() {
   return (
     <main className="min-h-dvh bg-background pb-28">
       <div className="max-w-md mx-auto px-5 pt-2 space-y-6">
-        <TopAppBar title="Profil" subtitle={p?.full_name ?? "Sahabat"} showBack />
+        <TopAppBar
+          title={t("profile.title")}
+          subtitle={p?.full_name ?? t("profile.defaultName")}
+          showBack
+        />
 
         {/* ── Section A: Identitas ─────────────────────────────────────────── */}
         <section className="bg-card p-6 rounded-3xl outline-1 outline-foreground/10 text-center animate-fade-up">
           <div className="size-20 mx-auto rounded-full bg-primary text-primary-foreground grid place-items-center text-2xl font-bold mb-3">
             {(p?.full_name ?? "U").slice(0, 1).toUpperCase()}
           </div>
-          <h2 className="text-xl font-bold">{p?.full_name ?? "Sahabat"}</h2>
+          <h2 className="text-xl font-bold">{p?.full_name ?? t("profile.defaultName")}</h2>
           <p className="text-sm text-muted-foreground capitalize">
             {p?.dietary_preference ?? "Balanced diet"}
           </p>
@@ -114,7 +120,7 @@ function ProfilePage() {
             to="/onboarding"
             className="inline-flex items-center gap-1 mt-3 text-sm text-primary font-medium hover:underline"
           >
-            Edit profil <ChevronRight className="size-3.5" />
+            {t("profile.edit")} <ChevronRight className="size-3.5" />
           </Link>
         </section>
 
@@ -131,16 +137,16 @@ function ProfilePage() {
               className="animate-fade-up"
               factors={[
                 {
-                  label: "BMI",
+                  label: t("profile.bmi"),
                   value:
                     bmi >= 18.5 && bmi <= 24.9 ? 100 : Math.max(0, 100 - Math.abs(bmi - 22) * 8),
                 },
-                { label: "Aktivitas", value: activityScore(p?.activity_level) },
+                { label: t("profile.activity"), value: activityScore(p?.activity_level) },
                 {
-                  label: "Target berat",
+                  label: t("profile.weightTarget"),
                   value: weightTargetScore(Number(p?.weight_kg), Number(p?.target_weight_kg)),
                 },
-                { label: "Kalori harian", value: p?.daily_calorie_target ? 80 : 40 },
+                { label: t("profile.dailyCalories"), value: p?.daily_calorie_target ? 80 : 40 },
               ]}
             />
           </>
@@ -149,7 +155,7 @@ function ProfilePage() {
         {/* ── Section C: Aksi Cepat (3 featured) ──────────────────────────── */}
         <section className="animate-fade-up">
           <h3 className="text-[12px] uppercase tracking-wider text-muted-foreground font-semibold px-1 mb-3">
-            Aksi Cepat
+            {t("profile.quickActions")}
           </h3>
           <div className="grid grid-cols-3 gap-3">
             <Link
@@ -158,9 +164,9 @@ function ProfilePage() {
             >
               <Camera className="size-6 text-primary" aria-hidden />
               <div>
-                <p className="text-sm font-semibold leading-tight">Scan</p>
+                <p className="text-sm font-semibold leading-tight">{t("profile.scanLabel")}</p>
                 <p className="text-[11px] text-muted-foreground leading-tight mt-0.5">
-                  Foto, barcode, menu
+                  {t("profile.scanDesc")}
                 </p>
               </div>
             </Link>
@@ -170,9 +176,9 @@ function ProfilePage() {
             >
               <Sparkles className="size-6 text-coral" aria-hidden />
               <div>
-                <p className="text-sm font-semibold leading-tight">AI Coach</p>
+                <p className="text-sm font-semibold leading-tight">{t("profile.coachLabel")}</p>
                 <p className="text-[11px] text-muted-foreground leading-tight mt-0.5">
-                  Tanya & insight
+                  {t("profile.coachDesc")}
                 </p>
               </div>
             </Link>
@@ -182,9 +188,9 @@ function ProfilePage() {
             >
               <ChefHat className="size-6 text-sage-deep" aria-hidden />
               <div>
-                <p className="text-sm font-semibold leading-tight">Resep</p>
+                <p className="text-sm font-semibold leading-tight">{t("profile.recipesLabel")}</p>
                 <p className="text-[11px] text-muted-foreground leading-tight mt-0.5">
-                  Yang lo simpan
+                  {t("profile.recipesDesc")}
                 </p>
               </div>
             </Link>
@@ -193,14 +199,14 @@ function ProfilePage() {
             to="/resep"
             className="mt-3 inline-flex items-center gap-1 text-xs font-medium text-primary hover:underline px-1"
           >
-            Jelajahi semua resep <ChevronRight className="size-3" />
+            {t("profile.exploreRecipes")} <ChevronRight className="size-3" />
           </Link>
         </section>
 
         {/* ── Section D: Fitur Lengkap (organized nav grid) ───────────────── */}
         <section className="animate-fade-up">
           <h3 className="text-[12px] uppercase tracking-wider text-muted-foreground font-semibold px-1 mb-3">
-            Fitur Lainnya
+            {t("profile.moreFeatures")}
           </h3>
           <ProfileNavGrid theme={theme} onToggleTheme={toggle} />
         </section>
@@ -218,10 +224,8 @@ function ProfilePage() {
               <Settings className="size-4" />
             </div>
             <div className="flex-1 text-left min-w-0">
-              <p className="font-semibold text-sm">Pengaturan</p>
-              <p className="text-[11px] text-muted-foreground">
-                Akun, privasi, preferensi, notifikasi
-              </p>
+              <p className="font-semibold text-sm">{t("settings.title")}</p>
+              <p className="text-[11px] text-muted-foreground">{t("profile.settingsSubtitle")}</p>
             </div>
             <ChevronRight className="size-4 text-muted-foreground shrink-0" />
           </Link>
@@ -231,26 +235,23 @@ function ProfilePage() {
               <AlertDialogTrigger asChild>
                 <button
                   className="w-full flex items-center justify-center gap-2 text-destructive font-semibold py-3 rounded-xl hover:bg-destructive/10 transition min-h-11"
-                  aria-label="Keluar dari akun"
+                  aria-label={t("profile.logout")}
                 >
-                  <LogOut className="size-4" /> Keluar dari akun
+                  <LogOut className="size-4" /> {t("profile.logout")}
                 </button>
               </AlertDialogTrigger>
               <AlertDialogContent>
                 <AlertDialogHeader>
-                  <AlertDialogTitle>Keluar dari HealthyU?</AlertDialogTitle>
-                  <AlertDialogDescription>
-                    Kamu akan keluar dari akun ini. Data tetap aman dan bisa diakses lagi saat masuk
-                    kembali.
-                  </AlertDialogDescription>
+                  <AlertDialogTitle>{t("profile.logoutConfirm")}</AlertDialogTitle>
+                  <AlertDialogDescription>{t("profile.logoutConfirmDesc")}</AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
-                  <AlertDialogCancel>Batal</AlertDialogCancel>
+                  <AlertDialogCancel>{t("common.cancel")}</AlertDialogCancel>
                   <AlertDialogAction
                     onClick={handleLogout}
                     className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                   >
-                    Ya, keluar
+                    {t("profile.logoutConfirmYes")}
                   </AlertDialogAction>
                 </AlertDialogFooter>
               </AlertDialogContent>

@@ -16,6 +16,7 @@ import {
   useScanRecognizeMutation,
   useScanLogMutation,
 } from "@/features/scan/hooks/useScanMutations";
+import { useTranslation } from "@/lib/i18n";
 
 export const Route = createFileRoute("/_authenticated/scan")({
   component: () => (
@@ -28,6 +29,7 @@ export const Route = createFileRoute("/_authenticated/scan")({
 type Item = Awaited<ReturnType<typeof recognizeFood>>["items"][number];
 
 function ScanPage() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const fileRef = useRef<HTMLInputElement>(null);
   const limitFn = useServerFn(checkScanLimit);
@@ -65,7 +67,7 @@ function ScanPage() {
     try {
       const lim = await limitFn().catch(() => null);
       if (lim && lim.remaining <= 0 && !lim.isPro) {
-        toast.error(`Limit harian ${lim.limit} scan. Upgrade Pro untuk unlimited.`);
+        toast.error(t("scan.limitReached", { limit: lim.limit }));
         return;
       }
       const url = await fileToDataUrl(file);
@@ -73,7 +75,7 @@ function ScanPage() {
       setItems([]);
       scanMut.mutate(url);
     } catch {
-      toast.error("Gagal memproses gambar");
+      toast.error(t("scan.processError"));
     }
   }
 
@@ -90,13 +92,13 @@ function ScanPage() {
     <div className="min-h-dvh bg-background pb-28">
       <main className="max-w-md mx-auto px-4 pt-2 space-y-4">
         <TopAppBar
-          title="Scan Makanan"
+          title={t("scan.foodPhoto.title")}
           showBack
           action={
             <Link
               to="/scan/history"
               className="inline-flex items-center gap-1 text-xs text-primary"
-              aria-label="Riwayat scan"
+              aria-label={t("scan.history")}
             >
               <History className="size-4" />
             </Link>
@@ -107,27 +109,25 @@ function ScanPage() {
           <div className="flex items-center gap-2 text-xs">
             <Sparkles className="size-3.5 text-primary" />
             <span>
-              Mode AI: <b>{usePro ? "Akurat (lebih lambat)" : "Cepat"}</b>
+              {t("scan.aiMode")}
+              <b>{usePro ? t("scan.modeAccurate") : t("scan.modeFast")}</b>
             </span>
           </div>
           <button
             type="button"
             onClick={() => setUsePro((v) => !v)}
             className="text-xs px-3 py-1.5 rounded-lg bg-primary/10 text-primary font-medium inline-flex items-center gap-1 min-h-9"
-            aria-label={usePro ? "Beralih ke mode cepat" : "Beralih ke mode akurat"}
+            aria-label={usePro ? t("scan.switchModeFast") : t("scan.switchModeAccurate")}
           >
-            <Zap className="size-3" /> {usePro ? "Pakai Cepat" : "Pakai Akurat"}
+            <Zap className="size-3" /> {usePro ? t("scan.useFast") : t("scan.useAccurate")}
           </button>
         </div>
         <p className="text-[11px] text-muted-foreground -mt-2 px-1">
-          {usePro
-            ? "Akurat: sedikit lebih lama, tapi lebih teliti."
-            : "Cepat: cocok untuk catatan harian."}
+          {usePro ? t("scan.accurateDesc") : t("scan.fastDesc")}
         </p>
         {!imageUrl && (
           <div className="text-[11px] text-muted-foreground bg-muted/40 rounded-xl p-2">
-            💡 Tip: sertakan referensi (sendok, garpu, atau tangan) di foto agar estimasi porsi
-            lebih akurat.
+            {t("scan.foodPhoto.tip")}
           </div>
         )}
         <input
@@ -147,16 +147,14 @@ function ScanPage() {
               <Camera className="size-8 text-primary" />
             </div>
             <div>
-              <p className="font-semibold">Foto makananmu</p>
-              <p className="text-xs text-muted-foreground mt-1">
-                AI memperkirakan nama, porsi, & kalori — kamu bisa ubah sebelum simpan
-              </p>
+              <p className="font-semibold">{t("scan.foodPhoto.ctaTitle")}</p>
+              <p className="text-xs text-muted-foreground mt-1">{t("scan.foodPhoto.ctaDesc")}</p>
             </div>
             <button
               onClick={() => fileRef.current?.click()}
               className="w-full py-3 rounded-xl bg-primary text-primary-foreground font-semibold text-sm"
             >
-              Ambil / Pilih Foto
+              {t("scan.foodPhoto.choosePhoto")}
             </button>
           </div>
         ) : (
@@ -179,10 +177,8 @@ function ScanPage() {
                 <div className="absolute inset-0 bg-black/50 grid place-items-center text-white">
                   <div className="flex flex-col items-center gap-2 px-6 text-center">
                     <Loader2 className="size-8 animate-spin" />
-                    <p className="text-sm font-medium">Menganalisis foto…</p>
-                    <p className="text-[11px] text-white/80 max-w-[220px]">
-                      Hasilnya bisa kamu cek lagi sebelum simpan.
-                    </p>
+                    <p className="text-sm font-medium">{t("scan.analyzing")}</p>
+                    <p className="text-[11px] text-white/80 max-w-[220px]">{t("scan.canReview")}</p>
                   </div>
                 </div>
               )}
@@ -196,11 +192,9 @@ function ScanPage() {
                 className="rounded-2xl border border-rose-500/30 bg-rose-500/5 p-4 text-center space-y-1"
               >
                 <p className="text-sm font-semibold text-rose-700 dark:text-rose-300">
-                  Scan belum berhasil
+                  {t("scan.scanError")}
                 </p>
-                <p className="text-xs text-muted-foreground">
-                  Coba foto ulang dengan cahaya lebih terang, atau tambah manual.
-                </p>
+                <p className="text-xs text-muted-foreground">{t("scan.retryHint")}</p>
               </div>
             )}
 
@@ -218,10 +212,8 @@ function ScanPage() {
 
             {!scanMut.isPending && items.length === 0 && !scanMut.isError && (
               <div className="rounded-3xl border border-dashed border-border bg-card p-6 text-center space-y-2">
-                <p className="font-semibold text-sm">Belum terbaca jelas</p>
-                <p className="text-xs text-muted-foreground">
-                  Coba foto lebih dekat, pastikan makanan terlihat penuh, atau tambah manual.
-                </p>
+                <p className="font-semibold text-sm">{t("scan.notClear")}</p>
+                <p className="text-xs text-muted-foreground">{t("scan.notClearHint")}</p>
               </div>
             )}
 
@@ -232,14 +224,14 @@ function ScanPage() {
                   className="py-3 rounded-xl bg-muted text-foreground font-semibold text-sm min-h-11"
                   aria-label="Pindai ulang foto"
                 >
-                  Pindai ulang
+                  {t("scan.rescan")}
                 </button>
                 <Link
                   to="/food"
                   className="py-3 rounded-xl bg-card border text-foreground font-semibold text-sm min-h-11 inline-flex items-center justify-center"
                   aria-label="Tambah makanan secara manual"
                 >
-                  Tambah manual
+                  {t("scan.addManual")}
                 </Link>
               </div>
             )}

@@ -16,12 +16,14 @@ import {
   MoodComposer,
   MoodHistoryItem,
 } from "@/features/mood/components/MoodPieces";
+import { useTranslation } from "@/lib/i18n";
 
 export const Route = createFileRoute("/_authenticated/mood")({
   component: MoodPage,
 });
 
 function MoodPage() {
+  const { t } = useTranslation();
   const qc = useQueryClient();
   const fetchList = useServerFn(listMood);
   const add = useServerFn(addMood);
@@ -47,9 +49,7 @@ function MoodPage() {
       setNote("");
       qc.invalidateQueries({ queryKey: ["mood"] });
       toast.success(
-        res && "offline" in res && res.offline
-          ? "Mood disimpan offline. Akan sync otomatis."
-          : "Mood tercatat",
+        res && "offline" in res && res.offline ? t("mood.offlineSaved") : t("mood.logged"),
       );
     },
     onError: (e: Error) => toast.error(e.message),
@@ -59,7 +59,7 @@ function MoodPage() {
     mutationFn: (id: string) => del({ data: { id } }),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["mood"] });
-      toast.success("Dihapus");
+      toast.success(t("common.deleted"));
     },
   });
 
@@ -89,8 +89,8 @@ function MoodPage() {
     <div className="min-h-dvh bg-background pb-28">
       <div className="max-w-md mx-auto px-4">
         <TopAppBar
-          title="Mood & Jurnal"
-          subtitle={avg ? `Rata-rata 30 hari: ${avg.toFixed(1)} / 5` : "Catat perasaanmu hari ini"}
+          title={t("mood.title")}
+          subtitle={avg ? t("mood.avgLabel", { avg: avg.toFixed(1) }) : t("mood.subtitle")}
           showBack
           action={<SyncPill online={online} pending={pending} onSync={() => sync()} />}
         />
@@ -109,14 +109,10 @@ function MoodPage() {
         />
 
         <section>
-          <h2 className="text-sm font-semibold mb-3">Riwayat</h2>
+          <h2 className="text-sm font-semibold mb-3">{t("common.history")}</h2>
           {logs.length === 0 ? (
             <div className="rounded-2xl bg-card outline-1 outline-black/5">
-              <EmptyState
-                icon={Smile}
-                title="Belum ada catatan mood"
-                description="Pilih emoji di atas untuk mencatat perasaanmu hari ini."
-              />
+              <EmptyState icon={Smile} title={t("mood.empty")} description={t("mood.emptyHint")} />
             </div>
           ) : (
             <ul className="space-y-2">

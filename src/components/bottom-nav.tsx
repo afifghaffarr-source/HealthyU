@@ -5,14 +5,15 @@ import { SyncPill } from "@/components/healthyu/sync-pill";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { listNotifications } from "@/features/scan/lib/scanBatch8.functions";
+import { useTranslation, type TranslationKey } from "@/lib/i18n";
 
 const items = [
-  { to: "/dashboard", label: "Beranda", icon: Home },
-  { to: "/scan", label: "Scan", icon: Camera },
-  { to: "/foods", label: "Database", icon: Database },
-  { to: "/fasting", label: "Puasa", icon: Timer },
-  { to: "/workout", label: "Latihan", icon: Activity },
-  { to: "/profile", label: "Saya", icon: User },
+  { to: "/dashboard", labelKey: "nav.home" as TranslationKey, icon: Home },
+  { to: "/scan", labelKey: "nav.scan" as TranslationKey, icon: Camera },
+  { to: "/foods", labelKey: "nav.database" as TranslationKey, icon: Database },
+  { to: "/fasting", labelKey: "nav.fasting" as TranslationKey, icon: Timer },
+  { to: "/workout", labelKey: "nav.workout" as TranslationKey, icon: Activity },
+  { to: "/profile", labelKey: "nav.profile" as TranslationKey, icon: User },
 ] as const;
 
 export function BottomNav() {
@@ -28,6 +29,7 @@ export function BottomNav() {
  * renders per the Rules of Hooks (react-hooks/rules-of-hooks).
  */
 function BottomNavContent() {
+  const { t } = useTranslation();
   const { online, pending, sync } = useOfflineQueue();
   const fetchNotifs = useServerFn(listNotifications);
   const { data: notif } = useQuery({
@@ -47,14 +49,14 @@ function BottomNavContent() {
 
       {/* Mobile bottom bar */}
       <nav
-        aria-label="Navigasi utama"
+        aria-label={t("nav.main")}
         className="fixed bottom-4 left-4 right-4 z-40 h-16 bg-card/90 backdrop-blur-xl rounded-3xl outline-1 outline-black/5 shadow-lg shadow-black/5 flex items-center justify-around px-2 max-w-md mx-auto lg:hidden"
       >
-        {items.map(({ to, label, icon: Icon }) => (
+        {items.map(({ to, labelKey, icon: Icon }) => (
           <Link
             key={to}
             to={to}
-            aria-label={label}
+            aria-label={t(labelKey)}
             className="flex flex-col items-center gap-0.5 px-3 py-2 rounded-2xl text-muted-foreground transition-all duration-200 motion-safe:active:scale-90"
             activeProps={{
               className: "text-primary [&_.nav-dot]:opacity-100 [&_.nav-icon-wrap]:bg-primary/12",
@@ -68,7 +70,7 @@ function BottomNavContent() {
                 </span>
               )}
             </span>
-            <span className="text-[10px] font-semibold">{label}</span>
+            <span className="text-[10px] font-semibold">{t(labelKey)}</span>
             <span className="nav-dot size-1 rounded-full bg-primary opacity-0 transition-opacity" />
           </Link>
         ))}

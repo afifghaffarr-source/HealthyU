@@ -15,22 +15,24 @@ import { toast } from "@/lib/toast-config";
 import { toastError } from "@/lib/toast-config";
 import { enqueue } from "@/lib/offline-queue";
 import { useOfflineQueue } from "@/hooks/use-offline-queue";
+import { useTranslation, type TranslationKey } from "@/lib/i18n";
 
 export const Route = createFileRoute("/_authenticated/workout")({
   component: WorkoutPage,
 });
 
 const TYPES = [
-  { id: "cardio", label: "Kardio", emoji: "🏃" },
-  { id: "strength", label: "Strength", emoji: "🏋️" },
-  { id: "hiit", label: "HIIT", emoji: "🔥" },
-  { id: "yoga", label: "Yoga", emoji: "🧘" },
-  { id: "walking", label: "Jalan", emoji: "🚶" },
-  { id: "cycling", label: "Sepeda", emoji: "🚴" },
+  { id: "cardio", key: "workout.type.cardio" as TranslationKey, emoji: "🏃" },
+  { id: "strength", key: "workout.type.strength" as TranslationKey, emoji: "🏋️" },
+  { id: "hiit", key: "workout.type.hiit" as TranslationKey, emoji: "🔥" },
+  { id: "yoga", key: "workout.type.yoga" as TranslationKey, emoji: "🧘" },
+  { id: "walking", key: "workout.type.walking" as TranslationKey, emoji: "🚶" },
+  { id: "cycling", key: "workout.type.cycling" as TranslationKey, emoji: "🚴" },
 ] as const;
 
 function WorkoutPage() {
   const qc = useQueryClient();
+  const { t } = useTranslation();
   const list = useServerFn(recentWorkouts);
   const log = useServerFn(logWorkout);
   const del = useServerFn(deleteWorkout);
@@ -57,7 +59,7 @@ function WorkoutPage() {
     mutationFn: async () => {
       const payload = {
         type,
-        name: name || TYPES.find((t) => t.id === type)!.label,
+        name: name || t(TYPES.find((tt) => tt.id === type)!.key),
         duration_min: duration,
         calories_burned: calories,
         intensity,
@@ -71,13 +73,11 @@ function WorkoutPage() {
     onSuccess: (res) => {
       qc.invalidateQueries({ queryKey: ["workouts"] });
       toast.success(
-        res && "offline" in res && res.offline
-          ? "Latihan disimpan offline. Akan sync otomatis."
-          : "Latihan dicatat",
+        res && "offline" in res && res.offline ? t("workout.offlineSaved") : t("workout.logged"),
       );
       setName("");
     },
-    onError: (e) => toastError(e, "Gagal"),
+    onError: (e) => toastError(e, t("common.error")),
   });
 
   const delMut = useMutation({
@@ -159,16 +159,16 @@ function WorkoutPage() {
             Catat sesi baru
           </p>
           <div className="grid grid-cols-3 gap-2">
-            {TYPES.map((t) => (
+            {TYPES.map((ty) => (
               <button
-                key={t.id}
-                onClick={() => setType(t.id)}
+                key={ty.id}
+                onClick={() => setType(ty.id)}
                 className={`p-2 rounded-2xl text-xs font-semibold flex flex-col items-center gap-1 transition-colors ${
-                  type === t.id ? "bg-primary text-primary-foreground" : "bg-mint"
+                  type === ty.id ? "bg-primary text-primary-foreground" : "bg-mint"
                 }`}
               >
-                <span className="text-lg">{t.emoji}</span>
-                {t.label}
+                <span className="text-lg">{ty.emoji}</span>
+                {t(ty.key)}
               </button>
             ))}
           </div>

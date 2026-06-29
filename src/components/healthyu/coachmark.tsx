@@ -1,5 +1,6 @@
 import { useOnboardingFlag } from "@/hooks/use-onboarding-flag";
 import { X } from "lucide-react";
+import { useTranslation } from "@/lib/i18n";
 
 interface Props {
   flagKey: string;
@@ -8,6 +9,7 @@ interface Props {
 }
 
 export function Coachmark({ flagKey, title, description }: Props) {
+  const { t } = useTranslation();
   const { showOnboarding, dismiss } = useOnboardingFlag(flagKey);
   if (!showOnboarding) return null;
   return (
@@ -20,7 +22,7 @@ export function Coachmark({ flagKey, title, description }: Props) {
       </div>
       <button
         onClick={dismiss}
-        aria-label="Tutup tip"
+        aria-label={t("common.closeTip")}
         className="size-6 rounded-full grid place-items-center text-muted-foreground hover:bg-card transition"
       >
         <X className="size-3.5" />

@@ -16,6 +16,7 @@ import { SyncPill } from "@/components/healthyu/sync-pill";
 import { toast } from "@/lib/toast-config";
 import { enqueue } from "@/lib/offline-queue";
 import { useOfflineQueue } from "@/hooks/use-offline-queue";
+import { useTranslation } from "@/lib/i18n";
 
 export const Route = createFileRoute("/_authenticated/water")({
   component: WaterPage,
@@ -25,6 +26,7 @@ const GOAL_ML = 2500;
 const QUICK = [200, 250, 350, 500];
 
 function WaterPage() {
+  const { t } = useTranslation();
   const qc = useQueryClient();
   const fetchToday = useServerFn(todaysWater);
   const fetchEntries = useServerFn(todaysWaterEntries);
@@ -62,10 +64,10 @@ function WaterPage() {
     onSuccess: (res, ml) => {
       invalidate();
       if (res && (res as { offline?: boolean }).offline) {
-        toast.success(`+${ml}ml disimpan offline. Akan sync otomatis.`);
+        toast.success(t("water.offlineSaved", { ml }));
         return;
       }
-      toast.success(`+${ml}ml dicatat`);
+      toast.success(t("water.logged", { ml }));
       const newly = ("game" in res ? res.game?.newlyUnlocked : undefined) ?? [];
       newly.forEach((a: { icon: string; title: string }) =>
         toast.success(`${getAchievementToastPrefix(a.icon)} ${a.title} terbuka!`),
@@ -78,7 +80,7 @@ function WaterPage() {
     mutationFn: (id: string) => delFn({ data: { id } }),
     onSuccess: () => {
       invalidate();
-      toast.success("Dihapus");
+      toast.success(t("common.deleted"));
     },
   });
 
@@ -89,8 +91,8 @@ function WaterPage() {
     <div className="min-h-dvh bg-background pb-28">
       <div className="max-w-md mx-auto px-4">
         <TopAppBar
-          title="Hidrasi"
-          subtitle={`Target ${GOAL_ML} ml / hari`}
+          title={t("water.title")}
+          subtitle={t("water.target", { ml: GOAL_ML })}
           showBack
           action={<SyncPill online={online} pending={pending} onSync={() => sync()} />}
         />
@@ -100,7 +102,7 @@ function WaterPage() {
         <section className="rounded-3xl bg-card p-6 outline-1 outline-black/5">
           <div className="flex items-end justify-between mb-3">
             <div>
-              <p className="text-xs text-muted-foreground">Hari ini</p>
+              <p className="text-xs text-muted-foreground">{t("water.today")}</p>
               <p className="text-4xl font-bold">
                 {total}
                 <span className="text-base text-muted-foreground ml-1">ml</span>
@@ -113,11 +115,11 @@ function WaterPage() {
           <div className="h-3 rounded-full bg-muted overflow-hidden">
             <div className="h-full bg-primary transition-all" style={{ width: `${pct}%` }} />
           </div>
-          <p className="mt-2 text-xs text-muted-foreground">{pct}% dari target</p>
+          <p className="mt-2 text-xs text-muted-foreground">{t("water.progress", { pct })}</p>
         </section>
 
         <section>
-          <h2 className="text-sm font-semibold mb-3">Tambah cepat</h2>
+          <h2 className="text-sm font-semibold mb-3">{t("water.addQuick")}</h2>
           <div className="grid grid-cols-4 gap-2">
             {QUICK.map((ml) => (
               <button
@@ -135,7 +137,7 @@ function WaterPage() {
         </section>
 
         <section>
-          <h2 className="text-sm font-semibold mb-3">7 hari terakhir</h2>
+          <h2 className="text-sm font-semibold mb-3">{t("water.lastWeek")}</h2>
           <div className="rounded-3xl bg-card p-4 outline-1 outline-black/5">
             <div className="flex items-end justify-between gap-2 h-32">
               {week.map((d) => {
@@ -162,10 +164,10 @@ function WaterPage() {
         </section>
 
         <section>
-          <h2 className="text-sm font-semibold mb-3">Catatan hari ini</h2>
+          <h2 className="text-sm font-semibold mb-3">{t("water.todayEntries")}</h2>
           {entries.length === 0 ? (
             <p className="text-sm text-muted-foreground rounded-2xl bg-card p-4 outline-1 outline-black/5">
-              Belum ada catatan. Tekan tombol di atas untuk menambah.
+              {t("water.empty")}
             </p>
           ) : (
             <ul className="space-y-2">
@@ -191,7 +193,7 @@ function WaterPage() {
                   <button
                     onClick={() => delMut.mutate(e.id as string)}
                     className="size-9 rounded-xl flex items-center justify-center text-muted-foreground hover:text-destructive transition"
-                    aria-label="Hapus"
+                    aria-label={t("common.delete")}
                   >
                     <Trash2 className="size-4" />
                   </button>

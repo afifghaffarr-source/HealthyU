@@ -1,4 +1,4 @@
-import { useLocale, type Locale } from "@/lib/i18n";
+import { useLocale, useTranslation, type Locale } from "@/lib/i18n";
 
 /**
  * Reusable ID/EN locale switcher. Reads/writes via `useLocale()` (persisted
@@ -7,10 +7,11 @@ import { useLocale, type Locale } from "@/lib/i18n";
  */
 export function LocaleSwitcher({ className }: { className?: string }) {
   const { locale, setLocale } = useLocale();
+  const { t } = useTranslation();
   return (
     <div className={`flex items-center justify-between gap-3 px-1 ${className ?? ""}`}>
       <label htmlFor="locale-switcher" className="text-xs font-semibold text-muted-foreground">
-        Bahasa / Language
+        {t("prefs.languageLabel")}
       </label>
       <select
         id="locale-switcher"
