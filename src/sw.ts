@@ -36,12 +36,10 @@ import { ExpirationPlugin } from "workbox-expiration";
 
 declare const self: ServiceWorkerGlobalScope & {
   // Precache manifest placeholder.
-  // Workaround for workbox-build ESM bug under bun 1.2.21 — we cannot use
-  // workbox-build.injectManifest() to inject __WB_MANIFEST at build time.
-  // For now: empty precache, runtime caching only (Google Fonts, Supabase images).
-  // App shell is small enough that first-load (with cache headers from CF) is
-  // acceptable for offline; offline navigation still works via NavigationRoute
-  // to /index.html (cached by browser HTTP cache).
+  // Sprint 45: populated by scripts/precache-inject.ts post-build.
+  // The inject script walks dist/client/assets and generates the real manifest
+  // so the SW precaches the app shell for offline use. Previously empty due to
+  // workbox-build ESM/CJS bug under bun 1.2.21.
   __WB_MANIFEST: Array<{ url: string; revision: string | null }>;
 };
 

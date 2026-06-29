@@ -1,5 +1,6 @@
 import { useEffect, useState, useCallback } from "react";
 import { count, flush } from "@/lib/offline-queue";
+import type { QueueKind, QueueItem } from "@/lib/offline-queue";
 import { logWater } from "@/features/water/lib/water.functions";
 import { addWeight } from "@/features/vitals/lib/weight.functions";
 import { logMeal } from "@/features/meals/lib/meals.functions";
@@ -48,7 +49,7 @@ export function useOfflineQueue() {
       workout: async (it) => {
         await workout({ data: it.payload } as Parameters<typeof workout>[0]);
       },
-    });
+    } as Record<QueueKind, (it: QueueItem) => Promise<void>>);
     if (res.synced > 0) {
       qc.invalidateQueries();
     }

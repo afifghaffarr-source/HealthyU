@@ -228,8 +228,17 @@ export async function flush(
   for (const item of items) {
     if (item.expires_at && item.expires_at < now) continue;
     if ((item.next_attempt_at ?? 0) > now) continue;
+
+    // Sprint 45: guard against stale/unknown queue kinds
+    const syncer = syncers[item.kind];
+    if (!syncer) {
+      console.warn(`[offline-queue] No syncer for kind=${item.kind}, removing item`);
+      if (item.id != null) await remove(item.id);
+      continue;
+    }
+
     try {
-      await syncers[item.kind](item);
+      await syncer(item);
       if (item.id != null) await remove(item.id);
       synced++;
     } catch (err) {

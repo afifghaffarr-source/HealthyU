@@ -5,9 +5,10 @@
   "type": "module",
   "scripts": {
     "dev": "vite dev",
-    "build": "bun run og:build && NODE_OPTIONS=--max-old-space-size=4096 vite build && bun run build:sw",
+    "build": "bun run og:build && NODE_OPTIONS=--max-old-space-size=4096 vite build && bun run build:sw && bun run precache:inject",
     "og:build": "bun run scripts/generate-og-images.mjs",
     "build:sw": "bunx esbuild src/sw.ts --bundle --format=iife --minify --target=es2020 --outfile=dist/client/sw.js",
+    "precache:inject": "bun scripts/precache-inject.ts",
     "build:dev": "NODE_OPTIONS=--max-old-space-size=4096 vite build --mode development",
     "deploy": "bun run build && wrangler deploy",
     "preview": "vite preview",
