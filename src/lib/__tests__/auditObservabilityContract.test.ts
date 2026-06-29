@@ -23,6 +23,14 @@ import { join, resolve } from "node:path";
 
 const SRC_ROOT = resolve(__dirname, "../..");
 
+/**
+ * Sprint 41 — lock track() event naming convention.
+ * All events MUST be snake_case.dots: feature.action or feature.sub.action.
+ *
+ * Ponytail: single regex enforced in CI; no new eslint plugin/config.
+ */
+const TRACK_EVENT_REGEX = /^[a-z][a-z0-9_]+\.[a-z][a-z0-9_]+(\.[a-z][a-z0-9_]+)*$/;
+
 function readProject(rel: string): string {
   return readFileSync(resolve(SRC_ROOT, rel), "utf8");
 }
@@ -112,6 +120,16 @@ describe("Sprint 37 — audit-observability contract", () => {
 
       const missing = [...events].filter((e) => !labels.has(e)).sort();
       expect(missing, `track() events with no LABEL_MAP entry: ${missing.join(", ")}`).toEqual([]);
+    });
+
+    it("every track() event follows snake_case.dots naming convention (Sprint 41 lock)", () => {
+      const events = discoverTrackEvents();
+      expect(events.size, "no track() events — sanity").toBeGreaterThan(0);
+      const bad: string[] = [];
+      for (const e of events) {
+        if (!TRACK_EVENT_REGEX.test(e)) bad.push(e);
+      }
+      expect(bad.sort(), `track() events violating snake_case.dots: ${bad.join(", ")}`).toEqual([]);
     });
   });
 
