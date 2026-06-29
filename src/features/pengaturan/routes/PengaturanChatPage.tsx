@@ -37,7 +37,7 @@ export function PengaturanChatPage() {
 
   const [confirmDelete, setConfirmDelete] = useState(false);
 
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, isError, error, refetch } = useQuery({
     queryKey: ["chat-retention"],
     queryFn: () => getRetention(),
   });
@@ -93,6 +93,18 @@ export function PengaturanChatPage() {
 
           {isLoading ? (
             <p className="text-xs text-muted-foreground">Memuat…</p>
+          ) : isError ? (
+            <div className="text-center py-4 space-y-2">
+              <p className="text-xs text-destructive">
+                Gagal memuat: {(error as Error)?.message ?? "Unknown error"}
+              </p>
+              <button
+                onClick={() => refetch()}
+                className="px-3 py-1.5 text-xs font-semibold bg-primary text-primary-foreground rounded-lg"
+              >
+                Coba lagi
+              </button>
+            </div>
           ) : (
             <div className="space-y-2">
               {CHAT_RETENTION_OPTIONS.map((opt) => {

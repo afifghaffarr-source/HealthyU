@@ -10,6 +10,7 @@ import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { BottomNav } from "@/components/bottom-nav";
 import { Ruler, Globe, Palette, Clock, Check } from "lucide-react";
 import { toast } from "@/lib/toast-config";
+import { useLocale, type Locale } from "@/lib/i18n";
 
 export const Route = createFileRoute("/_authenticated/pengaturan/preferensi")({
   component: PreferensiPage,
@@ -22,7 +23,7 @@ const UNITS = [
 
 const LANGUAGES = [
   { value: "id" as const, label: "Bahasa Indonesia", sub: "Default" },
-  { value: "en" as const, label: "English", sub: "Coming soon" },
+  { value: "en" as const, label: "English", sub: "Beta" },
 ];
 
 const THEMES = [
@@ -43,10 +44,17 @@ function PreferensiPage() {
   const qc = useQueryClient();
   const fetchFn = useServerFn(getPreferences);
   const updateFn = useServerFn(updatePreferences);
-  const { data: prefs } = useQuery({
+  const {
+    data: prefs,
+    isLoading,
+    isError,
+    error,
+    refetch,
+  } = useQuery({
     queryKey: ["preferences"],
     queryFn: () => fetchFn(),
   });
+  const { setLocale } = useLocale();
   const updateMut = useMutation({
     mutationFn: (patch: Partial<UserPreferences>) => updateFn({ data: patch }),
     onSuccess: () => {
@@ -65,85 +73,103 @@ function PreferensiPage() {
       <div className="max-w-md mx-auto px-5 pt-2 space-y-5">
         <TopAppBar title="Preferensi" subtitle="Sesuaikan tampilan & unit" showBack />
 
-        {/* Unit Preference */}
-        <Section icon={Ruler} label="Unit Pengukuran" description="Untuk berat & tinggi badan">
-          <SegmentedPicker
-            value={prefs?.preferred_unit ?? "metric"}
-            options={UNITS}
-            onChange={(v) => setPref("preferred_unit", v)}
-          />
-        </Section>
-
-        {/* Language */}
-        <Section icon={Globe} label="Bahasa" description="Antarmuka aplikasi">
-          <div className="space-y-1.5">
-            {LANGUAGES.map((opt) => {
-              const active = prefs?.preferred_language === opt.value;
-              const disabled = opt.value === "en";
-              return (
-                <button
-                  key={opt.value}
-                  type="button"
-                  disabled={disabled}
-                  onClick={() => setPref("preferred_language", opt.value)}
-                  className={`w-full flex items-center justify-between p-3 rounded-xl text-left transition ${
-                    active ? "bg-primary/10 text-primary" : "bg-card hover:bg-secondary/30"
-                  } ${disabled ? "opacity-50 cursor-not-allowed" : ""}`}
-                >
-                  <div>
-                    <p className="text-sm font-semibold">{opt.label}</p>
-                    <p className="text-[11px] text-muted-foreground">{opt.sub}</p>
-                  </div>
-                  {active && <Check className="size-4 text-primary" />}
-                </button>
-              );
-            })}
+        {isLoading ? (
+          <div className="py-12 text-center text-muted-foreground text-sm">Memuat preferensi…</div>
+        ) : isError ? (
+          <div className="py-12 text-center space-y-3">
+            <p className="text-sm text-destructive">
+              Gagal memuat preferensi: {(error as Error)?.message ?? "Unknown error"}
+            </p>
+            <button
+              onClick={() => refetch()}
+              className="px-4 py-2 text-xs font-semibold bg-primary text-primary-foreground rounded-xl"
+            >
+              Coba lagi
+            </button>
           </div>
-        </Section>
+        ) : (
+          <>
+            <Section icon={Ruler} label="Unit Pengukuran" description="Untuk berat & tinggi badan">
+              <SegmentedPicker
+                value={prefs?.preferred_unit ?? "metric"}
+                options={UNITS}
+                onChange={(v) => setPref("preferred_unit", v)}
+              />
+            </Section>
 
-        {/* Theme */}
-        <Section icon={Palette} label="Tema" description="Tampilan terang/gelap">
-          <div className="space-y-1.5">
-            {THEMES.map((opt) => {
-              const active = prefs?.preferred_theme === opt.value;
-              return (
-                <button
-                  key={opt.value}
-                  type="button"
-                  onClick={() => setPref("preferred_theme", opt.value)}
-                  className={`w-full flex items-center justify-between p-3 rounded-xl text-left transition ${
-                    active ? "bg-primary/10 text-primary" : "bg-card hover:bg-secondary/30"
-                  }`}
-                >
-                  <div>
-                    <p className="text-sm font-semibold">{opt.label}</p>
-                    <p className="text-[11px] text-muted-foreground">{opt.sub}</p>
-                  </div>
-                  {active && <Check className="size-4 text-primary" />}
-                </button>
-              );
-            })}
-          </div>
-        </Section>
+            {/* Language */}
+            <Section icon={Globe} label="Bahasa" description="Antarmuka aplikasi">
+              <div className="space-y-1.5">
+                {LANGUAGES.map((opt) => {
+                  const active = prefs?.preferred_language === opt.value;
+                  return (
+                    <button
+                      key={opt.value}
+                      type="button"
+                      onClick={() => {
+                        setPref("preferred_language", opt.value);
+                        setLocale(opt.value as Locale);
+                      }}
+                      className={`w-full flex items-center justify-between p-3 rounded-xl text-left transition ${
+                        active ? "bg-primary/10 text-primary" : "bg-card hover:bg-secondary/30"
+                      }`}
+                    >
+                      <div>
+                        <p className="text-sm font-semibold">{opt.label}</p>
+                        <p className="text-[11px] text-muted-foreground">{opt.sub}</p>
+                      </div>
+                      {active && <Check className="size-4 text-primary" />}
+                    </button>
+                  );
+                })}
+              </div>
+            </Section>
 
-        {/* Timezone */}
-        <Section icon={Clock} label="Zona Waktu" description="Untuk jadwal shalat & pengingat">
-          <select
-            value={prefs?.timezone ?? "Asia/Jakarta"}
-            onChange={(e) => setPref("timezone", e.target.value)}
-            className="w-full bg-card border border-border/50 rounded-xl px-3 py-2.5 text-sm focus:ring-2 focus:ring-primary/30 outline-none"
-          >
-            {TIMEZONES.map((tz) => (
-              <option key={tz} value={tz}>
-                {tz}
-              </option>
-            ))}
-          </select>
-        </Section>
+            {/* Theme */}
+            <Section icon={Palette} label="Tema" description="Tampilan terang/gelap">
+              <div className="space-y-1.5">
+                {THEMES.map((opt) => {
+                  const active = prefs?.preferred_theme === opt.value;
+                  return (
+                    <button
+                      key={opt.value}
+                      type="button"
+                      onClick={() => setPref("preferred_theme", opt.value)}
+                      className={`w-full flex items-center justify-between p-3 rounded-xl text-left transition ${
+                        active ? "bg-primary/10 text-primary" : "bg-card hover:bg-secondary/30"
+                      }`}
+                    >
+                      <div>
+                        <p className="text-sm font-semibold">{opt.label}</p>
+                        <p className="text-[11px] text-muted-foreground">{opt.sub}</p>
+                      </div>
+                      {active && <Check className="size-4 text-primary" />}
+                    </button>
+                  );
+                })}
+              </div>
+            </Section>
 
-        <p className="text-[11px] text-muted-foreground text-center pt-2">
-          Preferensi disimpan ke akun Anda dan disinkronkan antar perangkat.
-        </p>
+            {/* Timezone */}
+            <Section icon={Clock} label="Zona Waktu" description="Untuk jadwal shalat & pengingat">
+              <select
+                value={prefs?.timezone ?? "Asia/Jakarta"}
+                onChange={(e) => setPref("timezone", e.target.value)}
+                className="w-full bg-card border border-border/50 rounded-xl px-3 py-2.5 text-sm focus:ring-2 focus:ring-primary/30 outline-none"
+              >
+                {TIMEZONES.map((tz) => (
+                  <option key={tz} value={tz}>
+                    {tz}
+                  </option>
+                ))}
+              </select>
+            </Section>
+
+            <p className="text-[11px] text-muted-foreground text-center pt-2">
+              Preferensi disimpan ke akun Anda dan disinkronkan antar perangkat.
+            </p>
+          </>
+        )}
       </div>
       <BottomNav />
     </main>

@@ -16,6 +16,7 @@ import {
   Clock,
   User as UserIcon,
   Sparkles,
+  Brain,
 } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/pengaturan")({
@@ -78,6 +79,12 @@ function PengaturanPage() {
           icon: MessageCircle,
           title: "Pengaturan Chat",
           description: "Retensi pesan, audit chat",
+        },
+        {
+          to: "/profile/pattern-settings",
+          icon: Brain,
+          title: "Deteksi Pola",
+          description: "Sensitivitas & threshold pola makan",
         },
       ],
     },
