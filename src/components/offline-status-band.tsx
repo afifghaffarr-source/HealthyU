@@ -24,7 +24,7 @@
  */
 
 import { useEffect, useState } from "react";
-import { CloudOff, Loader2, RefreshCw, Trash2, Wifi } from "lucide-react";
+import { CloudOff, Loader2, RefreshCw, Trash2, Wifi, X } from "lucide-react";
 import { pendingMealSyncCount } from "@/features/meals/lib/mealDexie";
 
 const REFRESH_INTERVAL_MS = 30_000;
@@ -36,21 +36,44 @@ export function OfflineStatusBand() {
   const [pendingMeals, setPendingMeals] = useState<number>(0);
   const [pendingWaters, setPendingWaters] = useState<number>(0);
   const [syncing, setSyncing] = useState<boolean>(false);
-  // Sprint 35 — Bug C: dismiss button state for purging stuck error rows.
-  // Separated from `syncing` so the spinner flows don't conflict.
   const [purging, setPurging] = useState<boolean>(false);
   const [purgeMessage, setPurgeMessage] = useState<string | null>(null);
+  const [dismissed, setDismissed] = useState<boolean>(false);
 
-  // Listen for browser online/offline events.
+  // Listen for browser online/offline events + passive ping fallback.
+  // navigator.onLine can be unreliable in installed PWAs (SW interception).
+  // We supplement with a periodic HEAD ping to the app origin as ground truth.
   useEffect(() => {
     if (typeof window === "undefined") return;
     const onOnline = () => setOnline(true);
     const onOffline = () => setOnline(false);
     window.addEventListener("online", onOnline);
     window.addEventListener("offline", onOffline);
+    // Passive ping every 60s to verify real connectivity.
+    // Uses no-cors to avoid preflight overhead — we only care about reachability.
+    let cancelled = false;
+    const ping = async () => {
+      try {
+        const controller = new AbortController();
+        const t = setTimeout(() => controller.abort(), 5_000);
+        await fetch("/favicon.ico", {
+          method: "HEAD",
+          signal: controller.signal,
+          cache: "no-store",
+        });
+        clearTimeout(t);
+        if (!cancelled) setOnline(true);
+      } catch {
+        if (!cancelled) setOnline(false);
+      }
+    };
+    void ping();
+    const pingId = window.setInterval(ping, 60_000);
     return () => {
+      cancelled = true;
       window.removeEventListener("online", onOnline);
       window.removeEventListener("offline", onOffline);
+      window.clearInterval(pingId);
     };
   }, []);
 
@@ -86,6 +109,8 @@ export function OfflineStatusBand() {
   const showOffline = !online;
   const showPersistent = totalPending > 0;
 
+  // User can dismiss the band for this session
+  if (dismissed) return null;
   if (!showOffline && !showPersistent) return null;
 
   const handleManualSync = async () => {
@@ -95,7 +120,6 @@ export function OfflineStatusBand() {
       const { syncMealLogs, syncWaterLogs } = await import("@/lib/dexie-sync");
       void syncWaterLogs();
       void syncMealLogs();
-      // Brief optimistic delay so the spinner is visible
       await new Promise((r) => setTimeout(r, 1_500));
     } finally {
       setSyncing(false);
@@ -144,11 +168,9 @@ export function OfflineStatusBand() {
     }
   };
 
-  // Only offer the dismiss button when the user is online AND there are
-  // pending entries. If they're truly offline, the manual sync stays off
-  // (it would no-op) but the dismiss-purge still helps if the count is
-  // dominated by stale "error" rows.
-  const offerPurge = online && totalPending > 0;
+  // Always offer purge when there are pending entries — IndexedDB is local,
+  // so stuck sync rows don't require network connectivity to delete.
+  const offerPurge = totalPending > 0;
 
   return (
     <div
@@ -189,7 +211,7 @@ export function OfflineStatusBand() {
       <button
         type="button"
         onClick={handleManualSync}
-        disabled={syncing || showOffline}
+        disabled={syncing}
         className="shrink-0 inline-flex items-center gap-1 text-xs font-medium hover:underline disabled:no-underline disabled:opacity-60"
       >
         {syncing ? <Loader2 className="size-3 animate-spin" /> : <RefreshCw className="size-3" />}
@@ -208,6 +230,14 @@ export function OfflineStatusBand() {
           Hapus yang gagal
         </button>
       )}
+      <button
+        type="button"
+        onClick={() => setDismissed(true)}
+        aria-label="Tutup notifikasi"
+        className="shrink-0 inline-flex items-center text-xs text-muted-foreground hover:text-foreground ml-0.5"
+      >
+        <X className="size-3.5" />
+      </button>
       {purgeMessage && (
         <span
           role="status"
