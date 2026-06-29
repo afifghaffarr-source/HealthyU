@@ -10,6 +10,7 @@ import { Plus, LogIn } from "lucide-react";
 import { toast } from "@/lib/toast-config";
 import { toastError } from "@/lib/toast-config";
 import { GroupCard } from "@/features/groups/components/GroupCard";
+import { useTranslation } from "@/lib/i18n";
 
 export const Route = createFileRoute("/_authenticated/groups")({
   validateSearch: (s: Record<string, unknown>) =>
@@ -31,26 +32,27 @@ function GroupsPage() {
 
   const [name, setName] = useState("");
   const [code, setCode] = useState("");
+  const { t } = useTranslation();
   const [selected, setSelected] = useState<string | null>(null);
 
   const createMut = useMutation({
     mutationFn: () => createFn({ data: { name } }),
     onSuccess: (r) => {
-      toast.success(`Grup dibuat. Kode: ${r.invite_code}`);
+      toast.success(t("groups.created", { code: r.invite_code }));
       setName("");
       qc.invalidateQueries({ queryKey: ["my-groups"] });
     },
-    onError: (e) => toastError(e, "Gagal membuat grup"),
+    onError: (e) => toastError(e, t("groups.createFailed")),
   });
 
   const joinMut = useMutation({
     mutationFn: (c: string) => joinFn({ data: { invite_code: c.trim().toUpperCase() } }),
     onSuccess: (r) => {
-      toast.success(`Bergabung ke ${r.name}`);
+      toast.success(t("groups.joined", { name: r.name }));
       setCode("");
       qc.invalidateQueries({ queryKey: ["my-groups"] });
     },
-    onError: (e) => toastError(e, "Gagal bergabung"),
+    onError: (e) => toastError(e, t("groups.joinFailed")),
   });
 
   const autoJoined = useRef(false);
@@ -64,17 +66,17 @@ function GroupsPage() {
   return (
     <main className="min-h-dvh bg-background pb-28">
       <div className="max-w-md mx-auto px-5 pt-2 space-y-5">
-        <TopAppBar title="Grup Teman" subtitle="Leaderboard privat bersama teman" showBack />
+        <TopAppBar title={t("groups.title")} subtitle={t("groups.subtitle")} showBack />
 
         <section className="bg-card p-5 rounded-3xl outline-1 outline-black/5 space-y-3">
           <div className="flex items-center gap-2">
             <Plus className="size-4 text-primary" />
-            <h2 className="font-semibold text-sm">Buat grup baru</h2>
+            <h2 className="font-semibold text-sm">{t("groups.createTitle")}</h2>
           </div>
           <input
             value={name}
             onChange={(e) => setName(e.target.value)}
-            placeholder="Nama grup (mis. Keluarga Sehat)"
+            placeholder={t("groups.createPlaceholder")}
             maxLength={60}
             className="w-full bg-background border border-border rounded-2xl px-4 py-3 text-sm"
           />
@@ -83,19 +85,19 @@ function GroupsPage() {
             onClick={() => createMut.mutate()}
             className="w-full bg-primary text-primary-foreground font-semibold py-3 rounded-2xl disabled:opacity-60"
           >
-            {createMut.isPending ? "Membuat..." : "Buat Grup"}
+            {createMut.isPending ? t("groups.creating") : t("groups.createBtn")}
           </button>
         </section>
 
         <section className="bg-card p-5 rounded-3xl outline-1 outline-black/5 space-y-3">
           <div className="flex items-center gap-2">
             <LogIn className="size-4 text-primary" />
-            <h2 className="font-semibold text-sm">Gabung dengan kode</h2>
+            <h2 className="font-semibold text-sm">{t("groups.joinTitle")}</h2>
           </div>
           <input
             value={code}
             onChange={(e) => setCode(e.target.value.toUpperCase())}
-            placeholder="Kode undangan (6 huruf)"
+            placeholder={t("groups.joinPlaceholder")}
             maxLength={12}
             className="w-full bg-background border border-border rounded-2xl px-4 py-3 text-sm uppercase tracking-widest text-center font-mono"
           />
@@ -104,17 +106,15 @@ function GroupsPage() {
             onClick={() => joinMut.mutate(code)}
             className="w-full bg-card outline-1 outline-black/10 font-semibold py-3 rounded-2xl disabled:opacity-60"
           >
-            {joinMut.isPending ? "Bergabung..." : "Gabung"}
+            {joinMut.isPending ? t("groups.joining") : t("groups.joinBtn")}
           </button>
         </section>
 
         <section className="space-y-3">
-          <h2 className="font-semibold text-sm px-1">Grup Saya</h2>
-          {isLoading && <p className="text-sm text-muted-foreground px-1">Memuat...</p>}
+          <h2 className="font-semibold text-sm px-1">{t("groups.myGroups")}</h2>
+          {isLoading && <p className="text-sm text-muted-foreground px-1">{t("groups.loading")}</p>}
           {!isLoading && !groups.length && (
-            <p className="text-sm text-muted-foreground px-1">
-              Belum ada grup. Buat baru atau gabung dengan kode.
-            </p>
+            <p className="text-sm text-muted-foreground px-1">{t("groups.empty")}</p>
           )}
           {groups.map((g) => (
             <GroupCard

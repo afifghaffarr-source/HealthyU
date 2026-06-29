@@ -9,6 +9,7 @@ import {
   equipPetAccessory,
 } from "@/features/scan/lib/scanBatch7.functions";
 import { toast } from "@/lib/toast-config";
+import { useTranslation } from "@/lib/i18n";
 
 export const Route = createFileRoute("/_authenticated/pet/shop")({ component: Page });
 
@@ -24,7 +25,7 @@ function Page() {
   const buy = useMutation({
     mutationFn: (id: string) => buyFn({ data: { accessoryId: id } }),
     onSuccess: () => {
-      toast.success("Dibeli!");
+      toast.success(t("pet.shop.bought"));
       qc.invalidateQueries({ queryKey: ["pet-shop"] });
     },
     onError: (e: Error) => toast.error(e.message),
@@ -33,10 +34,11 @@ function Page() {
     mutationFn: (v: { id: string; equipped: boolean }) => eqFn({ data: v }),
     onSuccess: () => qc.invalidateQueries({ queryKey: ["pet-shop"] }),
   });
+  const { t } = useTranslation();
   const ownedMap = new Map((data?.owned ?? []).map((o) => [o.accessory_id, o]));
   return (
     <div className="min-h-dvh pb-24 bg-background">
-      <TopAppBar title="Toko Aksesori Pet" showBack />
+      <TopAppBar title={t("pet.shop.title")} showBack />
       <main className="max-w-md mx-auto px-4 pt-4 grid grid-cols-2 gap-3">
         {(data?.shop ?? []).map((a) => {
           const owned = ownedMap.get(a.id);
@@ -49,7 +51,7 @@ function Page() {
                   onClick={() => eq.mutate({ id: owned.id, equipped: !owned.equipped })}
                   className={`w-full rounded-lg py-1.5 text-xs ${owned.equipped ? "bg-primary text-primary-foreground" : "border"}`}
                 >
-                  {owned.equipped ? "Dipakai" : "Pakai"}
+                  {owned.equipped ? t("pet.shop.equipped") : t("pet.shop.equip")}
                 </button>
               ) : (
                 <button
@@ -57,7 +59,7 @@ function Page() {
                   onClick={() => buy.mutate(a.id)}
                   className="w-full rounded-lg border py-1.5 text-xs"
                 >
-                  Beli {a.cost_coins} coin
+                  {t("pet.shop.buy", { cost: a.cost_coins })}
                 </button>
               )}
             </div>

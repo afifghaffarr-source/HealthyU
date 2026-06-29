@@ -7,16 +7,19 @@ import { BottomNav } from "@/components/bottom-nav";
 import { UserSearchBar } from "@/features/groups/components/UserSearchBar";
 import { Users } from "lucide-react";
 import { Link } from "@tanstack/react-router";
+import { useTranslation } from "@/lib/i18n";
 
 export const Route = createFileRoute("/_authenticated/discover")({
   component: DiscoverPage,
 });
 
 function DiscoverPage() {
+  const { t } = useTranslation();
+
   return (
     <main className="min-h-dvh bg-background pb-28">
       <div className="max-w-md mx-auto px-5 pt-2 space-y-5">
-        <TopAppBar title="Cari Teman" subtitle="Temukan orang dengan goals serupa" showBack />
+        <TopAppBar title={t("discover.title")} subtitle={t("discover.subtitle")} showBack />
 
         <Link
           to="/community"
@@ -24,8 +27,8 @@ function DiscoverPage() {
         >
           <Users className="size-5 text-primary" />
           <div className="flex-1">
-            <p className="text-sm font-semibold">Komunitas publik</p>
-            <p className="text-[11px] text-muted-foreground">Lihat semua post dari semua user</p>
+            <p className="text-sm font-semibold">{t("discover.publicCommunity")}</p>
+            <p className="text-[11px] text-muted-foreground">{t("discover.seeAllPosts")}</p>
           </div>
         </Link>
 

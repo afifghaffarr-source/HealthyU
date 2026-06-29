@@ -10,6 +10,7 @@ import {
 } from "@/features/scan/lib/scanBatch7.functions";
 import { Brain, Sparkles, Loader2 } from "lucide-react";
 import { toast } from "@/lib/toast-config";
+import { useTranslation } from "@/lib/i18n";
 
 export const Route = createFileRoute("/_authenticated/quiz/daily")({ component: Page });
 
@@ -33,23 +34,24 @@ function Page() {
     user_answer: number | null;
     correct_index: number;
   };
+  const { t } = useTranslation();
   const q = data?.quiz as Quiz | undefined;
   const mut = useMutation({
     mutationFn: (i: number) => ansFn({ data: { quizId: q!.id, answer: i } }),
     onSuccess: (r) => {
-      toast.success(r.correct ? `Benar! +${r.coins} coin` : "Salah, coba lagi besok");
+      toast.success(r.correct ? t("quiz.correct", { coins: String(r.coins) }) : t("quiz.wrong"));
       qc.invalidateQueries({ queryKey: ["daily-quiz"] });
     },
     onError: (e: Error) => toast.error(e.message),
   });
   return (
     <div className="min-h-dvh pb-24 bg-background">
-      <TopAppBar title="Kuis Harian" showBack />
+      <TopAppBar title={t("quiz.title")} showBack />
       <main className="max-w-md mx-auto px-4 pt-4 space-y-4">
         {quote?.quote && (
           <div className="rounded-2xl bg-gradient-to-br from-accent/30 to-accent/10 p-4 border">
             <div className="flex items-center gap-2 text-xs text-muted-foreground mb-1">
-              <Sparkles className="size-3" /> Quote Hari Ini
+              <Sparkles className="size-3" /> {t("quiz.quoteToday")}
             </div>
             <p className="text-sm italic">"{quote.quote.quote}"</p>
           </div>
@@ -58,7 +60,7 @@ function Page() {
         {q && (
           <div className="rounded-2xl bg-card border p-5 space-y-3">
             <div className="flex items-center gap-2 text-primary text-xs uppercase font-semibold">
-              <Brain className="size-4" /> Pertanyaan
+              <Brain className="size-4" /> {t("quiz.question")}
             </div>
             <h3 className="font-bold">{q.question}</h3>
             <div className="space-y-2">

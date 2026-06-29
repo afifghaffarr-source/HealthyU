@@ -6,6 +6,7 @@ import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { BottomNav } from "@/components/bottom-nav";
 import { convertCurrency } from "@/features/scan/lib/scanBatch8.functions";
 import { ArrowRight } from "lucide-react";
+import { useTranslation } from "@/lib/i18n";
 
 export const Route = createFileRoute("/_authenticated/currency")({ component: Page });
 
@@ -14,12 +15,13 @@ function Page() {
   const [amount, setAmount] = useState("10000");
   const [from, setFrom] = useState("IDR");
   const [to, setTo] = useState("USD");
+  const { t } = useTranslation();
   const mut = useMutation({
     mutationFn: () => fn({ data: { amount: Number(amount), from, to } }),
   });
   return (
     <div className="min-h-dvh pb-24 bg-background">
-      <TopAppBar title="Konversi Mata Uang" showBack />
+      <TopAppBar title={t("currency.title")} showBack />
       <main className="max-w-md mx-auto px-4 pt-4 space-y-4">
         <div className="rounded-2xl bg-card border p-4 space-y-3">
           <input
@@ -54,7 +56,7 @@ function Page() {
             disabled={mut.isPending}
             className="w-full rounded-lg bg-primary text-primary-foreground py-2 text-sm"
           >
-            Konversi
+            {t("currency.convertBtn")}
           </button>
           {mut.data && (
             <div className="text-center pt-2">

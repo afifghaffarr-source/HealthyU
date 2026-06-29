@@ -8,6 +8,7 @@ import { ListSkeleton } from "@/components/healthyu/skeletons";
 import { toast } from "@/lib/toast-config";
 import { BottomNav } from "@/components/bottom-nav";
 import { getPet, adoptPet, interactPet } from "@/features/pet/lib/pet.functions";
+import { useTranslation } from "@/lib/i18n";
 
 export const Route = createFileRoute("/_authenticated/pet")({
   component: PetPage,
@@ -63,7 +64,7 @@ function PetPage() {
   const adoptM = useMutation({
     mutationFn: () => adoptFn({ data: { pet_name: name.trim(), pet_type: type } }),
     onSuccess: () => {
-      toast.success("Pet diadopsi!");
+      toast.success(t("pet.adoptedToast"));
       invalidate();
     },
     onError: (e: Error) => toast.error(e.message),
@@ -75,25 +76,25 @@ function PetPage() {
     onError: (e: Error) => toast.error(e.message),
   });
 
+  const { t } = useTranslation();
+
   const pet = data?.pet;
 
   return (
     <div className="min-h-dvh pb-32">
       <div className="max-w-md mx-auto px-4">
-        <TopAppBar title="Virtual Pet" showBack />
+        <TopAppBar title={t("pet.title")} showBack />
       </div>
       <main className="max-w-md mx-auto px-4 pt-4 space-y-4">
         {isLoading && <ListSkeleton count={2} />}
         {!isLoading && !pet && (
           <div className="rounded-3xl bg-card outline-1 outline-black/5 p-5 space-y-4">
-            <h2 className="font-semibold">Adopsi pet kamu</h2>
-            <p className="text-xs text-muted-foreground">
-              Pet akan tumbuh seiring kebiasaan sehatmu.
-            </p>
+            <h2 className="font-semibold">{t("pet.adoptTitle")}</h2>
+            <p className="text-xs text-muted-foreground">{t("pet.adoptDesc")}</p>
             <input
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="Nama pet"
+              placeholder={t("pet.namePlaceholder")}
               maxLength={40}
               className="w-full h-11 px-4 rounded-2xl bg-muted text-sm outline-none"
             />
@@ -113,7 +114,7 @@ function PetPage() {
               onClick={() => adoptM.mutate()}
               className="w-full h-11 rounded-2xl bg-primary text-primary-foreground font-semibold disabled:opacity-50"
             >
-              Adopsi
+              {t("pet.adoptBtn")}
             </button>
           </div>
         )}
@@ -123,7 +124,7 @@ function PetPage() {
               <div className="text-7xl">{PET_EMOJI[pet.pet_type] ?? "🐾"}</div>
               <h2 className="font-bold text-lg mt-2">{pet.pet_name}</h2>
               <p className="text-xs text-muted-foreground">
-                Lv {pet.evolution_stage} · {pet.evolution_points} EXP
+                {t("pet.levelExp", { stage: pet.evolution_stage, exp: pet.evolution_points })}
               </p>
               {(() => {
                 const stage = Number(pet.evolution_stage ?? 1);
@@ -140,7 +141,7 @@ function PetPage() {
                       />
                     </div>
                     <p className="text-[10px] text-muted-foreground mt-1">
-                      {Math.max(0, nextLv - exp)} EXP menuju Lv {stage + 1}
+                      {t("pet.expToNext", { exp: Math.max(0, nextLv - exp), stage: stage + 1 })}
                     </p>
                   </div>
                 );
@@ -149,25 +150,25 @@ function PetPage() {
             <div className="rounded-3xl bg-card outline-1 outline-black/5 p-5 space-y-3">
               <Stat
                 icon={<Heart className="size-3 text-rose-500" />}
-                label="Health"
+                label={t("pet.healthLabel")}
                 value={pet.health_stat}
                 color="bg-rose-500"
               />
               <Stat
                 icon={<Smile className="size-3 text-amber-500" />}
-                label="Happiness"
+                label={t("pet.happinessLabel")}
                 value={pet.happiness_stat}
                 color="bg-amber-500"
               />
               <Stat
                 icon={<Zap className="size-3 text-sky-500" />}
-                label="Energy"
+                label={t("pet.energyLabel")}
                 value={pet.energy_stat}
                 color="bg-sky-500"
               />
               <Stat
                 icon={<Drumstick className="size-3 text-orange-600" />}
-                label="Hunger"
+                label={t("pet.hungerLabel")}
                 value={pet.hunger_stat}
                 color="bg-orange-600"
               />
@@ -178,21 +179,21 @@ function PetPage() {
                 disabled={actM.isPending}
                 className="h-12 rounded-2xl bg-primary text-primary-foreground text-sm font-semibold disabled:opacity-50"
               >
-                Beri makan
+                {t("pet.feedBtn")}
               </button>
               <button
                 onClick={() => actM.mutate("play")}
                 disabled={actM.isPending}
                 className="h-12 rounded-2xl bg-amber-500 text-white text-sm font-semibold disabled:opacity-50"
               >
-                Main
+                {t("pet.playBtn")}
               </button>
               <button
                 onClick={() => actM.mutate("rest")}
                 disabled={actM.isPending}
                 className="h-12 rounded-2xl bg-sky-500 text-white text-sm font-semibold disabled:opacity-50"
               >
-                Istirahat
+                {t("pet.restBtn")}
               </button>
             </div>
           </>

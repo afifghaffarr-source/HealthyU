@@ -7,6 +7,7 @@ import { BottomNav } from "@/components/bottom-nav";
 import { createFamilyPlan, listMyFamily } from "@/features/scan/lib/scanFinal.functions";
 import { Users, Plus } from "lucide-react";
 import { toast } from "@/lib/toast-config";
+import { useTranslation } from "@/lib/i18n";
 
 export const Route = createFileRoute("/_authenticated/family")({
   component: Page,
@@ -21,27 +22,29 @@ function Page() {
     queryKey: ["family-plans"],
     queryFn: () => listFn({ data: undefined as never }),
   });
+  const { t } = useTranslation();
+
   const mut = useMutation({
     mutationFn: () => createFn({ data: { name: name || undefined } }),
     onSuccess: () => {
       setName("");
-      toast.success("Family plan dibuat");
+      toast.success(t("family.createdToast"));
       qc.invalidateQueries({ queryKey: ["family-plans"] });
     },
     onError: (e: Error) => toast.error(e.message),
   });
   return (
     <div className="min-h-dvh pb-24 bg-background">
-      <TopAppBar title="Family Plan" showBack />
+      <TopAppBar title={t("family.title")} showBack />
       <main className="max-w-md mx-auto px-4 pt-4 space-y-4">
         <div className="rounded-2xl bg-card border p-4 space-y-2">
           <h3 className="font-semibold inline-flex items-center gap-2">
-            <Users className="size-4" /> Buat Plan Keluarga
+            <Users className="size-4" /> {t("family.createTitle")}
           </h3>
           <input
             value={name}
             onChange={(e) => setName(e.target.value)}
-            placeholder="Nama plan (cth: Keluarga Setiawan)"
+            placeholder={t("family.namePlaceholder")}
             className="w-full rounded-xl border bg-background px-3 py-2 text-sm"
           />
           <button
@@ -56,7 +59,7 @@ function Page() {
           <div key={m.plan_id} className="rounded-2xl bg-card border p-3">
             <div className="font-medium">{m.family_plans?.name}</div>
             <div className="text-xs text-muted-foreground">
-              {m.family_plans?.owner_id === undefined ? "" : "Plan aktif"}
+              {m.family_plans?.owner_id === undefined ? "" : t("family.activePlan")}
             </div>
           </div>
         ))}

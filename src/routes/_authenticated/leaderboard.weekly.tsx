@@ -4,18 +4,20 @@ import { useServerFn } from "@tanstack/react-start";
 import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { BottomNav } from "@/components/bottom-nav";
 import { getWeeklyLeaderboard } from "@/features/scan/lib/scanBatch12.functions";
+import { useTranslation } from "@/lib/i18n";
 
 export const Route = createFileRoute("/_authenticated/leaderboard/weekly")({ component: Page });
 
 function Page() {
   const fn = useServerFn(getWeeklyLeaderboard);
+  const { t } = useTranslation();
   const { data } = useQuery({
     queryKey: ["lb-week"],
     queryFn: () => fn({ data: undefined as never }),
   });
   return (
     <div className="min-h-dvh pb-24 bg-background">
-      <TopAppBar title="Leaderboard Mingguan" showBack />
+      <TopAppBar title={t("leaderboardWeekly.title")} showBack />
       <main className="max-w-md mx-auto px-4 pt-4 space-y-2">
         <p className="text-xs text-muted-foreground">Minggu: {data?.week}</p>
         {(data?.rows ?? []).map((r, i) => (

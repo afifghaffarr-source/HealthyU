@@ -15,6 +15,7 @@ import { toast } from "@/lib/toast-config";
 import { toastError } from "@/lib/toast-config";
 import { PostCard } from "@/features/groups/components/PostCard";
 import { COMMUNITY_CATS, CommunityComposer } from "@/features/groups/components/CommunityComposer";
+import { useTranslation } from "@/lib/i18n";
 
 export const Route = createFileRoute("/_authenticated/community")({
   component: CommunityPage,
@@ -26,6 +27,7 @@ function CommunityPage() {
   const create = useServerFn(createPost);
   const del = useServerFn(deletePost);
   const like = useServerFn(toggleLike);
+  const { t } = useTranslation();
 
   const { data: posts = [] } = useQuery({ queryKey: ["community"], queryFn: () => list() });
 
@@ -38,7 +40,7 @@ function CommunityPage() {
     onSuccess: () => {
       setContent("");
       qc.invalidateQueries({ queryKey: ["community"] });
-      toast.success("Posting terkirim");
+      toast.success(t("community.posted"));
     },
     onError: (e) => toastError(e, "Gagal"),
   });
@@ -74,18 +76,22 @@ function CommunityPage() {
   return (
     <main className="min-h-dvh bg-background pb-28">
       <div className="max-w-md mx-auto px-5 pt-2 space-y-5">
-        <TopAppBar title="Komunitas" subtitle="Berbagi tips & dukungan" showBack />
+        <TopAppBar title={t("community.title")} subtitle={t("community.subtitle")} showBack />
 
         <div className="grid grid-cols-3 gap-2">
-          <Stat icon={<Users className="size-3.5" />} label="Posts" value={posts.length} />
+          <Stat
+            icon={<Users className="size-3.5" />}
+            label={t("community.stats.posts")}
+            value={posts.length}
+          />
           <Stat
             icon={<Heart className="size-3.5" />}
-            label="Likes"
+            label={t("community.stats.likes")}
             value={posts.reduce((a, p) => a + (p.like_count ?? 0), 0)}
           />
           <Stat
             icon={<Flame className="size-3.5" />}
-            label="Aktif"
+            label={t("community.stats.active")}
             value={
               // eslint-disable-next-line react-hooks/purity -- wall-clock / non-deterministic browser API; re-renders deliberately driven by interval/timer or event subscription
               posts.filter((p) => Date.now() - new Date(p.created_at).getTime() < 24 * 3600_000)
@@ -110,17 +116,17 @@ function CommunityPage() {
                 onClick={() => setSort("new")}
                 className={`inline-flex items-center gap-1 px-3 py-1.5 rounded-full transition ${sort === "new" ? "bg-primary text-primary-foreground" : "text-muted-foreground"}`}
               >
-                <Clock className="size-3" /> Terbaru
+                <Clock className="size-3" /> {t("community.sort.newest")}
               </button>
               <button
                 onClick={() => setSort("hot")}
                 className={`inline-flex items-center gap-1 px-3 py-1.5 rounded-full transition ${sort === "hot" ? "bg-primary text-primary-foreground" : "text-muted-foreground"}`}
               >
-                <Flame className="size-3" /> Populer
+                <Flame className="size-3" /> {t("community.sort.popular")}
               </button>
             </div>
             <span className="text-[11px] text-muted-foreground tabular-nums">
-              {visiblePosts.length} post
+              {visiblePosts.length} {t("community.postUnit")}
             </span>
           </div>
           <div className="flex gap-2 overflow-x-auto no-scrollbar -mx-1 px-1">
@@ -132,7 +138,7 @@ function CommunityPage() {
                   : "bg-card outline-1 outline-black/10"
               }`}
             >
-              Semua <span className="opacity-70">· {counts.all}</span>
+              {t("community.categoryAll")} <span className="opacity-70">· {counts.all}</span>
             </button>
             {COMMUNITY_CATS.map((c) => (
               <button
@@ -149,9 +155,7 @@ function CommunityPage() {
             ))}
           </div>
           {visiblePosts.length === 0 ? (
-            <p className="text-sm text-muted-foreground text-center py-8">
-              Belum ada postingan. Jadilah yang pertama!
-            </p>
+            <p className="text-sm text-muted-foreground text-center py-8">{t("community.empty")}</p>
           ) : (
             visiblePosts.map((p) => (
               <PostCard

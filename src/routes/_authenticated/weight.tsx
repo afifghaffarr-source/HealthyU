@@ -10,6 +10,7 @@ import { SyncPill } from "@/components/healthyu/sync-pill";
 import { toast } from "@/lib/toast-config";
 import { enqueue } from "@/lib/offline-queue";
 import { useOfflineQueue } from "@/hooks/use-offline-queue";
+import { useTranslation } from "@/lib/i18n";
 
 export const Route = createFileRoute("/_authenticated/weight")({
   component: WeightPage,
@@ -22,6 +23,7 @@ function WeightPage() {
   const add = useServerFn(addWeight);
   const del = useServerFn(deleteWeight);
   const { online, pending, sync } = useOfflineQueue();
+  const { t } = useTranslation();
 
   const { data: logs = [], isLoading } = useQuery({
     queryKey: ["weight"],
@@ -47,9 +49,9 @@ function WeightPage() {
       qc.invalidateQueries({ queryKey: ["weight"] });
       qc.invalidateQueries({ queryKey: ["profile"] });
       if (res && "offline" in res && res.offline) {
-        toast.success("Berat disimpan offline. Akan sync otomatis.");
+        toast.success(t("weight.offlineSaved"));
       } else {
-        toast.success("Berat tercatat");
+        toast.success(t("weight.logged"));
       }
     },
     onError: (e: Error) => toast.error(e.message),
@@ -74,12 +76,12 @@ function WeightPage() {
   const range = Math.max(max - min, 1);
 
   return (
-    <PageShell title="Berat Badan" showBack loading={isLoading}>
+    <PageShell title={t("weight.title")} showBack loading={isLoading}>
       <section className="bg-card rounded-3xl p-5 shadow-sm outline-1 outline-black/5">
         <div className="flex items-end justify-between mb-4">
           <div>
             <p className="text-xs font-bold uppercase text-muted-foreground tracking-wider">
-              Sekarang
+              {t("weight.current")}
             </p>
             <p className="text-3xl font-bold tabular-nums">
               {current != null ? current.toFixed(1) : "—"}
@@ -88,7 +90,7 @@ function WeightPage() {
           </div>
           <div className="text-right">
             <p className="text-xs font-bold uppercase text-muted-foreground tracking-wider">
-              Target
+              {t("weight.target")}
             </p>
             <p className="text-xl font-bold tabular-nums">
               {target != null ? target.toFixed(1) : "—"} kg
@@ -109,14 +111,16 @@ function WeightPage() {
             }
           >
             {delta === 0
-              ? "Tidak berubah"
-              : `${delta > 0 ? "+" : ""}${delta.toFixed(1)} kg sejak awal`}
+              ? t("weight.change.unchanged")
+              : t("weight.change.sinceStart", {
+                  delta: `${delta > 0 ? "+" : ""}${delta.toFixed(1)}`,
+                })}
           </span>
         </div>
       </section>
 
       <section className="bg-card rounded-3xl p-5 shadow-sm outline-1 outline-black/5">
-        <p className="font-bold text-sm mb-3">Catat berat hari ini</p>
+        <p className="font-bold text-sm mb-3">{t("weight.logToday")}</p>
         <div className="flex gap-2">
           <input
             type="number"
@@ -132,12 +136,12 @@ function WeightPage() {
             disabled={!val || addMut.isPending}
             className="bg-primary text-primary-foreground font-semibold px-4 rounded-xl text-sm disabled:opacity-50"
           >
-            Simpan
+            {t("common.save")}
           </button>
         </div>
         <input
           type="text"
-          placeholder="Catatan (opsional)"
+          placeholder={t("weight.notePlaceholder")}
           value={note}
           onChange={(e) => setNote(e.target.value)}
           maxLength={300}
@@ -147,7 +151,7 @@ function WeightPage() {
 
       {logs.length > 1 && (
         <section className="bg-card rounded-3xl p-5 shadow-sm outline-1 outline-black/5">
-          <p className="font-bold text-sm mb-3">Tren ({logs.length} catatan)</p>
+          <p className="font-bold text-sm mb-3">{t("weight.trend", { count: logs.length })}</p>
           <div className="h-32 flex items-end gap-1">
             {[...logs].reverse().map((l) => {
               const h = ((Number(l.weight_kg) - min) / range) * 100;
@@ -168,12 +172,12 @@ function WeightPage() {
       )}
 
       <section className="bg-card rounded-3xl p-5 shadow-sm outline-1 outline-black/5">
-        <p className="font-bold text-sm mb-3">Riwayat</p>
+        <p className="font-bold text-sm mb-3">{t("common.history")}</p>
         {logs.length === 0 ? (
           <div className="text-center py-6 space-y-2">
             <Scale className="size-12 mx-auto text-muted-foreground/40" />
-            <p className="text-sm font-medium">Belum ada catatan berat</p>
-            <p className="text-xs text-muted-foreground">Catat berat badanmu untuk lacak progres</p>
+            <p className="text-sm font-medium">{t("weight.empty")}</p>
+            <p className="text-xs text-muted-foreground">{t("weight.emptyHint")}</p>
           </div>
         ) : (
           <ul className="divide-y">

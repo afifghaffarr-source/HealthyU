@@ -6,6 +6,7 @@ import { BottomNav } from "@/components/bottom-nav";
 import { getDailyInsights, copyYesterdayMeals } from "@/features/scan/lib/scanHistory.functions";
 import { Sparkles, Copy, Share2, Lightbulb, RefreshCw } from "lucide-react";
 import { toast } from "@/lib/toast-config";
+import { useTranslation } from "@/lib/i18n";
 
 const opts = queryOptions({ queryKey: ["daily-insights"], queryFn: () => getDailyInsights() });
 
@@ -13,13 +14,15 @@ export const Route = createFileRoute("/_authenticated/insights")({
   loader: ({ context }) => context.queryClient.ensureQueryData(opts),
   component: Page,
   errorComponent: ({ error }) => <div className="p-4 text-destructive">{error.message}</div>,
-  notFoundComponent: () => <div className="p-4">Tidak ditemukan</div>,
+  notFoundComponent: () => <div className="p-4">Belum ada data</div>,
 });
 
 function Page() {
   const { data } = useSuspenseQuery(opts);
   const qc = useQueryClient();
   const copyFn = useServerFn(copyYesterdayMeals);
+  const { t } = useTranslation();
+
   const copyMut = useMutation({
     mutationFn: () => copyFn({ data: {} }),
     onSuccess: (r) => {
@@ -35,10 +38,10 @@ function Page() {
     const text = `${data.summary}\n\n${data.tips.map((t, i) => `${i + 1}. ${t}`).join("\n")}\n\n— HealthyU`;
     try {
       if (navigator.share) {
-        await navigator.share({ title: "HealthyU Insight", text });
+        await navigator.share({ title: t("insights.shareTitle"), text });
       } else {
         await navigator.clipboard.writeText(text);
-        toast.success("Disalin ke clipboard");
+        toast.success(t("insights.clipboardCopied"));
       }
     } catch {
       /* user cancelled */
@@ -47,20 +50,20 @@ function Page() {
 
   return (
     <div className="min-h-dvh pb-24 bg-background">
-      <TopAppBar title="Insight AI" />
+      <TopAppBar title={t("insights.title")} />
       <main className="max-w-md mx-auto px-4 pt-4 space-y-4 animate-fade-up pb-24">
         <section className="relative rounded-3xl overflow-hidden p-5 bg-gradient-to-br from-primary via-primary/80 to-accent text-primary-foreground outline-1 outline-black/5">
           <div className="absolute -right-8 -top-8 size-32 rounded-full bg-white/10 blur-xl" />
           <div className="relative">
             <div className="inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider bg-white/20 px-2 py-1 rounded-full">
-              <Sparkles className="size-3" /> AI Insight · 7 hari
+              <Sparkles className="size-3" /> {t("insights.badge")}
             </div>
             <p className="mt-3 text-base leading-relaxed font-medium">{data.summary}</p>
             <button
               onClick={() => qc.invalidateQueries({ queryKey: ["daily-insights"] })}
               className="mt-3 inline-flex items-center gap-1 text-[11px] font-semibold bg-white/15 hover:bg-white/25 transition px-2.5 py-1.5 rounded-full"
             >
-              <RefreshCw className="size-3" /> Perbarui
+              <RefreshCw className="size-3" /> {t("insights.refresh")}
             </button>
           </div>
         </section>
@@ -71,7 +74,7 @@ function Page() {
               <div className="size-8 rounded-xl bg-amber-100 text-amber-600 grid place-items-center">
                 <Lightbulb className="size-4" />
               </div>
-              <h2 className="font-bold text-sm">Tips untuk kamu</h2>
+              <h2 className="font-bold text-sm">{t("insights.tipsForYou")}</h2>
             </div>
             <ul className="space-y-2">
               {data.tips.map((t, i) => (
@@ -92,7 +95,7 @@ function Page() {
             disabled={copyMut.isPending}
             className="rounded-2xl bg-card outline-1 outline-black/5 p-3.5 text-sm font-semibold inline-flex items-center justify-center gap-2 disabled:opacity-50 hover:bg-muted/50 transition"
           >
-            <Copy className="size-4" /> Sama seperti kemarin
+            <Copy className="size-4" /> {t("insights.sameAsYesterday")}
           </button>
           <button
             onClick={share}

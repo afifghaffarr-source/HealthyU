@@ -4,6 +4,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { BottomNav } from "@/components/bottom-nav";
 import { getMealHeatmap } from "@/features/scan/lib/scanBatch7.functions";
+import { useTranslation } from "@/lib/i18n";
 
 export const Route = createFileRoute("/_authenticated/heatmap")({ component: Page });
 
@@ -20,16 +21,17 @@ function Page() {
     const d = new Date(Date.now() - i * 86400000).toISOString().slice(0, 10);
     days.push({ date: d, n: counts[d] ?? 0 });
   }
+  const { t } = useTranslation();
   const max = Math.max(1, ...Object.values(counts));
   return (
     <div className="min-h-dvh pb-24 bg-background">
-      <TopAppBar title="Heatmap Tahunan" showBack />
+      <TopAppBar title={t("heatmap.title")} showBack />
       <main className="max-w-md mx-auto px-4 pt-4">
         <div className="grid grid-cols-[repeat(53,minmax(0,1fr))] gap-0.5">
           {days.map((d) => (
             <div
               key={d.date}
-              title={`${d.date}: ${d.n} meal`}
+              title={t("heatmap.mealTooltip", { date: d.date, n: d.n })}
               className="aspect-square rounded-sm"
               style={{
                 backgroundColor:
@@ -40,7 +42,7 @@ function Page() {
             />
           ))}
         </div>
-        <p className="text-xs text-muted-foreground text-center mt-3">365 hari terakhir</p>
+        <p className="text-xs text-muted-foreground text-center mt-3">{t("heatmap.last365")}</p>
       </main>
       <BottomNav />
     </div>

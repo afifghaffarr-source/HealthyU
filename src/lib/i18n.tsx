@@ -578,7 +578,357 @@ export type TranslationKey =
 
   // ── Sustainability ──────────────────────────────────────────────
   | "sustainability.calculatingCarbon"
-  | "sustainability.noData";
+  | "sustainability.noData"
+
+  // ── progress ──
+  | "progress.title"
+  | "progress.subtitle"
+  | "progress.photoSaved"
+  | "progress.uploadFailed"
+  | "progress.empty"
+  | "progress.emptyHint"
+  | "progress.saveFailed"
+
+  // ── achievements ──
+  | "achievements.title"
+  | "achievements.level"
+  | "achievements.xpToLevel"
+  | "achievements.share"
+  | "achievements.shareTitle"
+  | "achievements.imageDownloaded"
+  | "achievements.imageFailed"
+  | "achievements.streakLabel"
+  | "achievements.daysUnit"
+  | "achievements.longestLabel"
+  | "achievements.badgeCount"
+  | "achievements.dayUnit"
+
+  // ── alarms ──
+  | "alarms.title"
+  | "alarms.wakeTime"
+  | "alarms.windowHint"
+  | "alarms.saved"
+
+  // ── backup ──
+  | "backup.title"
+  | "backup.downloadAll"
+  | "backup.downloadAllDesc"
+  | "backup.auditLogged"
+  | "backup.allTables"
+  | "backup.generatingJson"
+  | "backup.downloadJsonFull"
+  | "backup.generatingCsv"
+  | "backup.downloadCsv"
+  | "backup.fileWarning"
+  | "backup.exportHistory"
+  | "backup.entriesCount"
+  | "backup.noHistory"
+  | "backup.tableUnit"
+  | "backup.rowUnit"
+  | "backup.success"
+  | "backup.failed"
+  | "backup.pdpDisclaimer"
+  | "backup.justNow"
+  | "backup.minutesAgo"
+  | "backup.hoursAgo"
+  | "backup.daysAgo"
+
+  // ── googleCalendar ──
+  | "googleCalendar.title"
+  | "googleCalendar.syncHint"
+  | "googleCalendar.connect"
+  | "googleCalendar.oauthConfig"
+
+  // ── challenges ──
+  | "challenges.title"
+  | "challenges.empty"
+  | "challenges.emptyDesc"
+  | "challenges.alreadyJoined"
+  | "challenges.joined"
+  | "challenges.alreadyJoinedAnnounce"
+  | "challenges.joinedAnnounce"
+  | "challenges.dayLogged"
+  | "challenges.left"
+  | "challenges.continueChallenge"
+  | "challenges.dayLabel"
+
+  // ── community ──
+  | "community.postUnit"
+  | "community.categoryAll"
+
+  // ── onboarding ──
+  | "onboarding.saveFailed"
+
+  // ── referrals ──
+  | "referrals.title"
+  | "referrals.yourCode"
+  | "referrals.shareHint"
+  | "referrals.copy"
+  | "referrals.shareButton"
+  | "referrals.invited"
+  | "referrals.completed"
+  | "referrals.coins"
+  | "referrals.hasCode"
+  | "referrals.singleUse"
+  | "referrals.apply"
+  | "referrals.appliedSuccess"
+  | "referrals.codeCopied"
+  | "referrals.linkCopied"
+  | "referrals.codePlaceholder"
+  | "referrals.shareMessage"
+
+  // ── reminders ──
+  | "reminders.soon"
+  | "reminders.countdownHm"
+  | "reminders.countdownM"
+
+  // ── subscription ──
+  | "subscription.title"
+  | "subscription.currently"
+  | "subscription.active"
+  | "subscription.select"
+  | "subscription.upgraded"
+
+  // ── notifications ──
+  | "notifications.title"
+  | "notifications.subtitle"
+
+  // ── mealplan ──
+  | "mealplan.title"
+  | "mealplan.subtitle"
+  | "mealplan.weekView"
+  | "mealplan.weekViewDesc"
+  | "mealplan.dayView"
+  | "mealplan.generateAI"
+  | "mealplan.budgetTitle"
+  | "mealplan.budgetLabel"
+  | "mealplan.budgetDays"
+  | "mealplan.aiGenerating"
+  | "mealplan.generatePlan"
+  | "mealplan.dayLabel"
+  | "mealplan.groceryTitle"
+  | "mealplan.groceryCount"
+  | "mealplan.planAdded"
+  | "mealplan.weeklyTitle"
+  | "mealplan.weeklySubtitle"
+
+  // ── meals ──
+  | "meals.detailTitle"
+  | "meals.ingredientsLabel"
+  | "meals.cookingSteps"
+  | "meals.alternatives"
+  | "meals.addToDiary"
+  | "meals.addedToDiary"
+  | "meals.linkCopied"
+  | "meals.parseError"
+  | "meals.voiceParseError"
+  | "meals.syncPending"
+
+  // ── recommendations ──
+  | "recommendations.title"
+  | "recommendations.subtitle"
+  | "recommendations.notesLabel"
+  | "recommendations.notesPlaceholder"
+  | "recommendations.generating"
+  | "recommendations.generateButton"
+  | "recommendations.aiBadge"
+  | "recommendations.templateBadge"
+  | "recommendations.budgetRemaining"
+  | "recommendations.totalPlan"
+  | "recommendations.aiUnavailable"
+  | "recommendations.forceAiRetry"
+  | "recommendations.saveToMealPlan"
+  | "recommendations.saved"
+  | "recommendations.saveError"
+  | "recommendations.noRecommendation"
+  | "recommendations.aiNotAvailable"
+
+  // ── reverseCalorie ──
+  | "reverseCalorie.title"
+  | "reverseCalorie.targetLabel"
+  | "reverseCalorie.searchButton"
+
+  // ── shopping ──
+  | "shopping.smartTitle"
+  | "shopping.smartPlaceholder"
+  | "shopping.smartGenerating"
+  | "shopping.smartGenerate"
+  | "shopping.deriveTitle"
+  | "shopping.deriveSubtitle"
+  | "shopping.deriveFromPlan"
+  | "shopping.deriveProgress"
+  | "shopping.deriveManual"
+  | "shopping.deriveDownloaded"
+  | "shopping.deriveSaveShare"
+  | "shopping.listTitle"
+  | "shopping.listPlaceholder"
+  | "shopping.listEstimatePrice"
+
+  // ── restaurants ──
+  | "restaurants.nearbyTitle"
+  | "restaurants.searchNearby"
+  | "restaurants.pressToSearch"
+
+  // ── foods ──
+  | "foods.filterCount"
+  | "foods.filterLabel"
+
+  // ── pet ──
+  | "pet.title"
+  | "pet.adoptTitle"
+  | "pet.adoptDesc"
+  | "pet.namePlaceholder"
+  | "pet.adoptBtn"
+  | "pet.adoptedToast"
+  | "pet.healthLabel"
+  | "pet.happinessLabel"
+  | "pet.energyLabel"
+  | "pet.hungerLabel"
+  | "pet.feedBtn"
+  | "pet.playBtn"
+  | "pet.restBtn"
+  | "pet.levelExp"
+  | "pet.expToNext"
+  | "pet.evolution.title"
+  | "pet.evolution.stages.egg"
+  | "pet.evolution.stages.hatchling"
+  | "pet.evolution.stages.child"
+  | "pet.evolution.stages.teen"
+  | "pet.evolution.stages.adult"
+  | "pet.evolution.stageProgress"
+  | "pet.evolution.xpNeeded"
+  | "pet.evolution.peakForm"
+  | "pet.evolution.evolveBtn"
+  | "pet.evolution.restartBtn"
+  | "pet.shop.title"
+  | "pet.shop.bought"
+  | "pet.shop.equipped"
+  | "pet.shop.equip"
+  | "pet.shop.buy"
+  | "pet.svg.title"
+  | "pet.svg.stageLabel"
+  | "pet.svg.stageProgress"
+
+  // ── gacha ──
+  | "gacha.title"
+  | "gacha.spin"
+  | "gacha.costHint"
+  | "gacha.spinning"
+  | "gacha.pullBtn"
+  | "gacha.result"
+
+  // ── rewards ──
+  | "rewards.title"
+  | "rewards.subtitle"
+  | "rewards.outOfStock"
+  | "rewards.notEnough"
+  | "rewards.redeem"
+  | "rewards.empty"
+  | "rewards.historyTitle"
+  | "rewards.redeemed"
+  | "rewards.failed"
+
+  // ── currency ──
+  | "currency.title"
+  | "currency.convertBtn"
+
+  // ── loginBonus ──
+  | "loginBonus.title"
+  | "loginBonus.desc"
+  | "loginBonus.claiming"
+  | "loginBonus.claimBtn"
+  | "loginBonus.alreadyClaimed"
+  | "loginBonus.claimed"
+
+  // ── streakFreeze ──
+  | "streakFreeze.title"
+  | "streakFreeze.desc"
+  | "streakFreeze.used"
+  | "streakFreeze.useBtn"
+
+  // ── quiz ──
+  | "quiz.title"
+  | "quiz.quoteToday"
+  | "quiz.question"
+  | "quiz.correct"
+  | "quiz.wrong"
+
+  // ── stories ──
+  | "stories.title"
+  | "stories.placeholder"
+  | "stories.posted"
+  | "stories.loading"
+  | "stories.unknownUser"
+  | "stories.imageAlt"
+  | "stories.empty"
+
+  // ── groups ──
+  | "groups.title"
+  | "groups.subtitle"
+  | "groups.createTitle"
+  | "groups.createPlaceholder"
+  | "groups.createBtn"
+  | "groups.creating"
+  | "groups.joinTitle"
+  | "groups.joinPlaceholder"
+  | "groups.joinBtn"
+  | "groups.joining"
+  | "groups.myGroups"
+  | "groups.loading"
+  | "groups.empty"
+  | "groups.created"
+  | "groups.joined"
+  | "groups.createFailed"
+  | "groups.joinFailed"
+
+  // ── leaderboard ──
+  | "leaderboard.title"
+  | "leaderboard.subtitle"
+  | "leaderboard.loading"
+  | "leaderboard.you"
+  | "leaderboard.level"
+  | "leaderboard.xp"
+  | "leaderboard.empty"
+
+  // ── leaderboardWeekly ──
+  | "leaderboardWeekly.title"
+
+  // ── discover ──
+  | "discover.title"
+  | "discover.subtitle"
+  | "discover.publicCommunity"
+  | "discover.seeAllPosts"
+
+  // ── heatmap ──
+  | "heatmap.title"
+  | "heatmap.last365"
+  | "heatmap.mealTooltip"
+
+  // ── insights ──
+  | "insights.title"
+  | "insights.badge"
+  | "insights.refresh"
+  | "insights.tipsForYou"
+  | "insights.sameAsYesterday"
+  | "insights.share"
+  | "insights.notFound"
+  | "insights.copiedMeals"
+  | "insights.noMealsYesterday"
+  | "insights.clipboardCopied"
+  | "insights.shareTitle"
+
+  // ── charity ──
+  | "charity.title"
+  | "charity.donateBtn"
+  | "charity.thanks"
+
+  // ── family ──
+  | "family.title"
+  | "family.createTitle"
+  | "family.namePlaceholder"
+  | "family.createBtn"
+  | "family.activePlan"
+  | "family.createdToast";
 
 /** Template string `{page}` → page number. */
 export type TranslationBundle = Record<TranslationKey, string>;
@@ -1170,6 +1520,360 @@ export const bundles = {
     // ── Sustainability ────────────────────────────────────────────
     "sustainability.calculatingCarbon": "Menghitung jejak karbon\u2026",
     "sustainability.noData": "Belum ada data minggu ini",
+
+    // ── progress ──
+    "progress.title": "Foto Progres",
+    "progress.subtitle": "Pantau perubahan kamu",
+    "progress.photoSaved": "Foto progres tersimpan",
+    "progress.uploadFailed": "Gagal upload",
+    "progress.empty": "Belum ada foto progres",
+    "progress.emptyHint": "Foto pertama jadi titik awal — progres bertahap, bukan harus sempurna.",
+    "progress.saveFailed": "Gagal simpan",
+
+    // ── achievements ──
+    "achievements.title": "Pencapaian",
+    "achievements.level": "Level",
+    "achievements.xpToLevel": "{xp} XP ke level {next}",
+    "achievements.share": "Bagikan pencapaian",
+    "achievements.shareTitle": "Pencapaianku di Healthy U",
+    "achievements.imageDownloaded": "Gambar diunduh",
+    "achievements.imageFailed": "Gagal membuat gambar",
+    "achievements.streakLabel": "Streak",
+    "achievements.daysUnit": "hari",
+    "achievements.longestLabel": "Terpanjang",
+    "achievements.badgeCount": "Badge ({unlocked}/{total})",
+    "achievements.dayUnit": "hari",
+
+    // ── alarms ──
+    "alarms.title": "Smart Alarm",
+    "alarms.wakeTime": "Waktu bangun",
+    "alarms.windowHint": "Window (menit) — bangun di fase tidur ringan",
+    "alarms.saved": "Alarm tersimpan",
+
+    // ── backup ──
+    "backup.title": "Backup & Ekspor",
+    "backup.downloadAll": "Unduh semua data Anda",
+    "backup.downloadAllDesc":
+      "Termasuk profil, makanan, latihan, tidur, vital signs, obat, mood, komunitas, dan pencapaian. Data Anda milik Anda — bawa kapan saja.",
+    "backup.auditLogged": "Audit logged",
+    "backup.allTables": "Semua tabel",
+    "backup.generatingJson": "Generating JSON…",
+    "backup.downloadJsonFull": "Unduh JSON (lengkap)",
+    "backup.generatingCsv": "Generating CSV…",
+    "backup.downloadCsv": "Unduh CSV (per tabel)",
+    "backup.fileWarning": "File berisi semua data pribadi Anda. Simpan di tempat aman.",
+    "backup.exportHistory": "Riwayat Ekspor",
+    "backup.entriesCount": "{count} entri",
+    "backup.noHistory": "Belum ada riwayat export.",
+    "backup.tableUnit": "tabel",
+    "backup.rowUnit": "baris",
+    "backup.success": "Backup {format} berhasil · {tables} tabel, {rows} baris",
+    "backup.failed": "Gagal membuat backup",
+    "backup.pdpDisclaimer":
+      "Hak Anda (UU PDP No. 27/2022): Anda berhak mengakses, mengoreksi, menghapus, dan membatasi pemrosesan data pribadi Anda. Semua ekspor dicatat untuk transparansi dan kepatuhan.",
+    "backup.justNow": "baru saja",
+    "backup.minutesAgo": "{n} menit lalu",
+    "backup.hoursAgo": "{n} jam lalu",
+    "backup.daysAgo": "{n} hari lalu",
+
+    // ── googleCalendar ──
+    "googleCalendar.title": "Google Calendar",
+    "googleCalendar.syncHint": "Sinkronkan jadwal workout & meal kamu ke Google Calendar.",
+    "googleCalendar.connect": "Connect Google Calendar",
+    "googleCalendar.oauthConfig": "OAuth Google Calendar akan dikonfigurasi (perlu CLIENT_ID)",
+
+    // ── challenges ──
+    "challenges.title": "Challenges",
+    "challenges.empty": "Belum ada challenge",
+    "challenges.emptyDesc": "Challenge baru akan dirilis berkala.",
+    "challenges.alreadyJoined": "Sudah bergabung",
+    "challenges.joined": "Bergabung challenge!",
+    "challenges.alreadyJoinedAnnounce": "Sudah bergabung challenge {title}",
+    "challenges.joinedAnnounce": "Bergabung challenge {title}",
+    "challenges.dayLogged": "Hari {day} tercatat · streak {streak}",
+    "challenges.left": "Keluar dari challenge",
+    "challenges.continueChallenge": "Lanjutkan tantangan",
+    "challenges.dayLabel": "Hari {day}",
+
+    // ── community ──
+    "community.postUnit": "post",
+    "community.categoryAll": "Semua",
+
+    // ── onboarding ──
+    "onboarding.saveFailed": "Gagal simpan",
+
+    // ── referrals ──
+    "referrals.title": "Ajak Teman",
+    "referrals.yourCode": "Kode Kamu",
+    "referrals.shareHint":
+      "Bagikan kode ini. Setiap teman yang gabung kamu dapat 100 koin, mereka dapat 50 koin.",
+    "referrals.copy": "Salin",
+    "referrals.shareButton": "Bagikan",
+    "referrals.invited": "Diajak",
+    "referrals.completed": "Selesai",
+    "referrals.coins": "Koin",
+    "referrals.hasCode": "Punya kode dari teman?",
+    "referrals.singleUse": "Masukkan sekali saja, dapat 50 koin bonus.",
+    "referrals.apply": "Pakai",
+    "referrals.appliedSuccess": "Berhasil! +{earned} koin",
+    "referrals.codeCopied": "Kode disalin",
+    "referrals.linkCopied": "Link disalin",
+    "referrals.codePlaceholder": "KODE TEMAN",
+    "referrals.shareMessage":
+      "Yuk gabung HealthyU! Pakai kode {code} dan dapatkan 50 koin bonus 🎁 {url}",
+
+    // ── reminders ──
+    "reminders.soon": "segera",
+    "reminders.countdownHm": "{h}j {m}m lagi",
+    "reminders.countdownM": "{m}m lagi",
+
+    // ── subscription ──
+    "subscription.title": "Subscription",
+    "subscription.currently": "Saat ini:",
+    "subscription.active": "Aktif",
+    "subscription.select": "Pilih",
+    "subscription.upgraded": "Berhasil upgrade",
+
+    // ── notifications ──
+    "notifications.title": "Notifikasi",
+    "notifications.subtitle": "Aktivitas terbaru untuk kamu",
+
+    // ── mealplan ──
+    "mealplan.title": "Meal Plan",
+    "mealplan.subtitle": "Rencanakan menu seminggu",
+    "mealplan.weekView": "Tampilan Mingguan",
+    "mealplan.weekViewDesc": "Lihat 7 hari + adherence + swap meal",
+    "mealplan.dayView": "Tampilan Hari",
+    "mealplan.generateAI": "Generate AI",
+    "mealplan.budgetTitle": "Meal Plan Budget",
+    "mealplan.budgetLabel": "Budget total (Rp)",
+    "mealplan.budgetDays": "Berapa hari",
+    "mealplan.aiGenerating": "AI menyusun…",
+    "mealplan.generatePlan": "Generate Plan",
+    "mealplan.dayLabel": "Hari {day}",
+    "mealplan.groceryTitle": "Grocery List",
+    "mealplan.groceryCount": "{count} item",
+    "mealplan.planAdded": "Rencana ditambahkan",
+    "mealplan.weeklyTitle": "Meal Plan Mingguan",
+    "mealplan.weeklySubtitle": "Atur & pantau adherence plan 7 hari",
+
+    // ── meals ──
+    "meals.detailTitle": "Detail Menu",
+    "meals.ingredientsLabel": "Bahan ({servings}x)",
+    "meals.cookingSteps": "Cara Masak",
+    "meals.alternatives": "Alternatif",
+    "meals.addToDiary": "Tambah ke Diary",
+    "meals.addedToDiary": "Ditambahkan {servings} porsi ke diary",
+    "meals.linkCopied": "Link disalin",
+    "meals.parseError": "Gagal parse makanan",
+    "meals.voiceParseError": "Gagal parse suara",
+    "meals.syncPending": "Sync {pending}",
+
+    // ── recommendations ──
+    "recommendations.title": "Rekomendasi AI",
+    "recommendations.subtitle": "Meal plan personal sesuai profil & sisa kalori",
+    "recommendations.notesLabel": "Catatan khusus (opsional)",
+    "recommendations.notesPlaceholder": "cth: ingin yang tinggi protein, mau cepat masak...",
+    "recommendations.generating": "Menyusun rekomendasi...",
+    "recommendations.generateButton": "Buat Rekomendasi",
+    "recommendations.aiBadge": "AI Personal",
+    "recommendations.templateBadge": "📋 Template (estimasi)",
+    "recommendations.budgetRemaining": "Sisa budget:",
+    "recommendations.totalPlan": "Total rencana:",
+    "recommendations.aiUnavailable": "AI tidak tersedia. Coba paksa AI lagi?",
+    "recommendations.forceAiRetry": "Coba AI lagi",
+    "recommendations.saveToMealPlan": "Simpan ke Meal Plan Hari Ini",
+    "recommendations.saved": "Rekomendasi disimpan ke meal plan hari ini",
+    "recommendations.saveError": "Gagal simpan",
+    "recommendations.noRecommendation": "Belum ada rekomendasi",
+    "recommendations.aiNotAvailable": "AI masih tidak tersedia. Coba lagi sebentar lagi.",
+
+    // ── reverseCalorie ──
+    "reverseCalorie.title": "Cari Menu by Kalori",
+    "reverseCalorie.targetLabel": "Target kalori",
+    "reverseCalorie.searchButton": "Cari",
+
+    // ── shopping ──
+    "shopping.smartTitle": "Daftar Belanja Pintar",
+    "shopping.smartPlaceholder": "Tempel meal plan kamu...",
+    "shopping.smartGenerating": "Membuat...",
+    "shopping.smartGenerate": "Generate",
+    "shopping.deriveTitle": "Belanja dari Meal Plan",
+    "shopping.deriveSubtitle": "Auto-derive mingguan",
+    "shopping.deriveFromPlan": "Diturunkan dari meal plan 7 hari",
+    "shopping.deriveProgress": "{done}/{total} item sudah dicentang",
+    "shopping.deriveManual": "Manual",
+    "shopping.deriveDownloaded": "Daftar belanja diunduh",
+    "shopping.deriveSaveShare": "Simpan / Bagikan",
+    "shopping.listTitle": "Smart Shopping List",
+    "shopping.listPlaceholder": "1 bahan per baris...",
+    "shopping.listEstimatePrice": "Estimasi Harga",
+
+    // ── restaurants ──
+    "restaurants.nearbyTitle": "Restoran Terdekat",
+    "restaurants.searchNearby": "Cari di sekitar saya",
+    "restaurants.pressToSearch": "Tekan tombol untuk mencari",
+
+    // ── foods ──
+    "foods.filterCount": "{count} filter",
+    "foods.filterLabel": "filter",
+
+    // ── pet ──
+    "pet.title": "Virtual Pet",
+    "pet.adoptTitle": "Adopsi pet kamu",
+    "pet.adoptDesc": "Pet akan tumbuh seiring kebiasaan sehatmu.",
+    "pet.namePlaceholder": "Nama pet",
+    "pet.adoptBtn": "Adopsi",
+    "pet.adoptedToast": "Pet diadopsi!",
+    "pet.healthLabel": "Health",
+    "pet.happinessLabel": "Happiness",
+    "pet.energyLabel": "Energy",
+    "pet.hungerLabel": "Hunger",
+    "pet.feedBtn": "Beri makan",
+    "pet.playBtn": "Main",
+    "pet.restBtn": "Istirahat",
+    "pet.levelExp": "Lv {stage} · {exp} EXP",
+    "pet.expToNext": "{exp} EXP menuju Lv {stage}",
+    "pet.evolution.title": "Pet Evolution",
+    "pet.evolution.stages.egg": "Telur",
+    "pet.evolution.stages.hatchling": "Tukik",
+    "pet.evolution.stages.child": "Anak",
+    "pet.evolution.stages.teen": "Remaja",
+    "pet.evolution.stages.adult": "Dewasa",
+    "pet.evolution.stageProgress": "Stage {n}/{total} · {xp} XP",
+    "pet.evolution.xpNeeded": "Butuh {xp} XP lagi ke {name}",
+    "pet.evolution.peakForm": "Form puncak tercapai!",
+    "pet.evolution.evolveBtn": "Evolve!",
+    "pet.evolution.restartBtn": "Mulai Lagi",
+    "pet.shop.title": "Toko Aksesori Pet",
+    "pet.shop.bought": "Dibeli!",
+    "pet.shop.equipped": "Dipakai",
+    "pet.shop.equip": "Pakai",
+    "pet.shop.buy": "Beli {cost} coin",
+    "pet.svg.title": "Evolusi Pet",
+    "pet.svg.stageLabel": "Tahap evolusi",
+    "pet.svg.stageProgress": "Tahap {n}/{total}",
+
+    // ── gacha ──
+    "gacha.title": "Gacha Reward",
+    "gacha.spin": "Putar Gacha",
+    "gacha.costHint": "Biaya 20 coin. Bisa dapat 0–200 coin acak. Jackpot 2%!",
+    "gacha.spinning": "Memutar...",
+    "gacha.pullBtn": "Pull (20 coin)",
+    "gacha.result": "🎉 Hasil: {label}",
+
+    // ── rewards ──
+    "rewards.title": "Tukar Koin",
+    "rewards.subtitle": "Marketplace reward partner",
+    "rewards.outOfStock": "Habis",
+    "rewards.notEnough": "Kurang",
+    "rewards.redeem": "Tukar",
+    "rewards.empty": "Belum ada reward.",
+    "rewards.historyTitle": "Riwayat Penukaran",
+    "rewards.redeemed": "Berhasil ditukar! Sisa koin: {coins}",
+    "rewards.failed": "Gagal",
+
+    // ── currency ──
+    "currency.title": "Konversi Mata Uang",
+    "currency.convertBtn": "Konversi",
+
+    // ── loginBonus ──
+    "loginBonus.title": "Bonus Harian",
+    "loginBonus.desc": "Klaim bonus harianmu. Makin lama streak, makin besar reward!",
+    "loginBonus.claiming": "Mengklaim…",
+    "loginBonus.claimBtn": "Klaim Bonus",
+    "loginBonus.alreadyClaimed": "Sudah klaim hari ini ({coins} coin, streak {streak})",
+    "loginBonus.claimed": "+{coins} coin! Streak: {streak}",
+
+    // ── streakFreeze ──
+    "streakFreeze.title": "Streak Freeze",
+    "streakFreeze.desc": "Lupa log hari ini? Gunakan freeze untuk menyelamatkan streakmu.",
+    "streakFreeze.used": "✓ Freeze Digunakan",
+    "streakFreeze.useBtn": "Gunakan 1 Freeze",
+
+    // ── quiz ──
+    "quiz.title": "Kuis Harian",
+    "quiz.quoteToday": "Quote Hari Ini",
+    "quiz.question": "Pertanyaan",
+    "quiz.correct": "Benar! +{coins} coin",
+    "quiz.wrong": "Salah, coba lagi besok",
+
+    // ── stories ──
+    "stories.title": "Meal Stories",
+    "stories.placeholder": "Tulis story makanan hari ini…",
+    "stories.posted": "Story diposting",
+    "stories.loading": "Memuat…",
+    "stories.unknownUser": "User",
+    "stories.imageAlt": "Story image",
+    "stories.empty": "Belum ada story aktif. Follow teman untuk lihat feed mereka.",
+
+    // ── groups ──
+    "groups.title": "Grup Teman",
+    "groups.subtitle": "Leaderboard privat bersama teman",
+    "groups.createTitle": "Buat grup baru",
+    "groups.createPlaceholder": "Nama grup (mis. Keluarga Sehat)",
+    "groups.createBtn": "Buat Grup",
+    "groups.creating": "Membuat...",
+    "groups.joinTitle": "Gabung dengan kode",
+    "groups.joinPlaceholder": "Kode undangan (6 huruf)",
+    "groups.joinBtn": "Gabung",
+    "groups.joining": "Bergabung...",
+    "groups.myGroups": "Grup Saya",
+    "groups.loading": "Memuat...",
+    "groups.empty": "Belum ada grup. Buat baru atau gabung dengan kode.",
+    "groups.created": "Grup dibuat. Kode: {code}",
+    "groups.joined": "Bergabung ke {name}",
+    "groups.createFailed": "Gagal membuat grup",
+    "groups.joinFailed": "Gagal bergabung",
+
+    // ── leaderboard ──
+    "leaderboard.title": "Leaderboard",
+    "leaderboard.subtitle": "Top 50 berdasarkan XP",
+    "leaderboard.loading": "Memuat...",
+    "leaderboard.you": " (Kamu)",
+    "leaderboard.level": "Lvl {level}",
+    "leaderboard.xp": "XP",
+    "leaderboard.empty": "Belum ada data",
+
+    // ── leaderboardWeekly ──
+    "leaderboardWeekly.title": "Leaderboard Mingguan",
+
+    // ── discover ──
+    "discover.title": "Cari Teman",
+    "discover.subtitle": "Temukan orang dengan goals serupa",
+    "discover.publicCommunity": "Komunitas publik",
+    "discover.seeAllPosts": "Lihat semua post dari semua user",
+
+    // ── heatmap ──
+    "heatmap.title": "Heatmap Tahunan",
+    "heatmap.last365": "365 hari terakhir",
+    "heatmap.mealTooltip": "{date}: {n} meal",
+
+    // ── insights ──
+    "insights.title": "Insight AI",
+    "insights.badge": "AI Insight · 7 hari",
+    "insights.refresh": "Perbarui",
+    "insights.tipsForYou": "Tips untuk kamu",
+    "insights.sameAsYesterday": "Sama seperti kemarin",
+    "insights.share": "Bagikan",
+    "insights.notFound": "Tidak ditemukan",
+    "insights.copiedMeals": "{n} meal disalin dari kemarin",
+    "insights.noMealsYesterday": "Tidak ada meal kemarin",
+    "insights.clipboardCopied": "Disalin ke clipboard",
+    "insights.shareTitle": "HealthyU Insight",
+
+    // ── charity ──
+    "charity.title": "Donasi Coin",
+    "charity.donateBtn": "Donasi {coins} Coin",
+    "charity.thanks": "Terima kasih! {coins} coin disumbang ke {charity}",
+
+    // ── family ──
+    "family.title": "Family Plan",
+    "family.createTitle": "Buat Plan Keluarga",
+    "family.namePlaceholder": "Nama plan (cth: Keluarga Setiawan)",
+    "family.createBtn": "Buat",
+    "family.activePlan": "Plan aktif",
+    "family.createdToast": "Family plan dibuat",
   },
 
   // ══════════════════════════════════════════════════════════════════
@@ -1755,6 +2459,360 @@ export const bundles = {
     // ── Sustainability ────────────────────────────────────────────
     "sustainability.calculatingCarbon": "Calculating carbon footprint\u2026",
     "sustainability.noData": "No data this week",
+
+    // ── progress ──
+    "progress.title": "Progress Photos",
+    "progress.subtitle": "Track your changes",
+    "progress.photoSaved": "Progress photo saved",
+    "progress.uploadFailed": "Upload failed",
+    "progress.empty": "No progress photos yet",
+    "progress.emptyHint":
+      "Your first photo is a starting point — gradual progress, not perfection.",
+    "progress.saveFailed": "Save failed",
+
+    // ── achievements ──
+    "achievements.title": "Achievements",
+    "achievements.level": "Level",
+    "achievements.xpToLevel": "{xp} XP to level {next}",
+    "achievements.share": "Share achievements",
+    "achievements.shareTitle": "My HealthyU Achievements",
+    "achievements.imageDownloaded": "Image downloaded",
+    "achievements.imageFailed": "Failed to create image",
+    "achievements.streakLabel": "Streak",
+    "achievements.daysUnit": "days",
+    "achievements.longestLabel": "Longest",
+    "achievements.badgeCount": "Badges ({unlocked}/{total})",
+    "achievements.dayUnit": "days",
+
+    // ── alarms ──
+    "alarms.title": "Smart Alarm",
+    "alarms.wakeTime": "Wake time",
+    "alarms.windowHint": "Window (minutes) — wake during light sleep phase",
+    "alarms.saved": "Alarm saved",
+
+    // ── backup ──
+    "backup.title": "Backup & Export",
+    "backup.downloadAll": "Download all your data",
+    "backup.downloadAllDesc":
+      "Includes profile, meals, workouts, sleep, vitals, medications, mood, community, and achievements. Your data belongs to you — take it anytime.",
+    "backup.auditLogged": "Audit logged",
+    "backup.allTables": "All tables",
+    "backup.generatingJson": "Generating JSON…",
+    "backup.downloadJsonFull": "Download JSON (full)",
+    "backup.generatingCsv": "Generating CSV…",
+    "backup.downloadCsv": "Download CSV (per table)",
+    "backup.fileWarning": "File contains all your personal data. Store it securely.",
+    "backup.exportHistory": "Export History",
+    "backup.entriesCount": "{count} entries",
+    "backup.noHistory": "No export history yet.",
+    "backup.tableUnit": "tables",
+    "backup.rowUnit": "rows",
+    "backup.success": "Backup {format} successful · {tables} tables, {rows} rows",
+    "backup.failed": "Failed to create backup",
+    "backup.pdpDisclaimer":
+      "Your rights (PDP Act No. 27/2022): You have the right to access, correct, delete, and restrict processing of your personal data. All exports are logged for transparency and compliance.",
+    "backup.justNow": "just now",
+    "backup.minutesAgo": "{n} minutes ago",
+    "backup.hoursAgo": "{n} hours ago",
+    "backup.daysAgo": "{n} days ago",
+
+    // ── googleCalendar ──
+    "googleCalendar.title": "Google Calendar",
+    "googleCalendar.syncHint": "Sync your workout & meal schedule to Google Calendar.",
+    "googleCalendar.connect": "Connect Google Calendar",
+    "googleCalendar.oauthConfig": "Google Calendar OAuth will be configured (needs CLIENT_ID)",
+
+    // ── challenges ──
+    "challenges.title": "Challenges",
+    "challenges.empty": "No challenges yet",
+    "challenges.emptyDesc": "New challenges will be released periodically.",
+    "challenges.alreadyJoined": "Already joined",
+    "challenges.joined": "Joined challenge!",
+    "challenges.alreadyJoinedAnnounce": "Already joined challenge {title}",
+    "challenges.joinedAnnounce": "Joined challenge {title}",
+    "challenges.dayLogged": "Day {day} logged · streak {streak}",
+    "challenges.left": "Leave challenge",
+    "challenges.continueChallenge": "Continue challenge",
+    "challenges.dayLabel": "Day {day}",
+
+    // ── community ──
+    "community.postUnit": "post",
+    "community.categoryAll": "All",
+
+    // ── onboarding ──
+    "onboarding.saveFailed": "Save failed",
+
+    // ── referrals ──
+    "referrals.title": "Invite Friends",
+    "referrals.yourCode": "Your Code",
+    "referrals.shareHint":
+      "Share this code. Each friend who joins gets you 100 coins, they get 50 coins.",
+    "referrals.copy": "Copy",
+    "referrals.shareButton": "Share",
+    "referrals.invited": "Invited",
+    "referrals.completed": "Completed",
+    "referrals.coins": "Coins",
+    "referrals.hasCode": "Have a code from a friend?",
+    "referrals.singleUse": "Enter once, get 50 bonus coins.",
+    "referrals.apply": "Apply",
+    "referrals.appliedSuccess": "Success! +{earned} coins",
+    "referrals.codeCopied": "Code copied",
+    "referrals.linkCopied": "Link copied",
+    "referrals.codePlaceholder": "FRIEND CODE",
+    "referrals.shareMessage": "Join HealthyU! Use code {code} and get 50 bonus coins 🎁 {url}",
+
+    // ── reminders ──
+    "reminders.soon": "soon",
+    "reminders.countdownHm": "{h}h {m}m left",
+    "reminders.countdownM": "{m}m left",
+
+    // ── subscription ──
+    "subscription.title": "Subscription",
+    "subscription.currently": "Currently:",
+    "subscription.active": "Active",
+    "subscription.select": "Select",
+    "subscription.upgraded": "Upgraded successfully",
+
+    // ── notifications ──
+    "notifications.title": "Notifications",
+    "notifications.subtitle": "Recent activity for you",
+
+    // ── mealplan ──
+    "mealplan.title": "Meal Plan",
+    "mealplan.subtitle": "Plan your weekly menu",
+    "mealplan.weekView": "Weekly View",
+    "mealplan.weekViewDesc": "View 7 days + adherence + meal swaps",
+    "mealplan.dayView": "Daily View",
+    "mealplan.generateAI": "Generate AI",
+    "mealplan.budgetTitle": "Meal Plan Budget",
+    "mealplan.budgetLabel": "Total budget (Rp)",
+    "mealplan.budgetDays": "How many days",
+    "mealplan.aiGenerating": "AI generating…",
+    "mealplan.generatePlan": "Generate Plan",
+    "mealplan.dayLabel": "Day {day}",
+    "mealplan.groceryTitle": "Grocery List",
+    "mealplan.groceryCount": "{count} items",
+    "mealplan.planAdded": "Plan added",
+    "mealplan.weeklyTitle": "Weekly Meal Plan",
+    "mealplan.weeklySubtitle": "Manage & track 7-day plan adherence",
+
+    // ── meals ──
+    "meals.detailTitle": "Menu Details",
+    "meals.ingredientsLabel": "Ingredients ({servings}x)",
+    "meals.cookingSteps": "Cooking Steps",
+    "meals.alternatives": "Alternatives",
+    "meals.addToDiary": "Add to Diary",
+    "meals.addedToDiary": "Added {servings} servings to diary",
+    "meals.linkCopied": "Link copied",
+    "meals.parseError": "Failed to parse food",
+    "meals.voiceParseError": "Failed to parse voice",
+    "meals.syncPending": "Sync {pending}",
+
+    // ── recommendations ──
+    "recommendations.title": "AI Recommendations",
+    "recommendations.subtitle": "Personal meal plans based on your profile & remaining calories",
+    "recommendations.notesLabel": "Special notes (optional)",
+    "recommendations.notesPlaceholder": "e.g. high protein, quick to cook...",
+    "recommendations.generating": "Generating recommendations...",
+    "recommendations.generateButton": "Generate Recommendations",
+    "recommendations.aiBadge": "AI Personal",
+    "recommendations.templateBadge": "📋 Template (estimate)",
+    "recommendations.budgetRemaining": "Budget remaining:",
+    "recommendations.totalPlan": "Plan total:",
+    "recommendations.aiUnavailable": "AI unavailable. Force retry?",
+    "recommendations.forceAiRetry": "Try AI again",
+    "recommendations.saveToMealPlan": "Save to Today's Meal Plan",
+    "recommendations.saved": "Recommendations saved to today's meal plan",
+    "recommendations.saveError": "Save failed",
+    "recommendations.noRecommendation": "No recommendations yet",
+    "recommendations.aiNotAvailable": "AI still unavailable. Try again later.",
+
+    // ── reverseCalorie ──
+    "reverseCalorie.title": "Find Menu by Calories",
+    "reverseCalorie.targetLabel": "Calorie target",
+    "reverseCalorie.searchButton": "Search",
+
+    // ── shopping ──
+    "shopping.smartTitle": "Smart Shopping List",
+    "shopping.smartPlaceholder": "Paste your meal plan...",
+    "shopping.smartGenerating": "Generating...",
+    "shopping.smartGenerate": "Generate",
+    "shopping.deriveTitle": "Shop from Meal Plan",
+    "shopping.deriveSubtitle": "Auto-derive weekly",
+    "shopping.deriveFromPlan": "Derived from 7-day meal plan",
+    "shopping.deriveProgress": "{done}/{total} items checked",
+    "shopping.deriveManual": "Manual",
+    "shopping.deriveDownloaded": "Shopping list downloaded",
+    "shopping.deriveSaveShare": "Save / Share",
+    "shopping.listTitle": "Smart Shopping List",
+    "shopping.listPlaceholder": "1 item per line...",
+    "shopping.listEstimatePrice": "Price Estimate",
+
+    // ── restaurants ──
+    "restaurants.nearbyTitle": "Nearby Restaurants",
+    "restaurants.searchNearby": "Search near me",
+    "restaurants.pressToSearch": "Press the button to search",
+
+    // ── foods ──
+    "foods.filterCount": "{count} filters",
+    "foods.filterLabel": "filter",
+
+    // ── pet ──
+    "pet.title": "Virtual Pet",
+    "pet.adoptTitle": "Adopt your pet",
+    "pet.adoptDesc": "Your pet grows with your healthy habits.",
+    "pet.namePlaceholder": "Pet name",
+    "pet.adoptBtn": "Adopt",
+    "pet.adoptedToast": "Pet adopted!",
+    "pet.healthLabel": "Health",
+    "pet.happinessLabel": "Happiness",
+    "pet.energyLabel": "Energy",
+    "pet.hungerLabel": "Hunger",
+    "pet.feedBtn": "Feed",
+    "pet.playBtn": "Play",
+    "pet.restBtn": "Rest",
+    "pet.levelExp": "Lv {stage} · {exp} EXP",
+    "pet.expToNext": "{exp} EXP to Lv {stage}",
+    "pet.evolution.title": "Pet Evolution",
+    "pet.evolution.stages.egg": "Egg",
+    "pet.evolution.stages.hatchling": "Hatchling",
+    "pet.evolution.stages.child": "Child",
+    "pet.evolution.stages.teen": "Teen",
+    "pet.evolution.stages.adult": "Adult",
+    "pet.evolution.stageProgress": "Stage {n}/{total} · {xp} XP",
+    "pet.evolution.xpNeeded": "{xp} XP needed for {name}",
+    "pet.evolution.peakForm": "Peak form reached!",
+    "pet.evolution.evolveBtn": "Evolve!",
+    "pet.evolution.restartBtn": "Start Over",
+    "pet.shop.title": "Pet Accessory Shop",
+    "pet.shop.bought": "Bought!",
+    "pet.shop.equipped": "Equipped",
+    "pet.shop.equip": "Equip",
+    "pet.shop.buy": "Buy {cost} coins",
+    "pet.svg.title": "Pet Evolution",
+    "pet.svg.stageLabel": "Evolution stage",
+    "pet.svg.stageProgress": "Stage {n}/{total}",
+
+    // ── gacha ──
+    "gacha.title": "Gacha Reward",
+    "gacha.spin": "Spin Gacha",
+    "gacha.costHint": "Costs 20 coins. Win 0–200 random coins. 2% jackpot!",
+    "gacha.spinning": "Spinning...",
+    "gacha.pullBtn": "Pull (20 coins)",
+    "gacha.result": "🎉 Result: {label}",
+
+    // ── rewards ──
+    "rewards.title": "Redeem Coins",
+    "rewards.subtitle": "Partner reward marketplace",
+    "rewards.outOfStock": "Out of stock",
+    "rewards.notEnough": "Not enough",
+    "rewards.redeem": "Redeem",
+    "rewards.empty": "No rewards yet.",
+    "rewards.historyTitle": "Redemption History",
+    "rewards.redeemed": "Redeemed! Remaining coins: {coins}",
+    "rewards.failed": "Failed",
+
+    // ── currency ──
+    "currency.title": "Currency Converter",
+    "currency.convertBtn": "Convert",
+
+    // ── loginBonus ──
+    "loginBonus.title": "Daily Bonus",
+    "loginBonus.desc": "Claim your daily bonus. Longer streak, bigger reward!",
+    "loginBonus.claiming": "Claiming…",
+    "loginBonus.claimBtn": "Claim Bonus",
+    "loginBonus.alreadyClaimed": "Already claimed today ({coins} coins, streak {streak})",
+    "loginBonus.claimed": "+{coins} coins! Streak: {streak}",
+
+    // ── streakFreeze ──
+    "streakFreeze.title": "Streak Freeze",
+    "streakFreeze.desc": "Forgot to log today? Use a freeze to save your streak.",
+    "streakFreeze.used": "✓ Freeze Used",
+    "streakFreeze.useBtn": "Use 1 Freeze",
+
+    // ── quiz ──
+    "quiz.title": "Daily Quiz",
+    "quiz.quoteToday": "Quote of the Day",
+    "quiz.question": "Question",
+    "quiz.correct": "Correct! +{coins} coins",
+    "quiz.wrong": "Wrong, try again tomorrow",
+
+    // ── stories ──
+    "stories.title": "Meal Stories",
+    "stories.placeholder": "Write today’s meal story…",
+    "stories.posted": "Story posted",
+    "stories.loading": "Loading…",
+    "stories.unknownUser": "User",
+    "stories.imageAlt": "Story image",
+    "stories.empty": "No active stories. Follow friends to see their feed.",
+
+    // ── groups ──
+    "groups.title": "Friend Groups",
+    "groups.subtitle": "Private leaderboard with friends",
+    "groups.createTitle": "Create new group",
+    "groups.createPlaceholder": "Group name (e.g. Healthy Family)",
+    "groups.createBtn": "Create Group",
+    "groups.creating": "Creating...",
+    "groups.joinTitle": "Join with code",
+    "groups.joinPlaceholder": "Invite code (6 letters)",
+    "groups.joinBtn": "Join",
+    "groups.joining": "Joining...",
+    "groups.myGroups": "My Groups",
+    "groups.loading": "Loading...",
+    "groups.empty": "No groups yet. Create one or join with a code.",
+    "groups.created": "Group created. Code: {code}",
+    "groups.joined": "Joined {name}",
+    "groups.createFailed": "Failed to create group",
+    "groups.joinFailed": "Failed to join",
+
+    // ── leaderboard ──
+    "leaderboard.title": "Leaderboard",
+    "leaderboard.subtitle": "Top 50 by XP",
+    "leaderboard.loading": "Loading...",
+    "leaderboard.you": " (You)",
+    "leaderboard.level": "Lvl {level}",
+    "leaderboard.xp": "XP",
+    "leaderboard.empty": "No data yet",
+
+    // ── leaderboardWeekly ──
+    "leaderboardWeekly.title": "Weekly Leaderboard",
+
+    // ── discover ──
+    "discover.title": "Find Friends",
+    "discover.subtitle": "Find people with similar goals",
+    "discover.publicCommunity": "Public Community",
+    "discover.seeAllPosts": "See all posts from all users",
+
+    // ── heatmap ──
+    "heatmap.title": "Yearly Heatmap",
+    "heatmap.last365": "Last 365 days",
+    "heatmap.mealTooltip": "{date}: {n} meal",
+
+    // ── insights ──
+    "insights.title": "AI Insights",
+    "insights.badge": "AI Insight · 7 days",
+    "insights.refresh": "Refresh",
+    "insights.tipsForYou": "Tips for you",
+    "insights.sameAsYesterday": "Same as yesterday",
+    "insights.share": "Share",
+    "insights.notFound": "Not found",
+    "insights.copiedMeals": "{n} meals copied from yesterday",
+    "insights.noMealsYesterday": "No meals yesterday",
+    "insights.clipboardCopied": "Copied to clipboard",
+    "insights.shareTitle": "HealthyU Insight",
+
+    // ── charity ──
+    "charity.title": "Coin Donation",
+    "charity.donateBtn": "Donate {coins} Coins",
+    "charity.thanks": "Thank you! {coins} coins donated to {charity}",
+
+    // ── family ──
+    "family.title": "Family Plan",
+    "family.createTitle": "Create Family Plan",
+    "family.namePlaceholder": "Plan name (e.g. Setiawan Family)",
+    "family.createBtn": "Create",
+    "family.activePlan": "Active plan",
+    "family.createdToast": "Family plan created",
   },
 } satisfies Record<string, TranslationBundle>;
 

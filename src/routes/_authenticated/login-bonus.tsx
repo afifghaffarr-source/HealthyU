@@ -6,11 +6,13 @@ import { BottomNav } from "@/components/bottom-nav";
 import { claimDailyLoginBonus } from "@/features/scan/lib/scanBatch9.functions";
 import { toast } from "@/lib/toast-config";
 import { Gift } from "lucide-react";
+import { useTranslation } from "@/lib/i18n";
 
 export const Route = createFileRoute("/_authenticated/login-bonus")({ component: Page });
 
 function Page() {
   const fn = useServerFn(claimDailyLoginBonus);
+  const { t } = useTranslation();
   const mut = useMutation({
     mutationFn: () => fn({ data: undefined as never }),
     onSuccess: (r) => {
@@ -25,20 +27,18 @@ function Page() {
   });
   return (
     <div className="min-h-dvh pb-24 bg-background">
-      <TopAppBar title="Bonus Harian" showBack />
+      <TopAppBar title={t("loginBonus.title")} showBack />
       <main className="max-w-md mx-auto px-4 pt-8 space-y-6 text-center">
         <div className="size-32 mx-auto rounded-full bg-gradient-to-br from-yellow-400/30 to-orange-500/30 inline-flex items-center justify-center">
           <Gift className="size-16 text-yellow-500" />
         </div>
-        <p className="text-muted-foreground">
-          Klaim bonus harianmu. Makin lama streak, makin besar reward!
-        </p>
+        <p className="text-muted-foreground">{t("loginBonus.desc")}</p>
         <button
           onClick={() => mut.mutate()}
           disabled={mut.isPending}
           className="w-full rounded-xl bg-primary text-primary-foreground py-3 font-semibold"
         >
-          {mut.isPending ? "Mengklaim…" : "Klaim Bonus"}
+          {mut.isPending ? t("loginBonus.claiming") : t("loginBonus.claimBtn")}
         </button>
       </main>
       <BottomNav />

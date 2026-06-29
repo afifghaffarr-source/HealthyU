@@ -14,6 +14,7 @@ import {
   syncPrayerReminders,
   type PrayerPrefs,
 } from "@/lib/reminders-store";
+import { useTranslation } from "@/lib/i18n";
 import { findNext, useCountdown } from "@/features/prayer/lib/prayer-time";
 import {
   ImsakSunriseGrid,
@@ -39,6 +40,7 @@ function PrayerPage() {
   const fetchProfile = useServerFn(getProfile);
   const { data: profile } = useQuery({ queryKey: ["profile"], queryFn: () => fetchProfile() });
   const city = profile?.city ?? "Jakarta";
+  const { t } = useTranslation();
 
   const { data: times, isLoading } = useQuery({
     queryKey: ["prayer", city],
@@ -56,11 +58,11 @@ function PrayerPage() {
 
   const prayers = times
     ? [
-        { name: "Subuh", time: times.Fajr },
-        { name: "Dzuhur", time: times.Dhuhr },
-        { name: "Ashar", time: times.Asr },
-        { name: "Maghrib", time: times.Maghrib },
-        { name: "Isya", time: times.Isha },
+        { name: t("prayer.names.fajr"), time: times.Fajr },
+        { name: t("prayer.names.dhuhr"), time: times.Dhuhr },
+        { name: t("prayer.names.asr"), time: times.Asr },
+        { name: t("prayer.names.maghrib"), time: times.Maghrib },
+        { name: t("prayer.names.isha"), time: times.Isha },
       ]
     : [];
 
@@ -95,20 +97,20 @@ function PrayerPage() {
 
   const requestPermAndEnable = async () => {
     if (!("Notification" in window)) {
-      toast.error("Browser tidak mendukung notifikasi");
+      toast.error(t("reminders.browserNotSupported"));
       return;
     }
     let p = Notification.permission;
     if (p === "default") p = await Notification.requestPermission();
     setPermission(p);
     if (p !== "granted") {
-      toast.error("Izin notifikasi ditolak");
+      toast.error(t("reminders.notifDenied"));
       return;
     }
     const next = { ...prefs, enabled: !prefs.enabled };
     setPrefs(next);
     savePrayerPrefs(next);
-    toast.success(next.enabled ? "Notifikasi sholat aktif" : "Notifikasi sholat dimatikan");
+    toast.success(next.enabled ? t("prayer.notifOn") : t("prayer.notifOff"));
   };
 
   const togglePref = (key: keyof PrayerPrefs) => {
@@ -120,14 +122,16 @@ function PrayerPage() {
   return (
     <main className="min-h-dvh bg-background pb-28">
       <div className="max-w-md mx-auto px-5 pt-2 space-y-5">
-        <TopAppBar title="Jadwal Sholat" showBack />
+        <TopAppBar title={t("prayer.title")} showBack />
 
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
           <MapPin className="size-4" />
           <span>{city}, Indonesia</span>
         </div>
 
-        {isLoading && <p className="text-center text-muted-foreground py-8">Memuat...</p>}
+        {isLoading && (
+          <p className="text-center text-muted-foreground py-8">{t("common.loading")}</p>
+        )}
 
         {times && (
           <>
@@ -150,9 +154,7 @@ function PrayerPage() {
 
             <PrayerTimesList prayers={prayers} nextIdx={nextIdx} />
 
-            <p className="text-xs text-muted-foreground text-center">
-              Sumber: Aladhan API · Metode Kemenag RI
-            </p>
+            <p className="text-xs text-muted-foreground text-center">{t("prayer.source")}</p>
           </>
         )}
       </div>

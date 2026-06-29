@@ -6,6 +6,7 @@ import { getProfile, updateProfile } from "@/features/profile/lib/profile.functi
 import { calcAge, calcBMR, calcTDEE, type ActivityLevel } from "@/lib/health";
 import { toast } from "@/lib/toast-config";
 import { toastError } from "@/lib/toast-config";
+import { useTranslation } from "@/lib/i18n";
 import {
   type Goal,
   type OnboardingForm,
@@ -28,6 +29,7 @@ function Onboarding() {
   const qc = useQueryClient();
   const fetchProfile = useServerFn(getProfile);
   const updateFn = useServerFn(updateProfile);
+  const { t } = useTranslation();
 
   const { data: profile } = useQuery({ queryKey: ["profile"], queryFn: () => fetchProfile() });
 
@@ -75,10 +77,10 @@ function Onboarding() {
     mutationFn: (payload: Record<string, unknown>) => updateFn({ data: payload }),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["profile"] });
-      toast.success("Profil tersimpan!");
+      toast.success(t("onboarding.profileSaved"));
       navigate({ to: "/dashboard" });
     },
-    onError: (e) => toastError(e, "Gagal simpan"),
+    onError: (e) => toastError(e, t("onboarding.saveFailed")),
   });
 
   const bmr = calcBMR({

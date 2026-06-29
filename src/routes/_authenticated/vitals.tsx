@@ -11,6 +11,7 @@ import { SyncPill } from "@/components/healthyu/sync-pill";
 import { toast } from "@/lib/toast-config";
 import { enqueue } from "@/lib/offline-queue";
 import { useOfflineQueue } from "@/hooks/use-offline-queue";
+import { useTranslation } from "@/lib/i18n";
 import { bpCategory, glucoseCategory } from "@/features/vitals/lib/vitalsCalc";
 import { SnapshotCard } from "@/features/vitals/components/SnapshotCard";
 import { BpTrendChart } from "@/features/vitals/components/BpTrendChart";
@@ -33,6 +34,7 @@ function VitalsPage() {
   const fetchBody = useServerFn(listBodyMetrics);
   const fetchProfile = useServerFn(getProfile);
   const { online, pending, sync } = useOfflineQueue();
+  const { t } = useTranslation();
 
   const { data: logs = [] } = useQuery({ queryKey: ["vitals"], queryFn: () => fetchList() });
   const { data: bodyLogs = [] } = useQuery({
@@ -72,9 +74,7 @@ function VitalsPage() {
       setGlu("");
       setNote("");
       toast.success(
-        res && "offline" in res && res.offline
-          ? "Vitals disimpan offline. Akan sync otomatis."
-          : "Vital signs tercatat",
+        res && "offline" in res && res.offline ? t("vitals.offlineSaved") : t("vitals.logged"),
       );
     },
     onError: (e: Error) => toast.error(e.message),
@@ -103,7 +103,7 @@ function VitalsPage() {
     <main className="min-h-dvh bg-background pb-28">
       <div className="max-w-md mx-auto px-5 pt-2 space-y-5">
         <TopAppBar
-          title="Vital Signs"
+          title={t("vitals.title")}
           showBack
           action={<SyncPill online={online} pending={pending} onSync={() => sync()} />}
         />

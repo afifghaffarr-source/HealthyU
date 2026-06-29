@@ -5,6 +5,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { listLeaderboard } from "@/features/groups/lib/social.functions";
 import { BottomNav } from "@/components/bottom-nav";
 import { Trophy, Flame } from "lucide-react";
+import { useTranslation } from "@/lib/i18n";
 
 export const Route = createFileRoute("/_authenticated/leaderboard")({
   component: LeaderboardPage,
@@ -12,6 +13,7 @@ export const Route = createFileRoute("/_authenticated/leaderboard")({
 
 function LeaderboardPage() {
   const fetchLb = useServerFn(listLeaderboard);
+  const { t } = useTranslation();
   const { data: rows = [], isLoading } = useQuery({
     queryKey: ["leaderboard"],
     queryFn: () => fetchLb(),
@@ -20,9 +22,9 @@ function LeaderboardPage() {
   return (
     <main className="min-h-dvh bg-background pb-28">
       <div className="max-w-md mx-auto px-5 pt-2 space-y-5">
-        <TopAppBar title="Leaderboard" subtitle="Top 50 berdasarkan XP" showBack />
+        <TopAppBar title={t("leaderboard.title")} subtitle={t("leaderboard.subtitle")} showBack />
 
-        {isLoading && <p className="text-sm text-muted-foreground">Memuat...</p>}
+        {isLoading && <p className="text-sm text-muted-foreground">{t("leaderboard.loading")}</p>}
 
         <section className="space-y-2">
           {rows.map((r) => (
@@ -48,10 +50,10 @@ function LeaderboardPage() {
               <div className="flex-1 min-w-0">
                 <p className="font-semibold truncate">
                   {r.name}
-                  {r.is_me && " (Kamu)"}
+                  {r.is_me && t("leaderboard.you")}
                 </p>
                 <p className="text-xs text-muted-foreground flex items-center gap-2">
-                  Lvl {r.level}
+                  {t("leaderboard.level", { level: r.level })}
                   <span className="inline-flex items-center gap-0.5">
                     <Flame className="size-3" />
                     {r.current_streak}d
@@ -60,12 +62,14 @@ function LeaderboardPage() {
               </div>
               <div className="text-right">
                 <p className="font-bold tabular-nums">{r.xp}</p>
-                <p className="text-[10px] text-muted-foreground">XP</p>
+                <p className="text-[10px] text-muted-foreground">{t("leaderboard.xp")}</p>
               </div>
             </div>
           ))}
           {!isLoading && rows.length === 0 && (
-            <p className="text-center text-sm text-muted-foreground py-10">Belum ada data</p>
+            <p className="text-center text-sm text-muted-foreground py-10">
+              {t("leaderboard.empty")}
+            </p>
           )}
         </section>
       </div>

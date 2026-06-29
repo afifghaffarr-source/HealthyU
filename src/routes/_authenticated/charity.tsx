@@ -7,6 +7,7 @@ import { BottomNav } from "@/components/bottom-nav";
 import { donateCoins } from "@/features/scan/lib/scanBatch11.functions";
 import { toast } from "@/lib/toast-config";
 import { Heart } from "lucide-react";
+import { useTranslation } from "@/lib/i18n";
 
 const CHARITIES = ["Yayasan Anak Sehat", "Bank Sampah Hijau", "Pemberdayaan Petani"];
 
@@ -16,14 +17,15 @@ function Page() {
   const fn = useServerFn(donateCoins);
   const [coins, setCoins] = useState(50);
   const [charity, setCharity] = useState(CHARITIES[0]);
+  const { t } = useTranslation();
   const mut = useMutation({
     mutationFn: () => fn({ data: { coins, charityName: charity } }),
-    onSuccess: () => toast.success(`Terima kasih! ${coins} coin disumbang ke ${charity}`),
+    onSuccess: () => toast.success(t("charity.thanks", { coins: String(coins), charity })),
     onError: (e: Error) => toast.error(e.message),
   });
   return (
     <div className="min-h-dvh pb-24 bg-background">
-      <TopAppBar title="Donasi Coin" showBack />
+      <TopAppBar title={t("charity.title")} showBack />
       <main className="max-w-md mx-auto px-4 pt-4 space-y-4">
         <div className="text-center py-4">
           <Heart className="size-12 text-red-500 mx-auto" />
@@ -51,7 +53,7 @@ function Page() {
           disabled={mut.isPending}
           className="w-full rounded-xl bg-primary text-primary-foreground py-2.5 font-medium"
         >
-          Donasi {coins} Coin
+          {t("charity.donateBtn", { coins: coins })}
         </button>
       </main>
       <BottomNav />

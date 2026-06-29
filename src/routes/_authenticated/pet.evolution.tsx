@@ -4,6 +4,7 @@ import { useState } from "react";
 import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { BottomNav } from "@/components/bottom-nav";
 import { celebrate } from "@/lib/confetti";
+import { useTranslation } from "@/lib/i18n";
 
 export const Route = createFileRoute("/_authenticated/pet/evolution")({ component: Page });
 
@@ -81,11 +82,12 @@ const STAGES = [
 
 function Page() {
   const [s, setS] = useState(0);
+  const { t } = useTranslation();
   const stage = STAGES[s];
   const next = STAGES[s + 1];
   return (
     <div className="min-h-dvh pb-24 bg-background">
-      <TopAppBar title="Pet Evolution" showBack />
+      <TopAppBar title={t("pet.evolution.title")} showBack />
       <main className="max-w-md mx-auto px-4 pt-4 space-y-6 text-center">
         <motion.div
           key={s}
@@ -103,7 +105,7 @@ function Page() {
             {stage.name}
           </p>
           <p className="text-xs text-muted-foreground">
-            Stage {s + 1} / {STAGES.length} · {stage.xp} XP
+            {t("pet.evolution.stageProgress", { n: s + 1, total: STAGES.length, xp: stage.xp })}
           </p>
         </div>
         <div className="flex gap-1.5 justify-center">
@@ -116,10 +118,10 @@ function Page() {
         </div>
         {next ? (
           <p className="text-xs text-muted-foreground">
-            Butuh {next.xp - stage.xp} XP lagi ke <strong>{next.name}</strong>
+            {t("pet.evolution.xpNeeded", { xp: next.xp - stage.xp, name: next.name })}
           </p>
         ) : (
-          <p className="text-xs text-primary font-semibold">Form puncak tercapai!</p>
+          <p className="text-xs text-primary font-semibold">{t("pet.evolution.peakForm")}</p>
         )}
         <button
           onClick={() => {
@@ -129,7 +131,7 @@ function Page() {
           }}
           className="rounded-2xl bg-primary text-primary-foreground px-6 py-3 text-sm font-semibold shadow active:scale-[0.98] transition"
         >
-          {next ? "Evolve!" : "Mulai Lagi"}
+          {next ? t("pet.evolution.evolveBtn") : t("pet.evolution.restartBtn")}
         </button>
       </main>
       <BottomNav />

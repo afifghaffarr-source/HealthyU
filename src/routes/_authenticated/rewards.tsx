@@ -7,6 +7,7 @@ import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { Coins, Gift } from "lucide-react";
 import { toast } from "@/lib/toast-config";
 import { toastError } from "@/lib/toast-config";
+import { useTranslation } from "@/lib/i18n";
 
 export const Route = createFileRoute("/_authenticated/rewards")({
   component: RewardsPage,
@@ -18,14 +19,16 @@ function RewardsPage() {
   const redeemFn = useServerFn(redeemReward);
   const { data } = useQuery({ queryKey: ["rewards"], queryFn: () => fetchFn() });
 
+  const { t } = useTranslation();
+
   const redeem = useMutation({
     mutationFn: (reward_id: string) => redeemFn({ data: { reward_id } }),
     onSuccess: (r) => {
       qc.invalidateQueries({ queryKey: ["rewards"] });
       qc.invalidateQueries({ queryKey: ["profile"] });
-      toast.success(`Berhasil ditukar! Sisa koin: ${r.remaining_coins}`);
+      toast.success(t("rewards.redeemed", { coins: String(r.remaining_coins) }));
     },
-    onError: (e) => toastError(e, "Gagal"),
+    onError: (e) => toastError(e, t("rewards.failed")),
   });
 
   const coins = data?.coins ?? 0;
@@ -34,8 +37,8 @@ function RewardsPage() {
     <main className="min-h-dvh bg-background pb-28">
       <div className="max-w-md mx-auto px-5 pt-2 space-y-5">
         <TopAppBar
-          title="Tukar Koin"
-          subtitle="Marketplace reward partner"
+          title={t("rewards.title")}
+          subtitle={t("rewards.subtitle")}
           showBack
           action={
             <div className="flex items-center gap-1 bg-amber-100 text-amber-700 px-3 py-2 rounded-2xl font-bold">
@@ -78,7 +81,11 @@ function RewardsPage() {
                       disabled={!canAfford || outOfStock || redeem.isPending}
                       className="bg-primary text-primary-foreground text-xs font-bold px-4 py-2 rounded-xl disabled:opacity-50"
                     >
-                      {outOfStock ? "Habis" : !canAfford ? "Kurang" : "Tukar"}
+                      {outOfStock
+                        ? t("rewards.outOfStock")
+                        : !canAfford
+                          ? t("rewards.notEnough")
+                          : t("rewards.redeem")}
                     </button>
                   </div>
                 </div>
@@ -86,14 +93,14 @@ function RewardsPage() {
             );
           })}
           {(data?.rewards.length ?? 0) === 0 && (
-            <p className="text-sm text-muted-foreground text-center py-8">Belum ada reward.</p>
+            <p className="text-sm text-muted-foreground text-center py-8">{t("rewards.empty")}</p>
           )}
         </section>
 
         {(data?.redemptions.length ?? 0) > 0 && (
           <section className="space-y-2 animate-fade-up">
             <h2 className="text-xs font-bold uppercase tracking-wider text-muted-foreground px-1">
-              Riwayat Penukaran
+              {t("rewards.historyTitle")}
             </h2>
             {data!.redemptions.map((r) => (
               <div
