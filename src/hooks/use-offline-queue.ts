@@ -18,7 +18,11 @@ export function useOfflineQueue() {
   const mood = useServerFn(addMood);
   const vitals = useServerFn(addVitals);
   const workout = useServerFn(logWorkout);
-  const [online, setOnline] = useState(typeof navigator !== "undefined" ? navigator.onLine : true);
+  const [online, setOnline] = useState(
+    typeof navigator !== "undefined" && typeof navigator.onLine === "boolean"
+      ? navigator.onLine
+      : true, // SSR (CF Workers have navigator but not onLine)
+  );
   const [pending, setPending] = useState(0);
 
   const refresh = useCallback(async () => {

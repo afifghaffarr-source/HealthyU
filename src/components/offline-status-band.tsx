@@ -31,7 +31,9 @@ const REFRESH_INTERVAL_MS = 30_000;
 
 export function OfflineStatusBand() {
   const [online, setOnline] = useState<boolean>(
-    typeof navigator !== "undefined" ? navigator.onLine : true,
+    typeof navigator !== "undefined" && typeof navigator.onLine === "boolean"
+      ? navigator.onLine
+      : true, // SSR (CF Workers have navigator but not onLine) defaults to online
   );
   const [pendingMeals, setPendingMeals] = useState<number>(0);
   const [pendingWaters, setPendingWaters] = useState<number>(0);
