@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, Outlet, useLocation } from "@tanstack/react-router";
 import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { BottomNav } from "@/components/bottom-nav";
 import {
@@ -33,6 +33,13 @@ type SettingItem = {
 };
 
 function PengaturanPage() {
+  const location = useLocation();
+
+  // Render child route content when on a sub-route (e.g., /pengaturan/preferensi)
+  if (location.pathname !== "/pengaturan") {
+    return <Outlet />;
+  }
+
   const groups: { label: string; items: SettingItem[] }[] = [
     {
       label: "Akun",
