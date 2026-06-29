@@ -76,7 +76,7 @@ export function FoodPage() {
   const logMutation = useMutation({
     mutationFn: async (payload: LogPayload) => {
       if (!navigator.onLine) {
-        await enqueue("meal", payload);
+        await enqueue("meal", payload).catch(() => {});
         return { offline: true as const };
       }
       return log({ data: payload });

@@ -216,10 +216,25 @@ const MAX_ATTEMPTS = 6;
 const BASE_DELAY_MS = 2_000;
 
 /** Drains the queue with exponential backoff per item. */
+let _flushing = false;
+
 export async function flush(
   syncers: Record<QueueKind, Syncer>,
 ): Promise<{ synced: number; failed: number }> {
   if (!navigator.onLine) return { synced: 0, failed: 0 };
+  // Sprint 45: mutex — prevent concurrent flush() from periodic + manual sync
+  if (_flushing) return { synced: 0, failed: 0 };
+  _flushing = true;
+  try {
+    return await _flushImpl(syncers);
+  } finally {
+    _flushing = false;
+  }
+}
+
+async function _flushImpl(
+  syncers: Record<QueueKind, Syncer>,
+): Promise<{ synced: number; failed: number }> {
   await cleanupExpired();
   const items = await listAll();
   const now = Date.now();

@@ -36,7 +36,7 @@ function WeightPage() {
     mutationFn: async () => {
       const payload = { weight_kg: Number(val), note: note.trim() || undefined };
       if (!navigator.onLine) {
-        await enqueue("weight", payload);
+        await enqueue("weight", payload).catch(() => {});
         return { offline: true as const };
       }
       return add({ data: payload });

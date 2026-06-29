@@ -63,7 +63,7 @@ function WorkoutPage() {
         intensity,
       };
       if (!navigator.onLine) {
-        await enqueue("workout", payload);
+        await enqueue("workout", payload).catch(() => {});
         return { offline: true as const };
       }
       return log({ data: payload });

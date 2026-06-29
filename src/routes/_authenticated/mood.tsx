@@ -37,7 +37,7 @@ function MoodPage() {
     mutationFn: async () => {
       const payload = { mood: mood!, note: note.trim() || undefined };
       if (!navigator.onLine) {
-        await enqueue("mood", payload);
+        await enqueue("mood", payload).catch(() => {});
         return { offline: true as const };
       }
       return add({ data: payload });

@@ -59,7 +59,7 @@ function VitalsPage() {
         note: note.trim() || undefined,
       };
       if (!navigator.onLine) {
-        await enqueue("vitals", payload);
+        await enqueue("vitals", payload).catch(() => {});
         return { offline: true as const };
       }
       return add({ data: payload });

@@ -54,7 +54,7 @@ function WaterPage() {
   const logMut = useMutation({
     mutationFn: async (ml: number) => {
       if (!navigator.onLine) {
-        await enqueue("water", { amount_ml: ml });
+        await enqueue("water", { amount_ml: ml }).catch(() => {});
         return { offline: true, ml };
       }
       return logFn({ data: { amount_ml: ml } });
