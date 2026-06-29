@@ -12,6 +12,7 @@
   "background_color": "#FBF8F1",
   "theme_color": "#6B8E5A",
   "orientation": "portrait",
+  "prefer_related_applications": false,
   "icons": [
     {
       "src": "/icon-192.svg",

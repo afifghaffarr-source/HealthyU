@@ -78,8 +78,10 @@ async function tx<T>(
   return new Promise<T>((resolve, reject) => {
     const t = db.transaction(storeName, mode);
     const s = t.objectStore(storeName);
-    Promise.resolve(fn(s)).then(resolve, reject);
+    // Attach onerror BEFORE fn(s) to avoid race where transaction
+    // errors during fn() execution and onerror isn't registered yet.
     t.onerror = () => reject(t.error);
+    Promise.resolve(fn(s)).then(resolve, reject);
   });
 }
 

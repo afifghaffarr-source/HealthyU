@@ -53,10 +53,28 @@ self.addEventListener("install", () => {
   self.skipWaiting();
 });
 
-// Precache the app shell — when injectionPoint=true, Vite plugin inlines the
-// build-time manifest. With injectionPoint=false (workbox-build ESM bug), this
-// is an empty array. Runtime caches (fonts, supabase images) still work fine.
+// v3 L2: Activation telemetry — log SW version + cache state for debugging.
+self.addEventListener("activate", (event) => {
+  event.waitUntil(
+    (async () => {
+      const cacheNames = await caches.keys();
+      const precache = cacheNames.find((n) => n.startsWith("workbox-precache"));
+      const entries = precache ? await (await caches.open(precache)).keys() : [];
+      console.log(`[sw] activate v3 — caches=${cacheNames.length} precache=${entries.length}`);
+      // Ensure clients get the new SW immediately.
+      await self.clients.claim();
+    })(),
+  );
+});
+
+// v3 L3: Precache runtime assertion — warn if manifest is empty (injection failed).
+// precacheAndRoute MUST keep the `self.__WB_MANIFEST || []` pattern — the
+// post-build injection script (scripts/precache-inject.ts) regex-matches this
+// exact pattern to inject the real asset manifest.
 precacheAndRoute(self.__WB_MANIFEST || []);
+if (!self.__WB_MANIFEST || self.__WB_MANIFEST.length === 0) {
+  console.warn("[sw] __WB_MANIFEST is empty — precache injection may have failed");
+}
 
 // SPA navigation fallback: deep links → /index.html so React Router handles them.
 // Only for GET navigation requests (excludes mutations).
