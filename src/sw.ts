@@ -53,14 +53,14 @@ self.addEventListener("install", () => {
   self.skipWaiting();
 });
 
-// v3 L2: Activation telemetry — log SW version + cache state for debugging.
+// v4: Bump to force precache refresh after preferensi/chat fixes (Sprint 53).
 self.addEventListener("activate", (event) => {
   event.waitUntil(
     (async () => {
       const cacheNames = await caches.keys();
       const precache = cacheNames.find((n) => n.startsWith("workbox-precache"));
       const entries = precache ? await (await caches.open(precache)).keys() : [];
-      console.log(`[sw] activate v3 — caches=${cacheNames.length} precache=${entries.length}`);
+      console.log(`[sw] activate v4 — caches=${cacheNames.length} precache=${entries.length}`);
       // Ensure clients get the new SW immediately.
       await self.clients.claim();
     })(),
