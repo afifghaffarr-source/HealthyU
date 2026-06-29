@@ -10,7 +10,7 @@ import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { BottomNav } from "@/components/bottom-nav";
 import { Ruler, Globe, Palette, Clock, Check } from "lucide-react";
 import { toast } from "@/lib/toast-config";
-import { useLocale, type Locale } from "@/lib/i18n";
+import { useLocale, useTranslation, type Locale } from "@/lib/i18n";
 
 export const Route = createFileRoute("/_authenticated/pengaturan/preferensi")({
   component: PreferensiPage,
@@ -55,10 +55,11 @@ function PreferensiPage() {
     queryFn: () => fetchFn(),
   });
   const { setLocale } = useLocale();
+  const { t } = useTranslation();
   const updateMut = useMutation({
     mutationFn: (patch: Partial<UserPreferences>) => updateFn({ data: patch }),
     onSuccess: () => {
-      toast.success("Tersimpan");
+      toast.success(t("prefs.saved"));
       qc.invalidateQueries({ queryKey: ["preferences"] });
     },
     onError: (e: Error) => toast.error(e.message),
@@ -71,25 +72,27 @@ function PreferensiPage() {
   return (
     <main className="min-h-dvh bg-background pb-28">
       <div className="max-w-md mx-auto px-5 pt-2 space-y-5">
-        <TopAppBar title="Preferensi" subtitle="Sesuaikan tampilan & unit" showBack />
+        <TopAppBar title={t("prefs.title")} subtitle={t("prefs.subtitle")} showBack />
 
         {isLoading ? (
-          <div className="py-12 text-center text-muted-foreground text-sm">Memuat preferensi…</div>
+          <div className="py-12 text-center text-muted-foreground text-sm">
+            {t("prefs.loading")}
+          </div>
         ) : isError ? (
           <div className="py-12 text-center space-y-3">
             <p className="text-sm text-destructive">
-              Gagal memuat preferensi: {(error as Error)?.message ?? "Unknown error"}
+              {t("prefs.error")}: {(error as Error)?.message ?? "Unknown error"}
             </p>
             <button
               onClick={() => refetch()}
               className="px-4 py-2 text-xs font-semibold bg-primary text-primary-foreground rounded-xl"
             >
-              Coba lagi
+              {t("prefs.retry")}
             </button>
           </div>
         ) : (
           <>
-            <Section icon={Ruler} label="Unit Pengukuran" description="Untuk berat & tinggi badan">
+            <Section icon={Ruler} label={t("prefs.unitLabel")} description={t("prefs.unitDesc")}>
               <SegmentedPicker
                 value={prefs?.preferred_unit ?? "metric"}
                 options={UNITS}
@@ -98,7 +101,11 @@ function PreferensiPage() {
             </Section>
 
             {/* Language */}
-            <Section icon={Globe} label="Bahasa" description="Antarmuka aplikasi">
+            <Section
+              icon={Globe}
+              label={t("prefs.languageLabel")}
+              description={t("prefs.languageDesc")}
+            >
               <div className="space-y-1.5">
                 {LANGUAGES.map((opt) => {
                   const active = prefs?.preferred_language === opt.value;
@@ -126,7 +133,11 @@ function PreferensiPage() {
             </Section>
 
             {/* Theme */}
-            <Section icon={Palette} label="Tema" description="Tampilan terang/gelap">
+            <Section
+              icon={Palette}
+              label={t("prefs.themeLabel")}
+              description={t("prefs.themeDesc")}
+            >
               <div className="space-y-1.5">
                 {THEMES.map((opt) => {
                   const active = prefs?.preferred_theme === opt.value;
@@ -151,7 +162,11 @@ function PreferensiPage() {
             </Section>
 
             {/* Timezone */}
-            <Section icon={Clock} label="Zona Waktu" description="Untuk jadwal shalat & pengingat">
+            <Section
+              icon={Clock}
+              label={t("prefs.timezoneLabel")}
+              description={t("prefs.timezoneDesc")}
+            >
               <select
                 value={prefs?.timezone ?? "Asia/Jakarta"}
                 onChange={(e) => setPref("timezone", e.target.value)}
@@ -166,7 +181,7 @@ function PreferensiPage() {
             </Section>
 
             <p className="text-[11px] text-muted-foreground text-center pt-2">
-              Preferensi disimpan ke akun Anda dan disinkronkan antar perangkat.
+              {t("prefs.syncNote")}
             </p>
           </>
         )}

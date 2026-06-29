@@ -18,6 +18,7 @@ import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { ConfirmDialog } from "@/components/healthyu/confirm-dialog";
 import { toastError } from "@/lib/toast-config";
 import { BottomNav } from "@/components/bottom-nav";
+import { useTranslation } from "@/lib/i18n";
 
 /**
  * AUDIT-017 Phase 3 — chat retention settings page.
@@ -34,6 +35,7 @@ export function PengaturanChatPage() {
   const getRetention = useServerFn(getChatRetention);
   const setRetentionFn = useServerFn(setChatRetention);
   const clearFn = useServerFn(clearChatHistory);
+  const { t } = useTranslation();
 
   const [confirmDelete, setConfirmDelete] = useState(false);
 
@@ -60,7 +62,7 @@ export function PengaturanChatPage() {
     onSuccess: ({ days }) => {
       setSelectedDays(days);
       qc.invalidateQueries({ queryKey: ["chat-retention"] });
-      toast.success("Pengaturan retensi tersimpan");
+      toast.success(t("chat.saved"));
     },
     onError: (e: Error) => toastError(e, "Gagal menyimpan pengaturan"),
   });
@@ -77,32 +79,29 @@ export function PengaturanChatPage() {
   return (
     <main className="min-h-dvh bg-background pb-24">
       <div className="mx-auto w-full max-w-md px-4 sm:px-5">
-        <TopAppBar title="Pengaturan Chat" subtitle="Retensi & privasi" showBack />
+        <TopAppBar title={t("chat.title")} subtitle={t("chat.subtitle")} showBack />
       </div>
 
       <div className="mx-auto w-full max-w-md px-4 sm:px-5 py-4 space-y-6">
         {/* Retention period selector */}
         <section className="rounded-[1.6rem] border border-border/60 bg-background/80 p-4 shadow-sm space-y-3">
           <header>
-            <h2 className="text-sm font-bold">Retensi Chat Otomatis</h2>
-            <p className="text-xs text-muted-foreground mt-1">
-              Pilih berapa lama chat Anda tersimpan. Chat yang lebih lama dari periode yang dipilih
-              akan dihapus otomatis setiap kali Anda mengirim pesan baru.
-            </p>
+            <h2 className="text-sm font-bold">{t("chat.retentionTitle")}</h2>
+            <p className="text-xs text-muted-foreground mt-1">{t("chat.retentionDesc")}</p>
           </header>
 
           {isLoading ? (
-            <p className="text-xs text-muted-foreground">Memuat…</p>
+            <p className="text-xs text-muted-foreground">{t("chat.loading")}</p>
           ) : isError ? (
             <div className="text-center py-4 space-y-2">
               <p className="text-xs text-destructive">
-                Gagal memuat: {(error as Error)?.message ?? "Unknown error"}
+                {t("chat.error")}: {(error as Error)?.message ?? "Unknown error"}
               </p>
               <button
                 onClick={() => refetch()}
                 className="px-3 py-1.5 text-xs font-semibold bg-primary text-primary-foreground rounded-lg"
               >
-                Coba lagi
+                {t("chat.retry")}
               </button>
             </div>
           ) : (
@@ -138,7 +137,7 @@ export function PengaturanChatPage() {
 
           <div className="flex items-center justify-between gap-3 pt-2">
             <p className="text-[11px] text-muted-foreground">
-              Saat ini:{" "}
+              {t("chat.currently")}:{" "}
               <span className="font-semibold text-foreground">
                 {describeChatRetention(data?.days === 0 ? null : (data?.days ?? null))}
               </span>
@@ -148,7 +147,7 @@ export function PengaturanChatPage() {
               disabled={saveMut.isPending || selectedDays === data?.days}
               className="px-4 py-2 rounded-full bg-primary text-primary-foreground text-xs font-semibold hover:opacity-90 disabled:opacity-40"
             >
-              {saveMut.isPending ? "Menyimpan…" : "Simpan"}
+              {saveMut.isPending ? t("chat.saving") : t("chat.save")}
             </button>
           </div>
         </section>
@@ -160,10 +159,8 @@ export function PengaturanChatPage() {
               <Trash2 className="size-5" />
             </div>
             <div className="min-w-0">
-              <h2 className="text-sm font-bold">Hapus semua chat sekarang</h2>
-              <p className="text-xs text-muted-foreground mt-1">
-                Menghapus seluruh riwayat chat Anda secara permanen. Tidak dapat dibatalkan.
-              </p>
+              <h2 className="text-sm font-bold">{t("chat.deleteTitle")}</h2>
+              <p className="text-xs text-muted-foreground mt-1">{t("chat.deleteDesc")}</p>
             </div>
           </header>
           <div className="flex justify-end">
@@ -172,14 +169,13 @@ export function PengaturanChatPage() {
               disabled={deleteMut.isPending}
               className="px-4 py-2 rounded-full bg-destructive text-destructive-foreground text-xs font-semibold hover:opacity-90 disabled:opacity-40"
             >
-              {deleteMut.isPending ? "Menghapus…" : "Hapus semua chat"}
+              {deleteMut.isPending ? t("chat.deleting") : t("chat.deleteBtn")}
             </button>
           </div>
         </section>
 
         <p className="text-[11px] text-muted-foreground text-center">
-          Periode retensi: {MIN_RETENTION_DAYS}–{MAX_RETENTION_DAYS} hari (10 tahun). UUID UU PDP
-          2022 compliance.
+          {t("chat.retentionFootnote", { min: MIN_RETENTION_DAYS, max: MAX_RETENTION_DAYS })}
         </p>
       </div>
 
@@ -187,10 +183,10 @@ export function PengaturanChatPage() {
 
       <ConfirmDialog
         open={confirmDelete}
-        title="Hapus semua chat?"
-        description="Tindakan ini tidak dapat dibatalkan. Semua pesan dan foto yang dikirim akan dihapus permanen dari akun Anda."
-        confirmLabel="Hapus permanen"
-        cancelLabel="Batal"
+        title={t("chat.deleteTitle")}
+        description={t("chat.deleteDesc")}
+        confirmLabel={t("chat.deleteBtn")}
+        cancelLabel={t("common.cancel")}
         destructive
         onConfirm={() => {
           setConfirmDelete(false);

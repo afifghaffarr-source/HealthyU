@@ -18,6 +18,7 @@ import {
   Sparkles,
   Brain,
 } from "lucide-react";
+import { useTranslation } from "@/lib/i18n";
 
 export const Route = createFileRoute("/_authenticated/pengaturan")({
   component: PengaturanPage,
@@ -34,6 +35,7 @@ type SettingItem = {
 
 function PengaturanPage() {
   const location = useLocation();
+  const { t } = useTranslation();
 
   // Render child route content when on a sub-route (e.g., /pengaturan/preferensi)
   if (location.pathname !== "/pengaturan") {
@@ -42,72 +44,72 @@ function PengaturanPage() {
 
   const groups: { label: string; items: SettingItem[] }[] = [
     {
-      label: "Akun",
+      label: t("settings.account"),
       items: [
         {
           to: "/profile",
           icon: UserIcon,
-          title: "Profil saya",
+          title: t("settings.profile"),
           description: "Nama, foto, biodata, target kesehatan",
         },
         {
           to: "/profile/privacy",
           icon: Lock,
-          title: "Privasi & Data",
+          title: t("settings.privacy"),
           description: "Audit, PII redaction, hapus akun",
         },
         {
           to: "/backup",
           icon: Download,
-          title: "Backup & Ekspor",
+          title: t("settings.backup"),
           description: "Unduh data pribadi (JSON/CSV)",
           tone: "primary",
         },
       ],
     },
     {
-      label: "Pengalaman",
+      label: t("settings.experience"),
       items: [
         {
           to: "/pengaturan/preferensi",
           icon: Palette,
-          title: "Preferensi",
+          title: t("settings.preferences"),
           description: "Unit, bahasa, tema, timezone",
           tone: "primary",
         },
         {
           to: "/notifications",
           icon: Bell,
-          title: "Notifikasi",
+          title: t("settings.notifications"),
           description: "Push, pengingat sahur/buka, dsb",
         },
         {
           to: "/pengaturan/chat",
           icon: MessageCircle,
-          title: "Pengaturan Chat",
+          title: t("settings.chatSettings"),
           description: "Retensi pesan, audit chat",
         },
         {
           to: "/profile/pattern-settings",
           icon: Brain,
-          title: "Deteksi Pola",
+          title: t("settings.patternDetection"),
           description: "Sensitivitas & threshold pola makan",
         },
       ],
     },
     {
-      label: "Tentang",
+      label: t("settings.about"),
       items: [
         {
           to: "/privacy",
           icon: Info,
-          title: "Kebijakan Privasi",
+          title: t("settings.privacyPolicy"),
           description: "UU PDP No. 27/2022",
         },
         {
           to: "/faq",
           icon: HelpCircle,
-          title: "FAQ",
+          title: t("settings.faq"),
           description: "Pertanyaan yang sering ditanya",
         },
       ],
@@ -117,7 +119,7 @@ function PengaturanPage() {
   return (
     <main className="min-h-dvh bg-background pb-28">
       <div className="max-w-md mx-auto px-5 pt-2 space-y-5">
-        <TopAppBar title="Pengaturan" subtitle="Atur akun, privasi, & preferensi" showBack />
+        <TopAppBar title={t("settings.title")} subtitle={t("settings.subtitle")} showBack />
 
         {/* Hero / status banner */}
         <section className="bg-gradient-to-br from-sage/10 to-primary/5 p-4 rounded-2xl outline-1 outline-primary/20 flex items-center gap-3 animate-fade-up">
@@ -125,9 +127,9 @@ function PengaturanPage() {
             <Sparkles className="size-5" />
           </div>
           <div className="min-w-0 flex-1">
-            <p className="text-sm font-semibold">Data Anda, kendali Anda</p>
+            <p className="text-sm font-semibold">{t("settings.dataControl")}</p>
             <p className="text-[11px] text-muted-foreground leading-snug mt-0.5">
-              Atur privasi, backup data, atau hapus akun kapan saja. Sesuai UU PDP.
+              {t("settings.dataControlDesc")}
             </p>
           </div>
         </section>
@@ -183,7 +185,7 @@ function PengaturanPage() {
         <section className="text-center pt-2 space-y-1">
           <div className="flex items-center justify-center gap-1.5 text-[10px] text-muted-foreground">
             <Clock className="size-3" />
-            <span>HealthyU v1.0</span>
+            <span>{t("settings.version")}</span>
           </div>
           <p className="text-[10px] text-muted-foreground/70">
             © 2026 HealthyU · Made with care in Indonesia 🇮🇩
