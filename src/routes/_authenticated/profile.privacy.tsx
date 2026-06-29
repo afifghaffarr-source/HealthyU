@@ -20,6 +20,7 @@ import { DataInventorySection } from "@/features/privacy/components/data-invento
 import { AuditLogSection } from "@/features/privacy/components/audit-log-section";
 import { TelemetryEventsSection } from "@/features/privacy/components/telemetry-events-section";
 import { TelemetryChart } from "@/features/privacy/components/telemetry-chart";
+import { TelemetryTimelineChart } from "@/features/privacy/components/telemetry-timeline-chart";
 
 const getPrivacy = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
@@ -104,8 +105,10 @@ function Page() {
         {/* Sprint 33: Telemetry events viewer — what `track()` writes */}
         {/* Sprint 42: Telemetry chart — aggregation bar chart, 0 infra */}
         <TelemetryChart className="mb-3" />
+        {/* Sprint 43: Timeline chart — 30-day sparkline, 0 infra */}
+        <TelemetryTimelineChart className="mb-3" />
+        {/* Sprint 33: Telemetry events viewer — what `track()` writes */}
         <TelemetryEventsSection limit={10} />
-
         {/* Privacy toggles — the existing switches */}
         <div className="rounded-2xl bg-card border p-4 flex items-start justify-between gap-3">
           <div className="min-w-0">

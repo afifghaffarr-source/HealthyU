@@ -134,3 +134,41 @@ export const getTelemetryEventCounts = createServerFn({ method: "GET" })
 
     return { events };
   });
+
+/** Sprint 43: time-series aggregation — event counts per day */
+export type TimelinePoint = { date: string; total: number; topEvent: string };
+
+export const getTelemetryTimeline = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { userId } = context;
+    const sb = supabaseAdmin as unknown as LooseSB;
+    const result = await sb
+      .from("error_reports")
+      .select("message, created_at")
+      .eq("user_id", userId)
+      .order("created_at", { ascending: false });
+
+    const byDay: Record<string, { total: number; tops: Record<string, number> }> = {};
+    const rows = (result as { data?: Array<{ message: string; created_at: string }> })?.data ?? [];
+
+    for (const row of rows) {
+      const name = parseEventName(row.message);
+      if (name === "unknown") continue;
+      const day = row.created_at.slice(0, 10);
+      if (!byDay[day]) byDay[day] = { total: 0, tops: {} };
+      byDay[day].total++;
+      byDay[day].tops[name] = (byDay[day].tops[name] ?? 0) + 1;
+    }
+
+    const points: TimelinePoint[] = Object.entries(byDay)
+      .map(([date, d]) => ({
+        date,
+        total: d.total,
+        topEvent: Object.entries(d.tops).sort((a, b) => b[1] - a[1])[0]?.[0] ?? "lainnya",
+      }))
+      .sort((a, b) => a.date.localeCompare(b.date));
+
+    // Last 30 days only
+    return { points: points.slice(-30) };
+  });
