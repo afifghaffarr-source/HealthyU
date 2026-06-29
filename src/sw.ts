@@ -71,6 +71,7 @@ self.addEventListener("activate", (event) => {
 // precacheAndRoute MUST keep the `self.__WB_MANIFEST || []` pattern — the
 // post-build injection script (scripts/precache-inject.ts) regex-matches this
 // exact pattern to inject the real asset manifest.
+// SW_VERSION: 3 (sprint 50 — dismissible offline pills)
 precacheAndRoute(self.__WB_MANIFEST || []);
 if (!self.__WB_MANIFEST || self.__WB_MANIFEST.length === 0) {
   console.warn("[sw] __WB_MANIFEST is empty — precache injection may have failed");
