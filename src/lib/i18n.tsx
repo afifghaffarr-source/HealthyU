@@ -1341,6 +1341,37 @@ export type TranslationKey =
   | "admin.i18n.revert"
   | "admin.i18n.saveId"
   | "admin.i18n.saveEn"
+  | "admin.notif.title"
+  | "admin.notif.subtitle"
+  | "admin.notif.channel"
+  | "admin.notif.channelAll"
+  | "admin.notif.channelEmail"
+  | "admin.notif.channelPush"
+  | "admin.notif.localeAll"
+  | "admin.notif.empty"
+  | "admin.notif.searchPlaceholder"
+  | "admin.notif.templateKey"
+  | "admin.notif.subject"
+  | "admin.notif.bodyText"
+  | "admin.notif.bodyHtml"
+  | "admin.notif.variables"
+  | "admin.notif.variablesHint"
+  | "admin.notif.isActive"
+  | "admin.notif.preview"
+  | "admin.notif.previewRendered"
+  | "admin.notif.previewSampleVars"
+  | "admin.notif.previewHint"
+  | "admin.notif.save"
+  | "admin.notif.cancel"
+  | "admin.notif.delete"
+  | "admin.notif.savedOk"
+  | "admin.notif.deletedOk"
+  | "admin.notif.disabledBadge"
+  | "admin.notif.toggleEnable"
+  | "admin.notif.toggleDisable"
+  | "admin.notif.confirmDelete"
+  | "admin.notif.fallbackHint"
+  | "admin.notif.updatedAt"
   | "family.createdToast"
   | "scan.fridgeTitle"
   | "admin.users.banTitle"
@@ -2478,6 +2509,39 @@ export const bundles = {
     "admin.i18n.revert": "Revert",
     "admin.i18n.saveId": "Simpan (ID)",
     "admin.i18n.saveEn": "Simpan (EN)",
+    "admin.notif.title": "Notification Templates",
+    "admin.notif.subtitle":
+      "Edit subject/body email dan judul push notifikasi tanpa code deploy. Variabel: {nama_var}.",
+    "admin.notif.channel": "Channel",
+    "admin.notif.channelAll": "Semua",
+    "admin.notif.channelEmail": "Email",
+    "admin.notif.channelPush": "Push",
+    "admin.notif.localeAll": "Semua locale",
+    "admin.notif.empty": "Belum ada template.",
+    "admin.notif.searchPlaceholder": "Cari template key...",
+    "admin.notif.templateKey": "Template Key",
+    "admin.notif.subject": "Subject / Title",
+    "admin.notif.bodyText": "Body (Text)",
+    "admin.notif.bodyHtml": "Body (HTML)",
+    "admin.notif.variables": "Variabel",
+    "admin.notif.variablesHint": "Pisah dengan koma. Contoh: user_name, pattern_count",
+    "admin.notif.isActive": "Aktif",
+    "admin.notif.preview": "Preview",
+    "admin.notif.previewRendered": "Hasil render",
+    "admin.notif.previewSampleVars": "Sample variabel (key=value, pisah koma)",
+    "admin.notif.previewHint":
+      "Contoh: user_name=Andi, pattern_count=12. Placeholder {user_name} akan diganti.",
+    "admin.notif.save": "Simpan",
+    "admin.notif.cancel": "Batal",
+    "admin.notif.delete": "Hapus",
+    "admin.notif.savedOk": "Template tersimpan.",
+    "admin.notif.deletedOk": "Template dihapus.",
+    "admin.notif.disabledBadge": "Disabled",
+    "admin.notif.toggleEnable": "Aktifkan",
+    "admin.notif.toggleDisable": "Nonaktifkan",
+    "admin.notif.confirmDelete": "Hapus template ini?",
+    "admin.notif.fallbackHint": "Locale 'en' akan fallback ke 'id' kalau tidak ada.",
+    "admin.notif.updatedAt": "Diperbarui",
     "privacyPolicy.section1UserItems.akun":
       "email, nama tampilan, foto profil (jika diunggah), preferensi publik.",
     "privacyPolicy.section1UserItems.profil":
@@ -3835,6 +3899,39 @@ export const bundles = {
     "admin.i18n.revert": "Revert",
     "admin.i18n.saveId": "Save (ID)",
     "admin.i18n.saveEn": "Save (EN)",
+    "admin.notif.title": "Notification Templates",
+    "admin.notif.subtitle":
+      "Edit email subject/body and push notification titles without a code deploy. Variables: {name}.",
+    "admin.notif.channel": "Channel",
+    "admin.notif.channelAll": "All",
+    "admin.notif.channelEmail": "Email",
+    "admin.notif.channelPush": "Push",
+    "admin.notif.localeAll": "All locales",
+    "admin.notif.empty": "No templates yet.",
+    "admin.notif.searchPlaceholder": "Search template key...",
+    "admin.notif.templateKey": "Template Key",
+    "admin.notif.subject": "Subject / Title",
+    "admin.notif.bodyText": "Body (Text)",
+    "admin.notif.bodyHtml": "Body (HTML)",
+    "admin.notif.variables": "Variables",
+    "admin.notif.variablesHint": "Comma separated. Example: user_name, pattern_count",
+    "admin.notif.isActive": "Active",
+    "admin.notif.preview": "Preview",
+    "admin.notif.previewRendered": "Rendered result",
+    "admin.notif.previewSampleVars": "Sample variables (key=value, comma separated)",
+    "admin.notif.previewHint":
+      "Example: user_name=Andi, pattern_count=12. The {user_name} placeholder will be replaced.",
+    "admin.notif.save": "Save",
+    "admin.notif.cancel": "Cancel",
+    "admin.notif.delete": "Delete",
+    "admin.notif.savedOk": "Template saved.",
+    "admin.notif.deletedOk": "Template deleted.",
+    "admin.notif.disabledBadge": "Disabled",
+    "admin.notif.toggleEnable": "Enable",
+    "admin.notif.toggleDisable": "Disable",
+    "admin.notif.confirmDelete": "Delete this template?",
+    "admin.notif.fallbackHint": "Locale 'en' falls back to 'id' when missing.",
+    "admin.notif.updatedAt": "Updated",
     "privacyPolicy.section1UserItems.akun":
       "email, display name, profile photo (if uploaded), public preferences.",
     "privacyPolicy.section1UserItems.profil":

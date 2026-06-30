@@ -11,6 +11,7 @@ import {
   ImageOff,
   Image as ImageIcon,
   Activity,
+  Bell,
 } from "lucide-react";
 import { getAdminOverview } from "@/features/admin/lib/adminOverview.functions";
 import { useTranslation } from "@/lib/i18n";
@@ -249,6 +250,12 @@ function AdminOverviewPage() {
                 icon={<Activity className="size-4" />}
                 title={t("admin.index.qaSystemHealthTitle")}
                 desc={t("admin.index.qaSystemHealthDesc")}
+              />
+              <QuickAction
+                to="/admin/notifications"
+                icon={<Bell className="size-4" />}
+                title={t("admin.notif.title")}
+                desc={t("admin.notif.subtitle")}
               />
             </div>
           </section>
