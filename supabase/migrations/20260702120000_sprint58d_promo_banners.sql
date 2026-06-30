@@ -176,13 +176,13 @@ SET search_path TO 'public'
 AS $$
 BEGIN
   RETURN QUERY
-  SELECT id, placement, title, description, cta_label, cta_href, color
-  FROM public.banners
-  WHERE is_active = TRUE
-    AND starts_at <= NOW()
-    AND (ends_at IS NULL OR ends_at > NOW())
-    AND (_position IS NULL OR placement = _position)
-  ORDER BY created_at DESC;
+  SELECT b.id, b.placement, b.title, b.description, b.cta_label, b.cta_href, b.color
+  FROM public.banners b
+  WHERE b.is_active = TRUE
+    AND b.starts_at <= NOW()
+    AND (b.ends_at IS NULL OR b.ends_at > NOW())
+    AND (_position IS NULL OR b.placement = _position)
+  ORDER BY b.created_at DESC;
 END;
 $$;
 
@@ -201,7 +201,7 @@ BEGIN
     RETURN OLD;
   ELSIF TG_OP = 'UPDATE' THEN
     INSERT INTO public.audit_log (user_id, action, meta)
-    VALUES (auth.uid(), TG_TABLE_NAME || '.updated', jsonb_build_object('id', NEW.id, 'changes', (row_to_json(NEW)::jsonb - row_to_json(OLD)::jsonb)));
+    VALUES (auth.uid(), TG_TABLE_NAME || '.updated', jsonb_build_object('id', NEW.id, 'new', row_to_json(NEW)::jsonb - 'created_by' - 'updated_at' - 'created_at'));
     RETURN NEW;
   ELSIF TG_OP = 'INSERT' THEN
     INSERT INTO public.audit_log (user_id, action, meta)
