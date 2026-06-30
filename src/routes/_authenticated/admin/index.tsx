@@ -13,6 +13,7 @@ import {
   Activity,
 } from "lucide-react";
 import { getAdminOverview } from "@/features/admin/lib/adminOverview.functions";
+import { useTranslation } from "@/lib/i18n";
 
 export const Route = createFileRoute("/_authenticated/admin/")({
   component: AdminOverviewPage,
@@ -21,6 +22,7 @@ export const Route = createFileRoute("/_authenticated/admin/")({
 type Overview = Awaited<ReturnType<typeof getAdminOverview>>;
 
 function AdminOverviewPage() {
+  const { t } = useTranslation();
   const { data, isLoading, error, refetch, dataUpdatedAt } = useQuery({
     queryKey: ["admin", "overview"],
     queryFn: () => getAdminOverview({ data: {} }),
@@ -31,13 +33,13 @@ function AdminOverviewPage() {
   if (error) {
     return (
       <div className="bg-destructive/10 border border-destructive/30 rounded-2xl p-4">
-        <p className="text-sm font-semibold text-destructive mb-1">Gagal memuat overview</p>
+        <p className="text-sm font-semibold text-destructive mb-1">{t("admin.index.loadFail")}</p>
         <p className="text-sm text-destructive/90 font-mono">{(error as Error).message}</p>
         <button
           onClick={() => refetch()}
           className="mt-3 px-3 py-1.5 rounded-lg bg-destructive text-destructive-foreground text-sm font-medium"
         >
-          Coba lagi
+          {t("admin.index.tryAgain")}
         </button>
       </div>
     );
@@ -47,14 +49,14 @@ function AdminOverviewPage() {
     <div className="space-y-6 max-w-6xl">
       <header className="flex items-end justify-between gap-4 flex-wrap">
         <div>
-          <h1 className="text-2xl font-bold">System Overview</h1>
-          <p className="text-sm text-muted-foreground mt-1">
-            Ringkasan real-time dari semua tabel utama. Diperbarui setiap menit.
-          </p>
+          <h1 className="text-2xl font-bold">{t("admin.index.title")}</h1>
+          <p className="text-sm text-muted-foreground mt-1">{t("admin.index.subtitle")}</p>
         </div>
         {dataUpdatedAt > 0 && (
           <p className="text-xs text-muted-foreground font-mono">
-            Last sync: {new Date(dataUpdatedAt).toLocaleTimeString("id-ID")}
+            {t("admin.index.lastSync", {
+              time: new Date(dataUpdatedAt).toLocaleTimeString("id-ID"),
+            })}
           </p>
         )}
       </header>
@@ -67,30 +69,30 @@ function AdminOverviewPage() {
           <section className="grid grid-cols-2 lg:grid-cols-4 gap-3">
             <StatCard
               icon={<Users className="size-5" />}
-              label="Total Users"
+              label={t("admin.index.totalUsers")}
               value={data.users.total}
-              sub={`+${data.users.last24h} hari ini · +${data.users.last7d} minggu ini`}
+              sub={`+${data.users.last24h} ${t("admin.index.totalUsersSub")} · +${data.users.last7d} 7d`}
               tone="primary"
             />
             <StatCard
               icon={<ShieldCheck className="size-5" />}
-              label="Admins"
+              label={t("admin.index.admins")}
               value={data.users.admins}
-              sub="User dengan role admin"
+              sub={t("admin.index.adminsSub")}
               tone="muted"
             />
             <StatCard
               icon={<BookOpen className="size-5" />}
-              label="Recipes"
+              label={t("admin.index.recipes")}
               value={data.recipes.total}
-              sub={`${data.recipes.withImage} punya image · ${data.recipes.last7d} minggu ini`}
+              sub={`${data.recipes.withImage} image · ${data.recipes.last7d} 7d`}
               tone="primary"
             />
             <StatCard
               icon={<Newspaper className="size-5" />}
-              label="Articles"
+              label={t("admin.index.articles")}
               value={`${data.articles.published}/${data.articles.total}`}
-              sub={`${data.articles.total - data.articles.published} draft`}
+              sub={`${data.articles.total - data.articles.published} ${t("admin.articles.draft").toLowerCase()}`}
               tone="muted"
             />
           </section>
@@ -100,7 +102,7 @@ function AdminOverviewPage() {
             <div className="bg-card rounded-2xl p-5 outline-1 outline-black/5">
               <div className="flex items-center gap-2 mb-3">
                 <ImageIcon className="size-4 text-primary" />
-                <h2 className="font-bold">Image coverage</h2>
+                <h2 className="font-bold">{t("admin.index.imageCoverage")}</h2>
               </div>
               <CoverageBar
                 total={data.recipes.total}
@@ -109,11 +111,9 @@ function AdminOverviewPage() {
               />
               {data.recipes.total - data.recipes.withImage > 0 && (
                 <p className="text-xs text-muted-foreground mt-3">
-                  Jalankan{" "}
-                  <code className="bg-muted px-1.5 py-0.5 rounded text-[11px]">
-                    python3 scripts/gen_recipe_image.py --slug &lt;slug&gt;
-                  </code>{" "}
-                  untuk backfill image per recipe.
+                  {t("admin.index.imageBackfillHint", {
+                    cmd: "python3 scripts/gen_recipe_image.py --slug <slug>",
+                  })}
                 </p>
               )}
             </div>
@@ -121,7 +121,7 @@ function AdminOverviewPage() {
             <div className="bg-card rounded-2xl p-5 outline-1 outline-black/5">
               <div className="flex items-center gap-2 mb-3">
                 <TrendingUp className="size-4 text-primary" />
-                <h2 className="font-bold">Recipes by category</h2>
+                <h2 className="font-bold">{t("admin.index.recipesByCategory")}</h2>
               </div>
               <ul className="space-y-1.5">
                 {data.recipesByCategory.slice(0, 8).map((c) => {
@@ -145,7 +145,7 @@ function AdminOverviewPage() {
                   );
                 })}
                 {data.recipesByCategory.length === 0 && (
-                  <p className="text-xs text-muted-foreground">Belum ada recipe.</p>
+                  <p className="text-xs text-muted-foreground">{t("admin.index.emptyRecipes")}</p>
                 )}
               </ul>
             </div>
@@ -157,10 +157,10 @@ function AdminOverviewPage() {
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center gap-2">
                   <Activity className="size-4 text-primary" />
-                  <h2 className="font-bold">Recent recipes</h2>
+                  <h2 className="font-bold">{t("admin.index.recentRecipes")}</h2>
                 </div>
                 <Link to="/admin/recipes" className="text-xs font-semibold text-primary">
-                  Lihat semua →
+                  {t("admin.index.viewAll")}
                 </Link>
               </div>
               <ul className="divide-y divide-black/5">
@@ -179,7 +179,9 @@ function AdminOverviewPage() {
                   </li>
                 ))}
                 {data.recentRecipes.length === 0 && (
-                  <p className="text-xs text-muted-foreground py-2">Belum ada recipe.</p>
+                  <p className="text-xs text-muted-foreground py-2">
+                    {t("admin.index.emptyRecipes")}
+                  </p>
                 )}
               </ul>
             </div>
@@ -188,10 +190,10 @@ function AdminOverviewPage() {
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center gap-2">
                   <Users className="size-4 text-primary" />
-                  <h2 className="font-bold">Recent users</h2>
+                  <h2 className="font-bold">{t("admin.index.recentUsers")}</h2>
                 </div>
                 <Link to="/admin/users" className="text-xs font-semibold text-primary">
-                  Lihat semua →
+                  {t("admin.index.viewAll")}
                 </Link>
               </div>
               <ul className="divide-y divide-black/5">
@@ -201,18 +203,24 @@ function AdminOverviewPage() {
                       {(u.email ?? "?").charAt(0).toUpperCase()}
                     </div>
                     <div className="min-w-0 flex-1">
-                      <p className="text-sm font-medium truncate">{u.email ?? "(no email)"}</p>
+                      <p className="text-sm font-medium truncate">
+                        {u.email ?? t("admin.index.noEmail")}
+                      </p>
                       <p className="text-xs text-muted-foreground font-mono">
-                        joined {new Date(u.created_at).toLocaleDateString("id-ID")}
+                        {t("admin.index.joinedDate", {
+                          date: new Date(u.created_at).toLocaleDateString("id-ID"),
+                        })}
                       </p>
                     </div>
                     <span className="text-[10px] text-muted-foreground font-mono shrink-0">
-                      {u.last_sign_in_at ? timeAgo(u.last_sign_in_at) : "never"}
+                      {u.last_sign_in_at ? timeAgo(u.last_sign_in_at) : t("admin.index.never")}
                     </span>
                   </li>
                 ))}
                 {data.recentUsers.length === 0 && (
-                  <p className="text-xs text-muted-foreground py-2">Belum ada user.</p>
+                  <p className="text-xs text-muted-foreground py-2">
+                    {t("admin.index.emptyRecipes")}
+                  </p>
                 )}
               </ul>
             </div>
@@ -221,26 +229,26 @@ function AdminOverviewPage() {
           {/* Quick links */}
           <section>
             <h2 className="font-bold text-sm uppercase tracking-wide text-muted-foreground mb-2">
-              Quick actions
+              {t("admin.index.quickActions")}
             </h2>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
               <QuickAction
                 to="/admin/seed-recipes"
                 icon={<Sparkles className="size-4" />}
-                title="Generate recipes"
-                desc="Bulk seed via AI"
+                title={t("admin.index.qaGenerateRecipesTitle")}
+                desc={t("admin.index.qaGenerateRecipesDesc")}
               />
               <QuickAction
                 to="/admin/audit"
                 icon={<Clock className="size-4" />}
-                title="Audit log"
-                desc="Privacy events"
+                title={t("admin.index.qaAuditLogTitle")}
+                desc={t("admin.index.qaAuditLogDesc")}
               />
               <QuickAction
                 to="/admin/system"
                 icon={<Activity className="size-4" />}
-                title="System health"
-                desc="Cron + backups"
+                title={t("admin.index.qaSystemHealthTitle")}
+                desc={t("admin.index.qaSystemHealthDesc")}
               />
             </div>
           </section>
@@ -284,6 +292,7 @@ function CoverageBar({
   covered: number;
   missing: number;
 }) {
+  const { t } = useTranslation();
   const pct = total > 0 ? Math.round((covered / total) * 100) : 0;
   return (
     <div>
@@ -291,14 +300,14 @@ function CoverageBar({
         <div>
           <p className="text-3xl font-bold tabular-nums">{pct}%</p>
           <p className="text-xs text-muted-foreground">
-            {covered} dari {total} resep punya image
+            {t("admin.index.coverageOf", { covered, total })}
           </p>
         </div>
         {missing > 0 && (
           <div className="text-right">
             <p className="text-xs font-semibold text-amber-600 flex items-center gap-1 justify-end">
               <ImageOff className="size-3" />
-              {missing} missing
+              {t("admin.index.coverageMissing", { count: missing })}
             </p>
           </div>
         )}

@@ -20,6 +20,7 @@ import {
   deleteRecipeAdmin,
   type RecipeListItem,
 } from "@/features/admin/lib/adminRecipes.functions";
+import { useTranslation } from "@/lib/i18n";
 
 export const Route = createFileRoute("/_authenticated/admin/recipes")({
   component: AdminRecipesPage,
@@ -27,7 +28,19 @@ export const Route = createFileRoute("/_authenticated/admin/recipes")({
 
 const PAGE_SIZE = 25;
 
+const CATEGORY_KEYS: Record<string, string> = {
+  breakfast: "admin.recipes.catBreakfast",
+  snack: "admin.recipes.catSnack",
+  main: "admin.recipes.catMain",
+  sup: "admin.recipes.catSup",
+  sayur: "admin.recipes.catSayur",
+  lauk: "admin.recipes.catLauk",
+  minuman: "admin.recipes.catMinuman",
+  salad: "admin.recipes.catSalad",
+};
+
 function AdminRecipesPage() {
+  const { t } = useTranslation();
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
@@ -35,16 +48,13 @@ function AdminRecipesPage() {
   const [confirmDelete, setConfirmDelete] = useState<RecipeListItem | null>(null);
 
   // Debounce search
-  const debounceTimer = useState<ReturnType<typeof setTimeout> | null>(null);
   const updateSearch = (v: string) => {
     setSearch(v);
-    if (debounceTimer[0]) clearTimeout(debounceTimer[0]);
-    debounceTimer[1](
-      setTimeout(() => {
-        setDebouncedSearch(v);
-        setPage(0);
-      }, 300),
-    );
+    const handle = setTimeout(() => {
+      setDebouncedSearch(v);
+      setPage(0);
+    }, 300);
+    return () => clearTimeout(handle);
   };
 
   const qc = useQueryClient();
@@ -83,9 +93,11 @@ function AdminRecipesPage() {
     <div className="space-y-4 max-w-6xl">
       <header className="flex items-end justify-between flex-wrap gap-4">
         <div>
-          <h1 className="text-2xl font-bold">Recipes</h1>
+          <h1 className="text-2xl font-bold">{t("admin.recipes.title")}</h1>
           <p className="text-sm text-muted-foreground mt-1">
-            {isLoading ? "Memuat…" : `${total} resep total`}
+            {isLoading
+              ? t("admin.recipes.loading")
+              : t("admin.recipes.totalCount", { count: total })}
           </p>
         </div>
       </header>
@@ -96,9 +108,17 @@ function AdminRecipesPage() {
           <Search className="size-4 text-muted-foreground" />
           <input
             type="search"
-            placeholder="Cari judul, slug, deskripsi…"
+            placeholder={t("admin.recipes.searchPlaceholder")}
             value={search}
-            onChange={(e) => updateSearch(e.target.value)}
+            onChange={(e) => {
+              setSearch(e.target.value);
+              const handle = setTimeout(() => {
+                setDebouncedSearch(e.target.value);
+                setPage(0);
+              }, 300);
+              // clear on next change
+              return () => clearTimeout(handle);
+            }}
             className="flex-1 bg-transparent outline-none text-sm"
           />
         </div>
@@ -112,15 +132,12 @@ function AdminRecipesPage() {
             }}
             className="bg-transparent outline-none text-sm"
           >
-            <option value="">Semua kategori</option>
-            <option value="breakfast">Breakfast</option>
-            <option value="snack">Snack</option>
-            <option value="main">Main</option>
-            <option value="sup">Sup</option>
-            <option value="sayur">Sayur</option>
-            <option value="lauk">Lauk</option>
-            <option value="minuman">Minuman</option>
-            <option value="salad">Salad</option>
+            <option value="">{t("admin.recipes.allCategories")}</option>
+            {Object.entries(CATEGORY_KEYS).map(([k, key]) => (
+              <option key={k} value={k}>
+                {t(key as Parameters<typeof t>[0])}
+              </option>
+            ))}
           </select>
         </div>
       </div>
@@ -140,7 +157,7 @@ function AdminRecipesPage() {
         </div>
       ) : data && data.items.length === 0 ? (
         <div className="bg-card rounded-2xl p-8 text-center">
-          <p className="text-muted-foreground">Tidak ada resep ditemukan.</p>
+          <p className="text-muted-foreground">{t("admin.recipes.empty")}</p>
         </div>
       ) : data ? (
         <div className="bg-card rounded-2xl outline-1 outline-black/5 overflow-hidden">
@@ -148,93 +165,102 @@ function AdminRecipesPage() {
             <thead>
               <tr className="bg-muted/50 text-left">
                 <th className="px-4 py-3 font-semibold text-xs uppercase tracking-wide text-muted-foreground">
-                  Resep
+                  {t("admin.recipes.colRecipe")}
                 </th>
                 <th className="px-4 py-3 font-semibold text-xs uppercase tracking-wide text-muted-foreground hidden md:table-cell">
-                  Kategori
+                  {t("admin.recipes.colCategory")}
                 </th>
                 <th className="px-4 py-3 font-semibold text-xs uppercase tracking-wide text-muted-foreground hidden md:table-cell">
-                  Nutrisi
+                  {t("admin.recipes.colNutrition")}
                 </th>
                 <th className="px-4 py-3 font-semibold text-xs uppercase tracking-wide text-muted-foreground">
-                  Status
+                  {t("admin.recipes.colStatus")}
                 </th>
                 <th className="px-4 py-3 font-semibold text-xs uppercase tracking-wide text-muted-foreground text-right">
-                  Aksi
+                  {t("admin.recipes.colAction")}
                 </th>
               </tr>
             </thead>
             <tbody className="divide-y divide-black/5">
-              {data.items.map((r) => (
-                <tr key={r.id} className="hover:bg-muted/30">
-                  <td className="px-4 py-3">
-                    <p className="font-medium line-clamp-1">{r.title}</p>
-                    <p className="text-xs text-muted-foreground font-mono">/{r.slug}</p>
-                  </td>
-                  <td className="px-4 py-3 hidden md:table-cell">
-                    <span className="text-xs bg-muted px-2 py-0.5 rounded-full capitalize">
-                      {r.category ?? "—"}
-                    </span>
-                  </td>
-                  <td className="px-4 py-3 hidden md:table-cell text-xs font-mono text-muted-foreground">
-                    {r.calories ?? "—"} kcal · {r.prep_min ?? "—"} min
-                  </td>
-                  <td className="px-4 py-3">
-                    <div className="flex items-center gap-1.5">
-                      {r.is_published ? (
-                        <span className="text-[10px] font-bold uppercase bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded-full">
-                          Published
-                        </span>
-                      ) : (
-                        <span className="text-[10px] font-bold uppercase bg-amber-50 text-amber-700 px-2 py-0.5 rounded-full">
-                          Draft
-                        </span>
-                      )}
-                      {r.has_image_file ? (
-                        <ImageIcon className="size-3 text-emerald-600" />
-                      ) : r.image_url ? (
-                        <ImageIcon className="size-3 text-muted-foreground" />
-                      ) : (
-                        <ImageOff className="size-3 text-amber-600" />
-                      )}
-                    </div>
-                  </td>
-                  <td className="px-4 py-3">
-                    <div className="flex items-center justify-end gap-1">
-                      <Link
-                        to="/resep/$slug"
-                        params={{ slug: r.slug ?? r.id }}
-                        target="_blank"
-                        rel="noopener"
-                        className="p-1.5 rounded-lg hover:bg-muted"
-                        title="Lihat publik"
-                      >
-                        <ExternalLink className="size-3.5 text-muted-foreground" />
-                      </Link>
-                      <button
-                        onClick={() => toggleMut.mutate({ id: r.id, isPublished: !r.is_published })}
-                        disabled={toggleMut.isPending}
-                        className="p-1.5 rounded-lg hover:bg-muted disabled:opacity-50"
-                        title={r.is_published ? "Unpublish" : "Publish"}
-                      >
+              {data.items.map((r) => {
+                const catKey = r.category ? CATEGORY_KEYS[r.category] : null;
+                return (
+                  <tr key={r.id} className="hover:bg-muted/30">
+                    <td className="px-4 py-3">
+                      <p className="font-medium line-clamp-1">{r.title}</p>
+                      <p className="text-xs text-muted-foreground font-mono">/{r.slug}</p>
+                    </td>
+                    <td className="px-4 py-3 hidden md:table-cell">
+                      <span className="text-xs bg-muted px-2 py-0.5 rounded-full capitalize">
+                        {catKey ? t(catKey as Parameters<typeof t>[0]) : (r.category ?? "—")}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3 hidden md:table-cell text-xs font-mono text-muted-foreground">
+                      {r.calories ?? "—"} kcal · {r.prep_min ?? "—"} min
+                    </td>
+                    <td className="px-4 py-3">
+                      <div className="flex items-center gap-1.5">
                         {r.is_published ? (
-                          <EyeOff className="size-3.5 text-muted-foreground" />
+                          <span className="text-[10px] font-bold uppercase bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded-full">
+                            {t("admin.recipes.published")}
+                          </span>
                         ) : (
-                          <Eye className="size-3.5 text-muted-foreground" />
+                          <span className="text-[10px] font-bold uppercase bg-amber-50 text-amber-700 px-2 py-0.5 rounded-full">
+                            {t("admin.recipes.draft")}
+                          </span>
                         )}
-                      </button>
-                      <button
-                        onClick={() => setConfirmDelete(r)}
-                        disabled={deleteMut.isPending}
-                        className="p-1.5 rounded-lg hover:bg-destructive/10 disabled:opacity-50"
-                        title="Hapus"
-                      >
-                        <Trash2 className="size-3.5 text-destructive" />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
+                        {r.has_image_file ? (
+                          <ImageIcon className="size-3 text-emerald-600" />
+                        ) : r.image_url ? (
+                          <ImageIcon className="size-3 text-muted-foreground" />
+                        ) : (
+                          <ImageOff className="size-3 text-amber-600" />
+                        )}
+                      </div>
+                    </td>
+                    <td className="px-4 py-3">
+                      <div className="flex items-center justify-end gap-1">
+                        <Link
+                          to="/resep/$slug"
+                          params={{ slug: r.slug ?? r.id }}
+                          target="_blank"
+                          rel="noopener"
+                          className="p-1.5 rounded-lg hover:bg-muted"
+                          title={t("admin.recipes.viewPublic")}
+                        >
+                          <ExternalLink className="size-3.5 text-muted-foreground" />
+                        </Link>
+                        <button
+                          onClick={() =>
+                            toggleMut.mutate({ id: r.id, isPublished: !r.is_published })
+                          }
+                          disabled={toggleMut.isPending}
+                          className="p-1.5 rounded-lg hover:bg-muted disabled:opacity-50"
+                          title={
+                            r.is_published
+                              ? t("admin.recipes.unpublish")
+                              : t("admin.recipes.publish")
+                          }
+                        >
+                          {r.is_published ? (
+                            <EyeOff className="size-3.5 text-muted-foreground" />
+                          ) : (
+                            <Eye className="size-3.5 text-muted-foreground" />
+                          )}
+                        </button>
+                        <button
+                          onClick={() => setConfirmDelete(r)}
+                          disabled={deleteMut.isPending}
+                          className="p-1.5 rounded-lg hover:bg-destructive/10 disabled:opacity-50"
+                          title={t("admin.recipes.delete")}
+                        >
+                          <Trash2 className="size-3.5 text-destructive" />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
 
@@ -242,7 +268,7 @@ function AdminRecipesPage() {
           {totalPages > 1 && (
             <div className="flex items-center justify-between px-4 py-3 border-t border-black/5 bg-muted/30">
               <p className="text-xs text-muted-foreground">
-                Halaman {page + 1} dari {totalPages}
+                {t("admin.recipes.pagination", { page: page + 1, total: totalPages })}
               </p>
               <div className="flex items-center gap-1">
                 <button
@@ -269,21 +295,19 @@ function AdminRecipesPage() {
       {confirmDelete && (
         <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-4">
           <div className="bg-card rounded-3xl p-6 max-w-md w-full">
-            <h3 className="font-bold text-lg">Hapus resep?</h3>
+            <h3 className="font-bold text-lg">{t("admin.recipes.deleteTitle")}</h3>
             <p className="text-sm text-muted-foreground mt-2">
               <span className="font-medium text-foreground">{confirmDelete.title}</span>
               <br />
-              slug: <code className="bg-muted px-1 rounded text-xs">/{confirmDelete.slug}</code>
+              {t("admin.recipes.deleteSlug", { slug: confirmDelete.slug ?? "" })}
             </p>
-            <p className="text-xs text-destructive mt-3">
-              Tindakan ini menghapus dari tabel recipes dan seo_recipes. Tidak bisa dibatalkan.
-            </p>
+            <p className="text-xs text-destructive mt-3">{t("admin.recipes.deleteWarning")}</p>
             <div className="flex gap-2 mt-5">
               <button
                 onClick={() => setConfirmDelete(null)}
                 className="flex-1 px-4 py-2.5 rounded-xl bg-muted font-medium"
               >
-                Batal
+                {t("admin.recipes.cancel")}
               </button>
               <button
                 onClick={() => deleteMut.mutate(confirmDelete.id)}
@@ -291,7 +315,7 @@ function AdminRecipesPage() {
                 className="flex-1 px-4 py-2.5 rounded-xl bg-destructive text-destructive-foreground font-medium flex items-center justify-center gap-2"
               >
                 {deleteMut.isPending && <Loader2 className="size-4 animate-spin" />}
-                Hapus
+                {t("admin.recipes.delete")}
               </button>
             </div>
           </div>

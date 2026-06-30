@@ -7,12 +7,14 @@ import {
   toggleArticlePublish,
   type ArticleListItem,
 } from "@/features/admin/lib/adminArticles.functions";
+import { useTranslation } from "@/lib/i18n";
 
 export const Route = createFileRoute("/_authenticated/admin/articles")({
   component: AdminArticlesPage,
 });
 
 function AdminArticlesPage() {
+  const { t } = useTranslation();
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
 
@@ -38,9 +40,11 @@ function AdminArticlesPage() {
   return (
     <div className="space-y-4 max-w-6xl">
       <header>
-        <h1 className="text-2xl font-bold">Articles</h1>
+        <h1 className="text-2xl font-bold">{t("admin.articles.title")}</h1>
         <p className="text-sm text-muted-foreground mt-1">
-          {isLoading ? "Memuat…" : `${data?.total ?? 0} artikel`}
+          {isLoading
+            ? t("admin.articles.loading")
+            : t("admin.articles.count", { count: data?.total ?? 0 })}
         </p>
       </header>
 
@@ -48,7 +52,7 @@ function AdminArticlesPage() {
         <Search className="size-4 text-muted-foreground ml-2" />
         <input
           type="search"
-          placeholder="Cari judul, slug…"
+          placeholder={t("admin.articles.searchPlaceholder")}
           value={search}
           onChange={(e) => updateSearch(e.target.value)}
           className="flex-1 bg-transparent outline-none text-sm py-2"
@@ -70,7 +74,7 @@ function AdminArticlesPage() {
       ) : data && data.items.length === 0 ? (
         <div className="bg-card rounded-2xl p-8 text-center">
           <Newspaper className="size-8 mx-auto text-muted-foreground/40 mb-2" />
-          <p className="text-muted-foreground">Tidak ada artikel.</p>
+          <p className="text-muted-foreground">{t("admin.articles.empty")}</p>
         </div>
       ) : data ? (
         <div className="space-y-2">
@@ -97,6 +101,7 @@ function ArticleRow({
   onToggle: () => void;
   isMutating: boolean;
 }) {
+  const { t } = useTranslation();
   return (
     <div className="bg-card rounded-2xl p-4 outline-1 outline-black/5 flex items-center gap-3">
       <div className="flex-1 min-w-0">
@@ -104,11 +109,11 @@ function ArticleRow({
           <p className="font-medium text-sm line-clamp-1">{a.title}</p>
           {a.is_published ? (
             <span className="text-[10px] font-bold uppercase bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded-full">
-              Published
+              {t("admin.articles.published")}
             </span>
           ) : (
             <span className="text-[10px] font-bold uppercase bg-amber-50 text-amber-700 px-2 py-0.5 rounded-full">
-              Draft
+              {t("admin.articles.draft")}
             </span>
           )}
           <span className="text-[10px] bg-muted px-1.5 py-0.5 rounded-full text-muted-foreground capitalize">
@@ -123,11 +128,15 @@ function ArticleRow({
           {a.reading_time_minutes && (
             <span className="inline-flex items-center gap-0.5">
               <Clock className="size-2.5" />
-              {a.reading_time_minutes} min
+              {a.reading_time_minutes} {t("admin.articles.minutesShort")}
             </span>
           )}
-          {Number(a.view_count ?? 0) > 0 && <span>👁 {a.view_count} views</span>}
-          {a.author_name && <span>by {a.author_name}</span>}
+          {Number(a.view_count ?? 0) > 0 && (
+            <span>
+              👁 {a.view_count} {t("admin.articles.views")}
+            </span>
+          )}
+          {a.author_name && <span>{t("admin.articles.by", { name: a.author_name })}</span>}
         </div>
       </div>
       <div className="flex items-center gap-1 shrink-0">
@@ -137,7 +146,7 @@ function ArticleRow({
           target="_blank"
           rel="noopener"
           className="p-1.5 rounded-lg hover:bg-muted"
-          title="Lihat publik"
+          title={t("admin.articles.viewPublic")}
         >
           <ExternalLink className="size-3.5 text-muted-foreground" />
         </Link>
@@ -145,7 +154,7 @@ function ArticleRow({
           onClick={onToggle}
           disabled={isMutating}
           className="p-1.5 rounded-lg hover:bg-muted disabled:opacity-50"
-          title={a.is_published ? "Unpublish" : "Publish"}
+          title={a.is_published ? t("admin.articles.unpublish") : t("admin.articles.publish")}
         >
           {isMutating ? (
             <Loader2 className="size-3.5 animate-spin text-muted-foreground" />

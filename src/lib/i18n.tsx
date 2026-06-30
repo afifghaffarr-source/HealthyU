@@ -1382,6 +1382,133 @@ export type TranslationKey =
   | "scanPhoto.featDisabled"
   | "scanPhoto.featDisabledDesc"
   | "fasting.featDisabled"
+  | "admin.articles.title"
+  | "admin.articles.loading"
+  | "admin.articles.count"
+  | "admin.articles.searchPlaceholder"
+  | "admin.articles.empty"
+  | "admin.articles.published"
+  | "admin.articles.draft"
+  | "admin.articles.minutesShort"
+  | "admin.articles.views"
+  | "admin.articles.by"
+  | "admin.articles.viewPublic"
+  | "admin.articles.unpublish"
+  | "admin.articles.publish"
+  | "admin.audit.title"
+  | "admin.audit.subtitle"
+  | "admin.audit.allCount"
+  | "admin.audit.categoryCount"
+  | "admin.audit.empty"
+  | "admin.audit.fieldWhen"
+  | "admin.audit.fieldActor"
+  | "admin.audit.fieldTarget"
+  | "admin.audit.metadata"
+  | "admin.audit.close"
+  | "admin.index.title"
+  | "admin.index.subtitle"
+  | "admin.index.lastSync"
+  | "admin.index.totalUsers"
+  | "admin.index.totalUsersSub"
+  | "admin.index.admins"
+  | "admin.index.adminsSub"
+  | "admin.index.recipes"
+  | "admin.index.recipesSub"
+  | "admin.index.articles"
+  | "admin.index.articlesSub"
+  | "admin.index.imageCoverage"
+  | "admin.index.imageBackfillHint"
+  | "admin.index.recipesByCategory"
+  | "admin.index.emptyRecipes"
+  | "admin.index.recentRecipes"
+  | "admin.index.viewAll"
+  | "admin.index.recentUsers"
+  | "admin.index.noEmail"
+  | "admin.index.joinedDate"
+  | "admin.index.never"
+  | "admin.index.quickActions"
+  | "admin.index.qaGenerateRecipesTitle"
+  | "admin.index.qaGenerateRecipesDesc"
+  | "admin.index.qaAuditLogTitle"
+  | "admin.index.qaAuditLogDesc"
+  | "admin.index.qaSystemHealthTitle"
+  | "admin.index.qaSystemHealthDesc"
+  | "admin.index.loadFail"
+  | "admin.index.tryAgain"
+  | "admin.index.coverageOf"
+  | "admin.index.coverageMissing"
+  | "admin.recipes.title"
+  | "admin.recipes.loading"
+  | "admin.recipes.totalCount"
+  | "admin.recipes.searchPlaceholder"
+  | "admin.recipes.allCategories"
+  | "admin.recipes.catBreakfast"
+  | "admin.recipes.catSnack"
+  | "admin.recipes.catMain"
+  | "admin.recipes.catSup"
+  | "admin.recipes.catSayur"
+  | "admin.recipes.catLauk"
+  | "admin.recipes.catMinuman"
+  | "admin.recipes.catSalad"
+  | "admin.recipes.colRecipe"
+  | "admin.recipes.colCategory"
+  | "admin.recipes.colNutrition"
+  | "admin.recipes.colStatus"
+  | "admin.recipes.colAction"
+  | "admin.recipes.published"
+  | "admin.recipes.draft"
+  | "admin.recipes.empty"
+  | "admin.recipes.viewPublic"
+  | "admin.recipes.unpublish"
+  | "admin.recipes.publish"
+  | "admin.recipes.delete"
+  | "admin.recipes.pagination"
+  | "admin.recipes.nutrition"
+  | "admin.recipes.deleteTitle"
+  | "admin.recipes.deleteSlug"
+  | "admin.recipes.deleteWarning"
+  | "admin.recipes.cancel"
+  | "admin.seed.title"
+  | "admin.seed.generatorTitle"
+  | "admin.seed.generatorDesc"
+  | "admin.seed.countLabel"
+  | "admin.seed.categoryLabel"
+  | "admin.seed.categoryPlaceholder"
+  | "admin.seed.focusLabel"
+  | "admin.seed.focusPlaceholder"
+  | "admin.seed.dryRunLabel"
+  | "admin.seed.generating"
+  | "admin.seed.previewBtn"
+  | "admin.seed.generateInsertBtn"
+  | "admin.seed.wouldInsert"
+  | "admin.seed.inserted"
+  | "admin.seed.skipped"
+  | "admin.seed.failed"
+  | "admin.seed.errorTitle"
+  | "admin.system.title"
+  | "admin.system.subtitle"
+  | "admin.system.lastSync"
+  | "admin.system.refresh"
+  | "admin.system.application"
+  | "admin.system.kvName"
+  | "admin.system.kvUrl"
+  | "admin.system.kvEnvironment"
+  | "admin.system.supabase"
+  | "admin.system.kvProject"
+  | "admin.system.kvRegion"
+  | "admin.system.kvTables"
+  | "admin.system.tablesSummary"
+  | "admin.system.aiUsage"
+  | "admin.system.last24h"
+  | "admin.system.last7d"
+  | "admin.system.topFeatures"
+  | "admin.system.cronJobs"
+  | "admin.system.backups"
+  | "admin.system.kvLastBackup"
+  | "admin.system.kvRetention"
+  | "admin.system.kvLocalPath"
+  | "admin.system.backupHint"
+  | "admin.system.never"
   | "fasting.featDisabledDesc";
 
 /** Template string `{page}` → page number. */
@@ -2616,6 +2743,136 @@ export const bundles = {
     "scanPhoto.featDisabledDesc": "Admin lagi maintenance. Bisa input manual dulu.",
     "fasting.featDisabled": "Tracker puasa sedang nonaktif",
     "fasting.featDisabledDesc": "Admin lagi maintenance. Bisa pakai meal log dulu ya.",
+    "admin.articles.title": "Articles",
+    "admin.articles.loading": "Memuat…",
+    "admin.articles.count": "{count} artikel",
+    "admin.articles.searchPlaceholder": "Cari judul, slug…",
+    "admin.articles.empty": "Tidak ada artikel.",
+    "admin.articles.published": "Published",
+    "admin.articles.draft": "Draft",
+    "admin.articles.minutesShort": "{n} min",
+    "admin.articles.views": "👁 {n} views",
+    "admin.articles.by": "oleh {name}",
+    "admin.articles.viewPublic": "Lihat publik",
+    "admin.articles.unpublish": "Unpublish",
+    "admin.articles.publish": "Publish",
+    "admin.audit.title": "Audit Log",
+    "admin.audit.subtitle":
+      "Privacy events (account deletions) + AI call trace. Disatukan dari {table1} dan {table2}.",
+    "admin.audit.allCount": "Semua ({count})",
+    "admin.audit.categoryCount": "{category} ({count})",
+    "admin.audit.empty": "Belum ada audit event.",
+    "admin.audit.fieldWhen": "When",
+    "admin.audit.fieldActor": "Actor",
+    "admin.audit.fieldTarget": "Target",
+    "admin.audit.metadata": "Metadata",
+    "admin.audit.close": "Tutup",
+    "admin.index.title": "System Overview",
+    "admin.index.subtitle": "Ringkasan real-time dari semua tabel utama. Diperbarui setiap menit.",
+    "admin.index.lastSync": "Sinkron terakhir: {time}",
+    "admin.index.totalUsers": "Total Users",
+    "admin.index.totalUsersSub": "+{today} hari ini · +{week} minggu ini",
+    "admin.index.admins": "Admins",
+    "admin.index.adminsSub": "User dengan role admin",
+    "admin.index.recipes": "Recipes",
+    "admin.index.recipesSub": "{withImage} punya image · {week} minggu ini",
+    "admin.index.articles": "Articles",
+    "admin.index.articlesSub": "{draft} draft",
+    "admin.index.imageCoverage": "Image coverage",
+    "admin.index.imageBackfillHint": "Jalankan {cmd} untuk backfill image per recipe.",
+    "admin.index.recipesByCategory": "Recipes by category",
+    "admin.index.emptyRecipes": "Belum ada recipe.",
+    "admin.index.recentRecipes": "Recent recipes",
+    "admin.index.viewAll": "Lihat semua →",
+    "admin.index.recentUsers": "Recent users",
+    "admin.index.noEmail": "(no email)",
+    "admin.index.joinedDate": "bergabung {date}",
+    "admin.index.never": "never",
+    "admin.index.quickActions": "Quick actions",
+    "admin.index.qaGenerateRecipesTitle": "Generate recipes",
+    "admin.index.qaGenerateRecipesDesc": "Bulk seed via AI",
+    "admin.index.qaAuditLogTitle": "Audit log",
+    "admin.index.qaAuditLogDesc": "Privacy events",
+    "admin.index.qaSystemHealthTitle": "System health",
+    "admin.index.qaSystemHealthDesc": "Cron + backups",
+    "admin.index.loadFail": "Gagal memuat overview",
+    "admin.index.tryAgain": "Coba lagi",
+    "admin.index.coverageOf": "{covered} dari {total} resep punya image",
+    "admin.index.coverageMissing": "{missing} missing",
+    "admin.recipes.title": "Recipes",
+    "admin.recipes.loading": "Memuat…",
+    "admin.recipes.totalCount": "{total} resep total",
+    "admin.recipes.searchPlaceholder": "Cari judul, slug, deskripsi…",
+    "admin.recipes.allCategories": "Semua kategori",
+    "admin.recipes.catBreakfast": "Breakfast",
+    "admin.recipes.catSnack": "Snack",
+    "admin.recipes.catMain": "Main",
+    "admin.recipes.catSup": "Sup",
+    "admin.recipes.catSayur": "Sayur",
+    "admin.recipes.catLauk": "Lauk",
+    "admin.recipes.catMinuman": "Minuman",
+    "admin.recipes.catSalad": "Salad",
+    "admin.recipes.colRecipe": "Resep",
+    "admin.recipes.colCategory": "Kategori",
+    "admin.recipes.colNutrition": "Nutrisi",
+    "admin.recipes.colStatus": "Status",
+    "admin.recipes.colAction": "Aksi",
+    "admin.recipes.published": "Published",
+    "admin.recipes.draft": "Draft",
+    "admin.recipes.empty": "Tidak ada resep ditemukan.",
+    "admin.recipes.viewPublic": "Lihat publik",
+    "admin.recipes.unpublish": "Unpublish",
+    "admin.recipes.publish": "Publish",
+    "admin.recipes.delete": "Hapus",
+    "admin.recipes.pagination": "Halaman {page} dari {total}",
+    "admin.recipes.nutrition": "{kcal} kcal · {min} min",
+    "admin.recipes.deleteTitle": "Hapus resep?",
+    "admin.recipes.deleteSlug": "slug: /{slug}",
+    "admin.recipes.deleteWarning":
+      "Tindakan ini menghapus dari tabel recipes dan seo_recipes. Tidak bisa dibatalkan.",
+    "admin.recipes.cancel": "Batal",
+    "admin.seed.title": "Seed Recipes (Admin)",
+    "admin.seed.generatorTitle": "Bulk Recipe Generator",
+    "admin.seed.generatorDesc":
+      "Generate Indonesian healthy recipes via VexoAPI and insert into recipes + seo_recipes tables. Idempotent: skips recipes whose slug already exists.",
+    "admin.seed.countLabel": "Count (1-20)",
+    "admin.seed.categoryLabel": "Category (optional)",
+    "admin.seed.categoryPlaceholder": "snack / breakfast / main",
+    "admin.seed.focusLabel": "Nutritional focus (optional)",
+    "admin.seed.focusPlaceholder": "high protein / low carb / vegan",
+    "admin.seed.dryRunLabel": "Dry run (preview only, no DB writes)",
+    "admin.seed.generating": "Generating…",
+    "admin.seed.previewBtn": "Preview",
+    "admin.seed.generateInsertBtn": "Generate & Insert",
+    "admin.seed.wouldInsert": "Would insert",
+    "admin.seed.inserted": "Inserted",
+    "admin.seed.skipped": "Skipped",
+    "admin.seed.failed": "Failed",
+    "admin.seed.errorTitle": "Error",
+    "admin.system.title": "System Health",
+    "admin.system.subtitle": "Status real-time infrastructure & services.",
+    "admin.system.lastSync": "Sinkron terakhir: {time}",
+    "admin.system.refresh": "Refresh",
+    "admin.system.application": "Application",
+    "admin.system.kvName": "Name",
+    "admin.system.kvUrl": "URL",
+    "admin.system.kvEnvironment": "Environment",
+    "admin.system.supabase": "Supabase",
+    "admin.system.kvProject": "Project",
+    "admin.system.kvRegion": "Region",
+    "admin.system.kvTables": "Tables",
+    "admin.system.tablesSummary": "{count} tables · {rows} rows",
+    "admin.system.aiUsage": "AI Usage (VexoAPI)",
+    "admin.system.last24h": "24h",
+    "admin.system.last7d": "7d",
+    "admin.system.topFeatures": "Top features (7d)",
+    "admin.system.cronJobs": "Cron Jobs",
+    "admin.system.backups": "Backups",
+    "admin.system.kvLastBackup": "Last backup",
+    "admin.system.kvRetention": "{days} hari",
+    "admin.system.kvLocalPath": "Local path",
+    "admin.system.backupHint": "Backup via {script} (pg_dump). Untuk verify: {verifyCmd}",
+    "admin.system.never": "never",
   },
 
   // ══════════════════════════════════════════════════════════════════
@@ -3842,6 +4099,136 @@ export const bundles = {
     "scanPhoto.featDisabledDesc": "Under maintenance. You can log meals manually for now.",
     "fasting.featDisabled": "Fasting tracker is currently disabled",
     "fasting.featDisabledDesc": "Under maintenance. Use the meal log for now.",
+    "admin.articles.title": "Articles",
+    "admin.articles.loading": "Loading…",
+    "admin.articles.count": "{count} articles",
+    "admin.articles.searchPlaceholder": "Search title, slug…",
+    "admin.articles.empty": "No articles.",
+    "admin.articles.published": "Published",
+    "admin.articles.draft": "Draft",
+    "admin.articles.minutesShort": "{n} min",
+    "admin.articles.views": "👁 {n} views",
+    "admin.articles.by": "by {name}",
+    "admin.articles.viewPublic": "View public",
+    "admin.articles.unpublish": "Unpublish",
+    "admin.articles.publish": "Publish",
+    "admin.audit.title": "Audit Log",
+    "admin.audit.subtitle":
+      "Privacy events (account deletions) + AI call trace. Aggregated from {table1} and {table2}.",
+    "admin.audit.allCount": "All ({count})",
+    "admin.audit.categoryCount": "{category} ({count})",
+    "admin.audit.empty": "No audit events yet.",
+    "admin.audit.fieldWhen": "When",
+    "admin.audit.fieldActor": "Actor",
+    "admin.audit.fieldTarget": "Target",
+    "admin.audit.metadata": "Metadata",
+    "admin.audit.close": "Close",
+    "admin.index.title": "System Overview",
+    "admin.index.subtitle": "Real-time summary of all key tables. Updated every minute.",
+    "admin.index.lastSync": "Last sync: {time}",
+    "admin.index.totalUsers": "Total Users",
+    "admin.index.totalUsersSub": "+{today} today · +{week} this week",
+    "admin.index.admins": "Admins",
+    "admin.index.adminsSub": "Users with admin role",
+    "admin.index.recipes": "Recipes",
+    "admin.index.recipesSub": "{withImage} have image · {week} this week",
+    "admin.index.articles": "Articles",
+    "admin.index.articlesSub": "{draft} drafts",
+    "admin.index.imageCoverage": "Image coverage",
+    "admin.index.imageBackfillHint": "Run {cmd} to backfill image per recipe.",
+    "admin.index.recipesByCategory": "Recipes by category",
+    "admin.index.emptyRecipes": "No recipes yet.",
+    "admin.index.recentRecipes": "Recent recipes",
+    "admin.index.viewAll": "View all →",
+    "admin.index.recentUsers": "Recent users",
+    "admin.index.noEmail": "(no email)",
+    "admin.index.joinedDate": "joined {date}",
+    "admin.index.never": "never",
+    "admin.index.quickActions": "Quick actions",
+    "admin.index.qaGenerateRecipesTitle": "Generate recipes",
+    "admin.index.qaGenerateRecipesDesc": "Bulk seed via AI",
+    "admin.index.qaAuditLogTitle": "Audit log",
+    "admin.index.qaAuditLogDesc": "Privacy events",
+    "admin.index.qaSystemHealthTitle": "System health",
+    "admin.index.qaSystemHealthDesc": "Cron + backups",
+    "admin.index.loadFail": "Failed to load overview",
+    "admin.index.tryAgain": "Try again",
+    "admin.index.coverageOf": "{covered} of {total} recipes have image",
+    "admin.index.coverageMissing": "{missing} missing",
+    "admin.recipes.title": "Recipes",
+    "admin.recipes.loading": "Loading…",
+    "admin.recipes.totalCount": "{total} recipes total",
+    "admin.recipes.searchPlaceholder": "Search title, slug, description…",
+    "admin.recipes.allCategories": "All categories",
+    "admin.recipes.catBreakfast": "Breakfast",
+    "admin.recipes.catSnack": "Snack",
+    "admin.recipes.catMain": "Main",
+    "admin.recipes.catSup": "Soup",
+    "admin.recipes.catSayur": "Vegetables",
+    "admin.recipes.catLauk": "Side dish",
+    "admin.recipes.catMinuman": "Drinks",
+    "admin.recipes.catSalad": "Salad",
+    "admin.recipes.colRecipe": "Recipe",
+    "admin.recipes.colCategory": "Category",
+    "admin.recipes.colNutrition": "Nutrition",
+    "admin.recipes.colStatus": "Status",
+    "admin.recipes.colAction": "Action",
+    "admin.recipes.published": "Published",
+    "admin.recipes.draft": "Draft",
+    "admin.recipes.empty": "No recipes found.",
+    "admin.recipes.viewPublic": "View public",
+    "admin.recipes.unpublish": "Unpublish",
+    "admin.recipes.publish": "Publish",
+    "admin.recipes.delete": "Delete",
+    "admin.recipes.pagination": "Page {page} of {total}",
+    "admin.recipes.nutrition": "{kcal} kcal · {min} min",
+    "admin.recipes.deleteTitle": "Delete recipe?",
+    "admin.recipes.deleteSlug": "slug: /{slug}",
+    "admin.recipes.deleteWarning":
+      "This action deletes from recipes and seo_recipes tables. Cannot be undone.",
+    "admin.recipes.cancel": "Cancel",
+    "admin.seed.title": "Seed Recipes (Admin)",
+    "admin.seed.generatorTitle": "Bulk Recipe Generator",
+    "admin.seed.generatorDesc":
+      "Generate Indonesian healthy recipes via VexoAPI and insert into recipes + seo_recipes tables. Idempotent: skips recipes whose slug already exists.",
+    "admin.seed.countLabel": "Count (1-20)",
+    "admin.seed.categoryLabel": "Category (optional)",
+    "admin.seed.categoryPlaceholder": "snack / breakfast / main",
+    "admin.seed.focusLabel": "Nutritional focus (optional)",
+    "admin.seed.focusPlaceholder": "high protein / low carb / vegan",
+    "admin.seed.dryRunLabel": "Dry run (preview only, no DB writes)",
+    "admin.seed.generating": "Generating…",
+    "admin.seed.previewBtn": "Preview",
+    "admin.seed.generateInsertBtn": "Generate & Insert",
+    "admin.seed.wouldInsert": "Would insert",
+    "admin.seed.inserted": "Inserted",
+    "admin.seed.skipped": "Skipped",
+    "admin.seed.failed": "Failed",
+    "admin.seed.errorTitle": "Error",
+    "admin.system.title": "System Health",
+    "admin.system.subtitle": "Real-time infrastructure & services status.",
+    "admin.system.lastSync": "Last sync: {time}",
+    "admin.system.refresh": "Refresh",
+    "admin.system.application": "Application",
+    "admin.system.kvName": "Name",
+    "admin.system.kvUrl": "URL",
+    "admin.system.kvEnvironment": "Environment",
+    "admin.system.supabase": "Supabase",
+    "admin.system.kvProject": "Project",
+    "admin.system.kvRegion": "Region",
+    "admin.system.kvTables": "Tables",
+    "admin.system.tablesSummary": "{count} tables · {rows} rows",
+    "admin.system.aiUsage": "AI Usage (VexoAPI)",
+    "admin.system.last24h": "24h",
+    "admin.system.last7d": "7d",
+    "admin.system.topFeatures": "Top features (7d)",
+    "admin.system.cronJobs": "Cron Jobs",
+    "admin.system.backups": "Backups",
+    "admin.system.kvLastBackup": "Last backup",
+    "admin.system.kvRetention": "{days} days",
+    "admin.system.kvLocalPath": "Local path",
+    "admin.system.backupHint": "Backup via {script} (pg_dump). To verify: {verifyCmd}",
+    "admin.system.never": "never",
   },
 } satisfies Record<string, TranslationBundle>;
 

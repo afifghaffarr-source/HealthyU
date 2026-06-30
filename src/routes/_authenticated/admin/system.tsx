@@ -12,12 +12,14 @@ import {
   Globe,
 } from "lucide-react";
 import { getSystemHealth, type CronHealth } from "@/features/admin/lib/adminSystem.functions";
+import { useTranslation } from "@/lib/i18n";
 
 export const Route = createFileRoute("/_authenticated/admin/system")({
   component: AdminSystemPage,
 });
 
 function AdminSystemPage() {
+  const { t } = useTranslation();
   const { data, isLoading, error, refetch, dataUpdatedAt } = useQuery({
     queryKey: ["admin", "system"],
     queryFn: () => getSystemHealth({ data: {} }),
@@ -29,22 +31,22 @@ function AdminSystemPage() {
     <div className="space-y-6 max-w-6xl">
       <header className="flex items-end justify-between gap-4 flex-wrap">
         <div>
-          <h1 className="text-2xl font-bold">System Health</h1>
-          <p className="text-sm text-muted-foreground mt-1">
-            Status real-time infrastructure & services.
-          </p>
+          <h1 className="text-2xl font-bold">{t("admin.system.title")}</h1>
+          <p className="text-sm text-muted-foreground mt-1">{t("admin.system.subtitle")}</p>
         </div>
         <div className="flex items-center gap-3">
           {dataUpdatedAt > 0 && (
             <p className="text-xs text-muted-foreground font-mono">
-              Last sync: {new Date(dataUpdatedAt).toLocaleTimeString("id-ID")}
+              {t("admin.system.lastSync", {
+                time: new Date(dataUpdatedAt).toLocaleTimeString("id-ID"),
+              })}
             </p>
           )}
           <button
             onClick={() => refetch()}
             className="text-xs font-semibold text-primary px-3 py-1.5 rounded-lg bg-primary/10 hover:bg-primary/20"
           >
-            Refresh
+            {t("admin.system.refresh")}
           </button>
         </div>
       </header>
@@ -65,31 +67,36 @@ function AdminSystemPage() {
         <>
           {/* App + Database */}
           <section className="grid md:grid-cols-2 gap-4">
-            <Card icon={<Globe className="size-4 text-primary" />} title="Application">
-              <KV k="Name" v={data.app.name} />
+            <Card
+              icon={<Globe className="size-4 text-primary" />}
+              title={t("admin.system.application")}
+            >
+              <KV k={t("admin.system.kvName")} v={data.app.name} />
               <KV
-                k="URL"
+                k={t("admin.system.kvUrl")}
                 v={
                   <Link to="/" className="text-primary underline">
                     {data.app.url}
                   </Link>
                 }
               />
-              <KV k="Environment" v={data.app.environment} mono />
+              <KV k={t("admin.system.kvEnvironment")} v={data.app.environment} mono />
             </Card>
 
-            <Card icon={<Database className="size-4 text-primary" />} title="Supabase">
-              <KV k="Project" v={data.database.projectRef} mono />
-              <KV k="Region" v={data.database.region} />
+            <Card
+              icon={<Database className="size-4 text-primary" />}
+              title={t("admin.system.supabase")}
+            >
+              <KV k={t("admin.system.kvProject")} v={data.database.projectRef} mono />
+              <KV k={t("admin.system.kvRegion")} v={data.database.region} />
               <KV
-                k="Tables"
+                k={t("admin.system.kvTables")}
                 v={
                   <>
-                    {data.database.tablesCount} tables ·{" "}
-                    <span className="font-mono tabular-nums">
-                      {data.database.totalRows.toLocaleString("id-ID")}
-                    </span>{" "}
-                    rows
+                    {t("admin.system.tablesSummary", {
+                      tables: data.database.tablesCount,
+                      rows: data.database.totalRows.toLocaleString("id-ID"),
+                    })}
                   </>
                 }
               />
@@ -97,15 +104,15 @@ function AdminSystemPage() {
           </section>
 
           {/* AI usage */}
-          <Card icon={<Brain className="size-4 text-primary" />} title="AI Usage (VexoAPI)">
+          <Card icon={<Brain className="size-4 text-primary" />} title={t("admin.system.aiUsage")}>
             <div className="grid grid-cols-2 gap-3 mb-4">
-              <MiniStat label="24h" value={data.ai.last24h} />
-              <MiniStat label="7d" value={data.ai.last7d} />
+              <MiniStat label={t("admin.system.last24h")} value={data.ai.last24h} />
+              <MiniStat label={t("admin.system.last7d")} value={data.ai.last7d} />
             </div>
             {data.ai.byFeature.length > 0 && (
               <div className="border-t border-black/5 pt-3">
                 <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">
-                  Top features (7d)
+                  {t("admin.system.topFeatures")}
                 </p>
                 <ul className="space-y-1.5">
                   {data.ai.byFeature.map((f) => {
@@ -134,7 +141,7 @@ function AdminSystemPage() {
           </Card>
 
           {/* Cron jobs */}
-          <Card icon={<Clock className="size-4 text-primary" />} title="Cron Jobs">
+          <Card icon={<Clock className="size-4 text-primary" />} title={t("admin.system.cronJobs")}>
             <div className="divide-y divide-black/5 -mx-5">
               {data.cron.map((c) => (
                 <CronRow key={c.name} cron={c} />
@@ -143,29 +150,34 @@ function AdminSystemPage() {
           </Card>
 
           {/* Backup */}
-          <Card icon={<HardDrive className="size-4 text-primary" />} title="Backups">
+          <Card
+            icon={<HardDrive className="size-4 text-primary" />}
+            title={t("admin.system.backups")}
+          >
             <KV
-              k="Last backup"
+              k={t("admin.system.kvLastBackup")}
               v={
                 data.backup.lastBackupAt
                   ? new Date(data.backup.lastBackupAt).toLocaleString("id-ID")
-                  : "never"
+                  : t("admin.system.never")
               }
             />
-            <KV k="Retention" v={`${data.backup.retentionDays} hari`} />
             <KV
-              k="Local path"
+              k={t("admin.system.kvRetention")}
+              v={t("admin.system.kvRetention", { days: data.backup.retentionDays })}
+            />
+            <KV
+              k={t("admin.system.kvLocalPath")}
               v={
                 <code className="bg-muted px-1.5 py-0.5 rounded text-xs">~/backups/healthyu/</code>
               }
             />
             <p className="text-xs text-muted-foreground mt-3 pt-3 border-t border-black/5">
               <Server className="size-3 inline mr-1" />
-              Backup via <code className="bg-muted px-1 rounded">backup_supabase.sh</code>{" "}
-              (pg_dump). Untuk verify:{" "}
-              <code className="bg-muted px-1 rounded">
-                ssh ubuntu@server &amp;&amp; ls -lt ~/backups/healthyu/ | head
-              </code>
+              {t("admin.system.backupHint", {
+                script: "backup_supabase.sh",
+                verifyCmd: "ssh ubuntu@server && ls -lt ~/backups/healthyu/ | head",
+              })}
             </p>
           </Card>
         </>
@@ -213,6 +225,7 @@ function MiniStat({ label, value }: { label: string; value: number }) {
 }
 
 function CronRow({ cron }: { cron: CronHealth }) {
+  const { t } = useTranslation();
   const Icon =
     cron.lastStatus === "success"
       ? CheckCircle2
@@ -246,7 +259,7 @@ function CronRow({ cron }: { cron: CronHealth }) {
               hour: "2-digit",
               minute: "2-digit",
             })
-          : "never"}
+          : t("admin.system.never")}
       </span>
     </div>
   );

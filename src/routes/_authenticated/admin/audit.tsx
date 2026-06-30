@@ -3,12 +3,14 @@ import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { ScrollText, Eye, Trash2, Brain } from "lucide-react";
 import { listAuditEvents, type AuditEvent } from "@/features/admin/lib/adminAudit.functions";
+import { useTranslation } from "@/lib/i18n";
 
 export const Route = createFileRoute("/_authenticated/admin/audit")({
   component: AdminAuditPage,
 });
 
 function AdminAuditPage() {
+  const { t } = useTranslation();
   const [category, setCategory] = useState("");
   const [selected, setSelected] = useState<AuditEvent | null>(null);
 
@@ -21,12 +23,8 @@ function AdminAuditPage() {
   return (
     <div className="space-y-4 max-w-6xl">
       <header>
-        <h1 className="text-2xl font-bold">Audit Log</h1>
-        <p className="text-sm text-muted-foreground mt-1">
-          Privacy events (account deletions) + AI call trace. Disatukan dari{" "}
-          <code className="bg-muted px-1 rounded text-xs">account_deletion_requests</code> dan{" "}
-          <code className="bg-muted px-1 rounded text-xs">ai_usage_logs</code>.
-        </p>
+        <h1 className="text-2xl font-bold">{t("admin.audit.title")}</h1>
+        <p className="text-sm text-muted-foreground mt-1">{t("admin.audit.subtitle")}</p>
       </header>
 
       {/* Category filter */}
@@ -38,7 +36,9 @@ function AdminAuditPage() {
               !category ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"
             }`}
           >
-            All ({data.categories.reduce((s, c) => s + c.count, 0)})
+            {t("admin.audit.allCount", {
+              count: data.categories.reduce((s, c) => s + c.count, 0),
+            })}
           </button>
           {data.categories.map((c) => (
             <button
@@ -71,7 +71,7 @@ function AdminAuditPage() {
       ) : data && data.items.length === 0 ? (
         <div className="bg-card rounded-2xl p-8 text-center">
           <ScrollText className="size-8 mx-auto text-muted-foreground/40 mb-2" />
-          <p className="text-muted-foreground">Belum ada audit event.</p>
+          <p className="text-muted-foreground">{t("admin.audit.empty")}</p>
         </div>
       ) : data ? (
         <div className="bg-card rounded-2xl outline-1 outline-black/5 divide-y divide-black/5">
@@ -124,12 +124,17 @@ function AdminAuditPage() {
               </span>
             </div>
             <dl className="space-y-2 text-sm">
-              <Field label="When" value={new Date(selected.created_at).toLocaleString("id-ID")} />
-              <Field label="Actor" value={selected.actor_id ?? "—"} mono />
-              <Field label="Target" value={selected.target_id ?? "—"} mono />
+              <Field
+                label={t("admin.audit.fieldWhen")}
+                value={new Date(selected.created_at).toLocaleString("id-ID")}
+              />
+              <Field label={t("admin.audit.fieldActor")} value={selected.actor_id ?? "—"} mono />
+              <Field label={t("admin.audit.fieldTarget")} value={selected.target_id ?? "—"} mono />
             </dl>
             <div className="mt-4">
-              <p className="text-xs font-semibold text-muted-foreground mb-1">Metadata</p>
+              <p className="text-xs font-semibold text-muted-foreground mb-1">
+                {t("admin.audit.metadata")}
+              </p>
               <pre className="bg-muted rounded-xl p-3 text-xs font-mono overflow-x-auto">
                 {JSON.stringify(selected.meta, null, 2)}
               </pre>
@@ -138,7 +143,7 @@ function AdminAuditPage() {
               onClick={() => setSelected(null)}
               className="mt-5 w-full px-4 py-2.5 rounded-xl bg-muted font-medium"
             >
-              Tutup
+              {t("admin.audit.close")}
             </button>
           </div>
         </div>

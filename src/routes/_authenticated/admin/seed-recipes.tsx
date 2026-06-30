@@ -6,6 +6,7 @@ import { seedRecipesAdmin } from "@/features/admin/lib/seedRecipesAdmin.function
 import { supabase } from "@/integrations/supabase/client";
 import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { Sparkles, Loader2, CheckCircle2, XCircle, SkipForward } from "lucide-react";
+import { useTranslation } from "@/lib/i18n";
 
 export const Route = createFileRoute("/_authenticated/admin/seed-recipes")({
   beforeLoad: async () => {
@@ -26,6 +27,7 @@ export const Route = createFileRoute("/_authenticated/admin/seed-recipes")({
 type SeedResult = Awaited<ReturnType<typeof seedRecipesAdmin>>;
 
 function SeedRecipesPage() {
+  const { t } = useTranslation();
   const seed = useServerFn(seedRecipesAdmin);
   const [count, setCount] = useState(5);
   const [category, setCategory] = useState("");
@@ -55,17 +57,14 @@ function SeedRecipesPage() {
 
   return (
     <main className="min-h-dvh bg-background pb-20">
-      <TopAppBar title="Seed Recipes (Admin)" showBack />
+      <TopAppBar title={t("admin.seed.title")} showBack />
       <div className="max-w-2xl mx-auto px-5 pt-4 space-y-5">
         <section className="bg-card rounded-3xl p-5 outline-1 outline-black/5">
           <div className="flex items-center gap-2 mb-3">
             <Sparkles className="size-4 text-primary" />
-            <h2 className="font-bold">Bulk Recipe Generator</h2>
+            <h2 className="font-bold">{t("admin.seed.generatorTitle")}</h2>
           </div>
-          <p className="text-sm text-muted-foreground mb-4">
-            Generate Indonesian healthy recipes via VexoAPI and insert into recipes + seo_recipes
-            tables. Idempotent: skips recipes whose slug already exists.
-          </p>
+          <p className="text-sm text-muted-foreground mb-4">{t("admin.seed.generatorDesc")}</p>
 
           <form
             onSubmit={(e) => {
@@ -78,7 +77,9 @@ function SeedRecipesPage() {
           >
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="text-xs font-semibold text-muted-foreground">Count (1-20)</label>
+                <label className="text-xs font-semibold text-muted-foreground">
+                  {t("admin.seed.countLabel")}
+                </label>
                 <input
                   type="number"
                   min={1}
@@ -90,11 +91,11 @@ function SeedRecipesPage() {
               </div>
               <div>
                 <label className="text-xs font-semibold text-muted-foreground">
-                  Category (optional)
+                  {t("admin.seed.categoryLabel")}
                 </label>
                 <input
                   type="text"
-                  placeholder="snack / breakfast / main"
+                  placeholder={t("admin.seed.categoryPlaceholder")}
                   value={category}
                   onChange={(e) => setCategory(e.target.value)}
                   className="mt-1 w-full bg-muted rounded-xl px-3 py-2 outline-none"
@@ -104,11 +105,11 @@ function SeedRecipesPage() {
 
             <div>
               <label className="text-xs font-semibold text-muted-foreground">
-                Nutritional focus (optional)
+                {t("admin.seed.focusLabel")}
               </label>
               <input
                 type="text"
-                placeholder="high protein / low carb / vegan"
+                placeholder={t("admin.seed.focusPlaceholder")}
                 value={focus}
                 onChange={(e) => setFocus(e.target.value)}
                 className="mt-1 w-full bg-muted rounded-xl px-3 py-2 outline-none"
@@ -122,7 +123,7 @@ function SeedRecipesPage() {
                 onChange={(e) => setDryRun(e.target.checked)}
                 className="size-4"
               />
-              <span>Dry run (preview only, no DB writes)</span>
+              <span>{t("admin.seed.dryRunLabel")}</span>
             </label>
 
             <button
@@ -133,12 +134,12 @@ function SeedRecipesPage() {
               {mut.isPending ? (
                 <>
                   <Loader2 className="size-4 animate-spin" />
-                  Generating…
+                  {t("admin.seed.generating")}
                 </>
               ) : (
                 <>
                   <Sparkles className="size-4" />
-                  {dryRun ? "Preview" : "Generate & Insert"}
+                  {dryRun ? t("admin.seed.previewBtn") : t("admin.seed.generateInsertBtn")}
                 </>
               )}
             </button>
@@ -147,7 +148,9 @@ function SeedRecipesPage() {
 
         {error && (
           <section className="bg-destructive/10 border border-destructive/30 rounded-2xl p-4">
-            <p className="text-sm font-semibold text-destructive mb-1">Error</p>
+            <p className="text-sm font-semibold text-destructive mb-1">
+              {t("admin.seed.errorTitle")}
+            </p>
             <p className="text-sm text-destructive/90 font-mono">{error}</p>
           </section>
         )}
@@ -157,19 +160,19 @@ function SeedRecipesPage() {
             <div className="grid grid-cols-3 gap-2">
               <Stat
                 icon={<CheckCircle2 className="size-4" />}
-                label={dryRun ? "Would insert" : "Inserted"}
+                label={dryRun ? t("admin.seed.wouldInsert") : t("admin.seed.inserted")}
                 value={result.inserted.length}
                 tone="success"
               />
               <Stat
                 icon={<SkipForward className="size-4" />}
-                label="Skipped"
+                label={t("admin.seed.skipped")}
                 value={result.skipped.length}
                 tone="muted"
               />
               <Stat
                 icon={<XCircle className="size-4" />}
-                label="Failed"
+                label={t("admin.seed.failed")}
                 value={result.failed.length}
                 tone={result.failed.length > 0 ? "danger" : "muted"}
               />
@@ -177,7 +180,7 @@ function SeedRecipesPage() {
 
             {result.inserted.length > 0 && (
               <ResultGroup
-                title={dryRun ? "Would insert" : "Inserted"}
+                title={dryRun ? t("admin.seed.wouldInsert") : t("admin.seed.inserted")}
                 tone="success"
                 items={result.inserted.map((r) => ({
                   label: r.title,
@@ -187,7 +190,7 @@ function SeedRecipesPage() {
             )}
             {result.skipped.length > 0 && (
               <ResultGroup
-                title="Skipped"
+                title={t("admin.seed.skipped")}
                 tone="muted"
                 items={result.skipped.map((s) => ({
                   label: s.title,
@@ -197,7 +200,7 @@ function SeedRecipesPage() {
             )}
             {result.failed.length > 0 && (
               <ResultGroup
-                title="Failed"
+                title={t("admin.seed.failed")}
                 tone="danger"
                 items={result.failed.map((f) => ({
                   label: f.title,
