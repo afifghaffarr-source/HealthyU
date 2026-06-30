@@ -17,6 +17,7 @@ import {
   RefreshCw,
   Plus,
   X,
+  Copy,
 } from "lucide-react";
 import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { useTranslation } from "@/lib/i18n";
@@ -127,6 +128,29 @@ function BannersAdminPage() {
   const toggleActive = (row: BannerRow) => {
     updateMut.mutate({ id: row.id, is_active: !row.is_active });
   };
+
+  const duplicateMut = useMutation({
+    mutationFn: (row: BannerRow) =>
+      createBannerAdmin({
+        data: {
+          placement: row.placement,
+          title: `${row.title} (copy)`,
+          description: row.description,
+          cta_label: row.cta_label,
+          cta_href: row.cta_href,
+          color: row.color,
+          starts_at: row.starts_at,
+          ends_at: row.ends_at,
+        },
+      }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["admin", "banners"] });
+      qc.invalidateQueries({ queryKey: ["activeBanners"] });
+      setFeedback({ kind: "ok", msg: t("admin.banners.duplicatedOk") });
+      setTimeout(() => setFeedback(null), 3000);
+    },
+    onError: (e: Error) => setFeedback({ kind: "err", msg: e.message }),
+  });
 
   return (
     <main className="min-h-dvh bg-background pb-32">
@@ -246,6 +270,17 @@ function BannersAdminPage() {
                       className="text-[10px] text-primary underline cursor-pointer"
                     >
                       {r.is_active ? "deactivate" : "activate"}
+                    </span>
+                    <span
+                      role="button"
+                      tabIndex={0}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        duplicateMut.mutate(r);
+                      }}
+                      className="text-[10px] text-primary underline cursor-pointer inline-flex items-center gap-1"
+                    >
+                      <Copy className="size-3" /> {t("admin.banners.duplicate")}
                     </span>
                   </div>
                 </div>

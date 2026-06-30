@@ -1756,6 +1756,8 @@ export type TranslationKey =
   | "admin.banners.empty"
   | "admin.banners.savedOk"
   | "admin.banners.deletedOk"
+  | "admin.banners.duplicate"
+  | "admin.banners.duplicatedOk"
   | "admin.exp.title"
   | "admin.exp.subtitle"
   | "admin.exp.createBtn"
@@ -3399,6 +3401,8 @@ export const bundles = {
     "admin.banners.empty": "Belum ada banner.",
     "admin.banners.savedOk": "Banner tersimpan.",
     "admin.banners.deletedOk": "Banner dihapus.",
+    "admin.banners.duplicate": "Duplikat",
+    "admin.banners.duplicatedOk": "Banner diduplikasi.",
     // Sprint 58-E — experiments (ID)
     "admin.exp.title": "Eksperimen A/B",
     "admin.exp.subtitle": "Kelola eksperimen A/B test untuk landing, CTA, dan UI lainnya.",
@@ -5034,6 +5038,8 @@ export const bundles = {
     "admin.banners.empty": "No banners yet.",
     "admin.banners.savedOk": "Banner saved.",
     "admin.banners.deletedOk": "Banner deleted.",
+    "admin.banners.duplicate": "Duplicate",
+    "admin.banners.duplicatedOk": "Banner duplicated.",
     // Sprint 58-E — experiments (EN)
     "admin.exp.title": "A/B Experiments",
     "admin.exp.subtitle": "Manage A/B test experiments for landing, CTA, and other UI.",
