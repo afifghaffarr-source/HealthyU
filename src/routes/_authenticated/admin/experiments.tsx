@@ -19,6 +19,7 @@ import {
   RefreshCw,
   Plus,
   X,
+  Copy,
 } from "lucide-react";
 import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { useTranslation } from "@/lib/i18n";
@@ -117,6 +118,26 @@ function ExperimentsAdminPage() {
   const toggleActive = (row: ExperimentRow) => {
     updateMut.mutate({ id: row.id, is_active: !row.is_active });
   };
+
+  const duplicateMut = useMutation({
+    mutationFn: (row: ExperimentRow) =>
+      createExperimentAdmin({
+        data: {
+          key: `${row.key}-${Date.now().toString(36).slice(-4)}`,
+          label: `${row.label} (copy)`,
+          description: row.description,
+          variant_a_json: row.variant_a_json,
+          variant_b_json: row.variant_b_json,
+          split_pct: row.split_pct,
+        },
+      }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["admin", "experiments"] });
+      setFeedback({ kind: "ok", msg: t("admin.exp.duplicatedOk") });
+      setTimeout(() => setFeedback(null), 3000);
+    },
+    onError: (e: Error) => setFeedback({ kind: "err", msg: e.message }),
+  });
 
   return (
     <main className="min-h-dvh bg-background pb-32">
@@ -223,6 +244,17 @@ function ExperimentsAdminPage() {
                       className="text-[10px] text-primary underline cursor-pointer"
                     >
                       {r.is_active ? "deactivate" : "activate"}
+                    </span>
+                    <span
+                      role="button"
+                      tabIndex={0}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        duplicateMut.mutate(r);
+                      }}
+                      className="text-[10px] text-primary underline cursor-pointer inline-flex items-center gap-1"
+                    >
+                      <Copy className="size-3" /> {t("admin.exp.duplicate")}
                     </span>
                   </div>
                 </div>

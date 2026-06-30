@@ -1772,6 +1772,8 @@ export type TranslationKey =
   | "admin.exp.savedOk"
   | "admin.exp.deletedOk"
   | "admin.exp.invalidJson"
+  | "admin.exp.duplicate"
+  | "admin.exp.duplicatedOk"
   | "admin.index.promoStatsTitle"
   | "admin.index.promoTotalCodes"
   | "admin.index.promoActiveCodes"
@@ -3418,6 +3420,8 @@ export const bundles = {
     "admin.exp.savedOk": "Eksperimen tersimpan.",
     "admin.exp.deletedOk": "Eksperimen dihapus.",
     "admin.exp.invalidJson": "Format JSON tidak valid untuk variant_a_json atau variant_b_json.",
+    "admin.exp.duplicate": "Duplikat",
+    "admin.exp.duplicatedOk": "Eksperimen diduplikasi.",
     // Sprint 58-C — promo stats card + quick actions (ID)
     "admin.index.promoStatsTitle": "Promo & Redemptions",
     "admin.index.promoTotalCodes": "Total kode",
@@ -5055,6 +5059,8 @@ export const bundles = {
     "admin.exp.savedOk": "Experiment saved.",
     "admin.exp.deletedOk": "Experiment deleted.",
     "admin.exp.invalidJson": "Invalid JSON for variant_a_json or variant_b_json.",
+    "admin.exp.duplicate": "Duplicate",
+    "admin.exp.duplicatedOk": "Experiment duplicated.",
     // Sprint 58-C — promo stats card + quick actions (EN)
     "admin.index.promoStatsTitle": "Promo & Redemptions",
     "admin.index.promoTotalCodes": "Total codes",
