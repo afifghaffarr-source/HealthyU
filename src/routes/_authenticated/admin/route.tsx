@@ -13,6 +13,8 @@ import {
   Loader2,
   Settings,
   Languages,
+  Ticket,
+  Megaphone,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { TopAppBar } from "@/components/healthyu/top-app-bar";
@@ -72,6 +74,18 @@ const NAV: NavItem[] = [
     label: "Translation Editor",
     icon: Languages,
     description: "Edit copy in-DB tanpa redeploy. Override beats bundled.",
+  },
+  {
+    to: "/admin/promo",
+    label: "Promo Codes",
+    icon: Ticket,
+    description: "Kelola kode promo (coins/XP/premium).",
+  },
+  {
+    to: "/admin/banners",
+    label: "Banners",
+    icon: Megaphone,
+    description: "Kelola banner pengumuman yang tampil di seluruh app.",
   },
   {
     to: "/admin/system",

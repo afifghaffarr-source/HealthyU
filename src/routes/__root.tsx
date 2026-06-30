@@ -38,6 +38,11 @@ const MaintenanceBanner = lazy(() =>
     default: m.MaintenanceBanner,
   })),
 );
+const PromoBanner = lazy(() =>
+  import("@/components/healthyu/promo-banner").then((m) => ({
+    default: m.PromoBanner,
+  })),
+);
 import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
 import { ThemeProvider } from "@/components/theme-provider";
@@ -195,6 +200,9 @@ function RootComponent() {
               <OfflineStatusBand />
               <Suspense fallback={null}>
                 <MaintenanceBanner />
+              </Suspense>
+              <Suspense fallback={null}>
+                <PromoBanner />
               </Suspense>
               <Outlet />
             </GlobalErrorBoundary>

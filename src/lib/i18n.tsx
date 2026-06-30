@@ -1721,7 +1721,43 @@ export type TranslationKey =
   | "landing.copyright"
   | "landing.privacy"
   | "landing.prism"
-  | "landing.premiumBadge";
+  | "landing.premiumBadge"
+
+  // Sprint 58-D — promo codes + banners admin + client redemption UI
+  | "admin.promo.title"
+  | "admin.promo.subtitle"
+  | "admin.promo.createBtn"
+  | "admin.promo.code"
+  | "admin.promo.label"
+  | "admin.promo.description"
+  | "admin.promo.rewardType"
+  | "admin.promo.rewardValue"
+  | "admin.promo.maxUses"
+  | "admin.promo.usesRemaining"
+  | "admin.promo.expiresAt"
+  | "admin.promo.active"
+  | "admin.promo.empty"
+  | "admin.promo.savedOk"
+  | "admin.promo.deletedOk"
+  | "admin.banners.title"
+  | "admin.banners.subtitle"
+  | "admin.banners.createBtn"
+  | "admin.banners.placement"
+  | "admin.banners.title_field"
+  | "admin.banners.description"
+  | "admin.banners.ctaLabel"
+  | "admin.banners.ctaHref"
+  | "admin.banners.color"
+  | "admin.banners.startsAt"
+  | "admin.banners.endsAt"
+  | "admin.banners.active"
+  | "admin.banners.empty"
+  | "admin.banners.savedOk"
+  | "admin.banners.deletedOk"
+  | "promo.placeholder"
+  | "promo.redeemBtn"
+  | "promo.redeemOk"
+  | "promo.redeemFail";
 
 /** Template string `{page}` → page number. */
 export type TranslationBundle = Record<TranslationKey, string>;
@@ -3305,6 +3341,41 @@ export const bundles = {
     "admin.system.kvLocalPath": "Local path",
     "admin.system.backupHint": "Backup via {script} (pg_dump). Untuk verify: {verifyCmd}",
     "admin.system.never": "never",
+    // Sprint 58-D — promo + banners (ID)
+    "admin.promo.title": "Kode Promo",
+    "admin.promo.subtitle": "Kelola kode promo: buat, edit, dan aktifkan. Reward coins/XP/premium.",
+    "admin.promo.createBtn": "Buat Kode",
+    "admin.promo.code": "Kode",
+    "admin.promo.label": "Label",
+    "admin.promo.description": "Deskripsi",
+    "admin.promo.rewardType": "Tipe Reward",
+    "admin.promo.rewardValue": "Nilai Reward",
+    "admin.promo.maxUses": "Maks Penggunaan",
+    "admin.promo.usesRemaining": "Sisa",
+    "admin.promo.expiresAt": "Kedaluwarsa",
+    "admin.promo.active": "Aktif",
+    "admin.promo.empty": "Belum ada kode promo.",
+    "admin.promo.savedOk": "Kode promo tersimpan.",
+    "admin.promo.deletedOk": "Kode promo dihapus.",
+    "admin.banners.title": "Banner",
+    "admin.banners.subtitle": "Kelola banner pengumuman yang tampil di seluruh app.",
+    "admin.banners.createBtn": "Buat Banner",
+    "admin.banners.placement": "Posisi",
+    "admin.banners.title_field": "Judul",
+    "admin.banners.description": "Deskripsi",
+    "admin.banners.ctaLabel": "Label CTA",
+    "admin.banners.ctaHref": "URL CTA",
+    "admin.banners.color": "Warna",
+    "admin.banners.startsAt": "Mulai",
+    "admin.banners.endsAt": "Selesai",
+    "admin.banners.active": "Aktif",
+    "admin.banners.empty": "Belum ada banner.",
+    "admin.banners.savedOk": "Banner tersimpan.",
+    "admin.banners.deletedOk": "Banner dihapus.",
+    "promo.placeholder": "Masukkan kode promo",
+    "promo.redeemBtn": "Tukar",
+    "promo.redeemOk": "Kode berhasil ditukar!",
+    "promo.redeemFail": "Gagal menukar kode",
   },
 
   // ══════════════════════════════════════════════════════════════════
@@ -4878,6 +4949,41 @@ export const bundles = {
     "admin.system.kvLocalPath": "Local path",
     "admin.system.backupHint": "Backup via {script} (pg_dump). To verify: {verifyCmd}",
     "admin.system.never": "never",
+    // Sprint 58-D — promo + banners (EN)
+    "admin.promo.title": "Promo Codes",
+    "admin.promo.subtitle": "Manage promo codes: create, edit, activate. Reward coins/XP/premium.",
+    "admin.promo.createBtn": "Create Code",
+    "admin.promo.code": "Code",
+    "admin.promo.label": "Label",
+    "admin.promo.description": "Description",
+    "admin.promo.rewardType": "Reward Type",
+    "admin.promo.rewardValue": "Reward Value",
+    "admin.promo.maxUses": "Max Uses",
+    "admin.promo.usesRemaining": "Remaining",
+    "admin.promo.expiresAt": "Expires",
+    "admin.promo.active": "Active",
+    "admin.promo.empty": "No promo codes yet.",
+    "admin.promo.savedOk": "Promo code saved.",
+    "admin.promo.deletedOk": "Promo code deleted.",
+    "admin.banners.title": "Banners",
+    "admin.banners.subtitle": "Manage announcement banners shown across the app.",
+    "admin.banners.createBtn": "Create Banner",
+    "admin.banners.placement": "Placement",
+    "admin.banners.title_field": "Title",
+    "admin.banners.description": "Description",
+    "admin.banners.ctaLabel": "CTA Label",
+    "admin.banners.ctaHref": "CTA URL",
+    "admin.banners.color": "Color",
+    "admin.banners.startsAt": "Starts",
+    "admin.banners.endsAt": "Ends",
+    "admin.banners.active": "Active",
+    "admin.banners.empty": "No banners yet.",
+    "admin.banners.savedOk": "Banner saved.",
+    "admin.banners.deletedOk": "Banner deleted.",
+    "promo.placeholder": "Enter promo code",
+    "promo.redeemBtn": "Redeem",
+    "promo.redeemOk": "Code redeemed!",
+    "promo.redeemFail": "Failed to redeem code",
   },
 } satisfies Record<string, TranslationBundle>;
 

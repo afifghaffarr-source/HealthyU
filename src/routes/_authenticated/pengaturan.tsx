@@ -17,8 +17,13 @@ import {
   User as UserIcon,
   Sparkles,
   Brain,
+  Gift,
+  Loader2,
 } from "lucide-react";
+import { useState } from "react";
+import toast from "react-hot-toast";
 import { useTranslation } from "@/lib/i18n";
+import { useRedeemPromo } from "@/hooks/use-promo-banners";
 
 export const Route = createFileRoute("/_authenticated/pengaturan")({
   component: PengaturanPage,
@@ -181,6 +186,9 @@ function PengaturanPage() {
           </section>
         ))}
 
+        {/* Promo code redemption */}
+        <RedeemPromoSection />
+
         {/* Quick info */}
         <section className="text-center pt-2 space-y-1">
           <div className="flex items-center justify-center gap-1.5 text-[10px] text-muted-foreground">
@@ -201,3 +209,73 @@ function PengaturanPage() {
 void Languages;
 void Globe;
 void Ruler;
+
+/**
+ * RedeemPromoSection — small inline form on /pengaturan for users to
+ * redeem admin-issued promo codes. Calls the redeem_promo SECURITY DEFINER
+ * RPC via useRedeemPromo hook. Success/error surfaced via react-hot-toast.
+ * ponytail: inline form on settings page; add a dedicated /promo route
+ * if/when the redemption history view is requested (~25 lines of code).
+ */
+function RedeemPromoSection() {
+  const { t } = useTranslation();
+  const [code, setCode] = useState("");
+  const redeem = useRedeemPromo();
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const trimmed = code.trim();
+    if (!trimmed) return;
+    redeem.mutate(
+      { code: trimmed },
+      {
+        onSuccess: (res) => {
+          if (res.success) {
+            toast.success(t("promo.redeemOk"));
+            setCode("");
+          } else {
+            toast.error(res.message || t("promo.redeemFail"));
+          }
+        },
+        onError: (err: Error) => {
+          toast.error(err.message || t("promo.redeemFail"));
+        },
+      },
+    );
+  };
+
+  return (
+    <section className="bg-card rounded-2xl outline-1 outline-black/5 dark:outline-white/10 p-4 space-y-3 animate-fade-up">
+      <div className="flex items-center gap-2">
+        <div className="size-8 rounded-xl bg-primary/10 grid place-items-center text-primary shrink-0">
+          <Gift className="size-4" aria-hidden />
+        </div>
+        <div className="flex-1 min-w-0">
+          <p className="text-sm font-semibold">{t("admin.promo.title")}</p>
+          <p className="text-[11px] text-muted-foreground mt-0.5">{t("admin.promo.subtitle")}</p>
+        </div>
+      </div>
+      <form onSubmit={handleSubmit} className="flex gap-2">
+        <input
+          type="text"
+          value={code}
+          onChange={(e) => setCode(e.target.value.toUpperCase())}
+          placeholder={t("promo.placeholder")}
+          className="flex-1 min-w-0 bg-muted rounded-xl px-3 py-2.5 text-sm font-mono outline-none focus:ring-2 focus:ring-primary/30"
+        />
+        <button
+          type="submit"
+          disabled={redeem.isPending || !code.trim()}
+          className="inline-flex items-center justify-center gap-1.5 bg-primary text-primary-foreground text-sm font-semibold px-4 py-2.5 rounded-xl disabled:opacity-50 shrink-0"
+        >
+          {redeem.isPending ? (
+            <Loader2 className="size-4 animate-spin" />
+          ) : (
+            <Gift className="size-4" />
+          )}
+          {t("promo.redeemBtn")}
+        </button>
+      </form>
+    </section>
+  );
+}
