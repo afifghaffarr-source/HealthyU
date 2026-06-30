@@ -63,6 +63,8 @@ export type TranslationKey =
   | "common.logged"
   | "common.sending"
   | "common.saved"
+  | "common.refresh"
+  | "common.saving"
   | "common.history"
   | "common.all"
   | "common.total"
@@ -1123,7 +1125,264 @@ export type TranslationKey =
   | "privacyPolicy.section2Item.audit"
   | "privacyPolicy.section2NoTargeted"
   | "privacyPolicy.section4ActiveAccount"
-  | "family.createdToast";
+  | "privacy.openSettings"
+  | "privacy.toggleAudit"
+  | "privacy.togglePiiRedact"
+  | "privacy.policyLinkTitle"
+  | "privacyPolicy.title"
+  | "privacyPolicy.lastUpdated"
+  | "privacyPolicy.summaryTitle"
+  | "privacyPolicy.summaryLead"
+  | "privacyPolicy.section1Title"
+  | "privacyPolicy.section1UserTitle"
+  | "privacyPolicy.section1AutoTitle"
+  | "privacyPolicy.section1UserItems.akun"
+  | "privacyPolicy.section1UserItems.profil"
+  | "privacyPolicy.section1UserItems.log"
+  | "privacyPolicy.section1UserItems.komunitas"
+  | "privacyPolicy.section1UserItems.ai"
+  | "privacyPolicy.section1AutoItems.auth"
+  | "privacyPolicy.section1AutoItems.notif"
+  | "privacyPolicy.section1AutoItems.wearable"
+  | "privacyPolicy.section1AutoItems.logs"
+  | "privacyPolicy.section2Item.summary"
+  | "privacyPolicy.section2Item.recommend"
+  | "privacyPolicy.section2Item.notif"
+  | "privacyPolicy.section2Item.audit"
+  | "privacyPolicy.section2NoTargeted"
+  | "privacyPolicy.section4ActiveAccount"
+  | "privacyPolicy.section2Title"
+  | "privacyPolicy.section3Title"
+  | "privacyPolicy.section4Title"
+  | "privacyPolicy.section5Title"
+  | "privacyPolicy.section5Intro"
+  | "privacyPolicy.rightAccessTitle"
+  | "privacyPolicy.rightAccessDesc"
+  | "privacyPolicy.rightAccessAction"
+  | "privacyPolicy.rightCopyTitle"
+  | "privacyPolicy.rightCopyDesc"
+  | "privacyPolicy.rightCopyAction"
+  | "privacyPolicy.rightFixTitle"
+  | "privacyPolicy.rightFixDesc"
+  | "privacyPolicy.rightFixAction"
+  | "privacyPolicy.rightDeleteTitle"
+  | "privacyPolicy.rightDeleteDesc"
+  | "privacyPolicy.rightDeleteAction"
+  | "privacyPolicy.section5After"
+  | "privacyPolicy.section6Title"
+  | "privacyPolicy.section7Title"
+  | "privacyPolicy.section7Body"
+  | "privacyPolicy.section8Title"
+  | "privacyPolicy.section8Intro"
+  | "privacyPolicy.section8EmailLabel"
+  | "privacyPolicy.section8After"
+  | "privacyPolicy.section9Title"
+  | "privacyPolicy.section9Body"
+  | "privacyPolicy.footer"
+  | "privacyPolicy.publicNotice"
+  | "backup.historyMeta"
+  | "backup.pdpDisclaimerTitle"
+  | "backup.pdpDisclaimerBody"
+  | "body.title"
+  | "body.tabs.weight"
+  | "body.tabs.measurements"
+  | "body.tabs.photo"
+  | "body.tabs.vitals"
+  | "body.weightChart"
+  | "body.weightGoal"
+  | "body.measurements.waist"
+  | "body.measurements.chest"
+  | "body.measurements.arm"
+  | "body.measurements.thigh"
+  | "body.measurementsHint"
+  | "body.photo.addProgress"
+  | "body.photo.angles"
+  | "body.photo.upload"
+  | "body.vitals.bloodPressure"
+  | "body.vitals.heartRate"
+  | "body.vitals.bodyTemp"
+  | "body.vitals.spo2"
+  | "body.vitalsLogLink"
+  | "patternSettings.title"
+  | "patternSettings.subtitle"
+  | "patternSettings.skipBreakfastLabel"
+  | "patternSettings.daysPerWeek"
+  | "patternSettings.skipBreakfastDesc"
+  | "patternSettings.lateNightDinnerLabel"
+  | "patternSettings.lateNightDesc"
+  | "patternSettings.irregularVarianceLabel"
+  | "patternSettings.hoursUnit"
+  | "patternSettings.irregularDesc"
+  | "patternSettings.thresholdTitle"
+  | "patternSettings.thresholdDesc"
+  | "patternSettings.sensitivityTitle"
+  | "patternSettings.sensitivityDesc"
+  | "patternSettings.sensitivityLabel"
+  | "patternSettings.sensitivity.low"
+  | "patternSettings.sensitivity.medium"
+  | "patternSettings.sensitivity.high"
+  | "patternSettings.sensitivityHint"
+  | "patternSettings.saveButton"
+  | "patternSettings.savingButton"
+  | "patternSettings.resetButton"
+  | "patternSettings.savedAlert"
+  | "patternSettings.errorAlert"
+  | "articles.title"
+  | "articles.navTitle"
+  | "articles.savedFilter"
+  | "articles.empty"
+  | "articles.emptyDesc"
+  | "articles.noResults"
+  | "articles.noResultsDesc"
+  | "articles.byline"
+  | "articles.unbookmark"
+  | "articles.bookmark"
+  | "articles.readingTime"
+  | "articles.shareFallback"
+  | "articles.share.trigger"
+  | "articles.share.dialogTitle"
+  | "articles.share.dialogText"
+  | "articles.linkCopied"
+  | "articles.loadError"
+  | "articles.loadErrorDesc"
+  | "articles.notFound"
+  | "articles.notFoundDesc"
+  | "articles.contentMissing"
+  | "articles.takeaway"
+  | "articles.relatedTitle"
+  | "articles.loadFailImage"
+  | "sleep.diaryTitle"
+  | "sleep.diaryTonight"
+  | "sleep.diaryHours"
+  | "sleep.diaryBedtimeLabel"
+  | "sleep.diaryWakeLabel"
+  | "sleep.diaryNotePlaceholder"
+  | "sleep.diaryAvgQuality"
+  | "sleep.diaryHistory"
+  | "scan.label.title"
+  | "scan.label.subtitle"
+  | "scan.label.takePhoto"
+  | "scan.label.gallery"
+  | "scan.label.clientScan"
+  | "scan.label.aiVision"
+  | "scan.label.noOcrBrowser"
+  | "scan.label.changePhoto"
+  | "scan.label.processing"
+  | "scan.label.progressStatus"
+  | "scan.label.enginePreparing"
+  | "scan.label.engineInitializing"
+  | "scan.label.engineReading"
+  | "scan.label.engineDone"
+  | "scan.label.ocrNotSupported"
+  | "scan.label.aiVisionPending"
+  | "scan.label.offlineSupported"
+  | "scan.label.offlineNoSupport"
+  | "scan.label.tryAi"
+  | "scan.label.mealLogTitle"
+  | "scan.label.mealTypes.breakfast"
+  | "scan.label.mealTypes.lunch"
+  | "scan.label.mealTypes.dinner"
+  | "scan.label.mealTypes.snack"
+  | "scan.label.savedAs.breakfast"
+  | "scan.label.savedAs.lunch"
+  | "scan.label.savedAs.dinner"
+  | "scan.label.savedAs.snack"
+  | "scan.label.servingDefault"
+  | "scan.label.scanAnother"
+  | "scan.label.aiParsing"
+  | "scan.label.aiParsingHint"
+  | "scan.label.aiVisionReading"
+  | "scan.label.aiVisionHint"
+  | "scan.label.aiSuccess"
+  | "scan.label.aiFailed"
+  | "scan.label.altText"
+  | "scan.label.lowConfidenceHint"
+  | "scan.label.matchedFields"
+  | "scan.label.ocrFailed"
+  | "scan.label.saveToMealLogSuccess"
+  | "scan.label.saveFailed"
+  | "scan.label.readFailedFallback"
+  | "scan.label.detectedFallback"
+  | "scan.label.resultsTitle"
+  | "scan.label.fieldsDetected"
+  | "scan.label.noServingSize"
+  | "scan.label.energy"
+  | "scan.label.protein"
+  | "scan.label.carbs"
+  | "scan.label.sugar"
+  | "scan.label.fatTotal"
+  | "scan.label.fatSat"
+  | "scan.label.fatTrans"
+  | "scan.label.fiber"
+  | "scan.label.sodium"
+  | "scan.label.cholesterol"
+  | "scan.label.kcal"
+  | "scan.label.confidenceAccurate"
+  | "scan.label.confidenceLow"
+  | "scan.label.confidenceMedium"
+  | "admin.config.title"
+  | "admin.config.subtitle"
+  | "admin.config.backToAdmin"
+  | "admin.config.empty"
+  | "admin.config.savedOk"
+  | "admin.config.deletedOk"
+  | "admin.config.value"
+  | "admin.i18n.title"
+  | "admin.i18n.subtitle"
+  | "admin.i18n.searchPlaceholder"
+  | "admin.i18n.filterAll"
+  | "admin.i18n.filterOverridden"
+  | "admin.i18n.filterDefault"
+  | "admin.i18n.empty"
+  | "admin.i18n.selectKeyPrompt"
+  | "admin.i18n.savedOk"
+  | "admin.i18n.revertedOk"
+  | "admin.i18n.overriddenBadge"
+  | "admin.i18n.revert"
+  | "admin.i18n.saveId"
+  | "admin.i18n.saveEn"
+  | "family.createdToast"
+  | "scan.fridgeTitle"
+  | "admin.users.banTitle"
+  | "admin.users.banReason"
+  | "admin.users.banReasonPlaceholder"
+  | "admin.users.banConfirm"
+  | "admin.users.unbanConfirm"
+  | "admin.users.forceLogoutConfirm"
+  | "admin.users.banAction"
+  | "admin.users.unbanAction"
+  | "admin.users.forceLogoutAction"
+  | "admin.users.details"
+  | "admin.users.bannedSuccess"
+  | "admin.users.unbannedSuccess"
+  | "admin.users.forceLogoutSuccess"
+  | "admin.users.bannedBy"
+  | "admin.users.neverBanned"
+  | "admin.users.recentActivity"
+  | "admin.users.noActivity"
+  | "admin.users.detailTitle"
+  | "admin.users.detailClose"
+  | "admin.users.roleAdmin"
+  | "admin.users.roleModerator"
+  | "admin.users.roleUser"
+  | "admin.users.detailLoadFail"
+  | "admin.users.confirmYes"
+  | "admin.users.confirmNo"
+  | "admin.users.featFlagsTitle"
+  | "admin.users.featFlagsDesc"
+  | "admin.users.featFlagEnabled"
+  | "admin.users.featFlagDisabled"
+  | "common.featDisabled"
+  | "common.featDisabledDesc"
+  | "common.featDisabledBack"
+  | "coach.featDisabled"
+  | "coach.featDisabledDesc"
+  | "scanLabel.featDisabled"
+  | "scanLabel.featDisabledDesc"
+  | "scanPhoto.featDisabled"
+  | "scanPhoto.featDisabledDesc"
+  | "fasting.featDisabled"
+  | "fasting.featDisabledDesc";
 
 /** Template string `{page}` → page number. */
 export type TranslationBundle = Record<TranslationKey, string>;
@@ -1177,6 +1436,8 @@ export const bundles = {
     "common.logged": "Dicatat",
     "common.sending": "Mengirim\u2026",
     "common.saved": "Tersimpan",
+    "common.refresh": "Refresh",
+    "common.saving": "Menyimpan\u2026",
     "common.history": "Riwayat",
     "common.all": "Semua",
     "common.total": "Total",
@@ -2069,6 +2330,27 @@ export const bundles = {
     "family.createBtn": "Buat",
     "family.activePlan": "Plan aktif",
     "family.createdToast": "Family plan dibuat",
+    "admin.config.title": "App Config",
+    "admin.config.subtitle": "Edit runtime config. Changes apply immediately. Audit-logged.",
+    "admin.config.backToAdmin": "Kembali ke Admin",
+    "admin.config.empty": "Belum ada config key untuk filter ini.",
+    "admin.config.savedOk": "Tersimpan. Cache akan refresh dalam 60 detik.",
+    "admin.config.deletedOk": "Dihapus. Default code value akan dipakai.",
+    "admin.config.value": "Value",
+    "admin.i18n.title": "Translation Editor",
+    "admin.i18n.subtitle": "Edit copy in-DB tanpa redeploy. Override beats bundled.",
+    "admin.i18n.searchPlaceholder": "Cari translation key...",
+    "admin.i18n.filterAll": "Semua",
+    "admin.i18n.filterOverridden": "Overridden",
+    "admin.i18n.filterDefault": "Default",
+    "admin.i18n.empty": "Tidak ada key yang cocok.",
+    "admin.i18n.selectKeyPrompt": "Pilih translation key di sebelah kiri untuk mulai mengedit.",
+    "admin.i18n.savedOk": "Tersimpan. Cache refresh dalam 5 menit.",
+    "admin.i18n.revertedOk": "Override dihapus. Kembali ke bundled value.",
+    "admin.i18n.overriddenBadge": "Edited",
+    "admin.i18n.revert": "Revert",
+    "admin.i18n.saveId": "Simpan (ID)",
+    "admin.i18n.saveEn": "Simpan (EN)",
     "privacyPolicy.section1UserItems.akun":
       "email, nama tampilan, foto profil (jika diunggah), preferensi publik.",
     "privacyPolicy.section1UserItems.profil":
@@ -2243,6 +2525,7 @@ export const bundles = {
     "sleep.diaryNotePlaceholder": "Catatan (mimpi, gangguan, dll)…",
     "sleep.diaryAvgQuality": "Kualitas rata-rata",
     "sleep.diaryHistory": "Riwayat",
+    "scan.fridgeTitle": "Resep dari Kulkas",
     "scan.label.title": "Scan Label Nutrisi",
     "scan.label.subtitle": "Client-side OCR · tanpa upload",
     "scan.label.takePhoto": "Ambil Foto Label",
@@ -2292,6 +2575,47 @@ export const bundles = {
     "scan.label.saveFailed": "Gagal simpan",
     "scan.label.readFailedFallback": "Gagal membaca label nutrisi",
     "scan.label.detectedFallback": "Label terdeteksi",
+    "admin.users.banTitle": "Ban user",
+    "admin.users.banReason": "Alasan ban",
+    "admin.users.banReasonPlaceholder": "Misalnya: spam, abusive language, ToS violation…",
+    "admin.users.banConfirm": "Ban {{email}}? Mereka tidak akan bisa login.",
+    "admin.users.unbanConfirm": "Unban {{email}}? Mereka akan bisa login lagi.",
+    "admin.users.forceLogoutConfirm": "Force logout {{email}}? Sesi aktif akan di-invalidate.",
+    "admin.users.banAction": "Ban",
+    "admin.users.unbanAction": "Unban",
+    "admin.users.forceLogoutAction": "Force logout",
+    "admin.users.details": "Detail",
+    "admin.users.bannedSuccess": "{{email}} di-ban.",
+    "admin.users.unbannedSuccess": "{{email}} di-unban.",
+    "admin.users.forceLogoutSuccess": "{{email}} akan di-force logout.",
+    "admin.users.bannedBy": "Di-ban {{date}} — {{reason}}",
+    "admin.users.neverBanned": "Tidak di-ban",
+    "admin.users.recentActivity": "Aktivitas terbaru (audit log)",
+    "admin.users.noActivity": "Belum ada aktivitas tercatat.",
+    "admin.users.detailTitle": "Detail user",
+    "admin.users.detailClose": "Tutup",
+    "admin.users.roleAdmin": "Admin",
+    "admin.users.roleModerator": "Moderator",
+    "admin.users.roleUser": "User",
+    "admin.users.detailLoadFail": "Gagal memuat detail user.",
+    "admin.users.confirmYes": "Ya, lanjutkan",
+    "admin.users.confirmNo": "Batal",
+    "admin.users.featFlagsTitle": "Feature flags (live)",
+    "admin.users.featFlagsDesc": "Di-toggle dari /admin/config. Cache 60s.",
+    "admin.users.featFlagEnabled": "ON",
+    "admin.users.featFlagDisabled": "OFF",
+    "common.featDisabled": "Fitur ini sedang nonaktif",
+    "common.featDisabledDesc":
+      "Admin sedang mematikan fitur ini sementara. Silakan coba lagi nanti.",
+    "common.featDisabledBack": "Kembali ke beranda",
+    "coach.featDisabled": "AI Coach sedang nonaktif",
+    "coach.featDisabledDesc": "Admin lagi maintenance coach. Bisa pakai pattern tracker dulu ya.",
+    "scanLabel.featDisabled": "Scan label nutrisi sedang nonaktif",
+    "scanLabel.featDisabledDesc": "Admin lagi maintenance. Bisa input manual di food diary dulu.",
+    "scanPhoto.featDisabled": "Scan foto makanan sedang nonaktif",
+    "scanPhoto.featDisabledDesc": "Admin lagi maintenance. Bisa input manual dulu.",
+    "fasting.featDisabled": "Tracker puasa sedang nonaktif",
+    "fasting.featDisabledDesc": "Admin lagi maintenance. Bisa pakai meal log dulu ya.",
   },
 
   // ══════════════════════════════════════════════════════════════════
@@ -2341,6 +2665,8 @@ export const bundles = {
     "common.logged": "Logged",
     "common.sending": "Sending\u2026",
     "common.saved": "Saved",
+    "common.refresh": "Refresh",
+    "common.saving": "Saving\u2026",
     "common.history": "History",
     "common.all": "All",
     "common.total": "Total",
@@ -3231,6 +3557,27 @@ export const bundles = {
     "family.createBtn": "Create",
     "family.activePlan": "Active plan",
     "family.createdToast": "Family plan created",
+    "admin.config.title": "App Config",
+    "admin.config.subtitle": "Edit runtime config. Changes apply immediately. Audit-logged.",
+    "admin.config.backToAdmin": "Back to Admin",
+    "admin.config.empty": "No config keys for this filter.",
+    "admin.config.savedOk": "Saved. Cache refreshes in 60 seconds.",
+    "admin.config.deletedOk": "Deleted. Code default will be used.",
+    "admin.config.value": "Value",
+    "admin.i18n.title": "Translation Editor",
+    "admin.i18n.subtitle": "Edit copy in-DB without redeploy. Override beats bundled.",
+    "admin.i18n.searchPlaceholder": "Search translation key...",
+    "admin.i18n.filterAll": "All",
+    "admin.i18n.filterOverridden": "Overridden",
+    "admin.i18n.filterDefault": "Default",
+    "admin.i18n.empty": "No matching keys.",
+    "admin.i18n.selectKeyPrompt": "Select a translation key on the left to start editing.",
+    "admin.i18n.savedOk": "Saved. Cache refreshes in 5 minutes.",
+    "admin.i18n.revertedOk": "Override removed. Back to bundled value.",
+    "admin.i18n.overriddenBadge": "Edited",
+    "admin.i18n.revert": "Revert",
+    "admin.i18n.saveId": "Save (ID)",
+    "admin.i18n.saveEn": "Save (EN)",
     "privacyPolicy.section1UserItems.akun":
       "email, display name, profile photo (if uploaded), public preferences.",
     "privacyPolicy.section1UserItems.profil":
@@ -3404,6 +3751,7 @@ export const bundles = {
     "sleep.diaryNotePlaceholder": "Notes (dreams, disturbances, etc.)…",
     "sleep.diaryAvgQuality": "Avg quality",
     "sleep.diaryHistory": "History",
+    "scan.fridgeTitle": "Recipes from Fridge",
     "scan.label.title": "Nutrition Label Scan",
     "scan.label.subtitle": "Client-side OCR · no upload",
     "scan.label.takePhoto": "Capture Label Photo",
@@ -3452,6 +3800,48 @@ export const bundles = {
     "scan.label.saveFailed": "Save failed",
     "scan.label.readFailedFallback": "Failed to read nutrition label",
     "scan.label.detectedFallback": "Label detected",
+    "admin.users.banTitle": "Ban user",
+    "admin.users.banReason": "Ban reason",
+    "admin.users.banReasonPlaceholder": "E.g. spam, abusive language, ToS violation…",
+    "admin.users.banConfirm": "Ban {{email}}? They will not be able to log in.",
+    "admin.users.unbanConfirm": "Unban {{email}}? They will be able to log in again.",
+    "admin.users.forceLogoutConfirm":
+      "Force logout {{email}}? Active sessions will be invalidated.",
+    "admin.users.banAction": "Ban",
+    "admin.users.unbanAction": "Unban",
+    "admin.users.forceLogoutAction": "Force logout",
+    "admin.users.details": "Details",
+    "admin.users.bannedSuccess": "{{email}} banned.",
+    "admin.users.unbannedSuccess": "{{email}} unbanned.",
+    "admin.users.forceLogoutSuccess": "{{email}} will be force logged out.",
+    "admin.users.bannedBy": "Banned {{date}} — {{reason}}",
+    "admin.users.neverBanned": "Not banned",
+    "admin.users.recentActivity": "Recent activity (audit log)",
+    "admin.users.noActivity": "No activity recorded yet.",
+    "admin.users.detailTitle": "User details",
+    "admin.users.detailClose": "Close",
+    "admin.users.roleAdmin": "Admin",
+    "admin.users.roleModerator": "Moderator",
+    "admin.users.roleUser": "User",
+    "admin.users.detailLoadFail": "Failed to load user details.",
+    "admin.users.confirmYes": "Yes, proceed",
+    "admin.users.confirmNo": "Cancel",
+    "admin.users.featFlagsTitle": "Feature flags (live)",
+    "admin.users.featFlagsDesc": "Toggled from /admin/config. 60s cache.",
+    "admin.users.featFlagEnabled": "ON",
+    "admin.users.featFlagDisabled": "OFF",
+    "common.featDisabled": "This feature is currently disabled",
+    "common.featDisabledDesc":
+      "An admin has temporarily turned this feature off. Please try again later.",
+    "common.featDisabledBack": "Back to home",
+    "coach.featDisabled": "AI Coach is currently disabled",
+    "coach.featDisabledDesc": "Coach is under maintenance. Use the pattern tracker for now.",
+    "scanLabel.featDisabled": "Nutrition label scan is currently disabled",
+    "scanLabel.featDisabledDesc": "Under maintenance. You can log meals manually for now.",
+    "scanPhoto.featDisabled": "Photo food scan is currently disabled",
+    "scanPhoto.featDisabledDesc": "Under maintenance. You can log meals manually for now.",
+    "fasting.featDisabled": "Fasting tracker is currently disabled",
+    "fasting.featDisabledDesc": "Under maintenance. Use the meal log for now.",
   },
 } satisfies Record<string, TranslationBundle>;
 

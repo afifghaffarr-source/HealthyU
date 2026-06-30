@@ -136,3 +136,96 @@ export const revokeRoleAdmin = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
     return { ok: true };
   });
+
+// ── New: ban / unban / force logout (Sprint 57) ──────────────────
+// Cast needed because `profiles.banned_at`/`force_logout_at` columns and
+// new RPCs are not yet in generated Supabase types (added in Sprint 57
+// migration). Re-generate types via `bunx supabase gen types typescript`
+// and remove this cast.
+const db = supabaseAdmin as any; // eslint-disable-line no-restricted-syntax, @typescript-eslint/no-explicit-any
+
+const BanInput = z.object({
+  userId: z.string().uuid(),
+  reason: z.string().min(1).max(500),
+});
+const TargetInput = z.object({ userId: z.string().uuid() });
+const GetUserInput = z.object({ userId: z.string().uuid() });
+
+export const banUserAdmin = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((i: unknown) => parseInput(BanInput, i))
+  .handler(async ({ data, context }) => {
+    const { userId: actingUserId } = context as { userId: string };
+    await ensureAdmin(supabaseAdmin, actingUserId);
+    if (actingUserId === data.userId) {
+      throw new Error("Tidak bisa ban diri sendiri");
+    }
+    const { error } = await db.rpc("ban_user", {
+      _target_user_id: data.userId,
+      _reason: data.reason,
+    });
+    if (error) throw new Error(`banUserAdmin: ${error.message}`);
+    return { ok: true } as const;
+  });
+
+export const unbanUserAdmin = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((i: unknown) => parseInput(TargetInput, i))
+  .handler(async ({ data, context }) => {
+    const { userId: actingUserId } = context as { userId: string };
+    await ensureAdmin(supabaseAdmin, actingUserId);
+    const { error } = await db.rpc("unban_user", {
+      _target_user_id: data.userId,
+    });
+    if (error) throw new Error(`unbanUserAdmin: ${error.message}`);
+    return { ok: true } as const;
+  });
+
+export const forceLogoutUserAdmin = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((i: unknown) => parseInput(TargetInput, i))
+  .handler(async ({ data, context }) => {
+    const { userId: actingUserId } = context as { userId: string };
+    await ensureAdmin(supabaseAdmin, actingUserId);
+    const { error } = await db.rpc("force_logout_user", {
+      _target_user_id: data.userId,
+    });
+    if (error) throw new Error(`forceLogoutUserAdmin: ${error.message}`);
+    return { ok: true } as const;
+  });
+
+export const getUserDetailsAdmin = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((i: unknown) => parseInput(GetUserInput, i))
+  .handler(async ({ data, context }) => {
+    const { userId: actingUserId } = context as { userId: string };
+    await ensureAdmin(supabaseAdmin, actingUserId);
+
+    const { data: profile, error } = await db
+      .from("profiles")
+      .select("id, full_name, avatar_url, banned_at, banned_reason, force_logout_at, created_at")
+      .eq("id", data.userId)
+      .maybeSingle();
+    if (error) throw new Error(`getUserDetailsAdmin: ${error.message}`);
+    if (!profile) return null;
+
+    const { data: roleRows } = await db
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", data.userId);
+    const roles = (roleRows ?? []).map((r: { role: string }) => r.role);
+
+    const { data: authUser } = await supabaseAdmin.auth.admin.getUserById(data.userId);
+    const { data: auditRows } = await db
+      .from("audit_log")
+      .select("id, action, meta, created_at")
+      .eq("user_id", data.userId)
+      .order("created_at", { ascending: false })
+      .limit(20);
+
+    return {
+      profile: { ...(profile as Record<string, unknown>), email: authUser?.user?.email ?? null },
+      roles,
+      recent_audit: auditRows ?? [],
+    };
+  });

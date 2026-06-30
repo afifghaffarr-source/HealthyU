@@ -55,6 +55,7 @@ import { validateImageFile, fileToDataUrl, dataUrlToBlob } from "@/lib/image-uti
 import { toast, toastError } from "@/lib/toast-config";
 import type { MealType } from "@/features/food/lib/foodHelpers";
 import { useTranslation } from "@/lib/i18n";
+import { FeatureDisabled } from "@/components/healthyu/FeatureDisabled";
 
 export const Route = createFileRoute("/_authenticated/scan/nutrition-label")({
   component: Page,
@@ -289,212 +290,223 @@ function Page() {
   }
 
   return (
-    <div className="min-h-dvh pb-24 bg-background">
-      <TopAppBar title={t("scan.label.title")} subtitle={t("scan.label.subtitle")} showBack />
-      <main className="max-w-md mx-auto px-4 pt-4 space-y-4">
-        {/* Medical safety disclaimer — AI parses label text, not medical advice. */}
-        <MedicalDisclaimer variant="disclaimer" compact className="w-full justify-center" />
+    <FeatureDisabled
+      flag="feature.scan_label"
+      titleKey="scanLabel.featDisabled"
+      descKey="scanLabel.featDisabledDesc"
+    >
+      <div className="min-h-dvh pb-24 bg-background">
+        <TopAppBar title={t("scan.label.title")} subtitle={t("scan.label.subtitle")} showBack />
+        <main className="max-w-md mx-auto px-4 pt-4 space-y-4">
+          {/* Medical safety disclaimer — AI parses label text, not medical advice. */}
+          <MedicalDisclaimer variant="disclaimer" compact className="w-full justify-center" />
 
-        {/* Offline-capable banner */}
-        <Card className="p-3 bg-emerald-50 border-emerald-200 dark:bg-emerald-950/30 dark:border-emerald-900">
-          <div className="flex items-start gap-2.5">
-            {ocrSupported ? (
-              <Wifi className="size-4 mt-0.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
-            ) : (
-              <WifiOff className="size-4 mt-0.5 text-amber-600 shrink-0" />
-            )}
-            <p className="text-xs leading-relaxed text-emerald-900 dark:text-emerald-100">
-              {ocrSupported ? t("scan.label.offlineSupported") : t("scan.label.offlineNoSupport")}
-            </p>
-          </div>
-        </Card>
-
-        {/* Image preview */}
-        {(phase.kind === "preview" ||
-          phase.kind === "scanning" ||
-          phase.kind === "parsed" ||
-          phase.kind === "ai-scanning") && (
-          <div className="rounded-2xl overflow-hidden border bg-card">
-            <img
-              src={phase.src}
-              alt={t("scan.label.altText")}
-              className="w-full max-h-72 object-contain bg-muted"
-            />
-          </div>
-        )}
-
-        {/* Idle state: capture/upload */}
-        {phase.kind === "idle" && (
-          <div className="space-y-3">
-            <Button size="lg" className="w-full" onClick={() => fileInputRef.current?.click()}>
-              <Camera className="size-4 mr-2" />
-              {t("scan.label.takePhoto")}
-            </Button>
-            <Button
-              size="lg"
-              variant="outline"
-              className="w-full"
-              onClick={() => fileInputRef.current?.click()}
-            >
-              <ScanLine className="size-4 mr-2" />
-              {t("scan.label.gallery")}
-            </Button>
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept="image/*"
-              capture="environment"
-              onChange={(e) => onFile(e.target.files?.[0])}
-              className="hidden"
-            />
-          </div>
-        )}
-
-        {/* Preview state: choose OCR mode */}
-        {phase.kind === "preview" && (
-          <div className="space-y-3">
-            <Button size="lg" className="w-full" onClick={startClientScan} disabled={!ocrSupported}>
-              <ScanLine className="size-4 mr-2" />
-              {t("scan.label.clientScan")}
-            </Button>
-            <Button
-              size="lg"
-              variant="outline"
-              className="w-full border-violet-300 text-violet-700 dark:border-violet-700 dark:text-violet-300"
-              onClick={startVisionScan}
-              disabled={visionMut.isPending}
-            >
-              <Sparkles className="size-4 mr-2" />
-              {t("scan.label.aiVision")}
-            </Button>
-            {!ocrSupported && (
-              <p className="text-xs text-amber-600 dark:text-amber-400 text-center px-2">
-                {t("scan.label.noOcrBrowser")}
+          {/* Offline-capable banner */}
+          <Card className="p-3 bg-emerald-50 border-emerald-200 dark:bg-emerald-950/30 dark:border-emerald-900">
+            <div className="flex items-start gap-2.5">
+              {ocrSupported ? (
+                <Wifi className="size-4 mt-0.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
+              ) : (
+                <WifiOff className="size-4 mt-0.5 text-amber-600 shrink-0" />
+              )}
+              <p className="text-xs leading-relaxed text-emerald-900 dark:text-emerald-100">
+                {ocrSupported ? t("scan.label.offlineSupported") : t("scan.label.offlineNoSupport")}
               </p>
-            )}
-            <Button size="sm" variant="ghost" className="w-full" onClick={reset}>
-              <RotateCcw className="size-3.5 mr-1.5" />
-              {t("scan.label.changePhoto")}
-            </Button>
-          </div>
-        )}
-
-        {/* Scanning state: progress */}
-        {phase.kind === "scanning" && (
-          <Card className="p-4 space-y-3">
-            <div className="flex items-center justify-between">
-              <p className="text-sm font-medium">{t("scan.label.processing")}</p>
-              <span className="text-xs text-muted-foreground tabular-nums">
-                {Math.round(phase.progress * 100)}%
-              </span>
             </div>
-            <Progress value={phase.progress * 100} className="h-1.5" />
-            <p className="text-xs text-muted-foreground">{phase.status}</p>
           </Card>
-        )}
 
-        {/* Parsed state: results */}
-        {phase.kind === "parsed" && (
-          <>
-            <NutritionCard parsed={phase.parsed} />
-            {phase.parsed.confidence < CONFIDENCE_THRESHOLD && (
+          {/* Image preview */}
+          {(phase.kind === "preview" ||
+            phase.kind === "scanning" ||
+            phase.kind === "parsed" ||
+            phase.kind === "ai-scanning") && (
+            <div className="rounded-2xl overflow-hidden border bg-card">
+              <img
+                src={phase.src}
+                alt={t("scan.label.altText")}
+                className="w-full max-h-72 object-contain bg-muted"
+              />
+            </div>
+          )}
+
+          {/* Idle state: capture/upload */}
+          {phase.kind === "idle" && (
+            <div className="space-y-3">
+              <Button size="lg" className="w-full" onClick={() => fileInputRef.current?.click()}>
+                <Camera className="size-4 mr-2" />
+                {t("scan.label.takePhoto")}
+              </Button>
               <Button
                 size="lg"
                 variant="outline"
                 className="w-full"
-                onClick={startAiScan}
-                disabled={aiMut.isPending}
+                onClick={() => fileInputRef.current?.click()}
+              >
+                <ScanLine className="size-4 mr-2" />
+                {t("scan.label.gallery")}
+              </Button>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                capture="environment"
+                onChange={(e) => onFile(e.target.files?.[0])}
+                className="hidden"
+              />
+            </div>
+          )}
+
+          {/* Preview state: choose OCR mode */}
+          {phase.kind === "preview" && (
+            <div className="space-y-3">
+              <Button
+                size="lg"
+                className="w-full"
+                onClick={startClientScan}
+                disabled={!ocrSupported}
+              >
+                <ScanLine className="size-4 mr-2" />
+                {t("scan.label.clientScan")}
+              </Button>
+              <Button
+                size="lg"
+                variant="outline"
+                className="w-full border-violet-300 text-violet-700 dark:border-violet-700 dark:text-violet-300"
+                onClick={startVisionScan}
+                disabled={visionMut.isPending}
               >
                 <Sparkles className="size-4 mr-2" />
-                {t("scan.label.tryAi")}
+                {t("scan.label.aiVision")}
               </Button>
-            )}
+              {!ocrSupported && (
+                <p className="text-xs text-amber-600 dark:text-amber-400 text-center px-2">
+                  {t("scan.label.noOcrBrowser")}
+                </p>
+              )}
+              <Button size="sm" variant="ghost" className="w-full" onClick={reset}>
+                <RotateCcw className="size-3.5 mr-1.5" />
+                {t("scan.label.changePhoto")}
+              </Button>
+            </div>
+          )}
 
-            {/* Save to meal log */}
-            {visionMut.data?.ok && visionMut.data.label_id && (
-              <Card className="p-4 space-y-3 bg-emerald-50/50 dark:bg-emerald-950/20 border-emerald-200 dark:border-emerald-900">
-                <div className="flex items-center gap-2">
-                  <Plus className="size-4 text-emerald-600 dark:text-emerald-400" />
-                  <p className="text-sm font-semibold">{t("scan.label.mealLogTitle")}</p>
-                </div>
-                <div className="grid grid-cols-4 gap-2">
-                  {(["breakfast", "lunch", "dinner", "snack"] as const).map((mt) => (
-                    <button
-                      key={mt}
-                      type="button"
-                      onClick={() => setMealType(mt)}
-                      className={`text-xs font-semibold py-2 rounded-lg border transition ${
-                        mealType === mt
-                          ? "bg-primary text-primary-foreground border-primary"
-                          : "bg-card text-foreground border-border/50 hover:bg-secondary/30"
-                      }`}
-                    >
-                      {mt === "breakfast"
-                        ? t("scan.label.mealTypes.breakfast")
-                        : mt === "lunch"
-                          ? t("scan.label.mealTypes.lunch")
-                          : mt === "dinner"
-                            ? t("scan.label.mealTypes.dinner")
-                            : t("scan.label.mealTypes.snack")}
-                    </button>
-                  ))}
-                </div>
+          {/* Scanning state: progress */}
+          {phase.kind === "scanning" && (
+            <Card className="p-4 space-y-3">
+              <div className="flex items-center justify-between">
+                <p className="text-sm font-medium">{t("scan.label.processing")}</p>
+                <span className="text-xs text-muted-foreground tabular-nums">
+                  {Math.round(phase.progress * 100)}%
+                </span>
+              </div>
+              <Progress value={phase.progress * 100} className="h-1.5" />
+              <p className="text-xs text-muted-foreground">{phase.status}</p>
+            </Card>
+          )}
+
+          {/* Parsed state: results */}
+          {phase.kind === "parsed" && (
+            <>
+              <NutritionCard parsed={phase.parsed} />
+              {phase.parsed.confidence < CONFIDENCE_THRESHOLD && (
                 <Button
                   size="lg"
-                  className="w-full bg-emerald-600 hover:bg-emerald-700"
-                  onClick={() => handleAddToMeal(visionMut.data!.label_id!)}
-                  disabled={addMealMut.isPending}
+                  variant="outline"
+                  className="w-full"
+                  onClick={startAiScan}
+                  disabled={aiMut.isPending}
                 >
-                  {addMealMut.isPending ? (
-                    <Loader2 className="size-4 mr-2 animate-spin" />
-                  ) : (
-                    <Check className="size-4 mr-2" />
-                  )}
-                  {mealType === "breakfast"
-                    ? t("scan.label.savedAs.breakfast")
-                    : mealType === "lunch"
-                      ? t("scan.label.savedAs.lunch")
-                      : mealType === "dinner"
-                        ? t("scan.label.savedAs.dinner")
-                        : t("scan.label.savedAs.snack")}
+                  <Sparkles className="size-4 mr-2" />
+                  {t("scan.label.tryAi")}
                 </Button>
-                <p className="text-[10px] text-muted-foreground text-center">
-                  {phase.parsed.nutrition.servingSize ?? t("scan.label.servingDefault")}
-                </p>
-              </Card>
-            )}
+              )}
 
-            <Button size="sm" variant="ghost" className="w-full" onClick={reset}>
-              <RotateCcw className="size-3.5 mr-1.5" />
-              {t("scan.label.scanAnother")}
-            </Button>
-          </>
-        )}
+              {/* Save to meal log */}
+              {visionMut.data?.ok && visionMut.data.label_id && (
+                <Card className="p-4 space-y-3 bg-emerald-50/50 dark:bg-emerald-950/20 border-emerald-200 dark:border-emerald-900">
+                  <div className="flex items-center gap-2">
+                    <Plus className="size-4 text-emerald-600 dark:text-emerald-400" />
+                    <p className="text-sm font-semibold">{t("scan.label.mealLogTitle")}</p>
+                  </div>
+                  <div className="grid grid-cols-4 gap-2">
+                    {(["breakfast", "lunch", "dinner", "snack"] as const).map((mt) => (
+                      <button
+                        key={mt}
+                        type="button"
+                        onClick={() => setMealType(mt)}
+                        className={`text-xs font-semibold py-2 rounded-lg border transition ${
+                          mealType === mt
+                            ? "bg-primary text-primary-foreground border-primary"
+                            : "bg-card text-foreground border-border/50 hover:bg-secondary/30"
+                        }`}
+                      >
+                        {mt === "breakfast"
+                          ? t("scan.label.mealTypes.breakfast")
+                          : mt === "lunch"
+                            ? t("scan.label.mealTypes.lunch")
+                            : mt === "dinner"
+                              ? t("scan.label.mealTypes.dinner")
+                              : t("scan.label.mealTypes.snack")}
+                      </button>
+                    ))}
+                  </div>
+                  <Button
+                    size="lg"
+                    className="w-full bg-emerald-600 hover:bg-emerald-700"
+                    onClick={() => handleAddToMeal(visionMut.data!.label_id!)}
+                    disabled={addMealMut.isPending}
+                  >
+                    {addMealMut.isPending ? (
+                      <Loader2 className="size-4 mr-2 animate-spin" />
+                    ) : (
+                      <Check className="size-4 mr-2" />
+                    )}
+                    {mealType === "breakfast"
+                      ? t("scan.label.savedAs.breakfast")
+                      : mealType === "lunch"
+                        ? t("scan.label.savedAs.lunch")
+                        : mealType === "dinner"
+                          ? t("scan.label.savedAs.dinner")
+                          : t("scan.label.savedAs.snack")}
+                  </Button>
+                  <p className="text-[10px] text-muted-foreground text-center">
+                    {phase.parsed.nutrition.servingSize ?? t("scan.label.servingDefault")}
+                  </p>
+                </Card>
+              )}
 
-        {/* AI scanning state */}
-        {phase.kind === "ai-scanning" && (
-          <Card className="p-4 space-y-2">
-            <div className="flex items-center gap-2">
-              <Sparkles className="size-4 animate-pulse text-violet-600" />
-              <p className="text-sm font-medium">{t("scan.label.aiParsing")}</p>
-            </div>
-            <p className="text-xs text-muted-foreground">{t("scan.label.aiParsingHint")}</p>
-          </Card>
-        )}
+              <Button size="sm" variant="ghost" className="w-full" onClick={reset}>
+                <RotateCcw className="size-3.5 mr-1.5" />
+                {t("scan.label.scanAnother")}
+              </Button>
+            </>
+          )}
 
-        {/* AI Vision scanning state */}
-        {visionMut.isPending && (
-          <Card className="p-4 space-y-2 border-violet-200 dark:border-violet-800">
-            <div className="flex items-center gap-2">
-              <Sparkles className="size-4 animate-pulse text-violet-600" />
-              <p className="text-sm font-medium">{t("scan.label.aiVisionReading")}</p>
-            </div>
-            <p className="text-xs text-muted-foreground">{t("scan.label.aiVisionHint")}</p>
-          </Card>
-        )}
-      </main>
-      <BottomNav />
-    </div>
+          {/* AI scanning state */}
+          {phase.kind === "ai-scanning" && (
+            <Card className="p-4 space-y-2">
+              <div className="flex items-center gap-2">
+                <Sparkles className="size-4 animate-pulse text-violet-600" />
+                <p className="text-sm font-medium">{t("scan.label.aiParsing")}</p>
+              </div>
+              <p className="text-xs text-muted-foreground">{t("scan.label.aiParsingHint")}</p>
+            </Card>
+          )}
+
+          {/* AI Vision scanning state */}
+          {visionMut.isPending && (
+            <Card className="p-4 space-y-2 border-violet-200 dark:border-violet-800">
+              <div className="flex items-center gap-2">
+                <Sparkles className="size-4 animate-pulse text-violet-600" />
+                <p className="text-sm font-medium">{t("scan.label.aiVisionReading")}</p>
+              </div>
+              <p className="text-xs text-muted-foreground">{t("scan.label.aiVisionHint")}</p>
+            </Card>
+          )}
+        </main>
+        <BottomNav />
+      </div>
+    </FeatureDisabled>
   );
 }
 

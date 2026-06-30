@@ -22,6 +22,7 @@ import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { ActionPlanCard } from "@/features/coach/components/ActionPlanCard";
 import { toast } from "@/lib/toast-config";
 import { useTranslation } from "@/lib/i18n";
+import { FeatureDisabled } from "@/components/healthyu/FeatureDisabled";
 
 export const Route = createFileRoute("/_authenticated/coach")({
   component: CoachPage,
@@ -80,117 +81,125 @@ function CoachPage() {
   });
 
   return (
-    <main className="min-h-dvh bg-background pb-28">
-      <div className="max-w-md mx-auto px-5 pt-2 space-y-5">
-        <TopAppBar
-          title={t("coach.title")}
-          subtitle={t("coach.subtitle")}
-          showBack
-          action={
-            <button
-              onClick={handleRefresh}
-              disabled={currentIsPending}
-              className="size-9 rounded-full bg-muted grid place-items-center disabled:opacity-50"
-              aria-label={t("coach.refresh")}
-            >
-              {currentIsPending ? (
-                <Loader2 className="size-4 animate-spin" />
-              ) : (
-                <RefreshCw className="size-4" />
-              )}
-            </button>
-          }
-        />
+    <FeatureDisabled
+      flag="feature.ai_coach"
+      titleKey="coach.featDisabled"
+      descKey="coach.featDisabledDesc"
+    >
+      <main className="min-h-dvh bg-background pb-28">
+        <div className="max-w-md mx-auto px-5 pt-2 space-y-5">
+          <TopAppBar
+            title={t("coach.title")}
+            subtitle={t("coach.subtitle")}
+            showBack
+            action={
+              <button
+                onClick={handleRefresh}
+                disabled={currentIsPending}
+                className="size-9 rounded-full bg-muted grid place-items-center disabled:opacity-50"
+                aria-label={t("coach.refresh")}
+              >
+                {currentIsPending ? (
+                  <Loader2 className="size-4 animate-spin" />
+                ) : (
+                  <RefreshCw className="size-4" />
+                )}
+              </button>
+            }
+          />
 
-        {/* Tabs: Morning / Evening */}
-        <div className="grid grid-cols-2 gap-2 bg-card p-1 rounded-2xl outline-1 outline-black/5">
-          {TABS.map(({ id, label, Icon }) => (
-            <button
-              key={id}
-              type="button"
-              onClick={() => handleTabChange(id)}
-              className={`flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-sm font-semibold transition ${
-                tab === id
-                  ? "bg-primary text-primary-foreground shadow-sm"
-                  : "text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              <Icon className="size-3.5" aria-hidden />
-              {label}
-            </button>
-          ))}
-        </div>
-
-        {/* Medical safety disclaimer — AI Coach provides general guidance, not medical advice. */}
-        <MedicalDisclaimer variant="disclaimer" className="w-full" />
-
-        {/* Loading state */}
-        {currentIsPending && !currentData && (
-          <div className="bg-card p-8 rounded-3xl outline-1 outline-black/5 text-center space-y-3">
-            <Loader2 className="size-8 animate-spin mx-auto text-primary" />
-            <p className="text-sm text-muted-foreground">
-              {tab === "morning" ? t("coach.analyzingMorning") : t("coach.analyzingEvening")}
-            </p>
+          {/* Tabs: Morning / Evening */}
+          <div className="grid grid-cols-2 gap-2 bg-card p-1 rounded-2xl outline-1 outline-black/5">
+            {TABS.map(({ id, label, Icon }) => (
+              <button
+                key={id}
+                type="button"
+                onClick={() => handleTabChange(id)}
+                className={`flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-sm font-semibold transition ${
+                  tab === id
+                    ? "bg-primary text-primary-foreground shadow-sm"
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                <Icon className="size-3.5" aria-hidden />
+                {label}
+              </button>
+            ))}
           </div>
-        )}
 
-        {/* Error state */}
-        {currentError && !currentData && (
-          <div className="bg-destructive/10 p-5 rounded-3xl text-sm text-destructive">
-            {currentError instanceof Error ? currentError.message : t("coach.loadError")}
-          </div>
-        )}
+          {/* Medical safety disclaimer — AI Coach provides general guidance, not medical advice. */}
+          <MedicalDisclaimer variant="disclaimer" className="w-full" />
 
-        {/* MORNING COACH UI */}
-        {tab === "morning" && currentData && "focus" in currentData && (
-          <MorningView data={currentData} loading={currentIsPending} />
-        )}
-
-        {/* EVENING COACH UI */}
-        {tab === "evening" && currentData && "reflection" in currentData && (
-          <EveningView data={currentData} loading={currentIsPending} />
-        )}
-
-        {/* HISTORY */}
-        <section>
-          <button
-            type="button"
-            onClick={() => setShowHistory(!showHistory)}
-            className="w-full flex items-center justify-between p-3 rounded-xl bg-secondary/30 hover:bg-secondary/50 transition text-sm font-medium"
-          >
-            <span className="inline-flex items-center gap-2">
-              <TrendingUp className="size-4 text-muted-foreground" />
-              {t("coach.historyLabel")}
-            </span>
-            <ArrowRight
-              className={`size-4 transition-transform ${showHistory ? "rotate-90" : ""}`}
-            />
-          </button>
-          {showHistory && history.length > 0 && (
-            <div className="mt-3 space-y-2">
-              {history.map(
-                (h: {
-                  id: string;
-                  kind: string;
-                  session_date: string;
-                  focus: string | null;
-                  summary: string | null;
-                  tips: string[] | null;
-                  warnings: string[] | null;
-                  read_at: string | null;
-                }) => (
-                  <HistoryRow key={h.id} item={h} />
-                ),
-              )}
+          {/* Loading state */}
+          {currentIsPending && !currentData && (
+            <div className="bg-card p-8 rounded-3xl outline-1 outline-black/5 text-center space-y-3">
+              <Loader2 className="size-8 animate-spin mx-auto text-primary" />
+              <p className="text-sm text-muted-foreground">
+                {tab === "morning" ? t("coach.analyzingMorning") : t("coach.analyzingEvening")}
+              </p>
             </div>
           )}
-          {showHistory && history.length === 0 && (
-            <p className="text-xs text-muted-foreground text-center py-4">{t("coach.noHistory")}</p>
+
+          {/* Error state */}
+          {currentError && !currentData && (
+            <div className="bg-destructive/10 p-5 rounded-3xl text-sm text-destructive">
+              {currentError instanceof Error ? currentError.message : t("coach.loadError")}
+            </div>
           )}
-        </section>
-      </div>
-      <BottomNav />
-    </main>
+
+          {/* MORNING COACH UI */}
+          {tab === "morning" && currentData && "focus" in currentData && (
+            <MorningView data={currentData} loading={currentIsPending} />
+          )}
+
+          {/* EVENING COACH UI */}
+          {tab === "evening" && currentData && "reflection" in currentData && (
+            <EveningView data={currentData} loading={currentIsPending} />
+          )}
+
+          {/* HISTORY */}
+          <section>
+            <button
+              type="button"
+              onClick={() => setShowHistory(!showHistory)}
+              className="w-full flex items-center justify-between p-3 rounded-xl bg-secondary/30 hover:bg-secondary/50 transition text-sm font-medium"
+            >
+              <span className="inline-flex items-center gap-2">
+                <TrendingUp className="size-4 text-muted-foreground" />
+                {t("coach.historyLabel")}
+              </span>
+              <ArrowRight
+                className={`size-4 transition-transform ${showHistory ? "rotate-90" : ""}`}
+              />
+            </button>
+            {showHistory && history.length > 0 && (
+              <div className="mt-3 space-y-2">
+                {history.map(
+                  (h: {
+                    id: string;
+                    kind: string;
+                    session_date: string;
+                    focus: string | null;
+                    summary: string | null;
+                    tips: string[] | null;
+                    warnings: string[] | null;
+                    read_at: string | null;
+                  }) => (
+                    <HistoryRow key={h.id} item={h} />
+                  ),
+                )}
+              </div>
+            )}
+            {showHistory && history.length === 0 && (
+              <p className="text-xs text-muted-foreground text-center py-4">
+                {t("coach.noHistory")}
+              </p>
+            )}
+          </section>
+        </div>
+        <BottomNav />
+      </main>
+    </FeatureDisabled>
   );
 }
 

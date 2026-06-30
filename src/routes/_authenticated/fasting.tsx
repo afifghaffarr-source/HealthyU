@@ -28,6 +28,7 @@ import {
 } from "@/features/fasting/components/FastingPieces";
 import { FastingPhaseExplainer } from "@/features/fasting/components/FastingPhaseExplainer";
 import { track } from "@/lib/errorReporting";
+import { FeatureDisabled } from "@/components/healthyu/FeatureDisabled";
 
 export const Route = createFileRoute("/_authenticated/fasting")({
   component: FastingPage,
@@ -145,56 +146,62 @@ function FastingPage() {
   const pct = fast ? Math.min(100, (elapsedHrs / Number(fast.target_hours)) * 100) : 0;
 
   return (
-    <main className="min-h-dvh bg-background pb-28">
-      <div className="max-w-md mx-auto px-5 pt-2 space-y-5">
-        <TopAppBar title={t("fasting.title")} subtitle={t("fasting.subtitle")} showBack />
+    <FeatureDisabled
+      flag="feature.fasting"
+      titleKey="fasting.featDisabled"
+      descKey="fasting.featDisabledDesc"
+    >
+      <main className="min-h-dvh bg-background pb-28">
+        <div className="max-w-md mx-auto px-5 pt-2 space-y-5">
+          <TopAppBar title={t("fasting.title")} subtitle={t("fasting.subtitle")} showBack />
 
-        {/* Sprint 29 — Puasa Aman widget sits at top so users see countdown first */}
-        {puasaAman && <PuasaAmanWidget data={puasaAman} />}
+          {/* Sprint 29 — Puasa Aman widget sits at top so users see countdown first */}
+          {puasaAman && <PuasaAmanWidget data={puasaAman} />}
 
-        {/* Streak & Stats */}
-        {stats && (
-          <StreakDisplay
-            streak={stats.current_streak ?? 0}
-            totalFasts={stats.total_fasts ?? 0}
-            longestFast={Math.round((stats.longest_fast ?? 0) * 10) / 10}
-            thisWeekCount={stats.this_week_count ?? 0}
+          {/* Streak & Stats */}
+          {stats && (
+            <StreakDisplay
+              streak={stats.current_streak ?? 0}
+              totalFasts={stats.total_fasts ?? 0}
+              longestFast={Math.round((stats.longest_fast ?? 0) * 10) / 10}
+              thisWeekCount={stats.this_week_count ?? 0}
+            />
+          )}
+
+          {fast ? (
+            <ActiveFastCard
+              fast={fast}
+              elapsedMs={elapsedMs}
+              elapsedHrs={elapsedHrs}
+              pct={pct}
+              onStop={(id) => stopMut.mutate(id)}
+              stopping={stopMut.isPending}
+            />
+          ) : (
+            <>
+              {justStopped && <BreakFastTipsCard />}
+              <ProtocolPicker onStart={(p) => startMut.mutate(p)} starting={startMut.isPending} />
+            </>
+          )}
+
+          {/* Phase 3 (8.6): Educational fasting phases explainer */}
+          <FastingPhaseExplainer currentHours={fast ? elapsedHrs : undefined} />
+
+          <RamadhanScheduleCard
+            ramadhan={ramadhan}
+            setRamadhan={setRamadhan}
+            imsak={imsak}
+            setImsak={setImsak}
+            iftar={iftar}
+            setIftar={setIftar}
+            onSave={() => saveSchedule.mutate({ ramadhan, imsak, iftar })}
+            saving={saveSchedule.isPending}
           />
-        )}
 
-        {fast ? (
-          <ActiveFastCard
-            fast={fast}
-            elapsedMs={elapsedMs}
-            elapsedHrs={elapsedHrs}
-            pct={pct}
-            onStop={(id) => stopMut.mutate(id)}
-            stopping={stopMut.isPending}
-          />
-        ) : (
-          <>
-            {justStopped && <BreakFastTipsCard />}
-            <ProtocolPicker onStart={(p) => startMut.mutate(p)} starting={startMut.isPending} />
-          </>
-        )}
-
-        {/* Phase 3 (8.6): Educational fasting phases explainer */}
-        <FastingPhaseExplainer currentHours={fast ? elapsedHrs : undefined} />
-
-        <RamadhanScheduleCard
-          ramadhan={ramadhan}
-          setRamadhan={setRamadhan}
-          imsak={imsak}
-          setImsak={setImsak}
-          iftar={iftar}
-          setIftar={setIftar}
-          onSave={() => saveSchedule.mutate({ ramadhan, imsak, iftar })}
-          saving={saveSchedule.isPending}
-        />
-
-        <FastHistoryList history={history} />
-      </div>
-      <BottomNav />
-    </main>
+          <FastHistoryList history={history} />
+        </div>
+        <BottomNav />
+      </main>
+    </FeatureDisabled>
   );
 }

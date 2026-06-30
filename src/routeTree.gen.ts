@@ -185,6 +185,8 @@ import { Route as AuthenticatedAdminUsersRouteImport } from './routes/_authentic
 import { Route as AuthenticatedAdminSystemRouteImport } from './routes/_authenticated/admin/system'
 import { Route as AuthenticatedAdminSeedRecipesRouteImport } from './routes/_authenticated/admin/seed-recipes'
 import { Route as AuthenticatedAdminRecipesRouteImport } from './routes/_authenticated/admin/recipes'
+import { Route as AuthenticatedAdminI18nRouteImport } from './routes/_authenticated/admin/i18n'
+import { Route as AuthenticatedAdminConfigRouteImport } from './routes/_authenticated/admin/config'
 import { Route as AuthenticatedAdminAuditRouteImport } from './routes/_authenticated/admin/audit'
 import { Route as AuthenticatedAdminArticlesRouteImport } from './routes/_authenticated/admin/articles'
 import { Route as ApiWearableGoogleFitCallbackRouteImport } from './routes/api/wearable.google-fit.callback'
@@ -1148,6 +1150,17 @@ const AuthenticatedAdminRecipesRoute =
     path: '/recipes',
     getParentRoute: () => AuthenticatedAdminRouteRoute,
   } as any)
+const AuthenticatedAdminI18nRoute = AuthenticatedAdminI18nRouteImport.update({
+  id: '/i18n',
+  path: '/i18n',
+  getParentRoute: () => AuthenticatedAdminRouteRoute,
+} as any)
+const AuthenticatedAdminConfigRoute =
+  AuthenticatedAdminConfigRouteImport.update({
+    id: '/config',
+    path: '/config',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
 const AuthenticatedAdminAuditRoute = AuthenticatedAdminAuditRouteImport.update({
   id: '/audit',
   path: '/audit',
@@ -1335,6 +1348,8 @@ export interface FileRoutesByFullPath {
   '/resep/': typeof ResepIndexRoute
   '/admin/articles': typeof AuthenticatedAdminArticlesRoute
   '/admin/audit': typeof AuthenticatedAdminAuditRoute
+  '/admin/config': typeof AuthenticatedAdminConfigRoute
+  '/admin/i18n': typeof AuthenticatedAdminI18nRoute
   '/admin/recipes': typeof AuthenticatedAdminRecipesRoute
   '/admin/seed-recipes': typeof AuthenticatedAdminSeedRecipesRoute
   '/admin/system': typeof AuthenticatedAdminSystemRoute
@@ -1519,6 +1534,8 @@ export interface FileRoutesByTo {
   '/resep': typeof ResepIndexRoute
   '/admin/articles': typeof AuthenticatedAdminArticlesRoute
   '/admin/audit': typeof AuthenticatedAdminAuditRoute
+  '/admin/config': typeof AuthenticatedAdminConfigRoute
+  '/admin/i18n': typeof AuthenticatedAdminI18nRoute
   '/admin/recipes': typeof AuthenticatedAdminRecipesRoute
   '/admin/seed-recipes': typeof AuthenticatedAdminSeedRecipesRoute
   '/admin/system': typeof AuthenticatedAdminSystemRoute
@@ -1713,6 +1730,8 @@ export interface FileRoutesById {
   '/resep/': typeof ResepIndexRoute
   '/_authenticated/admin/articles': typeof AuthenticatedAdminArticlesRoute
   '/_authenticated/admin/audit': typeof AuthenticatedAdminAuditRoute
+  '/_authenticated/admin/config': typeof AuthenticatedAdminConfigRoute
+  '/_authenticated/admin/i18n': typeof AuthenticatedAdminI18nRoute
   '/_authenticated/admin/recipes': typeof AuthenticatedAdminRecipesRoute
   '/_authenticated/admin/seed-recipes': typeof AuthenticatedAdminSeedRecipesRoute
   '/_authenticated/admin/system': typeof AuthenticatedAdminSystemRoute
@@ -1907,6 +1926,8 @@ export interface FileRouteTypes {
     | '/resep/'
     | '/admin/articles'
     | '/admin/audit'
+    | '/admin/config'
+    | '/admin/i18n'
     | '/admin/recipes'
     | '/admin/seed-recipes'
     | '/admin/system'
@@ -2091,6 +2112,8 @@ export interface FileRouteTypes {
     | '/resep'
     | '/admin/articles'
     | '/admin/audit'
+    | '/admin/config'
+    | '/admin/i18n'
     | '/admin/recipes'
     | '/admin/seed-recipes'
     | '/admin/system'
@@ -2284,6 +2307,8 @@ export interface FileRouteTypes {
     | '/resep/'
     | '/_authenticated/admin/articles'
     | '/_authenticated/admin/audit'
+    | '/_authenticated/admin/config'
+    | '/_authenticated/admin/i18n'
     | '/_authenticated/admin/recipes'
     | '/_authenticated/admin/seed-recipes'
     | '/_authenticated/admin/system'
@@ -3655,6 +3680,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminRecipesRouteImport
       parentRoute: typeof AuthenticatedAdminRouteRoute
     }
+    '/_authenticated/admin/i18n': {
+      id: '/_authenticated/admin/i18n'
+      path: '/i18n'
+      fullPath: '/admin/i18n'
+      preLoaderRoute: typeof AuthenticatedAdminI18nRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_authenticated/admin/config': {
+      id: '/_authenticated/admin/config'
+      path: '/config'
+      fullPath: '/admin/config'
+      preLoaderRoute: typeof AuthenticatedAdminConfigRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
     '/_authenticated/admin/audit': {
       id: '/_authenticated/admin/audit'
       path: '/audit'
@@ -3766,6 +3805,8 @@ declare module '@tanstack/react-router' {
 interface AuthenticatedAdminRouteRouteChildren {
   AuthenticatedAdminArticlesRoute: typeof AuthenticatedAdminArticlesRoute
   AuthenticatedAdminAuditRoute: typeof AuthenticatedAdminAuditRoute
+  AuthenticatedAdminConfigRoute: typeof AuthenticatedAdminConfigRoute
+  AuthenticatedAdminI18nRoute: typeof AuthenticatedAdminI18nRoute
   AuthenticatedAdminRecipesRoute: typeof AuthenticatedAdminRecipesRoute
   AuthenticatedAdminSeedRecipesRoute: typeof AuthenticatedAdminSeedRecipesRoute
   AuthenticatedAdminSystemRoute: typeof AuthenticatedAdminSystemRoute
@@ -3777,6 +3818,8 @@ const AuthenticatedAdminRouteRouteChildren: AuthenticatedAdminRouteRouteChildren
   {
     AuthenticatedAdminArticlesRoute: AuthenticatedAdminArticlesRoute,
     AuthenticatedAdminAuditRoute: AuthenticatedAdminAuditRoute,
+    AuthenticatedAdminConfigRoute: AuthenticatedAdminConfigRoute,
+    AuthenticatedAdminI18nRoute: AuthenticatedAdminI18nRoute,
     AuthenticatedAdminRecipesRoute: AuthenticatedAdminRecipesRoute,
     AuthenticatedAdminSeedRecipesRoute: AuthenticatedAdminSeedRecipesRoute,
     AuthenticatedAdminSystemRoute: AuthenticatedAdminSystemRoute,

@@ -11,6 +11,8 @@ import {
   ChevronRight,
   ShieldCheck,
   Loader2,
+  Settings,
+  Languages,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { TopAppBar } from "@/components/healthyu/top-app-bar";
@@ -58,6 +60,18 @@ const NAV: NavItem[] = [
     label: "Seed Recipes",
     icon: Sprout,
     description: "Generate resep baru via AI (bulk).",
+  },
+  {
+    to: "/admin/config",
+    label: "App Config",
+    icon: Settings,
+    description: "Edit runtime config (feature flags, defaults, gamification).",
+  },
+  {
+    to: "/admin/i18n",
+    label: "Translation Editor",
+    icon: Languages,
+    description: "Edit copy in-DB tanpa redeploy. Override beats bundled.",
   },
   {
     to: "/admin/system",

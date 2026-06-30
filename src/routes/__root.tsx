@@ -31,8 +31,11 @@ const RouteProgressBar = lazy(() =>
   })),
 );
 const OfflineStatusBand = lazy(() =>
-  import("@/components/offline-status-band").then((m) => ({
-    default: m.OfflineStatusBand,
+  import("@/components/offline-status-band").then((m) => ({ default: m.OfflineStatusBand })),
+);
+const MaintenanceBanner = lazy(() =>
+  import("@/components/healthyu/maintenance-banner").then((m) => ({
+    default: m.MaintenanceBanner,
   })),
 );
 import { supabase } from "@/integrations/supabase/client";
@@ -190,6 +193,9 @@ function RootComponent() {
                   so it's visible across every route. Lazy + null fallback
                   keeps it out of the main bundle. */}
               <OfflineStatusBand />
+              <Suspense fallback={null}>
+                <MaintenanceBanner />
+              </Suspense>
               <Outlet />
             </GlobalErrorBoundary>
             <Suspense fallback={null}>
