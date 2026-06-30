@@ -188,6 +188,7 @@ import { Route as AuthenticatedAdminRecipesRouteImport } from './routes/_authent
 import { Route as AuthenticatedAdminPromoRouteImport } from './routes/_authenticated/admin/promo'
 import { Route as AuthenticatedAdminNotificationsRouteImport } from './routes/_authenticated/admin/notifications'
 import { Route as AuthenticatedAdminI18nRouteImport } from './routes/_authenticated/admin/i18n'
+import { Route as AuthenticatedAdminExperimentsRouteImport } from './routes/_authenticated/admin/experiments'
 import { Route as AuthenticatedAdminConfigRouteImport } from './routes/_authenticated/admin/config'
 import { Route as AuthenticatedAdminBannersRouteImport } from './routes/_authenticated/admin/banners'
 import { Route as AuthenticatedAdminAuditRouteImport } from './routes/_authenticated/admin/audit'
@@ -1169,6 +1170,12 @@ const AuthenticatedAdminI18nRoute = AuthenticatedAdminI18nRouteImport.update({
   path: '/i18n',
   getParentRoute: () => AuthenticatedAdminRouteRoute,
 } as any)
+const AuthenticatedAdminExperimentsRoute =
+  AuthenticatedAdminExperimentsRouteImport.update({
+    id: '/experiments',
+    path: '/experiments',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
 const AuthenticatedAdminConfigRoute =
   AuthenticatedAdminConfigRouteImport.update({
     id: '/config',
@@ -1370,6 +1377,7 @@ export interface FileRoutesByFullPath {
   '/admin/audit': typeof AuthenticatedAdminAuditRoute
   '/admin/banners': typeof AuthenticatedAdminBannersRoute
   '/admin/config': typeof AuthenticatedAdminConfigRoute
+  '/admin/experiments': typeof AuthenticatedAdminExperimentsRoute
   '/admin/i18n': typeof AuthenticatedAdminI18nRoute
   '/admin/notifications': typeof AuthenticatedAdminNotificationsRoute
   '/admin/promo': typeof AuthenticatedAdminPromoRoute
@@ -1559,6 +1567,7 @@ export interface FileRoutesByTo {
   '/admin/audit': typeof AuthenticatedAdminAuditRoute
   '/admin/banners': typeof AuthenticatedAdminBannersRoute
   '/admin/config': typeof AuthenticatedAdminConfigRoute
+  '/admin/experiments': typeof AuthenticatedAdminExperimentsRoute
   '/admin/i18n': typeof AuthenticatedAdminI18nRoute
   '/admin/notifications': typeof AuthenticatedAdminNotificationsRoute
   '/admin/promo': typeof AuthenticatedAdminPromoRoute
@@ -1758,6 +1767,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/audit': typeof AuthenticatedAdminAuditRoute
   '/_authenticated/admin/banners': typeof AuthenticatedAdminBannersRoute
   '/_authenticated/admin/config': typeof AuthenticatedAdminConfigRoute
+  '/_authenticated/admin/experiments': typeof AuthenticatedAdminExperimentsRoute
   '/_authenticated/admin/i18n': typeof AuthenticatedAdminI18nRoute
   '/_authenticated/admin/notifications': typeof AuthenticatedAdminNotificationsRoute
   '/_authenticated/admin/promo': typeof AuthenticatedAdminPromoRoute
@@ -1957,6 +1967,7 @@ export interface FileRouteTypes {
     | '/admin/audit'
     | '/admin/banners'
     | '/admin/config'
+    | '/admin/experiments'
     | '/admin/i18n'
     | '/admin/notifications'
     | '/admin/promo'
@@ -2146,6 +2157,7 @@ export interface FileRouteTypes {
     | '/admin/audit'
     | '/admin/banners'
     | '/admin/config'
+    | '/admin/experiments'
     | '/admin/i18n'
     | '/admin/notifications'
     | '/admin/promo'
@@ -2344,6 +2356,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/audit'
     | '/_authenticated/admin/banners'
     | '/_authenticated/admin/config'
+    | '/_authenticated/admin/experiments'
     | '/_authenticated/admin/i18n'
     | '/_authenticated/admin/notifications'
     | '/_authenticated/admin/promo'
@@ -3739,6 +3752,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminI18nRouteImport
       parentRoute: typeof AuthenticatedAdminRouteRoute
     }
+    '/_authenticated/admin/experiments': {
+      id: '/_authenticated/admin/experiments'
+      path: '/experiments'
+      fullPath: '/admin/experiments'
+      preLoaderRoute: typeof AuthenticatedAdminExperimentsRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
     '/_authenticated/admin/config': {
       id: '/_authenticated/admin/config'
       path: '/config'
@@ -3866,6 +3886,7 @@ interface AuthenticatedAdminRouteRouteChildren {
   AuthenticatedAdminAuditRoute: typeof AuthenticatedAdminAuditRoute
   AuthenticatedAdminBannersRoute: typeof AuthenticatedAdminBannersRoute
   AuthenticatedAdminConfigRoute: typeof AuthenticatedAdminConfigRoute
+  AuthenticatedAdminExperimentsRoute: typeof AuthenticatedAdminExperimentsRoute
   AuthenticatedAdminI18nRoute: typeof AuthenticatedAdminI18nRoute
   AuthenticatedAdminNotificationsRoute: typeof AuthenticatedAdminNotificationsRoute
   AuthenticatedAdminPromoRoute: typeof AuthenticatedAdminPromoRoute
@@ -3882,6 +3903,7 @@ const AuthenticatedAdminRouteRouteChildren: AuthenticatedAdminRouteRouteChildren
     AuthenticatedAdminAuditRoute: AuthenticatedAdminAuditRoute,
     AuthenticatedAdminBannersRoute: AuthenticatedAdminBannersRoute,
     AuthenticatedAdminConfigRoute: AuthenticatedAdminConfigRoute,
+    AuthenticatedAdminExperimentsRoute: AuthenticatedAdminExperimentsRoute,
     AuthenticatedAdminI18nRoute: AuthenticatedAdminI18nRoute,
     AuthenticatedAdminNotificationsRoute: AuthenticatedAdminNotificationsRoute,
     AuthenticatedAdminPromoRoute: AuthenticatedAdminPromoRoute,

@@ -12,8 +12,11 @@ import {
   Image as ImageIcon,
   Activity,
   Bell,
+  Ticket,
+  Megaphone,
 } from "lucide-react";
 import { getAdminOverview } from "@/features/admin/lib/adminOverview.functions";
+import { getPromoStatsAdmin } from "@/features/admin/lib/adminPromo.functions";
 import { useTranslation } from "@/lib/i18n";
 
 export const Route = createFileRoute("/_authenticated/admin/")({
@@ -29,6 +32,20 @@ function AdminOverviewPage() {
     queryFn: () => getAdminOverview({ data: {} }),
     staleTime: 60_000, // 1 min
     refetchOnWindowFocus: true,
+  });
+
+  // Sprint 58-C: separate tiny query for promo stats so it can refresh
+  // independently of the (potentially slow) overview query, and so the
+  // overview can render even if promo counts fail to load.
+  const {
+    data: promoStats,
+    isLoading: promoLoading,
+    error: promoError,
+  } = useQuery({
+    queryKey: ["admin", "promoStats"],
+    queryFn: () => getPromoStatsAdmin(),
+    staleTime: 60_000,
+    retry: 1,
   });
 
   if (error) {
@@ -152,6 +169,50 @@ function AdminOverviewPage() {
             </div>
           </section>
 
+          {/* Sprint 58-C: Promo & Redemptions overview */}
+          <section className="bg-card rounded-2xl p-5 outline-1 outline-black/5">
+            <div className="flex items-center gap-2 mb-3">
+              <Ticket className="size-4 text-primary" />
+              <h2 className="font-bold">{t("admin.index.promoStatsTitle")}</h2>
+            </div>
+            {promoLoading ? (
+              <p className="text-xs text-muted-foreground">{t("common.loading")}</p>
+            ) : promoError || !promoStats ? (
+              <p className="text-xs text-muted-foreground">{t("admin.index.tryAgain")}</p>
+            ) : (
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                <StatCard
+                  icon={<Ticket className="size-5" />}
+                  label={t("admin.index.promoTotalCodes")}
+                  value={promoStats.total_codes}
+                  sub={`${promoStats.active_codes} ${t("admin.index.promoActiveCodes").toLowerCase()}`}
+                  tone="primary"
+                />
+                <StatCard
+                  icon={<ShieldCheck className="size-5" />}
+                  label={t("admin.index.promoActiveCodes")}
+                  value={promoStats.active_codes}
+                  sub={t("admin.promo.active")}
+                  tone="muted"
+                />
+                <StatCard
+                  icon={<Activity className="size-5" />}
+                  label={t("admin.index.promoRedemptions")}
+                  value={promoStats.total_redemptions}
+                  sub={`${promoStats.unique_redeemers} ${t("admin.index.promoUnique").toLowerCase()}`}
+                  tone="primary"
+                />
+                <StatCard
+                  icon={<Users className="size-5" />}
+                  label={t("admin.index.promoUnique")}
+                  value={promoStats.unique_redeemers}
+                  sub={t("admin.index.promoRedemptions")}
+                  tone="muted"
+                />
+              </div>
+            )}
+          </section>
+
           {/* Recent activity */}
           <section className="grid lg:grid-cols-2 gap-4">
             <div className="bg-card rounded-2xl p-5 outline-1 outline-black/5">
@@ -256,6 +317,18 @@ function AdminOverviewPage() {
                 icon={<Bell className="size-4" />}
                 title={t("admin.notif.title")}
                 desc={t("admin.notif.subtitle")}
+              />
+              <QuickAction
+                to="/admin/promo"
+                icon={<Ticket className="size-4" />}
+                title={t("admin.index.qaPromoTitle")}
+                desc={t("admin.index.qaPromoDesc")}
+              />
+              <QuickAction
+                to="/admin/banners"
+                icon={<Megaphone className="size-4" />}
+                title={t("admin.index.qaBannersTitle")}
+                desc={t("admin.index.qaBannersDesc")}
               />
             </div>
           </section>

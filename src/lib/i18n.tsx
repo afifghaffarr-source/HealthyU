@@ -1754,6 +1754,29 @@ export type TranslationKey =
   | "admin.banners.empty"
   | "admin.banners.savedOk"
   | "admin.banners.deletedOk"
+  | "admin.exp.title"
+  | "admin.exp.subtitle"
+  | "admin.exp.createBtn"
+  | "admin.exp.key"
+  | "admin.exp.label"
+  | "admin.exp.description"
+  | "admin.exp.variantA"
+  | "admin.exp.variantB"
+  | "admin.exp.splitPct"
+  | "admin.exp.active"
+  | "admin.exp.empty"
+  | "admin.exp.savedOk"
+  | "admin.exp.deletedOk"
+  | "admin.exp.invalidJson"
+  | "admin.index.promoStatsTitle"
+  | "admin.index.promoTotalCodes"
+  | "admin.index.promoActiveCodes"
+  | "admin.index.promoRedemptions"
+  | "admin.index.promoUnique"
+  | "admin.index.qaPromoTitle"
+  | "admin.index.qaPromoDesc"
+  | "admin.index.qaBannersTitle"
+  | "admin.index.qaBannersDesc"
   | "promo.placeholder"
   | "promo.redeemBtn"
   | "promo.redeemOk"
@@ -3372,6 +3395,31 @@ export const bundles = {
     "admin.banners.empty": "Belum ada banner.",
     "admin.banners.savedOk": "Banner tersimpan.",
     "admin.banners.deletedOk": "Banner dihapus.",
+    // Sprint 58-E — experiments (ID)
+    "admin.exp.title": "Eksperimen A/B",
+    "admin.exp.subtitle": "Kelola eksperimen A/B test untuk landing, CTA, dan UI lainnya.",
+    "admin.exp.createBtn": "Buat Eksperimen",
+    "admin.exp.key": "Key",
+    "admin.exp.label": "Label",
+    "admin.exp.description": "Deskripsi",
+    "admin.exp.variantA": "Variant A (JSON)",
+    "admin.exp.variantB": "Variant B (JSON)",
+    "admin.exp.splitPct": "Split %",
+    "admin.exp.active": "Aktif",
+    "admin.exp.empty": "Belum ada eksperimen.",
+    "admin.exp.savedOk": "Eksperimen tersimpan.",
+    "admin.exp.deletedOk": "Eksperimen dihapus.",
+    "admin.exp.invalidJson": "Format JSON tidak valid untuk variant_a_json atau variant_b_json.",
+    // Sprint 58-C — promo stats card + quick actions (ID)
+    "admin.index.promoStatsTitle": "Promo & Redemptions",
+    "admin.index.promoTotalCodes": "Total kode",
+    "admin.index.promoActiveCodes": "Kode aktif",
+    "admin.index.promoRedemptions": "Redemptions",
+    "admin.index.promoUnique": "Unique redeemers",
+    "admin.index.qaPromoTitle": "Kelola Promo",
+    "admin.index.qaPromoDesc": "Kode & redemptions promo",
+    "admin.index.qaBannersTitle": "Kelola Banner",
+    "admin.index.qaBannersDesc": "Banner pengumuman",
     "promo.placeholder": "Masukkan kode promo",
     "promo.redeemBtn": "Tukar",
     "promo.redeemOk": "Kode berhasil ditukar!",
@@ -4980,6 +5028,31 @@ export const bundles = {
     "admin.banners.empty": "No banners yet.",
     "admin.banners.savedOk": "Banner saved.",
     "admin.banners.deletedOk": "Banner deleted.",
+    // Sprint 58-E — experiments (EN)
+    "admin.exp.title": "A/B Experiments",
+    "admin.exp.subtitle": "Manage A/B test experiments for landing, CTA, and other UI.",
+    "admin.exp.createBtn": "Create Experiment",
+    "admin.exp.key": "Key",
+    "admin.exp.label": "Label",
+    "admin.exp.description": "Description",
+    "admin.exp.variantA": "Variant A (JSON)",
+    "admin.exp.variantB": "Variant B (JSON)",
+    "admin.exp.splitPct": "Split %",
+    "admin.exp.active": "Active",
+    "admin.exp.empty": "No experiments yet.",
+    "admin.exp.savedOk": "Experiment saved.",
+    "admin.exp.deletedOk": "Experiment deleted.",
+    "admin.exp.invalidJson": "Invalid JSON for variant_a_json or variant_b_json.",
+    // Sprint 58-C — promo stats card + quick actions (EN)
+    "admin.index.promoStatsTitle": "Promo & Redemptions",
+    "admin.index.promoTotalCodes": "Total codes",
+    "admin.index.promoActiveCodes": "Active codes",
+    "admin.index.promoRedemptions": "Redemptions",
+    "admin.index.promoUnique": "Unique redeemers",
+    "admin.index.qaPromoTitle": "Manage Promo",
+    "admin.index.qaPromoDesc": "Promo codes & redemptions",
+    "admin.index.qaBannersTitle": "Manage Banners",
+    "admin.index.qaBannersDesc": "Announcement banners",
     "promo.placeholder": "Enter promo code",
     "promo.redeemBtn": "Redeem",
     "promo.redeemOk": "Code redeemed!",

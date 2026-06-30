@@ -318,3 +318,54 @@ export const getActiveBanners = createServerFn({ method: "POST" })
     if (error) throw new Error(`getActiveBanners: ${error.message}`);
     return (rows ?? []) as unknown as ActiveBanner[];
   });
+
+// ── Admin: Promo Stats (Sprint 58-C) ────────────────────────────────
+// Aggregate counts for the admin overview: total/active promo codes and
+// total/unique redemption counts. Admin-only (uses ensureAdmin).
+
+export type PromoStats = {
+  total_codes: number;
+  active_codes: number;
+  total_redemptions: number;
+  unique_redeemers: number;
+};
+
+export const getPromoStatsAdmin = createServerFn({ method: "POST" })
+  .middleware([ADMIN_GUARD])
+  .handler(async ({ context }): Promise<PromoStats> => {
+    const { userId } = context as { userId: string };
+    await ensureAdmin(userId);
+
+    // Three of the four counts are simple count(*) / count(*) WHERE
+    // queries, run in parallel via head+count.
+    const [totalRes, activeRes, redemptionsRes] = await Promise.all([
+      db.from("promo_codes").select("*", { count: "exact", head: true }),
+      db.from("promo_codes").select("*", { count: "exact", head: true }).eq("is_active", true),
+      db.from("promo_redemptions").select("*", { count: "exact", head: true }),
+    ]);
+
+    if (totalRes.error) throw new Error(`getPromoStats total: ${totalRes.error.message}`);
+    if (activeRes.error) throw new Error(`getPromoStats active: ${activeRes.error.message}`);
+    if (redemptionsRes.error)
+      throw new Error(`getPromoStats redemptions: ${redemptionsRes.error.message}`);
+
+    // Unique redeemers needs count(distinct user_id). PostgREST can't express
+    // COUNT(DISTINCT) in a head-only call, so we fetch the column and dedupe
+    // locally. The promo_redemptions table on the free plan is tiny.
+    const { data: distinctUsers, error: distinctErr } = await db
+      .from("promo_redemptions")
+      .select("user_id");
+    if (distinctErr) throw new Error(`getPromoStats distinct: ${distinctErr.message}`);
+    const uniqueCount = new Set(
+      (distinctUsers ?? [])
+        .map((r: { user_id: string }) => r.user_id)
+        .filter((u: string | null): u is string => u != null),
+    ).size;
+
+    return {
+      total_codes: totalRes.count ?? 0,
+      active_codes: activeRes.count ?? 0,
+      total_redemptions: redemptionsRes.count ?? 0,
+      unique_redeemers: uniqueCount,
+    };
+  });

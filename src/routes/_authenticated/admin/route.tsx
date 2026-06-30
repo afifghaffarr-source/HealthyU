@@ -15,6 +15,7 @@ import {
   Languages,
   Ticket,
   Megaphone,
+  FlaskConical,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { TopAppBar } from "@/components/healthyu/top-app-bar";
@@ -86,6 +87,12 @@ const NAV: NavItem[] = [
     label: "Banners",
     icon: Megaphone,
     description: "Kelola banner pengumuman yang tampil di seluruh app.",
+  },
+  {
+    to: "/admin/experiments",
+    label: "Experiments",
+    icon: FlaskConical,
+    description: "A/B test variants untuk landing, CTA, dan UI lainnya.",
   },
   {
     to: "/admin/system",

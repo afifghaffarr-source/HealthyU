@@ -19,6 +19,7 @@ import {
 } from "@/features/landing/components/LandingChrome";
 import { MobileNav } from "@/features/landing/components/MobileNav";
 import { LandingHero } from "@/features/landing/components/LandingHero";
+import { useExperimentVariant } from "@/hooks/use-experiments";
 
 // PERF (Fase 5 sub-PR 2): lazy-load below-fold landing sections so the
 // home page initial JS payload is ~30-40% smaller. Each section is a
@@ -156,7 +157,20 @@ function Index() {
   }, []);
 
   const ctaPrimary = hasSession ? "/dashboard" : "/auth";
-  const ctaPrimaryLabel = hasSession ? "Buka Dashboard" : "Mulai gratis sekarang";
+
+  // A/B test: override the default landing hero CTA label when the
+  // "landing.heroCta" experiment returns a non-empty payload.ctaLabel.
+  // The seeded experiment is a 50/50 split between "Mulai gratis sekarang"
+  // (variant_a) and "Coba sekarang" (variant_b) — but variant_a intentionally
+  // equals the default so this only visibly changes for ~50% of visitors
+  // (those assigned variant_b). For anonymous users, the RPC returns
+  // variant_a, so the label remains the existing default "Mulai gratis...".
+  const { payload: heroCtaPayload } = useExperimentVariant("landing.heroCta");
+  const defaultCtaPrimaryLabel = hasSession ? "Buka Dashboard" : "Mulai gratis sekarang";
+  const ctaPrimaryLabel =
+    typeof heroCtaPayload.ctaLabel === "string" && heroCtaPayload.ctaLabel.length > 0
+      ? heroCtaPayload.ctaLabel
+      : defaultCtaPrimaryLabel;
 
   const fireConfetti = () => {
     if (typeof window === "undefined") return;
