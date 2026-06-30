@@ -1786,7 +1786,17 @@ export type TranslationKey =
   | "promo.placeholder"
   | "promo.redeemBtn"
   | "promo.redeemOk"
-  | "promo.redeemFail";
+  | "promo.redeemFail"
+  | "pwa.install.title"
+  | "pwa.install.subtitle"
+  | "pwa.install.cta"
+  | "command.placeholder"
+  | "command.empty"
+  | "command.hintNav"
+  | "sync.pendingItems"
+  | "sync.offlineMode"
+  | "sync.syncCount"
+  | "sync.offline";
 
 /** Template string `{page}` → page number. */
 export type TranslationBundle = Record<TranslationKey, string>;
@@ -3436,6 +3446,16 @@ export const bundles = {
     "promo.redeemBtn": "Tukar",
     "promo.redeemOk": "Kode berhasil ditukar!",
     "promo.redeemFail": "Gagal menukar kode",
+    "pwa.install.title": "Install HealthyU",
+    "pwa.install.subtitle": "Akses cepat dari home screen.",
+    "pwa.install.cta": "Install",
+    "command.placeholder": "Cari halaman… (Esc untuk tutup)",
+    "command.empty": "Tidak ditemukan.",
+    "command.hintNav": "↑↓ navigasi · ↵ buka",
+    "sync.pendingItems": "Sync {count} item tertunda",
+    "sync.offlineMode": "Mode offline",
+    "sync.syncCount": "Sync {count}",
+    "sync.offline": "Offline",
   },
 
   // ══════════════════════════════════════════════════════════════════
@@ -5075,6 +5095,16 @@ export const bundles = {
     "promo.redeemBtn": "Redeem",
     "promo.redeemOk": "Code redeemed!",
     "promo.redeemFail": "Failed to redeem code",
+    "pwa.install.title": "Install HealthyU",
+    "pwa.install.subtitle": "Quick access from your home screen.",
+    "pwa.install.cta": "Install",
+    "command.placeholder": "Search pages… (Esc to close)",
+    "command.empty": "Not found.",
+    "command.hintNav": "↑↓ navigate · ↵ open",
+    "sync.pendingItems": "Sync {count} pending",
+    "sync.offlineMode": "Offline mode",
+    "sync.syncCount": "Sync {count}",
+    "sync.offline": "Offline",
   },
 } satisfies Record<string, TranslationBundle>;
 

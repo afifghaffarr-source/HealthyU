@@ -18,6 +18,7 @@
 
 import { useEffect, useState } from "react";
 import { RefreshCw, X } from "lucide-react";
+import { useTranslation } from "@/lib/i18n";
 
 const DISMISS_KEY = "healthyu-sw-update-dismissed";
 
@@ -33,6 +34,7 @@ interface RegisterSWOptions {
 }
 
 export function SWUpdateToast() {
+  const { t } = useTranslation();
   const [needRefresh, setNeedRefresh] = useState(false);
   const [offlineReady, setOfflineReady] = useState(false);
   const [updateFn, setUpdateFn] = useState<((reload?: boolean) => Promise<void>) | null>(null);
@@ -104,12 +106,10 @@ export function SWUpdateToast() {
         </div>
         <div className="flex-1 min-w-0">
           <p className="text-sm font-semibold leading-tight">
-            {needRefresh ? "Update tersedia" : "Siap dipakai offline"}
+            {needRefresh ? t("pwa.updateAvailable") : t("pwa.offlineReady")}
           </p>
           <p className="text-[11px] text-muted-foreground leading-tight">
-            {needRefresh
-              ? "Versi baru sudah diunduh. Muat ulang untuk menerapkan."
-              : "HealthyU bisa dibuka walau tanpa internet."}
+            {needRefresh ? t("pwa.updateDesc") : t("pwa.offlineDesc")}
           </p>
         </div>
         {needRefresh && (
@@ -118,13 +118,13 @@ export function SWUpdateToast() {
             onClick={handleUpdate}
             className="text-xs font-semibold bg-primary text-primary-foreground px-3 py-1.5 rounded-lg"
           >
-            Muat ulang
+            {t("pwa.reload")}
           </button>
         )}
         <button
           type="button"
           onClick={handleDismiss}
-          aria-label="Tutup"
+          aria-label={t("common.close")}
           className="size-7 grid place-items-center text-muted-foreground"
         >
           <X className="size-4" />

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Download, X } from "lucide-react";
 import { hasCompletedFirstAction } from "@/lib/first-action";
+import { useTranslation } from "@/lib/i18n";
 
 type BIPEvent = Event & {
   prompt: () => Promise<void>;
@@ -25,6 +26,7 @@ const MIN_DELAY_MS = 30_000; // 30s — kasih user lihat dulu apa isinya
  *   - Standar PWA install prompt best practice (Chrome team recommendation)
  */
 export function InstallPrompt() {
+  const { t } = useTranslation();
   const [evt, setEvt] = useState<BIPEvent | null>(null);
   const [show, setShow] = useState(false);
   const [ready, setReady] = useState(false);
@@ -110,9 +112,9 @@ export function InstallPrompt() {
           <Download className="size-4" />
         </div>
         <div className="flex-1 min-w-0">
-          <p className="text-sm font-semibold leading-tight">Install HealthyU</p>
+          <p className="text-sm font-semibold leading-tight">{t("pwa.install.title")}</p>
           <p className="text-[11px] text-muted-foreground leading-tight">
-            Akses cepat dari home screen.
+            {t("pwa.install.subtitle")}
           </p>
         </div>
         <button
@@ -120,12 +122,12 @@ export function InstallPrompt() {
           onClick={install}
           className="text-xs font-semibold bg-primary text-primary-foreground px-3 py-1.5 rounded-lg"
         >
-          Install
+          {t("pwa.install.cta")}
         </button>
         <button
           type="button"
           onClick={dismiss}
-          aria-label="Tutup"
+          aria-label={t("common.close")}
           className="size-7 grid place-items-center text-muted-foreground"
         >
           <X className="size-4" />

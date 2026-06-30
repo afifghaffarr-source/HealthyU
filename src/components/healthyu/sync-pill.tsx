@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { WifiOff, RefreshCw, X } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useTranslation } from "@/lib/i18n";
 
 interface Props {
   online: boolean;
@@ -10,6 +11,7 @@ interface Props {
 }
 
 export function SyncPill({ online, pending, onSync, className }: Props) {
+  const { t } = useTranslation();
   const [dismissed, setDismissed] = useState(false);
 
   if (dismissed) return null;
@@ -26,16 +28,20 @@ export function SyncPill({ online, pending, onSync, className }: Props) {
       <button
         type="button"
         onClick={onSync}
-        aria-label={online ? `Sync ${pending} item tertunda` : "Mode offline"}
+        aria-label={online ? t("sync.pendingItems", { count: pending }) : t("sync.offlineMode")}
         className="inline-flex items-center gap-1"
       >
         {online ? <RefreshCw className="size-3" /> : <WifiOff className="size-3" />}
-        {online ? `Sync ${pending}` : `Offline${pending ? ` · ${pending}` : ""}`}
+        {online
+          ? t("sync.syncCount", { count: pending })
+          : pending
+            ? `${t("sync.offline")} · ${pending}`
+            : t("sync.offline")}
       </button>
       <button
         type="button"
         onClick={() => setDismissed(true)}
-        aria-label="Tutup"
+        aria-label={t("common.close")}
         className="inline-flex items-center text-current/50 hover:text-current"
       >
         <X className="size-3" />

@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { Search, X } from "lucide-react";
+import { useTranslation } from "@/lib/i18n";
 
 const ROUTES: { label: string; to: string; hint?: string }[] = [
   { label: "Beranda", to: "/dashboard", hint: "Dashboard" },
@@ -36,6 +37,7 @@ const ROUTES: { label: string; to: string; hint?: string }[] = [
 ];
 
 export function CommandPalette() {
+  const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const [q, setQ] = useState("");
   const [idx, setIdx] = useState(0);
@@ -101,12 +103,12 @@ export function CommandPalette() {
                 go(filtered[idx].to);
               }
             }}
-            placeholder="Cari halaman… (Esc untuk tutup)"
+            placeholder={t("command.placeholder")}
             className="flex-1 bg-transparent py-3 text-sm outline-none"
           />
           <button
             onClick={() => setOpen(false)}
-            aria-label="Tutup"
+            aria-label={t("common.close")}
             className="p-1 rounded hover:bg-muted"
           >
             <X className="size-4" />
@@ -115,7 +117,7 @@ export function CommandPalette() {
         <ul className="max-h-80 overflow-y-auto py-1">
           {filtered.length === 0 && (
             <li className="px-4 py-6 text-sm text-muted-foreground text-center">
-              Tidak ditemukan.
+              {t("command.empty")}
             </li>
           )}
           {filtered.map((r, i) => (
@@ -132,7 +134,7 @@ export function CommandPalette() {
           ))}
         </ul>
         <div className="px-4 py-2 text-[10px] text-muted-foreground border-t border-border flex justify-between">
-          <span>↑↓ navigasi · ↵ buka</span>
+          <span>{t("command.hintNav")}</span>
           <span>⌘/Ctrl + K</span>
         </div>
       </div>
