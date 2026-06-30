@@ -17,6 +17,7 @@ import {
   RefreshCw,
   Plus,
   X,
+  Copy,
 } from "lucide-react";
 import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { useTranslation } from "@/lib/i18n";
@@ -111,6 +112,27 @@ function PromoAdminPage() {
       qc.invalidateQueries({ queryKey: ["admin", "promos"] });
       setFeedback({ kind: "ok", msg: t("admin.promo.deletedOk") });
       setEditing(null);
+      setTimeout(() => setFeedback(null), 3000);
+    },
+    onError: (e: Error) => setFeedback({ kind: "err", msg: e.message }),
+  });
+
+  const duplicateMut = useMutation({
+    mutationFn: (row: PromoRow) =>
+      createPromoAdmin({
+        data: {
+          code: `${row.code}-${Date.now().toString(36).toUpperCase().slice(-4)}`,
+          label: row.label,
+          description: row.description,
+          reward_type: row.reward_type,
+          reward_value: row.reward_value,
+          max_uses: row.max_uses,
+          expires_at: row.expires_at,
+        },
+      }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["admin", "promos"] });
+      setFeedback({ kind: "ok", msg: t("admin.promo.duplicatedOk") });
       setTimeout(() => setFeedback(null), 3000);
     },
     onError: (e: Error) => setFeedback({ kind: "err", msg: e.message }),
@@ -212,16 +234,30 @@ function PromoAdminPage() {
                     >
                       {r.is_active ? t("admin.promo.active") : "—"}
                     </span>
-                    <span
-                      role="button"
-                      tabIndex={0}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        toggleActive(r);
-                      }}
-                      className="text-[10px] text-primary underline cursor-pointer"
-                    >
-                      {r.is_active ? "deactivate" : "activate"}
+                    <span className="flex items-center gap-2">
+                      <span
+                        role="button"
+                        tabIndex={0}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          duplicateMut.mutate(r);
+                        }}
+                        className="inline-flex items-center gap-1 text-[10px] text-muted-foreground hover:text-primary cursor-pointer"
+                        title={t("admin.promo.duplicate")}
+                      >
+                        <Copy className="size-3" /> {t("admin.promo.duplicate")}
+                      </span>
+                      <span
+                        role="button"
+                        tabIndex={0}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          toggleActive(r);
+                        }}
+                        className="text-[10px] text-primary underline cursor-pointer"
+                      >
+                        {r.is_active ? "deactivate" : "activate"}
+                      </span>
                     </span>
                   </div>
                 </div>

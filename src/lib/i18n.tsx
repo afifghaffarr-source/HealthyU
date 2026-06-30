@@ -1739,6 +1739,8 @@ export type TranslationKey =
   | "admin.promo.empty"
   | "admin.promo.savedOk"
   | "admin.promo.deletedOk"
+  | "admin.promo.duplicate"
+  | "admin.promo.duplicatedOk"
   | "admin.banners.title"
   | "admin.banners.subtitle"
   | "admin.banners.createBtn"
@@ -3380,6 +3382,8 @@ export const bundles = {
     "admin.promo.empty": "Belum ada kode promo.",
     "admin.promo.savedOk": "Kode promo tersimpan.",
     "admin.promo.deletedOk": "Kode promo dihapus.",
+    "admin.promo.duplicate": "Duplikat",
+    "admin.promo.duplicatedOk": "Kode promo diduplikasi.",
     "admin.banners.title": "Banner",
     "admin.banners.subtitle": "Kelola banner pengumuman yang tampil di seluruh app.",
     "admin.banners.createBtn": "Buat Banner",
@@ -5013,6 +5017,8 @@ export const bundles = {
     "admin.promo.empty": "No promo codes yet.",
     "admin.promo.savedOk": "Promo code saved.",
     "admin.promo.deletedOk": "Promo code deleted.",
+    "admin.promo.duplicate": "Duplicate",
+    "admin.promo.duplicatedOk": "Promo code duplicated.",
     "admin.banners.title": "Banners",
     "admin.banners.subtitle": "Manage announcement banners shown across the app.",
     "admin.banners.createBtn": "Create Banner",
