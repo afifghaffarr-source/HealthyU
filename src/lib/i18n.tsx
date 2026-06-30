@@ -1811,6 +1811,36 @@ export type TranslationKey =
   | "command.placeholder"
   | "command.empty"
   | "command.hintNav"
+  | "command.nav.beranda"
+  | "command.nav.scan"
+  | "command.nav.foods"
+  | "command.nav.fasting"
+  | "command.nav.prayer"
+  | "command.nav.qibla"
+  | "command.nav.workout"
+  | "command.nav.workoutTimer"
+  | "command.nav.weight"
+  | "command.nav.weightChart"
+  | "command.nav.body"
+  | "command.nav.water"
+  | "command.nav.sleep"
+  | "command.nav.mood"
+  | "command.nav.resep"
+  | "command.nav.mealplan"
+  | "command.nav.shoppingList"
+  | "command.nav.chat"
+  | "command.nav.coach"
+  | "command.nav.profile"
+  | "command.nav.achievements"
+  | "command.nav.leaderboard"
+  | "command.nav.challenges"
+  | "command.nav.groups"
+  | "command.nav.rewards"
+  | "command.nav.pet"
+  | "command.nav.notifications"
+  | "command.nav.reminders"
+  | "command.nav.reportsWeekly"
+  | "command.nav.theme"
   | "sync.pendingItems"
   | "sync.offlineMode"
   | "sync.syncCount"
@@ -3488,6 +3518,36 @@ export const bundles = {
     "command.placeholder": "Cari halaman… (Esc untuk tutup)",
     "command.empty": "Tidak ditemukan.",
     "command.hintNav": "↑↓ navigasi · ↵ buka",
+    "command.nav.beranda": "Beranda",
+    "command.nav.scan": "Scan makanan",
+    "command.nav.foods": "Database makanan",
+    "command.nav.fasting": "Puasa",
+    "command.nav.prayer": "Jadwal sholat",
+    "command.nav.qibla": "Kompas kiblat",
+    "command.nav.workout": "Latihan",
+    "command.nav.workoutTimer": "Timer workout",
+    "command.nav.weight": "Berat badan",
+    "command.nav.weightChart": "Chart berat",
+    "command.nav.body": "Body metrics",
+    "command.nav.water": "Air minum",
+    "command.nav.sleep": "Tidur",
+    "command.nav.mood": "Mood",
+    "command.nav.resep": "Resep",
+    "command.nav.mealplan": "Meal plan",
+    "command.nav.shoppingList": "Shopping list",
+    "command.nav.chat": "AI Coach (chat)",
+    "command.nav.coach": "HealthyU AI Coach",
+    "command.nav.profile": "Profil saya",
+    "command.nav.achievements": "Achievements",
+    "command.nav.leaderboard": "Leaderboard",
+    "command.nav.challenges": "Tantangan",
+    "command.nav.groups": "Grup teman",
+    "command.nav.rewards": "Reward & koin",
+    "command.nav.pet": "Pet evolution",
+    "command.nav.notifications": "Notifikasi",
+    "command.nav.reminders": "Reminder",
+    "command.nav.reportsWeekly": "Laporan mingguan",
+    "command.nav.theme": "Pengaturan tema",
     "sync.pendingItems": "Sync {count} item tertunda",
     "sync.offlineMode": "Mode offline",
     "sync.syncCount": "Sync {count}",
@@ -5155,6 +5215,36 @@ export const bundles = {
     "command.placeholder": "Search pages… (Esc to close)",
     "command.empty": "Not found.",
     "command.hintNav": "↑↓ navigate · ↵ open",
+    "command.nav.beranda": "Home",
+    "command.nav.scan": "Scan food",
+    "command.nav.foods": "Food database",
+    "command.nav.fasting": "Fasting",
+    "command.nav.prayer": "Prayer times",
+    "command.nav.qibla": "Qibla compass",
+    "command.nav.workout": "Workouts",
+    "command.nav.workoutTimer": "Workout timer",
+    "command.nav.weight": "Body weight",
+    "command.nav.weightChart": "Weight chart",
+    "command.nav.body": "Body metrics",
+    "command.nav.water": "Water",
+    "command.nav.sleep": "Sleep",
+    "command.nav.mood": "Mood",
+    "command.nav.resep": "Recipes",
+    "command.nav.mealplan": "Meal plan",
+    "command.nav.shoppingList": "Shopping list",
+    "command.nav.chat": "AI Coach (chat)",
+    "command.nav.coach": "HealthyU AI Coach",
+    "command.nav.profile": "My profile",
+    "command.nav.achievements": "Achievements",
+    "command.nav.leaderboard": "Leaderboard",
+    "command.nav.challenges": "Challenges",
+    "command.nav.groups": "Friend groups",
+    "command.nav.rewards": "Rewards & coins",
+    "command.nav.pet": "Pet evolution",
+    "command.nav.notifications": "Notifications",
+    "command.nav.reminders": "Reminders",
+    "command.nav.reportsWeekly": "Weekly report",
+    "command.nav.theme": "Theme settings",
     "sync.pendingItems": "Sync {count} pending",
     "sync.offlineMode": "Offline mode",
     "sync.syncCount": "Sync {count}",

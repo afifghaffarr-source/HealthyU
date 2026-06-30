@@ -3,38 +3,42 @@ import { useNavigate } from "@tanstack/react-router";
 import { Search, X } from "lucide-react";
 import { useTranslation } from "@/lib/i18n";
 
-const ROUTES: { label: string; to: string; hint?: string }[] = [
-  { label: "Beranda", to: "/dashboard", hint: "Dashboard" },
-  { label: "Scan makanan", to: "/scan" },
-  { label: "Database makanan", to: "/foods" },
-  { label: "Puasa", to: "/fasting" },
-  { label: "Jadwal sholat", to: "/prayer" },
-  { label: "Kompas kiblat", to: "/prayer/qibla" },
-  { label: "Latihan", to: "/workout" },
-  { label: "Timer workout", to: "/workout/timer" },
-  { label: "Berat badan", to: "/weight" },
-  { label: "Chart berat", to: "/weight/chart" },
-  { label: "Body metrics", to: "/body" },
-  { label: "Air minum", to: "/water" },
-  { label: "Tidur", to: "/sleep" },
-  { label: "Mood", to: "/mood" },
-  { label: "Resep", to: "/resep" },
-  { label: "Meal plan", to: "/mealplan" },
-  { label: "Shopping list", to: "/shopping/list" },
-  { label: "AI Coach (chat)", to: "/chat" },
-  { label: "HealthyU AI Coach", to: "/coach" },
-  { label: "Profil saya", to: "/profile" },
-  { label: "Achievements", to: "/achievements" },
-  { label: "Leaderboard", to: "/leaderboard" },
-  { label: "Tantangan", to: "/challenges" },
-  { label: "Grup teman", to: "/groups" },
-  { label: "Reward & koin", to: "/rewards" },
-  { label: "Pet evolution", to: "/pet" },
-  { label: "Notifikasi", to: "/notifications" },
-  { label: "Reminder", to: "/reminders" },
-  { label: "Laporan mingguan", to: "/reports/weekly" },
-  { label: "Pengaturan tema", to: "/theme" },
-];
+const ROUTES = [
+  { labelKey: "command.nav.beranda", to: "/dashboard", hint: "Dashboard" },
+  { labelKey: "command.nav.scan", to: "/scan" },
+  { labelKey: "command.nav.foods", to: "/foods" },
+  { labelKey: "command.nav.fasting", to: "/fasting" },
+  { labelKey: "command.nav.prayer", to: "/prayer" },
+  { labelKey: "command.nav.qibla", to: "/prayer/qibla" },
+  { labelKey: "command.nav.workout", to: "/workout" },
+  { labelKey: "command.nav.workoutTimer", to: "/workout/timer" },
+  { labelKey: "command.nav.weight", to: "/weight" },
+  { labelKey: "command.nav.weightChart", to: "/weight/chart" },
+  { labelKey: "command.nav.body", to: "/body" },
+  { labelKey: "command.nav.water", to: "/water" },
+  { labelKey: "command.nav.sleep", to: "/sleep" },
+  { labelKey: "command.nav.mood", to: "/mood" },
+  { labelKey: "command.nav.resep", to: "/resep" },
+  { labelKey: "command.nav.mealplan", to: "/mealplan" },
+  { labelKey: "command.nav.shoppingList", to: "/shopping/list" },
+  { labelKey: "command.nav.chat", to: "/chat" },
+  { labelKey: "command.nav.coach", to: "/coach" },
+  { labelKey: "command.nav.profile", to: "/profile" },
+  { labelKey: "command.nav.achievements", to: "/achievements" },
+  { labelKey: "command.nav.leaderboard", to: "/leaderboard" },
+  { labelKey: "command.nav.challenges", to: "/challenges" },
+  { labelKey: "command.nav.groups", to: "/groups" },
+  { labelKey: "command.nav.rewards", to: "/rewards" },
+  { labelKey: "command.nav.pet", to: "/pet" },
+  { labelKey: "command.nav.notifications", to: "/notifications" },
+  { labelKey: "command.nav.reminders", to: "/reminders" },
+  { labelKey: "command.nav.reportsWeekly", to: "/reports/weekly" },
+  { labelKey: "command.nav.theme", to: "/theme" },
+] as const satisfies ReadonlyArray<{
+  labelKey: import("@/lib/i18n").TranslationKey;
+  to: string;
+  hint?: string;
+}>;
 
 export function CommandPalette() {
   const { t } = useTranslation();
@@ -58,11 +62,14 @@ export function CommandPalette() {
 
   const filtered = useMemo(() => {
     const needle = q.trim().toLowerCase();
-    if (!needle) return ROUTES.slice(0, 12);
-    return ROUTES.filter(
-      (r) => r.label.toLowerCase().includes(needle) || r.to.includes(needle),
-    ).slice(0, 20);
-  }, [q]);
+    const items = ROUTES.map((r) => ({ to: r.to, label: t(r.labelKey) }));
+    if (!needle) return items.slice(0, 12);
+    return items
+      .filter((r) => r.label.toLowerCase().includes(needle) || r.to.includes(needle))
+      .slice(0, 20);
+    // ROUTES is a static module-level constant; t() is stable across renders.
+    // We intentionally re-derive on q change (the only user-driven input).
+  }, [q, t]);
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect -- external-store/async-query sync; `useSyncExternalStore` and equivalent restructure would change the API surface
