@@ -2,6 +2,7 @@ import { Check, Pencil } from "lucide-react";
 import { recognizeFood } from "@/features/food/lib/foodScan.functions";
 import { ConfidenceBadge } from "@/components/healthyu/confidence-badge";
 import { tierFromScore } from "@/components/healthyu/confidence-badge.utils";
+import { useTranslation } from "@/lib/i18n";
 
 type Item = Awaited<ReturnType<typeof recognizeFood>>["items"][number];
 
@@ -47,6 +48,7 @@ export function ScanItemCard({
   onLog: () => void;
   logPending: boolean;
 }) {
+  const { t } = useTranslation();
   const tier = tierFromScore(it.confidence);
   return (
     <div className="p-3 rounded-2xl bg-card border border-border/50 space-y-2">
@@ -73,11 +75,12 @@ export function ScanItemCard({
           )}
           {!editing && tier === "low" && (
             <p className="text-[11px] text-amber-700 dark:text-amber-300 mt-1 leading-snug">
-              Mirip <b>{it.name}</b>? Konfirmasi dulu sebelum disimpan.
+              {t("scan.confLowHint")} <b>{it.name}</b>? {t("common.confirm")}{" "}
+              {t("common.save").toLowerCase()}.
             </p>
           )}
           {it.matched_food_id && !editing && (
-            <p className="text-[10px] text-primary mt-0.5">✓ ada di database</p>
+            <p className="text-[10px] text-primary mt-0.5">✓ {t("scan.inDatabase")}</p>
           )}
         </div>
         <div className="text-right shrink-0">
@@ -87,7 +90,7 @@ export function ScanItemCard({
         <button
           onClick={onToggleEdit}
           className="self-center size-8 rounded-lg bg-muted/60 grid place-items-center text-muted-foreground hover:text-foreground"
-          aria-label={editing ? "Tutup edit" : "Edit"}
+          aria-label={editing ? t("scan.editClose") : t("common.edit")}
         >
           <Pencil className="size-3.5" />
         </button>
@@ -95,7 +98,7 @@ export function ScanItemCard({
           onClick={onLog}
           disabled={logPending}
           className="self-center size-9 rounded-xl bg-primary text-primary-foreground grid place-items-center disabled:opacity-50"
-          aria-label="Catat"
+          aria-label={t("scan.logAria")}
         >
           <Check className="size-4" />
         </button>
@@ -124,32 +127,32 @@ export function ScanItemCard({
             ))}
           </div>
           <EditField
-            label="Porsi (g)"
+            label={t("scan.portionLabel")}
             value={it.portion_g ?? 0}
             onChange={(v) => onUpdate({ portion_g: v })}
           />
           <EditField
-            label="Kalori"
+            label={t("scan.caloriesLabel")}
             value={Math.round(it.calories)}
             onChange={(v) => onUpdate({ calories: v })}
           />
           <EditField
-            label="Protein (g)"
+            label={t("scan.proteinLabel")}
             value={Math.round(it.protein_g)}
             onChange={(v) => onUpdate({ protein_g: v })}
           />
           <EditField
-            label="Karbo (g)"
+            label={t("scan.carbsLabel")}
             value={Math.round(it.carbs_g)}
             onChange={(v) => onUpdate({ carbs_g: v })}
           />
           <EditField
-            label="Lemak (g)"
+            label={t("scan.fatLabel")}
             value={Math.round(it.fat_g)}
             onChange={(v) => onUpdate({ fat_g: v })}
           />
           <div className="col-span-2 text-[10px] text-muted-foreground pt-0.5">
-            Koreksimu akan dikirim ke audit AI untuk perbaikan ke depan.
+            {t("scan.auditNote")}
           </div>
         </div>
       )}

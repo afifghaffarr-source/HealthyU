@@ -2,6 +2,8 @@ import { useState } from "react";
 import { X, Check, AlertTriangle, ChevronDown, ChevronUp } from "lucide-react";
 import type { NlParsedFoodItem } from "@/features/food/lib/aiFoodParser";
 import { toast } from "@/lib/toast-config";
+import { useTranslation } from "@/lib/i18n";
+import type { TranslationKey } from "@/lib/i18n";
 
 type FoodConfirmationProps = {
   items: NlParsedFoodItem[];
@@ -18,6 +20,7 @@ export function FoodConfirmation({
   onCancel,
   isPending,
 }: FoodConfirmationProps) {
+  const { t } = useTranslation();
   const [expanded, setExpanded] = useState<Record<number, boolean>>({});
 
   if (items.length === 0) {
@@ -26,17 +29,15 @@ export function FoodConfirmation({
         <div className="bg-card w-full sm:max-w-md sm:rounded-2xl rounded-t-3xl p-6 space-y-4">
           <div className="text-center space-y-2">
             <AlertTriangle className="size-8 mx-auto text-amber-500" />
-            <p className="font-semibold">AI tidak menemukan makanan</p>
-            <p className="text-sm text-muted-foreground">
-              Coba gunakan kata kunci yang lebih spesifik, contoh: "nasi goreng ayam"
-            </p>
+            <p className="font-semibold">{t("food.confirmEmpty")}</p>
+            <p className="text-sm text-muted-foreground">{t("food.confirmEmptyHint")}</p>
           </div>
           <button
             type="button"
             onClick={onCancel}
             className="w-full bg-primary text-primary-foreground font-semibold py-3 rounded-xl"
           >
-            Tutup
+            {t("common.close")}
           </button>
         </div>
       </div>
@@ -48,7 +49,7 @@ export function FoodConfirmation({
   const totalCarbs = items.reduce((s, i) => s + (i.carbs_g || 0), 0);
   const totalFat = items.reduce((s, i) => s + (i.fat_g || 0), 0);
 
-  const warnings = computeWarnings(items);
+  const warnings = computeWarnings(items, t);
 
   return (
     <div className="fixed inset-0 z-50 bg-black/50 flex items-end sm:items-center justify-center">
@@ -56,21 +57,22 @@ export function FoodConfirmation({
         {/* Header */}
         <div className="sticky top-0 bg-card border-b border-border/50 px-5 pt-5 pb-3 space-y-2">
           <div className="flex items-center justify-between">
-            <h2 className="font-bold text-lg">Konfirmasi Makanan</h2>
+            <h2 className="font-bold text-lg">{t("food.confirmTitle")}</h2>
             <button
               type="button"
               onClick={onCancel}
               className="size-8 rounded-full bg-muted grid place-items-center"
-              aria-label="Tutup"
+              aria-label={t("common.close")}
             >
               <X className="size-4" />
             </button>
           </div>
           <p className="text-xs text-muted-foreground">
-            AI mengenali dari: <span className="font-medium text-foreground">"{rawInput}"</span>
+            {t("food.confirmSource")}{" "}
+            <span className="font-medium text-foreground">"{rawInput}"</span>
           </p>
           <p className="text-[11px] text-amber-600 dark:text-amber-400 font-medium">
-            ⚠️ Semua nilai gizi adalah perkiraan. Edit jika perlu sebelum menyimpan.
+            {t("food.confirmWarning")}
           </p>
         </div>
 
@@ -107,7 +109,9 @@ export function FoodConfirmation({
         {/* Totals */}
         <div className="px-5 pt-4 pb-2">
           <div className="bg-muted/50 rounded-xl p-3">
-            <p className="text-xs font-semibold text-muted-foreground mb-2">Total perkiraan</p>
+            <p className="text-xs font-semibold text-muted-foreground mb-2">
+              {t("food.totalEstimate")}
+            </p>
             <div className="grid grid-cols-4 gap-2 text-center">
               <div>
                 <p className="text-lg font-bold tabular-nums">{totalCalories}</p>
@@ -137,19 +141,19 @@ export function FoodConfirmation({
             className="flex-1 bg-muted text-foreground font-semibold py-3 rounded-xl"
             disabled={isPending}
           >
-            Batal
+            {t("common.cancel")}
           </button>
           <button
             type="button"
             onClick={() => {
               onConfirm(items);
-              toast.success(`${items.length} makanan dicatat ✓`);
+              toast.success(t("food.savedN").replace("{n}", String(items.length)));
             }}
             disabled={isPending}
             className="flex-[2] bg-primary text-primary-foreground font-semibold py-3 rounded-xl flex items-center justify-center gap-2 disabled:opacity-50"
           >
             <Check className="size-4" />
-            {isPending ? "Menyimpan..." : `Simpan ${items.length} makanan`}
+            {isPending ? t("food.savingN") : `${t("common.save")} ${items.length}`}
           </button>
         </div>
       </div>
@@ -170,19 +174,20 @@ function FoodItemCard({
   expanded: boolean;
   onToggle: () => void;
 }) {
+  const { t } = useTranslation();
   const confidenceBadge =
     item.confidence >= 0.8
       ? {
-          label: "Tinggi",
+          label: t("food.confHigh"),
           color: "bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300",
         }
       : item.confidence >= 0.5
         ? {
-            label: "Sedang",
+            label: t("food.confMed"),
             color: "bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300",
           }
         : {
-            label: "Rendah",
+            label: t("food.confLow"),
             color: "bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300",
           };
 
@@ -221,17 +226,17 @@ function FoodItemCard({
         <div className="px-4 pb-3 space-y-2 border-t border-border/30 pt-3">
           {/* Macros grid */}
           <div className="grid grid-cols-2 gap-2 text-xs">
-            <MacroRow label="Kalori" value={`${item.calories} kkal`} />
-            <MacroRow label="Protein" value={`${item.protein_g}g`} />
-            <MacroRow label="Karbohidrat" value={`${item.carbs_g}g`} />
-            <MacroRow label="Lemak" value={`${item.fat_g}g`} />
-            <MacroRow label="Gula" value={`${item.sugar_g}g`} />
-            <MacroRow label="Sodium" value={`${item.sodium_mg}mg`} />
+            <MacroRow label={t("food.macroCalories")} value={`${item.calories} kkal`} />
+            <MacroRow label={t("food.macroProtein")} value={`${item.protein_g}g`} />
+            <MacroRow label={t("food.macroCarbs")} value={`${item.carbs_g}g`} />
+            <MacroRow label={t("food.macroFat")} value={`${item.fat_g}g`} />
+            <MacroRow label={t("food.macroSugar")} value={`${item.sugar_g}g`} />
+            <MacroRow label={t("food.macroSodium")} value={`${item.sodium_mg}mg`} />
           </div>
           {item.notes && <p className="text-xs text-muted-foreground italic">📝 {item.notes}</p>}
           {item.matched_food_name && (
             <p className="text-[10px] text-green-600 dark:text-green-400 font-medium">
-              ✅ Cocok dengan database: {item.matched_food_name}
+              ✅ {t("food.matchedDb")} {item.matched_food_name}
             </p>
           )}
         </div>
@@ -255,7 +260,7 @@ function MacroRow({ label, value }: { label: string; value: string }) {
  * Compute dietary warnings based on daily recommended limits.
  * Based on AKG (Angka Kecukupan Gizi) Indonesia.
  */
-function computeWarnings(items: NlParsedFoodItem[]): string[] {
+function computeWarnings(items: NlParsedFoodItem[], t: (k: TranslationKey) => string): string[] {
   const warnings: string[] = [];
 
   const totalSodium = items.reduce((s, i) => s + (i.sodium_mg || 0), 0);
@@ -266,24 +271,28 @@ function computeWarnings(items: NlParsedFoodItem[]): string[] {
   // Sodium: max 2000mg/hari (WHO), warn if single meal > 800mg
   if (totalSodium > 800) {
     const pct = Math.round((totalSodium / 2000) * 100);
-    warnings.push(`Sodium tinggi (${totalSodium}mg = ${pct}% batas harian). Batas harian: 2000mg.`);
+    warnings.push(
+      t("food.warnSodium").replace("{n}", String(totalSodium)).replace("{pct}", String(pct)),
+    );
   }
 
   // Sugar: max 50g/hari (WHO), warn if single meal > 25g
   if (totalSugar > 25) {
     const pct = Math.round((totalSugar / 50) * 100);
-    warnings.push(`Gula tinggi (${totalSugar}g = ${pct}% batas harian). Batas harian: 50g.`);
+    warnings.push(
+      t("food.warnSugar").replace("{n}", String(totalSugar)).replace("{pct}", String(pct)),
+    );
   }
 
   // Fat: max 65g/hari, warn if single meal > 30g
   if (totalFat > 30) {
     const pct = Math.round((totalFat / 65) * 100);
-    warnings.push(`Lemak tinggi (${totalFat}g = ${pct}% batas harian). Batas harian: 65g.`);
+    warnings.push(t("food.warnFat").replace("{n}", String(totalFat)).replace("{pct}", String(pct)));
   }
 
   // Calories: warn if single meal > 1000 kcal
   if (totalCalories > 1000) {
-    warnings.push(`Kalori sangat tinggi (${totalCalories} kkal dalam satu porsi).`);
+    warnings.push(t("food.warnCalories").replace("{n}", String(totalCalories)));
   }
 
   return warnings;

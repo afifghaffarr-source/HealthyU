@@ -1,5 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { ArrowRight, Check, Crown } from "lucide-react";
+import { useTranslation } from "@/lib/i18n";
 
 export function ConfettiBurst() {
   return (
@@ -46,6 +47,7 @@ export function LandingNav({
   hasSession: boolean | null;
   ctaPrimary: string;
 }) {
+  const { t } = useTranslation();
   return (
     <nav className="sticky top-0 z-30 glass border-b border-white/10 hidden md:block">
       <div className="max-w-6xl mx-auto px-5 md:px-8 h-14 flex items-center justify-between">
@@ -62,23 +64,25 @@ export function LandingNav({
         </Link>
         <div className="hidden md:flex items-center gap-6 text-sm font-medium text-muted-foreground">
           <a href="#fitur" className="hover:text-foreground">
-            Fitur
+            {t("landing.features")}
           </a>
           <a href="#cara" className="hover:text-foreground">
-            Cara kerja
+            {t("landing.howItWorks")}
           </a>
           <a href="#testimoni" className="hover:text-foreground">
-            Testimoni
+            {t("landing.testimonials")}
           </a>
           <a href="#faq" className="hover:text-foreground">
-            FAQ
+            {t("landing.faq")}
           </a>
         </div>
         <Link
           to={ctaPrimary}
           className="relative overflow-hidden bg-gradient-to-r from-primary to-primary-dark text-primary-foreground text-sm font-semibold px-4 py-2 rounded-xl shadow-md shadow-primary/30 hover:shadow-lg hover:shadow-primary/40 transition-shadow"
         >
-          <span className="relative z-10">{hasSession ? "Dashboard" : "Masuk"}</span>
+          <span className="relative z-10">
+            {hasSession ? t("landing.dashboard") : t("landing.login")}
+          </span>
           <span className="pointer-events-none absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/30 to-transparent animate-shimmer" />
         </Link>
       </div>
@@ -87,22 +91,26 @@ export function LandingNav({
 }
 
 export function PricingSection({ ctaPrimary }: { ctaPrimary: string }) {
+  const { t } = useTranslation();
   return (
     <section className="max-w-5xl mx-auto px-5 md:px-8 py-16">
       <div className="grid md:grid-cols-2 gap-4">
         <div className="glass rounded-3xl p-7 border border-primary/30">
           <span className="inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-primary bg-primary/10 px-2 py-1 rounded-full">
-            Gratis
+            {t("landing.free")}
           </span>
           <h3 className="text-2xl font-bold mt-3" style={{ fontFamily: "var(--font-display)" }}>
-            Rp 0 <span className="text-sm font-normal text-muted-foreground">/ selamanya</span>
+            Rp 0{" "}
+            <span className="text-sm font-normal text-muted-foreground">
+              {t("landing.freeForever")}
+            </span>
           </h3>
           <ul className="text-sm space-y-2 mt-4 text-muted-foreground">
             {[
-              "Scan makanan AI",
-              "Meal plan personal",
-              "Puasa & jadwal sholat",
-              "HealthyU AI Coach chatbot",
+              t("landing.freeFeatures1"),
+              t("landing.freeFeatures2"),
+              t("landing.freeFeatures3"),
+              t("landing.freeFeatures4"),
             ].map((x) => (
               <li key={x} className="flex items-center gap-2">
                 <Check className="size-4 text-primary" />
@@ -114,22 +122,23 @@ export function PricingSection({ ctaPrimary }: { ctaPrimary: string }) {
             to={ctaPrimary}
             className="mt-5 block text-center bg-primary text-primary-foreground font-semibold py-3 rounded-xl"
           >
-            Mulai gratis
+            {t("landing.startFree")}
           </Link>
         </div>
         <div className="relative overflow-hidden bg-gradient-to-br from-primary via-primary-dark to-accent text-primary-foreground rounded-3xl p-7 shadow-xl">
           <span className="inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider bg-white/20 px-2 py-1 rounded-full">
-            <Crown className="size-3" /> Premium (segera)
+            <Crown className="size-3" /> {t("landing.premiumSoon")}
           </span>
           <h3 className="text-2xl font-bold mt-3" style={{ fontFamily: "var(--font-display)" }}>
-            Rp 29rb <span className="text-sm font-normal opacity-80">/ bulan</span>
+            {t("landing.premiumPrice")}{" "}
+            <span className="text-sm font-normal opacity-80">{t("landing.premiumPerMonth")}</span>
           </h3>
           <ul className="text-sm space-y-2 mt-4 opacity-95">
             {[
-              "Konsultasi nutritionist real",
-              "Resep premium tanpa batas",
-              "Export laporan PDF",
-              "Sinkron Apple/Google Fit",
+              t("landing.premiumFeatures1"),
+              t("landing.premiumFeatures2"),
+              t("landing.premiumFeatures3"),
+              t("landing.premiumFeatures4"),
             ].map((x) => (
               <li key={x} className="flex items-center gap-2">
                 <Check className="size-4" />
@@ -138,7 +147,7 @@ export function PricingSection({ ctaPrimary }: { ctaPrimary: string }) {
             ))}
           </ul>
           <button className="mt-5 w-full text-center bg-white text-primary font-semibold py-3 rounded-xl">
-            Notify saya
+            {t("landing.notifyMe")}
           </button>
         </div>
       </div>
@@ -155,6 +164,7 @@ export function FinalCtaSection({
   ctaPrimaryLabel: string;
   onCtaClick: () => void;
 }) {
+  const { t } = useTranslation();
   return (
     <section className="max-w-3xl mx-auto px-5 md:px-8 py-16 md:py-24 text-center">
       <div className="relative overflow-hidden bg-gradient-to-br from-primary via-primary-dark to-accent text-primary-foreground rounded-3xl p-10 md:p-14 space-y-5 shadow-2xl shadow-primary/30">
@@ -170,10 +180,10 @@ export function FinalCtaSection({
           className="relative text-3xl md:text-5xl font-bold tracking-tight text-balance"
           style={{ fontFamily: "var(--font-display)" }}
         >
-          Mulai perjalanan sehatmu hari ini
+          {t("landing.finalCtaTitle")}
         </h2>
         <p className="relative text-primary-foreground/85 text-balance">
-          Gratis selamanya. Tanpa kartu kredit. Hasil terlihat dalam 7 hari pertama.
+          {t("landing.finalCtaDesc")}
         </p>
         <div className="relative flex flex-col sm:flex-row gap-3 justify-center pt-2">
           <Link
@@ -187,13 +197,13 @@ export function FinalCtaSection({
         </div>
         <ul className="relative flex flex-wrap justify-center gap-x-5 gap-y-2 text-xs text-primary-foreground/80 pt-2">
           <li className="flex items-center gap-1">
-            <Check className="size-3.5" /> Gratis selamanya
+            <Check className="size-3.5" /> {t("landing.finalCtaFree")}
           </li>
           <li className="flex items-center gap-1">
-            <Check className="size-3.5" /> Database makanan Indonesia
+            <Check className="size-3.5" /> {t("landing.finalCtaDb")}
           </li>
           <li className="flex items-center gap-1">
-            <Check className="size-3.5" /> AI coach 24/7
+            <Check className="size-3.5" /> {t("landing.finalCtaAi")}
           </li>
         </ul>
       </div>
@@ -202,20 +212,23 @@ export function FinalCtaSection({
 }
 
 export function LandingFooter() {
+  const { t } = useTranslation();
   return (
     <footer className="border-t border-white/10">
       <div className="max-w-6xl mx-auto px-5 md:px-8 py-8 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-muted-foreground">
-        <p>© {new Date().getFullYear()} HealthyU · Dirancang khusus untuk Indonesia</p>
+        <p>
+          © {new Date().getFullYear()} HealthyU · {t("landing.copyright")}
+        </p>
         <div className="flex gap-4">
-          <Link to="/auth">Masuk</Link>
-          <Link to="/privacy">Privasi</Link>
-          <a href="#faq">FAQ</a>
+          <Link to="/auth">{t("landing.login")}</Link>
+          <Link to="/privacy">{t("landing.privacy")}</Link>
+          <a href="#faq">{t("landing.faq")}</a>
           <Link
             to="/prism"
             className="text-muted-foreground/70 hover:text-foreground transition-colors"
             title="Design experiment: desktop-first layout"
           >
-            Prism
+            {t("landing.prism")}
           </Link>
         </div>
       </div>
@@ -234,20 +247,20 @@ export function StickyCta({
   ctaPrimary: string;
   onCtaClick: () => void;
 }) {
+  const { t } = useTranslation();
   return (
     <div
       className={`fixed left-1/2 -translate-x-1/2 bottom-4 z-40 transition-all ${show ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6 pointer-events-none"}`}
     >
       <div className="glass border border-white/20 shadow-2xl rounded-full pl-4 pr-1 py-1 flex items-center gap-3">
-        <span className="text-xs font-semibold hidden sm:inline">
-          Siap memulai? Gratis selamanya.
-        </span>
+        <span className="text-xs font-semibold hidden sm:inline">{t("landing.stickyPrompt")}</span>
         <Link
           to={ctaPrimary}
           onClick={onCtaClick}
           className="bg-gradient-to-r from-primary to-primary-dark text-primary-foreground text-xs font-bold px-4 py-2 rounded-full inline-flex items-center gap-1.5"
         >
-          {hasSession ? "Dashboard" : "Mulai"} <ArrowRight className="size-3.5" />
+          {hasSession ? t("landing.dashboard") : t("landing.ctaStart")}{" "}
+          <ArrowRight className="size-3.5" />
         </Link>
       </div>
     </div>

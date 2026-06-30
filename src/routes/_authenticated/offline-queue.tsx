@@ -13,6 +13,7 @@ import {
   type QueueItem,
 } from "@/lib/offline-queue";
 import { useOfflineQueue } from "@/hooks/use-offline-queue";
+import { useTranslation } from "@/lib/i18n";
 
 export const Route = createFileRoute("/_authenticated/offline-queue")({
   component: OfflineQueuePage,
@@ -28,6 +29,7 @@ const KIND_LABEL: Record<string, string> = {
 };
 
 function OfflineQueuePage() {
+  const { t } = useTranslation();
   const { online, pending, sync } = useOfflineQueue();
   const [dead, setDead] = useState<QueueItem[]>([]);
   const [queued, setQueued] = useState<QueueItem[]>([]);
@@ -137,7 +139,7 @@ function OfflineQueuePage() {
                     refresh();
                   }}
                   className="size-9 grid place-items-center rounded-xl bg-primary/10 text-primary"
-                  aria-label="Coba lagi"
+                  aria-label={t("offlineQueue.retryAria")}
                 >
                   <RefreshCw className="size-4" />
                 </button>
@@ -148,7 +150,7 @@ function OfflineQueuePage() {
                     refresh();
                   }}
                   className="size-9 grid place-items-center rounded-xl text-muted-foreground hover:text-destructive"
-                  aria-label="Hapus"
+                  aria-label={t("offlineQueue.deleteAria")}
                 >
                   <Trash2 className="size-4" />
                 </button>

@@ -1406,6 +1406,46 @@ export type TranslationKey =
   | "common.featDisabled"
   | "common.featDisabledDesc"
   | "common.featDisabledBack"
+  | "common.next"
+  | "common.start"
+  | "common.skip"
+  | "common.edit"
+  | "common.send"
+  | "common.processing"
+  | "common.thinking"
+  | "common.previous"
+  | "common.dashboard"
+  | "common.moods.bad"
+  | "common.moods.low"
+  | "common.moods.neutral"
+  | "common.moods.good"
+  | "common.moods.great"
+  | "onboarding.steps.s1.title"
+  | "onboarding.steps.s1.body"
+  | "onboarding.steps.s2.title"
+  | "onboarding.steps.s2.body"
+  | "onboarding.steps.s3.title"
+  | "onboarding.steps.s3.body"
+  | "onboarding.steps.s4.title"
+  | "onboarding.steps.s4.body"
+  | "onboarding.steps.s5.title"
+  | "onboarding.steps.s5.body"
+  | "coach.meals.placeholder"
+  | "coach.meals.ariaSend"
+  | "coach.meals.emptyHint"
+  | "offlineQueue.retryAria"
+  | "offlineQueue.deleteAria"
+  | "group.inviteToggleOpen"
+  | "group.inviteToggleClose"
+  | "group.inviteLoading"
+  | "group.inviteEmpty"
+  | "recipes.remixSubstitutionLabel"
+  | "recipes.remixSubstitutionPlaceholder"
+  | "onboarding.health.hint"
+  | "fasting.confirmLongTitle"
+  | "fasting.confirmLongDesc"
+  | "fasting.confirmLongConfirm"
+  | "landing.ctaStart"
   | "coach.featDisabled"
   | "coach.featDisabledDesc"
   | "scanLabel.featDisabled"
@@ -1540,7 +1580,148 @@ export type TranslationKey =
   | "admin.system.kvLocalPath"
   | "admin.system.backupHint"
   | "admin.system.never"
-  | "fasting.featDisabledDesc";
+  | "fasting.featDisabledDesc"
+
+  // ── Mood tracker (C2) ───────────────────────────────────────────
+  | "mood.howFeel"
+  | "mood.notePlaceholder"
+  | "mood.trend14"
+  | "mood.avgShort"
+
+  // ── Vitals tracker (C2) ──────────────────────────────────────────
+  | "vitals.bp"
+  | "vitals.hr"
+  | "vitals.glucose"
+  | "vitals.recordTitle"
+  | "vitals.sysLabel"
+  | "vitals.diaLabel"
+  | "vitals.hrLabel"
+  | "vitals.gluLabel"
+  | "vitals.stateFasting"
+  | "vitals.statePostMeal"
+  | "vitals.stateRandom"
+  | "vitals.notePlaceholder"
+  | "vitals.historyTitle"
+  | "vitals.emptyHistory"
+  | "vitals.editClose"
+
+  // ── Reminders (C2) ───────────────────────────────────────────────
+  | "reminder.active"
+  | "reminder.next"
+  | "reminder.noneToday"
+  | "reminder.namePlaceholder"
+  | "reminder.catWater"
+  | "reminder.catMeal"
+  | "reminder.catWorkout"
+  | "reminder.catSleep"
+  | "reminder.catMedication"
+  | "reminder.catFasting"
+  | "reminder.catPrayer"
+  | "reminder.catCustom"
+  | "reminder.toggle"
+  | "reminder.everyDay"
+  | "reminder.nDays"
+
+  // ── Scan item card (C2) ──────────────────────────────────────────
+  | "scan.editClose"
+  | "scan.logAria"
+  | "scan.confLowHint"
+  | "scan.inDatabase"
+  | "scan.portionLabel"
+  | "scan.caloriesLabel"
+  | "scan.proteinLabel"
+  | "scan.carbsLabel"
+  | "scan.fatLabel"
+  | "scan.auditNote"
+
+  // ── Food detail sheet (C2) ──────────────────────────────────────
+  | "food.detailLoading"
+  | "food.gi"
+  | "food.gl"
+  | "food.giLow"
+  | "food.giMed"
+  | "food.giHigh"
+  | "food.giLegend"
+  | "food.perServing"
+  | "food.otherNutrients"
+  | "food.fiber"
+  | "food.sugar"
+  | "food.satFat"
+  | "food.transFat"
+  | "food.sodium"
+  | "food.cholesterol"
+  | "food.vitaminsMinerals"
+  | "food.potassium"
+  | "food.calcium"
+  | "food.iron"
+  | "food.vitA"
+  | "food.vitC"
+  | "food.vitD"
+  | "food.servingSizes"
+  | "food.defaultServing"
+  | "food.mainIngredients"
+  | "food.brand"
+  | "food.healthScore"
+  | "food.allergenWarn"
+  | "food.logAsFood"
+  | "food.filterAll"
+
+  // ── Food confirmation modal (C2) ────────────────────────────────
+  | "food.confirmTitle"
+  | "food.confirmEmpty"
+  | "food.confirmEmptyHint"
+  | "food.confirmSource"
+  | "food.confirmWarning"
+  | "food.totalEstimate"
+  | "food.confHigh"
+  | "food.confMed"
+  | "food.confLow"
+  | "food.macroCalories"
+  | "food.macroProtein"
+  | "food.macroCarbs"
+  | "food.macroFat"
+  | "food.macroSugar"
+  | "food.macroSodium"
+  | "food.matchedDb"
+  | "food.savingN"
+  | "food.savedN"
+  | "food.warnSodium"
+  | "food.warnSugar"
+  | "food.warnFat"
+  | "food.warnCalories"
+
+  // ── Landing chrome (C2) ─────────────────────────────────────────
+  | "landing.dashboard"
+  | "landing.login"
+  | "landing.features"
+  | "landing.howItWorks"
+  | "landing.testimonials"
+  | "landing.faq"
+  | "landing.free"
+  | "landing.freeForever"
+  | "landing.freeFeatures1"
+  | "landing.freeFeatures2"
+  | "landing.freeFeatures3"
+  | "landing.freeFeatures4"
+  | "landing.startFree"
+  | "landing.premiumSoon"
+  | "landing.premiumPrice"
+  | "landing.premiumPerMonth"
+  | "landing.premiumFeatures1"
+  | "landing.premiumFeatures2"
+  | "landing.premiumFeatures3"
+  | "landing.premiumFeatures4"
+  | "landing.notifyMe"
+  | "landing.finalCtaTitle"
+  | "landing.finalCtaDesc"
+  | "landing.finalCtaFree"
+  | "landing.finalCtaDb"
+  | "landing.finalCtaAi"
+  | "landing.stickyPrompt"
+  | "landing.copyright"
+  | "landing.privacy"
+  | "landing.prism"
+  | "landing.premiumBadge";
 
 /** Template string `{page}` → page number. */
 export type TranslationBundle = Record<TranslationKey, string>;
@@ -2799,6 +2980,48 @@ export const bundles = {
     "common.featDisabledDesc":
       "Admin sedang mematikan fitur ini sementara. Silakan coba lagi nanti.",
     "common.featDisabledBack": "Kembali ke beranda",
+    "common.next": "Lanjut",
+    "common.start": "Mulai",
+    "common.skip": "Lewati",
+    "common.edit": "Edit",
+    "common.send": "Kirim",
+    "common.processing": "Memproses…",
+    "common.thinking": "Berpikir…",
+    "common.previous": "Sebelumnya",
+    "common.dashboard": "Dashboard",
+    "common.moods.bad": "Buruk",
+    "common.moods.low": "Kurang",
+    "common.moods.neutral": "Biasa",
+    "common.moods.good": "Baik",
+    "common.moods.great": "Hebat",
+    "onboarding.steps.s1.title": "Selamat datang",
+    "onboarding.steps.s1.body": "Mari mulai perjalanan sehatmu bersama HealthyU.",
+    "onboarding.steps.s2.title": "Tetapkan target",
+    "onboarding.steps.s2.body": "Berat, kalori, dan kebiasaan harian dapat disesuaikan kapan saja.",
+    "onboarding.steps.s3.title": "Lacak makanan",
+    "onboarding.steps.s3.body": "Scan barcode, foto, atau cari di database lokal.",
+    "onboarding.steps.s4.title": "Aktif & istirahat",
+    "onboarding.steps.s4.body": "Latihan, puasa, tidur, dan air dipantau otomatis.",
+    "onboarding.steps.s5.title": "Siap memulai!",
+    "onboarding.steps.s5.body": "Buka dashboard untuk lihat ringkasan harian.",
+    "coach.meals.placeholder": "Tanya coach…",
+    "coach.meals.ariaSend": "Kirim",
+    "coach.meals.emptyHint":
+      'Tanya apa saja tentang pola makanmu 7 hari terakhir. Contoh: "Apakah protein cukup?"',
+    "offlineQueue.retryAria": "Coba lagi",
+    "offlineQueue.deleteAria": "Hapus",
+    "group.inviteToggleOpen": "Bareng grup",
+    "group.inviteToggleClose": "Tutup",
+    "group.inviteLoading": "Memuat…",
+    "group.inviteEmpty": "Belum ada grup. Buat di halaman Groups.",
+    "recipes.remixSubstitutionLabel": "Substitusi / Permintaan",
+    "recipes.remixSubstitutionPlaceholder": "Ganti daging dengan tempe; rendah garam...",
+    "onboarding.health.hint": "Semua jawaban bisa diubah kapan saja di Profil.",
+    "fasting.confirmLongTitle": "Puasa lebih dari 16 jam",
+    "fasting.confirmLongDesc":
+      "Puasa panjang tidak disarankan untuk ibu hamil/menyusui, remaja, atau yang punya riwayat gangguan makan, diabetes, atau kondisi medis lain. Pastikan kamu cukup hidrasi & berhenti kapan saja jika tidak nyaman.",
+    "fasting.confirmLongConfirm": "Saya mengerti, mulai",
+    "landing.ctaStart": "Mulai",
     "coach.featDisabled": "AI Coach sedang nonaktif",
     "coach.featDisabledDesc": "Admin lagi maintenance coach. Bisa pakai pattern tracker dulu ya.",
     "scanLabel.featDisabled": "Scan label nutrisi sedang nonaktif",
@@ -2807,6 +3030,151 @@ export const bundles = {
     "scanPhoto.featDisabledDesc": "Admin lagi maintenance. Bisa input manual dulu.",
     "fasting.featDisabled": "Tracker puasa sedang nonaktif",
     "fasting.featDisabledDesc": "Admin lagi maintenance. Bisa pakai meal log dulu ya.",
+
+    // ── Mood tracker (C2) ───────────────────────────────────────────
+    "mood.howFeel": "Bagaimana perasaanmu?",
+    "mood.notePlaceholder": "Catatan singkat (opsional)…",
+    "mood.trend14": "Tren 14 hari",
+    "mood.avgShort": "Avg",
+
+    // ── Vitals tracker (C2) ──────────────────────────────────────────
+    "vitals.bp": "Tekanan",
+    "vitals.hr": "Detak",
+    "vitals.glucose": "Gula",
+    "vitals.recordTitle": "Catat pengukuran",
+    "vitals.sysLabel": "Sistolik",
+    "vitals.diaLabel": "Diastolik",
+    "vitals.hrLabel": "Detak jantung",
+    "vitals.gluLabel": "Gula darah",
+    "vitals.stateFasting": "Puasa",
+    "vitals.statePostMeal": "Setelah makan",
+    "vitals.stateRandom": "Acak",
+    "vitals.notePlaceholder": "Catatan (opsional)",
+    "vitals.historyTitle": "Riwayat",
+    "vitals.emptyHistory": "Belum ada catatan",
+    "vitals.editClose": "Tutup edit",
+
+    // ── Reminders (C2) ───────────────────────────────────────────────
+    "reminder.active": "Pengingat aktif",
+    "reminder.next": "Berikutnya",
+    "reminder.noneToday": "Tidak ada pengingat tersisa hari ini",
+    "reminder.namePlaceholder": "Nama pengingat",
+    "reminder.catWater": "Air",
+    "reminder.catMeal": "Makan",
+    "reminder.catWorkout": "Olahraga",
+    "reminder.catSleep": "Tidur",
+    "reminder.catMedication": "Obat",
+    "reminder.catFasting": "Puasa",
+    "reminder.catPrayer": "Sholat",
+    "reminder.catCustom": "Lain",
+    "reminder.toggle": "Toggle",
+    "reminder.everyDay": "Setiap hari",
+    "reminder.nDays": "{n} hari",
+
+    // ── Scan item card (C2) ──────────────────────────────────────────
+    "scan.editClose": "Tutup edit",
+    "scan.logAria": "Catat",
+    "scan.confLowHint": "Mirip",
+    "scan.inDatabase": "ada di database",
+    "scan.portionLabel": "Porsi (g)",
+    "scan.caloriesLabel": "Kalori",
+    "scan.proteinLabel": "Protein (g)",
+    "scan.carbsLabel": "Karbo (g)",
+    "scan.fatLabel": "Lemak (g)",
+    "scan.auditNote": "Koreksimu akan dikirim ke audit AI untuk perbaikan ke depan.",
+
+    // ── Food detail sheet (C2) ──────────────────────────────────────
+    "food.detailLoading": "Memuat...",
+    "food.gi": "Indeks Glikemik",
+    "food.gl": "GL",
+    "food.giLow": "Rendah",
+    "food.giMed": "Sedang",
+    "food.giHigh": "Tinggi",
+    "food.giLegend": "GI < 55 rendah, 55-69 sedang, ≥ 70 tinggi. GL ≥ 20 tinggi.",
+    "food.perServing": "per porsi",
+    "food.otherNutrients": "Nutrisi Lain",
+    "food.fiber": "Serat",
+    "food.sugar": "Gula",
+    "food.satFat": "Lemak jenuh",
+    "food.transFat": "Lemak trans",
+    "food.sodium": "Natrium",
+    "food.cholesterol": "Kolesterol",
+    "food.vitaminsMinerals": "Vitamin & Mineral",
+    "food.potassium": "Kalium",
+    "food.calcium": "Kalsium",
+    "food.iron": "Zat besi",
+    "food.vitA": "Vit A",
+    "food.vitC": "Vit C",
+    "food.vitD": "Vit D",
+    "food.servingSizes": "Ukuran Porsi",
+    "food.defaultServing": "Default:",
+    "food.mainIngredients": "Bahan Utama",
+    "food.brand": "Merek",
+    "food.healthScore": "Health Score",
+    "food.allergenWarn": "Mengandung Alergen",
+    "food.logAsFood": "Catat sebagai makanan",
+    "food.filterAll": "Semua",
+
+    // ── Food confirmation modal (C2) ────────────────────────────────
+    "food.confirmTitle": "Konfirmasi Makanan",
+    "food.confirmEmpty": "AI tidak menemukan makanan",
+    "food.confirmEmptyHint":
+      'Coba gunakan kata kunci yang lebih spesifik, contoh: "nasi goreng ayam"',
+    "food.confirmSource": "AI mengenali dari:",
+    "food.confirmWarning":
+      "⚠️ Semua nilai gizi adalah perkiraan. Edit jika perlu sebelum menyimpan.",
+    "food.totalEstimate": "Total perkiraan",
+    "food.confHigh": "Tinggi",
+    "food.confMed": "Sedang",
+    "food.confLow": "Rendah",
+    "food.macroCalories": "Kalori",
+    "food.macroProtein": "Protein",
+    "food.macroCarbs": "Karbohidrat",
+    "food.macroFat": "Lemak",
+    "food.macroSugar": "Gula",
+    "food.macroSodium": "Sodium",
+    "food.matchedDb": "Cocok dengan database:",
+    "food.savingN": "Menyimpan...",
+    "food.savedN": "{n} makanan dicatat ✓",
+    "food.warnSodium": "Sodium tinggi ({n}mg = {pct}% batas harian). Batas harian: 2000mg.",
+    "food.warnSugar": "Gula tinggi ({n}g = {pct}% batas harian). Batas harian: 50g.",
+    "food.warnFat": "Lemak tinggi ({n}g = {pct}% batas harian). Batas harian: 65g.",
+    "food.warnCalories": "Kalori sangat tinggi ({n} kkal dalam satu porsi).",
+
+    // ── Landing chrome (C2) ─────────────────────────────────────────
+    "landing.dashboard": "Dashboard",
+    "landing.login": "Masuk",
+    "landing.features": "Fitur",
+    "landing.howItWorks": "Cara kerja",
+    "landing.testimonials": "Testimoni",
+    "landing.faq": "FAQ",
+    "landing.free": "Gratis",
+    "landing.freeForever": "/ selamanya",
+    "landing.freeFeatures1": "Scan makanan AI",
+    "landing.freeFeatures2": "Meal plan personal",
+    "landing.freeFeatures3": "Puasa & jadwal sholat",
+    "landing.freeFeatures4": "HealthyU AI Coach chatbot",
+    "landing.startFree": "Mulai gratis",
+    "landing.premiumSoon": "Premium (segera)",
+    "landing.premiumPrice": "Rp 29rb",
+    "landing.premiumPerMonth": "/ bulan",
+    "landing.premiumFeatures1": "Konsultasi nutritionist real",
+    "landing.premiumFeatures2": "Resep premium tanpa batas",
+    "landing.premiumFeatures3": "Export laporan PDF",
+    "landing.premiumFeatures4": "Sinkron Apple/Google Fit",
+    "landing.notifyMe": "Notify saya",
+    "landing.finalCtaTitle": "Mulai perjalanan sehatmu hari ini",
+    "landing.finalCtaDesc":
+      "Gratis selamanya. Tanpa kartu kredit. Hasil terlihat dalam 7 hari pertama.",
+    "landing.finalCtaFree": "Gratis selamanya",
+    "landing.finalCtaDb": "Database makanan Indonesia",
+    "landing.finalCtaAi": "AI coach 24/7",
+    "landing.stickyPrompt": "Siap memulai? Gratis selamanya.",
+    "landing.copyright": "Dirancang khusus untuk Indonesia",
+    "landing.privacy": "Privasi",
+    "landing.prism": "Prism",
+    "landing.premiumBadge": "Premium (segera)",
+
     "admin.articles.title": "Articles",
     "admin.articles.loading": "Memuat…",
     "admin.articles.count": "{count} artikel",
@@ -4188,6 +4556,48 @@ export const bundles = {
     "common.featDisabledDesc":
       "An admin has temporarily turned this feature off. Please try again later.",
     "common.featDisabledBack": "Back to home",
+    "common.next": "Next",
+    "common.start": "Get started",
+    "common.skip": "Skip",
+    "common.edit": "Edit",
+    "common.send": "Send",
+    "common.processing": "Processing…",
+    "common.thinking": "Thinking…",
+    "common.previous": "Previous",
+    "common.dashboard": "Dashboard",
+    "common.moods.bad": "Bad",
+    "common.moods.low": "Low",
+    "common.moods.neutral": "Okay",
+    "common.moods.good": "Good",
+    "common.moods.great": "Great",
+    "onboarding.steps.s1.title": "Welcome",
+    "onboarding.steps.s1.body": "Let's start your healthy journey with HealthyU.",
+    "onboarding.steps.s2.title": "Set your goals",
+    "onboarding.steps.s2.body": "Weight, calories, and daily habits can be adjusted anytime.",
+    "onboarding.steps.s3.title": "Track your food",
+    "onboarding.steps.s3.body": "Scan barcode, take a photo, or search the local database.",
+    "onboarding.steps.s4.title": "Active & rest",
+    "onboarding.steps.s4.body": "Workouts, fasting, sleep, and water are tracked automatically.",
+    "onboarding.steps.s5.title": "Ready to start!",
+    "onboarding.steps.s5.body": "Open the dashboard to see your daily summary.",
+    "coach.meals.placeholder": "Ask the coach…",
+    "coach.meals.ariaSend": "Send",
+    "coach.meals.emptyHint":
+      'Ask anything about your last 7 days of eating. Example: "Is my protein enough?"',
+    "offlineQueue.retryAria": "Try again",
+    "offlineQueue.deleteAria": "Delete",
+    "group.inviteToggleOpen": "With group",
+    "group.inviteToggleClose": "Close",
+    "group.inviteLoading": "Loading…",
+    "group.inviteEmpty": "No groups yet. Create one in the Groups page.",
+    "recipes.remixSubstitutionLabel": "Substitution / Request",
+    "recipes.remixSubstitutionPlaceholder": "Swap beef for tempeh; lower sodium...",
+    "onboarding.health.hint": "All answers can be changed anytime in Profile.",
+    "fasting.confirmLongTitle": "Fasting longer than 16 hours",
+    "fasting.confirmLongDesc":
+      "Long fasts are not recommended if you are pregnant/nursing, a teen, or have a history of eating disorders, diabetes, or other medical conditions. Stay hydrated and stop at any time if you feel unwell.",
+    "fasting.confirmLongConfirm": "I understand, start",
+    "landing.ctaStart": "Get started",
     "coach.featDisabled": "AI Coach is currently disabled",
     "coach.featDisabledDesc": "Coach is under maintenance. Use the pattern tracker for now.",
     "scanLabel.featDisabled": "Nutrition label scan is currently disabled",
@@ -4196,6 +4606,148 @@ export const bundles = {
     "scanPhoto.featDisabledDesc": "Under maintenance. You can log meals manually for now.",
     "fasting.featDisabled": "Fasting tracker is currently disabled",
     "fasting.featDisabledDesc": "Under maintenance. Use the meal log for now.",
+
+    // ── Mood tracker (C2) ───────────────────────────────────────────
+    "mood.howFeel": "How are you feeling?",
+    "mood.notePlaceholder": "Short note (optional)…",
+    "mood.trend14": "14-day trend",
+    "mood.avgShort": "Avg",
+
+    // ── Vitals tracker (C2) ──────────────────────────────────────────
+    "vitals.bp": "BP",
+    "vitals.hr": "HR",
+    "vitals.glucose": "Glucose",
+    "vitals.recordTitle": "Record measurement",
+    "vitals.sysLabel": "Systolic",
+    "vitals.diaLabel": "Diastolic",
+    "vitals.hrLabel": "Heart rate",
+    "vitals.gluLabel": "Blood glucose",
+    "vitals.stateFasting": "Fasting",
+    "vitals.statePostMeal": "Post-meal",
+    "vitals.stateRandom": "Random",
+    "vitals.notePlaceholder": "Note (optional)",
+    "vitals.historyTitle": "History",
+    "vitals.emptyHistory": "No records yet",
+    "vitals.editClose": "Close edit",
+
+    // ── Reminders (C2) ───────────────────────────────────────────────
+    "reminder.active": "Active reminders",
+    "reminder.next": "Next",
+    "reminder.noneToday": "No reminders left today",
+    "reminder.namePlaceholder": "Reminder name",
+    "reminder.catWater": "Water",
+    "reminder.catMeal": "Meal",
+    "reminder.catWorkout": "Workout",
+    "reminder.catSleep": "Sleep",
+    "reminder.catMedication": "Medication",
+    "reminder.catFasting": "Fasting",
+    "reminder.catPrayer": "Prayer",
+    "reminder.catCustom": "Other",
+    "reminder.toggle": "Toggle",
+    "reminder.everyDay": "Every day",
+    "reminder.nDays": "{n} days",
+
+    // ── Scan item card (C2) ──────────────────────────────────────────
+    "scan.editClose": "Close edit",
+    "scan.logAria": "Log",
+    "scan.confLowHint": "Looks like",
+    "scan.inDatabase": "in database",
+    "scan.portionLabel": "Portion (g)",
+    "scan.caloriesLabel": "Calories",
+    "scan.proteinLabel": "Protein (g)",
+    "scan.carbsLabel": "Carbs (g)",
+    "scan.fatLabel": "Fat (g)",
+    "scan.auditNote": "Your correction will be sent to AI audit for future improvements.",
+
+    // ── Food detail sheet (C2) ──────────────────────────────────────
+    "food.detailLoading": "Loading...",
+    "food.gi": "Glycemic Index",
+    "food.gl": "GL",
+    "food.giLow": "Low",
+    "food.giMed": "Medium",
+    "food.giHigh": "High",
+    "food.giLegend": "GI < 55 low, 55-69 medium, ≥ 70 high. GL ≥ 20 high.",
+    "food.perServing": "per serving",
+    "food.otherNutrients": "Other Nutrients",
+    "food.fiber": "Fiber",
+    "food.sugar": "Sugar",
+    "food.satFat": "Saturated fat",
+    "food.transFat": "Trans fat",
+    "food.sodium": "Sodium",
+    "food.cholesterol": "Cholesterol",
+    "food.vitaminsMinerals": "Vitamins & Minerals",
+    "food.potassium": "Potassium",
+    "food.calcium": "Calcium",
+    "food.iron": "Iron",
+    "food.vitA": "Vit A",
+    "food.vitC": "Vit C",
+    "food.vitD": "Vit D",
+    "food.servingSizes": "Serving Sizes",
+    "food.defaultServing": "Default:",
+    "food.mainIngredients": "Main Ingredients",
+    "food.brand": "Brand",
+    "food.healthScore": "Health Score",
+    "food.allergenWarn": "Contains Allergens",
+    "food.logAsFood": "Log as food",
+    "food.filterAll": "All",
+
+    // ── Food confirmation modal (C2) ────────────────────────────────
+    "food.confirmTitle": "Confirm Food",
+    "food.confirmEmpty": "AI couldn't find any food",
+    "food.confirmEmptyHint": 'Try more specific keywords, e.g. "chicken fried rice"',
+    "food.confirmSource": "AI recognized from:",
+    "food.confirmWarning": "⚠️ All nutrition values are estimates. Edit if needed before saving.",
+    "food.totalEstimate": "Total estimate",
+    "food.confHigh": "High",
+    "food.confMed": "Medium",
+    "food.confLow": "Low",
+    "food.macroCalories": "Calories",
+    "food.macroProtein": "Protein",
+    "food.macroCarbs": "Carbs",
+    "food.macroFat": "Fat",
+    "food.macroSugar": "Sugar",
+    "food.macroSodium": "Sodium",
+    "food.matchedDb": "Matched in database:",
+    "food.savingN": "Saving...",
+    "food.savedN": "{n} foods logged ✓",
+    "food.warnSodium": "High sodium ({n}mg = {pct}% daily limit). Daily limit: 2000mg.",
+    "food.warnSugar": "High sugar ({n}g = {pct}% daily limit). Daily limit: 50g.",
+    "food.warnFat": "High fat ({n}g = {pct}% daily limit). Daily limit: 65g.",
+    "food.warnCalories": "Very high calories ({n} kcal in one serving).",
+
+    // ── Landing chrome (C2) ─────────────────────────────────────────
+    "landing.dashboard": "Dashboard",
+    "landing.login": "Login",
+    "landing.features": "Features",
+    "landing.howItWorks": "How it works",
+    "landing.testimonials": "Testimonials",
+    "landing.faq": "FAQ",
+    "landing.free": "Free",
+    "landing.freeForever": "/ forever",
+    "landing.freeFeatures1": "AI food scan",
+    "landing.freeFeatures2": "Personal meal plan",
+    "landing.freeFeatures3": "Fasting & prayer schedule",
+    "landing.freeFeatures4": "HealthyU AI Coach chatbot",
+    "landing.startFree": "Start free",
+    "landing.premiumSoon": "Premium (soon)",
+    "landing.premiumPrice": "Rp 299k",
+    "landing.premiumPerMonth": "/ month",
+    "landing.premiumFeatures1": "Real nutritionist consults",
+    "landing.premiumFeatures2": "Unlimited premium recipes",
+    "landing.premiumFeatures3": "PDF report export",
+    "landing.premiumFeatures4": "Apple/Google Fit sync",
+    "landing.notifyMe": "Notify me",
+    "landing.finalCtaTitle": "Start your health journey today",
+    "landing.finalCtaDesc": "Free forever. No credit card. Results visible in 7 days.",
+    "landing.finalCtaFree": "Free forever",
+    "landing.finalCtaDb": "Indonesian food database",
+    "landing.finalCtaAi": "AI coach 24/7",
+    "landing.stickyPrompt": "Ready to start? Free forever.",
+    "landing.copyright": "Designed for Indonesia",
+    "landing.privacy": "Privacy",
+    "landing.prism": "Prism",
+    "landing.premiumBadge": "Premium (soon)",
+
     "admin.articles.title": "Articles",
     "admin.articles.loading": "Loading…",
     "admin.articles.count": "{count} articles",

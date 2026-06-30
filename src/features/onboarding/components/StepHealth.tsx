@@ -1,5 +1,6 @@
 import { Check } from "lucide-react";
 import { DisclaimerCard } from "@/components/healthyu/disclaimer-card";
+import { useTranslation } from "@/lib/i18n";
 import {
   ALLERGIES,
   HEALTH_CONDITIONS,
@@ -22,6 +23,7 @@ export function StepHealth({
   onFinish: () => void;
   pending: boolean;
 }) {
+  const { t } = useTranslation();
   return (
     <section className="space-y-5 animate-fade-up">
       <div>
@@ -83,18 +85,18 @@ export function StepHealth({
       </div>
       <div className="grid grid-cols-2 gap-3 pt-4">
         <button onClick={onBack} className={secondaryBtn}>
-          Kembali
+          {t("common.back")}
         </button>
         <button
           onClick={onFinish}
           disabled={pending}
           className={`${primaryBtn} disabled:opacity-60`}
         >
-          {pending ? "Menyimpan..." : "Mulai"}
+          {pending ? t("common.saving") : t("common.start")}
         </button>
       </div>
       <p className="text-[11px] text-center text-muted-foreground pt-1">
-        Semua jawaban bisa diubah kapan saja di Profil.
+        {t("onboarding.health.hint")}
       </p>
     </section>
   );

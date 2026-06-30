@@ -13,6 +13,7 @@ import {
   Leaf,
 } from "lucide-react";
 import type { getFoodDetail } from "@/features/food/lib/foodDb.functions";
+import { useTranslation } from "@/lib/i18n";
 
 export function FacetSelect({
   label,
@@ -25,6 +26,7 @@ export function FacetSelect({
   setValue: (v: string) => void;
   options: string[];
 }) {
+  const { t } = useTranslation();
   return (
     <label className="flex items-center gap-2 text-xs">
       <span className="w-16 text-muted-foreground font-medium">{label}</span>
@@ -33,7 +35,7 @@ export function FacetSelect({
         onChange={(e) => setValue(e.target.value)}
         className="flex-1 px-3 py-2 rounded-xl bg-muted/60 border border-transparent focus:border-primary outline-none text-sm"
       >
-        <option value="">Semua</option>
+        <option value="">{t("food.filterAll")}</option>
         {options.map((o) => (
           <option key={o} value={o}>
             {o}
@@ -46,14 +48,22 @@ export function FacetSelect({
 
 export type DetailData = Awaited<ReturnType<typeof getFoodDetail>> | undefined;
 
+import type { TranslationKey } from "@/lib/i18n";
+
 /* Glycemic index → label & color band */
-function giLabel(gi: number | null | undefined): { text: string; tone: string } {
+function giLabel(
+  gi: number | null | undefined,
+  t: (k: TranslationKey) => string,
+): { text: string; tone: string } {
   if (gi == null) return { text: "—", tone: "bg-muted text-muted-foreground" };
   if (gi < 55)
-    return { text: "Rendah", tone: "bg-emerald-500/10 text-emerald-700 dark:text-emerald-400" };
+    return {
+      text: t("food.giLow"),
+      tone: "bg-emerald-500/10 text-emerald-700 dark:text-emerald-400",
+    };
   if (gi < 70)
-    return { text: "Sedang", tone: "bg-amber-500/10 text-amber-700 dark:text-amber-400" };
-  return { text: "Tinggi", tone: "bg-rose-500/10 text-rose-700 dark:text-rose-400" };
+    return { text: t("food.giMed"), tone: "bg-amber-500/10 text-amber-700 dark:text-amber-400" };
+  return { text: t("food.giHigh"), tone: "bg-rose-500/10 text-rose-700 dark:text-rose-400" };
 }
 
 export function FoodDetailSheet({
@@ -65,9 +75,10 @@ export function FoodDetailSheet({
   loading: boolean;
   onClose: () => void;
 }) {
+  const { t } = useTranslation();
   const food = data?.food;
   const servings = data?.servings ?? [];
-  const gi = giLabel(food?.glycemic_index);
+  const gi = giLabel(food?.glycemic_index, t);
 
   return (
     <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/50" onClick={onClose}>
@@ -78,13 +89,17 @@ export function FoodDetailSheet({
         <div className="flex items-start justify-between mb-1">
           <div className="min-w-0 flex-1 pr-2">
             <h2 className="font-bold text-lg leading-tight">
-              {loading ? "Memuat..." : food?.name}
+              {loading ? t("food.detailLoading") : food?.name}
             </h2>
             {food?.name_en && food.name_en !== food.name && (
               <p className="text-xs text-muted-foreground mt-0.5">{food.name_en}</p>
             )}
           </div>
-          <button onClick={onClose} className="p-1 rounded-full hover:bg-muted" aria-label="Tutup">
+          <button
+            onClick={onClose}
+            className="p-1 rounded-full hover:bg-muted"
+            aria-label={t("common.close")}
+          >
             <X className="size-5" />
           </button>
         </div>
@@ -121,7 +136,7 @@ export function FoodDetailSheet({
             {(food.glycemic_index != null || food.glycemic_load != null) && (
               <section className="mb-4">
                 <p className="text-xs font-semibold text-muted-foreground mb-2 flex items-center gap-1.5">
-                  <Flame className="size-3.5" aria-hidden /> Indeks Glikemik
+                  <Flame className="size-3.5" aria-hidden /> {t("food.gi")}
                 </p>
                 <div className="grid grid-cols-2 gap-2">
                   <div className="flex items-center justify-between px-3 py-2.5 rounded-lg bg-muted/40">
@@ -138,11 +153,13 @@ export function FoodDetailSheet({
                       <p className="text-[10px] text-muted-foreground">GL</p>
                       <p className="text-sm font-bold">{food.glycemic_load ?? "—"}</p>
                     </div>
-                    <span className="text-[10px] text-muted-foreground px-1.5">per porsi</span>
+                    <span className="text-[10px] text-muted-foreground px-1.5">
+                      {t("food.perServing")}
+                    </span>
                   </div>
                 </div>
                 <p className="text-[11px] text-muted-foreground mt-1.5 leading-snug">
-                  GI &lt; 55 rendah, 55-69 sedang, ≥ 70 tinggi. GL ≥ 20 tinggi.
+                  {t("food.giLegend")}
                 </p>
               </section>
             )}
@@ -150,15 +167,15 @@ export function FoodDetailSheet({
             {/* Micronutrients — fiber + sodium + sat_fat + cholesterol */}
             <section className="mb-4">
               <p className="text-xs font-semibold text-muted-foreground mb-2 flex items-center gap-1.5">
-                <Pill className="size-3.5" aria-hidden /> Nutrisi Lain
+                <Pill className="size-3.5" aria-hidden /> {t("food.otherNutrients")}
               </p>
               <div className="grid grid-cols-2 gap-x-3 gap-y-1.5 text-xs">
-                <NutriRow label="Serat" value={food.fiber_g} unit="g" />
-                <NutriRow label="Gula" value={food.sugar_g} unit="g" />
-                <NutriRow label="Lemak jenuh" value={food.sat_fat_g} unit="g" />
-                <NutriRow label="Lemak trans" value={food.trans_fat_g} unit="g" />
-                <NutriRow label="Natrium" value={food.sodium_mg} unit="mg" />
-                <NutriRow label="Kolesterol" value={food.cholesterol_mg} unit="mg" />
+                <NutriRow label={t("food.fiber")} value={food.fiber_g} unit="g" />
+                <NutriRow label={t("food.sugar")} value={food.sugar_g} unit="g" />
+                <NutriRow label={t("food.satFat")} value={food.sat_fat_g} unit="g" />
+                <NutriRow label={t("food.transFat")} value={food.trans_fat_g} unit="g" />
+                <NutriRow label={t("food.sodium")} value={food.sodium_mg} unit="mg" />
+                <NutriRow label={t("food.cholesterol")} value={food.cholesterol_mg} unit="mg" />
               </div>
             </section>
 
@@ -171,26 +188,28 @@ export function FoodDetailSheet({
               Number(food.vitamin_d_mcg) > 0) && (
               <section className="mb-4">
                 <p className="text-xs font-semibold text-muted-foreground mb-2 flex items-center gap-1.5">
-                  <Sparkles className="size-3.5" aria-hidden /> Vitamin & Mineral
+                  <Sparkles className="size-3.5" aria-hidden /> {t("food.vitaminsMinerals")}
                 </p>
                 <div className="grid grid-cols-3 gap-1.5 text-[11px]">
-                  <MiniNutri label="Kalium" value={food.potassium_mg} unit="mg" />
-                  <MiniNutri label="Kalsium" value={food.calcium_mg} unit="mg" />
-                  <MiniNutri label="Zat besi" value={food.iron_mg} unit="mg" />
-                  <MiniNutri label="Vit A" value={food.vitamin_a_mcg} unit="mcg" />
-                  <MiniNutri label="Vit C" value={food.vitamin_c_mg} unit="mg" />
-                  <MiniNutri label="Vit D" value={food.vitamin_d_mcg} unit="mcg" />
+                  <MiniNutri label={t("food.potassium")} value={food.potassium_mg} unit="mg" />
+                  <MiniNutri label={t("food.calcium")} value={food.calcium_mg} unit="mg" />
+                  <MiniNutri label={t("food.iron")} value={food.iron_mg} unit="mg" />
+                  <MiniNutri label={t("food.vitA")} value={food.vitamin_a_mcg} unit="mcg" />
+                  <MiniNutri label={t("food.vitC")} value={food.vitamin_c_mg} unit="mg" />
+                  <MiniNutri label={t("food.vitD")} value={food.vitamin_d_mcg} unit="mcg" />
                 </div>
               </section>
             )}
 
             {/* Serving sizes */}
             <section className="mb-4">
-              <p className="text-xs font-semibold text-muted-foreground mb-2">Ukuran Porsi</p>
+              <p className="text-xs font-semibold text-muted-foreground mb-2">
+                {t("food.servingSizes")}
+              </p>
               <div className="space-y-1.5">
                 {servings.length === 0 && (
                   <p className="text-xs text-muted-foreground">
-                    Default: {food.serving_size}
+                    {t("food.defaultServing")} {food.serving_size}
                     {food.serving_unit}
                   </p>
                 )}
@@ -220,7 +239,9 @@ export function FoodDetailSheet({
             {/* Ingredients — flatten JSONB array if present */}
             {Array.isArray(food.ingredients) && food.ingredients.length > 0 && (
               <section className="mb-4">
-                <p className="text-xs font-semibold text-muted-foreground mb-2">Bahan Utama</p>
+                <p className="text-xs font-semibold text-muted-foreground mb-2">
+                  {t("food.mainIngredients")}
+                </p>
                 <p className="text-xs leading-relaxed">
                   {(food.ingredients as unknown[])
                     .slice(0, 8)
@@ -240,7 +261,7 @@ export function FoodDetailSheet({
             {/* Brand + BPOM + health rating meta row */}
             {(food.brand || food.bpom_number || food.health_rating != null) && (
               <section className="mb-4 pt-3 border-t border-border/50 space-y-1.5">
-                {food.brand && <MetaRow label="Merek" value={food.brand} />}
+                {food.brand && <MetaRow label={t("food.brand")} value={food.brand} />}
                 {food.bpom_number && (
                   <MetaRow
                     label="BPOM"
@@ -250,7 +271,7 @@ export function FoodDetailSheet({
                 )}
                 {food.health_rating != null && food.health_rating > 0 && (
                   <MetaRow
-                    label="Health Score"
+                    label={t("food.healthScore")}
                     value={`${food.health_rating}/10 ${
                       food.health_rating >= 8 ? "🟢" : food.health_rating >= 5 ? "🟡" : "🔴"
                     }`}
@@ -263,7 +284,7 @@ export function FoodDetailSheet({
             {(food.allergens?.length ?? 0) > 0 && (
               <section className="mb-3">
                 <p className="text-xs font-semibold text-destructive mb-2 flex items-center gap-1.5">
-                  <AlertTriangle className="size-3.5" aria-hidden /> Mengandung Alergen
+                  <AlertTriangle className="size-3.5" aria-hidden /> {t("food.allergenWarn")}
                 </p>
                 <div className="flex flex-wrap gap-1.5">
                   {food.allergens!.map((a: string) => (
@@ -299,7 +320,7 @@ export function FoodDetailSheet({
               to="/food"
               className="mt-2 flex items-center justify-center gap-2 w-full py-3 rounded-xl bg-primary text-primary-foreground font-semibold text-sm"
             >
-              <Info className="size-4" /> Catat sebagai makanan
+              <Info className="size-4" /> {t("food.logAsFood")}
             </Link>
           </>
         )}

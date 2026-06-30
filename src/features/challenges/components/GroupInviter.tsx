@@ -10,6 +10,7 @@ import {
   listMyGroupsForChallenge,
 } from "@/features/challenges/lib/groupChallenges.functions";
 import { groupChallengePendingMembers } from "@/features/challenges/lib/groupChallengePending.functions";
+import { useTranslation } from "@/lib/i18n";
 
 export function GroupInviter({
   challengeId,
@@ -18,6 +19,7 @@ export function GroupInviter({
   challengeId: string;
   initialOpen?: boolean;
 }) {
+  const { t } = useTranslation();
   const qc = useQueryClient();
   const navigate = useNavigate();
   const fetchGroups = useServerFn(listMyGroupsForChallenge);
@@ -57,14 +59,18 @@ export function GroupInviter({
         className="w-full text-[11px] font-semibold text-muted-foreground inline-flex items-center justify-center gap-1"
       >
         <UserPlus className="size-3" />
-        {open ? "Tutup" : "Bareng grup"}
+        {open ? t("group.inviteToggleClose") : t("group.inviteToggleOpen")}
       </button>
       {open && (
         <div className="mt-2 space-y-1.5">
-          {isLoading && <p className="text-[11px] text-muted-foreground text-center">Memuat…</p>}
+          {isLoading && (
+            <p className="text-[11px] text-muted-foreground text-center">
+              {t("group.inviteLoading")}
+            </p>
+          )}
           {!isLoading && groups.length === 0 && (
             <p className="text-[11px] text-muted-foreground text-center">
-              Belum ada grup. Buat di halaman Groups.
+              {t("group.inviteEmpty")}
             </p>
           )}
           {groups.map((g) => (

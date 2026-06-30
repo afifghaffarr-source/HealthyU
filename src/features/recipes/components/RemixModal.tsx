@@ -4,6 +4,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { Sparkles, Loader2, X } from "lucide-react";
 import { remixRecipe } from "@/features/scan/lib/scanSocial.functions";
 import { toast } from "@/lib/toast-config";
+import { useTranslation } from "@/lib/i18n";
 
 type Props = {
   open: boolean;
@@ -28,6 +29,7 @@ type RemixResult = {
  * Auth-required. Calls the existing remixRecipe server fn.
  */
 export function RemixModal({ open, onClose, recipesId, recipeTitle }: Props) {
+  const { t } = useTranslation();
   const [sub, setSub] = useState("");
   const fn = useServerFn(remixRecipe);
   const mut = useMutation({
@@ -61,18 +63,18 @@ export function RemixModal({ open, onClose, recipesId, recipeTitle }: Props) {
             type="button"
             onClick={onClose}
             className="size-8 grid place-items-center rounded-full hover:bg-accent"
-            aria-label="Tutup"
+            aria-label={t("common.close")}
           >
             <X className="size-4" />
           </button>
         </div>
 
         <div className="space-y-2">
-          <label className="text-sm font-medium">Substitusi / Permintaan</label>
+          <label className="text-sm font-medium">{t("recipes.remixSubstitutionLabel")}</label>
           <input
             value={sub}
             onChange={(e) => setSub(e.target.value)}
-            placeholder="Ganti daging dengan tempe; rendah garam..."
+            placeholder={t("recipes.remixSubstitutionPlaceholder")}
             maxLength={200}
             className="w-full rounded-xl border bg-background px-3 py-2 text-sm"
           />
@@ -86,7 +88,7 @@ export function RemixModal({ open, onClose, recipesId, recipeTitle }: Props) {
         >
           {mut.isPending ? (
             <>
-              <Loader2 className="size-4 animate-spin" /> Memproses...
+              <Loader2 className="size-4 animate-spin" /> {t("common.processing")}
             </>
           ) : (
             <>

@@ -7,6 +7,7 @@ import { BottomNav } from "@/components/bottom-nav";
 import { mealCoachChat } from "@/features/scan/lib/scanMore.functions";
 import { Send, Loader2, Sparkles } from "lucide-react";
 import { toast } from "@/lib/toast-config";
+import { useTranslation } from "@/lib/i18n";
 
 export const Route = createFileRoute("/_authenticated/coach/meals")({
   component: Page,
@@ -15,6 +16,7 @@ export const Route = createFileRoute("/_authenticated/coach/meals")({
 type Msg = { role: "user" | "assistant"; text: string };
 
 function Page() {
+  const { t } = useTranslation();
   const [messages, setMessages] = useState<Msg[]>([]);
   const [input, setInput] = useState("");
   const chat = useServerFn(mealCoachChat);
@@ -37,7 +39,7 @@ function Page() {
         {messages.length === 0 && (
           <div className="rounded-2xl bg-primary/5 border border-primary/20 p-4 text-sm">
             <Sparkles className="size-5 text-primary mb-2" />
-            Tanya apa saja tentang pola makanmu 7 hari terakhir. Contoh: "Apakah protein cukup?"
+            {t("coach.meals.emptyHint")}
           </div>
         )}
         {messages.map((m, i) => (
@@ -52,7 +54,7 @@ function Page() {
         ))}
         {mut.isPending && (
           <div className="rounded-2xl bg-card border p-3 mr-8 inline-flex items-center gap-2 text-sm text-muted-foreground">
-            <Loader2 className="size-4 animate-spin" /> Berpikir…
+            <Loader2 className="size-4 animate-spin" /> {t("common.thinking")}
           </div>
         )}
       </main>
@@ -62,14 +64,14 @@ function Page() {
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && send()}
-            placeholder="Tanya coach…"
+            placeholder={t("coach.meals.placeholder")}
             className="flex-1 bg-transparent outline-none text-sm px-2"
           />
           <button
             onClick={send}
             disabled={mut.isPending || !input.trim()}
             className="size-9 rounded-xl bg-primary text-primary-foreground grid place-items-center disabled:opacity-50"
-            aria-label="Kirim"
+            aria-label={t("coach.meals.ariaSend")}
           >
             <Send className="size-4" />
           </button>

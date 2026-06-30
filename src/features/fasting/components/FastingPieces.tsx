@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Check, X, Droplets, Flame, Trophy, Timer, Target, Calendar } from "lucide-react";
 import { ConfirmDialog } from "@/components/healthyu/confirm-dialog";
 import { FASTING_PROTOCOLS, fastingStage, formatDuration } from "@/lib/health";
+import { useTranslation } from "@/lib/i18n";
 
 // ─── Streak Display ──────────────────────────────────────────────────────────
 
@@ -171,6 +172,7 @@ export function ProtocolPicker({
   onStart: (p: { protocol: string; target_hours: number; is_custom?: boolean }) => void;
   starting: boolean;
 }) {
+  const { t } = useTranslation();
   const [pending, setPending] = useState<{ protocol: string; target_hours: number } | null>(null);
   const [customHours, setCustomHours] = useState(14);
   const [showCustom, setShowCustom] = useState(false);
@@ -274,10 +276,10 @@ export function ProtocolPicker({
 
       <ConfirmDialog
         open={!!pending}
-        title="Puasa lebih dari 16 jam"
-        description="Puasa panjang tidak disarankan untuk ibu hamil/menyusui, remaja, atau yang punya riwayat gangguan makan, diabetes, atau kondisi medis lain. Pastikan kamu cukup hidrasi & berhenti kapan saja jika tidak nyaman."
-        confirmLabel="Saya mengerti, mulai"
-        cancelLabel="Batal"
+        title={t("fasting.confirmLongTitle")}
+        description={t("fasting.confirmLongDesc")}
+        confirmLabel={t("fasting.confirmLongConfirm")}
+        cancelLabel={t("common.cancel")}
         onConfirm={() => {
           if (pending) {
             const isCustom = pending.protocol.startsWith("custom:");

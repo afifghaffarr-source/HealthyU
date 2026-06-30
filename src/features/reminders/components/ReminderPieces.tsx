@@ -12,17 +12,38 @@ import {
   MoonStar,
 } from "lucide-react";
 import type { Reminder, ReminderCategory } from "@/lib/reminders-store";
+import { useTranslation } from "@/lib/i18n";
+import type { TranslationKey } from "@/lib/i18n";
 
-export const CATEGORY_META: Record<ReminderCategory, { icon: typeof Bell; label: string }> = {
-  water: { icon: Droplet, label: "Air" },
-  meal: { icon: Utensils, label: "Makan" },
-  workout: { icon: Dumbbell, label: "Olahraga" },
-  sleep: { icon: Moon, label: "Tidur" },
-  medication: { icon: Pill, label: "Obat" },
-  fasting: { icon: Timer, label: "Puasa" },
-  prayer: { icon: MoonStar, label: "Sholat" },
-  custom: { icon: Sparkles, label: "Lain" },
+export const CATEGORY_ICONS: Record<ReminderCategory, typeof Bell> = {
+  water: Droplet,
+  meal: Utensils,
+  workout: Dumbbell,
+  sleep: Moon,
+  medication: Pill,
+  fasting: Timer,
+  prayer: MoonStar,
+  custom: Sparkles,
 };
+
+const CATEGORY_KEY_MAP: Record<ReminderCategory, TranslationKey> = {
+  water: "reminder.catWater",
+  meal: "reminder.catMeal",
+  workout: "reminder.catWorkout",
+  sleep: "reminder.catSleep",
+  medication: "reminder.catMedication",
+  fasting: "reminder.catFasting",
+  prayer: "reminder.catPrayer",
+  custom: "reminder.catCustom",
+};
+
+export function categoryLabel(cat: ReminderCategory, t: (k: TranslationKey) => string): string {
+  return t(CATEGORY_KEY_MAP[cat]);
+}
+
+export function getCategoryMeta(cat: ReminderCategory, t: (k: TranslationKey) => string) {
+  return { icon: CATEGORY_ICONS[cat], label: categoryLabel(cat, t) };
+}
 
 export const DAY_LABELS = ["M", "S", "S", "R", "K", "J", "S"];
 
@@ -37,6 +58,7 @@ export function NextReminderSummary({
   next: (Reminder & { min: number }) | null;
   fmtCountdown: (min: number) => string;
 }) {
+  const { t } = useTranslation();
   return (
     <section
       className="relative overflow-hidden rounded-3xl p-5 text-white animate-fade-up"
@@ -46,7 +68,9 @@ export function NextReminderSummary({
     >
       <div className="flex items-center justify-between">
         <div>
-          <div className="text-[11px] uppercase tracking-wider opacity-80">Pengingat aktif</div>
+          <div className="text-[11px] uppercase tracking-wider opacity-80">
+            {t("reminder.active")}
+          </div>
           <div className="text-3xl font-bold mt-1">
             {activeCount}
             <span className="text-base font-medium opacity-80">/{total}</span>
@@ -59,7 +83,7 @@ export function NextReminderSummary({
       {next ? (
         <div className="mt-4 bg-white/15 rounded-2xl p-3 flex items-center gap-3">
           {(() => {
-            const Icon = (CATEGORY_META[next.category] ?? CATEGORY_META.custom).icon;
+            const Icon = CATEGORY_ICONS[next.category] ?? CATEGORY_ICONS.custom;
             return (
               <div className="size-9 rounded-xl bg-white/20 grid place-items-center">
                 <Icon className="size-4" />
@@ -67,7 +91,7 @@ export function NextReminderSummary({
             );
           })()}
           <div className="flex-1 min-w-0">
-            <div className="text-[11px] opacity-80">Berikutnya</div>
+            <div className="text-[11px] opacity-80">{t("reminder.next")}</div>
             <div className="text-sm font-semibold truncate">
               {next.label} · {next.time}
             </div>
@@ -75,7 +99,7 @@ export function NextReminderSummary({
           <div className="text-xs font-medium opacity-90">{fmtCountdown(next.min)}</div>
         </div>
       ) : (
-        <div className="mt-4 text-xs opacity-80">Tidak ada pengingat tersisa hari ini</div>
+        <div className="mt-4 text-xs opacity-80">{t("reminder.noneToday")}</div>
       )}
     </section>
   );
@@ -100,11 +124,12 @@ export function AddReminderForm({
   onCancel: () => void;
   onAdd: () => void;
 }) {
+  const { t } = useTranslation();
   return (
     <section className="bg-card p-4 rounded-2xl outline-1 outline-black/5 space-y-3 animate-fade-up">
       <input
         type="text"
-        placeholder="Nama pengingat"
+        placeholder={t("reminder.namePlaceholder")}
         value={newLabel}
         onChange={(e) => setNewLabel(e.target.value)}
         className="w-full bg-muted rounded-xl px-3 py-2.5 text-sm outline-none"
@@ -121,9 +146,9 @@ export function AddReminderForm({
           onChange={(e) => setNewCategory(e.target.value as ReminderCategory)}
           className="flex-1 bg-muted rounded-xl px-3 py-2.5 text-sm outline-none"
         >
-          {Object.entries(CATEGORY_META).map(([k, v]) => (
+          {(Object.keys(CATEGORY_ICONS) as ReminderCategory[]).map((k) => (
             <option key={k} value={k}>
-              {v.label}
+              {categoryLabel(k, t)}
             </option>
           ))}
         </select>
@@ -133,13 +158,13 @@ export function AddReminderForm({
           onClick={onCancel}
           className="flex-1 bg-muted text-foreground font-semibold py-2.5 rounded-xl text-sm"
         >
-          Batal
+          {t("common.cancel")}
         </button>
         <button
           onClick={onAdd}
           className="flex-1 bg-primary text-primary-foreground font-semibold py-2.5 rounded-xl text-sm"
         >
-          Simpan
+          {t("common.save")}
         </button>
       </div>
     </section>
@@ -161,7 +186,8 @@ export function ReminderRow({
   onToggleDay: (day: number) => void;
   onRemove: () => void;
 }) {
-  const Meta = CATEGORY_META[it.category] ?? CATEGORY_META.custom;
+  const { t } = useTranslation();
+  const Meta = getCategoryMeta(it.category, t);
   const Icon = it.enabled ? Meta.icon : BellOff;
   return (
     <div className="bg-card p-4 rounded-2xl outline-1 outline-black/5 space-y-3">
@@ -176,7 +202,7 @@ export function ReminderRow({
             value={it.label}
             onChange={(e) => onUpdateLabel(e.target.value)}
             className="font-semibold text-sm bg-transparent outline-none w-full"
-            aria-label="Nama pengingat"
+            aria-label={t("reminder.namePlaceholder")}
           />
           <input
             type="time"
@@ -188,7 +214,7 @@ export function ReminderRow({
         <button
           onClick={onToggle}
           className={`w-11 h-6 rounded-full transition-colors relative ${it.enabled ? "bg-primary" : "bg-muted"}`}
-          aria-label="Toggle"
+          aria-label={t("reminder.toggle")}
         >
           <span
             className={`absolute top-0.5 size-5 rounded-full bg-white transition-transform ${it.enabled ? "translate-x-5" : "translate-x-0.5"}`}
@@ -197,7 +223,7 @@ export function ReminderRow({
         <button
           onClick={onRemove}
           className="size-8 grid place-items-center text-muted-foreground hover:text-destructive"
-          aria-label="Hapus"
+          aria-label={t("common.delete")}
         >
           <Trash2 className="size-4" />
         </button>
@@ -218,7 +244,9 @@ export function ReminderRow({
           );
         })}
         <span className="text-[10px] text-muted-foreground ml-1">
-          {it.days.length === 0 ? "Setiap hari" : `${it.days.length} hari`}
+          {it.days.length === 0
+            ? t("reminder.everyDay")
+            : t("reminder.nDays").replace("{n}", String(it.days.length))}
         </span>
       </div>
     </div>
