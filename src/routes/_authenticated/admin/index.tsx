@@ -106,7 +106,10 @@ function AdminOverviewPage() {
               icon={<Users className="size-5" />}
               label={t("admin.index.totalUsers")}
               value={data.users.total}
-              sub={`+${data.users.last24h} ${t("admin.index.totalUsersSub")} · +${data.users.last7d} 7d`}
+              sub={t("admin.index.totalUsersSub", {
+                today: data.users.last24h,
+                week: data.users.last7d,
+              })}
               tone="primary"
             />
             <StatCard

@@ -139,8 +139,9 @@ function BannersAdminPage() {
           cta_label: row.cta_label,
           cta_href: row.cta_href,
           color: row.color,
-          starts_at: row.starts_at,
-          ends_at: row.ends_at,
+          // Ponytail: normalize +00:00 → Z untuk Zod datetime validation
+          starts_at: row.starts_at ? row.starts_at.replace(/\+00:00$/, "Z") : undefined,
+          ends_at: row.ends_at ? row.ends_at.replace(/\+00:00$/, "Z") : null,
         },
       }),
     onSuccess: () => {

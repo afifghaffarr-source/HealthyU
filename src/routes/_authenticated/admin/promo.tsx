@@ -127,7 +127,10 @@ function PromoAdminPage() {
           reward_type: row.reward_type,
           reward_value: row.reward_value,
           max_uses: row.max_uses,
-          expires_at: row.expires_at,
+          // Ponytail: Postgres returns expires_at dengan offset +00:00, Zod
+          // z.string().datetime() expects trailing Z (UTC). Konversi normalize
+          // supaya duplikat promo tidak gagal validasi "Invalid datetime".
+          expires_at: row.expires_at ? row.expires_at.replace(/\+00:00$/, "Z") : null,
         },
       }),
     onSuccess: () => {
