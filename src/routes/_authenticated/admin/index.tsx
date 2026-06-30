@@ -14,9 +14,14 @@ import {
   Bell,
   Ticket,
   Megaphone,
+  Calculator,
 } from "lucide-react";
 import { getAdminOverview } from "@/features/admin/lib/adminOverview.functions";
 import { getPromoStatsAdmin } from "@/features/admin/lib/adminPromo.functions";
+import {
+  getBmrQuizStatsAdmin,
+  type BmrQuizStats,
+} from "@/features/admin/lib/adminExperiments.functions";
 import { useTranslation } from "@/lib/i18n";
 
 export const Route = createFileRoute("/_authenticated/admin/")({
@@ -44,6 +49,18 @@ function AdminOverviewPage() {
   } = useQuery({
     queryKey: ["admin", "promoStats"],
     queryFn: () => getPromoStatsAdmin(),
+    staleTime: 60_000,
+    retry: 1,
+  });
+
+  // Sprint 58-J — BMR quiz funnel stats (30d).
+  const {
+    data: bmrStats,
+    isLoading: bmrLoading,
+    error: bmrError,
+  } = useQuery<BmrQuizStats>({
+    queryKey: ["admin", "bmrStats"],
+    queryFn: () => getBmrQuizStatsAdmin(),
     staleTime: 60_000,
     retry: 1,
   });
@@ -210,6 +227,52 @@ function AdminOverviewPage() {
                   tone="muted"
                 />
               </div>
+            )}
+          </section>
+
+          {/* Sprint 58-J: BMR Quiz Funnel — 30d distribution */}
+          <section className="bg-card rounded-2xl p-5 outline-1 outline-black/5">
+            <div className="flex items-center gap-2 mb-3">
+              <Calculator className="size-4 text-primary" />
+              <h2 className="font-bold">{t("admin.index.bmrStatsTitle")}</h2>
+              {bmrStats && (
+                <span className="text-[10px] text-muted-foreground">
+                  · {t("admin.index.bmrWindow", { days: bmrStats.window_days })}
+                </span>
+              )}
+            </div>
+            {bmrLoading ? (
+              <p className="text-xs text-muted-foreground">{t("common.loading")}</p>
+            ) : bmrError || !bmrStats ? (
+              <p className="text-xs text-muted-foreground">{t("admin.index.tryAgain")}</p>
+            ) : (
+              <>
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mb-4">
+                  <StatCard
+                    icon={<Activity className="size-5" />}
+                    label={t("admin.index.bmrTotalCompletions")}
+                    value={bmrStats.total_completions}
+                    tone="primary"
+                  />
+                  <StatCard
+                    icon={<Calculator className="size-5" />}
+                    label={t("admin.index.bmrAvgBmr")}
+                    value={`${bmrStats.average_bmr.toLocaleString("id-ID")} kkal`}
+                    tone="muted"
+                  />
+                </div>
+                <BmrRangeBars
+                  distribution={bmrStats.range_distribution}
+                  total={bmrStats.total_completions}
+                  rangeLabels={{
+                    lt1200: t("admin.index.bmrRangeLt1200"),
+                    "1200-1500": t("admin.index.bmrRange1200to1500"),
+                    "1500-1800": t("admin.index.bmrRange1500to1800"),
+                    "1800-2200": t("admin.index.bmrRange1800to2200"),
+                    gte2200: t("admin.index.bmrRangeGte2200"),
+                  }}
+                />
+              </>
             )}
           </section>
 
@@ -453,4 +516,40 @@ function timeAgo(iso: string): string {
   const day = Math.floor(hr / 24);
   if (day < 30) return `${day}d`;
   return new Date(iso).toLocaleDateString("id-ID", { month: "short", day: "numeric" });
+}
+
+// Sprint 58-J — CSS bar chart for BMR range distribution (ponytail: 0 deps).
+function BmrRangeBars({
+  distribution,
+  total,
+  rangeLabels,
+}: {
+  distribution: Array<{ range: string; count: number }>;
+  total: number;
+  rangeLabels: Record<string, string>;
+}) {
+  return (
+    <div className="space-y-1.5">
+      {distribution.map((b) => {
+        const pct = total > 0 ? Math.round((b.count / total) * 100) : 0;
+        return (
+          <div key={b.range} className="flex items-center gap-2 text-xs">
+            <span className="w-28 text-muted-foreground shrink-0">
+              {rangeLabels[b.range] ?? b.range}
+            </span>
+            <div className="flex-1 h-5 bg-muted rounded-full overflow-hidden">
+              <div
+                className="h-full bg-primary/80 transition-all"
+                style={{ width: `${pct}%` }}
+                aria-hidden
+              />
+            </div>
+            <span className="w-16 text-right tabular-nums">
+              {b.count} ({pct}%)
+            </span>
+          </div>
+        );
+      })}
+    </div>
+  );
 }

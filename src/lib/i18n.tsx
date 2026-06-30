@@ -1792,6 +1792,15 @@ export type TranslationKey =
   | "admin.index.qaPromoDesc"
   | "admin.index.qaBannersTitle"
   | "admin.index.qaBannersDesc"
+  | "admin.index.bmrStatsTitle"
+  | "admin.index.bmrTotalCompletions"
+  | "admin.index.bmrAvgBmr"
+  | "admin.index.bmrRangeLt1200"
+  | "admin.index.bmrRange1200to1500"
+  | "admin.index.bmrRange1500to1800"
+  | "admin.index.bmrRange1800to2200"
+  | "admin.index.bmrRangeGte2200"
+  | "admin.index.bmrWindow"
   | "promo.placeholder"
   | "promo.redeemBtn"
   | "promo.redeemOk"
@@ -3460,6 +3469,15 @@ export const bundles = {
     "admin.index.qaPromoDesc": "Kode & redemptions promo",
     "admin.index.qaBannersTitle": "Kelola Banner",
     "admin.index.qaBannersDesc": "Banner pengumuman",
+    "admin.index.bmrStatsTitle": "BMR Quiz Funnel",
+    "admin.index.bmrTotalCompletions": "Total kalkulasi",
+    "admin.index.bmrAvgBmr": "Rata-rata BMR",
+    "admin.index.bmrRangeLt1200": "<1200 kkal",
+    "admin.index.bmrRange1200to1500": "1200-1500 kkal",
+    "admin.index.bmrRange1500to1800": "1500-1800 kkal",
+    "admin.index.bmrRange1800to2200": "1800-2200 kkal",
+    "admin.index.bmrRangeGte2200": "≥2200 kkal",
+    "admin.index.bmrWindow": "{days} hari terakhir",
     "promo.placeholder": "Masukkan kode promo",
     "promo.redeemBtn": "Tukar",
     "promo.redeemOk": "Kode berhasil ditukar!",
@@ -5118,6 +5136,15 @@ export const bundles = {
     "admin.index.qaPromoDesc": "Promo codes & redemptions",
     "admin.index.qaBannersTitle": "Manage Banners",
     "admin.index.qaBannersDesc": "Announcement banners",
+    "admin.index.bmrStatsTitle": "BMR Quiz Funnel",
+    "admin.index.bmrTotalCompletions": "Total calculations",
+    "admin.index.bmrAvgBmr": "Average BMR",
+    "admin.index.bmrRangeLt1200": "<1200 kcal",
+    "admin.index.bmrRange1200to1500": "1200-1500 kcal",
+    "admin.index.bmrRange1500to1800": "1500-1800 kcal",
+    "admin.index.bmrRange1800to2200": "1800-2200 kcal",
+    "admin.index.bmrRangeGte2200": "≥2200 kcal",
+    "admin.index.bmrWindow": "Last {days} days",
     "promo.placeholder": "Enter promo code",
     "promo.redeemBtn": "Redeem",
     "promo.redeemOk": "Code redeemed!",

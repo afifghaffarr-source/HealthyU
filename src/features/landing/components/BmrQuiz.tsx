@@ -1,6 +1,9 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { Sparkles } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { bmrRangeFor, trackBmrQuizEvent } from "@/features/admin/lib/adminExperiments.functions";
+import { getOrCreateSessionId } from "@/hooks/use-experiments";
 
 export function BmrQuiz() {
   const [g, setG] = useState<"m" | "f">("m");
@@ -10,6 +13,37 @@ export function BmrQuiz() {
   const bmr = Math.round(
     g === "m" ? 10 * w + 6.25 * h - 5 * age + 5 : 10 * w + 6.25 * h - 5 * age - 161,
   );
+
+  // Sprint 58-J — debounced completion telemetry. Fires once per "settled"
+  // input change (1.5s of no further edits) so we capture intent, not
+  // every keystroke. ponytail: piggyback on error_reports.
+  const lastFiredRef = useRef<string>("");
+  useEffect(() => {
+    const handle = window.setTimeout(() => {
+      const range = bmrRangeFor(bmr);
+      const fingerprint = `${g}-${age}-${w}-${h}-${range}`;
+      if (lastFiredRef.current === fingerprint) return; // dedup identical
+      lastFiredRef.current = fingerprint;
+      const sessionId = getOrCreateSessionId();
+      void supabase.auth.getSession().then(({ data: sess }) => {
+        void trackBmrQuizEvent({
+          data: {
+            gender: g,
+            age,
+            weight: w,
+            height: h,
+            bmr,
+            bmrRange: range,
+            sessionId,
+            userId: sess?.session?.user?.id ?? null,
+          },
+        }).catch(() => {
+          /* swallow — telemetry must not crash the app */
+        });
+      });
+    }, 1500);
+    return () => window.clearTimeout(handle);
+  }, [g, age, w, h, bmr]);
   return (
     <div className="glass rounded-3xl p-6 border border-primary/20">
       <div className="flex items-center gap-2 mb-4">

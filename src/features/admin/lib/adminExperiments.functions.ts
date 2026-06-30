@@ -299,3 +299,138 @@ export const getExperimentStatsAdmin = createServerFn({ method: "POST" })
 
 // Re-export EMPTY_STATS for the UI when the query has no data yet.
 export { EMPTY_STATS };
+
+// ── Sprint 58-J — BMR Quiz Telemetry ────────────────────────────────
+// Ponytail: piggyback on error_reports (same Sprint 19 pattern as
+// experiment tracking above). Zero new tables, zero new endpoints.
+
+const TrackBmrSchema = z.object({
+  gender: z.enum(["m", "f"]),
+  age: z.number().int().min(10).max(120),
+  weight: z.number().min(20).max(400),
+  height: z.number().min(80).max(260),
+  bmr: z.number().int().min(500).max(6000),
+  bmrRange: z.enum(["lt1200", "1200-1500", "1500-1800", "1800-2200", "gte2200"]),
+  sessionId: z.string().min(1).max(100),
+  userId: z.string().uuid().optional().nullable(),
+});
+
+export type BmrRange = z.infer<typeof TrackBmrSchema>["bmrRange"];
+
+/**
+ * Compute BMR bucket label for a given calorie value.
+ * Mirrors the BMR_RANGE enum on the client/server contract.
+ */
+export function bmrRangeFor(calories: number): BmrRange {
+  if (calories < 1200) return "lt1200";
+  if (calories < 1500) return "1200-1500";
+  if (calories < 1800) return "1500-1800";
+  if (calories < 2200) return "1800-2200";
+  return "gte2200";
+}
+
+export const trackBmrQuizEvent = createServerFn({ method: "POST" })
+  .inputValidator((i: unknown) => parseInput(TrackBmrSchema, i))
+  .handler(async ({ data }): Promise<{ ok: boolean }> => {
+    const source = "telemetry:bmr.quiz.completed";
+    const ctx: Record<string, unknown> = {
+      gender: data.gender,
+      age: data.age,
+      weight: data.weight,
+      height: data.height,
+      bmr: data.bmr,
+      bmrRange: data.bmrRange,
+      sessionId: data.sessionId,
+      is_telemetry: true,
+    };
+    const { error } = await supabaseAdmin.from("error_reports").insert({
+      user_id: data.userId ?? null,
+      source,
+      boundary: "global",
+      message: "event:bmr.quiz.completed",
+      context: ctx as never,
+      route: null,
+      handled: true,
+      severity: "info",
+    });
+    if (error) {
+      console.warn("[trackBmrQuizEvent] insert failed:", error.message);
+      return { ok: false };
+    }
+    return { ok: true };
+  });
+
+// ── Admin: BMR Quiz Stats ───────────────────────────────────────────
+
+export type BmrRangeBucket = {
+  range: BmrRange;
+  count: number;
+};
+
+export type BmrQuizStats = {
+  total_completions: number;
+  window_days: number;
+  range_distribution: BmrRangeBucket[];
+  average_bmr: number;
+};
+
+const RANGE_ORDER: BmrRange[] = ["lt1200", "1200-1500", "1500-1800", "1800-2200", "gte2200"];
+
+const EMPTY_BMR_STATS: BmrQuizStats = {
+  total_completions: 0,
+  window_days: 30,
+  range_distribution: RANGE_ORDER.map((range) => ({ range, count: 0 })),
+  average_bmr: 0,
+};
+
+export const getBmrQuizStatsAdmin = createServerFn({ method: "POST" })
+  .middleware([ADMIN_GUARD])
+  .inputValidator((i: unknown) => {
+    // Optional windowDays. If absent, default 30.
+    const obj = (i ?? {}) as { windowDays?: number };
+    if (obj.windowDays === undefined) return { windowDays: 30 };
+    if (typeof obj.windowDays !== "number" || obj.windowDays < 1 || obj.windowDays > 90) {
+      throw new Error("windowDays must be 1-90");
+    }
+    return { windowDays: obj.windowDays };
+  })
+  .handler(async ({ context }): Promise<BmrQuizStats> => {
+    const { userId } = context as { userId: string };
+    await ensureAdmin(userId);
+    const days = 30;
+    const since = new Date(Date.now() - days * 24 * 60 * 60 * 1000).toISOString();
+
+    const { data: rows, error } = await db
+      .from("error_reports")
+      .select("context")
+      .eq("source", "telemetry:bmr.quiz.completed")
+      .gte("created_at", since);
+
+    if (error) throw new Error(`getBmrQuizStats: ${error.message}`);
+
+    const counts: Record<string, number> = {};
+    let bmrSum = 0;
+    let bmrCount = 0;
+    for (const r of (rows ?? []) as Array<{
+      context: { bmrRange?: string; bmr?: number } | null;
+    }>) {
+      const range = r.context?.bmrRange;
+      if (range) counts[range] = (counts[range] ?? 0) + 1;
+      if (typeof r.context?.bmr === "number") {
+        bmrSum += r.context.bmr;
+        bmrCount += 1;
+      }
+    }
+
+    return {
+      total_completions: (rows ?? []).length,
+      window_days: days,
+      range_distribution: RANGE_ORDER.map((range) => ({
+        range,
+        count: counts[range] ?? 0,
+      })),
+      average_bmr: bmrCount > 0 ? Math.round(bmrSum / bmrCount) : 0,
+    };
+  });
+
+export { EMPTY_BMR_STATS };
