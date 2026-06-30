@@ -1774,6 +1774,15 @@ export type TranslationKey =
   | "admin.exp.invalidJson"
   | "admin.exp.duplicate"
   | "admin.exp.duplicatedOk"
+  | "admin.exp.statsTitle"
+  | "admin.exp.statsImpressions"
+  | "admin.exp.statsConversions"
+  | "admin.exp.statsCtr"
+  | "admin.exp.statsVariantA"
+  | "admin.exp.statsVariantB"
+  | "admin.exp.statsTotal"
+  | "admin.exp.statsWindow"
+  | "admin.exp.statsEmpty"
   | "admin.index.promoStatsTitle"
   | "admin.index.promoTotalCodes"
   | "admin.index.promoActiveCodes"
@@ -3432,6 +3441,15 @@ export const bundles = {
     "admin.exp.invalidJson": "Format JSON tidak valid untuk variant_a_json atau variant_b_json.",
     "admin.exp.duplicate": "Duplikat",
     "admin.exp.duplicatedOk": "Eksperimen diduplikasi.",
+    "admin.exp.statsTitle": "Statistik A/B",
+    "admin.exp.statsImpressions": "Tayangan",
+    "admin.exp.statsConversions": "Konversi",
+    "admin.exp.statsCtr": "CTR",
+    "admin.exp.statsVariantA": "Varian A",
+    "admin.exp.statsVariantB": "Varian B",
+    "admin.exp.statsTotal": "Total",
+    "admin.exp.statsWindow": "{days} hari terakhir",
+    "admin.exp.statsEmpty": "Belum ada data.",
     // Sprint 58-C — promo stats card + quick actions (ID)
     "admin.index.promoStatsTitle": "Promo & Redemptions",
     "admin.index.promoTotalCodes": "Total kode",
@@ -5081,6 +5099,15 @@ export const bundles = {
     "admin.exp.invalidJson": "Invalid JSON for variant_a_json or variant_b_json.",
     "admin.exp.duplicate": "Duplicate",
     "admin.exp.duplicatedOk": "Experiment duplicated.",
+    "admin.exp.statsTitle": "A/B Statistics",
+    "admin.exp.statsImpressions": "Impressions",
+    "admin.exp.statsConversions": "Conversions",
+    "admin.exp.statsCtr": "CTR",
+    "admin.exp.statsVariantA": "Variant A",
+    "admin.exp.statsVariantB": "Variant B",
+    "admin.exp.statsTotal": "Total",
+    "admin.exp.statsWindow": "Last {days} days",
+    "admin.exp.statsEmpty": "No data yet.",
     // Sprint 58-C — promo stats card + quick actions (EN)
     "admin.index.promoStatsTitle": "Promo & Redemptions",
     "admin.index.promoTotalCodes": "Total codes",

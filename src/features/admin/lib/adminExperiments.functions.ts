@@ -6,6 +6,15 @@
  *
  * Admin fns: list/create/update/delete.
  * Public fn: getExperimentVariant (SECURITY DEFINER RPC).
+ * Sprint 58-I adds real tracking: trackExperimentEvent (public, fire-and-forget)
+ * + getExperimentStatsAdmin (admin, aggregated from error_reports).
+ *
+ * ponytail scoreboard (Sprint 58-I):
+ *   - 0 new tables, 0 new cron, 0 new KV, 0 new deps, 0 new endpoints
+ *   - reuses error_reports (Sprint 19 telemetry pattern): source LIKE
+ *     'telemetry:experiment.%' → impressions/conversions/CTR per variant
+ *   - bounded volume: <100 events/day/user expected; if it grows, swap to
+ *     a dedicated telemetry_events table (deferred).
  */
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
@@ -167,3 +176,126 @@ export const getExperimentVariant = createServerFn({ method: "POST" })
         ((row as { payload: Record<string, unknown> }).payload as Record<string, unknown>) ?? {},
     } as AnyRow;
   });
+
+// ── Public: Track Experiment Event (impression / conversion) ────────
+// Sprint 58-I — real A/B tracking via error_reports reuse (Ponytail).
+
+const TrackEventSchema = z.object({
+  event: z.enum(["impression", "conversion"]),
+  key: z.string().min(1).max(120),
+  variant: z.enum(["a", "b"]),
+  sessionId: z.string().min(1).max(100),
+  conversionType: z.string().max(50).optional(),
+  userId: z.string().uuid().optional().nullable(),
+});
+
+export const trackExperimentEvent = createServerFn({ method: "POST" })
+  .inputValidator((i: unknown) => parseInput(TrackEventSchema, i))
+  .handler(async ({ data }): Promise<{ ok: boolean }> => {
+    // Mirror track() payload shape: source='telemetry:experiment.${event}',
+    // context carries the props. Severity=info, mechanism=telemetry.
+    const source = `telemetry:experiment.${data.event}`;
+    const ctx: Record<string, unknown> = {
+      key: data.key,
+      variant: data.variant,
+      sessionId: data.sessionId,
+      is_telemetry: true,
+    };
+    if (data.conversionType) ctx.conversionType = data.conversionType;
+
+    const { error } = await supabaseAdmin.from("error_reports").insert({
+      user_id: data.userId ?? null,
+      source,
+      boundary: "global",
+      message: `event:experiment.${data.event}`,
+      context: ctx as never,
+      route: null,
+      handled: true,
+      severity: "info",
+    });
+
+    if (error) {
+      // Never throw — telemetry must not crash the app.
+
+      console.warn("[trackExperimentEvent] insert failed:", error.message);
+      return { ok: false };
+    }
+    return { ok: true };
+  });
+
+// ── Admin: Get Experiment Stats (impressions / conversions / CTR) ────
+
+const GetStatsSchema = z.object({
+  key: z.string().min(1).max(120),
+  windowDays: z.number().int().min(1).max(90).optional(),
+});
+
+export type VariantStats = {
+  impressions: number;
+  conversions: number;
+  ctr: number; // percentage 0.0–100.0, 1 decimal
+};
+
+export type ExperimentStats = {
+  variant_a: VariantStats;
+  variant_b: VariantStats;
+  total: VariantStats;
+  window_days: number;
+};
+
+const EMPTY_STATS: VariantStats = { impressions: 0, conversions: 0, ctr: 0 };
+
+function makeStats(imp: number, conv: number): VariantStats {
+  return {
+    impressions: imp,
+    conversions: conv,
+    ctr: imp > 0 ? Math.round((conv / imp) * 1000) / 10 : 0,
+  };
+}
+
+export const getExperimentStatsAdmin = createServerFn({ method: "POST" })
+  .middleware([ADMIN_GUARD])
+  .inputValidator((i: unknown) => parseInput(GetStatsSchema, i))
+  .handler(async ({ data, context }): Promise<ExperimentStats> => {
+    const { userId } = context as { userId: string };
+    await ensureAdmin(userId);
+    const days = data.windowDays ?? 30;
+    const since = new Date(Date.now() - days * 24 * 60 * 60 * 1000).toISOString();
+
+    // Fetch from error_reports. Bounded volume (<100/day/user) — no RPC needed.
+    // ponytail: if volume grows, swap to a dedicated RPC with FILTER (WHERE).
+    const { data: rows, error } = await db
+      .from("error_reports")
+      .select("source, context")
+      .like("source", "telemetry:experiment.%")
+      .eq("context->>key", data.key)
+      .gte("created_at", since);
+
+    if (error) throw new Error(`getExperimentStats: ${error.message}`);
+
+    const a = { imp: 0, conv: 0 };
+    const b = { imp: 0, conv: 0 };
+    for (const r of (rows ?? []) as Array<{
+      source: string;
+      context: { variant?: string } | null;
+    }>) {
+      const v = r.context?.variant === "b" ? "b" : "a";
+      if (r.source === "telemetry:experiment.impression") {
+        if (v === "b") b.imp++;
+        else a.imp++;
+      } else if (r.source === "telemetry:experiment.conversion") {
+        if (v === "b") b.conv++;
+        else a.conv++;
+      }
+    }
+
+    return {
+      variant_a: makeStats(a.imp, a.conv),
+      variant_b: makeStats(b.imp, b.conv),
+      total: makeStats(a.imp + b.imp, a.conv + b.conv),
+      window_days: days,
+    };
+  });
+
+// Re-export EMPTY_STATS for the UI when the query has no data yet.
+export { EMPTY_STATS };

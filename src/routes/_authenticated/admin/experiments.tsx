@@ -20,15 +20,18 @@ import {
   Plus,
   X,
   Copy,
+  TrendingUp,
 } from "lucide-react";
 import { TopAppBar } from "@/components/healthyu/top-app-bar";
 import { useTranslation } from "@/lib/i18n";
 import {
   createExperimentAdmin,
   deleteExperimentAdmin,
+  getExperimentStatsAdmin,
   listExperimentsAdmin,
   updateExperimentAdmin,
   type ExperimentRow,
+  type ExperimentStats,
 } from "@/features/admin/lib/adminExperiments.functions";
 
 export const Route = createFileRoute("/_authenticated/admin/experiments")({
@@ -319,6 +322,16 @@ function ExperimentDrawer({
   const [splitPct, setSplitPct] = useState(draft.split_pct);
   const [jsonError, setJsonError] = useState<string | null>(null);
 
+  // Sprint 58-I — fetch live A/B stats for edit mode (ponytail: derived
+  // from error_reports — no new table, no new endpoint).
+  const { data: stats } = useQuery<ExperimentStats | null>({
+    queryKey: ["admin", "experimentStats", draft.key],
+    queryFn: () => getExperimentStatsAdmin({ data: { key: draft.key } }),
+    enabled: mode === "edit",
+    staleTime: 60_000,
+    retry: 1,
+  });
+
   const parseJsonOrError = (raw: string): Record<string, unknown> | null => {
     try {
       const parsed = JSON.parse(raw);
@@ -372,6 +385,48 @@ function ExperimentDrawer({
             <X className="size-4" />
           </button>
         </div>
+
+        {mode === "edit" && (
+          <div className="bg-muted/50 rounded-2xl p-3 space-y-2">
+            <div className="flex items-center justify-between">
+              <p className="text-xs font-semibold flex items-center gap-1.5">
+                <TrendingUp className="size-3.5 text-primary" />
+                {t("admin.exp.statsTitle")}
+                {stats && (
+                  <span className="text-[10px] font-normal text-muted-foreground">
+                    · {t("admin.exp.statsWindow", { days: stats.window_days })}
+                  </span>
+                )}
+              </p>
+            </div>
+            {stats &&
+              (stats.total.impressions === 0 ? (
+                <p className="text-[11px] text-muted-foreground">{t("admin.exp.statsEmpty")}</p>
+              ) : (
+                <div className="grid grid-cols-3 gap-1.5 text-[10px]">
+                  <StatCell
+                    label={t("admin.exp.statsVariantA")}
+                    impressions={stats.variant_a.impressions}
+                    conversions={stats.variant_a.conversions}
+                    ctr={stats.variant_a.ctr}
+                  />
+                  <StatCell
+                    label={t("admin.exp.statsVariantB")}
+                    impressions={stats.variant_b.impressions}
+                    conversions={stats.variant_b.conversions}
+                    ctr={stats.variant_b.ctr}
+                  />
+                  <StatCell
+                    label={t("admin.exp.statsTotal")}
+                    impressions={stats.total.impressions}
+                    conversions={stats.total.conversions}
+                    ctr={stats.total.ctr}
+                    highlight
+                  />
+                </div>
+              ))}
+          </div>
+        )}
 
         <div className="space-y-3">
           <div>
@@ -466,6 +521,41 @@ function ExperimentDrawer({
           )}
         </div>
       </div>
+    </div>
+  );
+}
+
+// Sprint 58-I — inline stat cell for the A/B drawer (3-col grid).
+function StatCell({
+  label,
+  impressions,
+  conversions,
+  ctr,
+  highlight,
+}: {
+  label: string;
+  impressions: number;
+  conversions: number;
+  ctr: number;
+  highlight?: boolean;
+}) {
+  const { t } = useTranslation();
+  return (
+    <div
+      className={`rounded-xl p-2 ${highlight ? "bg-primary/10 border border-primary/20" : "bg-background"}`}
+    >
+      <p className="font-semibold text-foreground text-[10px] mb-1">{label}</p>
+      <p className="text-[10px] text-muted-foreground">
+        {t("admin.exp.statsImpressions")}:{" "}
+        <strong className="text-foreground">{impressions}</strong>
+      </p>
+      <p className="text-[10px] text-muted-foreground">
+        {t("admin.exp.statsConversions")}:{" "}
+        <strong className="text-foreground">{conversions}</strong>
+      </p>
+      <p className="text-[11px] mt-1">
+        {t("admin.exp.statsCtr")}: <strong className="text-primary">{ctr.toFixed(1)}%</strong>
+      </p>
     </div>
   );
 }

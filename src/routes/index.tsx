@@ -19,7 +19,7 @@ import {
 } from "@/features/landing/components/LandingChrome";
 import { MobileNav } from "@/features/landing/components/MobileNav";
 import { LandingHero } from "@/features/landing/components/LandingHero";
-import { useExperimentVariant } from "@/hooks/use-experiments";
+import { useExperimentVariant, useExperimentConversion } from "@/hooks/use-experiments";
 
 // PERF (Fase 5 sub-PR 2): lazy-load below-fold landing sections so the
 // home page initial JS payload is ~30-40% smaller. Each section is a
@@ -165,7 +165,11 @@ function Index() {
   // equals the default so this only visibly changes for ~50% of visitors
   // (those assigned variant_b). For anonymous users, the RPC returns
   // variant_a, so the label remains the existing default "Mulai gratis...".
-  const { payload: heroCtaPayload } = useExperimentVariant("landing.heroCta");
+  // Sprint 58-I: also fires an impression on mount (auto via hook) and
+  // a conversion on CTA click (via useExperimentConversion).
+  const { variant: heroCtaVariant, payload: heroCtaPayload } =
+    useExperimentVariant("landing.heroCta");
+  const trackHeroCta = useExperimentConversion("landing.heroCta", heroCtaVariant, "hero_cta_click");
   const defaultCtaPrimaryLabel = hasSession ? "Buka Dashboard" : "Mulai gratis sekarang";
   const ctaPrimaryLabel =
     typeof heroCtaPayload.ctaLabel === "string" && heroCtaPayload.ctaLabel.length > 0
@@ -178,6 +182,11 @@ function Index() {
     sessionStorage.setItem("hu_confetti", "1");
     setConfetti(true);
     setTimeout(() => setConfetti(false), 1600);
+  };
+
+  const onHeroCtaClick = () => {
+    trackHeroCta();
+    fireConfetti();
   };
 
   return (
@@ -194,7 +203,7 @@ function Index() {
       <LandingHero
         ctaPrimary={ctaPrimary}
         ctaPrimaryLabel={ctaPrimaryLabel}
-        onCtaClick={fireConfetti}
+        onCtaClick={onHeroCtaClick}
       />
 
       <TrustMarquee />
@@ -251,7 +260,7 @@ function Index() {
       <FinalCtaSection
         ctaPrimary={ctaPrimary}
         ctaPrimaryLabel={ctaPrimaryLabel}
-        onCtaClick={fireConfetti}
+        onCtaClick={onHeroCtaClick}
       />
 
       <Suspense fallback={<SectionSkeleton />}>
@@ -262,7 +271,7 @@ function Index() {
         show={showStickyCta}
         hasSession={hasSession}
         ctaPrimary={ctaPrimary}
-        onCtaClick={fireConfetti}
+        onCtaClick={onHeroCtaClick}
       />
 
       <Suspense fallback={null}>
