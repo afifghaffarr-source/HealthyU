@@ -13,7 +13,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 
 describe("openrouterProvider", () => {
   beforeEach(() => {
-    process.env.OPENROUTER_API_KEY = "sk-or-test-fake-key-for-unit-tests";
+    process.env.OPENROUTER_API_KEY = "test-key";
     process.env.OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1";
   });
   afterEach(() => {

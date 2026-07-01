@@ -18,7 +18,7 @@ const VALID_SERVER = {
   SUPABASE_URL: "https://abc.supabase.co",
   SUPABASE_PUBLISHABLE_KEY: "eyJhbG...test",
   SUPABASE_SERVICE_ROLE_KEY: "test-service-role-key",
-  VEXO_API_KEY: "VEXO_TEST_KEY_xxxxxxxxxxxxxxxx",
+  VEXO_API_KEY: "VEXO_tk",
   CRON_SECRET: "x".repeat(32),
 } as const;
 
