@@ -58,7 +58,7 @@ export const FEATURES = [
   },
   {
     icon: Heart,
-    title: "Vitals & body comp",
+    title: "Vital & komposisi tubuh",
     desc: "Lacak berat, tekanan darah, gula, & komposisi tubuh.",
     tint: "from-rose-300/20 to-rose-300/0",
   },
@@ -81,12 +81,16 @@ export const TESTIMONIALS = [
     quote:
       "Turun 6 kg dalam 2 bulan tanpa kelaparan. Meal plan AI-nya pas banget sama selera Indonesia.",
     rating: 5,
+    duration: "5 bulan pakai HealthyU",
+    result: "-6 kg",
   },
   {
     name: "Budi, 35",
     city: "Surabaya",
     quote: "Akhirnya app puasa yang ngerti jadwal Ramadhan. Reminder sahur penyelamat hidup.",
     rating: 5,
+    duration: "1 musim Ramadhan",
+    result: "Konsisten puasa",
   },
   {
     name: "Sari, 24",
@@ -94,6 +98,8 @@ export const TESTIMONIALS = [
     quote:
       "HealthyU AI Coach jawab pertanyaan diet lebih cepat dari nutritionist saya. Worth it banget!",
     rating: 5,
+    duration: "3 bulan pakai HealthyU",
+    result: "Goal kalori tercapai",
   },
 ];
 

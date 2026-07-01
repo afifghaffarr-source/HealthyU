@@ -49,41 +49,44 @@ export function LandingNav({
 }) {
   const { t } = useTranslation();
   return (
-    <nav className="sticky top-0 z-30 glass border-b border-white/10 hidden md:block">
-      <div className="max-w-6xl mx-auto px-5 md:px-8 h-14 flex items-center justify-between">
+    <nav
+      className="sticky top-0 z-30 bg-black/80 backdrop-saturate-150 backdrop-blur-xl border-b border-white/[0.06] hidden md:block"
+      style={{
+        WebkitBackdropFilter: "saturate(1.8) blur(20px)",
+        backdropFilter: "saturate(1.8) blur(20px)",
+      }}
+    >
+      <div className="max-w-6xl mx-auto px-5 md:px-8 h-12 flex items-center justify-between">
         <Link
           to="/"
-          className="font-bold tracking-tight text-lg flex items-center gap-2"
+          className="font-semibold tracking-tight text-base flex items-center gap-2 text-white"
           style={{ fontFamily: "var(--font-display)" }}
         >
-          <span className="relative size-8 rounded-xl grid place-items-center text-sm text-primary-foreground bg-gradient-to-br from-primary to-primary-dark shadow-lg shadow-primary/30">
+          <span className="relative size-7 rounded-lg grid place-items-center text-sm text-primary-foreground bg-gradient-to-br from-primary to-primary-dark shadow-lg shadow-primary/30">
             H
-            <span className="absolute -inset-0.5 rounded-xl bg-primary/40 blur-md -z-10" />
+            <span className="absolute -inset-0.5 rounded-lg bg-primary/40 blur-md -z-10" />
           </span>
           HealthyU
         </Link>
-        <div className="hidden md:flex items-center gap-6 text-sm font-medium text-muted-foreground">
-          <a href="#fitur" className="hover:text-foreground">
+        <div className="hidden md:flex items-center gap-6 text-xs font-normal text-white/80">
+          <a href="#fitur" className="hover:text-white transition-colors">
             {t("landing.features")}
           </a>
-          <a href="#cara" className="hover:text-foreground">
+          <a href="#cara" className="hover:text-white transition-colors">
             {t("landing.howItWorks")}
           </a>
-          <a href="#testimoni" className="hover:text-foreground">
+          <a href="#testimoni" className="hover:text-white transition-colors">
             {t("landing.testimonials")}
           </a>
-          <a href="#faq" className="hover:text-foreground">
+          <a href="#faq" className="hover:text-white transition-colors">
             {t("landing.faq")}
           </a>
         </div>
         <Link
           to={ctaPrimary}
-          className="relative overflow-hidden bg-gradient-to-r from-primary to-primary-dark text-primary-foreground text-sm font-semibold px-4 py-2 rounded-xl shadow-md shadow-primary/30 hover:shadow-lg hover:shadow-primary/40 transition-shadow"
+          className="text-xs font-medium text-white px-4 py-1.5 rounded-full border border-white/20 hover:bg-white/10 hover:border-white/40 transition-all"
         >
-          <span className="relative z-10">
-            {hasSession ? t("landing.dashboard") : t("landing.login")}
-          </span>
-          <span className="pointer-events-none absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/30 to-transparent animate-shimmer" />
+          {hasSession ? t("landing.dashboard") : t("landing.login")}
         </Link>
       </div>
     </nav>
@@ -166,44 +169,36 @@ export function FinalCtaSection({
 }) {
   const { t } = useTranslation();
   return (
-    <section className="max-w-3xl mx-auto px-5 md:px-8 py-16 md:py-24 text-center">
-      <div className="relative overflow-hidden bg-gradient-to-br from-primary via-primary-dark to-accent text-primary-foreground rounded-3xl p-10 md:p-14 space-y-5 shadow-2xl shadow-primary/30">
-        <div
-          aria-hidden
-          className="absolute -top-20 -right-20 size-72 rounded-full bg-white/10 blur-3xl"
-        />
-        <div
-          aria-hidden
-          className="absolute -bottom-20 -left-20 size-72 rounded-full bg-white/10 blur-3xl"
-        />
+    <section className="bg-black text-white py-32 md:py-40 px-5 text-center relative overflow-hidden">
+      <div
+        aria-hidden
+        className="absolute bottom-[-30%] left-1/2 -translate-x-1/2 w-[600px] h-[400px] rounded-full bg-primary/20 blur-3xl pointer-events-none"
+      />
+      <div className="relative z-10 max-w-2xl mx-auto">
         <h2
-          className="relative text-3xl md:text-5xl font-bold tracking-tight text-balance"
+          className="text-4xl md:text-6xl font-semibold tracking-[-0.03em] leading-[1.07]"
           style={{ fontFamily: "var(--font-display)" }}
         >
           {t("landing.finalCtaTitle")}
         </h2>
-        <p className="relative text-primary-foreground/85 text-balance">
-          {t("landing.finalCtaDesc")}
-        </p>
-        <div className="relative flex flex-col sm:flex-row gap-3 justify-center pt-2">
-          <Link
-            to={ctaPrimary}
-            onClick={onCtaClick}
-            className="group inline-flex items-center justify-center gap-2 bg-white text-primary font-semibold py-4 px-6 rounded-2xl shadow-xl hover:-translate-y-0.5 transition-transform"
-          >
-            {ctaPrimaryLabel}
-            <ArrowRight className="size-4 group-hover:translate-x-1 transition-transform" />
-          </Link>
-        </div>
-        <ul className="relative flex flex-wrap justify-center gap-x-5 gap-y-2 text-xs text-primary-foreground/80 pt-2">
-          <li className="flex items-center gap-1">
-            <Check className="size-3.5" /> {t("landing.finalCtaFree")}
+        <p className="text-lg md:text-xl text-white/60 mt-5 mb-10">{t("landing.finalCtaDesc")}</p>
+        <Link
+          to={ctaPrimary}
+          onClick={onCtaClick}
+          className="group inline-flex items-center gap-2 bg-primary text-primary-foreground font-medium text-base px-8 py-4 rounded-lg hover:bg-primary-dark hover:-translate-y-0.5 transition-all shadow-xl shadow-primary/20"
+        >
+          {ctaPrimaryLabel}
+          <ArrowRight className="size-4 group-hover:translate-x-1 transition-transform" />
+        </Link>
+        <ul className="flex flex-wrap justify-center gap-x-6 gap-y-2 text-sm text-white/50 mt-8">
+          <li className="flex items-center gap-1.5">
+            <Check className="size-4 text-primary-glow" /> {t("landing.finalCtaFree")}
           </li>
-          <li className="flex items-center gap-1">
-            <Check className="size-3.5" /> {t("landing.finalCtaDb")}
+          <li className="flex items-center gap-1.5">
+            <Check className="size-4 text-primary-glow" /> {t("landing.finalCtaDb")}
           </li>
-          <li className="flex items-center gap-1">
-            <Check className="size-3.5" /> {t("landing.finalCtaAi")}
+          <li className="flex items-center gap-1.5">
+            <Check className="size-4 text-primary-glow" /> {t("landing.finalCtaAi")}
           </li>
         </ul>
       </div>

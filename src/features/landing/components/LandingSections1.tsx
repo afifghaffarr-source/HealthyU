@@ -1,5 +1,8 @@
-import { Zap, ArrowRight, Heart, Camera, Utensils, MessageCircle } from "lucide-react";
-import { StatsCounter } from "./StatsCounter";
+import { Zap, Heart, Camera, Utensils, MessageCircle } from "lucide-react";
+import { NumberTicker } from "@/components/magicui/number-ticker";
+import { BlurFade } from "@/components/magicui/blur-fade";
+import { ShineBorder } from "@/components/magicui/shine-border";
+import { AuroraText } from "@/components/magicui/aurora-text";
 import { FEATURES, STEPS, MARQUEE_CITIES } from "./landingData";
 
 export function TrustMarquee() {
@@ -32,15 +35,18 @@ export function StatsStrip() {
     { n: 24, s: "/7", l: "HealthyU AI Coach siap", i: MessageCircle },
   ];
   return (
-    <section className="max-w-6xl mx-auto px-5 md:px-8 py-10 grid grid-cols-2 md:grid-cols-4 gap-3">
-      {items.map(({ n, s, l, i: Icon }) => (
-        <div key={l} className="glass rounded-2xl p-4 border border-white/15 text-center">
-          <Icon className="size-5 text-primary mx-auto mb-2" />
-          <p className="text-2xl font-bold" style={{ fontFamily: "var(--font-display)" }}>
-            <StatsCounter value={n} suffix={s} />
+    <section className="max-w-5xl mx-auto px-5 md:px-8 py-20 grid grid-cols-2 md:grid-cols-4 gap-8">
+      {items.map(({ n, s, l, i: Icon }, idx) => (
+        <BlurFade key={l} delay={idx * 0.08} className="text-center">
+          <Icon className="size-6 text-primary mx-auto mb-3" />
+          <p
+            className="text-4xl md:text-5xl font-semibold tracking-tight text-foreground"
+            style={{ fontFamily: "var(--font-display)" }}
+          >
+            <NumberTicker value={n} suffix={s} />
           </p>
-          <p className="text-xs text-muted-foreground">{l}</p>
-        </div>
+          <p className="text-sm text-muted-foreground mt-1">{l}</p>
+        </BlurFade>
       ))}
     </section>
   );
@@ -48,40 +54,51 @@ export function StatsStrip() {
 
 export function FeaturesBento() {
   return (
-    <section id="fitur" className="max-w-6xl mx-auto px-5 md:px-8 py-16 md:py-24">
-      <div className="text-center max-w-2xl mx-auto mb-10">
-        <span className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-primary bg-primary/10 px-3 py-1 rounded-full">
-          <Zap className="size-3" /> Fitur unggulan
-        </span>
-        <h2
-          className="text-3xl md:text-5xl font-bold tracking-tight mt-3"
-          style={{ fontFamily: "var(--font-display)" }}
-        >
-          Satu app. <span className="text-primary">Semua kebutuhan sehatmu.</span>
-        </h2>
-        <p className="text-muted-foreground mt-3">
-          Dirancang untuk gaya hidup Indonesia: dari nasi padang sampai puasa Ramadhan.
-        </p>
-      </div>
-      <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
-        {FEATURES.map(({ icon: Icon, title, desc, tint }, i) => (
-          <article
-            key={title}
-            className={`group relative overflow-hidden rounded-2xl p-5 glass border border-white/15 hover:border-primary/30 hover:-translate-y-1 transition-all shadow-sm hover:shadow-xl hover:shadow-primary/10 ${i === 0 ? "sm:col-span-2 sm:row-span-1" : ""}`}
+    <section id="fitur" className="bg-black text-white py-24 md:py-32 px-5">
+      <div className="text-center max-w-2xl mx-auto mb-14">
+        <BlurFade>
+          <span className="inline-flex items-center gap-1.5 text-xs font-medium text-primary-glow bg-primary/10 px-3 py-1 rounded-full">
+            <Zap className="size-3" /> Fitur unggulan
+          </span>
+        </BlurFade>
+        <BlurFade delay={0.08}>
+          <h2
+            className="text-3xl md:text-5xl font-semibold tracking-[-0.03em] leading-[1.07] mt-4"
+            style={{ fontFamily: "var(--font-display)" }}
           >
-            <div
-              className={`absolute inset-0 bg-gradient-to-br ${tint} opacity-60 group-hover:opacity-100 transition-opacity`}
-            />
-            <div className="relative">
-              <div className="size-11 rounded-2xl bg-gradient-to-br from-primary/15 to-accent/15 text-primary grid place-items-center mb-3 border border-primary/20">
+            Satu app. Semua kebutuhan <AuroraText>sehatmu.</AuroraText>
+          </h2>
+        </BlurFade>
+        <BlurFade delay={0.16}>
+          <p className="text-white/60 text-lg mt-4">
+            Dirancang untuk gaya hidup Indonesia: dari nasi padang sampai puasa Ramadhan.
+          </p>
+        </BlurFade>
+      </div>
+      <div className="max-w-5xl mx-auto grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        {FEATURES.map(({ icon: Icon, title, desc }, i) => (
+          <BlurFade
+            key={title}
+            delay={i * 0.06}
+            className={i === 0 ? "sm:col-span-2 lg:col-span-1" : ""}
+          >
+            <div className="group relative bg-[#1a1a1c] rounded-xl p-6 min-h-[240px] flex flex-col justify-end overflow-hidden hover:-translate-y-1 transition-transform duration-300 hover:shadow-[0_0_0_1px_var(--primary-glow),0_12px_40px_rgba(0,0,0,0.4)]">
+              <ShineBorder
+                shineColor={["var(--primary-glow)", "var(--primary)"]}
+                className="opacity-0 group-hover:opacity-100 transition-opacity"
+              />
+              <div className="size-11 rounded-xl bg-gradient-to-br from-primary/15 to-primary/5 border border-primary/20 grid place-items-center mb-auto text-primary-glow">
                 <Icon className="size-5" />
               </div>
-              <h3 className="font-bold text-sm mb-1" style={{ fontFamily: "var(--font-display)" }}>
+              <h3
+                className="font-semibold text-lg text-white mt-4 mb-1.5"
+                style={{ fontFamily: "var(--font-display)" }}
+              >
                 {title}
               </h3>
-              <p className="text-xs text-muted-foreground leading-relaxed">{desc}</p>
+              <p className="text-sm text-white/50 leading-relaxed">{desc}</p>
             </div>
-          </article>
+          </BlurFade>
         ))}
       </div>
     </section>
@@ -90,47 +107,42 @@ export function FeaturesBento() {
 
 export function HowItWorks() {
   return (
-    <section id="cara" className="relative">
-      <div
-        aria-hidden
-        className="absolute inset-0 -z-10 bg-gradient-to-b from-transparent via-mint/40 to-transparent"
-      />
-      <div className="max-w-6xl mx-auto px-5 md:px-8 py-16 md:py-24">
-        <div className="text-center max-w-2xl mx-auto mb-10">
-          <h2
-            className="text-3xl md:text-5xl font-bold tracking-tight"
-            style={{ fontFamily: "var(--font-display)" }}
-          >
-            Mulai dalam <span className="text-primary">3 langkah</span>
-          </h2>
-          <p className="text-muted-foreground mt-3">
-            Tidak ribet. Hasil terlihat dalam minggu pertama.
-          </p>
-        </div>
-        <ol className="grid md:grid-cols-3 gap-4 relative">
-          {STEPS.map(({ n, title, desc }, i) => (
-            <li
-              key={n}
-              className="relative glass rounded-2xl p-6 border border-white/15 hover:border-primary/30 transition-colors"
+    <section id="cara" className="bg-[#f5f5f7] py-24 md:py-32 px-5">
+      <div className="max-w-5xl mx-auto">
+        <div className="text-center mb-14">
+          <BlurFade>
+            <h2
+              className="text-3xl md:text-5xl font-semibold tracking-[-0.03em] leading-[1.07]"
+              style={{ fontFamily: "var(--font-display)" }}
             >
-              <div className="flex items-baseline gap-3 mb-2">
-                <span
-                  className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-br from-primary to-accent"
-                  style={{ fontFamily: "var(--font-display)" }}
-                >
-                  {n}
-                </span>
-                {i < STEPS.length - 1 && (
-                  <ArrowRight className="hidden md:block size-4 text-primary/40 ml-auto" />
-                )}
+              Mulai dalam <span className="text-primary">3 langkah</span>
+            </h2>
+          </BlurFade>
+          <BlurFade delay={0.08}>
+            <p className="text-muted-foreground text-lg mt-4">
+              Tidak ribet. Hasil terlihat dalam minggu pertama.
+            </p>
+          </BlurFade>
+        </div>
+        <div className="grid md:grid-cols-3 gap-10">
+          {STEPS.map(({ n, title, desc }, i) => (
+            <BlurFade key={n} delay={i * 0.12} className="text-center">
+              <div
+                className="text-5xl font-light text-primary mb-4"
+                style={{ fontFamily: "var(--font-mono)" }}
+              >
+                {n}
               </div>
-              <h3 className="font-bold mb-1" style={{ fontFamily: "var(--font-display)" }}>
+              <h3
+                className="font-semibold text-xl text-foreground mb-2"
+                style={{ fontFamily: "var(--font-display)" }}
+              >
                 {title}
               </h3>
-              <p className="text-sm text-muted-foreground">{desc}</p>
-            </li>
+              <p className="text-muted-foreground text-base">{desc}</p>
+            </BlurFade>
           ))}
-        </ol>
+        </div>
       </div>
     </section>
   );

@@ -25,7 +25,7 @@ export function HeroDemoCard() {
           </p>
           <div className="h-2 bg-muted rounded-full mt-2 overflow-hidden">
             <div
-              className="h-full bg-gradient-to-r from-primary via-primary-glow to-accent rounded-full"
+              className="h-full bg-gradient-to-r from-primary via-primary-glow to-accent rounded-full animate-fill-progress"
               style={{ width: "78%" }}
             />
           </div>

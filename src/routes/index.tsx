@@ -57,16 +57,13 @@ const BeforeAfterSection = lazy(() =>
     default: m.BeforeAfterSection,
   })),
 );
-const FeaturedIn = lazy(() =>
-  import("@/features/landing/components/LandingSections").then((m) => ({
-    default: m.FeaturedIn,
-  })),
-);
 const PopularRecipes = lazy(() =>
   import("@/features/landing/components/LandingSections").then((m) => ({
     default: m.PopularRecipes,
   })),
 );
+// ponytail: Removed FeaturedIn section — fake media logos ("Kompas", "Detik", etc.)
+// without actual press coverage hurts credibility. Add back when real PR exists.
 const PricingSection = lazy(() =>
   import("@/features/landing/components/LandingChrome").then((m) => ({
     default: m.PricingSection,
@@ -251,10 +248,6 @@ function Index() {
 
       <Suspense fallback={<SectionSkeleton />}>
         <NewsletterSection />
-      </Suspense>
-
-      <Suspense fallback={<SectionSkeleton />}>
-        <FeaturedIn />
       </Suspense>
 
       <FinalCtaSection

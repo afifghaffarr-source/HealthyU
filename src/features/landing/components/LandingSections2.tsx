@@ -1,41 +1,57 @@
-import { Star, Check, Minus, Users } from "lucide-react";
+import { Star, Check, Minus, Users, TrendingUp } from "lucide-react";
 import { BeforeAfter } from "./BeforeAfter";
+import { BlurFade } from "@/components/magicui/blur-fade";
+import { AuroraText } from "@/components/magicui/aurora-text";
 import { TESTIMONIALS, FAQ_ITEMS, COMPARE, AUDIENCES, MEDIA_LOGOS } from "./landingData";
 
 export function Testimonials() {
   return (
-    <section id="testimoni" className="max-w-6xl mx-auto px-5 md:px-8 py-16 md:py-24">
-      <div className="text-center max-w-2xl mx-auto mb-10">
-        <h2
-          className="text-3xl md:text-5xl font-bold tracking-tight"
-          style={{ fontFamily: "var(--font-display)" }}
-        >
-          Cerita nyata, <span className="text-primary">hasil nyata</span>
-        </h2>
-        <p className="text-muted-foreground mt-3">Cerita nyata dari user HealthyU.</p>
-      </div>
-      <div className="grid md:grid-cols-3 gap-4">
-        {TESTIMONIALS.map((t) => (
-          <figure
-            key={t.name}
-            className="glass rounded-2xl p-6 border border-white/15 hover:border-primary/30 hover:-translate-y-1 transition-all"
+    <section id="testimoni" className="bg-black text-white py-24 md:py-32 px-5">
+      <div className="text-center max-w-2xl mx-auto mb-14">
+        <BlurFade>
+          <h2
+            className="text-3xl md:text-5xl font-semibold tracking-[-0.03em] leading-[1.07]"
+            style={{ fontFamily: "var(--font-display)" }}
           >
-            <div className="flex gap-0.5 mb-3">
-              {Array.from({ length: t.rating }).map((_, i) => (
-                <Star key={i} className="size-4 fill-amber-400 text-amber-400" />
-              ))}
-            </div>
-            <blockquote className="text-sm leading-relaxed mb-4">"{t.quote}"</blockquote>
-            <figcaption className="flex items-center gap-2 text-xs text-muted-foreground">
-              <span className="size-8 rounded-full bg-gradient-to-br from-primary to-accent grid place-items-center text-primary-foreground text-xs font-bold">
-                {t.name[0]}
-              </span>
-              <span>
-                <strong className="text-foreground block">{t.name}</strong>
-                {t.city}
-              </span>
-            </figcaption>
-          </figure>
+            Cerita nyata, <AuroraText>hasil nyata</AuroraText>
+          </h2>
+        </BlurFade>
+        <BlurFade delay={0.08}>
+          <p className="text-white/60 text-lg mt-4">Cerita nyata dari user HealthyU.</p>
+        </BlurFade>
+      </div>
+      <div className="max-w-5xl mx-auto grid md:grid-cols-3 gap-4">
+        {TESTIMONIALS.map((t, i) => (
+          <BlurFade key={t.name} delay={i * 0.1}>
+            <figure className="bg-[#1a1a1c] rounded-xl p-8 h-full flex flex-col">
+              <div className="flex gap-0.5 mb-4">
+                {Array.from({ length: t.rating }).map((_, si) => (
+                  <Star key={si} className="size-4 fill-amber-400 text-amber-400" />
+                ))}
+              </div>
+              <blockquote className="text-base leading-relaxed text-white/90 mb-5 flex-1">
+                "{t.quote}"
+              </blockquote>
+              {t.result && (
+                <div className="mb-4 inline-flex items-center gap-1.5 text-xs font-semibold text-primary-glow bg-primary/10 px-3 py-1 rounded-full w-fit">
+                  <TrendingUp className="size-3" />
+                  {t.result}
+                </div>
+              )}
+              <figcaption className="flex items-center gap-3 text-sm">
+                <span className="size-9 rounded-full bg-gradient-to-br from-primary to-primary-glow grid place-items-center text-primary-foreground text-xs font-bold">
+                  {t.name[0]}
+                </span>
+                <span>
+                  <strong className="text-white block">{t.name}</strong>
+                  <span className="text-white/50 text-xs">
+                    {t.city}
+                    {t.duration && <> · {t.duration}</>}
+                  </span>
+                </span>
+              </figcaption>
+            </figure>
+          </BlurFade>
         ))}
       </div>
     </section>
