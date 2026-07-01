@@ -106,7 +106,7 @@ export function LandingHero({
 
         <BlurFade delay={0.08} duration={0.5}>
           <h1
-            className="text-5xl md:text-7xl font-semibold tracking-[-0.03em] leading-[1.07]"
+            className="text-4xl md:text-7xl font-semibold tracking-[-0.03em] leading-[1.07]"
             style={{
               fontFamily: "var(--font-display)",
               textShadow:
@@ -120,7 +120,7 @@ export function LandingHero({
         </BlurFade>
 
         <BlurFade delay={0.16} duration={0.5}>
-          <p className="text-lg md:text-xl text-white/70 max-w-xl mx-auto leading-relaxed">
+          <p className="text-xl md:text-2xl text-white/80 max-w-xl mx-auto leading-relaxed">
             Scan piring, atur puasa, jadwal sholat. Tanya AI coach kapan saja.
           </p>
         </BlurFade>
@@ -131,14 +131,14 @@ export function LandingHero({
               to={ctaPrimary}
               onClick={onCtaClick}
               preload="render"
-              className="group relative overflow-hidden bg-primary text-primary-foreground font-medium text-base px-7 py-3.5 rounded-lg hover:bg-primary-dark hover:-translate-y-0.5 transition-all inline-flex items-center gap-2 justify-center"
+              className="group relative overflow-hidden bg-primary text-primary-foreground font-medium text-base px-8 py-4 rounded-lg hover:bg-primary-dark hover:-translate-y-0.5 transition-all inline-flex items-center gap-2 justify-center"
             >
               {ctaPrimaryLabel}
               <ArrowRight className="size-4 group-hover:translate-x-1 transition-transform" />
             </Link>
             <a
               href="#fitur"
-              className="text-base font-medium text-white px-7 py-3.5 rounded-full border border-white/20 hover:bg-white/10 hover:border-white/40 transition-all inline-flex items-center justify-center"
+              className="text-base font-medium text-white px-8 py-4 rounded-full border border-white/20 hover:bg-white/10 hover:border-white/40 transition-all inline-flex items-center justify-center"
             >
               Lihat fitur
             </a>
@@ -146,7 +146,7 @@ export function LandingHero({
         </BlurFade>
 
         <BlurFade delay={0.32} duration={0.5}>
-          <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 pt-6 text-sm text-white/60">
+          <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 pt-6 text-base text-white/70">
             <div className="flex items-center gap-1.5">
               <Star className="size-3.5 fill-amber-400 text-amber-400" />
               <strong className="text-white">4.8</strong> / 5 · 10.000+ user

@@ -13,7 +13,7 @@ export function TrustMarquee() {
       aria-label="Kota pengguna"
       className="border-y border-white/10 bg-card/30 py-4 overflow-hidden"
     >
-      <div className="flex gap-12 animate-marquee whitespace-nowrap text-sm font-semibold text-muted-foreground">
+      <div className="flex gap-12 animate-marquee whitespace-nowrap text-base font-semibold text-muted-foreground">
         {[...Array(2)].map((_, dup) => (
           <div key={dup} className="flex gap-12 shrink-0">
             {MARQUEE_CITIES.map((c) => (
@@ -37,7 +37,7 @@ export function StatsStrip() {
     { n: 24, s: "/7", l: "HealthyU AI Coach siap", i: MessageCircle },
   ];
   return (
-    <section className="relative max-w-5xl mx-auto px-5 md:px-8 py-24 grid grid-cols-2 md:grid-cols-4 gap-8 overflow-hidden">
+    <section className="relative max-w-5xl mx-auto px-5 md:px-8 py-24 grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8 overflow-hidden">
       {/* Decorative gradient mesh backgrounds */}
       <div
         aria-hidden
@@ -94,12 +94,12 @@ export function FeaturesBento() {
           </h2>
         </BlurFade>
         <BlurFade delay={0.16}>
-          <p className="text-white/60 text-lg mt-4">
+          <p className="text-white/70 text-xl mt-4">
             Dirancang untuk gaya hidup Indonesia: dari nasi padang sampai puasa Ramadhan.
           </p>
         </BlurFade>
       </div>
-      <div className="max-w-5xl mx-auto grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="max-w-5xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {FEATURES.map(({ icon: Icon, title, desc, foodImage }, i) => (
           <FeatureCard
             key={title}
@@ -214,7 +214,7 @@ function FeatureCard({
             >
               {title}
             </h3>
-            <p className="text-sm text-white/50 leading-relaxed relative z-10">{desc}</p>
+            <p className="text-base text-white/60 leading-relaxed relative z-10">{desc}</p>
           </>
         ) : (
           <>
@@ -232,7 +232,7 @@ function FeatureCard({
             >
               {title}
             </h3>
-            <p className="text-sm text-white/50 leading-relaxed relative z-10">{desc}</p>
+            <p className="text-base text-white/60 leading-relaxed relative z-10">{desc}</p>
           </>
         )}
       </div>
@@ -366,7 +366,7 @@ export function HowItWorks() {
             </p>
           </BlurFade>
         </div>
-        <div className="grid md:grid-cols-3 gap-10">
+        <div className="grid md:grid-cols-3 gap-8 md:gap-10">
           {STEPS.map(({ n, title, desc }, i) => {
             // Parallax: each card moves at different speed
             const parallaxOffset = (scrollY * 0.015 * (i + 1)) % 20;

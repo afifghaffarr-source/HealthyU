@@ -6,7 +6,7 @@ import { TESTIMONIALS, FAQ_ITEMS, COMPARE, AUDIENCES, MEDIA_LOGOS } from "./land
 
 export function Testimonials() {
   return (
-    <section id="testimoni" className="bg-black text-white py-24 md:py-32 px-5">
+    <section id="testimoni" className="bg-black text-white py-24 md:py-32 px-6">
       <div className="text-center max-w-2xl mx-auto mb-14">
         <BlurFade>
           <h2
@@ -17,13 +17,13 @@ export function Testimonials() {
           </h2>
         </BlurFade>
         <BlurFade delay={0.08}>
-          <p className="text-white/60 text-lg mt-4">Cerita nyata dari user HealthyU.</p>
+          <p className="text-white/70 text-xl mt-4">Cerita nyata dari user HealthyU.</p>
         </BlurFade>
       </div>
-      <div className="max-w-5xl mx-auto grid md:grid-cols-3 gap-4">
+      <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6">
         {TESTIMONIALS.map((t, i) => (
           <BlurFade key={t.name} delay={i * 0.1}>
-            <figure className="bg-[#1a1a1c] rounded-xl p-8 h-full flex flex-col">
+            <figure className="bg-[#1a1a1c] rounded-xl p-6 md:p-8 h-full flex flex-col">
               <div className="flex gap-0.5 mb-4">
                 {Array.from({ length: t.rating }).map((_, si) => (
                   <Star key={si} className="size-4 fill-amber-400 text-amber-400" />
@@ -81,13 +81,13 @@ export function FaqSection() {
               key={item.q}
               className="glass rounded-2xl p-5 border border-white/15 group hover:border-primary/30 transition-colors"
             >
-              <summary className="font-bold cursor-pointer flex items-center justify-between text-sm">
+              <summary className="font-bold cursor-pointer flex items-center justify-between text-base">
                 {item.q}
                 <span className="text-primary group-open:rotate-45 transition-transform text-xl leading-none">
                   +
                 </span>
               </summary>
-              <p className="text-sm text-muted-foreground mt-3 leading-relaxed">{item.a}</p>
+              <p className="text-base text-muted-foreground mt-3 leading-relaxed">{item.a}</p>
             </details>
           ))}
         </div>
@@ -120,7 +120,7 @@ export function ComparisonTable() {
         role="region"
         aria-label="Perbandingan fitur HealthyU dengan aplikasi lain"
       >
-        <table className="w-full text-sm">
+        <table className="w-full text-sm min-w-[600px]">
           <thead className="bg-card/60">
             <tr className="text-left">
               <th className="p-4 font-semibold">Fitur</th>
@@ -164,7 +164,7 @@ export function ForWhom() {
           Dibuat untuk <span className="text-primary">semua orang</span>
         </h2>
       </div>
-      <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
+      <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
         {AUDIENCES.map(({ icon: Icon, t, d }) => (
           <div
             key={t}
@@ -173,10 +173,10 @@ export function ForWhom() {
             <div className="size-10 rounded-xl bg-gradient-to-br from-primary/15 to-accent/15 grid place-items-center mb-3 text-primary">
               <Icon className="size-5" />
             </div>
-            <h3 className="font-bold text-sm mb-1" style={{ fontFamily: "var(--font-display)" }}>
+            <h3 className="font-bold text-base mb-1" style={{ fontFamily: "var(--font-display)" }}>
               {t}
             </h3>
-            <p className="text-xs text-muted-foreground">{d}</p>
+            <p className="text-sm text-muted-foreground">{d}</p>
           </div>
         ))}
       </div>
