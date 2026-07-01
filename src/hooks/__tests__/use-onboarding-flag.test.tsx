@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach } from "vitest";
+import { describe, it, expect, beforeEach, vi } from "vitest";
 import { renderHook, act, waitFor } from "@testing-library/react";
 import { useOnboardingFlag } from "../use-onboarding-flag";
 
@@ -22,5 +22,25 @@ describe("useOnboardingFlag", () => {
     window.localStorage.setItem("hu:onboarded:tour3", "1");
     const { result } = renderHook(() => useOnboardingFlag("tour3"));
     await waitFor(() => expect(result.current.showOnboarding).toBe(false));
+  });
+
+  it("falls back to seen=true when localStorage throws", async () => {
+    const spy = vi.spyOn(Storage.prototype, "getItem").mockImplementation(() => {
+      throw new Error("denied");
+    });
+    const { result } = renderHook(() => useOnboardingFlag("tour4"));
+    await waitFor(() => expect(result.current.showOnboarding).toBe(false));
+    spy.mockRestore();
+  });
+
+  it("dismiss does not throw when localStorage.setItem fails", async () => {
+    const { result } = renderHook(() => useOnboardingFlag("tour5"));
+    await waitFor(() => expect(result.current.showOnboarding).toBe(true));
+    const spy = vi.spyOn(Storage.prototype, "setItem").mockImplementation(() => {
+      throw new Error("denied");
+    });
+    act(() => result.current.dismiss());
+    expect(result.current.showOnboarding).toBe(false);
+    spy.mockRestore();
   });
 });

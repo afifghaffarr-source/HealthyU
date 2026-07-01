@@ -78,6 +78,17 @@ describe("buildRecipeSchema", () => {
     expect(s.suitableForDiet).toContain("https://schema.org/HalalDiet");
   });
 
+  it("emits VegetarianDiet when not vegan but vegetarian", () => {
+    const s = buildRecipeSchema({
+      title: "x",
+      slug: "x",
+      is_vegan: false,
+      is_vegetarian: true,
+    });
+    expect(s.suitableForDiet).toContain("https://schema.org/VegetarianDiet");
+    expect(s.suitableForDiet).not.toContain("https://schema.org/VeganDiet");
+  });
+
   it("emits HowToStep instructions with positions", () => {
     const s = buildRecipeSchema({
       title: "x",

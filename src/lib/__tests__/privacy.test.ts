@@ -136,4 +136,39 @@ describe("canShowProfileMetric", () => {
     expect(canShowProfileMetric(baseProfile, "meals", viewer)).toBe(true);
     expect(canShowProfileMetric(baseProfile, "weight", viewer)).toBe(false);
   });
+
+  it("returns false for null profile", () => {
+    expect(canShowProfileMetric(null, "weight", owner)).toBe(false);
+  });
+
+  it("respects progress_photos flag", () => {
+    expect(
+      canShowProfileMetric(
+        { ...baseProfile, show_progress_photos: true },
+        "progress_photos",
+        viewer,
+      ),
+    ).toBe(true);
+    expect(
+      canShowProfileMetric(
+        { ...baseProfile, show_progress_photos: false },
+        "progress_photos",
+        viewer,
+      ),
+    ).toBe(false);
+  });
+
+  it("respects workouts flag", () => {
+    expect(canShowProfileMetric({ ...baseProfile, show_workouts: true }, "workouts", viewer)).toBe(
+      true,
+    );
+    expect(canShowProfileMetric({ ...baseProfile, show_workouts: false }, "workouts", viewer)).toBe(
+      false,
+    );
+  });
+
+  it("respects dm flag", () => {
+    expect(canShowProfileMetric({ ...baseProfile, allow_dm: true }, "dm", viewer)).toBe(true);
+    expect(canShowProfileMetric({ ...baseProfile, allow_dm: false }, "dm", viewer)).toBe(false);
+  });
 });

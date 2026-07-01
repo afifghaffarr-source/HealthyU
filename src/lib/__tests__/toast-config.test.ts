@@ -82,4 +82,34 @@ describe("toastError", () => {
     toastError(new Error(""), "fallback");
     expect(rht.error).toHaveBeenCalledWith("fallback", { duration: 3500 });
   });
+
+  // Branch coverage: AI gateway error patterns
+  it("detects rate limit (429) and shows encouraging toast", () => {
+    toastError(new Error("Batas AI harian tercapai"));
+    expect(base).toHaveBeenCalledWith(
+      expect.stringContaining("Batas AI harian tercapai"),
+      expect.objectContaining({ duration: 4000 }),
+    );
+  });
+
+  it("detects credit exhausted (402)", () => {
+    toastError(new Error("Kredit AI habis"));
+    expect(rht.error).toHaveBeenCalledWith(
+      expect.stringContaining("Kredit AI sedang habis"),
+      expect.objectContaining({ duration: 4500 }),
+    );
+  });
+
+  it("detects timeout (503/504)", () => {
+    toastError(new Error("Layanan sedang sibuk"));
+    expect(rht.error).toHaveBeenCalledWith(
+      expect.stringContaining("Layanan AI sedang sibuk"),
+      expect.objectContaining({ duration: 4000 }),
+    );
+  });
+
+  it("detects 429 with space prefix", () => {
+    toastError("Error 429 rate-limit");
+    expect(base).toHaveBeenCalled();
+  });
 });
