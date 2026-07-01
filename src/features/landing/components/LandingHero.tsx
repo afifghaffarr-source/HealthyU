@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { ArrowRight, Flame, Shield, Star, Zap } from "lucide-react";
+import { ArrowRight, Flame, Shield, Star } from "lucide-react";
 import { AuroraText } from "@/components/magicui/aurora-text";
 import { BlurFade } from "@/components/magicui/blur-fade";
 
@@ -78,28 +78,63 @@ export function LandingHero({
         </BlurFade>
       </div>
 
-      {/* Floating badge cards — Apple-style minimal */}
+      {/* CSS phone mockup with mini dashboard */}
       <div
-        className="absolute right-[8%] top-[20%] hidden lg:flex z-10 animate-float"
-        style={{ animationDelay: "-2s" }}
+        aria-hidden
+        className="hidden lg:block absolute right-[6%] top-1/2 -translate-y-1/2 z-10 animate-float pointer-events-none"
       >
-        <div className="glass-dark border border-white/10 rounded-xl px-3 py-2 shadow-lg flex items-center gap-2 text-xs">
-          <Flame className="size-4 text-amber-500" />
-          <div>
-            <p className="font-semibold leading-none text-white">Streak 12 hari</p>
-            <p className="text-white/50">Konsisten!</p>
+        <div className="w-[280px] aspect-[9/19] rounded-[2rem] border border-white/15 bg-gradient-to-b from-[#1a1a1c] to-black p-4 shadow-2xl flex flex-col gap-3 overflow-hidden">
+          {/* Header */}
+          <div className="flex items-center justify-between text-white">
+            <span className="text-sm font-semibold" style={{ fontFamily: "var(--font-display)" }}>
+              Hari ini
+            </span>
+            <span className="text-[10px] text-white/50">14 Feb</span>
           </div>
-        </div>
-      </div>
-      <div
-        className="absolute left-[8%] bottom-[18%] hidden lg:flex z-10 animate-float"
-        style={{ animationDelay: "-5s" }}
-      >
-        <div className="glass-dark border border-white/10 rounded-xl px-3 py-2 shadow-lg flex items-center gap-2 text-xs">
-          <Zap className="size-4 text-primary-glow" />
-          <div>
-            <p className="font-semibold leading-none text-white">+120 poin</p>
-            <p className="text-white/50">Goal harian</p>
+
+          {/* Circular progress ring */}
+          <div className="flex flex-col items-center gap-1 pt-2">
+            <div
+              className="size-24 rounded-full grid place-items-center relative"
+              style={{
+                background:
+                  "conic-gradient(var(--primary) 0deg 244deg, rgba(255,255,255,0.08) 244deg 360deg)",
+              }}
+            >
+              <div className="absolute inset-1.5 rounded-full bg-[#1a1a1c] grid place-items-center text-center">
+                <div>
+                  <p className="text-base font-semibold text-white leading-none">1,420</p>
+                  <p className="text-[9px] text-white/50 mt-0.5">/ 2,100 kal</p>
+                </div>
+              </div>
+            </div>
+            <span className="text-[10px] text-primary-glow font-medium">68% goal harian</span>
+          </div>
+
+          {/* Meal items */}
+          <div className="flex flex-col gap-2 mt-1">
+            {[
+              { e: "🌅", l: "Sarapan", v: "320 kal" },
+              { e: "🍽️", l: "Makan siang", v: "680 kal" },
+              { e: "🍎", l: "Snack", v: "190 kal" },
+            ].map((m) => (
+              <div
+                key={m.l}
+                className="flex items-center gap-2 rounded-lg bg-white/5 px-2.5 py-1.5"
+              >
+                <span className="text-base leading-none">{m.e}</span>
+                <div className="flex-1">
+                  <p className="text-[11px] font-medium text-white leading-none">{m.l}</p>
+                  <p className="text-[9px] text-white/50 mt-0.5">{m.v}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Streak badge */}
+          <div className="mt-auto flex items-center justify-center gap-1.5 rounded-lg bg-amber-500/10 border border-amber-500/20 px-2.5 py-1.5">
+            <Flame className="size-3.5 text-amber-400" />
+            <span className="text-[11px] font-medium text-amber-300">Streak 12 hari</span>
           </div>
         </div>
       </div>

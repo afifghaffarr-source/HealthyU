@@ -54,8 +54,20 @@ export function StatsStrip() {
 
 export function FeaturesBento() {
   return (
-    <section id="fitur" className="bg-black text-white py-24 md:py-32 px-5">
-      <div className="text-center max-w-2xl mx-auto mb-14">
+    <section
+      id="fitur"
+      className="bg-black text-white py-24 md:py-32 px-5 relative overflow-hidden"
+    >
+      {/* Decorative gradient blobs */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute -top-10 -left-10 w-[300px] h-[300px] rounded-full bg-emerald-500/10 blur-3xl"
+      />
+      <div
+        aria-hidden
+        className="pointer-events-none absolute -bottom-10 -right-10 w-[320px] h-[320px] rounded-full bg-emerald-600/[0.07] blur-3xl"
+      />
+      <div className="text-center max-w-2xl mx-auto mb-14 relative z-10">
         <BlurFade>
           <span className="inline-flex items-center gap-1.5 text-xs font-medium text-primary-glow bg-primary/10 px-3 py-1 rounded-full">
             <Zap className="size-3" /> Fitur unggulan
@@ -82,21 +94,68 @@ export function FeaturesBento() {
             delay={i * 0.06}
             className={i === 0 ? "sm:col-span-2 lg:col-span-1" : ""}
           >
-            <div className="group relative bg-[#1a1a1c] rounded-xl p-6 min-h-[240px] flex flex-col justify-end overflow-hidden hover:-translate-y-1 transition-transform duration-300 hover:shadow-[0_0_0_1px_var(--primary-glow),0_12px_40px_rgba(0,0,0,0.4)]">
+            <div className="group relative bg-[#1a1a1c] rounded-xl min-h-[240px] flex flex-col justify-end overflow-hidden hover:-translate-y-1 transition-transform duration-300 hover:shadow-[0_0_0_1px_var(--primary-glow),0_12px_40px_rgba(0,0,0,0.4)]">
               <ShineBorder
                 shineColor={["var(--primary-glow)", "var(--primary)"]}
                 className="opacity-0 group-hover:opacity-100 transition-opacity"
               />
-              <div className="size-11 rounded-xl bg-gradient-to-br from-primary/15 to-primary/5 border border-primary/20 grid place-items-center mb-auto text-primary-glow">
-                <Icon className="size-5" />
-              </div>
-              <h3
-                className="font-semibold text-lg text-white mt-4 mb-1.5"
-                style={{ fontFamily: "var(--font-display)" }}
-              >
-                {title}
-              </h3>
-              <p className="text-sm text-white/50 leading-relaxed">{desc}</p>
+              {i === 0 ? (
+                <>
+                  {/* 2x2 food photo grid with calorie badges */}
+                  <div className="grid grid-cols-2 gap-1.5 mb-3">
+                    {[
+                      { src: "/images/recipes/gado-gado-sehat.png", label: "Gado-gado · 320 kal" },
+                      {
+                        src: "/images/recipes/soto-ayam-rendah-lemak.png",
+                        label: "Soto ayam · 280 kal",
+                      },
+                      {
+                        src: "/images/recipes/nasi-goreng-kacang-merah-sehat.png",
+                        label: "Nasi goreng · 450 kal",
+                      },
+                      {
+                        src: "/images/recipes/smoothie-mangga-kelapa-sehat.png",
+                        label: "Smoothie · 190 kal",
+                      },
+                    ].map((food) => (
+                      <div
+                        key={food.src}
+                        className="relative aspect-square rounded-lg overflow-hidden bg-white/5"
+                      >
+                        <img
+                          src={food.src}
+                          alt={food.label}
+                          loading="lazy"
+                          className="absolute inset-0 size-full object-cover"
+                        />
+                        <span className="absolute bottom-0 left-0 right-0 bg-black/70 backdrop-blur-sm text-white text-[10px] font-medium px-1.5 py-0.5 truncate">
+                          {food.label}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                  <h3
+                    className="font-semibold text-lg text-white mb-1.5"
+                    style={{ fontFamily: "var(--font-display)" }}
+                  >
+                    {title}
+                  </h3>
+                  <p className="text-sm text-white/50 leading-relaxed">{desc}</p>
+                </>
+              ) : (
+                <>
+                  <div className="size-11 rounded-xl bg-gradient-to-br from-primary/15 to-primary/5 border border-primary/20 grid place-items-center mb-auto text-primary-glow">
+                    <Icon className="size-5" />
+                  </div>
+                  <h3
+                    className="font-semibold text-lg text-white mt-4 mb-1.5"
+                    style={{ fontFamily: "var(--font-display)" }}
+                  >
+                    {title}
+                  </h3>
+                  <p className="text-sm text-white/50 leading-relaxed">{desc}</p>
+                </>
+              )}
             </div>
           </BlurFade>
         ))}
