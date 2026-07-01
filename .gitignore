@@ -58,3 +58,14 @@ playwright/.cache/
 # Supabase CLI ephemeral state
 supabase/.temp/
 
+# Agent skill bundles (not part of HealthyU source)
+.agents/
+
+# Legacy AI tool configs (migrated to Hermes)
+.kilo/
+
+# Hermes internal session plans (local-only)
+.hermes/plans/
+.hermes/SESSION-*.md
+.hermes/MIGRATION_*.md
+
