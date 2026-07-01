@@ -39,9 +39,12 @@ export function Testimonials() {
                 </div>
               )}
               <figcaption className="flex items-center gap-3 text-sm">
-                <span className="size-9 rounded-full bg-gradient-to-br from-primary to-primary-glow grid place-items-center text-primary-foreground text-xs font-bold">
-                  {t.name[0]}
-                </span>
+                <img
+                  src={t.avatar}
+                  alt={t.name}
+                  loading="lazy"
+                  className="size-9 rounded-full object-cover"
+                />
                 <span>
                   <strong className="text-white block">{t.name}</strong>
                   <span className="text-white/50 text-xs">

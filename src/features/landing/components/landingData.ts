@@ -19,48 +19,56 @@ export const FEATURES = [
     title: "Scan makanan AI",
     desc: "Foto piringmu, kalori & makro muncul instan.",
     tint: "from-primary/15 to-primary/0",
+    foodImage: undefined,
   },
   {
     icon: Utensils,
     title: "Database lokal Indonesia",
     desc: "Nasi padang, soto, gado-gado, ribuan menu lengkap.",
     tint: "from-accent/15 to-accent/0",
+    foodImage: "/images/recipes/nasi-merah-ayam-bakar.png",
   },
   {
     icon: Timer,
     title: "Puasa cerdas 16:8 & Ramadhan",
     desc: "Timer + reminder sahur & berbuka otomatis.",
     tint: "from-amber-300/20 to-amber-300/0",
+    foodImage: undefined,
   },
   {
     icon: Moon,
     title: "Jadwal sholat & kiblat",
     desc: "Waktu sholat akurat + kompas kiblat berbasis sensor.",
     tint: "from-indigo-400/15 to-indigo-400/0",
+    foodImage: undefined,
   },
   {
     icon: ChefHat,
     title: "Meal plan AI",
     desc: "Rencana mingguan personal sesuai goal & alergi.",
     tint: "from-primary/15 to-primary/0",
+    foodImage: "/images/recipes/salad-sayur-segar.png",
   },
   {
     icon: MessageCircle,
     title: "HealthyU AI Coach chatbot",
     desc: "Tanya jawab AI 24/7 dalam Bahasa Indonesia.",
     tint: "from-accent/15 to-accent/0",
+    foodImage: undefined,
   },
   {
     icon: Trophy,
     title: "Streak & gamifikasi",
     desc: "Level up, koin, achievement, konsisten jadi seru.",
     tint: "from-amber-300/20 to-amber-300/0",
+    foodImage: undefined,
   },
   {
     icon: Heart,
     title: "Vital & komposisi tubuh",
     desc: "Lacak berat, tekanan darah, gula, & komposisi tubuh.",
     tint: "from-rose-300/20 to-rose-300/0",
+    foodImage: undefined,
   },
 ];
 
@@ -83,6 +91,7 @@ export const TESTIMONIALS = [
     rating: 5,
     duration: "5 bulan pakai HealthyU",
     result: "-6 kg",
+    avatar: "https://i.pravatar.cc/150?img=5",
   },
   {
     name: "Budi, 35",
@@ -91,6 +100,7 @@ export const TESTIMONIALS = [
     rating: 5,
     duration: "1 musim Ramadhan",
     result: "Konsisten puasa",
+    avatar: "https://i.pravatar.cc/150?img=12",
   },
   {
     name: "Sari, 24",
@@ -100,6 +110,7 @@ export const TESTIMONIALS = [
     rating: 5,
     duration: "3 bulan pakai HealthyU",
     result: "Goal kalori tercapai",
+    avatar: "https://i.pravatar.cc/150?img=9",
   },
 ];
 

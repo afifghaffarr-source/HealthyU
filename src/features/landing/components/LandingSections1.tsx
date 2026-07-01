@@ -88,7 +88,7 @@ export function FeaturesBento() {
         </BlurFade>
       </div>
       <div className="max-w-5xl mx-auto grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {FEATURES.map(({ icon: Icon, title, desc }, i) => (
+        {FEATURES.map(({ icon: Icon, title, desc, foodImage }, i) => (
           <BlurFade
             key={title}
             delay={i * 0.06}
@@ -144,6 +144,16 @@ export function FeaturesBento() {
                 </>
               ) : (
                 <>
+                  {foodImage && (
+                    <div className="absolute top-3 right-3 w-20 h-20 rounded-xl overflow-hidden shadow-[0_8px_32px_rgba(0,0,0,0.3)]">
+                      <img
+                        src={foodImage}
+                        alt=""
+                        loading="lazy"
+                        className="size-full object-cover"
+                      />
+                    </div>
+                  )}
                   <div className="size-11 rounded-xl bg-gradient-to-br from-primary/15 to-primary/5 border border-primary/20 grid place-items-center mb-auto text-primary-glow">
                     <Icon className="size-5" />
                   </div>
@@ -165,6 +175,92 @@ export function FeaturesBento() {
 }
 
 export function HowItWorks() {
+  const stepMockups = [
+    {
+      gradient: "from-emerald-500/20 to-teal-500/10",
+      elements: (
+        <>
+          <div className="absolute inset-0 bg-gradient-to-b from-white via-white to-gray-50" />
+          <div className="relative z-10 p-3 space-y-2">
+            <div className="flex items-center gap-2 bg-white rounded-lg p-2 shadow-sm">
+              <div className="size-8 rounded-full bg-gradient-to-br from-primary to-primary-glow" />
+              <div className="flex-1 space-y-1">
+                <div className="h-2 bg-gray-200 rounded w-20" />
+                <div className="h-1.5 bg-gray-100 rounded w-16" />
+              </div>
+            </div>
+            <div className="bg-white rounded-lg p-2 shadow-sm space-y-1.5">
+              <div className="h-2 bg-gray-200 rounded w-24" />
+              <div className="h-1.5 bg-gray-100 rounded w-full" />
+              <div className="h-1.5 bg-gray-100 rounded w-3/4" />
+            </div>
+          </div>
+        </>
+      ),
+    },
+    {
+      gradient: "from-primary/20 to-accent/10",
+      elements: (
+        <>
+          <div className="absolute inset-0 bg-gradient-to-b from-white via-gray-50 to-white" />
+          <div className="relative z-10 p-3 space-y-2">
+            <div className="bg-white rounded-lg p-2 shadow-sm">
+              <div className="flex items-center justify-between mb-2">
+                <div className="h-2 bg-gray-200 rounded w-16" />
+                <div className="h-2 bg-primary/30 rounded w-12" />
+              </div>
+              <div className="space-y-1.5">
+                {[60, 80, 40].map((w, i) => (
+                  <div key={i} className="flex items-center gap-2">
+                    <div className="size-1.5 rounded-full bg-primary" />
+                    <div className="h-1.5 bg-gray-100 rounded" style={{ width: `${w}%` }} />
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div className="bg-gradient-to-br from-primary to-primary-glow rounded-lg p-2 text-center">
+              <div className="h-2 bg-white/30 rounded w-20 mx-auto" />
+            </div>
+          </div>
+        </>
+      ),
+    },
+    {
+      gradient: "from-amber-500/20 to-orange-500/10",
+      elements: (
+        <>
+          <div className="absolute inset-0 bg-gradient-to-b from-white via-white to-amber-50/30" />
+          <div className="relative z-10 p-3 space-y-2">
+            <div className="bg-white rounded-lg p-2 shadow-sm">
+              <div className="flex items-center justify-center mb-2">
+                <div
+                  className="size-12 rounded-full grid place-items-center relative"
+                  style={{
+                    background:
+                      "conic-gradient(var(--primary) 0deg 270deg, rgba(0,0,0,0.05) 270deg 360deg)",
+                  }}
+                >
+                  <div className="absolute inset-1 rounded-full bg-white grid place-items-center">
+                    <div className="size-2 rounded-full bg-primary" />
+                  </div>
+                </div>
+              </div>
+              <div className="space-y-1">
+                <div className="h-1.5 bg-gray-200 rounded w-full" />
+                <div className="h-1.5 bg-gray-100 rounded w-3/4 mx-auto" />
+              </div>
+            </div>
+            <div className="flex gap-1.5">
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="flex-1 h-8 bg-white rounded shadow-sm" />
+              ))}
+            </div>
+          </div>
+        </>
+      ),
+    },
+  ];
+
   return (
     <section id="cara" className="bg-[#f5f5f7] py-24 md:py-32 px-5">
       <div className="max-w-5xl mx-auto">
@@ -186,6 +282,18 @@ export function HowItWorks() {
         <div className="grid md:grid-cols-3 gap-10">
           {STEPS.map(({ n, title, desc }, i) => (
             <BlurFade key={n} delay={i * 0.12} className="text-center">
+              {/* CSS Phone Mockup */}
+              <div className="mb-6 flex justify-center">
+                <div
+                  className="w-[140px] aspect-[9/19] rounded-[1.5rem] border-2 border-gray-300 bg-white shadow-[0_8px_32px_rgba(0,0,0,0.08)] overflow-hidden relative"
+                  aria-hidden="true"
+                >
+                  <div
+                    className={`absolute inset-0 bg-gradient-to-br ${stepMockups[i].gradient}`}
+                  />
+                  {stepMockups[i].elements}
+                </div>
+              </div>
               <div
                 className="text-5xl font-light text-primary mb-4"
                 style={{ fontFamily: "var(--font-mono)" }}
