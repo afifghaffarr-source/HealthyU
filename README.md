@@ -1,5 +1,9 @@
 # HealthyU
 
+![CI](https://github.com/afifghaffarr-source/HealthyU/actions/workflows/ci.yml/badge.svg)
+![Deploy](https://github.com/afifghaffarr-source/HealthyU/actions/workflows/deploy.yml/badge.svg)
+![Lighthouse](https://github.com/afifghaffarr-source/HealthyU/actions/workflows/lighthouse.yml/badge.svg)
+
 AI nutrition coach untuk Indonesia: diet, puasa, jadwal sholat, dan HealthyU AI Coach.
 
 > **2026-06-13 migration**: decoupled from Lovable AI platform. Now runs on
@@ -139,7 +143,7 @@ Lihat `docs/HEALTHYU_MASTER_REKOMENDASI_REPO_2026-06-19.md` (Sprint 1a) untuk re
 bun install        # requires bun >=1.1.0 (packageManager: bun@1.2.21)
 bun run dev        # http://localhost:8080
 bun run build      # production build
-bun run test       # vitest (760 tests, 70% coverage threshold)
+bun run test       # vitest (1073 tests, 70% coverage threshold)
 bun run lint       # eslint (0 errors, 0 warnings)
 bun run e2e        # playwright e2e tests (smoke + regression + a11y)
 bunx tsc --noEmit  # typecheck
@@ -240,10 +244,10 @@ Bundle impact: server-only (`*.server.ts`) — tree-shaken dari client bundle.
 
 ## Deploy
 
-Pipeline deploy hybrid (sejak token GH Secret stale 2026-06-18, CI gagal 4 deploy terakhir):
+Pipeline deploy via Cloudflare Pages (CI-driven, git push to `main` triggers build):
 
-1. **Local** (sekarang jadi default): `bun run build` → `node scripts/postbuild-fix.mjs` → `node ./node_modules/.bin/wrangler deploy --keep-vars` (pakai `~/.config/healthyu/cf-token` di VPS).
-2. **CI** (broken): Git push to `main` triggers Cloudflare Pages build via `.github/workflows/deploy.yml`. Butuh `CLOUDFLARE_API_TOKEN` secret yang valid di GH repo settings.
+1. **CI**: Git push to `main` → `.github/workflows/deploy.yml` → `bun run build` → `wrangler deploy` (pakai `CLOUDFLARE_API_TOKEN` secret di GH repo settings).
+2. **Postbuild**: `scripts/postbuild-fix.mjs` membungkus `dist/server/index.js` jadi `fetch(request, env, ctx)` handler yang forward CF Workers `env` bindings ke TanStack Start request middleware chain.
 
 Postbuild fix script (`scripts/postbuild-fix.mjs`) membungkus `dist/server/index.js`
 jadi `fetch(request, env, ctx)` handler yang forward CF Workers `env` bindings ke
@@ -262,8 +266,8 @@ For first-time setup, see [`docs/cloudflare-deploy.md`](./docs/cloudflare-deploy
 | Area              | Status | Detail                                                            |
 | ----------------- | ------ | ----------------------------------------------------------------- |
 | Build             | ✅     | `bun run build` + `bunx tsc --noEmit` clean                       |
-| Tests             | ✅     | 81 files, 760 tests, vitest 70% threshold                         |
-| Lint              | ✅     | `bun run lint` 0 errors (69 warnings non-blocking)                |
+| Tests             | ✅     | 113 files, 1073 tests, vitest 70% threshold                       |
+| Lint              | ✅     | `bun run lint` 0 errors (3 warnings non-blocking)                 |
 | E2E               | ✅     | Playwright (smoke, public-pages, auth, a11y, regression)          |
 | Bundle            | ✅     | Main 500KB / gzip 164KB (hard floor TanStack Start + React 19)    |
 | `.env` hygiene    | ✅     | Not tracked in git, `.env.example` as template                    |
@@ -292,7 +296,7 @@ For first-time setup, see [`docs/cloudflare-deploy.md`](./docs/cloudflare-deploy
 - VexoAPI free tier tidak expose SSE — chat stream emits satu chunk, UI tidak dapat token-by-token animation. Acceptable trade-off.
 - **Bundle size 500KB** (gzip 164KB) adalah hard floor untuk TanStack Start + React 19. Target <400KB tidak reachable tanpa rewrite framework. Lihat `docs/known-issues.md` HI-001.
 - **37 phantom bindings** di Cloudflare Worker belum di-cleanup (no functional impact). Lihat `docs/known-issues.md` HI-003.
-- **GH Actions CF token** invalid (deploy manual dulu). Lihat `docs/known-issues.md` HI-002.
+- **GH Actions CF token** periodically rotated. Lihat `docs/known-issues.md` HI-002.
 
 ## Audit & Roadmap
 
