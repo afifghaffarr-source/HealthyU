@@ -343,54 +343,31 @@ describe("Time Pattern Detection", () => {
 
   describe("detectTimePatterns (integration)", () => {
     it("returns only detected patterns", () => {
-      const meals: MealLog[] = [
-        // Skip breakfast pattern (5 days)
-        {
-          log_date: "2026-06-16",
-          logged_at: "2026-06-16T12:00:00Z",
+      // Generate 5 weekday lunch-only meals (skip breakfast) from today
+      // so the test is date-independent.
+      const today = new Date();
+      const skipBreakfastMeals: MealLog[] = [];
+      const collected = new Set<string>();
+      for (let i = 0; i < 14 && collected.size < 5; i++) {
+        const d = new Date(today.getTime() - i * 86400000);
+        const day = d.getDay();
+        if (day === 0 || day === 6) continue;
+        const dateStr = d.toISOString().split("T")[0];
+        collected.add(dateStr);
+        skipBreakfastMeals.push({
+          log_date: dateStr,
+          logged_at: `${dateStr}T12:00:00Z`,
           meal_type: "lunch",
           calories: 500,
           carbs_g: 60,
           protein_g: 25,
           fat_g: 15,
-        },
-        {
-          log_date: "2026-06-17",
-          logged_at: "2026-06-17T12:00:00Z",
-          meal_type: "lunch",
-          calories: 500,
-          carbs_g: 60,
-          protein_g: 25,
-          fat_g: 15,
-        },
-        {
-          log_date: "2026-06-18",
-          logged_at: "2026-06-18T12:00:00Z",
-          meal_type: "lunch",
-          calories: 500,
-          carbs_g: 60,
-          protein_g: 25,
-          fat_g: 15,
-        },
-        {
-          log_date: "2026-06-19",
-          logged_at: "2026-06-19T12:00:00Z",
-          meal_type: "lunch",
-          calories: 500,
-          carbs_g: 60,
-          protein_g: 25,
-          fat_g: 15,
-        },
-        {
-          log_date: "2026-06-20",
-          logged_at: "2026-06-20T12:00:00Z",
-          meal_type: "lunch",
-          calories: 500,
-          carbs_g: 60,
-          protein_g: 25,
-          fat_g: 15,
-        },
-        // Late night pattern (3 meals)
+        });
+      }
+
+      // Late night pattern (3 meals, date-independent — detectLateNightEating
+      // does not filter by date, only by hour)
+      const lateNightMeals: MealLog[] = [
         {
           log_date: "2026-06-10",
           logged_at: "2026-06-10T22:30:00Z",
@@ -420,76 +397,53 @@ describe("Time Pattern Detection", () => {
         },
       ];
 
+      const meals = [...skipBreakfastMeals, ...lateNightMeals];
       const patterns = detectTimePatterns(meals);
 
       expect(patterns.length).toBeGreaterThan(0);
       expect(patterns.every((p) => p.detected)).toBe(true);
 
-      // Should detect both skip_breakfast and late_night_eating
       const types = patterns.map((p) => p.type);
       expect(types).toContain("skip_breakfast");
       expect(types).toContain("late_night_eating");
     });
 
     it("returns empty array if no patterns detected", () => {
-      // Last 5 weekdays: Jun 27(Fri), 26(Thu), 25(Wed), 24(Tue), 23(Mon)
-      // All have breakfast, no late-night, consistent timing → no patterns
-      const meals: MealLog[] = [
-        {
-          log_date: "2026-06-26", // Thu breakfast
-          logged_at: "2026-06-26T08:00:00Z",
+      // Generate breakfast for last 5 weekdays from today so the test
+      // is date-independent (detectTimePatterns uses new Date() internally).
+      const today = new Date();
+      const breakfasts: MealLog[] = [];
+      const collected = new Set<string>();
+      for (let i = 0; i < 14 && collected.size < 5; i++) {
+        const d = new Date(today.getTime() - i * 86400000);
+        const day = d.getDay();
+        if (day === 0 || day === 6) continue; // skip weekend
+        const dateStr = d.toISOString().split("T")[0];
+        collected.add(dateStr);
+        breakfasts.push({
+          log_date: dateStr,
+          logged_at: `${dateStr}T08:00:00Z`,
           meal_type: "breakfast",
           calories: 300,
           carbs_g: 40,
           protein_g: 15,
           fat_g: 10,
-        },
-        {
-          log_date: "2026-06-26",
-          logged_at: "2026-06-26T12:00:00Z",
+        });
+      }
+
+      // Add consistent lunch for each breakfast day (regular timing)
+      const meals: MealLog[] = [...breakfasts];
+      for (const b of breakfasts) {
+        meals.push({
+          log_date: b.log_date,
+          logged_at: `${b.log_date}T12:00:00Z`,
           meal_type: "lunch",
           calories: 500,
           carbs_g: 60,
           protein_g: 25,
           fat_g: 15,
-        },
-        {
-          log_date: "2026-06-25", // Wed breakfast
-          logged_at: "2026-06-25T08:00:00Z",
-          meal_type: "breakfast",
-          calories: 300,
-          carbs_g: 40,
-          protein_g: 15,
-          fat_g: 10,
-        },
-        {
-          log_date: "2026-06-24", // Tue breakfast
-          logged_at: "2026-06-24T08:00:00Z",
-          meal_type: "breakfast",
-          calories: 300,
-          carbs_g: 40,
-          protein_g: 15,
-          fat_g: 10,
-        },
-        {
-          log_date: "2026-06-23", // Mon breakfast
-          logged_at: "2026-06-23T08:00:00Z",
-          meal_type: "breakfast",
-          calories: 300,
-          carbs_g: 40,
-          protein_g: 15,
-          fat_g: 10,
-        },
-        {
-          log_date: "2026-06-20", // Fri (last week) breakfast
-          logged_at: "2026-06-20T08:00:00Z",
-          meal_type: "breakfast",
-          calories: 300,
-          carbs_g: 40,
-          protein_g: 15,
-          fat_g: 10,
-        },
-      ];
+        });
+      }
 
       const patterns = detectTimePatterns(meals);
 
