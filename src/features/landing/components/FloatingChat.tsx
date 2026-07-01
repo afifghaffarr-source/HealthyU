@@ -9,7 +9,7 @@ export function FloatingChat() {
       <button
         onClick={() => setOpen((v) => !v)}
         aria-label="Buka HealthyU AI Coach"
-        className="fixed bottom-20 lg:bottom-5 right-5 z-40 size-14 rounded-full bg-gradient-to-br from-primary to-accent text-primary-foreground shadow-xl shadow-primary/40 grid place-items-center hover:scale-105 transition-transform"
+        className="fixed bottom-24 lg:bottom-5 right-5 z-40 size-14 rounded-full bg-gradient-to-br from-primary to-accent text-primary-foreground shadow-xl shadow-primary/40 grid place-items-center hover:scale-105 transition-transform"
       >
         {open ? <X className="size-5" /> : <MessageCircle className="size-6" />}
         {!open && (
@@ -17,7 +17,7 @@ export function FloatingChat() {
         )}
       </button>
       {open && (
-        <div className="fixed bottom-36 lg:bottom-24 right-5 z-40 w-[90vw] max-w-sm glass rounded-2xl border border-white/20 shadow-2xl p-4 animate-fade-up">
+        <div className="fixed bottom-40 lg:bottom-24 right-5 z-40 w-[90vw] max-w-sm glass rounded-2xl border border-white/20 shadow-2xl p-4 animate-fade-up">
           <div className="flex items-center gap-2 pb-3 border-b border-white/10">
             <span className="size-8 rounded-full bg-gradient-to-br from-primary to-accent grid place-items-center text-primary-foreground">
               <Sparkles className="size-4" />

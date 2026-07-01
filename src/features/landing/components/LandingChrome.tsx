@@ -245,7 +245,7 @@ export function StickyCta({
   const { t } = useTranslation();
   return (
     <div
-      className={`fixed left-1/2 -translate-x-1/2 bottom-20 lg:bottom-4 z-40 transition-all ${show ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6 pointer-events-none"}`}
+      className={`hidden lg:flex fixed left-1/2 -translate-x-1/2 bottom-4 z-40 transition-all ${show ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6 pointer-events-none"}`}
     >
       <div className="glass border border-white/20 shadow-2xl rounded-full pl-4 pr-1 py-1 flex items-center gap-3">
         <span className="text-xs font-semibold hidden sm:inline">{t("landing.stickyPrompt")}</span>
