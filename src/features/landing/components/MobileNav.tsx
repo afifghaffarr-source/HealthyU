@@ -104,24 +104,24 @@ export function MobileNav() {
       {/* Bottom sheet nav (mobile only) */}
       <nav
         aria-label="Navigasi utama mobile"
-        className="lg:hidden fixed bottom-4 inset-x-4 z-40 rounded-2xl bg-background/95 backdrop-blur-xl border border-border shadow-[0_8px_32px_rgba(0,0,0,0.12)] flex items-center justify-around py-2"
+        className="lg:hidden fixed bottom-4 inset-x-4 z-40 rounded-2xl bg-background/95 backdrop-blur-xl border border-border shadow-[0_8px_32px_rgba(0,0,0,0.12)] flex items-center justify-between py-2 px-2 sm:px-3"
       >
         {BOTTOM_ITEMS.map(({ icon: Icon, label, href }) => (
           <Link
             key={href}
             to={href}
-            className="flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-xl text-[11px] font-medium text-muted-foreground hover:text-primary transition-colors"
+            className="flex flex-col items-center gap-0.5 px-1.5 py-1.5 rounded-xl text-[10px] sm:text-[11px] font-medium text-muted-foreground hover:text-primary transition-colors min-w-0"
           >
-            <Icon className="size-5" strokeWidth={1.75} />
-            {label}
+            <Icon className="size-5 shrink-0" strokeWidth={1.75} />
+            <span className="truncate max-w-[48px] sm:max-w-none">{label}</span>
           </Link>
         ))}
         <Link
           to="/auth"
-          className="flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-xl bg-primary text-primary-foreground text-[11px] font-semibold"
+          className="flex flex-col items-center gap-0.5 px-2 py-1.5 rounded-xl bg-primary text-primary-foreground text-[10px] sm:text-[11px] font-semibold min-w-0"
         >
-          <Sparkles className="size-5" strokeWidth={1.75} />
-          Mulai
+          <Sparkles className="size-5 shrink-0" strokeWidth={1.75} />
+          <span className="truncate max-w-[48px] sm:max-w-none">Mulai</span>
         </Link>
       </nav>
     </>
