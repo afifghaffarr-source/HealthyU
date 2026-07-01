@@ -6,31 +6,6 @@ export type Database = {
   __InternalSupabase: {
     PostgrestVersion: "14.5";
   };
-  graphql_public: {
-    Tables: {
-      [_ in never]: never;
-    };
-    Views: {
-      [_ in never]: never;
-    };
-    Functions: {
-      graphql: {
-        Args: {
-          extensions?: Json;
-          operationName?: string;
-          query?: string;
-          variables?: Json;
-        };
-        Returns: Json;
-      };
-    };
-    Enums: {
-      [_ in never]: never;
-    };
-    CompositeTypes: {
-      [_ in never]: never;
-    };
-  };
   public: {
     Tables: {
       account_deletion_log: {
@@ -375,6 +350,56 @@ export type Database = {
         };
         Relationships: [];
       };
+      app_config: {
+        Row: {
+          category: string;
+          created_at: string;
+          data_type: string;
+          description: string | null;
+          is_secret: boolean;
+          key: string;
+          label: string;
+          options: Json | null;
+          updated_at: string;
+          updated_by: string | null;
+          value: Json;
+        };
+        Insert: {
+          category?: string;
+          created_at?: string;
+          data_type?: string;
+          description?: string | null;
+          is_secret?: boolean;
+          key: string;
+          label: string;
+          options?: Json | null;
+          updated_at?: string;
+          updated_by?: string | null;
+          value: Json;
+        };
+        Update: {
+          category?: string;
+          created_at?: string;
+          data_type?: string;
+          description?: string | null;
+          is_secret?: boolean;
+          key?: string;
+          label?: string;
+          options?: Json | null;
+          updated_at?: string;
+          updated_by?: string | null;
+          value?: Json;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "app_config_updated_by_fkey";
+            columns: ["updated_by"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       app_versions: {
         Row: {
           build_number: number | null;
@@ -598,6 +623,62 @@ export type Database = {
           user_id?: string | null;
         };
         Relationships: [];
+      };
+      banners: {
+        Row: {
+          color: string;
+          created_at: string;
+          created_by: string | null;
+          cta_href: string | null;
+          cta_label: string | null;
+          description: string | null;
+          ends_at: string | null;
+          id: string;
+          is_active: boolean;
+          placement: string;
+          starts_at: string;
+          title: string;
+          updated_at: string;
+        };
+        Insert: {
+          color?: string;
+          created_at?: string;
+          created_by?: string | null;
+          cta_href?: string | null;
+          cta_label?: string | null;
+          description?: string | null;
+          ends_at?: string | null;
+          id?: string;
+          is_active?: boolean;
+          placement?: string;
+          starts_at?: string;
+          title: string;
+          updated_at?: string;
+        };
+        Update: {
+          color?: string;
+          created_at?: string;
+          created_by?: string | null;
+          cta_href?: string | null;
+          cta_label?: string | null;
+          description?: string | null;
+          ends_at?: string | null;
+          id?: string;
+          is_active?: boolean;
+          placement?: string;
+          starts_at?: string;
+          title?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "banners_created_by_fkey";
+            columns: ["created_by"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
       };
       barcode_cache: {
         Row: {
@@ -2028,6 +2109,56 @@ export type Database = {
         };
         Relationships: [];
       };
+      experiments: {
+        Row: {
+          created_at: string;
+          created_by: string | null;
+          description: string | null;
+          id: string;
+          is_active: boolean;
+          key: string;
+          label: string;
+          split_pct: number;
+          updated_at: string;
+          variant_a_json: Json;
+          variant_b_json: Json;
+        };
+        Insert: {
+          created_at?: string;
+          created_by?: string | null;
+          description?: string | null;
+          id?: string;
+          is_active?: boolean;
+          key: string;
+          label: string;
+          split_pct?: number;
+          updated_at?: string;
+          variant_a_json?: Json;
+          variant_b_json?: Json;
+        };
+        Update: {
+          created_at?: string;
+          created_by?: string | null;
+          description?: string | null;
+          id?: string;
+          is_active?: boolean;
+          key?: string;
+          label?: string;
+          split_pct?: number;
+          updated_at?: string;
+          variant_a_json?: Json;
+          variant_b_json?: Json;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "experiments_created_by_fkey";
+            columns: ["created_by"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       family_invites: {
         Row: {
           created_at: string;
@@ -2961,6 +3092,41 @@ export type Database = {
         };
         Relationships: [];
       };
+      i18n_overrides: {
+        Row: {
+          created_at: string;
+          key: string;
+          locale: string;
+          updated_at: string;
+          updated_by: string | null;
+          value: string;
+        };
+        Insert: {
+          created_at?: string;
+          key: string;
+          locale: string;
+          updated_at?: string;
+          updated_by?: string | null;
+          value: string;
+        };
+        Update: {
+          created_at?: string;
+          key?: string;
+          locale?: string;
+          updated_at?: string;
+          updated_by?: string | null;
+          value?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "i18n_overrides_updated_by_fkey";
+            columns: ["updated_by"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       imported_recipes: {
         Row: {
           created_at: string;
@@ -3700,6 +3866,56 @@ export type Database = {
         };
         Relationships: [];
       };
+      notification_templates: {
+        Row: {
+          body_html: string | null;
+          body_text: string | null;
+          channel: string;
+          id: number;
+          is_active: boolean;
+          locale: string;
+          subject: string | null;
+          template_key: string;
+          updated_at: string;
+          updated_by: string | null;
+          variables: string[];
+        };
+        Insert: {
+          body_html?: string | null;
+          body_text?: string | null;
+          channel: string;
+          id?: number;
+          is_active?: boolean;
+          locale?: string;
+          subject?: string | null;
+          template_key: string;
+          updated_at?: string;
+          updated_by?: string | null;
+          variables?: string[];
+        };
+        Update: {
+          body_html?: string | null;
+          body_text?: string | null;
+          channel?: string;
+          id?: number;
+          is_active?: boolean;
+          locale?: string;
+          subject?: string | null;
+          template_key?: string;
+          updated_at?: string;
+          updated_by?: string | null;
+          variables?: string[];
+        };
+        Relationships: [
+          {
+            foreignKeyName: "notification_templates_updated_by_fkey";
+            columns: ["updated_by"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       notifications: {
         Row: {
           body: string | null;
@@ -4120,6 +4336,8 @@ export type Database = {
           allow_dm: boolean;
           available_equipment: string[] | null;
           avatar_url: string | null;
+          banned_at: string | null;
+          banned_reason: string | null;
           birth_date: string | null;
           blood_type: string | null;
           bmi: number | null;
@@ -4140,6 +4358,7 @@ export type Database = {
           dietary_preference: string | null;
           display_currency: string;
           fcm_token: string | null;
+          force_logout_at: string | null;
           full_name: string | null;
           gender: string | null;
           health_age: number | null;
@@ -4192,6 +4411,8 @@ export type Database = {
           allow_dm?: boolean;
           available_equipment?: string[] | null;
           avatar_url?: string | null;
+          banned_at?: string | null;
+          banned_reason?: string | null;
           birth_date?: string | null;
           blood_type?: string | null;
           bmi?: number | null;
@@ -4212,6 +4433,7 @@ export type Database = {
           dietary_preference?: string | null;
           display_currency?: string;
           fcm_token?: string | null;
+          force_logout_at?: string | null;
           full_name?: string | null;
           gender?: string | null;
           health_age?: number | null;
@@ -4264,6 +4486,8 @@ export type Database = {
           allow_dm?: boolean;
           available_equipment?: string[] | null;
           avatar_url?: string | null;
+          banned_at?: string | null;
+          banned_reason?: string | null;
           birth_date?: string | null;
           blood_type?: string | null;
           bmi?: number | null;
@@ -4284,6 +4508,7 @@ export type Database = {
           dietary_preference?: string | null;
           display_currency?: string;
           fcm_token?: string | null;
+          force_logout_at?: string | null;
           full_name?: string | null;
           gender?: string | null;
           health_age?: number | null;
@@ -4361,6 +4586,107 @@ export type Database = {
           weight_kg?: number | null;
         };
         Relationships: [];
+      };
+      promo_codes: {
+        Row: {
+          code: string;
+          created_at: string;
+          created_by: string | null;
+          description: string | null;
+          expires_at: string | null;
+          id: string;
+          is_active: boolean;
+          label: string;
+          max_uses: number;
+          reward_type: string;
+          reward_value: number;
+          updated_at: string;
+          uses_remaining: number;
+        };
+        Insert: {
+          code: string;
+          created_at?: string;
+          created_by?: string | null;
+          description?: string | null;
+          expires_at?: string | null;
+          id?: string;
+          is_active?: boolean;
+          label: string;
+          max_uses?: number;
+          reward_type?: string;
+          reward_value?: number;
+          updated_at?: string;
+          uses_remaining?: number;
+        };
+        Update: {
+          code?: string;
+          created_at?: string;
+          created_by?: string | null;
+          description?: string | null;
+          expires_at?: string | null;
+          id?: string;
+          is_active?: boolean;
+          label?: string;
+          max_uses?: number;
+          reward_type?: string;
+          reward_value?: number;
+          updated_at?: string;
+          uses_remaining?: number;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "promo_codes_created_by_fkey";
+            columns: ["created_by"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      promo_redemptions: {
+        Row: {
+          code: string;
+          id: string;
+          promo_code_id: string;
+          redeemed_at: string;
+          reward_type: string;
+          reward_value: number;
+          user_id: string;
+        };
+        Insert: {
+          code: string;
+          id?: string;
+          promo_code_id: string;
+          redeemed_at?: string;
+          reward_type: string;
+          reward_value: number;
+          user_id: string;
+        };
+        Update: {
+          code?: string;
+          id?: string;
+          promo_code_id?: string;
+          redeemed_at?: string;
+          reward_type?: string;
+          reward_value?: number;
+          user_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "promo_redemptions_promo_code_id_fkey";
+            columns: ["promo_code_id"];
+            isOneToOne: false;
+            referencedRelation: "promo_codes";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "promo_redemptions_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
       };
       push_subscriptions: {
         Row: {
@@ -6880,6 +7206,10 @@ export type Database = {
     };
     Functions: {
       _get_field_key: { Args: never; Returns: string };
+      ban_user: {
+        Args: { _reason: string; _target_user_id: string };
+        Returns: undefined;
+      };
       block_user: { Args: { _target: string }; Returns: string };
       bump_reaction_count: {
         Args: { p_delta: number; p_post_id: string };
@@ -6898,11 +7228,42 @@ export type Database = {
         Returns: Json;
       };
       cleanup_rate_limit_log: { Args: never; Returns: undefined };
+      force_logout_user: {
+        Args: { _target_user_id: string };
+        Returns: undefined;
+      };
+      get_active_banners: {
+        Args: { _position?: string };
+        Returns: {
+          color: string;
+          cta_href: string;
+          cta_label: string;
+          description: string;
+          id: string;
+          placement: string;
+          title: string;
+        }[];
+      };
       get_current_fasting_streak: {
         Args: { p_user_id: string };
         Returns: number;
       };
+      get_experiment_variant: {
+        Args: { _key: string; _user_id?: string };
+        Returns: {
+          payload: Json;
+          variant: string;
+        }[];
+      };
       get_fasting_stats: { Args: { p_user_id: string }; Returns: Json };
+      get_notification_template: {
+        Args: { p_channel: string; p_key: string; p_locale?: string };
+        Returns: {
+          body_html: string;
+          body_text: string;
+          subject: string;
+        }[];
+      };
       get_sensitive_note: {
         Args: { _id: string };
         Returns: {
@@ -6913,6 +7274,13 @@ export type Database = {
           title: string;
           updated_at: string;
         }[];
+      };
+      grant_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"];
+          _target_user_id: string;
+        };
+        Returns: undefined;
       };
       has_role: {
         Args: {
@@ -6957,6 +7325,16 @@ export type Database = {
         Returns: number;
       };
       redeem_friend_invite: { Args: { _token: string }; Returns: string };
+      redeem_promo: {
+        Args: { _code: string; _user_id: string };
+        Returns: {
+          label: string;
+          message: string;
+          reward_type: string;
+          reward_value: number;
+          success: boolean;
+        }[];
+      };
       report_content: {
         Args: {
           _content_id: string;
@@ -6967,10 +7345,18 @@ export type Database = {
         Returns: string;
       };
       request_account_deletion: { Args: { _reason?: string }; Returns: string };
+      revoke_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"];
+          _target_user_id: string;
+        };
+        Returns: undefined;
+      };
       save_sensitive_note: {
         Args: { _category?: string; _note: string; _title: string };
         Returns: string;
       };
+      unban_user: { Args: { _target_user_id: string }; Returns: undefined };
       unblock_user: { Args: { _target: string }; Returns: boolean };
       update_sensitive_note: {
         Args: { _category?: string; _id: string; _note: string; _title: string };
@@ -7102,9 +7488,6 @@ export type CompositeTypes<
     : never;
 
 export const Constants = {
-  graphql_public: {
-    Enums: {},
-  },
   public: {
     Enums: {
       app_role: ["admin", "moderator", "user"],
