@@ -3,6 +3,17 @@ import { ArrowRight, Flame, Shield, Star } from "lucide-react";
 import { AuroraText } from "@/components/magicui/aurora-text";
 import { BlurFade } from "@/components/magicui/blur-fade";
 
+// Pre-computed particle positions (stable across renders)
+const PARTICLES = Array.from({ length: 25 }, (_, i) => ({
+  id: i,
+  size: i % 2 === 0 ? "w-1 h-1" : "w-0.5 h-0.5",
+  opacity: 0.1 + ((i * 7) % 20) / 100,
+  top: (i * 13) % 100,
+  left: (i * 17) % 100,
+  delay: (i * 0.4) % 10,
+  duration: 15 + ((i * 3) % 10),
+}));
+
 export function LandingHero({
   ctaPrimary,
   ctaPrimaryLabel,
@@ -14,19 +25,38 @@ export function LandingHero({
 }) {
   return (
     <section className="bg-black text-white min-h-[88vh] flex items-center justify-center text-center px-5 py-20 md:py-28 relative overflow-hidden">
+      {/* Particle background - CSS-only floating dots */}
+      <div aria-hidden className="absolute inset-0 pointer-events-none overflow-hidden">
+        {PARTICLES.map((p) => (
+          <div
+            key={p.id}
+            className={`absolute rounded-full bg-white ${p.size}`}
+            style={{
+              top: `${p.top}%`,
+              left: `${p.left}%`,
+              opacity: p.opacity,
+              animation: `float-particle ${p.duration}s ease-in-out ${p.delay}s infinite`,
+            }}
+          />
+        ))}
+      </div>
+
       {/* Subtle accent glow */}
       <div
         aria-hidden
         className="absolute top-[15%] left-1/2 -translate-x-1/2 w-[600px] h-[600px] rounded-full bg-primary/20 blur-3xl pointer-events-none animate-blob"
       />
 
-      {/* Floating badges - scattered around hero text */}
+      {/* Floating badges - scattered around hero text with enhanced glass morphism */}
       <div
         aria-hidden
         className="hidden lg:block absolute left-[8%] top-[28%] pointer-events-none z-20 animate-float"
         style={{ animationDelay: "0s" }}
       >
-        <div className="rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 px-4 py-2.5 text-sm font-medium text-white shadow-[0_8px_32px_rgba(0,0,0,0.12)] flex items-center gap-2">
+        <div
+          className="rounded-2xl bg-white/[0.08] border border-white/30 px-4 py-2.5 text-sm font-medium text-white shadow-[0_8px_32px_rgba(0,0,0,0.12),inset_0_1px_0_0_rgba(255,255,255,0.1)] flex items-center gap-2"
+          style={{ backdropFilter: "blur(24px) saturate(180%)" }}
+        >
           <Flame className="size-4 text-amber-400" />
           <span>12 hari streak</span>
         </div>
@@ -37,7 +67,10 @@ export function LandingHero({
         className="hidden lg:block absolute left-[6%] top-[58%] pointer-events-none z-20 animate-float"
         style={{ animationDelay: "0.8s" }}
       >
-        <div className="rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 px-4 py-2.5 text-sm font-medium text-white shadow-[0_8px_32px_rgba(0,0,0,0.12)]">
+        <div
+          className="rounded-2xl bg-white/[0.08] border border-white/30 px-4 py-2.5 text-sm font-medium text-white shadow-[0_8px_32px_rgba(0,0,0,0.12),inset_0_1px_0_0_rgba(255,255,255,0.1)]"
+          style={{ backdropFilter: "blur(24px) saturate(180%)" }}
+        >
           <div className="flex items-center gap-2 mb-1">
             <span className="text-primary-glow">✓</span>
             <span className="text-xs text-white/80">Target harian</span>
@@ -54,7 +87,10 @@ export function LandingHero({
         className="hidden lg:block absolute left-[10%] top-[75%] pointer-events-none z-20 animate-float"
         style={{ animationDelay: "0.4s" }}
       >
-        <div className="rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 px-4 py-2.5 text-sm font-medium text-white shadow-[0_8px_32px_rgba(0,0,0,0.12)] flex items-center gap-2">
+        <div
+          className="rounded-2xl bg-white/[0.08] border border-white/30 px-4 py-2.5 text-sm font-medium text-white shadow-[0_8px_32px_rgba(0,0,0,0.12),inset_0_1px_0_0_rgba(255,255,255,0.1)] flex items-center gap-2"
+          style={{ backdropFilter: "blur(24px) saturate(180%)" }}
+        >
           <Star className="size-4 text-amber-400 fill-amber-400" />
           <span>Level 8</span>
         </div>
@@ -71,7 +107,11 @@ export function LandingHero({
         <BlurFade delay={0.08} duration={0.5}>
           <h1
             className="text-5xl md:text-7xl font-semibold tracking-[-0.03em] leading-[1.07]"
-            style={{ fontFamily: "var(--font-display)" }}
+            style={{
+              fontFamily: "var(--font-display)",
+              textShadow:
+                "1px 1px 2px rgba(0,0,0,0.3), 2px 2px 4px rgba(0,0,0,0.2), 3px 3px 6px rgba(0,0,0,0.1), 4px 4px 8px rgba(0,0,0,0.05)",
+            }}
           >
             Hidup sehat,
             <br />

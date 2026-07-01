@@ -500,6 +500,22 @@
   animation: aurora-text 8s linear infinite;
 }
 
+/* Particle floating animation for hero background */
+@keyframes float-particle {
+  0%, 100% {
+    transform: translate(0, 0);
+  }
+  25% {
+    transform: translate(10px, -15px);
+  }
+  50% {
+    transform: translate(-8px, -30px);
+  }
+  75% {
+    transform: translate(-15px, -15px);
+  }
+}
+
 /* Aurora text gradient sweep */
 @keyframes aurora {
   0%,

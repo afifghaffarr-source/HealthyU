@@ -4,6 +4,8 @@ import { BlurFade } from "@/components/magicui/blur-fade";
 import { ShineBorder } from "@/components/magicui/shine-border";
 import { AuroraText } from "@/components/magicui/aurora-text";
 import { FEATURES, STEPS, MARQUEE_CITIES } from "./landingData";
+import { useState, useRef, useEffect as React_useEffect, type MouseEvent } from "react";
+import * as React from "react";
 
 export function TrustMarquee() {
   return (
@@ -99,98 +101,167 @@ export function FeaturesBento() {
       </div>
       <div className="max-w-5xl mx-auto grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {FEATURES.map(({ icon: Icon, title, desc, foodImage }, i) => (
-          <BlurFade
+          <FeatureCard
             key={title}
-            delay={i * 0.06}
-            className={i === 0 ? "sm:col-span-2 lg:col-span-1" : ""}
-          >
-            <div className="group relative bg-gradient-to-br from-[#1a1a1c] via-[#1a1a1c] to-primary/[0.03] rounded-xl min-h-[240px] flex flex-col justify-end overflow-hidden hover:-translate-y-1 transition-transform duration-300 hover:shadow-[0_0_0_1px_var(--primary-glow),0_12px_40px_rgba(0,0,0,0.4)]">
-              {/* Subtle gradient mesh overlay */}
-              <div
-                aria-hidden
-                className="pointer-events-none absolute bottom-0 right-0 w-[200px] h-[200px] bg-[radial-gradient(circle_at_100%_100%,rgba(16,185,129,0.08),transparent_70%)] opacity-60"
-              />
-
-              <ShineBorder
-                shineColor={["var(--primary-glow)", "var(--primary)"]}
-                className="opacity-0 group-hover:opacity-100 transition-opacity"
-              />
-              {i === 0 ? (
-                <>
-                  {/* 2x2 food photo grid with calorie badges */}
-                  <div className="grid grid-cols-2 gap-1.5 mb-3 relative z-10">
-                    {[
-                      { src: "/images/recipes/gado-gado-sehat.png", label: "Gado-gado · 320 kal" },
-                      {
-                        src: "/images/recipes/soto-ayam-rendah-lemak.png",
-                        label: "Soto ayam · 280 kal",
-                      },
-                      {
-                        src: "/images/recipes/nasi-goreng-kacang-merah-sehat.png",
-                        label: "Nasi goreng · 450 kal",
-                      },
-                      {
-                        src: "/images/recipes/smoothie-mangga-kelapa-sehat.png",
-                        label: "Smoothie · 190 kal",
-                      },
-                    ].map((food) => (
-                      <div
-                        key={food.src}
-                        className="relative aspect-square rounded-lg overflow-hidden bg-white/5"
-                      >
-                        <img
-                          src={food.src}
-                          alt={food.label}
-                          loading="lazy"
-                          className="absolute inset-0 size-full object-cover"
-                        />
-                        <span className="absolute bottom-0 left-0 right-0 bg-black/70 backdrop-blur-sm text-white text-[10px] font-medium px-1.5 py-0.5 truncate">
-                          {food.label}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                  <h3
-                    className="font-semibold text-lg text-white mb-1.5 relative z-10"
-                    style={{ fontFamily: "var(--font-display)" }}
-                  >
-                    {title}
-                  </h3>
-                  <p className="text-sm text-white/50 leading-relaxed relative z-10">{desc}</p>
-                </>
-              ) : (
-                <>
-                  {foodImage && (
-                    <div className="absolute top-3 right-3 w-20 h-20 rounded-xl overflow-hidden shadow-[0_8px_32px_rgba(0,0,0,0.3)] z-10">
-                      <img
-                        src={foodImage}
-                        alt=""
-                        loading="lazy"
-                        className="size-full object-cover"
-                      />
-                    </div>
-                  )}
-                  <div className="size-11 rounded-xl bg-gradient-to-br from-primary/15 to-primary/5 border border-primary/20 grid place-items-center mb-auto text-primary-glow relative z-10">
-                    <Icon className="size-5" />
-                  </div>
-                  <h3
-                    className="font-semibold text-lg text-white mt-4 mb-1.5 relative z-10"
-                    style={{ fontFamily: "var(--font-display)" }}
-                  >
-                    {title}
-                  </h3>
-                  <p className="text-sm text-white/50 leading-relaxed relative z-10">{desc}</p>
-                </>
-              )}
-            </div>
-          </BlurFade>
+            icon={Icon}
+            title={title}
+            desc={desc}
+            foodImage={foodImage}
+            index={i}
+          />
         ))}
       </div>
     </section>
   );
 }
 
+function FeatureCard({
+  icon: Icon,
+  title,
+  desc,
+  foodImage,
+  index,
+}: {
+  icon: React.ComponentType<{ className?: string }>;
+  title: string;
+  desc: string;
+  foodImage?: string;
+  index: number;
+}) {
+  const [tilt, setTilt] = useState({ rotateX: 0, rotateY: 0 });
+  const cardRef = useRef<HTMLDivElement>(null);
+
+  const handleMouseMove = (e: MouseEvent<HTMLDivElement>) => {
+    if (!cardRef.current) return;
+    const card = cardRef.current;
+    const rect = card.getBoundingClientRect();
+    const centerX = rect.left + rect.width / 2;
+    const centerY = rect.top + rect.height / 2;
+    const mouseX = e.clientX;
+    const mouseY = e.clientY;
+
+    // Calculate tilt (max 15deg as per spec)
+    const rotateY = ((mouseX - centerX) / (rect.width / 2)) * 12;
+    const rotateX = -((mouseY - centerY) / (rect.height / 2)) * 12;
+
+    setTilt({ rotateX, rotateY });
+  };
+
+  const handleMouseLeave = () => {
+    setTilt({ rotateX: 0, rotateY: 0 });
+  };
+
+  return (
+    <BlurFade delay={index * 0.06} className={index === 0 ? "sm:col-span-2 lg:col-span-1" : ""}>
+      <div
+        ref={cardRef}
+        onMouseMove={handleMouseMove}
+        onMouseLeave={handleMouseLeave}
+        className="group relative bg-gradient-to-br from-[#1a1a1c] via-[#1a1a1c] to-primary/[0.03] rounded-xl min-h-[240px] flex flex-col justify-end overflow-hidden hover:shadow-[0_0_0_1px_var(--primary-glow),0_12px_40px_rgba(0,0,0,0.4)]"
+        style={{
+          transform: `perspective(1000px) rotateX(${tilt.rotateX}deg) rotateY(${tilt.rotateY}deg)`,
+          transition: "transform 0.3s cubic-bezier(0.23, 1, 0.32, 1), box-shadow 0.3s",
+        }}
+      >
+        {/* Subtle gradient mesh overlay */}
+        <div
+          aria-hidden
+          className="pointer-events-none absolute bottom-0 right-0 w-[200px] h-[200px] bg-[radial-gradient(circle_at_100%_100%,rgba(16,185,129,0.08),transparent_70%)] opacity-60"
+        />
+
+        <ShineBorder
+          shineColor={["var(--primary-glow)", "var(--primary)"]}
+          className="opacity-0 group-hover:opacity-100 transition-opacity"
+        />
+        {index === 0 ? (
+          <>
+            {/* 2x2 food photo grid with calorie badges */}
+            <div className="grid grid-cols-2 gap-1.5 mb-3 relative z-10">
+              {[
+                { src: "/images/recipes/gado-gado-sehat.png", label: "Gado-gado · 320 kal" },
+                {
+                  src: "/images/recipes/soto-ayam-rendah-lemak.png",
+                  label: "Soto ayam · 280 kal",
+                },
+                {
+                  src: "/images/recipes/nasi-goreng-kacang-merah-sehat.png",
+                  label: "Nasi goreng · 450 kal",
+                },
+                {
+                  src: "/images/recipes/smoothie-mangga-kelapa-sehat.png",
+                  label: "Smoothie · 190 kal",
+                },
+              ].map((food) => (
+                <div
+                  key={food.src}
+                  className="relative aspect-square rounded-lg overflow-hidden bg-white/5"
+                >
+                  <img
+                    src={food.src}
+                    alt={food.label}
+                    loading="lazy"
+                    className="absolute inset-0 size-full object-cover"
+                  />
+                  <span className="absolute bottom-0 left-0 right-0 bg-black/70 backdrop-blur-sm text-white text-[10px] font-medium px-1.5 py-0.5 truncate">
+                    {food.label}
+                  </span>
+                </div>
+              ))}
+            </div>
+            <h3
+              className="font-semibold text-lg text-white mb-1.5 relative z-10"
+              style={{ fontFamily: "var(--font-display)" }}
+            >
+              {title}
+            </h3>
+            <p className="text-sm text-white/50 leading-relaxed relative z-10">{desc}</p>
+          </>
+        ) : (
+          <>
+            {foodImage && (
+              <div className="absolute top-3 right-3 w-20 h-20 rounded-xl overflow-hidden shadow-[0_8px_32px_rgba(0,0,0,0.3)] z-10">
+                <img src={foodImage} alt="" loading="lazy" className="size-full object-cover" />
+              </div>
+            )}
+            <div className="size-11 rounded-xl bg-gradient-to-br from-primary/15 to-primary/5 border border-primary/20 grid place-items-center mb-auto text-primary-glow relative z-10">
+              <Icon className="size-5" />
+            </div>
+            <h3
+              className="font-semibold text-lg text-white mt-4 mb-1.5 relative z-10"
+              style={{ fontFamily: "var(--font-display)" }}
+            >
+              {title}
+            </h3>
+            <p className="text-sm text-white/50 leading-relaxed relative z-10">{desc}</p>
+          </>
+        )}
+      </div>
+    </BlurFade>
+  );
+}
+
 export function HowItWorks() {
+  const [scrollY, setScrollY] = useState(0);
+  const sectionRef = useRef<HTMLDivElement>(null);
+
+  // Scroll-triggered parallax effect
+  React.useEffect(() => {
+    const handleScroll = () => {
+      if (!sectionRef.current) return;
+      const rect = sectionRef.current.getBoundingClientRect();
+      const sectionTop = rect.top;
+      const windowHeight = window.innerHeight;
+
+      // Only calculate when section is in viewport
+      if (sectionTop < windowHeight && sectionTop > -rect.height) {
+        setScrollY(window.scrollY);
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
   const stepMockups = [
     {
       gradient: "from-emerald-500/20 to-teal-500/10",
@@ -278,7 +349,7 @@ export function HowItWorks() {
   ];
 
   return (
-    <section id="cara" className="bg-[#f5f5f7] py-24 md:py-32 px-5">
+    <section id="cara" className="bg-[#f5f5f7] py-24 md:py-32 px-5" ref={sectionRef}>
       <div className="max-w-5xl mx-auto">
         <div className="text-center mb-14">
           <BlurFade>
@@ -296,35 +367,42 @@ export function HowItWorks() {
           </BlurFade>
         </div>
         <div className="grid md:grid-cols-3 gap-10">
-          {STEPS.map(({ n, title, desc }, i) => (
-            <BlurFade key={n} delay={i * 0.12} className="text-center">
-              {/* CSS Phone Mockup */}
-              <div className="mb-6 flex justify-center">
+          {STEPS.map(({ n, title, desc }, i) => {
+            // Parallax: each card moves at different speed
+            const parallaxOffset = (scrollY * 0.015 * (i + 1)) % 20;
+            return (
+              <BlurFade key={n} delay={i * 0.12} className="text-center">
+                {/* CSS Phone Mockup with parallax */}
                 <div
-                  className="w-[140px] aspect-[9/19] rounded-[1.5rem] border-2 border-gray-300 bg-white shadow-[0_8px_32px_rgba(0,0,0,0.08)] overflow-hidden relative"
-                  aria-hidden="true"
+                  className="mb-6 flex justify-center transition-transform duration-100"
+                  style={{ transform: `translateY(${parallaxOffset}px)` }}
                 >
                   <div
-                    className={`absolute inset-0 bg-gradient-to-br ${stepMockups[i].gradient}`}
-                  />
-                  {stepMockups[i].elements}
+                    className="w-[140px] aspect-[9/19] rounded-[1.5rem] border-2 border-gray-300 bg-white shadow-[0_8px_32px_rgba(0,0,0,0.08)] overflow-hidden relative"
+                    aria-hidden="true"
+                  >
+                    <div
+                      className={`absolute inset-0 bg-gradient-to-br ${stepMockups[i].gradient}`}
+                    />
+                    {stepMockups[i].elements}
+                  </div>
                 </div>
-              </div>
-              <div
-                className="text-5xl font-light text-primary mb-4"
-                style={{ fontFamily: "var(--font-mono)" }}
-              >
-                {n}
-              </div>
-              <h3
-                className="font-semibold text-xl text-foreground mb-2"
-                style={{ fontFamily: "var(--font-display)" }}
-              >
-                {title}
-              </h3>
-              <p className="text-muted-foreground text-base">{desc}</p>
-            </BlurFade>
-          ))}
+                <div
+                  className="text-5xl font-light text-primary mb-4"
+                  style={{ fontFamily: "var(--font-mono)" }}
+                >
+                  {n}
+                </div>
+                <h3
+                  className="font-semibold text-xl text-foreground mb-2"
+                  style={{ fontFamily: "var(--font-display)" }}
+                >
+                  {title}
+                </h3>
+                <p className="text-muted-foreground text-base">{desc}</p>
+              </BlurFade>
+            );
+          })}
         </div>
       </div>
     </section>
