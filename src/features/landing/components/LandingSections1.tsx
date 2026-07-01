@@ -35,9 +35,19 @@ export function StatsStrip() {
     { n: 24, s: "/7", l: "HealthyU AI Coach siap", i: MessageCircle },
   ];
   return (
-    <section className="max-w-5xl mx-auto px-5 md:px-8 py-20 grid grid-cols-2 md:grid-cols-4 gap-8">
+    <section className="relative max-w-5xl mx-auto px-5 md:px-8 py-24 grid grid-cols-2 md:grid-cols-4 gap-8 overflow-hidden">
+      {/* Decorative gradient mesh backgrounds */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute top-0 left-0 w-[400px] h-[400px] bg-[radial-gradient(circle_at_30%_30%,rgba(16,185,129,0.08),transparent_70%)]"
+      />
+      <div
+        aria-hidden
+        className="pointer-events-none absolute bottom-0 right-0 w-[350px] h-[350px] bg-[radial-gradient(circle_at_70%_70%,rgba(16,185,129,0.06),transparent_70%)]"
+      />
+
       {items.map(({ n, s, l, i: Icon }, idx) => (
-        <BlurFade key={l} delay={idx * 0.08} className="text-center">
+        <BlurFade key={l} delay={idx * 0.08} className="text-center relative z-10">
           <Icon className="size-6 text-primary mx-auto mb-3" />
           <p
             className="text-4xl md:text-5xl font-semibold tracking-tight text-foreground"
@@ -94,7 +104,13 @@ export function FeaturesBento() {
             delay={i * 0.06}
             className={i === 0 ? "sm:col-span-2 lg:col-span-1" : ""}
           >
-            <div className="group relative bg-[#1a1a1c] rounded-xl min-h-[240px] flex flex-col justify-end overflow-hidden hover:-translate-y-1 transition-transform duration-300 hover:shadow-[0_0_0_1px_var(--primary-glow),0_12px_40px_rgba(0,0,0,0.4)]">
+            <div className="group relative bg-gradient-to-br from-[#1a1a1c] via-[#1a1a1c] to-primary/[0.03] rounded-xl min-h-[240px] flex flex-col justify-end overflow-hidden hover:-translate-y-1 transition-transform duration-300 hover:shadow-[0_0_0_1px_var(--primary-glow),0_12px_40px_rgba(0,0,0,0.4)]">
+              {/* Subtle gradient mesh overlay */}
+              <div
+                aria-hidden
+                className="pointer-events-none absolute bottom-0 right-0 w-[200px] h-[200px] bg-[radial-gradient(circle_at_100%_100%,rgba(16,185,129,0.08),transparent_70%)] opacity-60"
+              />
+
               <ShineBorder
                 shineColor={["var(--primary-glow)", "var(--primary)"]}
                 className="opacity-0 group-hover:opacity-100 transition-opacity"
@@ -102,7 +118,7 @@ export function FeaturesBento() {
               {i === 0 ? (
                 <>
                   {/* 2x2 food photo grid with calorie badges */}
-                  <div className="grid grid-cols-2 gap-1.5 mb-3">
+                  <div className="grid grid-cols-2 gap-1.5 mb-3 relative z-10">
                     {[
                       { src: "/images/recipes/gado-gado-sehat.png", label: "Gado-gado · 320 kal" },
                       {
@@ -135,17 +151,17 @@ export function FeaturesBento() {
                     ))}
                   </div>
                   <h3
-                    className="font-semibold text-lg text-white mb-1.5"
+                    className="font-semibold text-lg text-white mb-1.5 relative z-10"
                     style={{ fontFamily: "var(--font-display)" }}
                   >
                     {title}
                   </h3>
-                  <p className="text-sm text-white/50 leading-relaxed">{desc}</p>
+                  <p className="text-sm text-white/50 leading-relaxed relative z-10">{desc}</p>
                 </>
               ) : (
                 <>
                   {foodImage && (
-                    <div className="absolute top-3 right-3 w-20 h-20 rounded-xl overflow-hidden shadow-[0_8px_32px_rgba(0,0,0,0.3)]">
+                    <div className="absolute top-3 right-3 w-20 h-20 rounded-xl overflow-hidden shadow-[0_8px_32px_rgba(0,0,0,0.3)] z-10">
                       <img
                         src={foodImage}
                         alt=""
@@ -154,16 +170,16 @@ export function FeaturesBento() {
                       />
                     </div>
                   )}
-                  <div className="size-11 rounded-xl bg-gradient-to-br from-primary/15 to-primary/5 border border-primary/20 grid place-items-center mb-auto text-primary-glow">
+                  <div className="size-11 rounded-xl bg-gradient-to-br from-primary/15 to-primary/5 border border-primary/20 grid place-items-center mb-auto text-primary-glow relative z-10">
                     <Icon className="size-5" />
                   </div>
                   <h3
-                    className="font-semibold text-lg text-white mt-4 mb-1.5"
+                    className="font-semibold text-lg text-white mt-4 mb-1.5 relative z-10"
                     style={{ fontFamily: "var(--font-display)" }}
                   >
                     {title}
                   </h3>
-                  <p className="text-sm text-white/50 leading-relaxed">{desc}</p>
+                  <p className="text-sm text-white/50 leading-relaxed relative z-10">{desc}</p>
                 </>
               )}
             </div>

@@ -20,6 +20,46 @@ export function LandingHero({
         className="absolute top-[15%] left-1/2 -translate-x-1/2 w-[600px] h-[600px] rounded-full bg-primary/20 blur-3xl pointer-events-none animate-blob"
       />
 
+      {/* Floating badges - scattered around hero text */}
+      <div
+        aria-hidden
+        className="hidden lg:block absolute left-[8%] top-[28%] pointer-events-none z-20 animate-float"
+        style={{ animationDelay: "0s" }}
+      >
+        <div className="rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 px-4 py-2.5 text-sm font-medium text-white shadow-[0_8px_32px_rgba(0,0,0,0.12)] flex items-center gap-2">
+          <Flame className="size-4 text-amber-400" />
+          <span>12 hari streak</span>
+        </div>
+      </div>
+
+      <div
+        aria-hidden
+        className="hidden lg:block absolute left-[6%] top-[58%] pointer-events-none z-20 animate-float"
+        style={{ animationDelay: "0.8s" }}
+      >
+        <div className="rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 px-4 py-2.5 text-sm font-medium text-white shadow-[0_8px_32px_rgba(0,0,0,0.12)]">
+          <div className="flex items-center gap-2 mb-1">
+            <span className="text-primary-glow">✓</span>
+            <span className="text-xs text-white/80">Target harian</span>
+          </div>
+          <div className="text-base font-semibold">1,420 / 2,100 kal</div>
+          <div className="mt-1.5 h-1.5 bg-white/20 rounded-full overflow-hidden">
+            <div className="h-full bg-primary-glow rounded-full" style={{ width: "68%" }} />
+          </div>
+        </div>
+      </div>
+
+      <div
+        aria-hidden
+        className="hidden lg:block absolute left-[10%] top-[75%] pointer-events-none z-20 animate-float"
+        style={{ animationDelay: "0.4s" }}
+      >
+        <div className="rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 px-4 py-2.5 text-sm font-medium text-white shadow-[0_8px_32px_rgba(0,0,0,0.12)] flex items-center gap-2">
+          <Star className="size-4 text-amber-400 fill-amber-400" />
+          <span>Level 8</span>
+        </div>
+      </div>
+
       <div className="relative z-10 max-w-3xl mx-auto space-y-6">
         <BlurFade duration={0.5}>
           <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-white/5 border border-white/10 text-xs font-medium text-white/80">
