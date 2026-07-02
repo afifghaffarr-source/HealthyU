@@ -37,11 +37,12 @@ function readVexoBaseUrl(): string {
 //   - google/gemma-4-31b-it:free       (31B)
 const MODEL_TO_VEXO_MODEL: Record<string, string> = {
   // Original Gemini-style identifiers used by callers
-  "google/gemini-2.5-flash": "openai/gpt-oss-120b:free",
+  "google/gemini-2.5-flash": "llama-3.3-70b-versatile",
   "google/gemini-2.5-flash-lite": "llama-3.1-8b-instant",
   "google/gemini-2.5-pro": "qwen/qwen3-32b",
-  "google/gemini-3-flash-preview": "openai/gpt-oss-120b:free",
+  "google/gemini-3-flash-preview": "llama-3.3-70b-versatile",
   // New direct names
+  "llama-3.3-70b-versatile": "llama-3.3-70b-versatile",
   "openai/gpt-oss-120b:free": "openai/gpt-oss-120b:free",
   "llama-3.1-8b-instant": "llama-3.1-8b-instant",
   "qwen/qwen3-32b": "qwen/qwen3-32b",
@@ -50,7 +51,7 @@ const MODEL_TO_VEXO_MODEL: Record<string, string> = {
   // Legacy short names (back-compat)
   gptoss120b: "openai/gpt-oss-120b:free",
   glm47flash: "llama-3.1-8b-instant",
-  gemini: "openai/gpt-oss-120b:free",
+  gemini: "llama-3.3-70b-versatile",
 };
 
 export function resolveVexoEndpoint(model: string): string {

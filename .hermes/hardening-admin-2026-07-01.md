@@ -22,12 +22,13 @@
 **Expected:** Drawer with edit form (like promo/banners/experiments)  
 **Impact:** Config editing via admin UI completely broken
 
-### Bug 2: Translation Editor drawer no-op
+### Bug 2: Translation Editor — NOT A BUG (two-column by design)
 
 **Page:** `/admin/i18n`  
-**Symptom:** Click any translation key row → no drawer opens  
-**Expected:** Drawer with ID/EN textareas (like notifications)  
-**Impact:** i18n editing via admin UI completely broken
+**Symptom:** Click translation key → appears to do nothing  
+**Actual:** Updates `selected` state, shows EditPanel in right column (line 170-183)  
+**Design:** Two-column layout (list left, edit panel right), NOT drawer overlay  
+**Impact:** None — working as designed
 
 ## What Worked
 

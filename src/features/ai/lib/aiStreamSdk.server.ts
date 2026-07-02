@@ -121,7 +121,7 @@ export async function streamChatWithSdk(opts: StreamChatSdkOptions): Promise<{
   let streamResult: Awaited<ReturnType<typeof streamText>>;
   try {
     streamResult = streamText({
-      model: vexoModel(opts.model ?? "google/gemini-2.5-flash"),
+      model: vexoModel(opts.model ?? "llama-3.3-70b-versatile"),
       system: prompt.system,
       messages: prompt.messages,
       maxTokens: opts.maxTokens ?? 1024,
