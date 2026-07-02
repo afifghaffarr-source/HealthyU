@@ -190,6 +190,7 @@ function ConfigAdminPage() {
 
       {editing && (
         <EditDrawer
+          key={editing.key}
           row={editing}
           onClose={() => setEditing(null)}
           onSave={(value) =>
