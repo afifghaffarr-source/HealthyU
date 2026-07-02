@@ -15,12 +15,15 @@
 
 ## Bugs Found
 
-### Bug 1: App Config drawer no-op
+### Bug 1: App Config drawer no-op ✅ FIXED
 
 **Page:** `/admin/config`  
 **Symptom:** Click any config item card → no drawer opens  
 **Expected:** Drawer with edit form (like promo/banners/experiments)  
-**Impact:** Config editing via admin UI completely broken
+**Root cause:** React state update without component remount → stale hooks registration  
+**Fix:** Added `key={editing.key}` to force remount (commit 95952e0, 2026-07-02)  
+**Status:** Fixed, pending deploy verification  
+**Impact:** Config editing via admin UI completely broken → now fixed
 
 ### Bug 2: Translation Editor — NOT A BUG (two-column by design)
 
