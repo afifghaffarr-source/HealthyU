@@ -37,10 +37,10 @@ function readVexoBaseUrl(): string {
 //   - google/gemma-4-31b-it:free       (31B)
 const MODEL_TO_VEXO_MODEL: Record<string, string> = {
   // Original Gemini-style identifiers used by callers
-  "google/gemini-2.5-flash": "llama-3.3-70b-versatile",
+  "google/gemini-2.5-flash": "openai/gpt-oss-120b:free",
   "google/gemini-2.5-flash-lite": "llama-3.1-8b-instant",
   "google/gemini-2.5-pro": "qwen/qwen3-32b",
-  "google/gemini-3-flash-preview": "llama-3.3-70b-versatile",
+  "google/gemini-3-flash-preview": "openai/gpt-oss-120b:free",
   // New direct names
   "llama-3.3-70b-versatile": "llama-3.3-70b-versatile",
   "openai/gpt-oss-120b:free": "openai/gpt-oss-120b:free",
