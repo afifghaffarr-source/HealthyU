@@ -20,6 +20,7 @@ import {
 import { MobileNav } from "@/features/landing/components/MobileNav";
 import { LandingHero } from "@/features/landing/components/LandingHero";
 import { useExperimentVariant, useExperimentConversion } from "@/hooks/use-experiments";
+import { markFirstAction } from "@/lib/first-action";
 
 // PERF (Fase 5 sub-PR 2): lazy-load below-fold landing sections so the
 // home page initial JS payload is ~30-40% smaller. Each section is a
@@ -148,7 +149,16 @@ function Index() {
   }, []);
 
   useEffect(() => {
-    const onScroll = () => setShowStickyCta(window.scrollY > 600);
+    let firstActionMarked = false;
+    const onScroll = () => {
+      setShowStickyCta(window.scrollY > 600);
+      // Mark first action when user scrolls past 50% of viewport height
+      // (shows engagement with content → eligible for PWA install prompt)
+      if (!firstActionMarked && window.scrollY > window.innerHeight * 0.5) {
+        markFirstAction();
+        firstActionMarked = true;
+      }
+    };
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
@@ -184,6 +194,7 @@ function Index() {
   const onHeroCtaClick = () => {
     trackHeroCta();
     fireConfetti();
+    markFirstAction(); // User klik CTA = first action (strong engagement signal)
   };
 
   return (
