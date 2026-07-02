@@ -23,6 +23,7 @@ import type { AiMultimodalMessage } from "./aiGateway.server";
 import { AiGatewayError } from "./aiGateway.server";
 import { enforceAiBudget } from "./aiBudget.server";
 import { logServerError } from "@/lib/logger.server";
+import { readPublicConfig } from "@/features/admin/lib/adminConfig.functions";
 
 export { AiGatewayError };
 
@@ -99,12 +100,13 @@ export async function streamChatWithSdk(opts: StreamChatSdkOptions): Promise<{
     try {
       const decision = await enforceAiBudget(opts.userId, !!opts.isPremium);
       if (!decision.allowed) {
-        throw new AiGatewayError(
+        const msg =
           decision.reason === "rate_hour"
             ? "Batas AI per jam tercapai. Coba lagi nanti."
-            : "Batas AI harian tercapai. Coba lagi besok.",
-          429,
-        );
+            : decision.reason === "rate_day"
+              ? "Batas pesan AI harian tercapai. Coba lagi besok."
+              : "Batas token AI harian tercapai. Coba lagi besok.";
+        throw new AiGatewayError(msg, 429);
       }
     } catch (e) {
       if (e instanceof AiGatewayError) throw e;
@@ -117,6 +119,12 @@ export async function streamChatWithSdk(opts: StreamChatSdkOptions): Promise<{
 
   const prompt = toPrompt(opts.messages);
 
+  // ─── Read max tokens from config ────────────────────────────────────────
+  const maxTokensConfigRaw = await readPublicConfig({
+    data: { key: "ai.max_tokens_per_request", defaultValue: 1024 },
+  });
+  const maxTokensFromConfig = typeof maxTokensConfigRaw === "number" ? maxTokensConfigRaw : 1024;
+
   // ─── Stream from AI SDK ────────────────────────────────────────────────
   let streamResult: Awaited<ReturnType<typeof streamText>>;
   try {
@@ -124,7 +132,7 @@ export async function streamChatWithSdk(opts: StreamChatSdkOptions): Promise<{
       model: vexoModel(opts.model ?? "openai/gpt-oss-120b:free"),
       system: prompt.system,
       messages: prompt.messages,
-      maxTokens: opts.maxTokens ?? 1024,
+      maxTokens: opts.maxTokens ?? maxTokensFromConfig,
       abortSignal: opts.signal ?? AbortSignal.timeout(opts.timeoutMs ?? 60_000),
       temperature: 0.3,
     });

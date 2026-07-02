@@ -101,12 +101,13 @@ export async function callAiStructured<S extends ZodTypeAny>(
     try {
       const decision = await enforceAiBudget(opts.userId, !!opts.isPremium);
       if (!decision.allowed) {
-        throw new AiGatewayError(
+        const msg =
           decision.reason === "rate_hour"
             ? "Batas AI per jam tercapai. Coba lagi nanti."
-            : "Batas AI harian tercapai. Coba lagi besok.",
-          429,
-        );
+            : decision.reason === "rate_day"
+              ? "Batas pesan AI harian tercapai. Coba lagi besok."
+              : "Batas token AI harian tercapai. Coba lagi besok.";
+        throw new AiGatewayError(msg, 429);
       }
     } catch (e) {
       if (e instanceof AiGatewayError) throw e;
