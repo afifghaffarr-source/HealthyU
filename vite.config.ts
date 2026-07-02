@@ -121,9 +121,8 @@ export default defineConfig({
         lang: "id-ID",
         dir: "ltr",
         // start_url: where the PWA opens after install.
-        // Use /resep (the public hub) so anon users don't get bounced to /auth.
-        // Authenticated users can navigate to /dashboard from the top nav.
-        start_url: "/resep",
+        // Opens to landing page - auth redirects handle logged-in users.
+        start_url: "/",
         scope: "/",
         display: "standalone",
         background_color: "#FBF8F1",

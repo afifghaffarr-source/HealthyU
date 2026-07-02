@@ -6,7 +6,7 @@
   "lang": "id-ID",
   "dir": "ltr",
   "categories": ["health", "fitness", "lifestyle", "medical"],
-  "start_url": "/dashboard",
+  "start_url": "/",
   "scope": "/",
   "display": "standalone",
   "background_color": "#FBF8F1",
