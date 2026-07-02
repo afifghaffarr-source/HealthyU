@@ -56,7 +56,10 @@ export function NumberTicker({
 
   return (
     <span ref={ref} className={cn("inline-block tabular-nums", className)} {...props}>
-      {startValue}
+      {Intl.NumberFormat("id-ID", {
+        minimumFractionDigits: decimalPlaces,
+        maximumFractionDigits: decimalPlaces,
+      }).format(startValue)}
       {suffix}
     </span>
   );
